@@ -17,11 +17,15 @@ const scriptOptions = new Set(["-e", "-f", "-E", "--expression", "--file"]);
 const directoryOptions = new Set(["-t", "--target-directory"]);
 
 const gitDenial = (path) =>
-  `${path} is inside .git or is a verification marker. Hooks, config and markers there would bypass the guards, so only git and pnpm verify write them.`;
+  `${path} is inside .git, a verification marker or the local Claude settings. Hooks, config, markers and local permissions there would bypass the guards, so only git and pnpm verify write them. settings.local.json is the owner's file.`;
 
 function gitInternals(real) {
   const segments = real.toLowerCase().split(sep);
-  return segments.includes(".git") || segments.at(-1) === "heat-verified";
+  return (
+    segments.includes(".git") ||
+    segments.at(-1) === "heat-verified" ||
+    (segments.at(-1) === "settings.local.json" && segments.at(-2) === ".claude")
+  );
 }
 
 const migrationDenial = (path) =>

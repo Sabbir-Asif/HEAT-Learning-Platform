@@ -145,6 +145,10 @@ describe("permissions.deny for environment files", () => {
     }
   });
 
+  test("the local settings file cannot be edited", () => {
+    expect(pathRules("Edit")).toContain("**/.claude/settings.local.json");
+  });
+
   test("Write is covered through Edit, as the permission syntax defines", () => {
     expect(pathRules("Write")).toEqual([]);
     expect(pathRules("Edit").length).toBeGreaterThan(0);

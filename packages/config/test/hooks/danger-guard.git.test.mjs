@@ -52,6 +52,23 @@ describe("file tools", () => {
   });
 });
 
+describe("local settings", () => {
+  test("Write, Edit and shell writes to .claude/settings.local.json are denied", () => {
+    const local = join(tree, ".claude/settings.local.json");
+    for (const tool of ["Write", "Edit", "MultiEdit"]) {
+      expect(file(tool, local).deny, tool).toMatch(/settings\.local\.json/);
+    }
+    expect(bash("echo '{}' > .claude/settings.local.json").deny).toMatch(/settings\.local\.json/);
+    expect(bash("cp x .claude/settings.local.json").deny).toMatch(/settings\.local\.json/);
+  });
+
+  test("the checked-in settings file and reads of the local one are not touched here", () => {
+    expect(file("Write", join(tree, ".claude/settings.json"))).toEqual({});
+    expect(file("Read", join(tree, ".claude/settings.local.json"))).toEqual({});
+    expect(bash("cat .claude/settings.local.json")).toEqual({});
+  });
+});
+
 describe("shell writes", () => {
   test.each([
     "echo x > .git/hooks/pre-commit",

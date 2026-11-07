@@ -11,6 +11,7 @@
       "Edit(!.env.example)",
       "Edit(*.env)",
       "Edit(.envrc)",
+      "Edit(**/.claude/settings.local.json)",
       "Bash(git push --force*)",
       "Bash(git push -f*)",
       "Bash(prisma migrate reset*)",

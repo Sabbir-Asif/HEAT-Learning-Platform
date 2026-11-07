@@ -9,3 +9,8 @@
 /packages/config/bin/hook.mjs @Sabbir-Asif
 /packages/config/bin/verify.mjs @Sabbir-Asif
 /packages/config/src/verify.mjs @Sabbir-Asif
+/packages/config/src/ticket.mjs @Sabbir-Asif
+/packages/config/bin/ticket.mjs @Sabbir-Asif
+/.claude/skills/ @Sabbir-Asif
+/.claude/agents/ @Sabbir-Asif
+CLAUDE.md @Sabbir-Asif
