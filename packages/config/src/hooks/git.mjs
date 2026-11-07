@@ -4,6 +4,7 @@ import { dirname } from "node:path";
 import { resolveReal } from "./paths.mjs";
 
 const gitTimeout = 10000;
+const gitMaxBuffer = 512 * 1024 * 1024;
 const ticketBranch = /^(?:feat|fix|chore|docs|spike)\/(\d+)-/;
 
 function cleanEnv() {
@@ -22,6 +23,7 @@ export function git(cwd, args) {
       env: cleanEnv(),
       stdio: ["ignore", "pipe", "ignore"],
       timeout: gitTimeout,
+      maxBuffer: gitMaxBuffer,
     }).trim();
   } catch {
     return null;
@@ -74,18 +76,24 @@ export function worktreeFor(cwd, branch) {
   return worktreesOf(cwd).find((tree) => tree.branch === branch)?.path ?? null;
 }
 
-export function existsInBase(top, relativePath) {
-  const refs = git(top, [
+export function existsInBase(top, relativePath, run = git) {
+  const refs = run(top, [
     "for-each-ref",
     "--format=%(refname)",
     "refs/remotes/origin/main",
     "refs/remotes/origin/epic",
   ]);
+  if (refs === null) return true;
   const wanted = relativePath.toLowerCase().replace(/\/+$/, "");
-  return (refs ? refs.split("\n") : []).some((ref) =>
-    (git(top, ["ls-tree", "-r", "--name-only", ref]) ?? "").split("\n").some((name) => {
-      const lower = name.toLowerCase();
-      return lower === wanted || lower.startsWith(`${wanted}/`);
-    }),
-  );
+  return refs
+    .split("\n")
+    .filter(Boolean)
+    .some((ref) => {
+      const listing = run(top, ["ls-tree", "-r", "--name-only", ref]);
+      if (listing === null) return true;
+      return listing.split("\n").some((name) => {
+        const lower = name.toLowerCase();
+        return lower === wanted || lower.startsWith(`${wanted}/`);
+      });
+    });
 }

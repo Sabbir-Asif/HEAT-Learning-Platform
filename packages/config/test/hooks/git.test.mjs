@@ -1,5 +1,13 @@
+import { spawnSync } from "node:child_process";
 import { afterAll, expect, test } from "vitest";
-import { branchOf, existsInBase, repoOf, ticketNumber, worktreeFor } from "../../src/hooks/git.mjs";
+import {
+  branchOf,
+  existsInBase,
+  git as run,
+  repoOf,
+  ticketNumber,
+  worktreeFor,
+} from "../../src/hooks/git.mjs";
 import {
   addOrigin,
   addWorktree,
@@ -72,4 +80,50 @@ test("existsInBase sees files and directories present in origin/main or origin/e
 
 test("existsInBase is false without an origin", () => {
   expect(existsInBase(makeRepo(), "README.md")).toBe(false);
+});
+
+function importTree(repo, ref, paths) {
+  const lines = [
+    "commit " + ref,
+    "committer t <t@example.com> 1700000000 +0000",
+    "data 5",
+    "bulk",
+    "",
+  ];
+  for (const path of paths) lines.push(`M 100644 inline ${path}`, "data 2", "x", "");
+  const result = spawnSync("git", ["fast-import", "--quiet"], {
+    cwd: repo,
+    input: lines.join("\n"),
+    encoding: "utf8",
+  });
+  if (result.status !== 0) throw new Error(result.stderr);
+}
+
+test("existsInBase still finds a migration when the base tree is far larger than a pipe buffer", () => {
+  const repo = makeRepo();
+  const migration = "apps/api/prisma/migrations/001_init/migration.sql";
+  const paths = Array.from(
+    { length: 40000 },
+    (_, index) =>
+      `packages/generated/modules/group-${index % 200}/component-with-a-long-name-${index}.ts`,
+  );
+  importTree(repo, "refs/remotes/origin/main", [...paths, migration]);
+  const listing = spawnSync("git", ["ls-tree", "-r", "--name-only", "refs/remotes/origin/main"], {
+    cwd: repo,
+    encoding: "utf8",
+    maxBuffer: 64 * 1024 * 1024,
+  });
+  expect(listing.stdout.length).toBeGreaterThan(2 * 1024 * 1024);
+  expect(existsInBase(repo, migration)).toBe(true);
+  expect(existsInBase(repo, "apps/api/prisma/migrations/002_new/migration.sql")).toBe(false);
+  expect(existsInBase(repo, "APPS/API/PRISMA/MIGRATIONS/001_INIT")).toBe(true);
+}, 60000);
+
+test("existsInBase fails closed when git cannot list the base", () => {
+  const repo = makeRepo();
+  addOrigin(repo, ["main"]);
+  const broken = (top, args) => (args[0] === "ls-tree" ? null : run(top, args));
+  expect(existsInBase(repo, "apps/api/prisma/migrations/002_new/migration.sql", broken)).toBe(true);
+  const noRefs = () => null;
+  expect(existsInBase(repo, "apps/api/prisma/migrations/002_new/migration.sql", noRefs)).toBe(true);
 });
