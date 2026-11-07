@@ -1,0 +1,6 @@
+/* Story canvas only. Not shipped with @heat/ui. */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  margin: 0;
+}

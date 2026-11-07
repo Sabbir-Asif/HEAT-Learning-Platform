@@ -10,12 +10,12 @@
 
 ## Acceptance criteria → proof
 
-| Criterion | Proof |
-| --- | --- |
-| `config/` names the four presets and covers all three bin scripts, `ticket` included | the diff; the rendered block in the pull request |
-| Does not suggest `dev:*` scripts live in config | the diff names only `audit:deps`, `github:setup`, `ticket` |
-| `pnpm format:check` and `pnpm --filter @heat/config test` pass | stage 6 log |
-| Only the `config/` entry changes | `git diff --stat` shows one file; the diff shows the i18n row losing its second column and one new row |
+| Criterion                                                                            | Proof                                                                                                  |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `config/` names the four presets and covers all three bin scripts, `ticket` included | the diff; the rendered block in the pull request                                                       |
+| Does not suggest `dev:*` scripts live in config                                      | the diff names only `audit:deps`, `github:setup`, `ticket`                                             |
+| `pnpm format:check` and `pnpm --filter @heat/config test` pass                       | stage 6 log                                                                                            |
+| Only the `config/` entry changes                                                     | `git diff --stat` shows one file; the diff shows the i18n row losing its second column and one new row |
 
 ## Tasks
 

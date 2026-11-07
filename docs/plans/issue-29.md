@@ -21,22 +21,22 @@ Alternatives not chosen: Vitest `projects` in the existing config (a browser wou
 
 ## Files
 
-| File                                                  | Change                                                                                               |
-| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `packages/ui/src/placeholder/placeholder.tsx`         | new, placeholder component                                                                           |
-| `packages/ui/src/placeholder/placeholder.stories.tsx` | new, four theme/locale stories with `play` assertions                                                |
-| `packages/ui/src/styles.css`                          | new, throwaway tokens for light and `.dark`                                                          |
-| `packages/ui/test/placeholder/placeholder.test.tsx`   | new, jsdom unit test (keeps the 85% gate honest)                                                     |
-| `packages/ui/test/styles.test.ts`                     | new, both token sets define the same variables                                                       |
-| `packages/ui/.storybook/main.ts`, `preview.tsx`, `preview.css` | new, Storybook config, globals and decorator, font                                          |
-| `packages/ui/vitest.stories.config.mjs`               | new, Storybook Vitest plugin with Playwright Chromium                                                |
-| `packages/ui/vitest.config.mjs`                       | stories and `.storybook` excluded from coverage                                                      |
+| File                                                                | Change                                                                                         |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `packages/ui/src/placeholder/placeholder.tsx`                       | new, placeholder component                                                                     |
+| `packages/ui/src/placeholder/placeholder.stories.tsx`               | new, four theme/locale stories with `play` assertions                                          |
+| `packages/ui/src/styles.css`                                        | new, throwaway tokens for light and `.dark`                                                    |
+| `packages/ui/test/placeholder/placeholder.test.tsx`                 | new, jsdom unit test (keeps the 85% gate honest)                                               |
+| `packages/ui/test/styles.test.ts`                                   | new, both token sets define the same variables                                                 |
+| `packages/ui/.storybook/main.ts`, `preview.tsx`, `preview.css`      | new, Storybook config, globals and decorator, font                                             |
+| `packages/ui/vitest.stories.config.mjs`                             | new, Storybook Vitest plugin with Playwright Chromium                                          |
+| `packages/ui/vitest.config.mjs`                                     | stories and `.storybook` excluded from coverage                                                |
 | `packages/ui/package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` | dev dependencies and scripts (`storybook`, `build-storybook`, `test:stories`); catalog entries |
-| `packages/ui/tsconfig.json`                           | include `.storybook`                                                                                 |
-| `.gitignore`, `packages/config/eslint/base.js`        | ignore `storybook-static`                                                                            |
-| `.github/workflows/ci.yml`                            | new `storybook` job                                                                                  |
-| `packages/config/test/workflows.test.mjs`             | tests for the Storybook job                                                                          |
-| `README.md`, `packages/ui/CLAUDE.md`                  | Storybook section and running note                                                                   |
+| `packages/ui/tsconfig.json`                                         | include `.storybook`                                                                           |
+| `.gitignore`, `packages/config/eslint/base.js`                      | ignore `storybook-static`                                                                      |
+| `.github/workflows/ci.yml`                                          | new `storybook` job                                                                            |
+| `packages/config/test/workflows.test.mjs`                           | tests for the Storybook job                                                                    |
+| `README.md`, `packages/ui/CLAUDE.md`                                | Storybook section and running note                                                             |
 
 ## Tasks
 
@@ -44,7 +44,7 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 
 - [x] **Task 1: placeholder component and tokens.** Tests first: `test/placeholder/placeholder.test.tsx` (renders heading, text and a named button from props) and `test/styles.test.ts` (`:root` and `.dark` define the same custom properties, including colours for background, foreground, primary and primary-foreground). Red: modules missing. Then `placeholder.tsx` and `styles.css`; add `react-dom` as a dev dependency for `renderToStaticMarkup`.
 - [x] **Task 2: Storybook and story-test harness.** Add the dev dependencies, `.storybook/main.ts`, minimal `preview.tsx`, `vitest.stories.config.mjs`, scripts, `tsconfig` include and a coverage exclusion. First story `LightEnglish` with `a11y: { test: 'error' }`. Red: `pnpm --filter @heat/ui test:stories` fails before the config exists (no Storybook config), green once it renders and passes axe in Chromium.
-- [ ] **Task 3: theme global.** Story `DarkEnglish` (`globals: { theme: "dark" }`) with a `play` that expects `.dark` on the story root and on `document.documentElement` and the heading's computed colour to equal the dark token, and `LightEnglish` to be different. Red: no theme decorator. Then the `theme` `globalType` and decorator and `preview.css` base colours.
+- [x] **Task 3: theme global.** Story `DarkEnglish` (`globals: { theme: "dark" }`) with a `play` that expects `.dark` on the story root and on `document.documentElement` and the heading's computed colour to equal the dark token, and `LightEnglish` to be different. Red: no theme decorator. Then the `theme` `globalType` and decorator and `preview.css` base colours.
 - [ ] **Task 4: locale global and Bangla font.** Stories `LightBangla` and `DarkBangla` with a `play` that expects `lang="bn"`, waits for `document.fonts.ready`, and expects the Noto Sans Bengali face to be loaded and applied (`document.fonts.check` and computed `font-family`). Red: no locale decorator or font. Then the `locale` `globalType`, `lang` handling and the self-hosted font import.
 - [ ] **Task 5: all four combinations pass axe.** Stories `DarkEnglish` and `DarkBangla` included in the run with the a11y gate on by default from `preview.tsx` (`parameters.a11y.test = "error"`). Red check: before the default is set a story without the local parameter does not fail the gate (shown by the proof in Task 6). Then confirm zero violations, `color-contrast` included, in all four.
 - [ ] **Task 6: prove the gate fails with a rule id.** Add `InaccessibleButton` (icon-only button, no name). Run `test:stories`, capture the failure naming `button-name` into the verification log. Commit the story, then remove it in a second commit.
@@ -53,18 +53,18 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 
 ## Acceptance criteria mapped to checks
 
-| Criterion (refined)                                                                   | Check                                                                                                    |
-| ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Stories listed; toolbar has theme (light, dark) and locale (bn, en)                   | Real-browser check of `pnpm --filter @heat/ui storybook` with screenshots; `globalTypes` in `preview.tsx` |
-| Theme switched to dark: dark selector on story root and `documentElement`, colours change | Task 3 `play` assertions (story test); browser check                                                  |
-| Locale bn: `lang="bn"`, Bangla text in the configured self-hosted font                | Task 4 `play` assertions after `document.fonts.ready`; browser check                                     |
-| Four combinations pass axe, `color-contrast` in dark included                         | Task 5, `test:stories` with `a11y.test = "error"`                                                        |
-| Missing accessible name fails with the axe rule id                                    | Task 6 captured failing output (`button-name`) in the verification log                                   |
-| CI runs story tests and builds static Storybook, uploaded as `storybook-static`       | Task 7 workflow tests; first CI run on the pull request                                                  |
-| Storybook job always runs (no path filter)                                            | Task 7 workflow test                                                                                     |
-| Root commands pass; stories do not dilute coverage; `storybook-static` ignored        | `pnpm lint`, `format:check`, `typecheck`, `test:coverage`, `build`; Task 8                               |
-| Frozen lockfile; Storybook, Playwright and axe only dev dependencies of `@heat/ui`    | `pnpm install --frozen-lockfile`; diff of `package.json` files                                           |
-| `pnpm audit:deps` has no new high or critical advisory                                | `pnpm audit:deps`                                                                                        |
+| Criterion (refined)                                                                       | Check                                                                                                     |
+| ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Stories listed; toolbar has theme (light, dark) and locale (bn, en)                       | Real-browser check of `pnpm --filter @heat/ui storybook` with screenshots; `globalTypes` in `preview.tsx` |
+| Theme switched to dark: dark selector on story root and `documentElement`, colours change | Task 3 `play` assertions (story test); browser check                                                      |
+| Locale bn: `lang="bn"`, Bangla text in the configured self-hosted font                    | Task 4 `play` assertions after `document.fonts.ready`; browser check                                      |
+| Four combinations pass axe, `color-contrast` in dark included                             | Task 5, `test:stories` with `a11y.test = "error"`                                                         |
+| Missing accessible name fails with the axe rule id                                        | Task 6 captured failing output (`button-name`) in the verification log                                    |
+| CI runs story tests and builds static Storybook, uploaded as `storybook-static`           | Task 7 workflow tests; first CI run on the pull request                                                   |
+| Storybook job always runs (no path filter)                                                | Task 7 workflow test                                                                                      |
+| Root commands pass; stories do not dilute coverage; `storybook-static` ignored            | `pnpm lint`, `format:check`, `typecheck`, `test:coverage`, `build`; Task 8                                |
+| Frozen lockfile; Storybook, Playwright and axe only dev dependencies of `@heat/ui`        | `pnpm install --frozen-lockfile`; diff of `package.json` files                                            |
+| `pnpm audit:deps` has no new high or critical advisory                                    | `pnpm audit:deps`                                                                                         |
 
 ## Verification
 
