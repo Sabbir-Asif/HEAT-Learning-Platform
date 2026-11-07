@@ -15,7 +15,8 @@
     "format": "prettier --write .",
     "format:check": "turbo run format:check //#format:root",
     "format:root": "prettier --check . '!apps/**' '!packages/**'",
-    "test:coverage": "turbo run test:coverage"
+    "test:coverage": "turbo run test:coverage",
+    "audit:deps": "node packages/config/bin/audit.mjs"
   },
   "devDependencies": {
     "@heat/config": "workspace:*",
