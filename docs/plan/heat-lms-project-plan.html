@@ -1,0 +1,1242 @@
+<title>HEAT LMS Project Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: long-form plan document; sticky contents rail on wide screens, single column under 960px. */
+:root {
+  --bg: #fbfafc;
+  --surface: #ffffff;
+  --sunken: #f3f0f7;
+  --fg: #1d1824;
+  --muted: #5f5869;
+  --line: #e3dde9;
+  --accent: #5b2d8e;
+  --accent-soft: #efe7f8;
+  --accent-ink: #4a2275;
+  --ok: #1f7a4d;
+  --ok-soft: #e4f3eb;
+  --warn: #9a5b00;
+  --warn-soft: #fbf0dc;
+  --risk: #b0303b;
+  --risk-soft: #fbe6e8;
+  --font-display: "Anek Bangla", "Hind Siliguri", system-ui, sans-serif;
+  --font-body: "Hind Siliguri", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --step--1: 0.875rem;
+  --step-0: 1rem;
+  --step-1: 1.2rem;
+  --step-2: 1.5rem;
+  --step-3: 2.1rem;
+  --step-4: 2.8rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15121a; --surface: #1d1924; --sunken: #241f2d; --fg: #ece8f2; --muted: #a9a1b6; --line: #352e40;
+    --accent: #b993ec; --accent-soft: #2e2440; --accent-ink: #d3b9f5;
+    --ok: #6fcf9d; --ok-soft: #1b2e25; --warn: #e9b35a; --warn-soft: #33281a; --risk: #f08a92; --risk-soft: #361d21;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15121a; --surface: #1d1924; --sunken: #241f2d; --fg: #ece8f2; --muted: #a9a1b6; --line: #352e40;
+  --accent: #b993ec; --accent-soft: #2e2440; --accent-ink: #d3b9f5;
+  --ok: #6fcf9d; --ok-soft: #1b2e25; --warn: #e9b35a; --warn-soft: #33281a; --risk: #f08a92; --risk-soft: #361d21;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: var(--step-0); line-height: 1.65;
+  padding-inline: 16px; padding-block: 0 64px;
+}
+.wrap { max-width: 1180px; margin-inline: auto; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 56px; }
+@media (max-width: 960px) { .wrap { grid-template-columns: minmax(0, 1fr); gap: 0; } .toc { display: none; } }
+
+h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.2; text-wrap: balance; margin: 0; color: var(--fg); }
+h1 { font-size: var(--step-4); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: var(--step-3); font-weight: 700; }
+h3 { font-size: var(--step-1); font-weight: 600; }
+h4 { font-size: var(--step-0); font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--accent); }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+code { background: var(--sunken); padding: 0.1em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+ul, ol { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.35rem; }
+li { max-width: 72ch; }
+
+/* contents rail */
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; padding-top: 56px; font-size: var(--step--1); }
+.toc .label { font-family: var(--font-display); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-size: 0.75rem; margin-bottom: 10px; }
+.toc ol { list-style: none; padding: 0; gap: 2px; counter-reset: toc; }
+.toc li { counter-increment: toc; }
+.toc a { display: flex; gap: 10px; text-decoration: none; color: var(--muted); padding: 4px 8px; border-radius: 6px; }
+.toc a::before { content: counter(toc, decimal-leading-zero); font-family: var(--font-mono); font-size: 0.75rem; color: var(--line); padding-top: 2px; min-width: 1.4rem; }
+.toc a:hover { color: var(--fg); background: var(--sunken); }
+
+main { min-width: 0; display: grid; gap: 72px; padding-top: 56px; }
+section { display: grid; gap: 22px; scroll-margin-top: 24px; min-width: 0; }
+.eyebrow { font-family: var(--font-display); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.lede { font-size: var(--step-1); color: var(--muted); max-width: 62ch; }
+.sec-head { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 28px; }
+
+/* header */
+header.doc { display: grid; gap: 18px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: var(--step--1); color: var(--muted); }
+.meta b { color: var(--fg); font-weight: 600; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 600; padding: 2px 10px; border-radius: 999px; background: var(--warn-soft); color: var(--warn); }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.accent { background: var(--accent-soft); color: var(--accent-ink); }
+.pill.risk { background: var(--risk-soft); color: var(--risk); }
+
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.facts div { background: var(--surface); padding: 14px 16px; display: grid; gap: 2px; }
+.facts .n { font-family: var(--font-display); font-size: var(--step-2); font-weight: 700; color: var(--accent-ink); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.facts .l { font-size: var(--step--1); color: var(--muted); line-height: 1.35; }
+
+/* tables */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.94rem; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+th { font-family: var(--font-display); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); background: var(--sunken); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 500; }
+tbody tr.group td { background: var(--accent-soft); color: var(--accent-ink); font-family: var(--font-display); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; padding-block: 6px; }
+.tbl.wide table { min-width: 720px; }
+
+/* callouts and grids */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.box p, .box li { font-size: 0.95rem; }
+.box .k { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
+.note { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 14px 18px; border-radius: 0 8px 8px 0; display: grid; gap: 6px; }
+.note.warn { border-color: var(--warn); background: var(--warn-soft); }
+.note p { max-width: none; }
+
+/* decisions */
+.decisions { display: grid; gap: 12px; }
+.decision { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; }
+.decision .id { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); padding-top: 3px; }
+.decision h4 { margin-bottom: 4px; }
+.decision p { font-size: 0.95rem; color: var(--muted); }
+.decision p strong { color: var(--fg); font-weight: 600; }
+@media (max-width: 520px) { .decision { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
+
+/* questions */
+.qs { counter-reset: q; display: grid; gap: 10px; list-style: none; padding: 0; }
+.qs li { counter-increment: q; max-width: none; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding: 14px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.qs li::before { content: "Q" counter(q); font-family: var(--font-mono); font-size: 0.8rem; color: var(--warn); padding-top: 3px; }
+.qs .q { font-weight: 600; }
+.qs .d { font-size: 0.93rem; color: var(--muted); }
+.qs .d b { color: var(--ok); font-weight: 600; }
+
+/* diagrams */
+.diagram { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; overflow-x: auto; }
+.diagram pre.mermaid { margin: 0; background: transparent; display: flex; justify-content: center; min-width: 560px; }
+.cap { font-size: var(--step--1); color: var(--muted); }
+pre.tree { margin: 0; font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.55; background: var(--sunken); border-radius: 10px; padding: 16px 18px; overflow-x: auto; color: var(--fg); }
+pre.tree .c { color: var(--muted); }
+
+/* roadmap */
+.phases { display: grid; gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.phase { display: grid; grid-template-columns: 110px minmax(0, 1fr) minmax(0, 1.3fr); gap: 20px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.phase:last-child { border-bottom: 0; }
+.phase .p { font-family: var(--font-display); font-weight: 700; color: var(--accent-ink); font-size: var(--step-1); }
+.phase .p span { display: block; font-family: var(--font-body); font-weight: 500; font-size: 0.78rem; color: var(--muted); }
+.phase h4 { margin-bottom: 2px; }
+.phase p, .phase li { font-size: 0.93rem; }
+.phase .exit { color: var(--muted); }
+@media (max-width: 760px) { .phase { grid-template-columns: minmax(0, 1fr); gap: 6px; } }
+
+/* backlog */
+details.epic { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+details.epic + details.epic { margin-top: 10px; }
+details.epic summary { cursor: pointer; list-style: none; display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; padding: 14px 18px; }
+details.epic summary::-webkit-details-marker { display: none; }
+details.epic summary .e { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); }
+details.epic summary .t { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; }
+details.epic summary .t small { display: block; font-family: var(--font-body); font-weight: 400; font-size: 0.88rem; color: var(--muted); }
+details.epic summary .c { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+details.epic summary .c::after { content: " ▸"; color: var(--accent); }
+details.epic[open] summary .c::after { content: " ▾"; }
+details.epic ol { padding: 0 18px 16px 70px; font-size: 0.93rem; gap: 4px; }
+details.epic ol li::marker { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
+.tags { display: inline-flex; flex-wrap: wrap; gap: 4px; margin-left: 6px; vertical-align: 1px; }
+.tag { font-family: var(--font-mono); font-size: 0.68rem; padding: 0 6px; border-radius: 4px; background: var(--sunken); color: var(--muted); border: 1px solid var(--line); }
+.tag.p0 { background: var(--risk-soft); color: var(--risk); border-color: transparent; }
+
+/* workflow pipeline */
+.pipeline { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; counter-reset: st; }
+.pipeline li { counter-increment: st; max-width: none; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; align-content: start; }
+.pipeline li::before { content: "Stage " counter(st); font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent); }
+.pipeline h4 { font-size: 1rem; }
+.pipeline p { font-size: 0.9rem; color: var(--muted); }
+.pipeline .out { font-family: var(--font-mono); font-size: 0.72rem; color: var(--ok); }
+.pipeline li.gate { border-color: var(--accent); background: var(--accent-soft); }
+
+footer { border-top: 1px solid var(--line); padding-top: 20px; color: var(--muted); font-size: var(--step--1); }
+
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+<nav class="toc" aria-label="Contents">
+  <div class="label">Contents</div>
+  <ol>
+    <li><a href="#understanding">What I understood</a></li>
+    <li><a href="#decisions">Design decisions</a></li>
+    <li><a href="#questions">Your answers</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#frontend">Frontend design</a></li>
+    <li><a href="#data">Data model</a></li>
+    <li><a href="#flows">Critical flows</a></li>
+    <li><a href="#quality">Security &amp; quality bar</a></li>
+    <li><a href="#roadmap">Delivery roadmap</a></li>
+    <li><a href="#backlog">Epics &amp; backlog</a></li>
+    <li><a href="#github">GitHub project setup</a></li>
+    <li><a href="#workflow">Claude workflow</a></li>
+    <li><a href="#risks">Risks</a></li>
+    <li><a href="#review">Adversarial review</a></li>
+    <li><a href="#next">Next steps</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="doc">
+  <div class="eyebrow">HEAT sub-project · University of Dhaka · Gender-based violence prevention</div>
+  <h1>HEAT LMS Project Plan</h1>
+  <p class="lede">How I plan to design, break down and build the interactive learning platform for <em>Preventing Gender-Based Violence in University Campuses</em>: a public site, a student learning app, an admin console, one NestJS backend, and a Claude-driven delivery workflow on GitHub.</p>
+  <div class="meta">
+    <span><b>Status</b> <span class="pill ok">Revision 4 · reviewed</span></span>
+    <span><b>Date</b> 7 November 2026</span>
+    <span><b>Inputs</b> prompt.md, lms_production_implementation_plan.md, demo UI mock</span>
+    <span><b>Scope of this page</b> plan only, no code or tickets yet</span>
+  </div>
+  <div class="facts" role="list">
+    <div role="listitem"><span class="n">10,000</span><span class="l">enrolled students (design target)</span></div>
+    <div role="listitem"><span class="n">200</span><span class="l">concurrent video viewers, 250 headroom test</span></div>
+    <div role="listitem"><span class="n">3 + 1</span><span class="l">apps: public web, admin, API, plus a job worker</span></div>
+    <div role="listitem"><span class="n">1 VPS</span><span class="l">4 vCPU, 16 GB, 200 GB NVMe, 16 TB/month</span></div>
+    <div role="listitem"><span class="n">~240 Mbps</span><span class="l">peak egress at 200 viewers × 1.2 Mbps average</span></div>
+  </div>
+</header>
+
+<!-- 1 -->
+<section id="understanding">
+  <div class="sec-head">
+    <div class="eyebrow">01 · Requirements</div>
+    <h2>What I understood</h2>
+    <p>Each requirement from your brief, restated with what it means for the build. Where the brief was silent I wrote down my reading; anything that changes scope is listed again under Open questions.</p>
+  </div>
+  <div class="tbl wide">
+    <table>
+      <thead><tr><th style="width:38%">You asked for</th><th>What it means for the build</th></tr></thead>
+      <tbody>
+        <tr class="group"><td colspan="2">Public site</td></tr>
+        <tr><td>A public landing page with HEAT project overview, course info and some modules</td><td>Server-rendered Next.js page, cached and revalidated when an admin changes content. Copy for the overview section comes from admin-editable settings, not hard-coded text.</td></tr>
+        <tr><td>Courses and modules tagged <code>frontpage</code> appear on the landing page</td><td>A <code>Tag</code> table with many-to-many links to courses and modules. <code>frontpage</code> is a reserved system tag that admins cannot delete. Admins also set the display order.</td></tr>
+        <tr><td>“Enroll course” button leads to enrollment</td><td>Deep link <code>/enroll?course=&lt;slug&gt;</code>. Signed-in students skip registration and send an enrollment request in one click.</td></tr>
+        <tr><td>Resources, News &amp; Updates and Contact pages (from the demo)</td><td>In v1. Admin-managed resources (files and links), news posts with publish dates, and a contact page with admin-edited details.</td></tr>
+        <tr class="group"><td colspan="2">Enrollment</td></tr>
+        <tr><td>Two-step form: academic details, then account details</td><td>One wizard, two steps, validated per step on the client. The server validates the full payload again on submit with the same shared Zod schema. Submitting creates the user and a <code>PENDING_VERIFICATION</code> enrollment request in one database transaction. The name is entered in English, because it is printed on the certificate.</td></tr>
+        <tr><td>Admin must approve before the student can start</td><td>The student verifies their email first; only then does the request enter the admin approval queue. Any admin can approve or reject, singly or in bulk, with an optional reason that is shown to the student. Every decision is audit-logged. See decision D11.</td></tr>
+        <tr><td>Rejected requests are soft-deleted</td><td>Rejecting a request soft-deletes that enrollment. The account is soft-deleted too only when it has no other approved or completed enrollment, so rejecting a second-course request never deletes an existing student. The reason reaches the student by email, because a deleted account cannot sign in. Soft-deleted accounts free the email for a new registration and are permanently deleted after 90 days; the audit log keeps an anonymous record.</td></tr>
+        <tr><td>Admin can remove students from a course</td><td>Removal revokes access and records a reason. Progress and quiz history are kept, and an admin can reinstate the student. An issued certificate stays valid.</td></tr>
+        <tr><td>Waiting for approval</td><td>A pending student can sign in, see an “Awaiting approval” page and edit their profile, but cannot open any course content.</td></tr>
+        <tr><td>University, faculty, department as dependent selects</td><td>Cascading selects: faculties filtered by university, departments filtered by university + faculty. Only active records are offered.</td></tr>
+        <tr><td>Faculty ↔ university is many-to-many; department belongs to a university + faculty pair</td><td>Join table <code>UniversityFaculty</code>. A department points to that join row, so a department can never sit under a faculty its university does not have.</td></tr>
+        <tr><td>Session as text in <code>2020-21</code> format</td><td>Pattern <code>^\d{4}-\d{2}$</code> plus a rule that the second part is the next year (2020-21 valid, 2020-23 invalid). Same check in browser and API.</td></tr>
+        <tr><td>Backend-generated captcha with letters and digits</td><td>API renders a distorted SVG captcha. The answer is stored hashed in Redis with a 5-minute TTL, single use, 3 tries. No third-party service. It also protects resend-verification and forgot-password. Kept as a text captcha by your decision, which is a recorded exception to WCAG 2.2 AA (criterion 1.1.1); the form shows a support contact for students who cannot read it.</td></tr>
+        <tr class="group"><td colspan="2">Accounts and email</td></tr>
+        <tr><td>Email verification</td><td>Changed by the approval step: verification now happens right after registration, because admins only review verified requests. The link is signed, single-use and expiring, and can be resent from the awaiting page or the profile. Unverified registrations are soft-deleted after 7 days so the email can register again.</td></tr>
+        <tr><td>Profile: picture, name, change password (needs verified email)</td><td>Avatar upload follows the media design. Name, university, faculty, department and session lock once the enrollment is approved; changing them is a request an admin approves, and each certificate stores the name it was issued with. Changing the password needs the current password plus a 6-digit code emailed to the verified address, and signs out all other sessions.</td></tr>
+        <tr><td>Forgot password needs a verified email</td><td>The reset request always returns the same response, so it does not reveal which emails exist. A link is sent only to verified addresses. Since every approved student is verified, no approved student can be locked out.</td></tr>
+        <tr><td>Unverified users cannot collect certificates</td><td>Kept as a server-side rule. In practice it always holds, because only verified students get approved.</td></tr>
+        <tr><td>Email sending through any transport, Gmail SMTP first</td><td>Mail goes through a transport interface, so changing provider is a settings change. Launch uses a personal Gmail account (about 500 emails a day), so intake runs in small cohorts. Every email is a BullMQ job with a per-category daily budget, held when the limit is reached and resumed after it resets. See decision D12.</td></tr>
+        <tr class="group"><td colspan="2">Courses and learning</td></tr>
+        <tr><td>Many courses, one available now</td><td>Course list is data-driven from day one. The UI shows a single course, but nothing assumes there is only one.</td></tr>
+        <tr><td>Each module: videos (one now, many later), text and one quiz</td><td><code>Video</code> rows ordered inside a module from the start, so moving to several videos is a UI change, not a migration. Modules also have written lesson sections and learning objectives, as in the demo.</td></tr>
+        <tr><td>Video must be watched before the quiz</td><td>The quiz opens once the student has watched 80% of each required video. Skipping ahead is allowed but skipped parts do not count.</td></tr>
+        <tr><td>Quiz rules set by the admin</td><td>Each quiz has its own pass mark, attempt limit and waiting time between attempts. Defaults: 70% pass mark, unlimited attempts, 10-minute wait.</td></tr>
+        <tr><td>Next module stays locked until the current one is passed</td><td>The server decides every lock. Module N+1 unlocks inside the same transaction that records a passing quiz attempt for module N.</td></tr>
+        <tr class="group"><td colspan="2">Certificates</td></tr>
+        <tr><td>Certificate after completing the course, downloadable and emailed</td><td>A BullMQ job renders the PDF once per enrollment (idempotent), stores it, and sends the completion email with the PDF attached.</td></tr>
+        <tr><td>Public certificate validation page</td><td><code>/verify/&lt;certificate-number&gt;</code> plus a QR code on the PDF. Shows name, course and date only. Rate-limited, and numbers are not sequential.</td></tr>
+        <tr class="group"><td colspan="2">Admin</td></tr>
+        <tr><td>Separate Next.js admin app, same backend</td><td>Separate host (for example <code>admin.</code>), separate cookie name and token audience. Admin API routes reject student tokens even when the session is valid.</td></tr>
+        <tr><td>Seeded super admin; only the super admin creates admins; no admin sign-up</td><td>Super admin is created from environment variables in the seed and must change the password on first login. Admins are invited by email and set their own password. Every admin, including the super admin, must also enter an authenticator-app code at sign-in. Every admin action goes to an audit log.</td></tr>
+        <tr><td>Student management</td><td>Approval queue; student list filtered by university, faculty, department, session and enrollment status; per-student progress (modules, quiz attempts, video progress, certificate); CSV export of the filtered list; summary dashboard with totals, pass rates per module and certificates issued.</td></tr>
+        <tr><td>Insights page about the course and student behaviour</td><td>v1 shows the enrollment funnel and trends (registered, verified, approved, started, completed over time) and module and quiz results (completion per module, where students stop, pass rates, average attempts, most-missed questions). Every chart filters by date range, course, university, faculty, department and session. Video engagement and activity insights are planned for v1.1. See decision D14.</td></tr>
+        <tr><td>Everything configurable: courses, modules, videos, quizzes, tags, directory</td><td>Full admin CRUD with drag-to-reorder, a quiz builder, and draft and preview states.</td></tr>
+        <tr><td>Video upload processed by Bull jobs</td><td>Resumable upload, then probe, transcode to HLS (360p to 1080p), validate, and mark the video ready. The admin sees status live.</td></tr>
+        <tr><td>No changes to course or video configuration once students are enrolled</td><td>The course locks at its first enrollment. Changes go into a new revision; see decision D4.</td></tr>
+        <tr><td>A university cannot be deleted while users belong to it</td><td><code>ON DELETE RESTRICT</code> foreign keys plus a service check that explains the reason. The same rule applies to faculties and departments, and records can be archived instead of deleted.</td></tr>
+        <tr class="group"><td colspan="2">Non-functional</td></tr>
+        <tr><td>Production grade, secure, user-facing at 10k users</td><td>OWASP ASVS Level 2 as the security target, SLOs, load tests before launch, off-site backups with restore drills, and monitoring from day one.</td></tr>
+        <tr><td>Design with Claude frontend design, Open Pencil, shadcn, Tailwind</td><td>Key screens are designed in Open Pencil first and exported as tokens into a shared <code>@heat/ui</code> package (shadcn + Tailwind v4). The demo mock is a direction, not a spec.</td></tr>
+        <tr><td>Reusable components, very little CSS, no filler</td><td>Both Next.js apps build only from <code>@heat/ui</code>. Styling comes from design tokens and Tailwind utilities inside those components; app code adds no custom CSS. Every element on a screen must serve the task on that screen. See decision D13.</td></tr>
+        <tr><td>Bangla / English switch</td><td>All interface text and emails in both languages. Course content is in one language per course for v1.</td></tr>
+        <tr><td>Logos</td><td>The 4 logos in the heat.ugc.gov.bd header (the HEAT mark and three partner marks) plus the University of Dhaka crest from the demo.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="decisions">
+  <div class="sec-head">
+    <div class="eyebrow">02 · Decisions</div>
+    <h2>Design decisions I am proposing</h2>
+    <p>These choices shape the whole backlog, so I want them agreed before issues are written. Each will become an Architecture Decision Record in <code>docs/adr/</code>.</p>
+  </div>
+  <div class="decisions">
+    <div class="decision"><div class="id">D1</div><div><h4>pnpm + Turborepo monorepo with shared contracts</h4><p>Two Next.js apps, the NestJS API and the worker live in one repo. <strong>A single <code>@heat/contracts</code> package holds Zod schemas</strong> used by React Hook Form in the browser and by <code>nestjs-zod</code> in the API, so frontend and backend validation cannot drift.</p></div></div>
+    <div class="decision"><div class="id">D2</div><div><h4>Modular monolith API, separate worker process</h4><p>NestJS modules with strict boundaries. <strong>The worker is the same codebase started with a different entry point</strong> and runs BullMQ consumers (transcode, certificate, email, cleanup), so FFmpeg never shares a process with HTTP traffic. No microservices, Kubernetes or Kafka.</p></div></div>
+    <div class="decision"><div class="id">D3</div><div><h4>First-party cookie sessions, two realms</h4><p>Nginx routes <code>/api</code> on both hosts to NestJS, and blocks admin API paths on the student host. Cookies use the <code>__Host-</code> prefix: the access cookie (10 minutes) is <code>SameSite=Lax</code> so links from emails arrive signed in, and the refresh cookie is <code>SameSite=Strict</code> and limited to the refresh path. <strong>A rotating refresh token</strong> is stored hashed, with reuse detection and a 20-second grace window for parallel refreshes. CSRF tokens are HMAC-bound to the session, so a sibling subdomain cannot plant one. Passwords use argon2id. Student and admin tokens carry different audiences. <strong>Admins must use an authenticator-app code (TOTP)</strong> with recovery codes; deactivating an admin revokes their sessions immediately, and a break-glass command on the server restores super-admin access if the authenticator is lost.</p></div></div>
+    <div class="decision"><div class="id">D4</div><div><h4>Content lock with course revisions</h4><p>A course moves from <code>DRAFT</code> to <code>PUBLISHED</code>. Publishing is refused unless every module has a ready video and a quiz with at least one question. <strong>The lock is taken inside the first approval's transaction</strong>, so it cannot race an admin edit: modules, videos, answer options, correct answers, quiz rules and pass marks become read-only. Wording fixes stay allowed but are limited to text changes that keep the same structure (no added or removed images, links, sections or questions), and each one is stored as a before/after diff in the audit log. Description, thumbnail, tags and front-page order stay editable. Bigger changes go into a cloned draft revision; enrollments are pinned to a revision at approval time, and shared video assets are reference-counted so cleanup never deletes a video another revision uses.</p></div></div>
+    <div class="decision"><div class="id">D5</div><div><h4>Signed HLS delivered by Nginx, never proxied through Node</h4><p>The API issues a playback session and sets a short-lived HMAC-signed cookie scoped to <code>/hls/&lt;videoId&gt;/</code>. <strong>Nginx (njs) verifies the signature on every playlist and segment</strong> without touching the database. Originals stay outside the web root. A Phase 1 spike proves this on the real VPS before anything else depends on it.</p></div></div>
+    <div class="decision"><div class="id">D6</div><div><h4>Watched-interval progress the server can trust</h4><p>The player sends watched ranges every 15 s and on pause, seek or tab hide. <strong>The server accepts ranges only up to the wall-clock time since the playback session started, multiplied by the highest allowed playback speed</strong>, so a script cannot report a whole video as watched. Late batches from an offline retry are accepted within that same budget. A video counts as complete at ≥ 80% coverage. Resume position is stored separately and never moves backwards from a stale request. Heartbeats are batched writes; Redis buffering is added only if load tests show a need.</p></div></div>
+    <div class="decision"><div class="id">D7</div><div><h4>Transactional outbox for email and jobs</h4><p>Domain events (enrolled, verified, completed) are written to an <code>Outbox</code> table in the same transaction as the state change, then relayed to BullMQ. <strong>No email or certificate is lost if Redis restarts</strong>, and none is sent twice.</p></div></div>
+    <div class="decision"><div class="id">D8</div><div><h4>Certificate PDFs from an HTML template</h4><p>Names are entered in English, so any PDF approach works. <strong>Rendering an HTML template in Playwright Chromium inside the worker</strong> keeps the certificate design a normal web template that matches the site, and leaves room for Bangla text later. Each certificate gets a random number, a QR code linking to the verification page, and a stored SHA-256 of the file.</p></div></div>
+    <div class="decision"><div class="id">D9</div><div><h4>Bangla and English interface from day one</h4><p>The demo has a বাংলা / English toggle. <strong>Interface strings and emails go through <code>next-intl</code> from the first screen</strong>, so translation is never a retrofit. Course content is in one language per course, with the schema ready for translations later.</p></div></div>
+    <div class="decision"><div class="id">D10</div><div><h4>Hooks guide, CI and branch protection enforce</h4><p>Claude Code hooks are shell commands that run on events, and some can be bypassed through other tools. <strong>An <code>/implement-issue</code> skill drives the eight stages</strong> (section 12), hooks act as guard rails, and the hard gates are branch protection and CI: nothing merges without green checks, and only you merge.</p></div></div>
+    <div class="decision"><div class="id">D11</div><div><h4>Enrollment approval lifecycle</h4><p>Status moves <code>PENDING_VERIFICATION</code> → <code>PENDING_APPROVAL</code> → <code>APPROVED</code> → <code>COMPLETED</code>, or to <code>REJECTED</code>, <code>EXPIRED</code> or <code>REMOVED</code>. <strong>Content endpoints and playback sessions allow <code>APPROVED</code> and <code>COMPLETED</code></strong>; a removed student loses video access within one cookie lifetime (10 minutes). Removal is possible from either state, and reinstatement restores the state the student had. Rejection soft-deletes the account only when no other approved or completed enrollment exists. Email jobs store a copy of the recipient address, so the rejection email still goes out after the account is hidden. A new registration for an email that only has an unverified account replaces that account, and verifying an email signs out every session created before verification, so nobody can squat or pre-hijack an account. Registering an email that already has an account shows the normal success message and sends that address an “you already have an account” email, so the form never reveals who has enrolled.</p></div></div>
+    <div class="decision"><div class="id">D12</div><div><h4>Pluggable, quota-aware email</h4><p>A <code>MailTransport</code> interface with an SMTP implementation chosen by configuration; personal Gmail first. <strong>All mail goes through a BullMQ queue</strong> with a Redis counter for the rolling 24-hour limit, split into per-category budgets so verification, password codes and resets always have capacity before approval and certificate mail. When a budget is used up, jobs wait until it frees instead of failing; Gmail quota errors (550 5.4.5) pause the queue the same way. Resend-verification and forgot-password require the captcha and are capped per email. The 7-day expiry for unverified registrations starts when the verification email is actually sent. Gmail SMTP gives no bounce reports, so failures are tracked from SMTP responses only.</p></div></div>
+    <div class="decision"><div class="id">D13</div><div><h4>One component library, minimal CSS</h4><p><strong><code>@heat/ui</code> is the only place styles are written</strong>: shadcn components themed by design tokens, plus composite components shared by both apps (page header, data table, form field, status badge, empty state, confirm dialog, stat card, file upload). Apps compose these and use Tailwind only for layout. No one-off CSS files, no arbitrary values outside the tokens, and no component on a screen unless the task needs it.</p></div></div>
+    <div class="decision"><div class="id">D14</div><div><h4>Insights from daily rollups, not live scans</h4><p>A nightly BullMQ job (plus an on-demand refresh) aggregates enrollments, module progress and quiz attempts into small rollup tables by day, course, module and academic group. <strong>The Insights page reads only these rollups</strong>, so charts load fast and never slow down students. Only aggregates are shown, groups smaller than 5 students are hidden, and the same data powers CSV download of each chart. Event timestamps are recorded from day one so later insights (video engagement, activity) need no backfill.</p></div></div>
+    <div class="decision"><div class="id">D15</div><div><h4>One data path per kind of page</h4><p>Public pages render on the server and are cached by tag; signed-in pages check the session in a server-only data layer and prefetch on the server; <strong>all interactive calls go from the browser to the API through generated hooks</strong>. No Server Actions. Sessions refresh in <code>proxy.ts</code>. Details in the Frontend design section.</p></div></div>
+    <div class="decision"><div class="id">D16</div><div><h4>Images and files on local disk behind a storage interface</h4><p>Uploads are type-checked, stripped and resized once, then stored under random names with a visibility level: public, protected (signed 1-hour links) or private (API-checked). <strong>Content stores asset IDs, not links</strong>, so a cloud S3 driver or CDN can be added later. MinIO was rejected.</p></div></div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="questions">
+  <div class="sec-head">
+    <div class="eyebrow">03 · Answers</div>
+    <h2>Your answers</h2>
+    <p>What you decided in review. These answers replace the earlier defaults and are already reflected in the rest of this page.</p>
+  </div>
+  <div class="tbl wide">
+    <table>
+      <thead><tr><th style="width:30%">Topic</th><th>Decision</th></tr></thead>
+      <tbody>
+        <tr class="group"><td colspan="2">Enrollment</td></tr>
+        <tr><td>Admin approval</td><td>New requirement. Students cannot start until an admin approves the request.</td></tr>
+        <tr><td>Rejection</td><td>Admins reject explicitly; nothing expires automatically. The account and enrollment are soft-deleted, and the person may register again.</td></tr>
+        <tr><td>While pending</td><td>The student can sign in, see the request status and edit their profile. No course content.</td></tr>
+        <tr><td>Removal</td><td>Access revoked with a reason, history kept, can be reinstated. Certificate stays valid.</td></tr>
+        <tr><td>Email verification</td><td>Required before the request reaches the admin queue. Unverified registrations are removed after 7 days.</td></tr>
+        <tr><td>Who decides</td><td>Any admin, on form details only, with bulk actions. Every decision is logged.</td></tr>
+        <tr><td>Reasons</td><td>Optional preset or written reason, shown to the student.</td></tr>
+        <tr class="group"><td colspan="2">Learning</td></tr>
+        <tr><td>Content lock</td><td>Locked after the first approved enrollment. Wording fixes in module and question text are still allowed; answers and rules are not.</td></tr>
+        <tr><td>Quiz rules</td><td>Set by the admin per quiz: pass mark, attempt limit, waiting time between attempts.</td></tr>
+        <tr><td>Watch rule</td><td>80% of each required video must be watched before the quiz opens.</td></tr>
+        <tr><td>Scope from the demo</td><td>In v1: module text and learning objectives, Resources, News &amp; Updates, Contact. Scenario activities are deferred. No “Get help” page.</td></tr>
+        <tr><td>Language</td><td>Interface and emails in Bangla and English. Course content in one language.</td></tr>
+        <tr class="group"><td colspan="2">Admin, certificates, operations</td></tr>
+        <tr><td>Admin sign-in</td><td>Password plus a required authenticator-app code for every admin.</td></tr>
+        <tr><td>Student information</td><td>Filtered student list, per-student progress, CSV export and a summary dashboard.</td></tr>
+        <tr><td>Insights page</td><td>Enrollment funnel and trends, and module and quiz results, in v1. Video engagement and student activity later.</td></tr>
+        <tr><td>Name and academic details</td><td>Locked after approval; changes go through an admin.</td></tr>
+        <tr><td>Change password</td><td>Current password plus a code emailed to the student.</td></tr>
+        <tr><td>Captcha</td><td>Text captcha only, recorded as an accessibility exception.</td></tr>
+        <tr><td>Data retention</td><td>Rejected and expired registrations permanently deleted after 90 days.</td></tr>
+        <tr><td>Certificate name</td><td>English only, as entered on the enrollment form.</td></tr>
+        <tr><td>Email</td><td>Any transport behind one interface. Personal Gmail first (about 500 a day), with intake in small cohorts. Every email queued in BullMQ, held when the daily budget is used and retried after it resets.</td></tr>
+        <tr><td>Logos</td><td>The 4 heat.ugc.gov.bd header logos and the University of Dhaka crest.</td></tr>
+        <tr><td>GitHub</td><td>Issues and Project in this repository (Sabbir-Asif/HEAT-Learning-Platform), Project under the Sabbir-Asif account.</td></tr>
+        <tr><td>Merging</td><td>CI must pass and only you merge; no approval rule, because GitHub does not let you approve your own pull request.</td></tr>
+        <tr><td>Staging</td><td>A smaller staging copy runs on the same VPS with strict resource limits.</td></tr>
+        <tr class="group"><td colspan="2">UI direction</td></tr>
+        <tr><td>Components and CSS</td><td>Reusable components shared by both apps, very little CSS, a professional modern look, and no filler components. See D13.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note warn"><p><strong>Still needed from you before launch, not before planning:</strong> certificate wording and signatory names, original vector files for the five logos, the production domain names, and the Gmail account to send from.</p></div>
+</section>
+
+<!-- 4 -->
+<section id="architecture">
+  <div class="sec-head">
+    <div class="eyebrow">04 · Architecture</div>
+    <h2>System architecture</h2>
+    <p>Everything runs as Docker Compose services on one VPS. Video bytes go from Nginx straight to the browser; the API only authorizes them.</p>
+  </div>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart TB
+  subgraph Clients
+    S["Student browser: frontend-public + Video.js"]
+    A["Admin browser: frontend-internal"]
+    P["Public certificate verifier"]
+  end
+  subgraph VPS["Single VPS, Docker Compose"]
+    N["Nginx: TLS, routing, rate limits, signed HLS check"]
+    W["frontend-public: Next.js site + learner area"]
+    AD["frontend-internal: Next.js admin"]
+    API["api: NestJS modular monolith"]
+    WK["worker: BullMQ, FFmpeg, Chromium"]
+    PG[("PostgreSQL")]
+    R[("Redis: queues, captcha, rate limits")]
+    FS[["NVMe: originals, hls, media, certificates"]]
+  end
+  OFF[("Off-site encrypted backups")]
+  SMTP["Transactional email"]
+  OBS["Sentry + Grafana"]
+
+  S --> N
+  A --> N
+  P --> N
+  N -->|"learn host"| W
+  N -->|"admin host"| AD
+  N -->|"/api on both hosts"| API
+  N -->|"/hls and /media"| FS
+  API --> PG
+  API --> R
+  API --> FS
+  WK --> R
+  WK --> PG
+  WK --> FS
+  WK --> SMTP
+  PG -.-> OFF
+  FS -.-> OFF
+  API -.-> OBS
+  WK -.-> OBS
+</pre>
+  </div>
+  <div class="grid2">
+    <div class="box">
+      <h3>Repository layout</h3>
+<pre class="tree">heat-lms/
+├── apps/
+│   ├── frontend-public/    <span class="c"># public site + learner area</span>
+│   ├── frontend-internal/  <span class="c"># admin console</span>
+│   ├── api/        <span class="c"># NestJS HTTP API</span>
+│   └── worker/     <span class="c"># BullMQ consumers (shares api modules)</span>
+├── packages/
+│   ├── contracts/  <span class="c"># Zod schemas, DTO types, error codes</span>
+│   ├── api-client/ <span class="c"># orval-generated hooks + fetch wrapper</span>
+│   ├── db/         <span class="c"># Prisma schema, migrations, seed</span>
+│   ├── ui/         <span class="c"># shadcn components, Tailwind tokens</span>
+│   ├── i18n/       <span class="c"># bn / en message catalogs</span>
+│   └── config/     <span class="c"># eslint, tsconfig, vitest presets</span>
+├── infra/          <span class="c"># compose, nginx, njs, backup, grafana</span>
+├── tests/          <span class="c"># playwright e2e, k6 load scripts</span>
+├── docs/           <span class="c"># adr/, plans/, runbooks/</span>
+└── .claude/        <span class="c"># skills, agents, hooks, settings</span></pre>
+    </div>
+    <div class="box">
+      <h3>Technology choices</h3>
+      <div class="tbl">
+      <table>
+        <tbody>
+          <tr><td>Frontend</td><td>Next.js (App Router), React, TypeScript, Tailwind v4, shadcn/ui</td></tr>
+          <tr><td>Data and forms</td><td>TanStack Query, orval-generated client, nuqs, React Hook Form + Zod</td></tr>
+          <tr><td>Player</td><td>Video.js v10 on hls.js, skin styled with the shared theme</td></tr>
+          <tr><td>API</td><td>NestJS, nestjs-zod, Pino logs, @nestjs/throttler on Redis</td></tr>
+          <tr><td>Data</td><td>PostgreSQL 17, Prisma, UUIDv7 ids</td></tr>
+          <tr><td>Jobs</td><td>BullMQ on Redis, transactional outbox</td></tr>
+          <tr><td>Media</td><td>tus resumable upload, FFmpeg, sharp, Playwright Chromium</td></tr>
+          <tr><td>Email</td><td>Nodemailer over SMTP, React Email templates</td></tr>
+          <tr><td>Tests</td><td>Vitest, Testcontainers, Playwright, k6</td></tr>
+          <tr><td>Ops</td><td>Docker Compose, GitHub Actions, GHCR, Prometheus, Grafana, Sentry, restic</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>API module</th><th>Owns</th></tr></thead>
+      <tbody>
+        <tr><td><code>auth</code></td><td>Sign-in, refresh rotation, sign-out, captcha, admin 2FA, guards and roles</td></tr>
+        <tr><td><code>accounts</code></td><td>Profile, avatar, email verification, password change and reset</td></tr>
+        <tr><td><code>directory</code></td><td>Universities, faculties, university-faculty links, departments</td></tr>
+        <tr><td><code>catalog</code></td><td>Courses, revisions, modules, tags, front-page content, site settings</td></tr>
+        <tr><td><code>enrollment</code></td><td>Enrollment wizard, enrollment state, course progress summary</td></tr>
+        <tr><td><code>video</code></td><td>Video uploads, video records, transcode orchestration, playback sessions, captions</td></tr>
+        <tr><td><code>learning</code></td><td>Video progress intervals, module progress, unlock rules</td></tr>
+        <tr><td><code>assessment</code></td><td>Quizzes, questions, attempts, scoring</td></tr>
+        <tr><td><code>certificates</code></td><td>Issue, hold until verified, render, deliver, verify publicly, revoke</td></tr>
+        <tr><td><code>admin-users</code></td><td>Admin invitations, roles, deactivation, audit log</td></tr>
+        <tr><td><code>notifications</code></td><td>Outbox relay, email templates, delivery log, in-app notifications</td></tr>
+        <tr><td><code>media</code></td><td>Image and file uploads, resizing, visibility, signed links, cleanup</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 4b -->
+<section id="frontend">
+  <div class="sec-head">
+    <div class="eyebrow">05 · Frontend</div>
+    <h2>Frontend design</h2>
+    <p>Two Next.js apps share one component library and one generated API client. <code>frontend-public</code> covers everything a visitor or student does; <code>frontend-internal</code> covers everything an admin does. Full detail: <code>docs/superpowers/specs/2026-11-07-frontend-architecture-design.md</code>.</p>
+  </div>
+
+  <div class="tbl wide">
+    <table>
+      <thead><tr><th style="width:30%">Your decision</th><th>What it means for the build</th></tr></thead>
+      <tbody>
+        <tr><td>Students use phones and laptops equally</td><td>Both layouts get the same design and test effort; every student journey is tested at phone and laptop width.</td></tr>
+        <tr><td>Built for slow mobile data</td><td>Strict JavaScript and image budgets, lower starting video quality, progress and quiz answers that survive a dropped connection.</td></tr>
+        <tr><td>Dark mode in both apps</td><td>Follows the device setting, with a manual switch. Every component is checked in both themes.</td></tr>
+        <tr><td>Language in the student app's address</td><td><code>/bn/…</code> and <code>/en/…</code>; <code>/</code> redirects by saved preference, then browser language, defaulting to Bangla.</td></tr>
+        <tr><td>Admin app: laptop first, quick tasks on phone, English only</td><td>Approvals and the dashboard are designed for phones; other screens are laptop-first but usable.</td></tr>
+        <tr><td>Learner area with a sidebar, as in the demo</td><td>Sidebar on laptop, a 5-item bottom bar on phones.</td></tr>
+        <tr><td>One question per screen, single choice only</td><td>Progress bar, Previous / Next, review screen before submitting.</td></tr>
+        <tr><td>In-app notifications plus email</td><td>Bell with unread count. Emails only for approval decisions, removal or reinstatement, and certificates; news posts are bell-only so they never use the Gmail quota.</td></tr>
+        <tr><td>Simple rich-text editor</td><td>Word-like toolbar: headings, bold, italic, lists, links, images, quotes.</td></tr>
+        <tr><td>Optional captions</td><td>Admins may upload a <code>.vtt</code> file per video and language; the player shows a captions menu only when one exists.</td></tr>
+        <tr><td>Resources are public</td><td>Anyone can open and download them.</td></tr>
+        <tr><td>No installable app</td><td>A normal website; no offline mode.</td></tr>
+        <tr><td>Designs approved before screens</td><td>The Open Pencil designs and theme are approved by you first. Setup, API and video work continue in parallel.</td></tr>
+        <tr><td>Images on the server's disk, no MinIO</td><td>See “Images and files” below.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>How the apps get their data</h3>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart LR
+  B["Browser"]
+  FP["frontend-public or frontend-internal (Next.js)"]
+  API["NestJS API"]
+  ST[["Disk: HLS and media"]]
+  B -->|"page requests"| FP
+  B -->|"/api calls from generated hooks"| API
+  B -->|"/hls and /media, signed"| ST
+  FP -->|"server-side fetch on internal network"| API
+  FP -->|"proxy.ts refreshes session"| API
+  API -->|"revalidate cached pages"| FP
+</pre>
+  </div>
+  <p class="cap">Every browser request goes through Nginx on the app's own host, so cookies stay first-party.</p>
+  <div class="grid2">
+    <div class="box"><h4>Rules</h4><ul>
+      <li><b>Public pages</b> render on the server and are cached by tag. When an admin changes content, the API tells <code>frontend-public</code> which tags to refresh.</li>
+      <li><b>Signed-in pages</b> check the session in a server-only data layer on every page. Checks are never only in a layout. First data is fetched on the server and handed to TanStack Query.</li>
+      <li><b>Everything interactive</b> calls the API from the browser through hooks generated by orval from the API's OpenAPI spec. No Server Actions, so there is one path for auth and CSRF.</li>
+      <li><b>Sessions</b> are refreshed in <code>proxy.ts</code> before a page renders, and by one shared retry in the browser. The API allows a 20-second grace window so parallel refreshes never log anyone out.</li>
+    </ul></div>
+    <div class="box"><h4>Shared packages</h4><ul>
+      <li><code>@heat/ui</code>: the only place styles are written</li>
+      <li><code>@heat/contracts</code>: Zod schemas and error codes, used by the forms and the API</li>
+      <li><code>@heat/api-client</code>: generated hooks, request wrapper and server fetcher</li>
+      <li><code>@heat/i18n</code>: Bangla and English text for the student app and emails</li>
+      <li>A CI check fails the build when the generated client is out of date with the API.</li>
+    </ul></div>
+  </div>
+
+  <h3>Pages</h3>
+  <div class="grid2">
+    <div class="box">
+      <h4><code>frontend-public</code> · learn.&lt;domain&gt;/[bn|en]</h4>
+      <div class="tbl"><table><tbody>
+        <tr><td>Public</td><td><code>/</code>, <code>/about</code>, <code>/courses/[slug]</code>, <code>/resources</code>, <code>/news</code>, <code>/news/[slug]</code>, <code>/contact</code>, <code>/verify/[number]</code></td></tr>
+        <tr><td>Account</td><td><code>/enroll</code>, <code>/sign-in</code>, <code>/forgot-password</code>, <code>/reset-password/[token]</code>, <code>/verify-email/[token]</code></td></tr>
+        <tr><td>Learner</td><td><code>/dashboard</code>, <code>/awaiting-approval</code>, <code>/learn/[course]</code>, <code>/learn/[course]/[module]</code>, <code>…/quiz</code>, <code>…/quiz/result/[attempt]</code>, <code>/certificates</code>, <code>/notifications</code>, <code>/profile</code></td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="box">
+      <h4><code>frontend-internal</code> · admin.&lt;domain&gt;</h4>
+      <div class="tbl"><table><tbody>
+        <tr><td>Sign-in</td><td><code>/sign-in</code>, <code>/sign-in/verify</code>, <code>/setup-2fa</code>, <code>/accept-invite/[token]</code>, password reset</td></tr>
+        <tr><td>Overview</td><td><code>/</code> dashboard, <code>/insights</code></td></tr>
+        <tr><td>Students</td><td><code>/enrollments</code>, <code>/students</code>, <code>/students/[id]</code></td></tr>
+        <tr><td>Courses</td><td><code>/courses</code>, <code>/courses/[id]</code>, <code>…/modules/[moduleId]</code>, <code>…/preview</code>, <code>/videos</code></td></tr>
+        <tr><td>Directory</td><td><code>/directory/universities</code>, <code>/faculties</code>, <code>/departments</code></td></tr>
+        <tr><td>Content</td><td><code>/content/resources</code>, <code>/content/news</code>, <code>/content/pages</code>, <code>/content/tags</code></td></tr>
+        <tr><td>Admin</td><td><code>/admins</code> (super admin), <code>/audit-log</code>, <code>/account</code></td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+  <div class="note"><p><strong>Access is checked per course.</strong> Approved and completed students can open a course; a completed student can rewatch lessons and see past quiz results. Pending courses show their status, removed courses show the reason, and a signed-in student can request further courses with one click.</p></div>
+
+  <h3>Student experience</h3>
+  <div class="grid3">
+    <div class="box"><h4>Video player</h4><ul>
+      <li>Video.js v10 on hls.js, styled through the shared theme</li>
+      <li>Auto quality capped at 480p on data-saver or 2G/3G, otherwise 720p; 1080p available by hand</li>
+      <li>About 20 s buffered ahead, remembered quality and bandwidth</li>
+      <li>Resumes from the saved position; recovers from an expired video cookie without stopping</li>
+      <li>Bangla and English labels, keyboard shortcuts, optional captions</li>
+    </ul></div>
+    <div class="box"><h4>Progress and quiz</h4><ul>
+      <li>Watched ranges sent every 15 s and on pause, seek or tab hide; unsent ones retried after reconnecting</li>
+      <li>Quiz opens at 80% watched</li>
+      <li>Answers saved on the device while in progress; submission can be safely retried</li>
+      <li>Result screen with score, explanations after a pass, and a countdown before the next attempt</li>
+    </ul></div>
+    <div class="box"><h4>Slow-network budget</h4><ul>
+      <li>Public pages: at most 150 KB of JavaScript (gzipped) on first load</li>
+      <li>Learner pages: at most 200 KB, plus the player only on lesson pages</li>
+      <li>Largest content shown within 2.5 s on a mid-range Android over Slow 4G, checked in CI</li>
+      <li>Pre-sized images, self-hosted fonts, no third-party scripts</li>
+    </ul></div>
+  </div>
+
+  <h3>Admin experience</h3>
+  <div class="grid2">
+    <div class="box"><ul>
+      <li>One data table for every list: server-side paging, sorting and filters kept in the address, so views can be shared and bookmarked. It turns into cards on phones.</li>
+      <li>One form pattern for create and edit, with an unsaved-changes guard and named confirmations for deletes.</li>
+      <li>Locked course fields are read-only with a short explanation; wording-fix fields note that changes are logged.</li>
+    </ul></div>
+    <div class="box"><ul>
+      <li>Drag to reorder modules and questions, with Move up / Move down for keyboard users.</li>
+      <li>Resumable video upload with pause and resume, then live processing status.</li>
+      <li>Insights charts share one filter bar, and each chart's data can be downloaded as CSV.</li>
+      <li>Course preview uses the same player and lesson components students see, with correct answers shown.</li>
+    </ul></div>
+  </div>
+
+  <h3>Shared component library</h3>
+  <div class="grid2">
+    <div class="box"><h4>What it contains</h4>
+      <p>shadcn/ui on Base UI, themed only by tokens from the approved designs. Shared building blocks: app shell, page header, data table, filter bar, form field, status badge, empty and error states, confirm dialog, stat card, chart card, file upload, video player, rich-text editor and renderer, sortable list, captcha field, language, theme and notification controls.</p>
+      <p class="cap">Heavy parts (player, editor, charts, tables, uploads) are separate imports, so a page only loads what it uses.</p>
+    </div>
+    <div class="box"><h4>Styling rules, enforced by lint</h4><ul>
+      <li>No CSS files in the apps except the one entry that imports the theme</li>
+      <li>No inline styles, and no arbitrary Tailwind values outside <code>@heat/ui</code></li>
+      <li>Apps use Tailwind only for layout</li>
+      <li>Every element must serve the screen's task: no filler cards, banners or stat tiles</li>
+      <li>Every component has a Storybook story in light and dark, Bangla and English, and passes an accessibility check</li>
+    </ul></div>
+  </div>
+
+  <h3>Images and files</h3>
+  <div class="tbl wide">
+    <table>
+      <thead><tr><th>What</th><th>Who can see it</th><th>How it is served</th></tr></thead>
+      <tbody>
+        <tr><td>Course and module thumbnails, news images, resources</td><td>Everyone</td><td>Public link served directly by Nginx, cached for a year</td></tr>
+        <tr><td>Images inside lesson text</td><td>Approved and completed students of that course, admins</td><td>Link that expires in 1 hour, checked by Nginx like the videos</td></tr>
+        <tr><td>Caption files</td><td>Same as the video</td><td>Stored under the video's signed path and covered by the same playback cookie</td></tr>
+        <tr><td>Profile pictures, certificate PDFs</td><td>The owner and admins</td><td>The API checks access, then Nginx sends the file</td></tr>
+        <tr><td>HEAT, partner and University of Dhaka logos</td><td>Everyone</td><td>Static files in the apps</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ol>
+    <li>The API checks each upload's real type from its contents. JPEG, PNG, WebP and AVIF images, PDF, DOCX and PPTX documents, and WebVTT captions are allowed; SVG is rejected.</li>
+    <li>Images are decoded, stripped of hidden data such as GPS location, and saved in fixed WebP sizes (320, 640, 1280 and 1920 px). The original upload is not kept.</li>
+    <li>Files are stored on the server's disk under random names, behind a storage interface. Pages store the image's ID, never its link, so moving to cloud storage or a CDN later changes no content.</li>
+    <li>Next.js picks the nearest ready-made size, so the server never resizes images while students browse.</li>
+    <li>Unused uploads are deleted after 24 hours, and all files are in the nightly off-site backup.</li>
+  </ol>
+  <div class="note warn"><p><strong>Why not MinIO:</strong> its free edition stopped shipping in October 2025 and its repository was archived in 2026. On a single server it also adds a hop for every file without making files any safer.</p></div>
+
+  <h3>Frontend stack</h3>
+  <div class="tbl wide">
+    <table>
+      <tbody>
+        <tr><td>Framework</td><td>Next.js 16.4 (App Router, Cache Components, <code>proxy.ts</code>, Turbopack, standalone output), React 19.3 with the React Compiler</td></tr>
+        <tr><td>UI</td><td>shadcn/ui on Base UI, Tailwind CSS 4.3, lucide icons, sonner toasts, next-themes</td></tr>
+        <tr><td>Data</td><td>TanStack Query 5, orval-generated client, nuqs for URL state, TanStack Table 9, Recharts 3</td></tr>
+        <tr><td>Forms</td><td>React Hook Form with Zod 4 schemas from <code>@heat/contracts</code></td></tr>
+        <tr><td>Content</td><td>Tiptap 3 editor, stored as JSON and rendered on the server through an allow-list</td></tr>
+        <tr><td>Media</td><td>Video.js 10 on hls.js 1.7; Uppy 6 with tus for video upload; dnd-kit for reordering</td></tr>
+        <tr><td>Language and dates</td><td>next-intl 4, date-fns 4</td></tr>
+        <tr><td>Quality</td><td>Storybook 10, Vitest, Playwright with axe and screenshots, Lighthouse CI, Sentry</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="data">
+  <div class="sec-head">
+    <div class="eyebrow">06 · Data</div>
+    <h2>Data model</h2>
+    <p>The entities from the implementation plan, extended for the academic directory, enrollment approval, lesson text, resources, news, tags, revisions, verification tokens, the email queue and the audit log. Field-level design is part of epic E2.</p>
+  </div>
+  <div class="diagram">
+<pre class="mermaid">
+erDiagram
+  UNIVERSITY ||--o{ UNIVERSITY_FACULTY : offers
+  FACULTY ||--o{ UNIVERSITY_FACULTY : "belongs to"
+  UNIVERSITY_FACULTY ||--o{ DEPARTMENT : contains
+  DEPARTMENT ||--o{ STUDENT_PROFILE : "studies in"
+  USER ||--o| STUDENT_PROFILE : has
+  USER ||--o{ SESSION : "signs in with"
+  USER ||--o{ AUTH_TOKEN : "verify or reset"
+  USER ||--o{ ENROLLMENT : makes
+  COURSE ||--o{ COURSE_REVISION : "versioned as"
+  COURSE_REVISION ||--o{ MODULE : contains
+  MODULE ||--o{ LESSON_SECTION : "text and objectives"
+  MODULE ||--o{ VIDEO : "ordered videos"
+  MODULE ||--o| QUIZ : "assessed by"
+  QUIZ ||--o{ QUESTION : has
+  QUESTION ||--o{ OPTION : has
+  VIDEO ||--o{ VIDEO_RENDITION : "HLS outputs"
+  ENROLLMENT }o--|| COURSE_REVISION : "pinned to"
+  ENROLLMENT ||--o{ VIDEO_PROGRESS : tracks
+  ENROLLMENT ||--o{ MODULE_PROGRESS : tracks
+  ENROLLMENT ||--o{ QUIZ_ATTEMPT : submits
+  QUIZ_ATTEMPT ||--o{ ANSWER : records
+  ENROLLMENT ||--o| CERTIFICATE : earns
+  ENROLLMENT ||--o{ ENROLLMENT_DECISION : "approve, reject, remove"
+  USER ||--o{ ENROLLMENT_DECISION : "decided by admin"
+  RESOURCE }o--o| COURSE : "optionally about"
+  USER ||--o{ NEWS_POST : authors
+  EMAIL_JOB }o--|| USER : "sent to"
+  TAG }o--o{ COURSE : labels
+  TAG }o--o{ MODULE : labels
+  USER ||--o{ AUDIT_LOG : "admin actions"
+</pre>
+  </div>
+  <div class="grid3">
+    <div class="box"><h4>Integrity rules</h4><ul>
+      <li>Unique (user, course) enrollment</li>
+      <li>Unique module order per revision, video order per module</li>
+      <li>One certificate per enrollment</li>
+      <li><code>RESTRICT</code> on directory foreign keys</li>
+      <li>Department FK to the university-faculty pair</li>
+      <li>Email unique among non-deleted users only (partial unique index)</li>
+    </ul></div>
+    <div class="box"><h4>History is never rewritten</h4><ul>
+      <li>Attempts store <code>passMarkSnapshot</code> and the score</li>
+      <li>Enrollments are pinned to a revision</li>
+      <li>Soft delete (<code>deletedAt</code>) for rejected users, content and directory, filtered by a Prisma extension</li>
+      <li>Every approve, reject, remove and reinstate stored as an enrollment decision with admin and reason</li>
+      <li>Append-only audit log with actor, action, before and after</li>
+    </ul></div>
+    <div class="box"><h4>Security-relevant storage</h4><ul>
+      <li>Refresh, verification and reset tokens are stored as SHA-256 hashes only</li>
+      <li>Captcha answers live in Redis, hashed, with a TTL</li>
+      <li>Videos are referenced by <code>assetKey</code>, never by a disk path</li>
+      <li>Correct quiz options are never sent to the learner app</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="flows">
+  <div class="sec-head">
+    <div class="eyebrow">07 · Flows</div>
+    <h2>Critical flows</h2>
+    <p>The flows where a mistake costs the most: enrollment approval, video security, progress integrity and certificate issuance. Each gets integration tests that drive the real state machine.</p>
+  </div>
+  <div class="box">
+    <h3>Enrollment states</h3>
+    <div class="diagram" style="padding:8px">
+<pre class="mermaid">
+stateDiagram-v2
+  [*] --> PENDING_VERIFICATION: form submitted
+  PENDING_VERIFICATION --> PENDING_APPROVAL: email verified
+  PENDING_VERIFICATION --> EXPIRED: 7 days unverified
+  PENDING_APPROVAL --> APPROVED: admin approves
+  PENDING_APPROVAL --> REJECTED: admin rejects
+  APPROVED --> REMOVED: admin removes
+  REMOVED --> APPROVED: admin reinstates
+  COMPLETED --> REMOVED: admin removes
+  REMOVED --> COMPLETED: reinstate if it was completed
+  APPROVED --> COMPLETED: last module passed
+  EXPIRED --> [*]
+  REJECTED --> [*]
+</pre>
+    </div>
+    <p class="cap"><code>EXPIRED</code> and <code>REJECTED</code> soft-delete the account only when it has no other approved or completed enrollment, which frees the email for a new registration. Approval, rejection and removal each send an email with the reason. Approval pins the enrollment to the current revision, locks the course and unlocks module 1 in one transaction.</p>
+  </div>
+  <div class="grid2">
+    <div class="box">
+      <h3>Video processing states</h3>
+      <div class="diagram" style="padding:8px">
+<pre class="mermaid">
+stateDiagram-v2
+  [*] --> UPLOADING
+  UPLOADING --> UPLOADED: tus complete
+  UPLOADED --> QUEUED: ffprobe ok
+  UPLOADED --> REJECTED: bad codec or size
+  QUEUED --> PROCESSING
+  PROCESSING --> READY: renditions validated
+  PROCESSING --> FAILED: error or timeout
+  FAILED --> QUEUED: admin retry
+  READY --> [*]
+</pre>
+      </div>
+      <p class="cap">Each attempt writes to a fresh temp directory and swaps it in atomically, so a retry never mixes partial output. FFmpeg runs at low priority with concurrency 1.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Rendition</th><th>Target bitrate</th><th>≈ size per 10 min</th></tr></thead>
+          <tbody>
+            <tr><td>360p</td><td>400 Kbps</td><td>30 MB</td></tr>
+            <tr><td>480p</td><td>650 Kbps</td><td>49 MB</td></tr>
+            <tr><td>720p</td><td>1.0–1.2 Mbps</td><td>90 MB</td></tr>
+            <tr><td>1080p</td><td>2.0–2.5 Mbps</td><td>188 MB</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="cap">H.264 video with AAC audio, about 6-second segments, keyframes aligned across renditions, and one master playlist listing every quality. A source smaller than 1080p is never upscaled. Bitrates are starting targets, tuned on real course footage in the Phase 1 spike.</p>
+    </div>
+    <div class="box">
+      <h3>Module progress states</h3>
+      <div class="diagram" style="padding:8px">
+<pre class="mermaid">
+stateDiagram-v2
+  [*] --> LOCKED
+  LOCKED --> UNLOCKED: previous module passed
+  UNLOCKED --> IN_PROGRESS: first heartbeat
+  IN_PROGRESS --> QUIZ_READY: required videos 80 pct
+  QUIZ_READY --> COMPLETED: attempt passed
+  QUIZ_READY --> QUIZ_READY: failed, wait, retry if allowed
+  COMPLETED --> [*]
+</pre>
+      </div>
+      <p class="cap">Module 1 unlocks when the enrollment is approved. If a quiz's attempt limit is used up, the module waits until an admin grants another attempt. Passing the last module marks the enrollment complete and writes a <code>CertificateRequested</code> outbox event, all in one transaction.</p>
+    </div>
+  </div>
+  <div class="box">
+    <h3>Authorized playback</h3>
+    <div class="diagram" style="padding:8px">
+<pre class="mermaid">
+sequenceDiagram
+  participant B as Browser (Video.js + hls.js)
+  participant API as NestJS API
+  participant DB as PostgreSQL
+  participant NG as Nginx + njs
+  B->>API: POST /videos/:id/playback-session
+  API->>DB: check enrollment, module unlocked, video READY
+  API-->>B: Set-Cookie hls_sig (path /hls/:id, 10 min) + resume position
+  loop every segment
+    B->>NG: GET /hls/:id/720p/seg_0042.m4s + cookie
+    NG->>NG: verify HMAC, expiry, path prefix
+    NG-->>B: 200 segment (sendfile, cached)
+  end
+  loop every 15 s and on pause
+    B->>API: POST /videos/:id/progress (interval, position, seq)
+    API->>DB: merge intervals, ignore stale seq
+  end
+  B->>API: refresh session before expiry
+</pre>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="quality">
+  <div class="sec-head">
+    <div class="eyebrow">08 · Quality bar</div>
+    <h2>Security and quality bar</h2>
+    <p>The rules every ticket is reviewed against. They go into <code>CLAUDE.md</code> and the review agents' checklists, so the bar stays the same from the first ticket to the last.</p>
+  </div>
+  <div class="grid2">
+    <div class="box"><h3>Security</h3><ul>
+      <li>Target OWASP ASVS Level 2; checklist items linked from tickets</li>
+      <li>argon2id, breached-password check (k-anonymity), lockout with backoff</li>
+      <li>Rate limits on sign-in, enrollment, captcha, reset, verify and playback sessions, keyed by account or email plus IP with generous per-IP ceilings, because a whole campus or mobile carrier can share one IP</li>
+      <li>Worker isolation: certificate rendering in Chromium with networking off and an escaped template; FFmpeg limited to local files of that job</li>
+      <li>Nginx signed-link checks use the normalised path and a constant-time comparison, with key rotation</li>
+      <li>The audit log is append-only at the database level: the app's database user cannot update or delete its rows</li>
+      <li>Strict CSP with nonces, HSTS, <code>helmet</code>, CSRF double-submit for unsafe methods</li>
+      <li>Every endpoint has an explicit guard. Deny by default, with a test that fails on any unguarded route</li>
+      <li>Uploads checked by magic bytes and ffprobe, size-capped, stored outside the web root</li>
+      <li>Secrets only in environment files with restricted permissions; no secrets in images or the repo</li>
+      <li>Dependabot, CodeQL, <code>pnpm audit</code> and container scanning in CI</li>
+    </ul></div>
+    <div class="box"><h3>Engineering</h3><ul>
+      <li>TypeScript strict mode, no <code>any</code>, ESLint and Prettier enforced by hooks and CI</li>
+      <li>Test-driven work: unit tests for rules, integration tests on a real Postgres (Testcontainers), Playwright for user journeys</li>
+      <li>Coverage gate: 85% on domain services, 100% on unlock, scoring and certificate rules</li>
+      <li>Prisma migrations reviewed, never edited after merge, run with <code>migrate deploy</code></li>
+      <li>Consistent error format with stable error codes shared through <code>@heat/contracts</code></li>
+      <li>Structured logs with request ids, no personal data in logs</li>
+    </ul></div>
+    <div class="box"><h3>User experience</h3><ul>
+      <li>WCAG 2.2 AA: keyboard flows, focus states, contrast, captions support in the player</li>
+      <li>Bangla and English for every UI string</li>
+      <li>Performance budget on a mid-range Android over 4G: LCP under 2.5 s on public pages</li>
+      <li>Loading, empty and error states designed for every screen</li>
+      <li>Every screen built from <code>@heat/ui</code> components; no app-level CSS files and no values outside the tokens</li>
+      <li>No decorative or filler components: each element on a screen must help the task on that screen</li>
+      <li>Consistent patterns across both apps: the same table, form, dialog and feedback behaviour everywhere</li>
+    </ul></div>
+    <div class="box"><h3>Operations</h3><ul>
+      <li>SLO: 99.5% monthly availability, under 1% playback request failures</li>
+      <li>Continuous off-site archiving of the database write-ahead log (pgBackRest), so at most 15 minutes of data can be lost; nightly encrypted off-site backups of media and certificates; restore drill each month; recovery within 4 hours</li>
+      <li>Staging copy on the same VPS with resource limits; every release and migration runs there first</li>
+      <li>Migrations follow expand then contract (add, backfill, switch, remove later), so a deploy never breaks the running version</li>
+      <li>External uptime check that alerts when the server stops responding, since the dashboards run on the same server</li>
+      <li>All scheduled jobs and dates use Asia/Dhaka time</li>
+      <li>Dashboards: CPU steal, egress, disk latency, queue depth, Nginx 5xx, player errors</li>
+      <li>Runbooks for deploy, rollback, restore, disk full, bandwidth near quota and email quota reached</li>
+      <li>Email queue dashboard: sent today, remaining quota, delayed jobs, failures</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section id="roadmap">
+  <div class="sec-head">
+    <div class="eyebrow">09 · Roadmap</div>
+    <h2>Delivery roadmap</h2>
+    <p>Eight phases, one GitHub milestone each. Video delivery is proven in phase 1 because it is the part the VPS is most likely to struggle with. Each phase ends with exit criteria that are checked, not assumed.</p>
+  </div>
+  <div class="phases">
+    <div class="phase"><div class="p">P0<span>Foundation</span></div><div><h4>Repo, tooling, workflow</h4><p>Monorepo, CI, Docker dev stack, CLAUDE.md, hooks, <code>/implement-issue</code> skill, issue templates, Open Pencil designs of the key screens and the theme, approved by you before any screen work, <code>@heat/ui</code> tokens.</p></div><p class="exit">Exit: a trivial ticket goes through all 8 workflow stages and merges green.</p></div>
+    <div class="phase"><div class="p">P1<span>De-risk</span></div><div><h4>Video delivery spike</h4><p>Transcode real course footage, signed HLS through Nginx njs, minimal player, k6 test from outside the VPS.</p></div><p class="exit">Exit: 200 simulated viewers for 30 min on the target VPS with under 1% segment errors, or a documented change of plan.</p></div>
+    <div class="phase"><div class="p">P2<span>Identity</span></div><div><h4>Data model, auth, directory, enrollment, approval</h4><p>Full Prisma schema, seed super admin, both auth realms with admin two-factor, captcha, university/faculty/department admin, minimal course and module admin with publish checks and the content lock, enrollment wizard, mail transport and email queue, email verification, approval queue with reject, remove and reinstate, notifications backend.</p></div><p class="exit">Exit: a student registers, verifies their email, is approved and sees their approved status; the first approval locks the course; rejection frees the email; the Gmail limit is simulated and queued mail resumes after reset.</p></div>
+    <div class="phase"><div class="p">P3<span>Authoring</span></div><div><h4>Full course admin, video pipeline, landing page</h4><p>Revisions, lesson text, tags and front page, quiz builder, resumable upload, transcode jobs with live status, captions, media pipeline, the public landing and course pages.</p></div><p class="exit">Exit: an admin builds the full course, publishes it, the landing page shows it, and wording fixes work on a locked course.</p></div>
+    <div class="phase"><div class="p">P4<span>Learning</span></div><div><h4>Learner experience and assessment</h4><p>Dashboard, course page, player with quality and speed controls, resume, interval progress, quiz taking, scoring and unlocks.</p></div><p class="exit">Exit: a student completes every module end to end in Playwright, and the unlock rules cannot be bypassed through the API.</p></div>
+    <div class="phase"><div class="p">P5<span>Completion</span></div><div><h4>Certificates, accounts, content, insights</h4><p>Profile and avatar, password change and reset, certificate rendering and completion email, public verification, Resources, News &amp; Updates and Contact pages, student detail, CSV export, summary dashboard and the Insights page.</p></div><p class="exit">Exit: completion produces exactly one certificate, emailed and verifiable by QR code; insights match a hand-checked sample dataset.</p></div>
+    <div class="phase"><div class="p">P6<span>Hardening</span></div><div><h4>Production readiness</h4><p>VPS hardening, TLS, production compose, backups and restore drill, monitoring and alerts, security review, accessibility audit, full load test with mixed traffic.</p></div><p class="exit">Exit: acceptance criteria from the implementation plan met; restore drill passed; no open high-severity findings.</p></div>
+    <div class="phase"><div class="p">P7<span>Launch</span></div><div><h4>Pilot and launch</h4><p>Content load by the department, pilot with one cohort, fixes, public launch, two weeks of close monitoring.</p></div><p class="exit">Exit: pilot cohort completes with no data-integrity incidents.</p></div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section id="backlog">
+  <div class="sec-head">
+    <div class="eyebrow">10 · Backlog</div>
+    <h2>Epics and first-cut backlog</h2>
+    <p>Seventeen epics become parent issues; the items below become their sub-issues. Each item is sized to fit one pull request. This is a first cut: the refinement stage of the workflow tightens each ticket before work starts. <span class="tag p0">P0</span> marks critical-path items.</p>
+  </div>
+  <div>
+    <details class="epic" open><summary><span class="e">E0</span><span class="t">Engineering foundation<small>Monorepo, CI and the Claude workflow everything else depends on</small></span><span class="c">P0 · 11 issues</span></summary><ol>
+      <li>Scaffold pnpm + Turborepo with apps and packages <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Shared TypeScript, ESLint, Prettier and Vitest presets</li>
+      <li>Docker Compose dev stack: Postgres, Redis, Nginx, Mailpit</li>
+      <li>GitHub Actions: lint, typecheck, test, build, CodeQL, dependency audit <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Root and per-app CLAUDE.md with conventions and the quality bar</li>
+      <li><code>/implement-issue</code> skill and subagents (refiner, reviewer, security reviewer) <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Workflow hooks: branch guard, plan gate, format on edit, verify before PR, stop check</li>
+      <li>Issue forms, PR template, labels, milestones and the GitHub Project</li>
+      <li>ADR template and the first ADRs (D1 to D16)</li>
+      <li>OpenAPI spec from NestJS and orval client generation with a CI drift check</li>
+      <li>Storybook for <code>@heat/ui</code> with accessibility checks</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E1</span><span class="t">Design system and app shells<small>Open Pencil designs, one shared component library, logos, i18n</small></span><span class="c">P0 · 11 issues</span></summary><ol>
+      <li>Open Pencil: landing, enrollment, awaiting approval, dashboard, course, quiz, admin list, editor and insights screens</li>
+      <li>Design tokens into the <code>@heat/ui</code> Tailwind theme (light and dark) <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>shadcn base components themed by tokens in <code>@heat/ui</code></li>
+      <li>Shared composites: page header, data table, form field, status badge, empty state, confirm dialog, stat card, file upload, chart</li>
+      <li>Lint rules that keep styling inside <code>@heat/ui</code> (no app CSS files, no arbitrary values)</li>
+      <li>Logo assets: 4 HEAT header logos and the University of Dhaka crest, optimized SVG</li>
+      <li>next-intl setup with bn and en catalogs and a language switch</li>
+      <li><code>frontend-public</code> and <code>frontend-internal</code> shells built only from <code>@heat/ui</code></li>
+      <li>Accessibility and visual regression baseline in Playwright</li>
+      <li>Spike and ADR: Content Security Policy that keeps cached pages static</li>
+      <li>Lighthouse CI with Slow 4G budgets (warning only)</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E2</span><span class="t">Data model<small>Prisma schema, migrations, seed</small></span><span class="c">P2 · 6 issues</span></summary><ol>
+      <li>Prisma schema for identity, directory, enrollment and catalog <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Schema for learning, assessment, certificates, content pages, email queue and audit</li>
+      <li>Soft-delete Prisma extension and partial unique index on active emails</li>
+      <li>Seed: super admin from env, University of Dhaka, sample faculties and departments</li>
+      <li>Testcontainers harness and per-test database isolation</li>
+      <li>Migration review checklist and CI drift check</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E3</span><span class="t">Identity and access<small>Both auth realms, admin two-factor, captcha, rate limiting</small></span><span class="c">P2 · 11 issues</span></summary><ol>
+      <li>Password hashing, session and refresh rotation service <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Student sign-in, sign-out, session refresh endpoints and pages</li>
+      <li>Admin sign-in with required authenticator code and recovery codes</li>
+      <li>Role, audience and enrollment-status guards, deny-by-default route test</li>
+      <li>Server captcha: generate, verify, refresh</li>
+      <li>Redis-backed rate limits and lockout</li>
+      <li>CSRF protection and security headers</li>
+      <li>Super admin: invite, deactivate and list admins</li>
+      <li>Audit log interceptor and admin audit viewer</li>
+      <li>Account protections: replace unverified registrations, sign out pre-verification sessions, no email enumeration</li>
+      <li>Break-glass super admin recovery command and idempotent seed</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E4</span><span class="t">Academic directory<small>Universities, faculties, departments</small></span><span class="c">P2 · 5 issues</span></summary><ol>
+      <li>University CRUD with delete-restriction rule</li>
+      <li>Faculty CRUD and assigning faculties to universities</li>
+      <li>Department CRUD under a university-faculty pair</li>
+      <li>Public cascading lookup endpoints (cached)</li>
+      <li>Archive and restore for directory records</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E5</span><span class="t">Public site and enrollment<small>Landing page, front-page tags, enrollment request</small></span><span class="c">P2 · 7 issues</span></summary><ol>
+      <li>Tags and front-page ordering (admin)</li>
+      <li>Site settings for project overview content (admin)</li>
+      <li>Landing page with cached front-page courses and modules</li>
+      <li>Enrollment step 1: academic details with cascading selects</li>
+      <li>Enrollment step 2: account details, captcha, submit <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Enrollment request transaction and “Awaiting approval” page with status</li>
+      <li>Signed-in students request further courses in one click</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E6</span><span class="t">Student management and insights<small>Approval queue, student records, dashboard, insights</small></span><span class="c">P2–P5 · 12 issues</span></summary><ol>
+      <li>Approval queue with filters and bulk approve or reject <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Reject with reason: soft-delete user and enrollment</li>
+      <li>Remove and reinstate students, with reasons</li>
+      <li>Decision emails: approved, rejected, removed, reinstated</li>
+      <li>Student list with university, faculty, department, session and status filters</li>
+      <li>Student detail: modules, quiz attempts, video progress, certificate</li>
+      <li>CSV export of the filtered student list (streamed)</li>
+      <li>Summary dashboard: totals, pass rates per module, certificates issued</li>
+      <li>Daily insights rollup job and query layer</li>
+      <li>Insights: enrollment funnel and trends over time</li>
+      <li>Insights: module completion, drop-off, quiz pass rates, attempts and most-missed questions</li>
+      <li>Name and academic detail change requests, approved by an admin</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E7</span><span class="t">Course authoring<small>Courses, revisions, modules, lesson text, quiz builder, content lock</small></span><span class="c">P3 · 9 issues</span></summary><ol>
+      <li>Course CRUD and status lifecycle</li>
+      <li>Module CRUD with drag-to-reorder, lesson sections and learning objectives</li>
+      <li>Video slots on modules (ordered, ready for several per module)</li>
+      <li>Quiz builder: single-choice questions, and per-quiz pass mark, attempt limit and wait time</li>
+      <li>Content lock at first approved enrollment, with audited wording fixes <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Clone to new revision and publish revision</li>
+      <li>Learner-view preview for admins</li>
+      <li>Publish checks: every module has a ready video and a quiz with questions</li>
+      <li>Rich text editor and safe renderer components (Tiptap), with text-only wording fixes and diffs</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E8</span><span class="t">Video and media pipeline<small>Upload, transcode, signed delivery, images and files</small></span><span class="c">P1–P3 · 10 issues</span></summary><ol>
+      <li>Spike: FFmpeg ladder on real footage and quality review <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Spike: Nginx njs signed-cookie validation for HLS <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Spike: k6 playback load test against the VPS <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Media module: image pipeline, visibility levels, signed links, cleanup</li>
+      <li>Optional caption upload per video and language</li>
+      <li>Resumable upload endpoint and admin uploader</li>
+      <li>Transcode job: probe, encode, validate, atomic publish, retry</li>
+      <li>Live processing status in admin</li>
+      <li>Playback session endpoint and cookie refresh</li>
+      <li>Cleanup job for temp files and orphaned originals</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E9</span><span class="t">Learner experience<small>Dashboard, course page, player, progress</small></span><span class="c">P4 · 8 issues</span></summary><ol>
+      <li>Learning structure endpoint with lock states</li>
+      <li>Student dashboard with progress and continue learning</li>
+      <li>Course page: module list, lesson text, objectives, video area</li>
+      <li>Player: auto and manual quality, speed, fullscreen, errors</li>
+      <li>Heartbeat and interval-merge progress service <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Resume playback across devices</li>
+      <li>Quiz unlock at 80% watched for each required video</li>
+      <li>Notifications: bell, list, unread count, mark as read</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E10</span><span class="t">Assessment<small>Quiz taking, scoring, unlocks</small></span><span class="c">P4 · 6 issues</span></summary><ol>
+      <li>Quiz delivery without answer leakage, shuffled options</li>
+      <li>Attempt submission, server scoring, per-quiz attempt limit and wait time</li>
+      <li>Transactional pass: complete module, unlock next, complete course <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Results screen with feedback and time until next attempt</li>
+      <li>Property-based tests for scoring and unlock rules</li>
+      <li>Admin action: grant an extra quiz attempt</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E11</span><span class="t">Accounts and email<small>Mail transport, quota-aware queue, verification, profile, passwords</small></span><span class="c">P2–P5 · 9 issues</span></summary><ol>
+      <li><code>MailTransport</code> interface with a configurable SMTP adapter (Gmail first) <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Email queue: rolling 24-hour quota, delay when full, resume after reset, priorities <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Outbox relay into the email queue, delivery log</li>
+      <li>Email templates in Bangla and English</li>
+      <li>Email verification after registration: send, confirm, resend with limits</li>
+      <li>Remove unverified registrations after 7 days</li>
+      <li>Profile: name and avatar upload</li>
+      <li>Change password with an emailed code, revoke other sessions</li>
+      <li>Forgot and reset password (verified emails only)</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E12</span><span class="t">Certificates<small>Render, deliver, verify</small></span><span class="c">P5 · 6 issues</span></summary><ol>
+      <li>Certificate HTML template with English name, QR code and number</li>
+      <li>Certificate job with Chromium rendering, idempotent <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Completion email with the PDF attached</li>
+      <li>Download endpoint and dashboard certificate card</li>
+      <li>Public verification page; admin reissue and revoke</li>
+      <li>Worker isolation for Chromium and FFmpeg; certificate name snapshot; verification page does not cache unknown numbers and is purged on revoke</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E13</span><span class="t">Content pages<small>Resources, News &amp; Updates, Contact</small></span><span class="c">P5 · 4 issues</span></summary><ol>
+      <li>Resources: admin upload and links, public list</li>
+      <li>News &amp; Updates: admin editor with publish dates, public list and article page</li>
+      <li>Contact page with admin-edited details</li>
+      <li>Navigation and caching for content pages</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E14</span><span class="t">Production infrastructure<small>VPS, delivery, backups, observability</small></span><span class="c">P6 · 11 issues</span></summary><ol>
+      <li>VPS hardening: SSH, firewall, fail2ban, unattended upgrades</li>
+      <li>Production compose with resource limits and health checks</li>
+      <li>Nginx: TLS, routing, HLS caching, MIME types, rate limits</li>
+      <li>CD: build images to GHCR, deploy with migrations, rollback</li>
+      <li>Backups with restic to off-site storage and a restore drill <span class="tags"><span class="tag p0">P0</span></span></li>
+      <li>Prometheus, Grafana dashboards, alerting, Sentry</li>
+      <li>Runbooks: deploy, rollback, restore, disk, bandwidth, email quota</li>
+      <li>Staging copy of the stack on the VPS with resource limits</li>
+      <li>Continuous write-ahead-log archiving off-site (pgBackRest) and restore drill</li>
+      <li>External uptime monitoring and alerting</li>
+      <li>Expand-and-contract migration policy and zero-downtime deploy</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E15</span><span class="t">Launch quality<small>Load, security, accessibility, pilot</small></span><span class="c">P6–P7 · 6 issues</span></summary><ol>
+      <li>Full mixed-traffic load test at 200 and 250 viewers</li>
+      <li>Security review and penetration checklist (ASVS L2)</li>
+      <li>Accessibility audit with fixes</li>
+      <li>Pilot cohort run and feedback triage</li>
+      <li>Launch checklist and hypercare</li>
+      <li>Privacy notice, 90-day retention job, account deletion on request, personal data scrubbing in Sentry, incident response runbook</li>
+    </ol></details>
+    <details class="epic"><summary><span class="e">E16</span><span class="t">Later (v1.1)<small>Agreed to be out of v1</small></span><span class="c">Backlog · 4 issues</span></summary><ol>
+      <li>Interactive scenario activities inside modules</li>
+      <li>Bilingual course content</li>
+      <li>Insights: video engagement (watch share, drop-off points, quality used)</li>
+      <li>Insights: student activity (active users, time to finish, inactive students, devices)</li>
+    </ol></details>
+  </div>
+</section>
+
+<!-- 10 -->
+<section id="github">
+  <div class="sec-head">
+    <div class="eyebrow">11 · GitHub</div>
+    <h2>GitHub project setup</h2>
+    <p>Everything is created with the <code>gh</code> CLI from a script kept in the repo, so it can be re-run and reviewed.</p>
+  </div>
+  <div class="grid3">
+    <div class="box"><h3>Project fields</h3><ul>
+      <li><b>Status</b>: Backlog, Refining, Ready, In progress, In review, Done</li>
+      <li><b>Epic</b>: E0 to E16</li>
+      <li><b>Phase</b>: P0 to P7 (mirrors milestones)</li>
+      <li><b>Priority</b>: P0 critical path, P1, P2</li>
+      <li><b>Size</b>: S, M, L (L must be split)</li>
+      <li><b>Area</b>: api, web, admin, worker, infra, design</li>
+    </ul></div>
+    <div class="box"><h3>Labels</h3><ul>
+      <li><code>type:feature</code> <code>type:bug</code> <code>type:spike</code> <code>type:chore</code> <code>type:epic</code></li>
+      <li><code>area:*</code> matching the Area field</li>
+      <li><code>security</code> triggers the security-review agent</li>
+      <li><code>needs-refinement</code>, <code>ready</code>, <code>blocked</code></li>
+      <li><code>claude:in-progress</code> marks a ticket being worked on</li>
+    </ul></div>
+    <div class="box"><h3>Issue template</h3><ul>
+      <li>Context and user story</li>
+      <li>Acceptance criteria in Given, When, Then form</li>
+      <li>Out of scope</li>
+      <li>Dependencies (blocked by #)</li>
+      <li>Test plan and security notes</li>
+      <li>Definition of done checklist</li>
+    </ul></div>
+  </div>
+  <div class="note"><p><strong>Epics as parent issues.</strong> Each epic is a <code>type:epic</code> issue with its tickets attached as GitHub sub-issues, so progress rolls up on the board. Dependencies are written as “blocked by” links so the skill can refuse to start a blocked ticket.</p></div>
+</section>
+
+<!-- 11 -->
+<section id="workflow">
+  <div class="sec-head">
+    <div class="eyebrow">12 · Workflow</div>
+    <h2>Claude delivery workflow</h2>
+    <p>Each ticket goes through the same eight stages, started with <code>/implement-issue &lt;number&gt;</code>. The skill does the work; hooks stop it from skipping stages. Highlighted stages are where you can approve or take over.</p>
+  </div>
+  <ol class="pipeline">
+    <li><h4>Pull ticket</h4><p>Fetch the issue, its epic, linked issues and comments with <code>gh</code>. Refuse if it is blocked or not <code>ready</code>.</p><span class="out">→ issue context loaded</span></li>
+    <li><h4>Refine</h4><p>Refiner agent checks the ticket against the code and ADRs and appends a “Refined” section with acceptance criteria and edge cases. It never rewrites your original text.</p><span class="out">→ issue updated, comment logged</span></li>
+    <li><h4>Branch</h4><p>Create <code>feat/N-slug</code> in its own worktree before anything is written, and move the card to In progress.</p><span class="out">→ isolated workspace</span></li>
+    <li class="gate"><h4>Brainstorm and plan</h4><p>Explore approaches, choose one, and write a step-by-step plan with tests first, committed on the branch. Optional human approval for <code>L</code> or <code>security</code> tickets.</p><span class="out">→ docs/plans/issue-N.md, plan comment</span></li>
+    <li><h4>Implement (TDD)</h4><p>Failing test, code, refactor, in small conventional commits that reference the issue.</p><span class="out">→ commits on branch</span></li>
+    <li><h4>Verify</h4><p>Lint, typecheck, unit, integration and affected Playwright tests. UI tickets are also checked in a real browser through Chrome DevTools.</p><span class="out">→ verification log</span></li>
+    <li><h4>Code review</h4><p>Reviewer agent checks against the quality bar; the security agent runs for <code>security</code> or auth tickets. Findings are fixed and checks re-run.</p><span class="out">→ review notes resolved</span></li>
+    <li class="gate"><h4>Pull request</h4><p>PR with summary, test evidence, screenshots and <code>Closes #N</code>; card moves to In review. A human merges.</p><span class="out">→ PR ready for merge</span></li>
+  </ol>
+  <div class="tbl wide">
+    <table>
+      <thead><tr><th>Hook</th><th>Event</th><th>What it enforces</th></tr></thead>
+      <tbody>
+        <tr><td>Context loader</td><td><code>SessionStart</code></td><td>Prints branch, linked issue and plan status so a new session picks up where the last one stopped.</td></tr>
+        <tr><td>Ticket injector</td><td><code>UserPromptSubmit</code></td><td>When the prompt mentions <code>#N</code>, adds the issue body and comments from repository collaborators only, marked as data, so outside comments cannot inject instructions.</td></tr>
+        <tr><td>Branch guard</td><td><code>PreToolUse</code> on Edit / Write</td><td>Blocks edits on <code>main</code>.</td></tr>
+        <tr><td>Plan gate</td><td><code>PreToolUse</code> on Edit / Write</td><td>Blocks source edits until <code>docs/plans/issue-N.md</code> exists on the current branch (the branch is created before the plan is written).</td></tr>
+        <tr><td>Danger guard</td><td><code>PreToolUse</code> on Bash, plus permission deny rules</td><td>Blocks force pushes, <code>prisma migrate reset</code>, edits to applied migrations, and shell writes that would bypass the edit guards. Reading <code>.env</code> files is denied for every tool, including Read.</td></tr>
+        <tr><td>PR gate</td><td><code>PreToolUse</code> on Bash</td><td>Blocks <code>gh pr create</code> and pull-request API calls unless a verification marker newer than the last commit exists. Branch protection and CI remain the real gate.</td></tr>
+        <tr><td>Formatter</td><td><code>PostToolUse</code> on Edit / Write</td><td>Runs Prettier and ESLint fixes on the touched file.</td></tr>
+        <tr><td>Stop check</td><td><code>Stop</code></td><td>Runs the typecheck only, at most 3 times per turn, and respects <code>stop_hook_active</code> so it cannot loop. It skips the intentional failing-test step of TDD and pauses for plan approval; full tests run in the Verify stage and CI.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid2">
+    <div class="box"><h3>What keeps quality consistent across sessions</h3><ul>
+      <li>Short root <code>CLAUDE.md</code> pointing to per-app files and ADRs, so context stays focused</li>
+      <li>One reference implementation per pattern (a module, a form, a job) that new code copies</li>
+      <li>The plan file and issue comments are the memory between sessions, not the chat</li>
+      <li>Review agents read the same quality bar as the implementer</li>
+    </ul></div>
+    <div class="box"><h3>Where you stay in control</h3><ul>
+      <li>Approve the plan for large or security-sensitive tickets</li>
+      <li>Merge every PR; branch protection requires green CI and only you can merge</li>
+      <li>Lighthouse and screenshot checks warn on pull requests instead of blocking them, so a flaky check never stalls all work</li>
+      <li>Production deploys run only from tagged releases you create</li>
+      <li>ADR changes always go through you</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- 12 -->
+<section id="risks">
+  <div class="sec-head">
+    <div class="eyebrow">13 · Risks</div>
+    <h2>Risks and mitigations</h2>
+  </div>
+  <div class="tbl wide">
+    <table>
+      <thead><tr><th>Risk</th><th>Impact</th><th>Mitigation</th></tr></thead>
+      <tbody>
+        <tr><td>VPS throughput or CPU steal below what is advertised</td><td><span class="pill risk">High</span></td><td>Phase 1 spike with k6 from outside the VPS; CDN or a separate video origin as fallback, enabled by the <code>assetKey</code> abstraction.</td></tr>
+        <tr><td>Monthly bandwidth near the 16 TB quota</td><td><span class="pill risk">High</span></td><td>Egress dashboard with an alert at 70%; default to 720p on mobile; CDN plan ready.</td></tr>
+        <tr><td>Single VPS is a single point of failure</td><td><span class="pill">Medium</span></td><td>Off-site backups, tested restore runbook, recovery target under 4 hours, documented in the SLO.</td></tr>
+        <tr><td>Gmail sending limit too low for launch volume</td><td><span class="pill risk">High</span></td><td>Personal Gmail sends about 500 emails a day. Each student gets at least 3 emails, so 10,000 students need about 60 days of sending. Mitigation chosen: intake in small cohorts, per-category budgets that keep verification mail flowing, captcha and per-email caps on resend and reset, and the 7-day expiry counted from when the email was actually sent. Moving to a higher-limit sender is a settings change if intake must speed up.</td></tr>
+        <tr><td>Approval backlog delays students</td><td><span class="pill">Medium</span></td><td>Bulk approve with filters, pending count on the admin dashboard, oldest-first sorting.</td></tr>
+        <tr><td>Wording fixes change meaning after students passed</td><td><span class="pill">Medium</span></td><td>Answers and rules stay locked (D4); every wording fix is audit-logged with before and after.</td></tr>
+        <tr><td>Email lands in spam</td><td><span class="pill">Medium</span></td><td>Plain templates, consistent sender, delivery log from SMTP responses. Gmail SMTP has no bounce reports, so undeliverable addresses are only detected from send errors.</td></tr>
+        <tr><td>Shared campus or mobile IPs trip rate limits</td><td><span class="pill">Medium</span></td><td>Limits keyed by account or email plus IP, generous per-IP ceilings, and a load test with a whole cohort behind one IP.</td></tr>
+        <tr><td>Screen-reader users cannot pass the text captcha</td><td><span class="pill">Medium</span></td><td>Accepted by owner decision; the form shows a support contact so affected students can be helped.</td></tr>
+        <tr><td>FFmpeg slows playback during uploads</td><td><span class="pill">Medium</span></td><td>Concurrency 1, <code>nice</code>, CPU limits on the worker, off-peak scheduling.</td></tr>
+        <tr><td>Quality drift over many AI-written tickets</td><td><span class="pill">Medium</span></td><td>Hooks, review agents, reference implementations, coverage gates and human merge.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- review -->
+<section id="review">
+  <div class="sec-head">
+    <div class="eyebrow">14 · Review</div>
+    <h2>Adversarial review</h2>
+    <p>An independent reviewer agent tried to break this plan and the frontend design on 7 November 2026. Every finding was checked against the documents and is resolved below, either with a fix already applied to this page or with your decision.</p>
+  </div>
+  <div class="tbl wide">
+    <table>
+      <thead><tr><th style="width:34%">Finding</th><th style="width:90px">Severity</th><th>Resolution</th></tr></thead>
+      <tbody>
+        <tr><td>Rejecting a second-course request would delete an existing student's account</td><td><span class="pill risk">Critical</span></td><td>The account is soft-deleted only when it has no other approved or completed enrollment (D11)</td></tr>
+        <tr><td>Gmail's daily limit plus the 7-day expiry would delete real registrations; resend could be abused to burn the quota</td><td><span class="pill risk">Critical</span></td><td>Your choice: personal Gmail with small intake cohorts. Expiry counts from the actual send, budgets per mail type, captcha and caps on resend and reset (D12)</td></tr>
+        <tr><td>“One review required” cannot be met: GitHub blocks approving your own pull request</td><td><span class="pill risk">Critical</span></td><td>Your choice: CI must pass and only you merge</td></tr>
+        <tr><td>Phase 2's exit test needed work scheduled for Phases 3 and 4</td><td><span class="pill risk">High</span></td><td>Minimal course and module admin, the content lock and the notifications backend moved into Phase 2; landing page moved to Phase 3</td></tr>
+        <tr><td>Plan file was written before the branch existed; hooks can be bypassed; the stop hook could loop</td><td><span class="pill risk">High</span></td><td>Branch first, then plan; deny rules for <code>.env</code>; typecheck-only stop check with a retry cap; CI and branch protection are the real gate (D10)</td></tr>
+        <tr><td>The browser reports its own watched ranges, so a script could pass the 80% rule</td><td><span class="pill risk">High</span></td><td>The server caps accepted ranges by elapsed time × top playback speed (D6)</td></tr>
+        <tr><td>Soft delete never triggers database RESTRICT; rejected students could never see the reason; emails to hidden accounts could fail</td><td><span class="pill risk">High</span></td><td>Reason sent by email, recipient address stored on the email job, delete rules checked in the service (D11)</td></tr>
+        <tr><td>Students could change their name after approval and get a certificate under another name</td><td><span class="pill risk">High</span></td><td>Your choice: name and academic details lock at approval; changes need an admin</td></tr>
+        <tr><td>No staging, up to 24 hours of data loss, monitoring dies with the server</td><td><span class="pill risk">High</span></td><td>Your choice: staging on the same VPS. Continuous log archiving (≤ 15 min loss), external uptime check, expand-and-contract migrations</td></tr>
+        <tr><td>Accounts could be squatted or hijacked before verification; registration revealed who enrolled</td><td><span class="pill risk">High</span></td><td>New registration replaces an unverified one, verification signs out earlier sessions, duplicate emails get a generic response (D11)</td></tr>
+        <tr><td>IP-based rate limits would lock out a whole campus</td><td><span class="pill risk">High</span></td><td>Limits keyed by account or email plus IP, tested with a cohort behind one IP</td></tr>
+        <tr><td>Text captcha fails accessibility rules</td><td><span class="pill risk">High</span></td><td>Your choice: keep the text captcha, recorded as an exception with a support contact</td></tr>
+        <tr><td>Gaps in state machines: completed students blocked, no removal after completion, attempt limit dead end, modules without quiz or video, lock race</td><td><span class="pill">Medium</span></td><td>Completed students keep access, removal and reinstatement restore state, admins can grant attempts, publish checks, lock inside the approval transaction (D4, D11)</td></tr>
+        <tr><td>“Wording fixes” could change content meaning</td><td><span class="pill">Medium</span></td><td>Text-only changes with the same structure, stored as diffs (D4)</td></tr>
+        <tr><td>CSRF cookie could be planted from a sibling subdomain; strict cookies broke email links</td><td><span class="pill">Medium</span></td><td><code>__Host-</code> cookies, session-bound CSRF tokens, Lax access cookie and Strict refresh cookie, admin API blocked on the student host (D3)</td></tr>
+        <tr><td>Chromium and FFmpeg in the worker could reach internal services or local files</td><td><span class="pill">Medium</span></td><td>No network for certificate rendering, escaped template, FFmpeg limited to the job's files</td></tr>
+        <tr><td>Missing tickets: CSP spike, API client pipeline, Storybook, editor, Lighthouse</td><td><span class="pill">Medium</span></td><td>Added to E0, E1 and E7</td></tr>
+        <tr><td>Issue comments could inject instructions; the refiner could silently rewrite tickets</td><td><span class="pill">Medium</span></td><td>Collaborator-only comments, the refiner appends instead of rewriting, flaky checks warn instead of block</td></tr>
+        <tr><td>No privacy notice, retention, account deletion or incident runbook</td><td><span class="pill">Medium</span></td><td>Your choice: delete rejected and expired registrations after 90 days. Privacy, deletion and runbook ticket added to E15; admin deactivation revokes sessions</td></tr>
+        <tr><td>Verification page cache could be flooded with random numbers and show revoked certificates</td><td><span class="pill">Medium</span></td><td>Unknown numbers are not cached; revoking purges the entry</td></tr>
+        <tr><td>Small inconsistencies: epic field range, duplicate API module, decision count, caption serving path</td><td><span class="pill ok">Low</span></td><td>Fixed in this page and the design document</td></tr>
+        <tr><td>Password change did not use email; no super-admin recovery; audit log only append-only by convention</td><td><span class="pill ok">Low</span></td><td>Your choice: emailed code on password change. Break-glass recovery command; database role cannot edit the audit log</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 13 -->
+<section id="next">
+  <div class="sec-head">
+    <div class="eyebrow">15 · Next steps</div>
+    <h2>What happens after you approve this plan</h2>
+  </div>
+  <ol>
+    <li>You approve this revision of the plan.</li>
+    <li>I write the ADRs (D1 to D16) and a detailed spec per epic into <code>docs/</code>, including the full Prisma schema and the API contract.</li>
+    <li>I design the key screens in Open Pencil from the demo direction and the five logos, for your review.</li>
+    <li>I create the labels, milestones, GitHub Project and fields in this repository, then the 17 epic issues and about 136 sub-issues using the issue template.</li>
+    <li>I set up E0: the monorepo, CI, CLAUDE.md, hooks and the <code>/implement-issue</code> skill, and run one small ticket through the full workflow as a dry run.</li>
+    <li>We start Phase 1, the video delivery spike, on the real VPS.</li>
+  </ol>
+  <div class="note warn"><p><strong>Before I create anything on GitHub</strong>, I will confirm the target is <code>Sabbir-Asif/HEAT-Learning-Platform</code> (this repository's remote) and that <code>gh</code> is signed in with the <code>project</code> scope (<code>gh auth refresh -s project</code>).</p></div>
+</section>
+
+<footer>Prepared with Claude Code from prompt.md, lms_production_implementation_plan.md and the HEAT Gender Safety Training Platform mock. Revision 4 after adversarial review, 7 November 2026.</footer>
+</main>
+</div>
