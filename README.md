@@ -57,7 +57,7 @@ Pull requests and pushes to `main` run these checks in GitHub Actions; each is a
 | `integration`                                  | `test:integration` in any package that defines it (Testcontainers)   |
 | `audit`                                        | `pnpm audit:deps`, also weekly; fails on high or critical advisories |
 
-CodeQL needs GitHub code security on a private repository. It runs from `.github/workflows/codeql.yml` and Dependabot from `.github/dependabot.yml` (npm and GitHub Actions; Docker is added with the Dockerfiles). In CI, Turborepo's cache lives in `.turbo` and is restored per task, so unchanged packages replay instead of re-running.
+Dependabot runs from `.github/dependabot.yml` (npm and GitHub Actions; Docker is added with the Dockerfiles). CodeQL is left out: GitHub only stores its results for a private repository with code security enabled. Add it back if the repository goes public or code security is bought. In CI, Turborepo's cache lives in `.turbo` and is restored per task, so unchanged packages replay instead of re-running.
 
 Workflow rules, enforced by `packages/config/test/workflows.test.mjs`: every external action is pinned to a commit SHA, each workflow sets `permissions`, and `pull_request_target` is not used.
 

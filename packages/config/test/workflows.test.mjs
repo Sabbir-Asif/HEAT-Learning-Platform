@@ -37,11 +37,11 @@ describe("GitHub workflows", () => {
     expect(missing).toEqual([]);
   });
 
-  test("only the CodeQL workflow may grant write permissions", () => {
+  test("no workflow grants write permissions", () => {
     const writers = workflows
       .filter(({ text }) => /:\s*write\b|write-all/.test(text))
       .map(({ name }) => name);
-    expect(writers).toEqual(["codeql.yml"]);
+    expect(writers).toEqual([]);
   });
 
   test("every required status check in branch-protection.json is reported by a job", () => {
