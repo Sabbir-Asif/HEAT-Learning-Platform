@@ -5,7 +5,8 @@ import { repoOf, worktreeFor } from "./git.mjs";
 import { markerStatus } from "./marker.mjs";
 import { parseShell } from "./shell.mjs";
 
-const pullsCollection = /^\/?repos\/[^/]+\/[^/]+\/pulls\/?(?:\?.*)?$/;
+const pullsCollection =
+  /^(?:https?:\/\/[^/]+(?:\/api\/v3)?)?\/?repos\/[^/]+\/[^/]+\/pulls\/?(?:\?.*)?$/;
 const maxInputBytes = 1024 * 1024;
 
 function mentionsMutation(file, cwd) {
