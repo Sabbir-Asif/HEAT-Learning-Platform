@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync, symlinkSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { decisionOf, fakeBin, hookBin, runBin, withPath } from "../fixtures/hook.mjs";
@@ -115,6 +115,129 @@ describe("stop-check as a child process", () => {
       { env: { ...state, ...withPath(pnpm) } },
     );
     expect(result).toMatchObject({ code: 0, stdout: "" });
+  });
+});
+
+describe("context-loader as a child process", () => {
+  test("prints the ticket context on a ticket branch", () => {
+    const result = runBin("context-loader", { cwd: ticket, source: "startup" });
+    expect(result.json.hookSpecificOutput.hookEventName).toBe("SessionStart");
+    expect(result.json.hookSpecificOutput.additionalContext).toContain("Ticket: #25");
+  });
+
+  test("says there is no ticket branch on main", () => {
+    const result = runBin("context-loader", { cwd: main, source: "resume" });
+    expect(result.json.hookSpecificOutput.additionalContext).toMatch(/no ticket branch/i);
+  });
+});
+
+describe("ticket-injector as a child process", () => {
+  const issue = {
+    number: 25,
+    title: "T",
+    state: "open",
+    body: "Build it.",
+    author_association: "OWNER",
+    user: { login: "o" },
+  };
+  const comments = [
+    {
+      user: { login: "o" },
+      author_association: "OWNER",
+      created_at: "2026-11-08",
+      body: "owner note",
+    },
+    {
+      user: { login: "x" },
+      author_association: "NONE",
+      created_at: "2026-11-08",
+      body: "stranger note",
+    },
+  ];
+  const gh = fakeBin(
+    "gh",
+    `const path = process.argv[3];\nconsole.log(JSON.stringify(path.includes("/comments") ? ${JSON.stringify(comments)} : ${JSON.stringify(issue)}));`,
+  );
+  const signedOut = fakeBin("gh", 'console.error("gh auth login"); process.exit(4);');
+  const env = () => ({ HEAT_HOOKS_STATE_DIR: tempDir("state") });
+
+  test("injects collaborator text for #N and leaves outsiders out", () => {
+    const result = runBin(
+      "ticket-injector",
+      { prompt: "do #25", session_id: "s" },
+      { env: { ...env(), ...withPath(gh) } },
+    );
+    const context = result.json.hookSpecificOutput.additionalContext;
+    expect(result.json.hookSpecificOutput.hookEventName).toBe("UserPromptSubmit");
+    expect(context).toContain("owner note");
+    expect(context).not.toContain("stranger note");
+  });
+
+  test("adds a note and never blocks when gh is signed out", () => {
+    const result = runBin(
+      "ticket-injector",
+      { prompt: "do #25", session_id: "s" },
+      { env: { ...env(), ...withPath(signedOut) } },
+    );
+    expect(result.code).toBe(0);
+    expect(result.json.decision).toBeUndefined();
+    expect(result.json.hookSpecificOutput.additionalContext).toMatch(/could not load #25/);
+  });
+
+  test("does nothing for a prompt without #N", () => {
+    const result = runBin(
+      "ticket-injector",
+      { prompt: "/implement-issue 25", session_id: "s" },
+      { env: env() },
+    );
+    expect(result).toMatchObject({ code: 0, stdout: "" });
+  });
+});
+
+describe("formatter as a child process", () => {
+  function project() {
+    const repo = addWorktree(main, `chore/6${Math.floor(Math.random() * 1e6)}-fmt`);
+    symlinkSync(join(import.meta.dirname, "../../node_modules"), join(repo, "node_modules"));
+    write(repo, "package.json", "{}\n");
+    write(repo, "pkg/package.json", "{}\n");
+    write(repo, "pkg/eslint.config.mjs", 'export default [{ rules: { "no-var": "error" } }];\n');
+    return repo;
+  }
+
+  const edit = (repo, file, state) =>
+    runBin(
+      "formatter",
+      { tool_name: "Write", tool_input: { file_path: file }, session_id: "f1", cwd: repo },
+      { env: state },
+    );
+
+  test("fixes and formats the edited file", () => {
+    const repo = project();
+    const file = write(repo, "pkg/a.js", "var   x = {a:1}\n");
+    const result = edit(repo, file, { HEAT_HOOKS_STATE_DIR: tempDir("state") });
+    expect(result).toMatchObject({ code: 0, stdout: "" });
+    expect(readFileSync(file, "utf8")).toBe("let x = { a: 1 };\n");
+  });
+
+  test("records a typed edit for the stop check", () => {
+    const repo = project();
+    const state = { HEAT_HOOKS_STATE_DIR: tempDir("state") };
+    const file = write(repo, "pkg/b.ts", "const   y = {b:2}\n");
+    edit(repo, file, state);
+    expect(readFileSync(file, "utf8")).toBe("const y = { b: 2 };\n");
+    const saved = JSON.parse(readFileSync(join(state.HEAT_HOOKS_STATE_DIR, "f1.json"), "utf8"));
+    expect(saved).toMatchObject({ worktree: repo, typedDirty: true });
+  });
+
+  test("leaves a file under docs/ alone", () => {
+    const repo = project();
+    const file = write(repo, "docs/note.md", "*  a\n");
+    runBin(
+      "formatter",
+      { tool_name: "Write", tool_input: { file_path: file }, cwd: repo },
+      { env: { HEAT_HOOKS_STATE_DIR: tempDir("state") } },
+    );
+    expect(readFileSync(file, "utf8")).toBe("*  a\n");
   });
 });
 
