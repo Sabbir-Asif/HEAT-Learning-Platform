@@ -210,7 +210,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; color: var(--mute
   <h1>HEAT LMS Project Plan</h1>
   <p class="lede">How I plan to design, break down and build the interactive learning platform for <em>Preventing Gender-Based Violence in University Campuses</em>: a public site, a student learning app, an admin console, one NestJS backend, and a Claude-driven delivery workflow on GitHub.</p>
   <div class="meta">
-    <span><b>Status</b> <span class="pill ok">Revision 4 · reviewed</span></span>
+    <span><b>Status</b> <span class="pill ok">Revision 5 · issues created</span></span>
     <span><b>Date</b> 7 November 2026</span>
     <span><b>Inputs</b> prompt.md, lms_production_implementation_plan.md, demo UI mock</span>
     <span><b>Scope of this page</b> plan only, no code or tickets yet</span>
@@ -295,7 +295,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; color: var(--mute
   <div class="decisions">
     <div class="decision"><div class="id">D1</div><div><h4>pnpm + Turborepo monorepo with shared contracts</h4><p>Two Next.js apps, the NestJS API and the worker live in one repo. <strong>A single <code>@heat/contracts</code> package holds Zod schemas</strong> used by React Hook Form in the browser and by <code>nestjs-zod</code> in the API, so frontend and backend validation cannot drift.</p></div></div>
     <div class="decision"><div class="id">D2</div><div><h4>Modular monolith API, separate worker process</h4><p>NestJS modules with strict boundaries. <strong>The worker is the same codebase started with a different entry point</strong> and runs BullMQ consumers (transcode, certificate, email, cleanup), so FFmpeg never shares a process with HTTP traffic. No microservices, Kubernetes or Kafka.</p></div></div>
-    <div class="decision"><div class="id">D3</div><div><h4>First-party cookie sessions, two realms</h4><p>Nginx routes <code>/api</code> on both hosts to NestJS, and blocks admin API paths on the student host. Cookies use the <code>__Host-</code> prefix: the access cookie (10 minutes) is <code>SameSite=Lax</code> so links from emails arrive signed in, and the refresh cookie is <code>SameSite=Strict</code> and limited to the refresh path. <strong>A rotating refresh token</strong> is stored hashed, with reuse detection and a 20-second grace window for parallel refreshes. CSRF tokens are HMAC-bound to the session, so a sibling subdomain cannot plant one. Passwords use argon2id. Student and admin tokens carry different audiences. <strong>Admins must use an authenticator-app code (TOTP)</strong> with recovery codes; deactivating an admin revokes their sessions immediately, and a break-glass command on the server restores super-admin access if the authenticator is lost.</p></div></div>
+    <div class="decision"><div class="id">D3</div><div><h4>First-party cookie sessions, two realms</h4><p>Nginx routes <code>/api</code> on both hosts to NestJS, and blocks admin API paths on the student host. The access cookie (10 minutes) and the CSRF cookie use the <code>__Host-</code> prefix; the access cookie is <code>SameSite=Lax</code> so links from emails arrive signed in. The refresh cookie uses the <code>__Secure-</code> prefix with no <code>Domain</code>, is <code>SameSite=Strict</code> and is limited to the refresh path (a <code>__Host-</code> cookie cannot be path-limited). <strong>A rotating refresh token</strong> is stored hashed, with reuse detection and a 20-second grace window for parallel refreshes. CSRF tokens are HMAC-bound to the session, so a sibling subdomain cannot plant one. Passwords use argon2id. Student and admin tokens carry different audiences. <strong>Admins must use an authenticator-app code (TOTP)</strong> with recovery codes; deactivating an admin revokes their sessions immediately, and a break-glass command on the server restores super-admin access if the authenticator is lost.</p></div></div>
     <div class="decision"><div class="id">D4</div><div><h4>Content lock with course revisions</h4><p>A course moves from <code>DRAFT</code> to <code>PUBLISHED</code>. Publishing is refused unless every module has a ready video and a quiz with at least one question. <strong>The lock is taken inside the first approval's transaction</strong>, so it cannot race an admin edit: modules, videos, answer options, correct answers, quiz rules and pass marks become read-only. Wording fixes stay allowed but are limited to text changes that keep the same structure (no added or removed images, links, sections or questions), and each one is stored as a before/after diff in the audit log. Description, thumbnail, tags and front-page order stay editable. Bigger changes go into a cloned draft revision; enrollments are pinned to a revision at approval time, and shared video assets are reference-counted so cleanup never deletes a video another revision uses.</p></div></div>
     <div class="decision"><div class="id">D5</div><div><h4>Signed HLS delivered by Nginx, never proxied through Node</h4><p>The API issues a playback session and sets a short-lived HMAC-signed cookie scoped to <code>/hls/&lt;videoId&gt;/</code>. <strong>Nginx (njs) verifies the signature on every playlist and segment</strong> without touching the database. Originals stay outside the web root. A Phase 1 spike proves this on the real VPS before anything else depends on it.</p></div></div>
     <div class="decision"><div class="id">D6</div><div><h4>Watched-interval progress the server can trust</h4><p>The player sends watched ranges every 15 s and on pause, seek or tab hide. <strong>The server accepts ranges only up to the wall-clock time since the playback session started, multiplied by the highest allowed playback speed</strong>, so a script cannot report a whole video as watched. Late batches from an offline retry are accepted within that same budget. A video counts as complete at ≥ 80% coverage. Resume position is stored separately and never moves backwards from a stale request. Heartbeats are batched writes; Redis buffering is added only if load tests show a need.</p></div></div>
@@ -962,7 +962,7 @@ sequenceDiagram
       <li>Enrollment request transaction and “Awaiting approval” page with status</li>
       <li>Signed-in students request further courses in one click</li>
     </ol></details>
-    <details class="epic"><summary><span class="e">E6</span><span class="t">Student management and insights<small>Approval queue, student records, dashboard, insights</small></span><span class="c">P2–P5 · 12 issues</span></summary><ol>
+    <details class="epic"><summary><span class="e">E6</span><span class="t">Student management and insights<small>Approval queue, student records, dashboard, insights</small></span><span class="c">P2–P5 · 13 issues</span></summary><ol>
       <li>Approval queue with filters and bulk approve or reject <span class="tags"><span class="tag p0">P0</span></span></li>
       <li>Reject with reason: soft-delete user and enrollment</li>
       <li>Remove and reinstate students, with reasons</li>
@@ -975,6 +975,7 @@ sequenceDiagram
       <li>Insights: enrollment funnel and trends over time</li>
       <li>Insights: module completion, drop-off, quiz pass rates, attempts and most-missed questions</li>
       <li>Name and academic detail change requests, approved by an admin</li>
+      <li>In-app notifications backend: records, list, unread count, mark read <span class="tags"><span class="tag p0">P0</span></span></li>
     </ol></details>
     <details class="epic"><summary><span class="e">E7</span><span class="t">Course authoring<small>Courses, revisions, modules, lesson text, quiz builder, content lock</small></span><span class="c">P3 · 9 issues</span></summary><ol>
       <li>Course CRUD and status lifecycle</li>
@@ -1230,7 +1231,7 @@ sequenceDiagram
     <li>You approve this revision of the plan.</li>
     <li>I write the ADRs (D1 to D16) and a detailed spec per epic into <code>docs/</code>, including the full Prisma schema and the API contract.</li>
     <li>I design the key screens in Open Pencil from the demo direction and the five logos, for your review.</li>
-    <li>I create the labels, milestones, GitHub Project and fields in this repository, then the 17 epic issues and about 136 sub-issues using the issue template.</li>
+    <li>I create the labels, milestones, GitHub Project and fields in this repository, then the 17 epic issues and about 137 sub-issues using the issue template.</li>
     <li>I set up E0: the monorepo, CI, CLAUDE.md, hooks and the <code>/implement-issue</code> skill, and run one small ticket through the full workflow as a dry run.</li>
     <li>We start Phase 1, the video delivery spike, on the real VPS.</li>
   </ol>

@@ -1,1 +1,4 @@
 .DS_Store
+
+# Source course videos (large media, kept out of git)
+/GBV modules/

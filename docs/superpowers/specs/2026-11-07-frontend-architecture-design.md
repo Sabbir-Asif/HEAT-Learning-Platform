@@ -127,7 +127,7 @@ One rule set for both apps:
    - If a server render still gets 401, it redirects to `/auth/refresh?next=…` (Route Handler) which refreshes or sends the user to sign-in.
    - In the browser, the orval mutator performs one shared refresh on 401 and retries once.
    - **Backend requirement:** refresh-token rotation gets a 20-second grace window in Redis so parallel refreshes do not trigger reuse detection and log the user out.
-5. **Cookies and CSRF.** Cookies use the `__Host-` prefix. The access cookie (10 minutes) is `SameSite=Lax` so links from emails arrive signed in; the refresh cookie is `SameSite=Strict` and limited to the refresh path. The mutator sends a CSRF token that is HMAC-bound to the session on every unsafe request, so a sibling subdomain cannot plant a valid one. Nginx blocks admin API paths on the student host.
+5. **Cookies and CSRF.** The access cookie (10 minutes) and the CSRF cookie use the `__Host-` prefix; the access cookie is `SameSite=Lax` so links from emails arrive signed in. The refresh cookie uses `__Secure-` with no `Domain`, is `SameSite=Strict` and limited to the refresh path, because a `__Host-` cookie must have `Path=/`. The mutator sends a CSRF token that is HMAC-bound to the session on every unsafe request, so a sibling subdomain cannot plant a valid one. Nginx blocks admin API paths on the student host.
 6. **Errors.** The API's stable error codes (from `@heat/contracts`) map to translated messages; form-level errors map to fields by path.
 
 `proxy.ts` only does optimistic work (refresh, locale redirect, redirect to sign-in when no session cookie exists). Real authorization is always the API's.
@@ -264,7 +264,7 @@ Every uploaded image or file goes through one `media` module in the API and one 
 - **Owner decision (2026-11-07): local disk, no object-storage server.** MinIO was considered and rejected: its free edition stopped shipping images in October 2025 and its repository was archived in 2026, and on a single VPS an object store adds a network hop for every file without adding durability. If off-server file storage is needed later, add a cloud S3 driver (Cloudflare R2, Backblaze B2 or AWS S3).
 
 ## 10. Security in the frontends
-- Cookies host-only, `Secure`, `HttpOnly`, `SameSite=Strict`; CSRF double-submit as in §5.
+- Cookies as in §5: `__Host-` access (Lax) and CSRF cookies, `__Secure-` refresh cookie (Strict, refresh path only), all `Secure` and `HttpOnly` except the CSRF cookie the client must read.
 - Content Security Policy without `unsafe-inline` scripts. Dynamic pages use per-request nonces set in `proxy.ts`; cached pages must not become dynamic because of the nonce — the builder verifies the approach (hash or SRI-based policy for static pages) in a spike and records it in an ADR.
 - Lesson text and news are rendered only through the allow-listed static renderer; links limited to `https:` and `mailto:`; no `dangerouslySetInnerHTML` with author content anywhere.
 - No secrets in `NEXT_PUBLIC_*`; the revalidation secret lives only on the server.
