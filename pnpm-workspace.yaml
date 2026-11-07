@@ -12,7 +12,7 @@ catalog:
   babel-plugin-react-compiler: 1.0.0
   typescript: 5.9.3
   vitest: 5.1.0
-  "@types/node": ^22.19.0
+  "@types/node": ^26.6.6
   zod: 4.6.7
   eslint: 10.14.0
   prettier: 3.9.10
