@@ -80,6 +80,13 @@ describe("the implement-issue skill", () => {
     expect(verify.indexOf("pnpm verify")).toBeGreaterThan(verify.indexOf("pnpm build"));
   });
 
+  test("stage 6 saves screenshots outside the repository so the tree stays clean", () => {
+    const verify = text()
+      .split(/^## 7\./m)[0]
+      .split(/^## 6\./m)[1];
+    expect(verify).toMatch(/screenshots[^.]*in `\$SCRATCH`[^.]*outside the repository/);
+  });
+
   test("relative links in the skill resolve", () => {
     const broken = markdownFiles(skillDir).flatMap((file) =>
       [...read(file).matchAll(/\]\(([^)\s#]+)(?:#[^)]*)?\)/g)]
