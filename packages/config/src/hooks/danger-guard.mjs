@@ -181,16 +181,25 @@ export function dangerGuard(input) {
   const tool = input.tool_name;
   const toolInput = input.tool_input ?? {};
   if (tool === "Bash") return checkBash(input);
+  const cwd = input.cwd || process.cwd();
   let paths = [];
-  if (tool === "Read") paths = [toolInput.file_path];
-  else if (tool === "Grep") paths = [toolInput.path, toolInput.glob];
-  else if (tool === "Glob") paths = [toolInput.pattern, toolInput.path];
-  else if (fileTools.has(tool)) paths = [toolInput.file_path ?? toolInput.notebook_path];
-  const envPath = firstEnvPath(paths);
+  let real = [];
+  if (tool === "Read") paths = real = [toolInput.file_path];
+  else if (tool === "Grep") {
+    paths = [toolInput.path, toolInput.glob];
+    real = [toolInput.path];
+  } else if (tool === "Glob") {
+    paths = [toolInput.pattern, toolInput.path];
+    real = [toolInput.path];
+  } else if (fileTools.has(tool)) paths = real = [toolInput.file_path ?? toolInput.notebook_path];
+  const resolved = real
+    .filter((path) => typeof path === "string" && path)
+    .map((path) => resolveReal(path, cwd));
+  const envPath = firstEnvPath([...paths, ...resolved]);
   if (envPath) return { deny: envDenial(envPath) };
   if (!fileTools.has(tool)) return {};
-  const real = resolveReal(paths[0], input.cwd || process.cwd());
-  if (gitInternals(real)) return { deny: gitDenial(real) };
+  const [target] = resolved.length ? resolved : [resolveReal(paths[0], cwd)];
+  if (gitInternals(target)) return { deny: gitDenial(target) };
   const location = locate(paths[0], input.cwd);
   const deny = location && migrationDenialFor(location);
   return deny ? { deny } : {};

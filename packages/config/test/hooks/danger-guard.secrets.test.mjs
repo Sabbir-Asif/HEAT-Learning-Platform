@@ -1,5 +1,10 @@
-import { describe, expect, test } from "vitest";
+import { symlinkSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { afterAll, describe, expect, test } from "vitest";
+import { cleanupAll, tempDir } from "../fixtures/repo.mjs";
 import { dangerGuard } from "../../src/hooks/danger-guard.mjs";
+
+afterAll(cleanupAll);
 
 const use = (tool_name, tool_input) => dangerGuard({ tool_name, tool_input, cwd: "/tmp" });
 
@@ -73,5 +78,40 @@ describe("environment files through Bash", () => {
 
   test("allows the commands the workflow uses", () => {
     expect(bash("git add .env.example && git commit -m 'never read .env files'")).toEqual({});
+  });
+});
+
+describe("symlinks to environment files", () => {
+  const dir = tempDir("links");
+  writeFileSync(join(dir, ".env"), "SECRET=1\n");
+  writeFileSync(join(dir, ".env.example"), "SECRET=\n");
+  symlinkSync(join(dir, ".env"), join(dir, "notes.txt"));
+  symlinkSync(join(dir, ".env.example"), join(dir, "example.txt"));
+  symlinkSync(dir, join(dir, "self"));
+  const innocent = join(dir, "notes.txt");
+
+  test.each([
+    ["Read", { file_path: innocent }],
+    ["Edit", { file_path: innocent }],
+    ["Write", { file_path: innocent }],
+    ["NotebookEdit", { notebook_path: innocent }],
+    ["Grep", { pattern: "S", path: innocent }],
+    ["Glob", { pattern: "*", path: innocent }],
+    ["Read", { file_path: join(dir, "self", "notes.txt") }],
+  ])("denies %s through a symlink: %j", (tool, input) => {
+    expect(use(tool, input).deny).toMatch(/environment files/i);
+  });
+
+  test("a symlink to .env.example stays readable", () => {
+    expect(use("Read", { file_path: join(dir, "example.txt") })).toEqual({});
+  });
+
+  test("a relative symlink path is resolved against the session directory", () => {
+    const result = dangerGuard({
+      tool_name: "Read",
+      tool_input: { file_path: "notes.txt" },
+      cwd: dir,
+    });
+    expect(result.deny).toMatch(/environment files/i);
   });
 });
