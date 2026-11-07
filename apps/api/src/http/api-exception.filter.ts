@@ -3,7 +3,8 @@ import { Catch, HttpException, Logger } from "@nestjs/common";
 import type { ArgumentsHost, ExceptionFilter } from "@nestjs/common";
 import { ZodValidationException } from "nestjs-zod";
 import { z } from "zod";
-import type { ErrorCode, ErrorResponse, FieldError } from "@heat/contracts";
+import { fieldErrorCodes } from "@heat/contracts";
+import type { ErrorCode, ErrorResponse, FieldError, FieldErrorCode } from "@heat/contracts";
 
 interface RequestLike {
   headers: Record<string, string | string[] | undefined>;
@@ -28,9 +29,15 @@ const messages: Record<ErrorCode, string> = {
 
 const issuesSchema = z.object({
   issues: z.array(
-    z.object({ path: z.array(z.union([z.string(), z.number(), z.symbol()])), code: z.string() }),
+    z.object({
+      path: z.array(z.union([z.string(), z.number(), z.symbol()])),
+      code: z.string(),
+      message: z.string().optional(),
+    }),
   ),
 });
+
+type Issue = z.infer<typeof issuesSchema>["issues"][number];
 
 const requestIdPattern = /^[A-Za-z0-9._-]{1,64}$/;
 
@@ -55,12 +62,22 @@ function codeForStatus(status: number): ErrorCode {
   }
 }
 
+const isFieldErrorCode = (code: string): code is FieldErrorCode =>
+  (fieldErrorCodes as readonly string[]).includes(code);
+
+const isMissingValue = (issue: Issue) => issue.message?.endsWith("received undefined") === true;
+
+function fieldErrorCode(issue: Issue): FieldErrorCode {
+  if (issue.code === "invalid_type" && isMissingValue(issue)) return "required";
+  return isFieldErrorCode(issue.code) ? issue.code : "invalid";
+}
+
 function fieldErrors(error: unknown): FieldError[] {
   const parsed = issuesSchema.safeParse(error);
   if (!parsed.success) return [];
   return parsed.data.issues.map((issue) => ({
     path: issue.path.map(String).join("."),
-    code: issue.code,
+    code: fieldErrorCode(issue),
   }));
 }
 

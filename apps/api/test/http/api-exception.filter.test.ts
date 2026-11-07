@@ -12,6 +12,7 @@ import { errorResponseSchema } from "@heat/contracts";
 import type { ErrorResponse } from "@heat/contracts";
 import type { ArgumentsHost } from "@nestjs/common";
 import { ZodValidationException } from "nestjs-zod";
+import { z } from "zod";
 import { Logger } from "@nestjs/common";
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import { configureApp } from "../../src/app.setup";
@@ -94,6 +95,20 @@ describe("validation", () => {
     );
   });
 
+  test("a missing field is required, a wrong type is invalid_type, a bound is too_big", async () => {
+    const missing = await call("/api/items", post(JSON.stringify({})));
+    expect(missing.body.error.fields).toEqual(
+      expect.arrayContaining([
+        { path: "name", code: "required" },
+        { path: "quantity", code: "required" },
+      ]),
+    );
+    const wrongType = await call("/api/items", post(JSON.stringify({ name: 5, quantity: 1 })));
+    expect(wrongType.body.error.fields).toEqual([{ path: "name", code: "invalid_type" }]);
+    const tooBig = await call("/api/items", post(JSON.stringify({ name: "abc", quantity: 100 })));
+    expect(tooBig.body.error.fields).toEqual([{ path: "quantity", code: "too_big" }]);
+  });
+
   test("a Zod failure on the query is reported with the query key as the path", async () => {
     const { response, body } = await call("/api/items?page=0");
     expect(response.status).toBe(400);
@@ -104,7 +119,7 @@ describe("validation", () => {
     const { response, body } = await call("/api/items/not-a-uuid");
     expect(response.status).toBe(400);
     expect(body.error.code).toBe("VALIDATION_FAILED");
-    expect(body.error.fields?.[0]?.path).toBe("id");
+    expect(body.error.fields).toEqual([{ path: "id", code: "invalid_format" }]);
   });
 
   test("a valid request is not touched", async () => {
@@ -219,6 +234,19 @@ describe("the filter on its own", () => {
   test("an object with a non-numeric status is an internal error", () => {
     expect(run({ status: "teapot" }).status).toBe(500);
     expect(run(null).status).toBe(500);
+  });
+
+  test.each([
+    ["an unknown key", z.strictObject({ a: z.string() }), { a: "x", b: 1 }, "unrecognized_keys"],
+    ["a refinement", z.string().refine(() => false), "x", "custom"],
+    ["a wrong value", z.enum(["a"]), "b", "invalid_value"],
+    ["an unsupported kind of issue", z.number().multipleOf(2), 3, "invalid"],
+    ["a union", z.union([z.string(), z.number()]), null, "invalid"],
+  ])("%s is reported with a code from the closed list", (_name, schema, input, code) => {
+    const result = schema.safeParse(input);
+    const sent = run(new ZodValidationException(result.error));
+    expect(sent.body?.error.fields?.map((field) => field.code)).toEqual([code]);
+    expect(errorResponseSchema.safeParse(sent.body).success).toBe(true);
   });
 
   test("a validation exception whose payload is not a Zod error has no fields", () => {

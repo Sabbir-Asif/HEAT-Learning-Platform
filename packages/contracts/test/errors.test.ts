@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { clientErrorCodes, errorCodes, errorResponseSchema } from "../src/index";
+import { clientErrorCodes, errorCodes, errorResponseSchema, fieldErrorCodes } from "../src/index";
 
 const publishedCodes = [
   "BAD_REQUEST",
@@ -10,6 +10,17 @@ const publishedCodes = [
   "UNAUTHENTICATED",
   "VALIDATION_FAILED",
 ];
+const publishedFieldCodes = [
+  "custom",
+  "invalid",
+  "invalid_format",
+  "invalid_type",
+  "invalid_value",
+  "required",
+  "too_big",
+  "too_small",
+  "unrecognized_keys",
+];
 const publishedClientCodes = ["NETWORK_ERROR", "REQUEST_ABORTED", "UNEXPECTED_RESPONSE"];
 
 describe("error codes", () => {
@@ -19,6 +30,15 @@ describe("error codes", () => {
 
   test("every published client code is still present", () => {
     expect(clientErrorCodes).toEqual(expect.arrayContaining(publishedClientCodes));
+  });
+
+  test("every published field code is still present", () => {
+    expect(fieldErrorCodes).toEqual(expect.arrayContaining(publishedFieldCodes));
+  });
+
+  test("field codes are unique lower snake case", () => {
+    expect(new Set(fieldErrorCodes).size).toBe(fieldErrorCodes.length);
+    expect(fieldErrorCodes.filter((code) => !/^[a-z]+(_[a-z]+)*$/.test(code))).toEqual([]);
   });
 
   test("codes are unique upper snake case, and no code is shared by API and client", () => {
@@ -40,6 +60,11 @@ describe("errorResponseSchema", () => {
       error: { ...base, code: "VALIDATION_FAILED", fields: [{ path: "a.0.b", code: "too_small" }] },
     };
     expect(errorResponseSchema.parse(body)).toEqual(body);
+  });
+
+  test("rejects a field code outside the closed list", () => {
+    const body = { error: { ...base, fields: [{ path: "a", code: "not_multiple_of" }] } };
+    expect(errorResponseSchema.safeParse(body).success).toBe(false);
   });
 
   test("rejects a code outside the closed list", () => {

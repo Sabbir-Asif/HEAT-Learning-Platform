@@ -21,9 +21,23 @@ export type ClientErrorCode = (typeof clientErrorCodes)[number];
 
 export const errorCodeSchema = z.enum(errorCodes);
 
+export const fieldErrorCodes = [
+  "custom",
+  "invalid",
+  "invalid_format",
+  "invalid_type",
+  "invalid_value",
+  "required",
+  "too_big",
+  "too_small",
+  "unrecognized_keys",
+] as const;
+
+export type FieldErrorCode = (typeof fieldErrorCodes)[number];
+
 export const fieldErrorSchema = z.object({
   path: z.string(),
-  code: z.string(),
+  code: z.enum(fieldErrorCodes),
 });
 
 export const errorResponseSchema = z.object({
