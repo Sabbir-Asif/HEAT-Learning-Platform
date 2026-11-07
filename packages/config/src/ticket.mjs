@@ -1,0 +1,454 @@
+// The GitHub rules of the /implement-issue skill (plan section 12): whether a ticket may start,
+// its branch name and base, the append-only refinement and the card moves. The skill calls these
+// through `pnpm ticket` so the rules live in tested code, not in the skill's prose.
+import { parseArgs } from "node:util";
+import { checkTarget } from "./github-setup.mjs";
+
+export const defaultRepo = "Sabbir-Asif/HEAT-Learning-Platform";
+export const projectTitle = "HEAT LMS";
+export const approvalMarker = "<!-- implement-issue:plan-approved -->";
+const markerPattern = /implement-issue:plan-approved/;
+
+const startStatuses = ["Ready", "Refining"];
+// A ticket already under way is resumed from its branch rather than started again.
+const resumeStatuses = ["In progress", "In review"];
+// Author associations GitHub gives people with access to the repository. Anything else is an
+// outsider whose text never reaches the agent (plan section 14).
+const collaborators = new Set(["OWNER", "MEMBER", "COLLABORATOR"]);
+const prefixes = { feature: "feat", bug: "fix", chore: "chore", docs: "docs", spike: "spike" };
+const stopWords = new Set(["a", "an", "and", "the", "with", "for", "of", "to", "in", "on"]);
+const maxSlugWords = 4;
+const maxSlugLength = 40;
+// Branch names reach shell commands in the skill, so only these shapes are used. A ref with any
+// other character (git allows `$`, backticks, quotes and `;`) is refused, never quoted around.
+const safeBranch = /^(?:feat|fix|chore|docs|spike)\/\d+-[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const safeEpic = /^epic\/e\d+(?:-[a-z0-9]+)*$/;
+
+const issueQuery = `query($owner: String!, $name: String!, $number: Int!) {
+  repository(owner: $owner, name: $name) {
+    issue(number: $number) {
+      number title url state body authorAssociation
+      author { login }
+      labels(first: 50) { nodes { name } }
+      parent { number title }
+      blockedBy(first: 50) { nodes { number title state } }
+      subIssues(first: 100) { nodes { number title state } }
+      comments(last: 100) { nodes { author { login } authorAssociation createdAt body } }
+      projectItems(first: 20) {
+        nodes {
+          id
+          project { id title }
+          fieldValues(first: 30) {
+            nodes {
+              ... on ProjectV2ItemFieldSingleSelectValue {
+                name
+                field { ... on ProjectV2SingleSelectField { name } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`;
+
+/** Lower-case words of the title without filler, joined by hyphens; "issue" when nothing is left. */
+export function slugify(title) {
+  const words = title
+    .normalize("NFKD")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .split(" ")
+    .filter((word) => word && !stopWords.has(word))
+    .slice(0, maxSlugWords);
+  let slug = "";
+  for (const word of words) {
+    const next = slug ? `${slug}-${word}` : word;
+    if (next.length > maxSlugLength) break;
+    slug = next;
+  }
+  return slug || words[0]?.slice(0, maxSlugLength) || "issue";
+}
+
+/** True when the pull request body uses a GitHub closing keyword on issue `number`. */
+export function closesIssue(body, number) {
+  const keyword = /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b/gi;
+  return [...(body ?? "").matchAll(keyword)].some((match) => Number(match[1]) === number);
+}
+
+const json = (gh, args) => JSON.parse(gh(args));
+const login = (author) => author?.login ?? "ghost";
+
+/** Runs one of the issue queries above and returns the issue, failing when there is none. */
+function queryIssue(gh, repo, number, query) {
+  const [owner, name] = repo.split("/");
+  const result = json(gh, [
+    "api",
+    "graphql",
+    "-f",
+    `query=${query}`,
+    "-F",
+    `owner=${owner}`,
+    "-F",
+    `name=${name}`,
+    "-F",
+    `number=${number}`,
+  ]);
+  const issue = result.data?.repository?.issue;
+  if (!issue) throw new Error(`Issue #${number} not found in ${repo}`);
+  return issue;
+}
+
+function projectItemOf(issue) {
+  const item = issue.projectItems.nodes.find((node) => node.project.title === projectTitle);
+  if (!item) return null;
+  const field = (name) =>
+    item.fieldValues.nodes.find((value) => value.field?.name === name)?.name ?? null;
+  return {
+    projectId: item.project.id,
+    itemId: item.id,
+    status: field("Status"),
+    size: field("Size"),
+  };
+}
+
+function remoteHeads(gh, repo) {
+  return gh(["api", `repos/${repo}/git/matching-refs/heads/`, "--paginate", "--jq", ".[].ref"])
+    .split("\n")
+    .filter(Boolean)
+    .map((ref) => ref.replace(/^refs\/heads\//, ""));
+}
+
+/**
+ * The branch for this issue: an existing `<type>/<N>-…` branch if there is one, otherwise a new
+ * name from the type label and title. The base is the epic's `epic/<code>-…` branch on origin
+ * when there is exactly one, otherwise main. `branch` is null when `problems` is not empty.
+ */
+function resolveBranch({ number, title, type, epic }, heads, localBranches) {
+  const forIssue = new RegExp(`^(?:${Object.values(prefixes).join("|")})/${number}-`);
+  const existing = [...localBranches, ...heads].filter((branch) => forIssue.test(branch));
+  const unsafe = [...new Set(existing.filter((branch) => !safeBranch.test(branch)))];
+  const code = epic?.title.match(/^(E\d+)\b/i)?.[1].toLowerCase();
+  const epics = code
+    ? heads.filter(
+        (head) =>
+          safeEpic.test(head) && (head === `epic/${code}` || head.startsWith(`epic/${code}-`)),
+      )
+    : [];
+  const problems = [
+    ...unsafe.map(
+      (branch) =>
+        `Branch "${branch}" for #${number} has an unsafe branch name; the owner renames or deletes it.`,
+    ),
+    ...(epics.length > 1
+      ? [
+          `#${number}'s epic has more than one epic branch (${epics.join(", ")}); the owner keeps one.`,
+        ]
+      : []),
+  ];
+  if (problems.length) return { branch: null, problems };
+  const name = existing[0] ?? `${prefixes[type]}/${number}-${slugify(title)}`;
+  return {
+    branch: {
+      name,
+      base: epics[0] ?? "main",
+      existsRemote: heads.includes(name),
+      existsLocal: localBranches.includes(name),
+    },
+    problems,
+  };
+}
+
+function checkBlockers(gh, repo, blockedBy, heads) {
+  const open = blockedBy.filter((blocker) => blocker.state !== "CLOSED");
+  // Pull requests into an epic branch do not close issues, so a blocker merged there is still
+  // open on GitHub. Its closing pull request is what shows the work is in. Each epic branch is
+  // read on its own so pull requests into main do not push older ones past the limit, and pull
+  // requests from forks are ignored.
+  const merged = open.length
+    ? heads
+        .filter((head) => safeEpic.test(head))
+        .flatMap((head) =>
+          json(gh, [
+            "pr",
+            "list",
+            "--repo",
+            repo,
+            "--base",
+            head,
+            "--state",
+            "merged",
+            "--limit",
+            "500",
+            "--json",
+            "number,body,baseRefName,isCrossRepository",
+          ]),
+        )
+        .filter((pr) => !pr.isCrossRepository)
+    : [];
+  return blockedBy.map(({ number, title, state }) => {
+    const closingPr =
+      state === "CLOSED"
+        ? null
+        : (merged.find((pr) => closesIssue(pr.body, number))?.number ?? null);
+    return { number, title, state, closingPr, done: state === "CLOSED" || closingPr !== null };
+  });
+}
+
+function findPr(gh, repo, branch) {
+  const [pr] = json(gh, [
+    "pr",
+    "list",
+    "--repo",
+    repo,
+    "--head",
+    branch,
+    "--state",
+    "all",
+    "--json",
+    "number,state,url,isCrossRepository",
+  ]).filter((each) => !each.isCrossRepository);
+  // A fork can open a pull request from a branch with the same name; only our own counts.
+  return pr ? { number: pr.number, state: pr.state, url: pr.url } : null;
+}
+
+/**
+ * Loads an issue with everything stage 1 needs and decides whether it may start.
+ * `gh(args)` runs the GitHub CLI and returns stdout; this function only reads. `refusals` is empty
+ * when the ticket may start. Comments from outside the repository's collaborators are dropped.
+ */
+export function loadTicket({ gh, repo, number, localBranches = [] }) {
+  const issue = queryIssue(gh, repo, number, issueQuery);
+  const labels = issue.labels.nodes.map((label) => label.name);
+  const types = labels.filter((label) => label.startsWith("type:")).map((label) => label.slice(5));
+  const type = types.find((name) => name in prefixes) ?? null;
+  const item = projectItemOf(issue);
+  const epic = issue.parent ? { number: issue.parent.number, title: issue.parent.title } : null;
+  const heads = remoteHeads(gh, repo);
+  const blockers = checkBlockers(gh, repo, issue.blockedBy.nodes, heads);
+  const comments = issue.comments.nodes
+    .filter((comment) => collaborators.has(comment.authorAssociation))
+    .map((comment) => ({
+      author: login(comment.author),
+      association: comment.authorAssociation,
+      createdAt: comment.createdAt,
+      body: comment.body,
+    }));
+
+  const { branch, problems } =
+    type && !types.includes("epic")
+      ? resolveBranch({ number, title: issue.title, type, epic }, heads, localBranches)
+      : { branch: null, problems: [] };
+  const branchExists = Boolean(branch && (branch.existsLocal || branch.existsRemote));
+  const resuming = branchExists && resumeStatuses.includes(item?.status);
+
+  const refusals = [...problems];
+  if (issue.state !== "OPEN") refusals.push(`#${number} is closed.`);
+  if (!collaborators.has(issue.authorAssociation)) {
+    refusals.push(
+      `#${number} was opened by @${login(issue.author)}, who is not a repository collaborator.`,
+    );
+  }
+  if (types.includes("epic")) {
+    refusals.push(`#${number} is an epic; implement its sub-issues instead.`);
+  } else if (!type) {
+    refusals.push(`#${number} has no type: label, so the branch prefix is unknown.`);
+  }
+  if (!item) {
+    refusals.push(`#${number} is not on the ${projectTitle} project board.`);
+  } else if (resumeStatuses.includes(item.status) && !branchExists) {
+    refusals.push(
+      `Project status is "${item.status}" but no branch for #${number} exists, so there is nothing to resume.`,
+    );
+  } else if (!startStatuses.includes(item.status) && !resuming) {
+    refusals.push(
+      `Project status is "${item.status ?? "none"}"; it must be ${startStatuses.join(" or ")}.`,
+    );
+  }
+  if (labels.includes("blocked")) refusals.push(`#${number} has the blocked label.`);
+  for (const blocker of blockers.filter((each) => !each.done)) {
+    refusals.push(
+      `Blocked by #${blocker.number} (${blocker.title}), which is open with no merged closing pull request.`,
+    );
+  }
+
+  return {
+    number: issue.number,
+    title: issue.title,
+    url: issue.url,
+    state: issue.state,
+    author: login(issue.author),
+    labels,
+    body: issue.body,
+    type,
+    size: item?.size ?? null,
+    status: item?.status ?? null,
+    epic,
+    blockers,
+    subIssues: issue.subIssues.nodes.map(({ number: n, title, state }) => ({
+      number: n,
+      title,
+      state,
+    })),
+    comments,
+    hiddenComments: issue.comments.nodes.length - comments.length,
+    branch,
+    resuming,
+    pr: branch ? findPr(gh, repo, branch.name) : null,
+    needsApproval: item?.size === "L" || labels.includes("security"),
+    // Only the owner approves plans (plan section 12). This is a record for a later session, not
+    // a gate: `gh` runs under the owner's account, so whatever the agent posts is the owner's too.
+    planApproved: comments.some(
+      (comment) => comment.association === "OWNER" && comment.body.includes(approvalMarker),
+    ),
+    refusals,
+    projectItem: item ? { projectId: item.projectId, itemId: item.itemId } : null,
+  };
+}
+
+/** Today's date in Asia/Dhaka, where every date in this project is kept, as YYYY-MM-DD. */
+export const today = () =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(new Date());
+
+const readBody = (gh, repo, number) =>
+  json(gh, ["api", `repos/${repo}/issues/${number}`]).body ?? "";
+
+/**
+ * Appends refinement text to the issue body and logs it in a comment. The owner's text is never
+ * rewritten: the new body is the old one plus a "Refined" section (or a dated update under the
+ * existing one), and the body is read back to prove it.
+ */
+export function appendRefinement({ gh, repo, number, text, summary, date = today() }) {
+  const addition = text.trim();
+  if (!addition) throw new Error("Refinement text is empty");
+  if (markerPattern.test(text) || markerPattern.test(summary ?? "")) {
+    throw new Error("Refinement text must not carry the plan approval marker");
+  }
+  const original = readBody(gh, repo, number);
+  const section = /^## Refined\s*$/m.test(original)
+    ? `\n\n### Update ${date}\n\n${addition}\n`
+    : `\n\n---\n\n## Refined\n\n${addition}\n`;
+  const next = original + section;
+  // GitHub has no compare-and-swap for issue bodies; reading again just before the write keeps
+  // the window in which an owner's edit could be lost as small as it can be.
+  if (readBody(gh, repo, number) !== original) {
+    throw new Error(
+      `Issue #${number} body changed while the refinement was prepared; run it again.`,
+    );
+  }
+  gh(["issue", "edit", String(number), "--repo", repo, "--body-file", "-"], next);
+  // GitHub may store line endings differently, so they are compared without them.
+  const lf = (value) => value.replace(/\r\n/g, "\n");
+  if (lf(readBody(gh, repo, number)) !== lf(next)) {
+    throw new Error(
+      `Issue #${number} body is not what was written; someone may have edited it. Check it by hand.`,
+    );
+  }
+  const log = summary ?? 'appended to the "Refined" section; the original text is unchanged.';
+  gh(
+    ["issue", "comment", String(number), "--repo", repo, "--body-file", "-"],
+    `Refinement log (${date}): ${log}`,
+  );
+  return { body: next };
+}
+
+const stages = {
+  start: { status: "In progress", add: ["in-progress"], remove: ["needs-refinement", "ready"] },
+  review: { status: "In review", add: [], remove: [] },
+};
+
+const cardQuery = `query($owner: String!, $name: String!, $number: Int!) {
+  repository(owner: $owner, name: $name) {
+    issue(number: $number) {
+      labels(first: 50) { nodes { name } }
+      projectItems(first: 20) {
+        nodes {
+          id
+          project {
+            id title
+            field(name: "Status") { ... on ProjectV2SingleSelectField { id options { id name } } }
+          }
+        }
+      }
+    }
+  }
+}`;
+
+/** Moves the issue's card to the stage's Status and sets the stage's labels. */
+export function moveCard({ gh, repo, number, stage }) {
+  const want = stages[stage];
+  if (!want) throw new Error(`Unknown stage "${stage}"; use ${Object.keys(stages).join(" or ")}`);
+  const issue = queryIssue(gh, repo, number, cardQuery);
+  const item = issue.projectItems.nodes.find((node) => node.project.title === projectTitle);
+  if (!item) throw new Error(`#${number} is not on the ${projectTitle} project board`);
+  const field = item.project.field;
+  const option = field.options.find((each) => each.name === want.status);
+  if (!option) throw new Error(`Status option "${want.status}" not found on ${projectTitle}`);
+
+  const labels = issue.labels.nodes.map((label) => label.name);
+  const add = want.add.filter((label) => !labels.includes(label));
+  const remove = want.remove.filter((label) => labels.includes(label));
+  gh([
+    "project",
+    "item-edit",
+    "--id",
+    item.id,
+    "--project-id",
+    item.project.id,
+    "--field-id",
+    field.id,
+    "--single-select-option-id",
+    option.id,
+  ]);
+  if (add.length || remove.length) {
+    gh([
+      "issue",
+      "edit",
+      String(number),
+      "--repo",
+      repo,
+      ...(add.length ? ["--add-label", add.join(",")] : []),
+      ...(remove.length ? ["--remove-label", remove.join(",")] : []),
+    ]);
+  }
+}
+
+export const usage = [
+  "Usage: pnpm ticket load <N>",
+  "       pnpm ticket refine <N> --file <path> [--summary <text>]",
+  "       pnpm ticket move <N> start|review",
+  "Options: --repo owner/name (default " + defaultRepo + ")",
+].join("\n");
+
+/** Parses the command line; throws on anything but the three commands above. */
+export function parseCli(argv) {
+  const { values, positionals } = parseArgs({
+    args: argv,
+    allowPositionals: true,
+    options: {
+      repo: { type: "string", default: defaultRepo },
+      file: { type: "string" },
+      summary: { type: "string" },
+    },
+  });
+  const [command, numberText, stage, ...extra] = positionals;
+  if (!["load", "refine", "move"].includes(command) || extra.length) throw new Error(usage);
+  if (!/^[1-9]\d{0,8}$/.test(numberText ?? "")) {
+    throw new Error(`Expected an issue number, got "${numberText ?? ""}"\n${usage}`);
+  }
+  checkTarget(values.repo, values.repo.split("/")[0]);
+  const base = { command, number: Number(numberText), repo: values.repo };
+  if (command === "move") {
+    if (!(stage in stages) || values.file || values.summary) {
+      throw new Error(`move takes start or review\n${usage}`);
+    }
+    return { ...base, stage };
+  }
+  if (stage || (command === "load" && (values.file || values.summary))) throw new Error(usage);
+  if (command === "refine") {
+    if (!values.file) throw new Error(`refine needs --file <path>\n${usage}`);
+    return { ...base, file: values.file, summary: values.summary };
+  }
+  return base;
+}

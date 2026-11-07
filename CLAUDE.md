@@ -34,11 +34,11 @@ pnpm dev:up               # Postgres, Redis, Nginx, Mailpit in Docker
 
 ## Workflow
 
-Every ticket goes through eight stages, started with `/implement-issue <number>`. GitHub issues, `docs/plans/issue-N.md` and issue comments are the memory between sessions.
+Every ticket goes through eight stages, started with `/implement-issue <number>` ([skill](.claude/skills/implement-issue/SKILL.md)). GitHub issues, `docs/plans/issue-N.md` and issue comments are the memory between sessions.
 
-1. Pull ticket: fetch the issue, its epic, linked issues and comments. Refuse if blocked or not ready.
+1. Pull ticket: fetch the issue, its epic, linked issues and collaborators' comments. Refuse if it is blocked or its card is not Ready or Refining; a blocker counts as done once its closing pull request is merged into an epic branch.
 2. Refine: check the ticket against the code and ADRs, then append a `Refined` section. Never rewrite the owner's original text.
-3. Branch: create `feat/N-slug` in its own worktree before writing anything, and move the card to In progress.
+3. Branch: create `<type>/N-slug` (`feat`, `fix`, `chore`, `docs` or `spike`, from the type label) in its own worktree before writing anything, cut from the epic's `epic/*` branch when it has one, otherwise from `main`; the pull request targets the same base. Move the card to In progress.
 4. Brainstorm and plan: choose an approach, write a step-by-step plan with tests first, commit it on the branch.
 5. Implement (TDD): failing test, code, refactor, in small conventional commits that reference the issue.
 6. Verify: lint, typecheck, unit, integration and affected Playwright tests. Check UI tickets in a real browser.

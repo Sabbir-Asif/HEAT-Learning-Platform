@@ -18,6 +18,7 @@
     "test:coverage": "turbo run test:coverage",
     "audit:deps": "node packages/config/bin/audit.mjs",
     "github:setup": "node packages/config/bin/github-setup.mjs",
+    "ticket": "node packages/config/bin/ticket.mjs",
     "dev:up": "node infra/scripts/dev.mjs up",
     "dev:down": "node infra/scripts/dev.mjs down",
     "dev:reset": "node infra/scripts/dev.mjs reset"
