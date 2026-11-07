@@ -72,6 +72,12 @@ describe("the implement-issue skill", () => {
     expect(missing).toEqual([]);
   });
 
+  test("stage 6 ends with pnpm verify, which writes the marker the pull request gate checks", () => {
+    const verify = text().split(/^## 7\./m)[0].split(/^## 6\./m)[1];
+    expect(verify).toContain("pnpm verify");
+    expect(verify.indexOf("pnpm verify")).toBeGreaterThan(verify.indexOf("pnpm build"));
+  });
+
   test("relative links in the skill resolve", () => {
     const broken = markdownFiles(skillDir).flatMap((file) =>
       [...read(file).matchAll(/\]\(([^)\s#]+)(?:#[^)]*)?\)/g)]
