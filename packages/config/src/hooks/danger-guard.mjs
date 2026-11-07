@@ -1,7 +1,8 @@
-import { basename } from "node:path";
+import { basename, sep } from "node:path";
 import { branchDenial, locate, planDenial } from "./edit-guards.mjs";
 import { envAccess, isEnvFile } from "./env-files.mjs";
 import { existsInBase } from "./git.mjs";
+import { resolveReal } from "./paths.mjs";
 import { gitInvocation } from "./invocation.mjs";
 import { parseShell } from "./shell.mjs";
 
@@ -14,6 +15,14 @@ const migrationPath = /(?:^|\/)prisma\/migrations(?:\/|$)/;
 const scratchTarget = /^(?:\$SCRATCH|\$\{SCRATCH\})(?:\/|$)/;
 const scriptOptions = new Set(["-e", "-f", "-E", "--expression", "--file"]);
 const directoryOptions = new Set(["-t", "--target-directory"]);
+
+const gitDenial = (path) =>
+  `${path} is inside .git or is a verification marker. Hooks, config and markers there would bypass the guards, so only git and pnpm verify write them.`;
+
+function gitInternals(real) {
+  const segments = real.toLowerCase().split(sep);
+  return segments.includes(".git") || segments.at(-1) === "heat-verified";
+}
 
 const migrationDenial = (path) =>
   `${path} is an applied migration (it exists on origin/main or an epic branch) and is never edited after merge. Add a new migration instead.`;
@@ -67,6 +76,8 @@ function writeDenial(target, cwd) {
   if (/[$`]/.test(target)) {
     return `The write target "${target}" contains an unexpanded variable, so the guard cannot tell where it lands. Use the Write tool with an absolute path (or $SCRATCH for scratch files).`;
   }
+  const real = resolveReal(target, cwd);
+  if (gitInternals(real)) return gitDenial(real);
   const location = locate(target, cwd);
   if (!location) return null;
   if (isEnvFile(location.real)) return envDenial(location.real);
@@ -146,6 +157,8 @@ export function dangerGuard(input) {
   const envPath = firstEnvPath(paths);
   if (envPath) return { deny: envDenial(envPath) };
   if (!fileTools.has(tool)) return {};
+  const real = resolveReal(paths[0], input.cwd || process.cwd());
+  if (gitInternals(real)) return { deny: gitDenial(real) };
   const location = locate(paths[0], input.cwd);
   const deny = location && migrationDenialFor(location);
   return deny ? { deny } : {};
