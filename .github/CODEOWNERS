@@ -2,3 +2,5 @@
 /.github/ @Sabbir-Asif
 /packages/config/bin/audit.mjs @Sabbir-Asif
 /packages/config/src/audit.mjs @Sabbir-Asif
+/packages/config/bin/github-setup.mjs @Sabbir-Asif
+/packages/config/src/github-setup.mjs @Sabbir-Asif

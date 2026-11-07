@@ -17,6 +17,7 @@
     "format:root": "prettier --check . '!apps/**' '!packages/**'",
     "test:coverage": "turbo run test:coverage",
     "audit:deps": "node packages/config/bin/audit.mjs",
+    "github:setup": "node packages/config/bin/github-setup.mjs",
     "dev:up": "node infra/scripts/dev.mjs up",
     "dev:down": "node infra/scripts/dev.mjs down",
     "dev:reset": "node infra/scripts/dev.mjs reset"

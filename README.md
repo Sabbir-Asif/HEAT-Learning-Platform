@@ -88,6 +88,17 @@ Workflow rules, enforced by `packages/config/test/workflows.test.mjs`: every ext
 gh api -X PUT repos/Sabbir-Asif/HEAT-Learning-Platform/branches/main/protection --input .github/branch-protection.json
 ```
 
+### GitHub setup
+
+Issue forms (feature, bug, spike, chore) are in `.github/ISSUE_TEMPLATE/` and the pull request template is `.github/pull_request_template.md`. Labels, milestones and the "HEAT LMS" Project with its fields are kept in `packages/config/src/github-setup.mjs` and applied with the `gh` CLI (signed in with the `repo` and `project` scopes):
+
+```sh
+pnpm github:setup --dry-run   # print the planned changes, make none
+pnpm github:setup                # apply them
+```
+
+It is safe to re-run. It creates what is missing, updates a label's colour and description in place, and adds missing options to a project field while keeping the existing options' ids. It never deletes or renames anything and never touches issues or project items; extra labels, milestones and options are left alone. It exits non-zero when something needs a person, such as a field of the wrong type. The Project Area options are the `area:*` labels, from one list in the script. `packages/config/test/github-setup.test.mjs` tests it against a fake `gh`, with no network or credentials.
+
 ### Conventions
 
 The quality bar, the delivery workflow and the rules for each app and package are in `CLAUDE.md` at the repo root and in each area's directory; the root file links to the rest. A rule is written in one file only. `packages/config/test/docs.test.mjs` fails if the root file reaches 200 lines, an area file is missing, a link or heading anchor in these files is dead, or a sentence is repeated between files.
