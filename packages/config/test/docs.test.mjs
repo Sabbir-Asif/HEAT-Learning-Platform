@@ -55,9 +55,10 @@ test("relative links and heading anchors in the instruction files resolve", () =
         const [path, anchor] = link.split("#");
         const target = path ? resolve(root, dirname(file), path) : join(root, file);
         if (!existsSync(target)) return true;
-        return anchor
-          ? !(target.endsWith(".md") && anchors(relative(root, target)).includes(anchor))
-          : false;
+        if (!anchor) return false;
+        if (target.endsWith(".html"))
+          return !read(relative(root, target)).includes(`id="${anchor}"`);
+        return !(target.endsWith(".md") && anchors(relative(root, target)).includes(anchor));
       })
       .map((link) => `${file}: ${link}`);
   });
