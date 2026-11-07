@@ -1,11 +1,13 @@
 // pnpm dev:up | dev:down | dev:reset — manage the local Docker Compose stack.
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync } from "node:fs";
+import { chmodSync, constants, copyFileSync, existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const composeFile = join(root, "infra/compose/docker-compose.dev.yml");
+// Fixed, so a COMPOSE_PROJECT_NAME in the shell cannot make `reset` delete another project's volumes.
+const projectName = "heat-lms-dev";
 const envDirs = [
   "infra/compose",
   "apps/api",
@@ -16,9 +18,12 @@ const envDirs = [
 const waitSeconds = 60;
 
 const compose = (...args) => {
-  const { status } = spawnSync("docker", ["compose", "-f", composeFile, ...args], {
-    stdio: "inherit",
-  });
+  const { status, error } = spawnSync(
+    "docker",
+    ["compose", "-p", projectName, "-f", composeFile, ...args],
+    { stdio: "inherit" },
+  );
+  if (error) console.error(`Could not run docker (${error.message}). Is Docker installed?`);
   if (status !== 0) process.exit(status ?? 1);
 };
 
@@ -27,29 +32,60 @@ function ensureEnvFiles() {
   for (const dir of envDirs) {
     const target = join(root, dir, ".env");
     if (existsSync(target)) continue;
-    copyFileSync(join(root, dir, ".env.example"), target);
+    // Exclusive create, owner-only: these files hold real values later.
+    copyFileSync(join(root, dir, ".env.example"), target, constants.COPYFILE_EXCL);
+    chmodSync(target, 0o600);
     console.log(`Created ${dir}/.env from .env.example`);
   }
 }
 
-const up = () => {
-  ensureEnvFiles();
+// Polls the published Nginx port for up to `seconds`.
+const nginxReachable = async (seconds) => {
+  const env = readFileSync(join(root, "infra/compose/.env"), "utf8");
+  const port = env.match(/^HTTP_PORT=(\d+)$/m)?.[1] ?? "80";
+  for (let attempt = 0; attempt < seconds; attempt++) {
+    try {
+      const response = await fetch(`http://127.0.0.1:${port}/nginx-health`, {
+        signal: AbortSignal.timeout(1000),
+      });
+      if (response.ok) return true;
+    } catch {
+      // not reachable yet
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+  return false;
+};
+
+const up = async () => {
   compose("up", "--detach", "--wait", "--wait-timeout", String(waitSeconds));
+  // Docker Desktop sometimes leaves a recreated container's published port dead
+  // (connection reset) although the container is healthy; restarting it fixes that.
+  if (!(await nginxReachable(2))) {
+    console.log("Nginx is healthy but not reachable on the host; restarting it once.");
+    compose("restart", "nginx");
+    if (!(await nginxReachable(15))) {
+      console.error("Nginx is still not reachable on the host port.");
+      process.exit(1);
+    }
+  }
 };
 
 const commands = {
   up,
   down: () => compose("down"),
   // Drops the volumes, so Postgres and Redis come back empty.
-  reset: () => {
+  reset: async () => {
     compose("down", "--volumes");
-    up();
+    await up();
   },
 };
 
-const command = commands[process.argv[2]];
+const command = Object.hasOwn(commands, process.argv[2]) ? commands[process.argv[2]] : undefined;
 if (!command) {
   console.error(`Usage: node infra/scripts/dev.mjs <${Object.keys(commands).join("|")}>`);
   process.exit(1);
 }
-command();
+// Compose needs the variables from .env for every command, including down.
+ensureEnvFiles();
+await command();

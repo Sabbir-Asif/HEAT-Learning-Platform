@@ -31,8 +31,9 @@ describe("dev compose stack", () => {
   });
 
   test("Redis keeps an append-only log and never evicts, as BullMQ requires", () => {
-    expect(service("redis")).toMatch(/"--appendonly", "yes"/);
-    expect(service("redis")).toMatch(/"--maxmemory-policy", "noeviction"/);
+    const command = service("redis").match(/^ {4}command: (.*)$/m)?.[1] ?? "";
+    expect(command).toContain('"--appendonly", "yes"');
+    expect(command).toContain('"--maxmemory-policy", "noeviction"');
   });
 
   test("Postgres 17 and Redis keep their data in named volumes", () => {
@@ -49,7 +50,7 @@ describe("dev compose stack", () => {
   });
 
   test("every variable the compose file reads has a default in .env.example", () => {
-    const used = [...compose.matchAll(/\$\{(\w+)\}/g)].map((m) => m[1]);
+    const used = [...compose.matchAll(/(?<!\$)\$\{(\w+)/g)].map((m) => m[1]);
     expect(used.length).toBeGreaterThan(0);
     expect(used.filter((name) => !(name in composeEnv))).toEqual([]);
   });
@@ -68,10 +69,37 @@ describe("dev Nginx config", () => {
     expect(block).toMatch(/location \/ \{\s*proxy_pass http:\/\/frontend_internal;/);
   });
 
-  test("upstreams match the app ports", () => {
-    expect(nginx).toMatch(/upstream frontend_public \{\s*server host\.docker\.internal:3000;/);
-    expect(nginx).toMatch(/upstream frontend_internal \{\s*server host\.docker\.internal:3001;/);
+  test("upstreams match the ports the apps listen on", () => {
+    const port = (app) =>
+      read(`apps/${app}/package.json`).match(/"dev": "next dev --port (\d+)"/)?.[1];
+    expect(nginx).toContain(`server host.docker.internal:${port("frontend-public")};`);
+    expect(nginx).toContain(`server host.docker.internal:${port("frontend-internal")};`);
+    // The API defaults to 4000 in main.ts.
+    expect(read("apps/api/src/main.ts")).toContain("process.env.PORT ?? 4000");
     expect(nginx).toMatch(/upstream api \{\s*server host\.docker\.internal:4000;/);
+  });
+
+  test("every proxied location uses the shared proxy headers", () => {
+    const proxied = [...nginx.matchAll(/proxy_pass [^;]+;\s*include ([^;]+);/g)];
+    expect(proxied).toHaveLength(4);
+    expect(new Set(proxied.map((m) => m[1]))).toEqual(new Set(["/etc/nginx/conf.d/proxy.inc"]));
+    expect(compose).toContain("../nginx/proxy.inc:/etc/nginx/conf.d/proxy.inc:ro");
+  });
+
+  test("client-supplied forwarding headers are overwritten, never appended", () => {
+    const headers = read("infra/nginx/proxy.inc");
+    expect(headers).toContain("proxy_set_header X-Forwarded-For $remote_addr;");
+    expect(headers).not.toContain("$proxy_add_x_forwarded_for");
+    expect(headers).toContain("proxy_set_header X-Real-IP $remote_addr;");
+  });
+
+  test("the health check endpoint exists and unknown hosts get 404", () => {
+    expect(nginx).toMatch(/location = \/nginx-health \{[^}]*return 200/);
+    expect(nginx).toMatch(/default_server;[\s\S]*?location \/ \{\s*return 404;/);
+  });
+
+  test("Nginx can reach host.docker.internal on Linux", () => {
+    expect(service("nginx")).toContain('- "host.docker.internal:host-gateway"');
   });
 });
 

@@ -37,7 +37,7 @@ pnpm turbo build lint typecheck test
 
 ### Local services (Docker)
 
-`pnpm dev:up` starts Postgres 17, Redis, Nginx and Mailpit from `infra/compose/docker-compose.dev.yml` and returns once all four are healthy (it waits up to 60 seconds). On first run it copies each `.env.example` to `.env` (`infra/compose/` and every app); edit the copies, they are ignored by git.
+`pnpm dev:up` starts Postgres 17, Redis, Nginx and Mailpit from `infra/compose/docker-compose.dev.yml` and returns once all four are healthy (it waits up to 60 seconds). On first run it copies each `.env.example` to `.env` (`infra/compose/` and every app, mode 600); edit the copies, they are ignored by git. Only `infra/compose/.env` is read today; the app files list the variables the apps will read once configuration loading lands.
 
 | Service  | Host address                                                    | Notes                                                                 |
 | -------- | --------------------------------------------------------------- | --------------------------------------------------------------------- |
@@ -46,7 +46,7 @@ pnpm turbo build lint typecheck test
 | Mailpit  | SMTP `localhost:1035`, web UI <http://localhost:8035>           | Catches all outgoing mail; nothing is delivered                       |
 | Nginx    | <http://learn.localhost> and <http://admin.localhost> (port 80) | `/api` on both hosts goes to the API; everything else to the frontend |
 
-The apps run on the host (`pnpm dev`), and Nginx forwards to them on ports 3000, 3001 and 4000 through `host.docker.internal`, so start them for the hosts to answer. `*.localhost` resolves to your machine without a hosts-file change. The host ports are uncommon on purpose so the stack runs next to a local Postgres, Redis or Mailpit; change them in `infra/compose/.env` (and the matching URLs in the app `.env` files) if they clash.
+The apps run on the host (`pnpm dev`), and Nginx forwards to them on ports 3000, 3001 and 4000 through `host.docker.internal`, so start them for the hosts to answer. `*.localhost` resolves to your machine without a hosts-file change. Keep the apps bound to `127.0.0.1` where Nginx can reach them (Docker Desktop on macOS and Windows); on Linux `host.docker.internal` is the Docker bridge address, so bind to that interface or add a firewall rule rather than listening on `0.0.0.0`, which exposes the apps to your network and skips Nginx. The host ports are uncommon on purpose so the stack runs next to a local Postgres, Redis or Mailpit; change them in `infra/compose/.env` (and the matching URLs in the app `.env` files) if they clash.
 
 ```sh
 pnpm dev:up      # start and wait until healthy
