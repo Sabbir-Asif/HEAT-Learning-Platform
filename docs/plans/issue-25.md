@@ -73,7 +73,7 @@ Normal commands that must stay allowed (test table in A7): `pnpm install --froze
 
 - [x] **D1 CODEOWNERS** entries for `.claude/settings.json`, `packages/config/src/hooks/`, `packages/config/bin/hook.mjs` (and `bin/verify.mjs`, `src/verify.mjs`), with a test.
 - [x] **D2 SKILL.md stage 6** runs `pnpm verify` after the check list; `skill.test.mjs` stays green.
-- [ ] **D3 README** hooks section: what each hook does, how the marker works, that the plan gate lets hook code be edited once the plan exists, and that hooks are guard rails while CI is the gate.
+- [x] **D3 README** hooks section: what each hook does, how the marker works, that the plan gate lets hook code be edited once the plan exists, and that hooks are guard rails while CI is the gate.
 - [ ] **D4 `.claude/settings.json`** (created last): hooks, `permissions.deny` for `.env` (`Read`, `Edit`), `onFailure: "block"` on the guards, timeouts. `settings.test.mjs` checks every command points to an existing hook name, the schema shape, and runs each deny rule against the skill's normal paths for false positives.
 
 ## Acceptance criteria mapped to checks

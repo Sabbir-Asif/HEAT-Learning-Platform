@@ -165,6 +165,29 @@ pnpm ticket move 24 start                    # card to In progress, labels set (
 
 It needs `gh` with the `repo` and `project` scopes. `load` only reads, and keeps only comments from repository collaborators. `refine` never rewrites the owner's text: it appends, reads the body again just before writing and stops if it changed, then reads it back and fails if it is not exactly what was written. GitHub has no compare-and-swap for issue bodies, so an edit in the moment between that last read and the write can still be lost. `packages/config/test/ticket.test.mjs` tests it against a fake `gh`; `packages/config/test/skill.test.mjs` checks the skill and its agents.
 
+### Workflow hooks
+
+`.claude/settings.json` wires eight Claude Code hooks to `node packages/config/bin/hook.mjs <name>`. The logic is in `packages/config/src/hooks/` (Node built-ins only, so it runs before `pnpm install`) and is tested with throwaway git repos, worktrees and a fake `gh`, with no network. The hooks are guard rails for an agent session; branch protection and CI stay the gate (ADR 0010), because a hook can be bypassed through another tool.
+
+| Hook              | Event                     | What it does                                                                                                                                                                                   |
+| ----------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `context-loader`  | SessionStart              | Prints the branch, issue number, plan path and ticked tasks, offline. On `main` and epic branches it lists the ticket worktrees to resume.                                                     |
+| `ticket-injector` | UserPromptSubmit          | For `#N` in a prompt, adds the issue body and the owner, member and collaborator comments as delimited untrusted data. Never blocks the prompt.                                                |
+| `branch-guard`    | PreToolUse Edit, Write    | Blocks edits in a checkout on `main`, `master` or a detached HEAD. The repo is taken from the file, not from the session directory.                                                            |
+| `plan-gate`       | PreToolUse Edit, Write    | On `<type>/N-slug`, blocks every file but `docs/plans/issue-N.md` until that plan exists. Other branches, such as `epic/*`, are allowed.                                                       |
+| `danger-guard`    | PreToolUse Bash and files | Blocks force pushes, `prisma migrate reset`, edits to migrations already on `origin/main` or `origin/epic/*`, shell writes that skip the edit guards, and every read or write of `.env` files. |
+| `pr-gate`         | PreToolUse Bash           | Blocks `gh pr create` and pull request API writes unless the verification marker matches `HEAD` on a clean tree.                                                                               |
+| `formatter`       | PostToolUse Edit, Write   | Runs ESLint fixes and Prettier on the touched file with the ignore files of `lint` and `format:check`. Skips `docs/`, generated files and images.                                              |
+| `stop-check`      | Stop                      | Runs `pnpm typecheck` in the last edited worktree after typed files changed, at most 3 blocks per session, never twice in one turn.                                                            |
+
+The four guards fail closed: malformed input, a crash or a timeout denies. The other four fail open with a one-line note.
+
+`pnpm verify` runs lint, format check, typecheck, coverage tests and build in order and, only if all pass on a clean tree, writes the commit sha to `heat-verified` in the worktree's own git directory (never committed). The PR gate accepts a marker only when it equals `HEAD` and the tree is clean, so any later commit needs another `pnpm verify`. Stage 6 of the skill calls it.
+
+Hook state for the stop check lives in `$HEAT_HOOKS_STATE_DIR` or `heat-hooks/` under the system temp directory, outside every working tree. The plan gate allows editing the hook code and `.claude/settings.json` once the ticket's plan exists; `.github/CODEOWNERS` makes the owner read every change to them. A change to a hook takes effect in sessions started in a checkout that contains it.
+
+`.env` files are also denied by `permissions.deny` for Read and Edit. `.env.example` stays readable.
+
 ### Conventions
 
 The quality bar, the delivery workflow and the rules for each app and package are in `CLAUDE.md` at the repo root and in each area's directory; the root file links to the rest. A rule is written in one file only. `packages/config/test/docs.test.mjs` fails if the root file reaches 200 lines, an area file is missing, a link or heading anchor in these files is dead, or a sentence is repeated between files.
