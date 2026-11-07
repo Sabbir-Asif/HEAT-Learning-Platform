@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { closesIssue, loadTicket, slugify } from "../src/ticket.mjs";
+import { appendRefinement, closesIssue, loadTicket, moveCard, slugify } from "../src/ticket.mjs";
 
 const repo = "owner/repo";
 const epicBranch = "epic/e0-engineering-foundation";
@@ -333,5 +333,168 @@ describe("closesIssue", () => {
 
   test("handles an empty body", () => {
     expect(closesIssue(null, 23)).toBe(false);
+  });
+});
+
+// A stand-in for the issue body, its comments, labels and card, recording every call.
+function fakeIssue({ body = "Original text", labels = [], status = "Ready", options } = {}) {
+  const state = { body, comments: [], labels: [...labels], status };
+  const statusOptions = (options ?? ["Backlog", "Ready", "In progress", "In review"]).map(
+    (name, index) => ({ id: `opt${index}`, name }),
+  );
+  const calls = [];
+  const tweak = { afterWrite: undefined };
+  const gh = (args, input) => {
+    calls.push({ args, input });
+    const [a, b] = args;
+    if (a === "api" && b === "graphql") {
+      return JSON.stringify({
+        data: {
+          repository: {
+            issue: {
+              labels: { nodes: state.labels.map((name) => ({ name })) },
+              projectItems: {
+                nodes: [
+                  {
+                    id: "ITEM",
+                    project: {
+                      id: "PROJ",
+                      title: "HEAT LMS",
+                      field: { id: "STATUS", options: statusOptions },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      });
+    }
+    if (a === "api") return JSON.stringify({ body: state.body });
+    if (a === "issue" && b === "edit" && args.includes("--body-file")) {
+      state.body = input;
+      tweak.afterWrite?.(state);
+      return "";
+    }
+    if (a === "issue" && b === "edit") {
+      const list = (flag) => (args.includes(flag) ? args[args.indexOf(flag) + 1].split(",") : []);
+      state.labels = state.labels.filter((name) => !list("--remove-label").includes(name));
+      state.labels.push(...list("--add-label"));
+      return "";
+    }
+    if (a === "issue" && b === "comment") {
+      state.comments.push(input);
+      return "";
+    }
+    if (a === "project" && b === "item-edit") {
+      const id = args[args.indexOf("--single-select-option-id") + 1];
+      state.status = statusOptions.find((option) => option.id === id).name;
+      return "";
+    }
+    throw new Error(`unexpected gh call: ${args.join(" ")}`);
+  };
+  return { gh, state, calls, tweak };
+}
+
+describe("appendRefinement", () => {
+  const date = "2026-11-07";
+
+  test("keeps the original text byte for byte and appends a Refined section and a log comment", () => {
+    const original = "## Context\r\nOwner text.\n\n";
+    const { gh, state } = fakeIssue({ body: original });
+    appendRefinement({ gh, repo, number: 24, text: "  New criteria.\n", date });
+    expect(state.body.startsWith(original)).toBe(true);
+    expect(state.body.slice(original.length)).toBe("\n\n---\n\n## Refined\n\nNew criteria.\n");
+    expect(state.comments).toEqual([
+      'Refinement log (2026-11-07): appended to the "Refined" section; the original text is unchanged.',
+    ]);
+  });
+
+  test("a second refinement adds a dated update under the existing section", () => {
+    const { gh, state } = fakeIssue({ body: "Owner text.\n\n## Refined\n\nFirst." });
+    appendRefinement({ gh, repo, number: 24, text: "Second.", summary: "added X.", date });
+    expect(state.body).toBe(
+      "Owner text.\n\n## Refined\n\nFirst.\n\n### Update 2026-11-07\n\nSecond.\n",
+    );
+    expect(state.body.match(/^## Refined$/gm)).toHaveLength(1);
+    expect(state.comments).toEqual(["Refinement log (2026-11-07): added X."]);
+  });
+
+  test("fails, and posts no log, when the body read back is not what was written", () => {
+    const { gh, state, tweak } = fakeIssue();
+    tweak.afterWrite = (s) => {
+      s.body = "Someone else's text";
+    };
+    expect(() => appendRefinement({ gh, repo, number: 24, text: "x", date })).toThrow(
+      /#24 .*not what was written/,
+    );
+    expect(state.comments).toEqual([]);
+  });
+
+  test("refuses empty text without calling GitHub", () => {
+    const { gh, calls } = fakeIssue();
+    expect(() => appendRefinement({ gh, repo, number: 24, text: " \n", date })).toThrow(/empty/);
+    expect(calls).toEqual([]);
+  });
+
+  test("dates the update in Asia/Dhaka by default", () => {
+    const { gh, state } = fakeIssue();
+    appendRefinement({ gh, repo, number: 24, text: "x" });
+    expect(state.comments[0]).toMatch(/^Refinement log \(\d{4}-\d{2}-\d{2}\)/);
+  });
+});
+
+describe("moveCard", () => {
+  test("start sets In progress, adds in-progress and removes the labels that are present", () => {
+    const { gh, state, calls } = fakeIssue({ labels: ["type:chore", "ready"] });
+    moveCard({ gh, repo, number: 24, stage: "start" });
+    expect(state.status).toBe("In progress");
+    expect(state.labels.sort()).toEqual(["in-progress", "type:chore"]);
+    const labelCall = calls.find(({ args }) => args.includes("--add-label")).args;
+    expect(labelCall).toEqual([
+      "issue",
+      "edit",
+      "24",
+      "--repo",
+      repo,
+      "--add-label",
+      "in-progress",
+      "--remove-label",
+      "ready",
+    ]);
+  });
+
+  test("review only sets the status", () => {
+    const { gh, state, calls } = fakeIssue({ labels: ["in-progress"], status: "In progress" });
+    moveCard({ gh, repo, number: 24, stage: "review" });
+    expect(state.status).toBe("In review");
+    expect(state.labels).toEqual(["in-progress"]);
+    expect(calls.filter(({ args }) => args[0] === "issue")).toEqual([]);
+  });
+
+  test("start with the labels already right makes no label call", () => {
+    const { gh, calls } = fakeIssue({ labels: ["in-progress"] });
+    moveCard({ gh, repo, number: 24, stage: "start" });
+    expect(calls.filter(({ args }) => args[0] === "issue")).toEqual([]);
+  });
+
+  test("fails on a status option the project does not have", () => {
+    const { gh, calls } = fakeIssue({ options: ["Backlog", "In progress"] });
+    expect(() => moveCard({ gh, repo, number: 24, stage: "review" })).toThrow(
+      /"In review" not found/,
+    );
+    expect(calls.filter(({ args }) => args[0] !== "api")).toEqual([]);
+  });
+
+  test("fails on an unknown stage or an issue not on the project", () => {
+    const { gh } = fakeIssue();
+    expect(() => moveCard({ gh, repo, number: 24, stage: "merge" })).toThrow(/Unknown stage/);
+    const empty = () =>
+      JSON.stringify({
+        data: { repository: { issue: { labels: { nodes: [] }, projectItems: { nodes: [] } } } },
+      });
+    expect(() => moveCard({ gh: empty, repo, number: 24, stage: "start" })).toThrow(
+      /not on the HEAT LMS project/,
+    );
   });
 });

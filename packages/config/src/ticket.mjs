@@ -72,13 +72,14 @@ export function closesIssue(body, number) {
 const json = (gh, args) => JSON.parse(gh(args));
 const login = (author) => author?.login ?? "ghost";
 
-function readIssue(gh, repo, number) {
+/** Runs one of the issue queries above and returns the issue, failing when there is none. */
+function queryIssue(gh, repo, number, query) {
   const [owner, name] = repo.split("/");
   const result = json(gh, [
     "api",
     "graphql",
     "-f",
-    `query=${issueQuery}`,
+    `query=${query}`,
     "-F",
     `owner=${owner}`,
     "-F",
@@ -183,7 +184,7 @@ function findPr(gh, repo, branch) {
  * when the ticket may start. Comments from outside the repository's collaborators are dropped.
  */
 export function loadTicket({ gh, repo, number, localBranches = [] }) {
-  const issue = readIssue(gh, repo, number);
+  const issue = queryIssue(gh, repo, number, issueQuery);
   const labels = issue.labels.nodes.map((label) => label.name);
   const types = labels.filter((label) => label.startsWith("type:")).map((label) => label.slice(5));
   const type = types.find((name) => name in prefixes) ?? null;
@@ -264,4 +265,101 @@ export function loadTicket({ gh, repo, number, localBranches = [] }) {
     refusals,
     projectItem: item ? { projectId: item.projectId, itemId: item.itemId } : null,
   };
+}
+
+/** Today's date in Asia/Dhaka, where every date in this project is kept, as YYYY-MM-DD. */
+export const today = () =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(new Date());
+
+const readBody = (gh, repo, number) =>
+  json(gh, ["api", `repos/${repo}/issues/${number}`]).body ?? "";
+
+/**
+ * Appends refinement text to the issue body and logs it in a comment. The owner's text is never
+ * rewritten: the new body is the old one plus a "Refined" section (or a dated update under the
+ * existing one), and the body is read back to prove it.
+ */
+export function appendRefinement({ gh, repo, number, text, summary, date = today() }) {
+  const addition = text.trim();
+  if (!addition) throw new Error("Refinement text is empty");
+  const original = readBody(gh, repo, number);
+  const section = /^## Refined\s*$/m.test(original)
+    ? `\n\n### Update ${date}\n\n${addition}\n`
+    : `\n\n---\n\n## Refined\n\n${addition}\n`;
+  const next = original + section;
+  gh(["issue", "edit", String(number), "--repo", repo, "--body-file", "-"], next);
+  // GitHub may store line endings differently, so they are compared without them.
+  const lf = (value) => value.replace(/\r\n/g, "\n");
+  if (lf(readBody(gh, repo, number)) !== lf(next)) {
+    throw new Error(
+      `Issue #${number} body is not what was written; someone may have edited it. Check it by hand.`,
+    );
+  }
+  const log = summary ?? 'appended to the "Refined" section; the original text is unchanged.';
+  gh(
+    ["issue", "comment", String(number), "--repo", repo, "--body-file", "-"],
+    `Refinement log (${date}): ${log}`,
+  );
+  return { body: next };
+}
+
+const stages = {
+  start: { status: "In progress", add: ["in-progress"], remove: ["needs-refinement", "ready"] },
+  review: { status: "In review", add: [], remove: [] },
+};
+
+const cardQuery = `query($owner: String!, $name: String!, $number: Int!) {
+  repository(owner: $owner, name: $name) {
+    issue(number: $number) {
+      labels(first: 50) { nodes { name } }
+      projectItems(first: 20) {
+        nodes {
+          id
+          project {
+            id title
+            field(name: "Status") { ... on ProjectV2SingleSelectField { id options { id name } } }
+          }
+        }
+      }
+    }
+  }
+}`;
+
+/** Moves the issue's card to the stage's Status and sets the stage's labels. */
+export function moveCard({ gh, repo, number, stage }) {
+  const want = stages[stage];
+  if (!want) throw new Error(`Unknown stage "${stage}"; use ${Object.keys(stages).join(" or ")}`);
+  const issue = queryIssue(gh, repo, number, cardQuery);
+  const item = issue.projectItems.nodes.find((node) => node.project.title === projectTitle);
+  if (!item) throw new Error(`#${number} is not on the ${projectTitle} project board`);
+  const field = item.project.field;
+  const option = field.options.find((each) => each.name === want.status);
+  if (!option) throw new Error(`Status option "${want.status}" not found on ${projectTitle}`);
+
+  const labels = issue.labels.nodes.map((label) => label.name);
+  const add = want.add.filter((label) => !labels.includes(label));
+  const remove = want.remove.filter((label) => labels.includes(label));
+  gh([
+    "project",
+    "item-edit",
+    "--id",
+    item.id,
+    "--project-id",
+    item.project.id,
+    "--field-id",
+    field.id,
+    "--single-select-option-id",
+    option.id,
+  ]);
+  if (add.length || remove.length) {
+    gh([
+      "issue",
+      "edit",
+      String(number),
+      "--repo",
+      repo,
+      ...(add.length ? ["--add-label", add.join(",")] : []),
+      ...(remove.length ? ["--remove-label", remove.join(",")] : []),
+    ]);
+  }
 }
