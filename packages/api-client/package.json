@@ -3,29 +3,40 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./mocks": "./src/mocks.ts",
+    "./schemas": "./src/generated/zod/schemas.ts"
   },
   "scripts": {
     "lint": "eslint .",
-    "format:check": "prettier --check . --ignore-path ../../.gitignore",
+    "format:check": "prettier --check . --ignore-path ../../.gitignore --ignore-path .prettierignore",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "generate": "orval --config orval.config.ts"
   },
   "peerDependencies": {
     "react": "catalog:"
   },
   "devDependencies": {
+    "@faker-js/faker": "10.6.0",
     "@heat/config": "workspace:*",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "16.3.3",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "eslint": "catalog:",
+    "msw": "3.0.4",
+    "orval": "8.46.0",
     "prettier": "catalog:",
     "react": "catalog:",
+    "react-dom": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
   "dependencies": {
-    "@heat/contracts": "workspace:*"
+    "@heat/contracts": "workspace:*",
+    "@tanstack/react-query": "5.106.1",
+    "zod": "catalog:"
   }
 }

@@ -33,8 +33,10 @@ function prepare(options: RequestInit): RequestInit {
   return { ...options, headers, credentials: "include" };
 }
 
+// By name rather than `instanceof`: a DOMException from another realm (jsdom, an iframe) is not an Error here.
 const isAbort = (error: unknown, signal: AbortSignal | null | undefined) =>
-  signal?.aborted === true || (error instanceof Error && error.name === "AbortError");
+  signal?.aborted === true ||
+  (typeof error === "object" && error !== null && "name" in error && error.name === "AbortError");
 
 async function send<T>(url: string, options: RequestInit): Promise<T> {
   const { url: finalUrl, init } = await applyInterceptors({
