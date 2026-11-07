@@ -413,6 +413,9 @@ importers:
 
   packages/ui:
     devDependencies:
+      '@fontsource-variable/noto-sans-bengali':
+        specifier: 5.3.0
+        version: 5.3.0
       '@heat/config':
         specifier: workspace:*
         version: link:../config
@@ -809,6 +812,9 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
+
+  '@fontsource-variable/noto-sans-bengali@5.3.0':
+    resolution: {integrity: sha512-035m0mzOcsVC1GHFH1ioeXjIFqVhuflGvnn8Xvr6esaZlGErNe1d+Jx2sEN/2WGPhjrT+5wwKPPSO8rbBeQo3w==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -4603,6 +4609,8 @@ snapshots:
       levn: 0.4.1
 
   '@exodus/bytes@1.16.0': {}
+
+  '@fontsource-variable/noto-sans-bengali@5.3.0': {}
 
   '@humanfs/core@0.19.2':
     dependencies:

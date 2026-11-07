@@ -1,6 +1,10 @@
-/* Story canvas only. Not shipped with @heat/ui. */
+/* Story canvas only. Not shipped with @heat/ui. Temporary self-hosted font (Bengali and Latin
+   subsets); replaced when E1-2 and the font choice land. */
+@import "@fontsource-variable/noto-sans-bengali";
+
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: "Noto Sans Bengali Variable", sans-serif;
   margin: 0;
 }
