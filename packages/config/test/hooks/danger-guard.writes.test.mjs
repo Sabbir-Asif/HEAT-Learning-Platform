@@ -96,6 +96,25 @@ describe("shell writes that bypass the edit guards", () => {
   });
 
   test.each([
+    "echo x > $SCRATCH/../../etc/x",
+    "echo x > ${SCRATCH}/../x",
+    "cp a $SCRATCH/sub/../../b",
+  ])("blocks a $SCRATCH target that climbs out: %s", (command) => {
+    expect(bash(command, withPlan).deny).toMatch(/SCRATCH/);
+  });
+
+  test("allows $SCRATCH targets whose names merely contain dots", () => {
+    expect(bash("echo x > $SCRATCH/a..b/c.md", main)).toEqual({});
+    expect(bash("echo x > $SCRATCH/.hidden", main)).toEqual({});
+  });
+
+  test("the working directory is restored after a ( ... ) group", () => {
+    expect(bash("(cd src && true); echo x > a.ts", main).deny).toMatch(/"main"/);
+    expect(bash(`(cd ${outside} && true); echo x > a.ts`, withoutPlan).deny).toMatch(/issue-7\.md/);
+    expect(bash(`(cd ${outside}; echo x > a.ts)`, main)).toEqual({});
+  });
+
+  test.each([
     "echo x > $OTHER/file",
     'echo x > "$(pwd)/file"',
     "echo x > $SCRATCHY/file",

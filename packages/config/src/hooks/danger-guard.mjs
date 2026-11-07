@@ -72,11 +72,16 @@ function writeTargets(command) {
 }
 
 function isAlwaysAllowed(target) {
-  return target.startsWith("/dev/") || scratchTarget.test(target);
+  if (target.startsWith("/dev/")) return true;
+  const match = scratchTarget.exec(target);
+  return Boolean(match) && !target.slice(match[0].length).split("/").includes("..");
 }
 
 function writeDenial(target, cwd) {
   if (isAlwaysAllowed(target)) return null;
+  if (scratchTarget.test(target)) {
+    return `The write target "${target}" climbs out of $SCRATCH with "..". Use a path inside $SCRATCH, or the Write tool.`;
+  }
   if (/[$`]/.test(target)) {
     return `The write target "${target}" contains an unexpanded variable, so the guard cannot tell where it lands. Use the Write tool with an absolute path (or $SCRATCH for scratch files).`;
   }

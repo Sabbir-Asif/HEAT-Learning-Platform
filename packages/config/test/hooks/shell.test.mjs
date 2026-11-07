@@ -184,4 +184,21 @@ describe("working directory", () => {
     ]);
     expect(parseShell("pushd x; ls", base)[1].cwd).toBe(resolve(base, "x"));
   });
+
+  test("a directory change inside ( ... ) ends with the group", () => {
+    const parsed = parseShell(
+      "(cd sub && echo a); echo b; (cd x; (cd y; echo c); echo d); echo e",
+      base,
+    );
+    const cwdOf = (word) => parsed.find((command) => command.words[1] === word).cwd;
+    expect(cwdOf("a")).toBe(resolve(base, "sub"));
+    expect(cwdOf("b")).toBe(base);
+    expect(cwdOf("c")).toBe(resolve(base, "x/y"));
+    expect(cwdOf("d")).toBe(resolve(base, "x"));
+    expect(cwdOf("e")).toBe(base);
+  });
+
+  test("a stray closing parenthesis does not lose the directory", () => {
+    expect(parseShell("cd sub; ) echo a", base).at(-1).cwd).toBe(resolve(base, "sub"));
+  });
 });

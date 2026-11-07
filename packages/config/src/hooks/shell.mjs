@@ -85,6 +85,7 @@ function scan(text, startCwd, out) {
   let writes = [];
   let reads = [];
   const heredocs = [];
+  const groups = [];
   const length = text.length;
 
   const finish = () => {
@@ -268,6 +269,8 @@ function scan(text, startCwd, out) {
       i = capture(i, writes);
     } else if (separators.has(ch)) {
       finish();
+      if (ch === "(") groups.push(cwd);
+      else if (ch === ")") cwd = groups.pop() ?? cwd;
       i += 1;
     } else if (ch === ">" || ch === "<") i = redirect(i);
     else {
