@@ -81,3 +81,30 @@ jobs:
           name: storybook-static
           path: packages/ui/storybook-static
           retention-days: 7
+
+  # Regenerates apps/api/openapi.json and the @heat/api-client output, and fails when either differs
+  # from what is committed, so an API change cannot merge with a stale client. Untracked files count
+  # too. Add it to branch-protection.json to make it required.
+  api-client-drift:
+    name: api-client-drift
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      # Builds contracts and the API, emits the spec, runs orval. --force skips Turborepo's cache.
+      - run: pnpm generate --force
+      - name: Fail when the generated files changed
+        run: |
+          paths="apps/api/openapi.json packages/api-client/src/generated"
+          changed=$(git status --porcelain --untracked-files=all -- $paths)
+          if [ -n "$changed" ]; then
+            echo "::error title=Generated API client is out of date::Run pnpm generate and commit the result."
+            echo "Changed generated files (M modified, D deleted, ?? new):"
+            echo "$changed"
+            git diff --stat -- $paths
+            exit 1
+          fi
+          echo "Generated files are up to date."
