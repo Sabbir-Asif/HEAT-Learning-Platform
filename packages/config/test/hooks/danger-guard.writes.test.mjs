@@ -200,6 +200,41 @@ describe("applied migrations", () => {
     expect(bash(`echo x >> ${created}`, tree)).toEqual({});
   });
 
+  test("the migration path check ignores case", () => {
+    const upper = join(tree, "APPS/API/PRISMA/MIGRATIONS/001_INIT/MIGRATION.SQL");
+    expect(file("Write", { file_path: upper }).deny).toMatch(/applied migration/i);
+    expect(bash("echo x >> Apps/Api/Prisma/Migrations/001_init/migration.sql", tree).deny).toMatch(
+      /applied migration/i,
+    );
+  });
+
+  test.each([
+    `git rm ${migration}`,
+    "git rm -r apps/api/prisma/migrations/001_init",
+    "git rm --cached apps/api/prisma/migrations/001_init/migration.sql",
+    `git mv ${migration} apps/api/prisma/migrations/001_init/other.sql`,
+    `git checkout origin/main -- ${migration}`,
+    `git checkout HEAD -- apps/api/prisma/migrations`,
+    `git -C ${"."} rm ${migration}`,
+    `cd apps/api && git rm prisma/migrations/001_init/migration.sql`,
+  ])("git commands that rewrite an applied migration are blocked: %s", (command) => {
+    expect(bash(command, tree).deny, command).toMatch(/applied migration/i);
+  });
+
+  test.each([
+    "git rm apps/api/prisma/migrations/002_new/migration.sql",
+    "git checkout main",
+    "git checkout -b chore/80-x",
+    "git checkout origin/main -- README.md",
+    "git rm --cached notes.txt",
+    "git mv README.md README2.md",
+    "git status -- apps/api/prisma/migrations",
+    "git log -- apps/api/prisma/migrations",
+    "git diff origin/main -- apps/api/prisma/migrations",
+  ])("other git commands stay allowed: %s", (command) => {
+    expect(bash(command, tree), command).toEqual({});
+  });
+
   test("a repository without origin has no applied migrations", () => {
     const lone = makeRepo({ branch: "epic/e1-x", files: { [migration]: "a\n" } });
     expect(file("Edit", { file_path: join(lone, migration) })).toEqual({});

@@ -16,7 +16,7 @@ function cleanEnv() {
 
 export function git(cwd, args) {
   try {
-    return execFileSync("git", ["--literal-pathspecs", ...args], {
+    return execFileSync("git", args, {
       cwd,
       encoding: "utf8",
       env: cleanEnv(),
@@ -81,7 +81,11 @@ export function existsInBase(top, relativePath) {
     "refs/remotes/origin/main",
     "refs/remotes/origin/epic",
   ]);
-  return (refs ? refs.split("\n") : []).some(
-    (ref) => (git(top, ["ls-tree", "-r", "--name-only", ref, "--", relativePath]) ?? "") !== "",
+  const wanted = relativePath.toLowerCase().replace(/\/+$/, "");
+  return (refs ? refs.split("\n") : []).some((ref) =>
+    (git(top, ["ls-tree", "-r", "--name-only", ref]) ?? "").split("\n").some((name) => {
+      const lower = name.toLowerCase();
+      return lower === wanted || lower.startsWith(`${wanted}/`);
+    }),
   );
 }

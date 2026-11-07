@@ -1,4 +1,4 @@
-import { basename, sep } from "node:path";
+import { basename, resolve, sep } from "node:path";
 import { branchDenial, locate, planDenial } from "./edit-guards.mjs";
 import { envAccess, isEnvFile } from "./env-files.mjs";
 import { existsInBase } from "./git.mjs";
@@ -11,7 +11,7 @@ const fileTools = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
 const envDenial = (path) =>
   `Access to environment files is denied: ${path}. They hold secrets; ask the owner for the value you need instead.`;
 
-const migrationPath = /(?:^|\/)prisma\/migrations(?:\/|$)/;
+const migrationPath = /(?:^|\/)prisma\/migrations(?:\/|$)/i;
 const scratchTarget = /^(?:\$SCRATCH|\$\{SCRATCH\})(?:\/|$)/;
 const scriptOptions = new Set(["-e", "-f", "-E", "--expression", "--file"]);
 const directoryOptions = new Set(["-t", "--target-directory"]);
@@ -52,9 +52,24 @@ function optionValue(args, names) {
   return undefined;
 }
 
+function gitTargets(git) {
+  if (["rm", "mv"].includes(git.sub)) {
+    return positionalArguments(git.args, new Set()).map((target) => resolve(git.cwd, target));
+  }
+  if (["checkout", "restore"].includes(git.sub)) {
+    const separator = git.args.indexOf("--");
+    return separator < 0
+      ? []
+      : git.args.slice(separator + 1).map((target) => resolve(git.cwd, target));
+  }
+  return [];
+}
+
 function writeTargets(command) {
   const [program = "", ...args] = command.words;
   const name = basename(program);
+  const git = gitInvocation(command);
+  if (git) return gitTargets(git);
   if (["tee", "rm", "mv"].includes(name)) return positionalArguments(args, new Set());
   if (name === "cp" || name === "install") {
     const targetDirectory = optionValue(args, ["-t", "--target-directory"]);
