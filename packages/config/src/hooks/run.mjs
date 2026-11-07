@@ -1,4 +1,9 @@
-const specs = {};
+import { branchGuard, planGate } from "./edit-guards.mjs";
+
+const specs = {
+  "branch-guard": { event: "PreToolUse", closed: true, run: branchGuard },
+  "plan-gate": { event: "PreToolUse", closed: true, run: planGate },
+};
 
 const wrote = (code, stdout = "", stderr = "") => ({ code, stdout, stderr });
 
