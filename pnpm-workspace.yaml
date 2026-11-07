@@ -1,0 +1,23 @@
+packages:
+  - apps/*
+  - packages/*
+
+# One version of each shared dependency across the workspace.
+catalog:
+  react: 19.3.1
+  react-dom: 19.3.1
+  "@types/react": 19.3.0
+  "@types/react-dom": 19.3.0
+  next: 16.4.5
+  babel-plugin-react-compiler: 1.0.0
+  typescript: 5.9.3
+  vitest: 5.1.0
+  "@types/node": ^22.19.0
+  zod: 4.6.7
+
+minimumReleaseAgeExclude:
+  - '@nestjs/cli@12.0.12'
+  - '@nestjs/common@12.4.0'
+  - '@nestjs/core@12.4.0'
+  - '@nestjs/platform-express@12.4.0'
+  - '@nestjs/schematics@12.0.13'
