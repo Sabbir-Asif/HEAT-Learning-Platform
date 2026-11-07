@@ -9,6 +9,7 @@ const advisory = (severity, id = "GHSA-aaaa-bbbb-cccc") => ({
   module_name: "left-pad",
   title: "Something bad",
 });
+const clean = { advisories: {}, metadata: {} };
 const report = (...items) => ({ advisories: Object.fromEntries(items.map((a, i) => [i, a])) });
 const ignore = (overrides = {}) => ({
   advisory: "GHSA-aaaa-bbbb-cccc",
@@ -19,7 +20,17 @@ const ignore = (overrides = {}) => ({
 
 describe("evaluateAudit", () => {
   test("passes when there are no advisories", () => {
-    expect(evaluateAudit({}, [], today)).toEqual([]);
+    expect(evaluateAudit(clean, [], today)).toEqual([]);
+  });
+
+  test.each([
+    ["an error report", { error: { code: "pnpm", message: "fetch failed" } }],
+    ["an empty object", {}],
+    ["null", null],
+  ])("fails closed on %s from pnpm", (_name, broken) => {
+    const failures = evaluateAudit(broken, [], today);
+    expect(failures).toHaveLength(1);
+    expect(failures[0]).toContain("did not return a usable report");
   });
 
   test.each(["info", "low", "moderate"])("lets %s advisories through", (severity) => {
@@ -57,9 +68,10 @@ describe("evaluateAudit", () => {
     ["a reason", { reason: " " }, "missing reason"],
     ["an advisory id", { advisory: undefined }, "missing advisory id"],
     ["a valid expiry", { expires: "soon" }, "expires must be a YYYY-MM-DD date"],
+    ["a real date", { expires: "2026-02-30" }, "expires must be a YYYY-MM-DD date"],
     ["a close expiry", { expires: "2027-06-01" }, "more than 90 days out"],
   ])("rejects an ignore without %s", (_name, overrides, message) => {
-    const failures = evaluateAudit({}, [ignore(overrides)], today);
+    const failures = evaluateAudit(clean, [ignore(overrides)], today);
     expect(failures).toHaveLength(1);
     expect(failures[0]).toContain(message);
   });

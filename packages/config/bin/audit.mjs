@@ -9,12 +9,18 @@ const root = resolve(import.meta.dirname, "../../..");
 const ignores = JSON.parse(readFileSync(resolve(root, ".github/audit-ignore.json"), "utf8"));
 
 // pnpm exits non-zero when it finds anything, so the verdict comes from the report, not the exit code.
-const audit = spawnSync("pnpm", ["audit", "--json"], { cwd: root, encoding: "utf8" });
+const audit = spawnSync("pnpm", ["audit", "--json"], {
+  cwd: root,
+  encoding: "utf8",
+  maxBuffer: 64 * 1024 * 1024, // the report lists every dependency path in every workspace
+});
 let report;
 try {
   report = JSON.parse(audit.stdout);
 } catch {
-  console.error(`pnpm audit gave no readable report.\n${audit.stderr}`);
+  console.error(
+    `pnpm audit gave no readable report (${audit.error?.message ?? `exit ${audit.status}`}).\n${audit.stderr}`,
+  );
   process.exit(1);
 }
 

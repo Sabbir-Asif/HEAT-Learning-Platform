@@ -11,16 +11,27 @@ const MAX_IGNORE_DAYS = 90;
  * @property {string} expires Last day the ignore holds, as YYYY-MM-DD.
  */
 
+/** True for a real calendar date written as YYYY-MM-DD. */
+const isDate = (/** @type {unknown} */ value) =>
+  typeof value === "string" &&
+  /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+  new Date(value).toISOString().slice(0, 10) === value;
+
 /**
  * Checks `pnpm audit --json` output against the ignore list.
  * An ignore needs a reason and an expiry no more than 90 days out; an expired ignore fails the audit.
  *
- * @param {{ advisories?: Record<string, { github_advisory_id: string, severity: string, module_name: string, title: string }> }} report
+ * @param {{ error?: unknown, metadata?: object, advisories?: Record<string, { github_advisory_id: string, severity: string, module_name: string, title: string }> }} report
  * @param {AuditIgnore[]} ignores
  * @param {Date} today
  * @returns {string[]} Human-readable failures; empty when the audit passes.
  */
 export function evaluateAudit(report, ignores, today) {
+  // pnpm prints an error object, still valid JSON, when the registry is unreachable. That must not pass.
+  if (report?.error || typeof report?.advisories !== "object" || !report.advisories) {
+    const detail = report?.error ? JSON.stringify(report.error) : "no advisories field";
+    return [`pnpm audit did not return a usable report: ${detail}`];
+  }
   const failures = [];
   const active = new Set();
   const day = today.toISOString().slice(0, 10);
@@ -30,7 +41,7 @@ export function evaluateAudit(report, ignores, today) {
     const label = `Ignore ${ignore.advisory ?? "(no advisory id)"}`;
     if (!ignore.advisory) failures.push(`${label}: missing advisory id`);
     else if (!ignore.reason?.trim()) failures.push(`${label}: missing reason`);
-    else if (!/^\d{4}-\d{2}-\d{2}$/.test(ignore.expires ?? "")) {
+    else if (!isDate(ignore.expires)) {
       failures.push(`${label}: expires must be a YYYY-MM-DD date`);
     } else if (ignore.expires < day) failures.push(`${label}: expired on ${ignore.expires}`);
     else if (ignore.expires > limit) {
@@ -38,7 +49,7 @@ export function evaluateAudit(report, ignores, today) {
     } else active.add(ignore.advisory);
   }
 
-  for (const advisory of Object.values(report.advisories ?? {})) {
+  for (const advisory of Object.values(report.advisories)) {
     if (!BLOCKING_SEVERITIES.includes(advisory.severity)) continue;
     if (active.has(advisory.github_advisory_id)) continue;
     failures.push(

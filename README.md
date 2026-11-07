@@ -57,13 +57,13 @@ Pull requests and pushes to `main` run these checks in GitHub Actions; each is a
 | `integration`                                  | `test:integration` in any package that defines it (Testcontainers)   |
 | `audit`                                        | `pnpm audit:deps`, also weekly; fails on high or critical advisories |
 
-CodeQL runs from `.github/workflows/codeql.yml` and Dependabot from `.github/dependabot.yml` (npm and GitHub Actions; Docker is added with the Dockerfiles). Turborepo's cache lives in `.turbo` and is restored per task, so unchanged packages replay instead of re-running.
+CodeQL needs GitHub code security on a private repository. It runs from `.github/workflows/codeql.yml` and Dependabot from `.github/dependabot.yml` (npm and GitHub Actions; Docker is added with the Dockerfiles). In CI, Turborepo's cache lives in `.turbo` and is restored per task, so unchanged packages replay instead of re-running.
 
 Workflow rules, enforced by `packages/config/test/workflows.test.mjs`: every external action is pinned to a commit SHA, each workflow sets `permissions`, and `pull_request_target` is not used.
 
 **Audit ignore list.** To accept an advisory you cannot fix yet, add `{ "advisory": "GHSA-...", "reason": "...", "expires": "YYYY-MM-DD" }` to `.github/audit-ignore.json`. A reason is required, the expiry is at most 90 days out, and an expired entry fails the audit.
 
-**Branch protection.** `main` requires the checks above, linear history (merge with squash or rebase), and blocks force pushes and deletions. There is no required-approval rule; only the owner merges. Apply or re-apply it with:
+**Branch protection.** `main` requires the checks above, linear history (merge with squash or rebase), and blocks force pushes and deletions. Changes go through a pull request, but no approval is required; only the owner merges. Apply or re-apply it with:
 
 ```sh
 gh api -X PUT repos/Sabbir-Asif/HEAT-Learning-Platform/branches/main/protection --input .github/branch-protection.json

@@ -37,6 +37,27 @@ describe("GitHub workflows", () => {
     expect(missing).toEqual([]);
   });
 
+  test("only the CodeQL workflow may grant write permissions", () => {
+    const writers = workflows
+      .filter(({ text }) => /:\s*write\b|write-all/.test(text))
+      .map(({ name }) => name);
+    expect(writers).toEqual(["codeql.yml"]);
+  });
+
+  test("every required status check in branch-protection.json is reported by a job", () => {
+    const { required_status_checks } = JSON.parse(
+      readFileSync(join(github, "branch-protection.json"), "utf8"),
+    );
+    // Job names: literal `name:` lines, plus the task names of the CI matrix.
+    const reported = new Set(
+      workflows.flatMap(({ text }) => [
+        ...[...text.matchAll(/^ {4}name: (?!\$\{\{)(.+)$/gm)].map((m) => m[1].trim()),
+        ...[...text.matchAll(/- \{ task: (\w+),/g)].map((m) => m[1]),
+      ]),
+    );
+    expect(required_status_checks.contexts.filter((name) => !reported.has(name))).toEqual([]);
+  });
+
   test("no workflow uses pull_request_target, which would hand secrets to fork code", () => {
     const risky = workflows
       .filter(({ text }) => /pull_request_target/.test(text))
