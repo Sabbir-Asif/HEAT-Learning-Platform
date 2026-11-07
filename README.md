@@ -78,7 +78,7 @@ pnpm --filter @heat/ui test:stories                           # every story rend
 pnpm --filter @heat/ui build-storybook                        # static build in packages/ui/storybook-static (ignored by git)
 ```
 
-The toolbar has a theme control (light, dark: the `.dark` class on the story root and on `<html>`) and a locale control (`en`, `bn`: the `lang` attribute; `dir` stays `ltr`). A story pins both with `globals: { theme, locale }`, and each component gets one story for every combination. Sample text is written in the story, because `@heat/ui` has no i18n dependency. The temporary Bangla and Latin font is self-hosted from `@fontsource-variable/noto-sans-bengali` through `.storybook/preview.css`.
+The toolbar has a theme control (light, dark: the `.dark` class on the story root and on `<html>`) and a locale control (`en`, `bn`: the `lang` attribute; `dir` stays `ltr`). A story pins both with `globals: { theme, locale }`, which locks the toolbar for that story, so each component gets one story for every combination plus a `Default` story that follows the toolbar. Sample text is written in the story, because `@heat/ui` has no i18n dependency. The temporary Bangla and Latin font is self-hosted from `@fontsource-variable/noto-sans-bengali` through `.storybook/preview.css`.
 
 An axe violation fails the story test and the output names the rule, for example `button-name`. A story that must accept a known violation sets `parameters.a11y.test` to `"todo"` with a reason. Story tests are not part of `pnpm test` or the coverage gate; they run in `test:stories` and in the `storybook` CI job.
 

@@ -19,6 +19,10 @@ const meta = {
   component: Placeholder,
   tags: ["test"],
   args: english,
+  // The sample text follows the locale global, so a pinned story and the toolbar agree.
+  render: (args, { globals }) => (
+    <Placeholder {...args} {...(globals["locale"] === "bn" ? bangla : {})} />
+  ),
 } satisfies Meta<typeof Placeholder>;
 
 export default meta;
@@ -27,6 +31,9 @@ type Story = StoryObj<typeof meta>;
 const lightForeground = "rgb(15, 23, 42)";
 const darkForeground = "rgb(229, 231, 235)";
 const fontFamily = "Noto Sans Bengali Variable";
+
+/** Follows the toolbar. The four stories below pin theme and locale, which locks the toolbar. */
+export const Default: Story = {};
 
 export const LightEnglish: Story = {
   globals: { theme: "light", locale: "en" },
@@ -52,6 +59,7 @@ const expectBanglaFont: NonNullable<Story["play"]> = async ({ canvasElement, can
   await expect(document.documentElement).toHaveAttribute("lang", "bn");
   await expect(canvasElement.querySelector('[lang="bn"]')).not.toBeNull();
   const heading = canvas.getByRole("heading");
+  await expect(heading).toHaveTextContent(bangla.heading);
   await document.fonts.load(`16px "${fontFamily}"`, bangla.heading);
   await document.fonts.ready;
   const loaded = [...document.fonts].filter(
@@ -62,13 +70,11 @@ const expectBanglaFont: NonNullable<Story["play"]> = async ({ canvasElement, can
 };
 
 export const LightBangla: Story = {
-  args: bangla,
   globals: { theme: "light", locale: "bn" },
   play: expectBanglaFont,
 };
 
 export const DarkBangla: Story = {
-  args: bangla,
   globals: { theme: "dark", locale: "bn" },
   play: async (context) => {
     await expect(document.documentElement).toHaveClass("dark");
