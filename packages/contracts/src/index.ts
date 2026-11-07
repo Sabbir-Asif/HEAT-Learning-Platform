@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export * from "./errors";
+
 export const healthResponseSchema = z.object({
   status: z.literal("ok"),
 });

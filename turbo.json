@@ -25,6 +25,21 @@
     "test:coverage": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"]
+    },
+    "openapi": {
+      "dependsOn": ["build"],
+      "inputs": ["$TURBO_DEFAULT$", "!openapi.json"],
+      "outputs": ["openapi.json"]
+    },
+    "generate": {
+      "dependsOn": ["api#openapi"],
+      "inputs": [
+        "orval.config.ts",
+        "src/mutator/**",
+        "src/server/**",
+        "$TURBO_ROOT$/apps/api/openapi.json"
+      ],
+      "outputs": ["src/generated/**"]
     }
   }
 }

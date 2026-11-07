@@ -4,6 +4,7 @@ packages:
 
 allowBuilds:
   esbuild: false
+  "@scarf/scarf": false
 
 # One version of each shared dependency across the workspace.
 catalog:
