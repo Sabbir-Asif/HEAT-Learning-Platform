@@ -129,8 +129,8 @@
 
 ### Task 6: Verify, review, dry runs, PR
 
-- [ ] `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:coverage && pnpm build` — all exit 0.
-- [ ] Negative run: `pnpm ticket load <a blocked issue>` exits 3 and names the blocker; the skill stops at stage 1 with that reason.
-- [ ] Reviewer and security reviewer agents on the branch diff; fix confirmed findings; re-run checks.
+- [x] `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:coverage && pnpm build` — all exit 0.
+- [x] Negative run: `pnpm ticket load <a blocked issue>` exits 3 and names the blocker; the skill stops at stage 1 with that reason.
+- [x] Reviewer and security reviewer agents on the branch diff; fix confirmed findings; re-run checks.
 - [ ] Push, PR into `epic/e0-engineering-foundation` with `Closes #24`, test evidence and both reviews' findings; `pnpm ticket move 24 review`.
 - [ ] P0 exit dry run: `/implement-issue <trivial ticket the owner picks>` end to end to a green PR, linked from this PR. Owner merges.

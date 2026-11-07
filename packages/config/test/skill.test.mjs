@@ -99,25 +99,29 @@ describe("the agents", () => {
   });
 });
 
+// The forbidding word must come before the dangerous token in the same sentence.
+const dangerToken = String.raw`co-authored-by|generated with|--force|gh pr merge|migrate reset|\.env\b|environment files`;
+const danger = new RegExp(dangerToken, "i");
+const forbidden = new RegExp(String.raw`\b(?:never|do not|don't|no)\b[^.]*(?:${dangerToken})`, "i");
+const unsafeLine = (line) => danger.test(line) && !forbidden.test(line);
+
 test("a dangerous command appears only in a sentence that forbids it", () => {
-  const token = String.raw`co-authored-by|generated with|--force|gh pr merge|migrate reset|\.env\b|environment files`;
-  const danger = new RegExp(token, "i");
-  // The forbidding word must come before the token in the same sentence.
-  const allowed = new RegExp(String.raw`\b(?:never|do not|don't|no)\b[^.]*(?:${token})`, "i");
   const offending = [".claude/skills", ".claude/agents"].flatMap((dir) =>
     markdownFiles(dir).flatMap((file) =>
       read(file)
         .split("\n")
-        .filter((line) => danger.test(line) && !allowed.test(line))
+        .filter(unsafeLine)
         .map((line) => `${file}: ${line.trim()}`),
     ),
   );
   expect(offending).toEqual([]);
 });
 
-test("the dangerous-command guard rejects a line that only mentions not", () => {
-  const token = /gh pr merge/i;
-  const line = "Run `gh pr merge` when checks are not red.";
-  const allowed = /\b(?:never|do not|don't|no)\b[^.]*(?:gh pr merge)/i;
-  expect(token.test(line) && !allowed.test(line)).toBe(true);
+test.each([
+  ["Run `gh pr merge` when checks are not red.", true],
+  ["Then `gh pr merge` it. Never force-push.", true],
+  ["Never run `gh pr merge`.", false],
+  ["No `Co-Authored-By` lines.", false],
+])("the guard flags %j: %s", (line, flagged) => {
+  expect(unsafeLine(line)).toBe(flagged);
 });
