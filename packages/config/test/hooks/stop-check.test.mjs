@@ -1,6 +1,7 @@
 import { afterAll, beforeEach, describe, expect, test } from "vitest";
 import { readState, updateState } from "../../src/hooks/state.mjs";
-import { stopCheck } from "../../src/hooks/stop-check.mjs";
+import { runTypecheck, stopCheck } from "../../src/hooks/stop-check.mjs";
+import { fakeBin } from "../fixtures/hook.mjs";
 import {
   addWorktree,
   cleanupAll,
@@ -154,5 +155,42 @@ describe("failing open", () => {
     write(tree, "src/a.ts");
     outcome = { status: "missing", output: "" };
     expect(stop().context).toMatch(/pnpm/);
+  });
+});
+
+describe("runTypecheck", () => {
+  const withFakePnpm = (body, check) => {
+    const original = process.env.PATH;
+    process.env.PATH = `${fakeBin("pnpm", body)}:${original}`;
+    try {
+      return check();
+    } finally {
+      process.env.PATH = original;
+    }
+  };
+
+  test("passes when pnpm typecheck exits 0", () => {
+    expect(withFakePnpm("process.exit(0);", () => runTypecheck(tree))).toEqual({
+      status: "ok",
+      output: "",
+    });
+  });
+
+  test("returns the output when it exits non-zero", () => {
+    const result = withFakePnpm('console.log("TS2322 here"); process.exit(2);', () =>
+      runTypecheck(tree),
+    );
+    expect(result.status).toBe("failed");
+    expect(result.output).toContain("TS2322 here");
+  });
+
+  test("reports a missing pnpm", () => {
+    const original = process.env.PATH;
+    process.env.PATH = tempDir("empty");
+    try {
+      expect(runTypecheck(tree).status).toBe("missing");
+    } finally {
+      process.env.PATH = original;
+    }
   });
 });
