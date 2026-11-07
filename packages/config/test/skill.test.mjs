@@ -35,6 +35,10 @@ describe("the implement-issue skill", () => {
     expect(description.length).toBeLessThanOrEqual(1024);
   });
 
+  test("never reads the ticket JSON through pnpm", () => {
+    expect(text()).not.toMatch(/pnpm[^\n]*ticket load/);
+  });
+
   test("stays under 500 lines", () => {
     expect(text().split("\n").length).toBeLessThan(500);
   });
@@ -58,7 +62,8 @@ describe("the implement-issue skill", () => {
 
   test("uses every pnpm ticket command and every agent", () => {
     const missing = [
-      "pnpm -s ticket load",
+      // pnpm prints its own error line to stdout on a non-zero exit, which would corrupt the JSON.
+      'node packages/config/bin/ticket.mjs load $N > "$SCRATCH/ticket-$N.json"',
       "pnpm ticket refine",
       "pnpm ticket move $N start",
       "pnpm ticket move $N review",

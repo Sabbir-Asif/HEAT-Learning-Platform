@@ -38,8 +38,10 @@ With a pull request already open, check `gh pr checks` and unresolved review com
 ## 1. Pull ticket
 
 ```sh
-pnpm -s ticket load $N > "$SCRATCH/ticket-$N.json"
+node packages/config/bin/ticket.mjs load $N > "$SCRATCH/ticket-$N.json"
 ```
+
+This runs the script behind `pnpm ticket` directly, because on a non-zero exit pnpm adds its own error line to stdout, which would corrupt the JSON.
 
 - **Exit 3**: the ticket may not start. Stop. Quote each line of `refusals` and say what would unblock it (the owner moves the card to Ready, a blocker's PR merges, the `blocked` label comes off). Do not work around a refusal; only the owner can override one, by saying so in this session.
 - **Exit 1**: show the error. A missing scope is fixed with `gh auth refresh -s project`; suggest the owner runs it as `! gh auth refresh -s project`.
