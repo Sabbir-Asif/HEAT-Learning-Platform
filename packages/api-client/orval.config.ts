@@ -27,6 +27,23 @@ export default defineConfig({
       },
     },
   },
+  // Plain typed functions for Server Components, calling the server-only fetcher. Not exported from the package root.
+  server: {
+    input,
+    output: {
+      client: "fetch",
+      httpClient: "fetch",
+      mode: "single",
+      target: "src/generated/server/endpoints.ts",
+      clean: true,
+      override: {
+        header,
+        useDates: false,
+        fetch: { includeHttpResponseReturnType: false },
+        mutator: { path: "src/server/server-fetch.ts", name: "serverFetch" },
+      },
+    },
+  },
   // Zod schemas for the same operations, for parsing responses. Forms use @heat/contracts instead.
   zod: {
     input,

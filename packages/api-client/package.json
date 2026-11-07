@@ -4,6 +4,7 @@
   "private": true,
   "exports": {
     ".": "./src/index.ts",
+    "./server": "./src/server/index.ts",
     "./mocks": "./src/mocks.ts",
     "./schemas": "./src/generated/zod/schemas.ts"
   },
@@ -16,7 +17,8 @@
     "generate": "orval --config orval.config.ts"
   },
   "peerDependencies": {
-    "react": "catalog:"
+    "react": "catalog:",
+    "next": "catalog:"
   },
   "devDependencies": {
     "@faker-js/faker": "10.6.0",
@@ -27,6 +29,7 @@
     "@types/react": "catalog:",
     "eslint": "catalog:",
     "msw": "3.0.4",
+    "next": "catalog:",
     "orval": "8.46.0",
     "prettier": "catalog:",
     "react": "catalog:",
@@ -37,6 +40,7 @@
   "dependencies": {
     "@heat/contracts": "workspace:*",
     "@tanstack/react-query": "5.106.1",
+    "server-only": "0.0.1",
     "zod": "catalog:"
   }
 }

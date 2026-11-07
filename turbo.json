@@ -33,7 +33,12 @@
     },
     "generate": {
       "dependsOn": ["api#openapi"],
-      "inputs": ["orval.config.ts", "src/mutator/**", "$TURBO_ROOT$/apps/api/openapi.json"],
+      "inputs": [
+        "orval.config.ts",
+        "src/mutator/**",
+        "src/server/**",
+        "$TURBO_ROOT$/apps/api/openapi.json"
+      ],
       "outputs": ["src/generated/**"]
     }
   }

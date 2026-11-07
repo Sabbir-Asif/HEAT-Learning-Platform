@@ -39,6 +39,7 @@ describe("request", () => {
   test("refuses an absolute URL, so the API client cannot be pointed at another origin", async () => {
     await expect(customFetch("https://evil.example/api/health")).rejects.toThrow(TypeError);
     await expect(customFetch("//evil.example/api/health")).rejects.toThrow(TypeError);
+    await expect(customFetch("/\\evil.example/api/health")).rejects.toThrow(TypeError);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
