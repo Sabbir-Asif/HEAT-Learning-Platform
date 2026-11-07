@@ -1,8 +1,8 @@
 import type { INestApplication } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import { afterAll, beforeAll, expect, test } from "vitest";
-import { AppModule } from "./app.module";
-import { configureApp } from "./app.setup";
+import { AppModule } from "../src/app.module";
+import { configureApp } from "../src/app.setup";
 
 let app: INestApplication;
 let baseUrl: string;

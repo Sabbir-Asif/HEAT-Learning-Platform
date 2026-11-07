@@ -20,11 +20,13 @@ function preset(
   return defineConfig({
     test: {
       environment,
+      // Every package keeps its tests in test/, mirroring the paths under src/.
+      include: ["test/**/*.test.{ts,tsx,mjs}"],
       coverage: {
         provider: "v8",
         reporter: ["text", "lcov"],
         include: ["src/**"],
-        exclude: ["**/*.test.*", "**/*.d.ts", "src/main.ts", ...coverageExclude],
+        exclude: ["**/*.d.ts", "src/main.ts", ...coverageExclude],
         thresholds: {
           lines: threshold,
           functions: threshold,

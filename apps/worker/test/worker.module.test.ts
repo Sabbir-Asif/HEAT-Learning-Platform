@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { Module } from "@nestjs/common";
-import { WorkerModule } from "./worker.module";
+import { WorkerModule } from "../src/worker.module";
 
 test("worker module is a Nest module with no HTTP controllers", () => {
   expect(Reflect.getMetadata("controllers", WorkerModule)).toBeUndefined();
