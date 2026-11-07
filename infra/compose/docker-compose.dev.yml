@@ -46,7 +46,7 @@ services:
       retries: 10
 
   nginx:
-    image: nginx:1.28-alpine
+    image: nginx:1.29-alpine
     ports:
       - "127.0.0.1:${HTTP_PORT:?run pnpm dev:up}:80"
     volumes:
