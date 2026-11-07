@@ -1,8 +1,10 @@
+import { dangerGuard } from "./danger-guard.mjs";
 import { branchGuard, planGate } from "./edit-guards.mjs";
 
 const specs = {
   "branch-guard": { event: "PreToolUse", closed: true, run: branchGuard },
   "plan-gate": { event: "PreToolUse", closed: true, run: planGate },
+  "danger-guard": { event: "PreToolUse", closed: true, run: dangerGuard },
 };
 
 const wrote = (code, stdout = "", stderr = "") => ({ code, stdout, stderr });
