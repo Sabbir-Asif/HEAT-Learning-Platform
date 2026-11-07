@@ -45,6 +45,17 @@ describe("environment files through Bash", () => {
     expect(bash("cat apps/api/.env").deny).toContain("apps/api/.env");
   });
 
+  test.each([
+    "rg process.env",
+    "grep -rn process.env apps",
+    "git grep process.env",
+    "rg import.meta.env",
+    "grep -rn 'next.env' .",
+    "git log -S process.env",
+  ])("allows searching the code for %s", (command) => {
+    expect(bash(command)).toEqual({});
+  });
+
   test("allows the commands the workflow uses", () => {
     expect(bash("git add .env.example && git commit -m 'never read .env files'")).toEqual({});
   });

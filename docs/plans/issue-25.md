@@ -99,3 +99,11 @@ pnpm audit:deps
 ```
 
 Manual smoke test: pipe sample hook JSON into `node packages/config/bin/hook.mjs <name>` for an allow and a block case of each hook and log the output lines. The ticket's dry run with hooks on happens after merge in a new session, because a hook change only takes effect in a session started in a checkout that holds it.
+
+### Group E: review fixes
+
+- [x] **E1 Env-file false positives.** The `*.env` suffix rule applies only to path-like words (a slash, a leading dot, or a file that exists in the working directory); the pattern argument of `grep`, `rg`, `git grep` and `git log -S/-G` is exempt.
+- [ ] **E2 Heredoc and `${...}` substitution.** Unquoted heredoc bodies and `${...}` expansions are scanned for `$(...)` and backticks and checked like any command; quoted delimiters stay skipped.
+- [ ] **E3 `.git` and marker writes.** Writes under a `.git` path segment and to any file named `heat-verified` are denied from every tool; reads stay allowed.
+- [ ] **E4 Guard tampering.** CODEOWNERS covers `ticket.mjs`, `.claude/skills/`, `.claude/agents/` and every CLAUDE.md; `.claude/settings.local.json` cannot be written; the README documents the limits.
+- [ ] **E5 Minor fixes.** PR gate limited to PR creation; rebase and detached-HEAD messages; `db push --force-reset`; `$SCRATCH/..` and subshell cwd; case-insensitive migration paths with `git rm` and `git checkout`; invisible characters in the injector; per-user state directory; symlink resolution before the env check; SKILL.md screenshots outside the repository.

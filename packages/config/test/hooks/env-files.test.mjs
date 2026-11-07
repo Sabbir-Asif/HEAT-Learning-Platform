@@ -1,4 +1,7 @@
-import { describe, expect, test } from "vitest";
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { afterAll, describe, expect, test } from "vitest";
+import { cleanupAll, tempDir } from "../fixtures/repo.mjs";
 import { envAccess, isEnvFile } from "../../src/hooks/env-files.mjs";
 import { parseShell } from "../../src/hooks/shell.mjs";
 
@@ -35,8 +38,10 @@ describe("isEnvFile", () => {
   });
 });
 
+afterAll(cleanupAll);
+
 describe("envAccess", () => {
-  const find = (text) => envAccess(parseShell(text, "/w"));
+  const find = (text, cwd = "/w") => envAccess(parseShell(text, cwd));
 
   test.each([
     "cat .env",
@@ -46,11 +51,14 @@ describe("envAccess", () => {
     "source .env",
     ". ./.env",
     "rg SECRET .env",
-    "grep -r KEY prod.env",
     "cp .env /tmp/leak",
     "base64 .env",
     "cat < .env",
     "cat<.env",
+    "grep -r KEY ./prod.env",
+    "cat config/staging.env",
+    "rg -e KEY .env",
+    "git grep KEY -- .env",
     "echo hi > .env",
     "echo $(cat .env)",
     'echo "$(cat .env)"',
@@ -81,8 +89,29 @@ describe("envAccess", () => {
     "test -f .env",
     "[ -f .env ]",
     "cat README.md",
+    "rg process.env",
+    "rg process.env apps/api/src",
+    "grep -rn process.env apps",
+    "grep -rn 'next.env' .",
+    "git grep process.env",
+    "git grep -n import.meta.env -- apps",
+    "rg import.meta.env",
+    "rg -e process.env -e import.meta.env src",
+    "git log -S process.env",
+    "git log -G import.meta.env --oneline",
+    "git log -Sprocess.env",
+    "egrep -n 'process.env' src",
+    "echo process.env",
   ])("allows %s", (text) => {
     expect(find(text)).toBeNull();
+  });
+
+  test("a bare name ending in .env is an env file when it exists on disk", () => {
+    const dir = tempDir("envcwd");
+    writeFileSync(join(dir, "prod.env"), "x\n");
+    expect(find("cat prod.env", dir)).toBe("prod.env");
+    expect(find("grep -r KEY staging.env", dir)).toBeNull();
+    expect(find("cat process.env", dir)).toBeNull();
   });
 
   test("names the path it found", () => {
