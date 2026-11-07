@@ -4,3 +4,13 @@
 /packages/config/src/audit.mjs @Sabbir-Asif
 /packages/config/bin/github-setup.mjs @Sabbir-Asif
 /packages/config/src/github-setup.mjs @Sabbir-Asif
+/.claude/settings.json @Sabbir-Asif
+/packages/config/src/hooks/ @Sabbir-Asif
+/packages/config/bin/hook.mjs @Sabbir-Asif
+/packages/config/bin/verify.mjs @Sabbir-Asif
+/packages/config/src/verify.mjs @Sabbir-Asif
+/packages/config/src/ticket.mjs @Sabbir-Asif
+/packages/config/bin/ticket.mjs @Sabbir-Asif
+/.claude/skills/ @Sabbir-Asif
+/.claude/agents/ @Sabbir-Asif
+CLAUDE.md @Sabbir-Asif

@@ -14,7 +14,7 @@ const startStatuses = ["Ready", "Refining"];
 const resumeStatuses = ["In progress", "In review"];
 // Author associations GitHub gives people with access to the repository. Anything else is an
 // outsider whose text never reaches the agent (plan section 14).
-const collaborators = new Set(["OWNER", "MEMBER", "COLLABORATOR"]);
+export const collaborators = new Set(["OWNER", "MEMBER", "COLLABORATOR"]);
 const prefixes = { feature: "feat", bug: "fix", chore: "chore", docs: "docs", spike: "spike" };
 const stopWords = new Set(["a", "an", "and", "the", "with", "for", "of", "to", "in", "on"]);
 const maxSlugWords = 4;
