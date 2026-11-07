@@ -46,9 +46,15 @@ describe("without a valid marker", () => {
     "gh api repos/o/r/pulls -X POST -f title=x",
     "gh api repos/o/r/pulls -f title=x",
     "gh api --method POST repos/o/r/pulls",
-    "gh api -X PATCH repos/o/r/pulls/5",
-    "gh api repos/o/r/pulls/5/comments -F body=hi",
+    "gh pr new --fill",
+    "gh api -XPOST repos/o/r/pulls",
+    "gh api -XPOST repos/o/r/pulls -f title=x",
+    "gh api --method=POST repos/o/r/pulls -f title=x",
+    "gh api repos/{owner}/{repo}/pulls -f title=x",
+    "gh api /repos/o/r/pulls -f title=x",
     "gh api repos/o/r/pulls --input body.json",
+    "gh api graphql -F query='mutation { createPullRequest(input: {}) { clientMutationId } }'",
+    "gh api graphql --input -",
     "gh api graphql -f query='mutation { createPullRequest(input: {}) { clientMutationId } }'",
   ])("blocks %s", (command) => {
     expect(gate(command, tree).deny, command).toBeTruthy();
@@ -60,7 +66,17 @@ describe("without a valid marker", () => {
     "gh pr checks 5 --watch",
     "gh issue create --title x",
     "gh api repos/o/r/pulls/5",
+    "gh api -X PATCH repos/o/r/pulls/5",
+    "gh api repos/o/r/pulls/5/comments -F body=hi",
+    "gh api repos/o/r/pulls/5/comments/9/replies -f body=ok",
+    "gh api repos/o/r/pulls/5/requested_reviewers -f reviewers[]=x",
+    "gh pr create --help",
+    "gh pr create -h",
+    "gh pr new --help",
+    "gh pr comment 5 --body ok",
+    "gh pr edit 5 --title x",
     "gh api repos/o/r/pulls -X GET",
+    "gh api -XGET repos/o/r/pulls -f state=open",
     "gh api repos/o/r/issues/5 -X POST -f body=x",
     "gh api graphql -f query='query { viewer { login } }'",
     'git commit -m "docs: explain gh pr create"',
@@ -72,6 +88,17 @@ describe("without a valid marker", () => {
     "ls",
   ])("allows %j", (command) => {
     expect(gate(command, tree)).toEqual({});
+  });
+
+  test("a graphql input file is read for the mutation", () => {
+    const dir = tempDir("gql");
+    write(dir, "create.json", '{"query":"mutation { createPullRequest(input: {}) { id } }"}');
+    write(dir, "viewer.json", '{"query":"{ viewer { login } }"}');
+    expect(gate("gh api graphql --input create.json", dir).deny).toBeTruthy();
+    expect(gate("gh api graphql --input viewer.json", dir)).toEqual({});
+    write(dir, "q.graphql", "mutation { createPullRequest(input: {}) { id } }");
+    expect(gate("gh api graphql -F query=@q.graphql", dir).deny).toBeTruthy();
+    expect(gate("gh api graphql --input missing.json", dir)).toEqual({});
   });
 
   test("a head branch with no worktree is blocked with a clear reason", () => {

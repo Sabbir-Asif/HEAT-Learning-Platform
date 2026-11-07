@@ -56,18 +56,30 @@ export function ghInvocation(command) {
   let method = null;
   let head = null;
   let hasFields = false;
+  let help = false;
+  const files = [];
   for (let i = 1; i < words.length; i += 1) {
     const word = words[i];
     const inline = word.startsWith("--") ? word.indexOf("=") : -1;
     const name = inline > 0 ? word.slice(0, inline) : word;
     const value = inline > 0 ? word.slice(inline + 1) : null;
     if (!word.startsWith("-")) positional.push(word);
+    else if (/^-X./.test(word)) method = word.slice(2);
+    else if (word === "--help" || word === "-h") help = true;
     else {
       const consumed = value === null && ghValueFlags.has(name) ? words[i + 1] : value;
       if (value === null && ghValueFlags.has(name)) i += 1;
       if (name === "-X" || name === "--method") method = consumed ?? null;
       if (name === "--head" || (name === "-H" && positional[0] === "pr")) head = consumed ?? null;
       if (fieldFlags.has(name)) hasFields = true;
+      if (name === "--input" && consumed) files.push(consumed);
+      if (
+        (name === "-f" || name === "-F" || name === "--field" || name === "--raw-field") &&
+        consumed
+      ) {
+        const reference = /^[^=]+=@(.+)$/.exec(consumed);
+        if (reference) files.push(reference[1]);
+      }
     }
   }
   return {
@@ -75,6 +87,8 @@ export function ghInvocation(command) {
     method,
     head,
     hasFields,
+    help,
+    files,
     mentionsPullRequestMutation: words.some((word) => word.includes("createPullRequest")),
     cwd: command.cwd,
   };

@@ -1,17 +1,33 @@
+import { existsSync, readFileSync, statSync } from "node:fs";
+import { resolve } from "node:path";
 import { ghInvocation } from "./invocation.mjs";
 import { repoOf, worktreeFor } from "./git.mjs";
 import { markerStatus } from "./marker.mjs";
 import { parseShell } from "./shell.mjs";
 
-const pullsPath = /(?:^|\/)pulls(?:[/?]|$)/;
+const pullsCollection = /^\/?repos\/[^/]+\/[^/]+\/pulls\/?(?:\?.*)?$/;
+const maxInputBytes = 1024 * 1024;
+
+function mentionsMutation(file, cwd) {
+  if (file === "-") return true;
+  const path = resolve(cwd, file);
+  if (!existsSync(path) || statSync(path).size > maxInputBytes) return false;
+  return readFileSync(path, "utf8").includes("createPullRequest");
+}
 
 function isGuarded(invocation) {
+  if (invocation.help) return false;
   const [first, second] = invocation.positional;
-  if (first === "pr") return second === "create";
+  if (first === "pr") return second === "create" || second === "new";
   if (first !== "api") return false;
-  if (second === "graphql") return invocation.mentionsPullRequestMutation;
-  if (!pullsPath.test(second ?? "")) return false;
-  if (invocation.method) return !["GET", "HEAD"].includes(invocation.method.toUpperCase());
+  if (second === "graphql") {
+    return (
+      invocation.mentionsPullRequestMutation ||
+      invocation.files.some((file) => mentionsMutation(file, invocation.cwd))
+    );
+  }
+  if (!pullsCollection.test(second ?? "")) return false;
+  if (invocation.method) return invocation.method.toUpperCase() === "POST";
   return invocation.hasFields;
 }
 
