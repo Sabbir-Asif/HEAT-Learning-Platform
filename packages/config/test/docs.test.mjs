@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { expect, test } from "vitest";
 
 const root = resolve(import.meta.dirname, "../../..");
@@ -35,34 +35,59 @@ test("every area CLAUDE.md links back to the root file", () => {
   expect(unlinked).toEqual([]);
 });
 
-test("relative links in the instruction files resolve", () => {
+const slug = (heading) =>
+  heading
+    .toLowerCase()
+    .replace(/`/g, "")
+    .replace(/[^\p{L}\p{N} _-]/gu, "")
+    .replace(/ /g, "-");
+const anchors = (file) =>
+  lines(read(file))
+    .filter((line) => /^#{1,6} /.test(line))
+    .map((line) => slug(line.replace(/^#+ /, "")));
+
+test("relative links and heading anchors in the instruction files resolve", () => {
   const broken = ["CLAUDE.md", ...areaFiles, "docs/adr/README.md"].flatMap((file) => {
     const links = [...read(file).matchAll(/\]\(([^)\s]+)\)/g)].map((match) => match[1]);
     return links
-      .filter((link) => !/^[a-z]+:|^#/.test(link))
-      .map((link) => ({ file, link, target: resolve(root, dirname(file), link.split("#")[0]) }))
-      .filter(({ target }) => !existsSync(target))
-      .map(({ file, link }) => `${file}: ${link}`);
+      .filter((link) => !/^[a-z]+:/.test(link))
+      .filter((link) => {
+        const [path, anchor] = link.split("#");
+        const target = path ? resolve(root, dirname(file), path) : join(root, file);
+        if (!existsSync(target)) return true;
+        return anchor
+          ? !(target.endsWith(".md") && anchors(relative(root, target)).includes(anchor))
+          : false;
+      })
+      .map((link) => `${file}: ${link}`);
   });
   expect(broken).toEqual([]);
 });
 
-test("a rule is written in one file only: area files do not repeat root lines", () => {
-  const long = (text) =>
-    lines(text)
-      .map((line) => line.trim())
-      .filter((line) => line.length >= 40);
-  const rootLines = new Set(long(read("CLAUDE.md")));
-  const repeated = areaFiles.flatMap((file) =>
-    long(read(file))
-      .filter((line) => rootLines.has(line))
-      .map((line) => `${file}: ${line}`),
-  );
-  const seen = new Map();
-  for (const file of areaFiles) {
-    for (const line of long(read(file))) {
-      if (seen.has(line)) repeated.push(`${seen.get(line)} and ${file}: ${line}`);
-      else seen.set(line, file);
+test("a rule is written in one file only: no sentence is repeated between files", () => {
+  // Sentences are compared as lower-case words, so wrapping, punctuation and
+  // markup do not hide a copy. Short sentences are ignored, and so is each area
+  // file's intro, which only names the area and points to the root file.
+  const sentences = (file) =>
+    read(file)
+      .replace(file === "CLAUDE.md" ? /^$/ : /^[\s\S]*?(?=^## )/m, "")
+      .replace(/```[\s\S]*?```/g, "")
+      .split(/(?<=[.;:!?])\s+|\n/)
+      .map((sentence) =>
+        sentence
+          .toLowerCase()
+          .replace(/[^\p{L}\p{N} ]/gu, " ")
+          .split(/\s+/)
+          .filter(Boolean),
+      )
+      .filter((words) => words.length >= 6)
+      .map((words) => words.join(" "));
+  const owner = new Map();
+  const repeated = [];
+  for (const file of ["CLAUDE.md", ...areaFiles]) {
+    for (const sentence of new Set(sentences(file))) {
+      if (owner.has(sentence)) repeated.push(`${owner.get(sentence)} and ${file}: ${sentence}`);
+      else owner.set(sentence, file);
     }
   }
   expect(repeated).toEqual([]);
