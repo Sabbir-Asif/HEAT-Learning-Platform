@@ -116,7 +116,7 @@ pnpm ticket refine 24 --file refined.md      # append to the issue's "Refined" s
 pnpm ticket move 24 start                    # card to In progress, labels set (review: In review)
 ```
 
-It needs `gh` with the `repo` and `project` scopes. `load` only reads, and keeps only comments from repository collaborators. `refine` never rewrites the owner's text: it appends, reads the body back and fails if anything else changed. `packages/config/test/ticket.test.mjs` tests it against a fake `gh`; `packages/config/test/skill.test.mjs` checks the skill and its agents.
+It needs `gh` with the `repo` and `project` scopes. `load` only reads, and keeps only comments from repository collaborators. `refine` never rewrites the owner's text: it appends, reads the body again just before writing and stops if it changed, then reads it back and fails if it is not exactly what was written. GitHub has no compare-and-swap for issue bodies, so an edit in the moment between that last read and the write can still be lost. `packages/config/test/ticket.test.mjs` tests it against a fake `gh`; `packages/config/test/skill.test.mjs` checks the skill and its agents.
 
 ### Conventions
 

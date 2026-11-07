@@ -25,7 +25,7 @@
 
 1. A blocker merged into a different epic's branch (not ours) still counts as done. Test: `loadTicket` with a blocker PR based on `epic/e3-…` → no refusal.
 2. A closing keyword inside a longer word or for a different number (`Closes #230` when the blocker is #23) does not count. Test in Task 1.
-3. Issue body edited by someone between read and write during refinement: the append must not overwrite it. `appendRefinement` re-reads after writing and fails if the original is no longer a prefix. Test in Task 2.
+3. Issue body edited by someone between read and write during refinement: the append must not overwrite it. `appendRefinement` reads again just before writing and stops if the body changed, then reads back after writing and fails unless it is exactly what was written. GitHub has no compare-and-swap, so a very short window remains. Test in Task 2.
 4. Issue title of only punctuation or Bangla gives an empty slug. Fallback slug `issue`. Test in Task 1.
 5. Issue number argument like `24; rm -rf` or `-1`. `parseCli` rejects anything but a positive integer. Test in Task 3.
 
@@ -43,7 +43,7 @@
 - Produces: `loadTicket({ gh, repo, number, localBranches = [] }) -> Ticket`, `branchFor(issue, heads) -> { name, base }`, `slugify(title) -> string`, `closesIssue(body, n) -> boolean`, constants `defaultRepo`, `projectTitle = "HEAT LMS"`.
 - `Ticket = { number, title, url, state, author, labels: string[], body, type, size, status, epic: {number,title}|null, blockers: [{number,title,state,closingPr:number|null,done}], subIssues: [{number,title,state}], comments: [{author,association,createdAt,body}], hiddenComments: number, branch: {name, base, existsRemote, existsLocal}, pr: {number,state,url}|null, needsApproval: boolean, planApproved: boolean, refusals: string[], projectItem: {projectId,itemId}|null }`
 - `gh` calls: one GraphQL query for the issue (labels, author association, parent, blockedBy, subIssues, comments with authorAssociation, projectItems with Status and Size), `api repos/<repo>/git/matching-refs/heads/` for branches, `pr list --state merged --limit 200 --json number,body,baseRefName`, `pr list --head <branch> --state all --json number,state,url`.
-- `planApproved` is true when a comment contains the marker `<!-- implement-issue:plan-approved -->`. It is a record for resuming, not a gate: the `gh` account is the owner's, so the agent could write it. The owner's chat approval is the gate.
+- `planApproved` is true when a comment from the OWNER association contains the marker `<!-- implement-issue:plan-approved -->`. It is a record for resuming, not a gate: the `gh` account is the owner's, so the agent could write it. The owner's chat approval is the gate.
 
 - [x] **Step 1: Write the failing tests** with a fake `gh` returning canned JSON. Cases:
   - ready ticket → `refusals: []`, `branch: { name: "chore/24-implement-issue-skill-refiner", base: "epic/e0-engineering-foundation" }` for title "`/implement-issue` skill with refiner, reviewer and security reviewer agents"
