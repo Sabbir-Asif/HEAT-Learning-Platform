@@ -70,8 +70,20 @@ describe("danger-guard as a child process", () => {
   });
 });
 
+describe("pr-gate as a child process", () => {
+  test("blocks gh pr create without a marker", () => {
+    const result = runBin("pr-gate", bash("gh pr create --fill", ticket));
+    expect(decisionOf(result)).toBe("deny");
+    expect(result.json.hookSpecificOutput.permissionDecisionReason).toMatch(/pnpm verify/);
+  });
+
+  test("allows other gh commands", () => {
+    expect(runBin("pr-gate", bash("gh pr view 3", ticket))).toMatchObject({ code: 0, stdout: "" });
+  });
+});
+
 describe("failing closed and open", () => {
-  test.each(["branch-guard", "plan-gate", "danger-guard"])(
+  test.each(["branch-guard", "plan-gate", "danger-guard", "pr-gate"])(
     "%s denies on empty and malformed input",
     (name) => {
       expect(decisionOf(runBin(name, null, { raw: "" }))).toBe("deny");
