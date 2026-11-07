@@ -7,6 +7,7 @@ import { checkTarget } from "./github-setup.mjs";
 export const defaultRepo = "Sabbir-Asif/HEAT-Learning-Platform";
 export const projectTitle = "HEAT LMS";
 export const approvalMarker = "<!-- implement-issue:plan-approved -->";
+const markerPattern = /implement-issue:plan-approved/;
 
 const startStatuses = ["Ready", "Refining"];
 // A ticket already under way is resumed from its branch rather than started again.
@@ -18,6 +19,10 @@ const prefixes = { feature: "feat", bug: "fix", chore: "chore", docs: "docs", sp
 const stopWords = new Set(["a", "an", "and", "the", "with", "for", "of", "to", "in", "on"]);
 const maxSlugWords = 4;
 const maxSlugLength = 40;
+// Branch names reach shell commands in the skill, so only these shapes are used. A ref with any
+// other character (git allows `$`, backticks, quotes and `;`) is refused, never quoted around.
+const safeBranch = /^(?:feat|fix|chore|docs|spike)\/\d+-[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const safeEpic = /^epic\/e\d+(?:-[a-z0-9]+)*$/;
 
 const issueQuery = `query($owner: String!, $name: String!, $number: Int!) {
   repository(owner: $owner, name: $name) {
@@ -118,43 +123,69 @@ function remoteHeads(gh, repo) {
 /**
  * The branch for this issue: an existing `<type>/<N>-…` branch if there is one, otherwise a new
  * name from the type label and title. The base is the epic's `epic/<code>-…` branch on origin
- * when it exists, otherwise main.
+ * when there is exactly one, otherwise main. `branch` is null when `problems` is not empty.
  */
-export function branchFor({ number, title, type, epic }, heads, localBranches = []) {
-  const existing = new RegExp(`^(?:${Object.values(prefixes).join("|")})/${number}-`);
-  const name =
-    localBranches.find((branch) => existing.test(branch)) ??
-    heads.find((branch) => existing.test(branch)) ??
-    `${prefixes[type]}/${number}-${slugify(title)}`;
+function resolveBranch({ number, title, type, epic }, heads, localBranches) {
+  const forIssue = new RegExp(`^(?:${Object.values(prefixes).join("|")})/${number}-`);
+  const existing = [...localBranches, ...heads].filter((branch) => forIssue.test(branch));
+  const unsafe = [...new Set(existing.filter((branch) => !safeBranch.test(branch)))];
   const code = epic?.title.match(/^(E\d+)\b/i)?.[1].toLowerCase();
-  const base =
-    (code && heads.find((head) => head === `epic/${code}` || head.startsWith(`epic/${code}-`))) ||
-    "main";
+  const epics = code
+    ? heads.filter(
+        (head) =>
+          safeEpic.test(head) && (head === `epic/${code}` || head.startsWith(`epic/${code}-`)),
+      )
+    : [];
+  const problems = [
+    ...unsafe.map(
+      (branch) =>
+        `Branch "${branch}" for #${number} has an unsafe branch name; the owner renames or deletes it.`,
+    ),
+    ...(epics.length > 1
+      ? [
+          `#${number}'s epic has more than one epic branch (${epics.join(", ")}); the owner keeps one.`,
+        ]
+      : []),
+  ];
+  if (problems.length) return { branch: null, problems };
+  const name = existing[0] ?? `${prefixes[type]}/${number}-${slugify(title)}`;
   return {
-    name,
-    base,
-    existsRemote: heads.includes(name),
-    existsLocal: localBranches.includes(name),
+    branch: {
+      name,
+      base: epics[0] ?? "main",
+      existsRemote: heads.includes(name),
+      existsLocal: localBranches.includes(name),
+    },
+    problems,
   };
 }
 
-function checkBlockers(gh, repo, blockedBy) {
+function checkBlockers(gh, repo, blockedBy, heads) {
   const open = blockedBy.filter((blocker) => blocker.state !== "CLOSED");
   // Pull requests into an epic branch do not close issues, so a blocker merged there is still
-  // open on GitHub. Its closing pull request is what shows the work is in.
+  // open on GitHub. Its closing pull request is what shows the work is in. Each epic branch is
+  // read on its own so pull requests into main do not push older ones past the limit, and pull
+  // requests from forks are ignored.
   const merged = open.length
-    ? json(gh, [
-        "pr",
-        "list",
-        "--repo",
-        repo,
-        "--state",
-        "merged",
-        "--limit",
-        "200",
-        "--json",
-        "number,body,baseRefName",
-      ]).filter((pr) => pr.baseRefName.startsWith("epic/"))
+    ? heads
+        .filter((head) => safeEpic.test(head))
+        .flatMap((head) =>
+          json(gh, [
+            "pr",
+            "list",
+            "--repo",
+            repo,
+            "--base",
+            head,
+            "--state",
+            "merged",
+            "--limit",
+            "500",
+            "--json",
+            "number,body,baseRefName,isCrossRepository",
+          ]),
+        )
+        .filter((pr) => !pr.isCrossRepository)
     : [];
   return blockedBy.map(({ number, title, state }) => {
     const closingPr =
@@ -176,8 +207,9 @@ function findPr(gh, repo, branch) {
     "--state",
     "all",
     "--json",
-    "number,state,url",
-  ]);
+    "number,state,url,isCrossRepository",
+  ]).filter((each) => !each.isCrossRepository);
+  // A fork can open a pull request from a branch with the same name; only our own counts.
   return pr ? { number: pr.number, state: pr.state, url: pr.url } : null;
 }
 
@@ -193,7 +225,8 @@ export function loadTicket({ gh, repo, number, localBranches = [] }) {
   const type = types.find((name) => name in prefixes) ?? null;
   const item = projectItemOf(issue);
   const epic = issue.parent ? { number: issue.parent.number, title: issue.parent.title } : null;
-  const blockers = checkBlockers(gh, repo, issue.blockedBy.nodes);
+  const heads = remoteHeads(gh, repo);
+  const blockers = checkBlockers(gh, repo, issue.blockedBy.nodes, heads);
   const comments = issue.comments.nodes
     .filter((comment) => collaborators.has(comment.authorAssociation))
     .map((comment) => ({
@@ -203,14 +236,14 @@ export function loadTicket({ gh, repo, number, localBranches = [] }) {
       body: comment.body,
     }));
 
-  const branch =
+  const { branch, problems } =
     type && !types.includes("epic")
-      ? branchFor({ number, title: issue.title, type, epic }, remoteHeads(gh, repo), localBranches)
-      : null;
+      ? resolveBranch({ number, title: issue.title, type, epic }, heads, localBranches)
+      : { branch: null, problems: [] };
   const branchExists = Boolean(branch && (branch.existsLocal || branch.existsRemote));
   const resuming = branchExists && resumeStatuses.includes(item?.status);
 
-  const refusals = [];
+  const refusals = [...problems];
   if (issue.state !== "OPEN") refusals.push(`#${number} is closed.`);
   if (!collaborators.has(issue.authorAssociation)) {
     refusals.push(
@@ -264,7 +297,11 @@ export function loadTicket({ gh, repo, number, localBranches = [] }) {
     resuming,
     pr: branch ? findPr(gh, repo, branch.name) : null,
     needsApproval: item?.size === "L" || labels.includes("security"),
-    planApproved: comments.some((comment) => comment.body.includes(approvalMarker)),
+    // Only the owner approves plans (plan section 12). This is a record for a later session, not
+    // a gate: `gh` runs under the owner's account, so whatever the agent posts is the owner's too.
+    planApproved: comments.some(
+      (comment) => comment.association === "OWNER" && comment.body.includes(approvalMarker),
+    ),
     refusals,
     projectItem: item ? { projectId: item.projectId, itemId: item.itemId } : null,
   };
@@ -285,11 +322,21 @@ const readBody = (gh, repo, number) =>
 export function appendRefinement({ gh, repo, number, text, summary, date = today() }) {
   const addition = text.trim();
   if (!addition) throw new Error("Refinement text is empty");
+  if (markerPattern.test(text) || markerPattern.test(summary ?? "")) {
+    throw new Error("Refinement text must not carry the plan approval marker");
+  }
   const original = readBody(gh, repo, number);
   const section = /^## Refined\s*$/m.test(original)
     ? `\n\n### Update ${date}\n\n${addition}\n`
     : `\n\n---\n\n## Refined\n\n${addition}\n`;
   const next = original + section;
+  // GitHub has no compare-and-swap for issue bodies; reading again just before the write keeps
+  // the window in which an owner's edit could be lost as small as it can be.
+  if (readBody(gh, repo, number) !== original) {
+    throw new Error(
+      `Issue #${number} body changed while the refinement was prepared; run it again.`,
+    );
+  }
   gh(["issue", "edit", String(number), "--repo", repo, "--body-file", "-"], next);
   // GitHub may store line endings differently, so they are compared without them.
   const lf = (value) => value.replace(/\r\n/g, "\n");

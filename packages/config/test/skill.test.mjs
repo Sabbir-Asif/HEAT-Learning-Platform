@@ -100,8 +100,10 @@ describe("the agents", () => {
 });
 
 test("a dangerous command appears only in a sentence that forbids it", () => {
-  const danger = /co-authored-by|generated with|--force|gh pr merge|migrate reset|\.env\b/i;
-  const allowed = /\bnever\b|\bdo not\b|\bdon't\b|\bnot\b/i;
+  const token = String.raw`co-authored-by|generated with|--force|gh pr merge|migrate reset|\.env\b|environment files`;
+  const danger = new RegExp(token, "i");
+  // The forbidding word must come before the token in the same sentence.
+  const allowed = new RegExp(String.raw`\b(?:never|do not|don't|no)\b[^.]*(?:${token})`, "i");
   const offending = [".claude/skills", ".claude/agents"].flatMap((dir) =>
     markdownFiles(dir).flatMap((file) =>
       read(file)
@@ -111,4 +113,11 @@ test("a dangerous command appears only in a sentence that forbids it", () => {
     ),
   );
   expect(offending).toEqual([]);
+});
+
+test("the dangerous-command guard rejects a line that only mentions not", () => {
+  const token = /gh pr merge/i;
+  const line = "Run `gh pr merge` when checks are not red.";
+  const allowed = /\b(?:never|do not|don't|no)\b[^.]*(?:gh pr merge)/i;
+  expect(token.test(line) && !allowed.test(line)).toBe(true);
 });
