@@ -106,6 +106,18 @@ Run the dry run first. It reads only, but it still needs a token that can read t
 
 It is safe to re-run. It creates what is missing, updates a label's colour and description in place, and never touches issues or project items. It does not delete or rename anything. Extra labels, milestones and options are left alone, and a closed project with the same title is reported instead of duplicated. Adding an option to an existing project field is the one risky write, because the API replaces the whole option list. The script reads the options twice and writes nothing if they changed, prints the current list first so it can be restored, passes every existing option back with its id, and reads the field again afterwards, failing if any option id or name is missing. It exits non-zero when something needs a person, such as a field of the wrong type. The Project Area options are the `area:*` labels, from one list in the script. `packages/config/test/github-setup.test.mjs` tests it against a fake `gh`, with no network or credentials.
 
+### Ticket command
+
+`pnpm ticket` is the GitHub side of the `/implement-issue` skill (`.claude/skills/implement-issue/`), kept in `packages/config/src/ticket.mjs` so the workflow rules are tested code:
+
+```sh
+pnpm ticket load 24                          # ticket JSON; exit 3 with the reasons when it may not start
+pnpm ticket refine 24 --file refined.md      # append to the issue's "Refined" section and log it
+pnpm ticket move 24 start                    # card to In progress, labels set (review: In review)
+```
+
+It needs `gh` with the `repo` and `project` scopes. `load` only reads, and keeps only comments from repository collaborators. `refine` never rewrites the owner's text: it appends, reads the body back and fails if anything else changed. `packages/config/test/ticket.test.mjs` tests it against a fake `gh`; `packages/config/test/skill.test.mjs` checks the skill and its agents.
+
 ### Conventions
 
 The quality bar, the delivery workflow and the rules for each app and package are in `CLAUDE.md` at the repo root and in each area's directory; the root file links to the rest. A rule is written in one file only. `packages/config/test/docs.test.mjs` fails if the root file reaches 200 lines, an area file is missing, a link or heading anchor in these files is dead, or a sentence is repeated between files.
