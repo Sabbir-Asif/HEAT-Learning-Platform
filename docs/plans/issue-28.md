@@ -17,7 +17,7 @@
 - **Spec by preview app, not a running server.** `NestFactory.create(AppModule, { preview: true })` builds the module graph without instantiating providers, so a later database provider cannot break the emit. `configureApp()` is called so the `api` prefix is in every path. Rejected: booting the full app (needs Postgres and Redis later) and the Nest CLI swagger plugin (adds a compile step and hides the DTO source).
 - **DTOs from contracts.** `createZodDto(healthResponseSchema)`; `@ApiOkResponse({ type })` puts the response in the spec. Operation ids come from an `operationIdFactory` (`healthCheck`) so hook names are stable and readable (`useHealthCheck`).
 - **Deterministic output.** The emitter sorts object keys recursively, writes two-space JSON plus a newline, and puts no timestamp, path or environment value in the document. `apps/api/openapi.json` is committed and ignored by Prettier, like `src/generated`.
-- **Error envelope.** `@heat/contracts` gets a closed `errorCodes` list, `clientErrorCodes` for failures that never reach the API (network, abort, unreadable response) and `errorResponseSchema`. A global `ApiExceptionFilter` maps Zod validation errors, `HttpException` and unknown errors to it, with fixed messages (never the exception text) and a request id.
+- **Error envelope.** `@heat/contracts` gets a closed `errorCodes` list, `clientErrorCodes` for failures that never reach the API (network, abort, unreadable response), a closed `fieldErrorCodes` list for per-field errors and `errorResponseSchema`. A global `ApiExceptionFilter` maps Zod validation errors, `HttpException` and unknown errors to it, with fixed messages (never the exception text), a request id and Zod issue codes mapped to `fieldErrorCodes`; it leaves a response that has already started alone.
 - **One orval run, two outputs.** The browser output is `react-query` with `httpClient: fetch`, `mode: split`, mocks on, `includeHttpResponseReturnType: false` (so `data` is the body, `data.status`) and the browser mutator. A second `fetch` output uses the server fetcher as its mutator, so Server Components call typed functions that cannot be imported into a Client Component (`server-only`). A third output writes Zod schemas. Generated files carry no banner details beyond orval's own header and live in `src/generated/`, excluded from lint, Prettier and coverage but type-checked.
 - **Mutator and fetcher share `ApiError` and one `parseErrorResponse`.** Mutator extension points (`registerRequestInterceptor`, `setUnauthorizedHandler`) exist for E3-7 and E3-2 and ship with no behaviour.
 - **Build order through Turborepo.** `api#openapi` depends on `api#build`; `generate` in `@heat/api-client` depends on `api#openapi`; root `pnpm generate` runs it. CI job `api-client-drift` runs `pnpm generate` and fails on any changed or new file under `apps/api/openapi.json` or `packages/api-client/src/generated`, listing them.
@@ -25,8 +25,8 @@
 ## Files
 
 - `packages/contracts/src/errors.ts` (new), `src/index.ts`, `test/errors.test.ts`
-- `apps/api/src/health/health.dto.ts`, `health.controller.ts`; `src/http/http.module.ts`, `api-exception.filter.ts`, `error-messages.ts`; `src/openapi/build-document.ts`, `serialize.ts`, `emit.ts`; `openapi.json`; `.prettierignore`; `package.json`; `app.module.ts`; tests under `apps/api/test/` mirroring these
-- `packages/api-client/orval.config.ts`, `src/errors.ts`, `src/mutator/*`, `src/server/*`, `src/mocks.ts`, `src/index.ts`, `src/generated/**` (generated), `.prettierignore`, `package.json`, `vitest.config.mjs`; tests under `test/`
+- `apps/api/src/health/health.dto.ts`, `health.controller.ts`; `src/http/http.module.ts`, `api-exception.filter.ts` (with the message table); `src/openapi/build-document.ts`, `serialize.ts`, `write-document.ts`, `emit.ts`; `openapi.json`; `.prettierignore`; `package.json`; `app.module.ts`; tests under `apps/api/test/` mirroring these
+- `packages/api-client/orval.config.ts`, `src/errors.ts`, `src/transport.ts`, `src/mutator/*`, `src/server/*`, `src/mocks.ts`, `src/index.ts`, `src/generated/**` (generated), `.prettierignore`, `package.json`, `vitest.config.mjs`; tests under `test/` (with `test/support/msw.ts`)
 - `apps/frontend-public/test/api-client.test.ts`, `apps/frontend-internal/test/api-client.test.ts`
 - `turbo.json`, `package.json`, `pnpm-workspace.yaml`, `packages/config/eslint/base.js`, `.github/workflows/ci.yml`
 - `README.md`, `packages/api-client/CLAUDE.md`, root `CLAUDE.md` area row, `packages/config/test/docs.test.mjs`
@@ -36,19 +36,19 @@
 | Criterion | Proof |
 | --- | --- |
 | Health in the spec with its 200 schema equal to `healthResponseSchema`, no DB, Redis or server, env unset | `apps/api/test/openapi/build-document.test.ts` |
-| Two builds are byte-identical, no absolute paths or env values | `apps/api/test/openapi/serialize.test.ts`, `emit.test.ts`; generation run twice with no diff (verify log) |
+| Two builds are byte-identical, no absolute paths or env values | `apps/api/test/openapi/serialize.test.ts`, `write-document.test.ts` (byte-identical, no path or environment value); generation run twice with no diff (verify log) |
 | Zod request DTO shows body, query and path parameters with constraints; validation failure returns the envelope with a stable code and field paths | `build-document.test.ts` (fixture controller), `test/http/api-exception.filter.test.ts` |
-| One `errorResponseSchema`, closed code enum, test fails if a code is removed or changed | `packages/contracts/test/errors.test.ts` |
+| One `errorResponseSchema`, closed code enum, test fails if a code is removed or changed | `packages/contracts/test/errors.test.ts` (also the closed field error codes) |
 | Both frontends import the health hook and read `data.status`, `data` typed `{ status: "ok" }` | `apps/frontend-*/test/api-client.test.ts` under `pnpm typecheck` |
-| Generated MSW health handler renders the hook deterministically | `packages/api-client/test/generated/health.test.tsx` |
+| Generated MSW health handler renders the hook deterministically | `packages/api-client/test/generated/client/endpoints.test.tsx` |
 | 4xx and 5xx envelope becomes `ApiError` with status, code, field paths | `packages/api-client/test/mutator/custom-fetch.test.ts` |
 | Non-envelope, unknown code, network failure, abort give a fallback code and leak nothing | same file |
 | Same-origin `/api` URL once, `credentials: "include"`, no `Content-Type` for bodiless and `FormData`, caller signal, 204 does not throw | same file |
 | Interceptor and 401 handler called in order; default behaviour unchanged | `test/mutator/extensions.test.ts` |
 | Server fetcher uses `API_INTERNAL_URL`, forwards only `Cookie`, never returns `Set-Cookie`, no redirect following, same `ApiError` | `test/server/server-fetch.test.ts` |
-| Importing the server fetcher into a Client Component fails the build | `test/server/entry.test.ts` (entry starts with `server-only`, root export excludes it) plus a captured throwaway `next build` (verify log) |
+| Importing the server fetcher into a Client Component fails the build | `test/server/index.test.ts` (entry starts with `server-only`, root export excludes it) plus a captured throwaway `next build` (verify log) |
 | Missing `API_INTERNAL_URL` throws a clear error, no `localhost` fallback | `test/server/server-fetch.test.ts` |
-| Drift job fails and names files; passes when clean; double run leaves no diff | deliberate drift on a throwaway change, captured in the verify log; `workflows.test.mjs` for pinning |
+| Drift job fails and names files; passes when clean; double run leaves no diff | deliberate drift on a throwaway change, captured in the verify log |
 | Generated code skipped by lint, Prettier and coverage but type-checked; hand-written mutator and fetcher at least 85% | `pnpm lint`, `format:check`, `typecheck`, `test:coverage` in the verify log |
 
 ## Tasks
