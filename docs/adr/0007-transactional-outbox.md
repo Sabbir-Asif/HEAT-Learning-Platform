@@ -17,7 +17,7 @@ State changes (enrolled, verified, completed) must trigger emails and jobs. Neit
 ## Consequences
 
 - Delivery is decoupled from the request: the transaction commits first and the relay delivers afterwards.
-- Consumers must be idempotent, because the relay may deliver an event again.
+- The relay can deliver an event more than once, so consumers must be idempotent. That, with the outbox, gives the plan's result of nothing lost and nothing sent twice.
 - The relay and the outbox table need monitoring, for example queue depth on the dashboards.
 - Passing the last module writes `CertificateRequested` to the outbox in the same transaction.
 

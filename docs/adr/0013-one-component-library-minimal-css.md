@@ -19,7 +19,7 @@ Many AI-written tickets build two apps. Without one source of styles the screens
 
 - Both apps look and behave the same, and a style change is made once.
 - New UI needs a shared component first, then use in the app.
-- The styling rules are enforced by lint, see [packages/ui/CLAUDE.md](../../packages/ui/CLAUDE.md).
+- The styling rules are enforced by lint (frontend design spec, [section 8](../superpowers/specs/2026-11-07-frontend-architecture-design.md)).
 
 ## Alternatives considered
 

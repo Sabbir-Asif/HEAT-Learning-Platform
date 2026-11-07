@@ -15,7 +15,7 @@ Launch uses a personal Gmail account, about 500 emails a day, and each student g
 - The limit is split into per-category budgets, so verification, password codes and resets always have capacity before approval and certificate mail.
 - When a budget is used up, jobs wait until it frees instead of failing. Gmail quota errors (550 5.4.5) pause the queue the same way.
 - Resend-verification and forgot-password require the captcha and are capped per email.
-- The 7-day expiry for unverified registrations is counted from the actual send, that is, from when the verification email is actually sent.
+- The 7-day expiry for unverified registrations is counted from the actual send, not from registration: it starts when the verification email is actually sent.
 - Gmail SMTP gives no bounce reports, so failures are tracked from SMTP responses only.
 
 ## Consequences

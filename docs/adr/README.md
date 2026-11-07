@@ -2,7 +2,7 @@
 
 One file per decision, numbered in order (`0001-title.md`). Each record states the decision, why, what follows from it and the alternatives considered. Changes to an ADR always go through the owner.
 
-Records 0001 to 0016 are the design decisions D1 to D16 in section 02 of the [project plan](../plan/heat-lms-project-plan.html#decisions). The frontend design spec ([frontend architecture](../superpowers/specs/2026-11-07-frontend-architecture-design.md)) adds detail to D9, D13, D15 and D16. To add a record, copy [0000-template.md](0000-template.md) and take the next free number. The Content Security Policy record is written by its own spike (#39) and takes the next number then.
+Records 0001 to 0016 are the design decisions D1 to D16 in section 02 of the [project plan](../plan/heat-lms-project-plan.html#decisions). The frontend design spec ([frontend architecture](../superpowers/specs/2026-11-07-frontend-architecture-design.md)) adds detail to D9, D13, D15 and D16. A status is Proposed, Accepted or Superseded by NNNN. An "Open points for the owner" section lists conflicts or gaps in the source documents with a Proposed resolution; none is decided until the owner accepts it. To add a record, copy [0000-template.md](0000-template.md) and take the next free number. The Content Security Policy record is written by its own spike (#39) and takes the next number then.
 
 | No.  | Decision                                                                                                    | Plan       | Status   |
 | ---- | ----------------------------------------------------------------------------------------------------------- | ---------- | -------- |

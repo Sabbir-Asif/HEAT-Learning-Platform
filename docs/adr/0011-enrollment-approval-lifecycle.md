@@ -11,7 +11,7 @@ Admins must approve every student before they start. The lifecycle has to handle
 ## Decision
 
 - Status moves `PENDING_VERIFICATION` to `PENDING_APPROVAL` to `APPROVED` to `COMPLETED`, or to `REJECTED`, `EXPIRED` or `REMOVED`.
-- Content endpoints and playback sessions allow `APPROVED` and `COMPLETED`. A removed student loses video access within one cookie lifetime (10 minutes).
+- Content endpoints and playback sessions allow `APPROVED` and `COMPLETED`. A removed student loses video access within one cookie lifetime (10 minutes), the playback cookie in [0005](0005-signed-hls-delivered-by-nginx.md).
 - Removal is possible from either state, and reinstatement restores the state the student had.
 - Rejection soft-deletes the account only when no other approved or completed enrollment exists.
 - Email jobs store a copy of the recipient address, so the rejection email still goes out after the account is hidden.
@@ -22,7 +22,7 @@ Admins must approve every student before they start. The lifecycle has to handle
 ## Consequences
 
 - The form never reveals who has enrolled, and nobody can squat or pre-hijack an account.
-- Every decision is audit-logged and carries a reason shown to the student.
+- Every decision is audit-logged. The reason is optional and, when given, shown to the student.
 - Approval pins the enrollment to the current course revision, locks the course and unlocks module 1 in one transaction, see [0004](0004-content-lock-with-course-revisions.md).
 - Unverified registrations expire after 7 days, counted as in [0012](0012-pluggable-quota-aware-email.md).
 
