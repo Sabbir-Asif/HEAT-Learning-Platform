@@ -2,16 +2,35 @@
   "name": "@heat/config",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./tsconfig/*": "./tsconfig/*"
+    "./tsconfig/*": "./tsconfig/*",
+    "./eslint/base": "./eslint/base.js",
+    "./eslint/react": "./eslint/react.js",
+    "./eslint/nest": "./eslint/nest.js",
+    "./prettier": "./prettier/index.json",
+    "./vitest": "./vitest/index.js"
   },
   "scripts": {
+    "lint": "eslint .",
+    "format:check": "prettier --check . --ignore-path ../../.gitignore",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "catalog:",
+    "eslint-config-next": "catalog:",
+    "globals": "^17.14.0",
+    "jsdom": "^31.0.0",
+    "typescript-eslint": "^8.72.1"
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

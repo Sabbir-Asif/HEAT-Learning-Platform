@@ -6,8 +6,11 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "lint": "eslint .",
+    "format:check": "prettier --check . --ignore-path ../../.gitignore",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "peerDependencies": {
     "react": "catalog:"
@@ -16,6 +19,8 @@
     "@heat/config": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
     "react": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

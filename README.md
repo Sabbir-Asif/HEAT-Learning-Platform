@@ -26,14 +26,32 @@ pnpm turbo build lint typecheck test
 
 ### Run each app
 
-| App | Dev | Production build |
-|---|---|---|
-| `frontend-public` | `pnpm --filter frontend-public dev` | `pnpm --filter frontend-public build && pnpm --filter frontend-public start` |
+| App                 | Dev                                   | Production build                                                                 |
+| ------------------- | ------------------------------------- | -------------------------------------------------------------------------------- |
+| `frontend-public`   | `pnpm --filter frontend-public dev`   | `pnpm --filter frontend-public build && pnpm --filter frontend-public start`     |
 | `frontend-internal` | `pnpm --filter frontend-internal dev` | `pnpm --filter frontend-internal build && pnpm --filter frontend-internal start` |
-| `api` | `pnpm --filter api dev` | `pnpm --filter api build && pnpm --filter api start` |
-| `worker` | `pnpm --filter worker dev` | `pnpm --filter worker build && pnpm --filter worker start` |
+| `api`               | `pnpm --filter api dev`               | `pnpm --filter api build && pnpm --filter api start`                             |
+| `worker`            | `pnpm --filter worker dev`            | `pnpm --filter worker build && pnpm --filter worker start`                       |
 
 `pnpm dev` starts everything through Turborepo. Check the apps with `curl localhost:4000/api/health` and by opening ports 3000 and 3001. The worker logs `Worker ready` and opens no port.
+
+### Quality checks
+
+```sh
+pnpm lint            # ESLint, no explicit any
+pnpm format:check    # Prettier; `pnpm format` fixes
+pnpm typecheck       # strict TypeScript
+pnpm test            # Vitest
+pnpm test:coverage   # Vitest with V8 coverage, 85% minimum
+```
+
+All rules live in `@heat/config`. A package opts in with one-line files (`eslint.config.mjs`, `vitest.config.mjs`, a tsconfig that extends `@heat/config/tsconfig/*`) and the root `package.json` points Prettier at the shared config. A package that holds rule logic (unlock, scoring, certificates) raises its coverage gate with `nodePreset({ threshold: 100 })`.
+
+### Where tests live
+
+Every app and package keeps its tests in a `test/` directory at its root, mirroring the paths under `src/` (`src/health/health.controller.ts` is tested by `test/health/health.controller.test.ts`). Test files end in `.test.ts` or `.test.tsx` and import the code under test from `../src/...`.
+
+This is enforced: the Vitest preset only runs `test/**`, and `packages/config/test/layout.test.mjs` fails if a test file sits anywhere else or an app or package has no `test/` directory. Fixtures and helpers go in `test/` too (for example `test/fixtures/`).
 
 ### Docker images
 
