@@ -24,5 +24,8 @@
     "react": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
+  },
+  "dependencies": {
+    "@heat/contracts": "workspace:*"
   }
 }
