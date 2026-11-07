@@ -75,9 +75,3 @@ export const DarkBangla: Story = {
     await expectBanglaFont(context);
   },
 };
-
-/** Deliberately inaccessible: proves the axe gate (#29). Removed right after the proof run. */
-export const InaccessibleButton: Story = {
-  globals: { theme: "light", locale: "en" },
-  render: () => <button type="button" />,
-};
