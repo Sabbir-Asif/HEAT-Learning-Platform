@@ -1,5 +1,14 @@
+import { spawnSync } from "node:child_process";
+import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
-import { appendRefinement, closesIssue, loadTicket, moveCard, slugify } from "../src/ticket.mjs";
+import {
+  appendRefinement,
+  closesIssue,
+  loadTicket,
+  moveCard,
+  parseCli,
+  slugify,
+} from "../src/ticket.mjs";
 
 const repo = "owner/repo";
 const epicBranch = "epic/e0-engineering-foundation";
@@ -497,4 +506,44 @@ describe("moveCard", () => {
       /not on the HEAT LMS project/,
     );
   });
+});
+
+describe("parseCli", () => {
+  test.each([
+    [["load", "24"], { command: "load", number: 24, repo: "Sabbir-Asif/HEAT-Learning-Platform" }],
+    [
+      ["move", "7", "review", "--repo", "a/b"],
+      { command: "move", number: 7, stage: "review", repo: "a/b" },
+    ],
+    [
+      ["refine", "24", "--file", "r.md", "--summary", "added criteria."],
+      { command: "refine", number: 24, file: "r.md", summary: "added criteria." },
+    ],
+  ])("%j", (argv, expected) => {
+    expect(parseCli(argv)).toMatchObject(expected);
+  });
+
+  test.each([
+    [[], /Usage/],
+    [["nuke", "1"], /Usage/],
+    [["load"], /issue number/],
+    [["load", "24; rm -rf /"], /issue number/],
+    [["load", "0"], /issue number/],
+    [["load", "-1"], /Unknown option/],
+    [["load", "1", "extra"], /Usage/],
+    [["load", "1", "--file", "x"], /Usage/],
+    [["move", "1", "merge"], /start or review/],
+    [["refine", "1"], /--file/],
+    [["load", "1", "--repo", "evil;rm"], /Invalid --repo/],
+    [["load", "1", "--force"], /Unknown option/],
+  ])("rejects %j", (argv, message) => {
+    expect(() => parseCli(argv)).toThrow(message);
+  });
+});
+
+test("the command prints usage and exits 1 when called without arguments", () => {
+  const bin = resolve(import.meta.dirname, "../bin/ticket.mjs");
+  const result = spawnSync(process.execPath, [bin], { encoding: "utf8" });
+  expect(result.status).toBe(1);
+  expect(result.stderr).toMatch(/Usage: pnpm ticket/);
 });

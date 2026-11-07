@@ -1,6 +1,9 @@
 // The GitHub rules of the /implement-issue skill (plan section 12): whether a ticket may start,
 // its branch name and base, the append-only refinement and the card moves. The skill calls these
 // through `pnpm ticket` so the rules live in tested code, not in the skill's prose.
+import { parseArgs } from "node:util";
+import { checkTarget } from "./github-setup.mjs";
+
 export const defaultRepo = "Sabbir-Asif/HEAT-Learning-Platform";
 export const projectTitle = "HEAT LMS";
 export const approvalMarker = "<!-- implement-issue:plan-approved -->";
@@ -362,4 +365,43 @@ export function moveCard({ gh, repo, number, stage }) {
       ...(remove.length ? ["--remove-label", remove.join(",")] : []),
     ]);
   }
+}
+
+export const usage = [
+  "Usage: pnpm ticket load <N>",
+  "       pnpm ticket refine <N> --file <path> [--summary <text>]",
+  "       pnpm ticket move <N> start|review",
+  "Options: --repo owner/name (default " + defaultRepo + ")",
+].join("\n");
+
+/** Parses the command line; throws on anything but the three commands above. */
+export function parseCli(argv) {
+  const { values, positionals } = parseArgs({
+    args: argv,
+    allowPositionals: true,
+    options: {
+      repo: { type: "string", default: defaultRepo },
+      file: { type: "string" },
+      summary: { type: "string" },
+    },
+  });
+  const [command, numberText, stage, ...extra] = positionals;
+  if (!["load", "refine", "move"].includes(command) || extra.length) throw new Error(usage);
+  if (!/^[1-9]\d{0,8}$/.test(numberText ?? "")) {
+    throw new Error(`Expected an issue number, got "${numberText ?? ""}"\n${usage}`);
+  }
+  checkTarget(values.repo, values.repo.split("/")[0]);
+  const base = { command, number: Number(numberText), repo: values.repo };
+  if (command === "move") {
+    if (!(stage in stages) || values.file || values.summary) {
+      throw new Error(`move takes start or review\n${usage}`);
+    }
+    return { ...base, stage };
+  }
+  if (stage || (command === "load" && (values.file || values.summary))) throw new Error(usage);
+  if (command === "refine") {
+    if (!values.file) throw new Error(`refine needs --file <path>\n${usage}`);
+    return { ...base, file: values.file, summary: values.summary };
+  }
+  return base;
 }

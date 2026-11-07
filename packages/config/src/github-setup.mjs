@@ -78,7 +78,8 @@ const projectListLimit = 100;
 const ownerPattern = /^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$/;
 const repoNamePattern = /^[\w.-]{1,100}$/;
 
-function checkTarget(repo, owner) {
+/** Throws unless `repo` is `owner/name` and both parts are valid GitHub names. */
+export function checkTarget(repo, owner) {
   const [repoOwner, name, ...rest] = repo.split("/");
   if (rest.length || !ownerPattern.test(repoOwner ?? "") || !repoNamePattern.test(name ?? "")) {
     throw new Error(`Invalid --repo "${repo}"`);
