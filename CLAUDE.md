@@ -68,6 +68,7 @@ Every ticket is reviewed against these rules. Implementer and reviewers read the
 ### Engineering
 
 - TypeScript strict mode, no `any`, ESLint and Prettier enforced by hooks and CI
+- No comments in code: no `//`, `/* */` or `#` comments in source, config, workflow or script files. Names, structure and tests carry the meaning. Docs, plans and ADRs are prose and are not affected
 - Test-driven work: unit tests for rules, integration tests on a real Postgres (Testcontainers), Playwright for user journeys
 - Coverage gate: 85% on domain services, 100% on unlock, scoring and certificate rules
 - Prisma migrations reviewed, never edited after merge, run with `migrate deploy`
