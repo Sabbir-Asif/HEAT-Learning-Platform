@@ -1,5 +1,7 @@
 import { spawnSync } from "node:child_process";
-import { resolve } from "node:path";
+import { chmodSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { tempDir } from "./repo.mjs";
 
 export const hookBin = resolve(import.meta.dirname, "../../bin/hook.mjs");
 
@@ -26,3 +28,13 @@ export function runBin(name, input, { env = {}, bin = hookBin, raw } = {}) {
 }
 
 export const decisionOf = (result) => result.json?.hookSpecificOutput?.permissionDecision ?? null;
+
+export function fakeBin(name, body) {
+  const dir = tempDir("fakebin");
+  const script = join(dir, name);
+  writeFileSync(script, `#!/usr/bin/env node\n${body}\n`);
+  chmodSync(script, 0o755);
+  return dir;
+}
+
+export const withPath = (dir) => ({ PATH: `${dir}:${process.env.PATH}` });

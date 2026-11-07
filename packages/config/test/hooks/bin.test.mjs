@@ -1,7 +1,8 @@
 import { copyFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import { decisionOf, hookBin, runBin } from "../fixtures/hook.mjs";
+import { decisionOf, fakeBin, hookBin, runBin, withPath } from "../fixtures/hook.mjs";
+import { updateState } from "../../src/hooks/state.mjs";
 import { addWorktree, cleanupAll, makeRepo, tempDir, write } from "../fixtures/repo.mjs";
 
 afterAll(cleanupAll);
@@ -79,6 +80,41 @@ describe("pr-gate as a child process", () => {
 
   test("allows other gh commands", () => {
     expect(runBin("pr-gate", bash("gh pr view 3", ticket))).toMatchObject({ code: 0, stdout: "" });
+  });
+});
+
+describe("stop-check as a child process", () => {
+  const stateDir = () => ({ HEAT_HOOKS_STATE_DIR: tempDir("state") });
+
+  function seeded(env) {
+    updateState("s1", { worktree: ticket, typedDirty: true, blocks: 0 }, env);
+    write(ticket, "packages/config/src/stop-fixture.ts");
+  }
+
+  test("blocks with the typecheck errors", () => {
+    const state = stateDir();
+    seeded(state);
+    const pnpm = fakeBin("pnpm", 'console.log("src/x.ts: error TS2322"); process.exit(1);');
+    const result = runBin(
+      "stop-check",
+      { session_id: "s1" },
+      { env: { ...state, ...withPath(pnpm) } },
+    );
+    expect(result.code).toBe(0);
+    expect(result.json.decision).toBe("block");
+    expect(result.json.reason).toContain("error TS2322");
+  });
+
+  test("does not block when stop_hook_active is set", () => {
+    const state = stateDir();
+    seeded(state);
+    const pnpm = fakeBin("pnpm", "process.exit(1);");
+    const result = runBin(
+      "stop-check",
+      { session_id: "s1", stop_hook_active: true },
+      { env: { ...state, ...withPath(pnpm) } },
+    );
+    expect(result).toMatchObject({ code: 0, stdout: "" });
   });
 });
 
