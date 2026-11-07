@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { ApiError } from "../../src/errors";
 
-// `server-only` throws outside a Server Component build; here it is a no-op.
 vi.mock("server-only", () => ({}));
 const incoming = vi.fn<() => Headers>();
 vi.mock("next/headers", () => ({ headers: async () => incoming() }));

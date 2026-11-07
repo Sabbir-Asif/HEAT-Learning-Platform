@@ -5,16 +5,13 @@ export interface ApiRequest {
   init: RequestInit;
 }
 
-/** Runs before every request, in registration order, and returns the request to send (CSRF header, E3-7). */
 export type RequestInterceptor = (request: ApiRequest) => ApiRequest | Promise<ApiRequest>;
 
-/** Called on a 401. Resolve `true` after refreshing the session to retry the request once (E3-2). */
 export type UnauthorizedHandler = (error: ApiError) => boolean | Promise<boolean>;
 
 const interceptors: RequestInterceptor[] = [];
 let unauthorizedHandler: UnauthorizedHandler | undefined;
 
-/** Returns a function that removes the interceptor again. */
 export function registerRequestInterceptor(interceptor: RequestInterceptor): () => void {
   interceptors.push(interceptor);
   return () => {
@@ -23,7 +20,6 @@ export function registerRequestInterceptor(interceptor: RequestInterceptor): () 
   };
 }
 
-/** One handler at most; pass `undefined` to remove it. */
 export function setUnauthorizedHandler(handler: UnauthorizedHandler | undefined): void {
   unauthorizedHandler = handler;
 }

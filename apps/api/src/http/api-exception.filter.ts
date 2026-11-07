@@ -5,7 +5,6 @@ import { ZodValidationException } from "nestjs-zod";
 import { z } from "zod";
 import type { ErrorCode, ErrorResponse, FieldError } from "@heat/contracts";
 
-/** The parts of the Express request and response the filter uses. */
 interface RequestLike {
   headers: Record<string, string | string[] | undefined>;
 }
@@ -14,10 +13,6 @@ interface ResponseLike {
   status(code: number): { json(body: unknown): unknown };
 }
 
-/**
- * Fixed text per code. The exception's own message is never sent: it can carry names, e-mail
- * addresses or internal hosts. Clients show their own translated text for the code.
- */
 const messages: Record<ErrorCode, string> = {
   BAD_REQUEST: "The request could not be processed.",
   FORBIDDEN: "You are not allowed to do this.",
@@ -66,7 +61,6 @@ function fieldErrors(error: unknown): FieldError[] {
   }));
 }
 
-/** Errors thrown by Express middleware (body-parser) carry a numeric `status` instead of being HttpExceptions. */
 function middlewareStatus(exception: unknown): number | undefined {
   if (typeof exception !== "object" || exception === null) return undefined;
   const status = (exception as { status?: unknown }).status;
@@ -89,7 +83,6 @@ function classify(exception: unknown): Classified {
   return { status, code: codeForStatus(status) };
 }
 
-/** Turns every failure into the `@heat/contracts` error envelope. */
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(ApiExceptionFilter.name);
@@ -102,7 +95,6 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const { status, code, fields } = classify(exception);
 
     if (status >= 500) {
-      // Name and request id only: the message and stack can hold personal data.
       const name = exception instanceof Error ? exception.name : typeof exception;
       this.logger.error(`${name} (request ${requestId})`);
     }

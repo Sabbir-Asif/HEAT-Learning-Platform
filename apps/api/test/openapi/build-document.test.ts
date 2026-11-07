@@ -35,7 +35,6 @@ describe("buildOpenApiDocument", () => {
       required: ["status"],
       properties: { status: { type: "string", enum: ["ok"] } },
     });
-    // The literal in the spec accepts exactly what the contracts schema accepts.
     expect(healthResponseSchema.safeParse({ status: "ok" }).success).toBe(true);
     expect(healthResponseSchema.safeParse({ status: "down" }).success).toBe(false);
   });

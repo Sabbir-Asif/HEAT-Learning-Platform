@@ -10,7 +10,6 @@ function sortKeys(value: unknown): unknown {
   return value;
 }
 
-/** Stable JSON: object keys sorted at every depth, array order kept, two spaces, one final newline. */
 export function serializeDocument(document: unknown): string {
   return `${JSON.stringify(sortKeys(document), null, 2)}\n`;
 }

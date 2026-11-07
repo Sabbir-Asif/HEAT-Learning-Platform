@@ -1,7 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { clientErrorCodes, errorCodes, errorResponseSchema } from "../src/index";
 
-// Error codes are public identifiers: this list may grow, but a code must never be removed or renamed.
 const publishedCodes = [
   "BAD_REQUEST",
   "FORBIDDEN",

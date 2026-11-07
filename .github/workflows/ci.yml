@@ -82,9 +82,6 @@ jobs:
           path: packages/ui/storybook-static
           retention-days: 7
 
-  # Regenerates apps/api/openapi.json and the @heat/api-client output, and fails when either differs
-  # from what is committed, so an API change cannot merge with a stale client. Untracked files count
-  # too. Add it to branch-protection.json to make it required.
   api-client-drift:
     name: api-client-drift
     runs-on: ubuntu-24.04
@@ -94,7 +91,6 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
-      # Builds contracts and the API, emits the spec, runs orval. --force skips Turborepo's cache.
       - run: pnpm generate --force
       - name: Fail when the generated files changed
         run: |

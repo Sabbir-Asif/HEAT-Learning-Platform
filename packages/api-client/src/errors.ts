@@ -11,11 +11,6 @@ export interface ApiErrorInit {
   retryAfterSeconds?: number;
 }
 
-/**
- * Every failed API call ends as this error, from the browser mutator and the server fetcher alike.
- * `message` is the code, never text from the server: screens show their own translated message
- * for `code` (see `@heat/contracts`).
- */
 export class ApiError extends Error {
   readonly status: number;
   readonly code: ApiErrorCode;
@@ -38,17 +33,13 @@ export function isApiError(value: unknown): value is ApiError {
   return value instanceof ApiError;
 }
 
-/** The request never produced a response (offline, DNS, connection reset). */
 export const networkError = () => new ApiError({ status: 0, code: "NETWORK_ERROR" });
 
-/** The caller aborted the request. */
 export const abortedError = () => new ApiError({ status: 0, code: "REQUEST_ABORTED" });
 
-/** A response arrived but is not something the API sends. */
 export const unexpectedResponseError = (status: number) =>
   new ApiError({ status, code: "UNEXPECTED_RESPONSE" });
 
-/** Seconds from a `Retry-After` header, given as a number of seconds or an HTTP date. */
 function retryAfterSeconds(header: string | null): number | undefined {
   if (header === null) return undefined;
   if (/^\d+$/.test(header.trim())) return Number(header);
@@ -56,11 +47,6 @@ function retryAfterSeconds(header: string | null): number | undefined {
   return Number.isNaN(date) ? undefined : Math.max(0, Math.ceil((date - Date.now()) / 1000));
 }
 
-/**
- * Reads the body of a failed response. An API envelope becomes an `ApiError` with its code; anything
- * else (a proxy's HTML page, an empty body, a code this client does not know) becomes
- * `UNEXPECTED_RESPONSE` with the status kept and nothing from the body.
- */
 export async function parseErrorResponse(response: Response): Promise<ApiError> {
   let text: string;
   try {
