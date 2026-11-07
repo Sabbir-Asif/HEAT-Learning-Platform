@@ -1,0 +1,30 @@
+/* Throwaway placeholder tokens for the Storybook setup (#29). E1-2 replaces this file and keeps
+   the `.dark` class as the dark selector. */
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --primary: #1d4ed8;
+  --primary-foreground: #ffffff;
+}
+
+.dark {
+  --background: #0b1220;
+  --foreground: #e5e7eb;
+  --primary: #93c5fd;
+  --primary-foreground: #0b1220;
+}
+
+.heat-placeholder {
+  background: var(--background);
+  color: var(--foreground);
+  padding: 1rem;
+}
+
+.heat-placeholder button {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: 0;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font: inherit;
+}
