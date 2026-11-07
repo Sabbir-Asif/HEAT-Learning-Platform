@@ -67,6 +67,21 @@ pnpm test:coverage   # Vitest with V8 coverage, 85% minimum
 
 All rules live in `@heat/config`. A package opts in with one-line files (`eslint.config.mjs`, `vitest.config.mjs`, a tsconfig that extends `@heat/config/tsconfig/*`) and the root `package.json` points Prettier at the shared config. A package that holds rule logic (unlock, scoring, certificates) raises its coverage gate with `nodePreset({ threshold: 100 })`.
 
+### Storybook
+
+`@heat/ui` has a Storybook 10 workbench with the accessibility addon (axe) and the Vitest addon. Stories sit next to their component as `src/**/*.stories.tsx`; the config is in `packages/ui/.storybook/`.
+
+```sh
+pnpm --filter @heat/ui storybook                              # dev server on http://localhost:6006
+pnpm --filter @heat/ui exec playwright install chromium       # one time: the browser the story tests use
+pnpm --filter @heat/ui test:stories                           # every story rendered in Chromium and checked with axe
+pnpm --filter @heat/ui build-storybook                        # static build in packages/ui/storybook-static (ignored by git)
+```
+
+The toolbar has a theme control (light, dark: the `.dark` class on the story root and on `<html>`) and a locale control (`en`, `bn`: the `lang` attribute; `dir` stays `ltr`). A story pins both with `globals: { theme, locale }`, and each component gets one story for every combination. Sample text is written in the story, because `@heat/ui` has no i18n dependency. The temporary Bangla and Latin font is self-hosted from `@fontsource-variable/noto-sans-bengali` through `.storybook/preview.css`.
+
+An axe violation fails the story test and the output names the rule, for example `button-name`. A story that must accept a known violation sets `parameters.a11y.test` to `"todo"` with a reason. Story tests are not part of `pnpm test` or the coverage gate; they run in `test:stories` and in the `storybook` CI job.
+
 ### Continuous integration
 
 Pull requests and pushes to `main` run these checks in GitHub Actions; each is a required status check:
@@ -76,6 +91,8 @@ Pull requests and pushes to `main` run these checks in GitHub Actions; each is a
 | `lint`, `format`, `typecheck`, `test`, `build` | The matching root script through Turborepo (`test` runs coverage)    |
 | `integration`                                  | `test:integration` in any package that defines it (Testcontainers)   |
 | `audit`                                        | `pnpm audit:deps`, also weekly; fails on high or critical advisories |
+
+The `storybook` job is separate and not yet a required check: it runs the story tests with axe and builds static Storybook, and uploads it as the `storybook-static` artifact (7 days, also when the tests fail). It runs on every pull request. The owner adds it to `.github/branch-protection.json` and re-applies the protection.
 
 Dependabot runs from `.github/dependabot.yml` (npm, GitHub Actions and the dev compose images; app Dockerfiles are added with the deployment tickets). CodeQL is left out: GitHub only stores its results for a private repository with code security enabled. Add it back if the repository goes public or code security is bought. In CI, Turborepo's cache lives in `.turbo` and is restored per task, so unchanged packages replay instead of re-running.
 
