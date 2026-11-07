@@ -184,7 +184,7 @@ The four guards fail closed: malformed input, a crash or a timeout denies. The o
 
 `pnpm verify` runs lint, format check, typecheck, coverage tests and build in order and, only if all pass on a clean tree, writes the commit sha to `heat-verified` in the worktree's own git directory (never committed). The PR gate accepts a marker only when it equals `HEAD` and the tree is clean, so any later commit needs another `pnpm verify`. Stage 6 of the skill calls it.
 
-Hook state for the stop check lives in `$HEAT_HOOKS_STATE_DIR` or `heat-hooks/` under the system temp directory, outside every working tree. The plan gate allows editing the hook code and `.claude/settings.json` once the ticket's plan exists; `.github/CODEOWNERS` makes the owner read every change to them. A change to a hook takes effect in sessions started in a checkout that contains it.
+Hook state for the stop check lives in `$HEAT_HOOKS_STATE_DIR` or a private `heat-hooks-<uid>/` directory (mode 0700, owner checked, never a symlink) under the system temp directory, outside every working tree. The plan gate allows editing the hook code and `.claude/settings.json` once the ticket's plan exists; `.github/CODEOWNERS` makes the owner read every change to them. A change to a hook takes effect in sessions started in a checkout that contains it.
 
 `.env` files are also denied by `permissions.deny` for Read and Edit. `.env.example` stays readable.
 
