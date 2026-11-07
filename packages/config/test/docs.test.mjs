@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { expect, test } from "vitest";
 
 const root = resolve(import.meta.dirname, "../../..");
@@ -47,17 +47,21 @@ const anchors = (file) =>
     .map((line) => slug(line.replace(/^#+ /, "")));
 
 test("relative links and heading anchors in the instruction files resolve", () => {
-  const broken = ["CLAUDE.md", ...areaFiles, "docs/adr/README.md"].flatMap((file) => {
+  const adrFiles = readdirSync(join(root, "docs/adr"))
+    .filter((file) => file.endsWith(".md"))
+    .map((file) => `docs/adr/${file}`);
+  const broken = ["CLAUDE.md", ...areaFiles, ...adrFiles].flatMap((file) => {
     const links = [...read(file).matchAll(/\]\(([^)\s]+)\)/g)].map((match) => match[1]);
     return links
       .filter((link) => !/^[a-z]+:/.test(link))
       .filter((link) => {
         const [path, anchor] = link.split("#");
         const target = path ? resolve(root, dirname(file), path) : join(root, file);
-        if (!existsSync(target)) return true;
-        return anchor
-          ? !(target.endsWith(".md") && anchors(relative(root, target)).includes(anchor))
-          : false;
+        if (!target.startsWith(root + sep) || !existsSync(target)) return true;
+        if (!anchor) return false;
+        if (target.endsWith(".html"))
+          return !new RegExp(`\\sid="${anchor}"`).test(read(relative(root, target)));
+        return !(target.endsWith(".md") && anchors(relative(root, target)).includes(anchor));
       })
       .map((link) => `${file}: ${link}`);
   });
