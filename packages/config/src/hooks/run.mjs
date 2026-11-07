@@ -65,4 +65,4 @@ export async function runHook(name, raw, registry = specs) {
   }
 }
 
-export const hookNames = () => Object.keys(specs);
+export const hookSpecs = specs;
