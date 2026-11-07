@@ -13,6 +13,7 @@ const areas = [
   "packages/ui",
   "packages/db",
   "packages/contracts",
+  "packages/api-client",
 ];
 const areaFiles = areas.map((area) => `${area}/CLAUDE.md`);
 const lines = (text) => text.split("\n");

@@ -64,7 +64,7 @@ Each task: failing test first, see it fail for the right reason, least code, tic
 - [x] **Task 7: Orval config and generated client.** Add dependencies (`orval`, `msw`, `@faker-js/faker`, `@tanstack/react-query`, testing library), `orval.config.ts`, the `generate` scripts, `turbo.json` tasks, lint/Prettier/coverage exclusions, first generation of `openapi.json` and `src/generated`. Tests: hook against the generated MSW handler returns `{ status: "ok" }`; type assertions in both frontends. Commit `feat(api-client): generate hooks, Zod schemas and MSW mocks with orval (#28)`.
 - [x] **Task 8: Server fetcher.** Tests as in the table. Add `src/server/server-fetch.ts`, `index.ts`, second orval output, `exports` subpath, `next` peer and `server-only`. Commit `feat(api-client): add the server-only fetcher for Server Components (#28)`.
 - [x] **Task 9: CI drift job.** Add `api-client-drift` to `ci.yml` (SHA-pinned actions only), not required. Capture the deliberate-drift run (throwaway API change, no regeneration, failure names the files, then undo). Commit `ci: fail when the generated API client is out of date (#28)`.
-- [ ] **Task 10: Docs.** `packages/api-client/CLAUDE.md`, root area row, `docs.test.mjs` area list, README (layout line, port 4000 vs the ticket's 3000, generate commands, drift job, `API_INTERNAL_URL`). Commit `docs: describe the generated API client and the drift check (#28)`.
+- [x] **Task 10: Docs.** `packages/api-client/CLAUDE.md`, root area row, `docs.test.mjs` area list, README (layout line, port 4000 vs the ticket's 3000, generate commands, drift job, `API_INTERNAL_URL`). Commit `docs: describe the generated API client and the drift check (#28)`.
 
 ## Verification
 

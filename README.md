@@ -12,7 +12,7 @@ apps/
   worker/             Same codebase as the API, no HTTP listener
 packages/
   contracts/  Zod schemas and shared types        db/       Prisma (added later)
-  api-client/ Generated API client (added later)  ui/       Shared components and tokens
+  api-client/ Generated API client and fetchers   ui/       Shared components and tokens
   i18n/       Message catalogs
   config/     tsconfig, ESLint, Prettier and Vitest presets; repository scripts (audit:deps, github:setup, ticket)
 ```
@@ -82,6 +82,33 @@ The toolbar has a theme control (light, dark: the `.dark` class on the story roo
 
 An axe violation fails the story test and the output names the rule, for example `button-name`. A story that must accept a known violation sets `parameters.a11y.test` to `"todo"` with a reason. Story tests are not part of `pnpm test` or the coverage gate; they run in `test:stories` and in the `storybook` CI job.
 
+### API client
+
+The API describes itself, and the browser and Server Components call it through code generated from that description (ADR 0015). Nothing is written by hand between the controllers and the hooks.
+
+```sh
+pnpm generate                      # build contracts and the API, emit the spec, run orval
+pnpm --filter api openapi          # only the spec, after `pnpm --filter api build`
+pnpm --filter @heat/api-client generate   # only orval, from the committed spec
+```
+
+1. Controllers use `nestjs-zod` DTOs built from `@heat/contracts` schemas and `@nestjs/swagger` decorators. `apps/api/src/openapi/` creates the application in preview mode (the module graph, no provider instantiated), so the spec needs no database, Redis or server. The output has sorted keys and no timestamp, path or environment value.
+2. `apps/api/openapi.json` is committed, so an API change shows in the diff.
+3. Orval 8 turns it into `packages/api-client/src/generated/`: TanStack Query hooks and MSW handlers (`client/`), plain typed functions for Server Components (`server/`) and Zod schemas (`zod/`). The generated files are committed, skipped by ESLint, Prettier and the coverage gate, and still type-checked.
+
+| Import                     | For                                                                                     |
+| -------------------------- | --------------------------------------------------------------------------------------- |
+| `@heat/api-client`         | Hooks, model types, `ApiError`, `registerRequestInterceptor`, `setUnauthorizedHandler`  |
+| `@heat/api-client/server`  | `serverFetch` and the server functions; `server-only`, a Client Component cannot use it |
+| `@heat/api-client/mocks`   | MSW handlers and response factories for tests and Storybook                             |
+| `@heat/api-client/schemas` | Generated Zod schemas, for parsing responses (forms use `@heat/contracts`)              |
+
+Errors have one shape: `{ "error": { "code", "message", "requestId", "fields": [{ "path", "code" }] } }`, with `code` from the closed list in `@heat/contracts`. A global filter in the API produces it with fixed message text. Both the browser mutator and the server fetcher throw an `ApiError` carrying the status, code, field paths, request id and `Retry-After`; when no envelope arrives (an Nginx error page, a network failure, an abort) the code is `UNEXPECTED_RESPONSE`, `NETWORK_ERROR` or `REQUEST_ABORTED`.
+
+The server fetcher reads `API_INTERNAL_URL`, the API's address on the internal network (`http://api:4000` in Docker, `http://localhost:4000` locally; the API listens on 4000, not the 3000 written in the first design text). It throws a configuration error when the variable is missing and has no fallback. It forwards only the incoming `Cookie` header, does not follow redirects and does not cache unless asked. Pass `forwardCookies: false` inside `'use cache'` functions.
+
+The CSRF header and the 401 refresh are not part of this package yet. They register through `registerRequestInterceptor` and `setUnauthorizedHandler` when their tickets land.
+
 ### Continuous integration
 
 Pull requests and pushes to `main` run these checks in GitHub Actions; each is a required status check:
@@ -93,6 +120,8 @@ Pull requests and pushes to `main` run these checks in GitHub Actions; each is a
 | `audit`                                        | `pnpm audit:deps`, also weekly; fails on high or critical advisories |
 
 The `storybook` job is separate and not yet a required check: it runs the story tests with axe and builds static Storybook, and uploads it as the `storybook-static` artifact (7 days, also when the tests fail). It runs on every pull request. The owner adds it to `.github/branch-protection.json` and re-applies the protection.
+
+The `api-client-drift` job is separate and not yet a required check either. It builds contracts and the API, regenerates `apps/api/openapi.json` and `packages/api-client/src/generated/`, and fails when any file differs from what is committed (modified, deleted or new), listing the files. Run `pnpm generate` and commit the result to fix it.
 
 Dependabot runs from `.github/dependabot.yml` (npm, GitHub Actions and the dev compose images; app Dockerfiles are added with the deployment tickets). CodeQL is left out: GitHub only stores its results for a private repository with code security enabled. Add it back if the repository goes public or code security is bought. In CI, Turborepo's cache lives in `.turbo` and is restored per task, so unchanged packages replay instead of re-running.
 

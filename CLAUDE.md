@@ -4,15 +4,16 @@ Learning platform for the HEAT gender-safety training at the University of Dhaka
 
 ## Where things are
 
-| Area                 | Path                                     | Rules                                         |
-| -------------------- | ---------------------------------------- | --------------------------------------------- |
-| Public site, learner | `apps/frontend-public`                   | [CLAUDE.md](apps/frontend-public/CLAUDE.md)   |
-| Admin console        | `apps/frontend-internal`                 | [CLAUDE.md](apps/frontend-internal/CLAUDE.md) |
-| HTTP API             | `apps/api`                               | [CLAUDE.md](apps/api/CLAUDE.md)               |
-| Background worker    | `apps/worker`                            | [CLAUDE.md](apps/worker/CLAUDE.md)            |
-| Shared UI            | `packages/ui` (`@heat/ui`)               | [CLAUDE.md](packages/ui/CLAUDE.md)            |
-| Database             | `packages/db` (`@heat/db`)               | [CLAUDE.md](packages/db/CLAUDE.md)            |
-| Contracts            | `packages/contracts` (`@heat/contracts`) | [CLAUDE.md](packages/contracts/CLAUDE.md)     |
+| Area                 | Path                                       | Rules                                         |
+| -------------------- | ------------------------------------------ | --------------------------------------------- |
+| Public site, learner | `apps/frontend-public`                     | [CLAUDE.md](apps/frontend-public/CLAUDE.md)   |
+| Admin console        | `apps/frontend-internal`                   | [CLAUDE.md](apps/frontend-internal/CLAUDE.md) |
+| HTTP API             | `apps/api`                                 | [CLAUDE.md](apps/api/CLAUDE.md)               |
+| Background worker    | `apps/worker`                              | [CLAUDE.md](apps/worker/CLAUDE.md)            |
+| Shared UI            | `packages/ui` (`@heat/ui`)                 | [CLAUDE.md](packages/ui/CLAUDE.md)            |
+| Database             | `packages/db` (`@heat/db`)                 | [CLAUDE.md](packages/db/CLAUDE.md)            |
+| Contracts            | `packages/contracts` (`@heat/contracts`)   | [CLAUDE.md](packages/contracts/CLAUDE.md)     |
+| API client           | `packages/api-client` (`@heat/api-client`) | [CLAUDE.md](packages/api-client/CLAUDE.md)    |
 
 - Decisions: [docs/adr/](docs/adr/), one record per decision. ADR changes always go through the owner.
 - Plan: [docs/plan/heat-lms-project-plan.html](docs/plan/heat-lms-project-plan.html). Frontend design: [docs/superpowers/specs/](docs/superpowers/specs/).
