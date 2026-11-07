@@ -120,6 +120,43 @@ function firstEnvPath(paths) {
 }
 
 const runners = new Set(["pnpm", "pnpx", "npx", "npm", "yarn", "bunx", "bun", "corepack"]);
+const configReads = ["--list", "-l", "--name-only"];
+const configWrites = new Set([
+  "--add",
+  "--replace-all",
+  "--unset",
+  "--unset-all",
+  "--rename-section",
+  "--remove-section",
+]);
+const configValueFlags = new Set(["--file", "-f", "--blob", "--type", "--default", "--comment"]);
+const configKeys = new Set([
+  "core.hookspath",
+  "core.fsmonitor",
+  "core.sshcommand",
+  "core.editor",
+  "core.pager",
+  "core.askpass",
+  "core.gitproxy",
+  "sequence.editor",
+  "credential.helper",
+  "diff.external",
+  "gpg.program",
+  "include.path",
+  "uploadpack.packobjectshook",
+]);
+const configKeyPatterns = [
+  /^alias\./,
+  /^includeif\./,
+  /^filter\./,
+  /^credential\..*\.helper$/,
+  /^diff\..*\.(?:textconv|command)$/,
+  /^merge\..*\.driver$/,
+  /^gpg\..*\.program$/,
+  /^url\..*\.(?:push)?insteadof$/,
+];
+const configDenial =
+  "git config of keys that run commands or redirect remotes (core.hooksPath, core.fsmonitor, core.sshCommand, core.editor, alias.*, filter.*, credential.helper, url.*.insteadOf and similar) is blocked: it would let a later git command run arbitrary code outside the guards.";
 const forceLong = /^--(?:for(?:c(?:e(?:-with-lease|-if-includes)?)?)?|mi\w*)(?:=|$)/;
 const forceShort = /^-[a-zA-Z]*f[a-zA-Z]*$/;
 
@@ -127,6 +164,18 @@ const forceDenial =
   "Force pushes are blocked (hard rule: never force-push). Push normally; if history has to change, ask the owner.";
 const resetDenial =
   "prisma migrate reset and prisma db push --force-reset are blocked (hard rule). They drop the database; ask the owner if a reset is really needed.";
+
+function isConfigWrite(command) {
+  const git = gitInvocation(command);
+  if (git?.sub !== "config") return false;
+  if (git.args.some((arg) => configReads.includes(arg) || arg.startsWith("--get"))) return false;
+  const positional = positionalArguments(git.args, configValueFlags);
+  const key = (positional[0] ?? "").toLowerCase();
+  if (!configKeys.has(key) && !configKeyPatterns.some((pattern) => pattern.test(key))) {
+    return false;
+  }
+  return positional.length > 1 || git.args.some((arg) => configWrites.has(arg));
+}
 
 function isForcePush(command) {
   const git = gitInvocation(command);
@@ -167,6 +216,7 @@ function checkBash(input) {
   const envPath = envAccess(commands);
   if (envPath) return { deny: envDenial(envPath) };
   if (commands.some(isForcePush)) return { deny: forceDenial };
+  if (commands.some(isConfigWrite)) return { deny: configDenial };
   if (commands.some(isMigrateReset)) return { deny: resetDenial };
   for (const command of commands) {
     for (const target of [...command.writes, ...writeTargets(command)]) {

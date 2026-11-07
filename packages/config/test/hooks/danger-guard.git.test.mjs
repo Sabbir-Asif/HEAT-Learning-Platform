@@ -69,6 +69,58 @@ describe("local settings", () => {
   });
 });
 
+describe("git config keys that run commands", () => {
+  test.each([
+    "git config core.hooksPath .githooks",
+    "git config --local core.hooksPath /tmp/hooks",
+    "git config --worktree core.hooksPath /tmp/hooks",
+    "git config --global core.hooksPath /tmp/hooks",
+    "git config core.hookspath x",
+    "git config core.fsmonitor 'sh -c evil'",
+    "git config core.sshCommand 'ssh -o ProxyCommand=evil'",
+    "git config core.editor evil",
+    "git config core.pager evil",
+    "git config alias.p 'push --force'",
+    "git config --add alias.x '!evil'",
+    "git config --replace-all core.hooksPath x",
+    "git config --unset core.hooksPath",
+    "git config --unset-all alias.p",
+    "git config credential.helper '!evil'",
+    "git config filter.lfs.smudge evil",
+    "git config diff.external evil",
+    "git config diff.x.textconv evil",
+    "git config include.path ../evil",
+    "git config includeIf.gitdir:/.path ../evil",
+    "git config url.git@evil:.insteadOf https://github.com/",
+    "git config --file .git/config core.hooksPath x",
+    "git -C ../other config core.hooksPath x",
+    "cd .. && git config alias.p x",
+    "git config -- core.hooksPath x",
+  ])("denies %s", (command) => {
+    expect(bash(command).deny, command).toMatch(/git config/);
+  });
+
+  test.each([
+    "git config user.name tester",
+    "git config user.email tester@example.com",
+    "git config --get core.hooksPath",
+    "git config core.hooksPath",
+    "git config alias.p",
+    "git config --list",
+    "git config -l",
+    "git config --get-regexp alias",
+    "git config --get-all remote.origin.url",
+    "git config --local --get core.editor",
+    "git config commit.gpgsign false",
+    "git config --unset user.name",
+    "git config pull.rebase true",
+    "git config --global init.defaultBranch main",
+    "git -c core.hooksPath=/dev/null commit -m x",
+  ])("allows %s", (command) => {
+    expect(bash(command), command).toEqual({});
+  });
+});
+
 describe("shell writes", () => {
   test.each([
     "echo x > .git/hooks/pre-commit",
