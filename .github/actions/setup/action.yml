@@ -1,0 +1,21 @@
+name: Set up Node and pnpm
+description: Node from .nvmrc, pnpm through Corepack with its store cached, then a frozen-lockfile install.
+
+inputs:
+  install:
+    description: Set to "false" to skip installing dependencies.
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    # Corepack reads the pnpm version from package.json, so there is one place to bump it.
+    - run: corepack enable
+      shell: bash
+    - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version-file: .nvmrc
+        cache: ${{ inputs.install == 'true' && 'pnpm' || '' }}
+    - if: inputs.install == 'true'
+      run: pnpm install --frozen-lockfile
+      shell: bash

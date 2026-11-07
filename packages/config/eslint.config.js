@@ -1,1 +1,4 @@
-export { default } from "./eslint/base.js";
+import globals from "globals";
+import base from "./eslint/base.js";
+
+export default [...base, { files: ["bin/**"], languageOptions: { globals: globals.node } }];

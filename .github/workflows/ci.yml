@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Pull requests use the pull_request event, so runs from forks get a read-only token and no secrets.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}-${{ github.event_name == 'push' && github.sha || 'pr' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # One job per task so each is its own required status check named after the task.
+  check:
+    name: ${{ matrix.task }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { task: lint, command: pnpm lint }
+          - { task: format, command: pnpm format:check }
+          - { task: typecheck, command: pnpm typecheck }
+          - { task: test, command: pnpm test:coverage }
+          - { task: build, command: pnpm build }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      # Turborepo's local cache, kept per task. Unchanged packages replay from it instead of re-running.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo
+          key: turbo-${{ matrix.task }}-${{ github.sha }}
+          restore-keys: turbo-${{ matrix.task }}-
+      - run: ${{ matrix.command }}
+        env:
+          TURBO_CACHE_DIR: .turbo
+
+  # Runs the Testcontainers suites (E2-5). Nothing defines test:integration yet, so it passes as a no-op.
+  integration:
+    name: integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: pnpm -r --if-present run test:integration
