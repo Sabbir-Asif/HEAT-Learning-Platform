@@ -14,10 +14,11 @@
     "build": "nest build",
     "start": "node dist/main.js",
     "lint": "eslint .",
-    "format:check": "prettier --check . --ignore-path ../../.gitignore",
+    "format:check": "prettier --check . --ignore-path ../../.gitignore --ignore-path .prettierignore",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "openapi": "node dist/openapi/emit.js"
   },
   "dependencies": {
     "@heat/contracts": "workspace:*",
