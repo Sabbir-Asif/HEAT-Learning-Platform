@@ -69,13 +69,19 @@ describe("prisma migrate reset", () => {
     "cd packages/db && pnpm exec prisma migrate  reset -f",
     "echo ok; prisma migrate reset",
     "sh -c 'prisma migrate reset'",
+    "pnpm prisma db push --force-reset",
+    "pnpm exec prisma db push --force-reset --accept-data-loss",
+    "npx prisma db push --skip-generate --force-reset",
+    "prisma db push --force-reset",
   ])("blocks %s", (command) => {
-    expect(bash(command).deny).toMatch(/migrate reset/);
+    expect(bash(command).deny).toMatch(/migrate reset|force-reset/);
   });
 
   test.each([
     "prisma migrate deploy",
     "prisma migrate dev --name add_users",
+    "pnpm exec prisma db push",
+    "echo prisma db push --force-reset",
     "pnpm exec prisma generate",
     "pnpm dev:reset",
     "pnpm dev:up",

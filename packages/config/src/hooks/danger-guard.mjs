@@ -106,7 +106,7 @@ const forceShort = /^-[a-zA-Z]*f[a-zA-Z]*$/;
 const forceDenial =
   "Force pushes are blocked (hard rule: never force-push). Push normally; if history has to change, ask the owner.";
 const resetDenial =
-  "prisma migrate reset is blocked (hard rule). It drops the database; ask the owner if a reset is really needed.";
+  "prisma migrate reset and prisma db push --force-reset are blocked (hard rule). They drop the database; ask the owner if a reset is really needed.";
 
 function isForcePush(command) {
   const git = gitInvocation(command);
@@ -129,7 +129,15 @@ function isMigrateReset(command) {
     after = rest.slice(at + 1);
   } else return false;
   const migrate = after.indexOf("migrate");
-  return migrate >= 0 && after.slice(migrate + 1).find((word) => !word.startsWith("-")) === "reset";
+  if (migrate >= 0 && after.slice(migrate + 1).find((word) => !word.startsWith("-")) === "reset") {
+    return true;
+  }
+  const push = after.indexOf("db");
+  return (
+    push >= 0 &&
+    after.slice(push + 1).find((word) => !word.startsWith("-")) === "push" &&
+    after.includes("--force-reset")
+  );
 }
 
 function checkBash(input) {
