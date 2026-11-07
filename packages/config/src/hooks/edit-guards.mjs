@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { join, relative } from "node:path";
-import { branchOf, repoOf, ticketNumber } from "./git.mjs";
+import { branchOf, git, repoOf, ticketNumber } from "./git.mjs";
 import { resolveReal } from "./paths.mjs";
 
 const protectedBranches = new Set(["main", "master", ""]);
@@ -19,10 +19,21 @@ export function locate(target, cwd) {
   return { real, top, relative: relative(top, real), branch: branchOf(top) };
 }
 
+function rebaseInProgress(top) {
+  const gitDir = git(top, ["rev-parse", "--absolute-git-dir"]);
+  return (
+    Boolean(gitDir) &&
+    ["rebase-merge", "rebase-apply"].some((name) => existsSync(join(gitDir, name)))
+  );
+}
+
 export function branchDenial(location) {
   if (!protectedBranches.has(location.branch)) return null;
-  const name = location.branch ? `"${location.branch}"` : "a detached HEAD";
-  return `Edits are blocked: ${location.real} is in a checkout on ${name}. Create the ticket branch and worktree first (stage 3 of /implement-issue) and work there.`;
+  if (location.branch === "") {
+    if (rebaseInProgress(location.top)) return null;
+    return `Edits are blocked: ${location.real} is in a checkout with a detached HEAD, not on a branch. Check out the ticket branch (git switch <branch>) or create it in its own worktree (stage 3 of /implement-issue).`;
+  }
+  return `Edits are blocked: ${location.real} is in a checkout on "${location.branch}". Create the ticket branch and worktree first (stage 3 of /implement-issue) and work there.`;
 }
 
 export function planPath(location, number) {
