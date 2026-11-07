@@ -9,6 +9,9 @@ interface RequestLike {
   headers: Record<string, string | string[] | undefined>;
 }
 interface ResponseLike {
+  headersSent?: boolean;
+  writableEnded?: boolean;
+  end(): unknown;
   setHeader(name: string, value: string): unknown;
   status(code: number): { json(body: unknown): unknown };
 }
@@ -94,8 +97,15 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const requestId = resolveRequestId(request.headers["x-request-id"]);
     const { status, code, fields } = classify(exception);
 
+    const name = exception instanceof Error ? exception.name : typeof exception;
+
+    if (response.headersSent) {
+      this.logger.error(`${name} (request ${requestId})`);
+      if (!response.writableEnded) response.end();
+      return;
+    }
+
     if (status >= 500) {
-      const name = exception instanceof Error ? exception.name : typeof exception;
       this.logger.error(`${name} (request ${requestId})`);
     }
 

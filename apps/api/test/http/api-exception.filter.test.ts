@@ -12,7 +12,8 @@ import { errorResponseSchema } from "@heat/contracts";
 import type { ErrorResponse } from "@heat/contracts";
 import type { ArgumentsHost } from "@nestjs/common";
 import { ZodValidationException } from "nestjs-zod";
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { Logger } from "@nestjs/common";
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import { configureApp } from "../../src/app.setup";
 import { ApiExceptionFilter } from "../../src/http/api-exception.filter";
 import { HttpApiModule } from "../../src/http/http.module";
@@ -224,5 +225,43 @@ describe("the filter on its own", () => {
     const sent = run(new ZodValidationException("not a zod error"));
     expect(sent.status).toBe(400);
     expect(sent.body?.error.fields).toEqual([]);
+  });
+
+  describe("when the response has already started", () => {
+    function runStarted(options: { writableEnded: boolean }) {
+      const calls: string[] = [];
+      const host = {
+        switchToHttp: () => ({
+          getRequest: () => ({ headers: { "x-request-id": "req-started" } }),
+          getResponse: () => ({
+            headersSent: true,
+            writableEnded: options.writableEnded,
+            setHeader: () => calls.push("setHeader"),
+            status: () => {
+              calls.push("status");
+              return { json: () => calls.push("json") };
+            },
+            end: () => calls.push("end"),
+          }),
+        }),
+      } as unknown as ArgumentsHost;
+      const error = vi.spyOn(Logger.prototype, "error").mockImplementation(() => undefined);
+      new ApiExceptionFilter().catch(new NotFoundException("hidden"), host);
+      const logged = error.mock.calls.map(([message]) => String(message));
+      error.mockRestore();
+      return { calls, logged };
+    }
+
+    test("does not write headers or a body, ends the response and logs the name and request id", () => {
+      const { calls, logged } = runStarted({ writableEnded: false });
+      expect(calls).toEqual(["end"]);
+      expect(logged).toEqual(["NotFoundException (request req-started)"]);
+    });
+
+    test("does nothing more when the response has already ended", () => {
+      const { calls, logged } = runStarted({ writableEnded: true });
+      expect(calls).toEqual([]);
+      expect(logged).toEqual(["NotFoundException (request req-started)"]);
+    });
   });
 });
