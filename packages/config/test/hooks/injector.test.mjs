@@ -1,3 +1,5 @@
+import { symlinkSync } from "node:fs";
+import { join } from "node:path";
 import { afterAll, describe, expect, test } from "vitest";
 import { extractIssueNumbers, ticketInjector } from "../../src/hooks/injector.mjs";
 import { updateState, readState } from "../../src/hooks/state.mjs";
@@ -268,6 +270,19 @@ describe("never blocking the prompt", () => {
 });
 
 describe("the stop-check counter", () => {
+  test("an unusable state directory does not stop the ticket text from being injected", () => {
+    const real = tempDir("real");
+    const link = join(tempDir("links"), "state");
+    symlinkSync(real, link);
+    const { gh } = fakeGh({ 25: { issue: issue(), comments: [] } });
+    const result = ticketInjector(prompt("#25"), {
+      gh,
+      nonce: "n",
+      env: { HEAT_HOOKS_STATE_DIR: link },
+    });
+    expect(result.context).toContain("Build the hooks.");
+  });
+
   test("a new prompt resets it", () => {
     const env = { HEAT_HOOKS_STATE_DIR: tempDir("state") };
     updateState("s1", { blocks: 3 }, env);

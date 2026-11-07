@@ -83,11 +83,19 @@ function describe(issue, comments) {
   return lines.join("\n");
 }
 
+function resetStopCounter(sessionId, env) {
+  try {
+    if (readState(sessionId, env).blocks > 0) updateState(sessionId, { blocks: 0 }, env);
+  } catch (error) {
+    return error;
+  }
+  return null;
+}
+
 export function ticketInjector(input, deps = {}) {
   const { gh = defaultGh, now = Date.now, env = process.env, repo = defaultRepo } = deps;
   const nonce = deps.nonce ?? randomBytes(4).toString("hex");
-  if (readState(input.session_id, env).blocks > 0)
-    updateState(input.session_id, { blocks: 0 }, env);
+  resetStopCounter(input.session_id, env);
   const numbers = extractIssueNumbers(input.prompt);
   if (!numbers.length) return {};
 
