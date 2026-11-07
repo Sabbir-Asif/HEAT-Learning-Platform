@@ -19,7 +19,7 @@
 
 ## Tasks
 
-- [ ] **Task 1: Rewrite the `config/` entry.** Remove `config/   tsconfig presets` from the `i18n/` row and add the row `  config/     tsconfig, ESLint, Prettier and Vitest presets; repository scripts (audit:deps, github:setup, ticket)`. Commit `docs: describe everything packages/config holds in the README layout (#168)`.
+- [x] **Task 1: Rewrite the `config/` entry.** Remove `config/   tsconfig presets` from the `i18n/` row and add the row `  config/     tsconfig, ESLint, Prettier and Vitest presets; repository scripts (audit:deps, github:setup, ticket)`. Commit `docs: describe everything packages/config holds in the README layout (#168)`.
 
 ## Verification
 
