@@ -2,6 +2,9 @@ name: "Bug"
 description: "Something that does not work as specified"
 labels: ["type:bug", "needs-refinement"]
 body:
+  - type: markdown
+    attributes:
+      value: "Do not paste passwords, tokens or personal data (names, emails, student IDs). Redact logs and screenshots first."
   - type: textarea
     id: context
     attributes:

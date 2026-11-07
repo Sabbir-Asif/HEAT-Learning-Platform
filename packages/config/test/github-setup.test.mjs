@@ -1,9 +1,9 @@
 import { spawnSync } from "node:child_process";
-import { chmodSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, test } from "vitest";
-import { parse } from "yaml";
+import { load as parse } from "js-yaml";
 import {
   areas,
   defaultProjectTitle,
@@ -30,6 +30,9 @@ function fakeGitHub(initial = {}) {
     ...structuredClone(initial),
   };
   const calls = [];
+  // Hooks that let a test change GitHub between the script's calls.
+  const tweak = { beforeRead: undefined, regenerateIds: false };
+  let reads = 0;
   const ids = (() => {
     let next = 0;
     return () => `id${(next += 1)}`;
@@ -66,6 +69,8 @@ function fakeGitHub(initial = {}) {
     }
     if (a === "api" && args[1] === "graphql" && !input) {
       calls.push({ write: false, args });
+      reads += 1;
+      tweak.beforeRead?.(reads, state);
       const id = args.find((arg) => arg.startsWith("id=")).slice(3);
       const field = state.fields.find((f) => f.id === id);
       return read({
@@ -80,7 +85,10 @@ function fakeGitHub(initial = {}) {
       calls.push({ write: true, args, input });
       const { fieldId, singleSelectOptions } = JSON.parse(input).variables.input;
       const field = state.fields.find((f) => f.id === fieldId);
-      field.options = singleSelectOptions.map((o) => ({ ...o, id: o.id ?? ids() }));
+      field.options = singleSelectOptions.map((o) => ({
+        ...o,
+        id: tweak.regenerateIds ? ids() : (o.id ?? ids()),
+      }));
       return "";
     }
     if (a === "project" && b === "list") {
@@ -109,7 +117,7 @@ function fakeGitHub(initial = {}) {
     throw new Error(`unexpected gh call: ${args.join(" ")}`);
   };
   const writes = () => calls.filter((call) => call.write);
-  return { gh, state, calls, writes };
+  return { gh, state, calls, writes, tweak };
 }
 
 const run = (fake, extra = {}) => {
@@ -202,6 +210,21 @@ describe("setup on an existing repository", () => {
     expect(fake.state.labels[index]).toEqual(labels.find((l) => l.name === "security"));
   });
 
+  test.each([
+    ["colour", { color: "ffffff" }],
+    ["description", { description: "something else" }],
+  ])("updates a label in place when only the %s differs", (_, drift) => {
+    const fake = complete();
+    const index = fake.state.labels.findIndex((l) => l.name === "security");
+    fake.state.labels[index] = { ...fake.state.labels[index], ...drift };
+    const other = fake.state.labels.length;
+    const { changes, lines } = run(fake);
+    expect(changes).toBe(1);
+    expect(lines[0]).toBe("update label security");
+    expect(fake.state.labels).toHaveLength(other);
+    expect(fake.state.labels[index]).toEqual(labels.find((l) => l.name === "security"));
+  });
+
   test("treats colour case, a missing description and label name case as the same label", () => {
     const fake = complete();
     fake.state.labels = fake.state.labels.map((l) =>
@@ -239,7 +262,7 @@ describe("setup on an existing repository", () => {
     size.options = size.options.slice(0, 2);
     const { changes, lines } = run(fake);
     expect(changes).toBe(1);
-    expect(lines[0]).toBe("add option L to field Size");
+    expect(lines).toContain("add option L to field Size");
     expect(size.options.map((o) => o.name)).toEqual(["S", "M", "L"]);
     expect(size.options.slice(0, 2).map((o) => o.id)).toEqual(idsBefore);
     const mutation = fake.writes().at(-1);
@@ -248,6 +271,81 @@ describe("setup on an existing repository", () => {
       { id: idsBefore[1], name: "M", color: "BLUE", description: "kept" },
       { name: "L", color: "GRAY", description: "" },
     ]);
+  });
+
+  test("prints the options before writing so they can be restored", () => {
+    const fake = complete();
+    const size = fake.state.fields.find((f) => f.name === "Size");
+    size.options = size.options.slice(0, 2);
+    const { lines } = run(fake);
+    const backup = lines.find((line) => line.startsWith("backup of field Size options"));
+    expect(backup).toContain(JSON.stringify(size.options.slice(0, 2).map((o) => o.id)[0]));
+    expect(lines.indexOf(backup)).toBeLessThan(lines.indexOf("add option L to field Size"));
+  });
+
+  test("writes nothing when an option was added between the field list and the first read", () => {
+    const fake = complete();
+    const size = fake.state.fields.find((f) => f.name === "Size");
+    size.options = size.options.slice(0, 2);
+    fake.tweak.beforeRead = (n) => n === 1 && size.options.push({ id: "web", name: "XL" });
+    expect(() => run(fake)).toThrow(/Size changed while reading; nothing was written/);
+    expect(fake.writes().filter((w) => w.args[1] === "graphql")).toEqual([]);
+  });
+
+  test("writes nothing when an option changed between the two reads", () => {
+    const fake = complete();
+    const size = fake.state.fields.find((f) => f.name === "Size");
+    size.options = size.options.slice(0, 2);
+    fake.tweak.beforeRead = (n) => n === 2 && size.options.push({ id: "web", name: "XL" });
+    expect(() => run(fake)).toThrow(/Size changed before the write; nothing was written/);
+    expect(fake.writes().filter((w) => w.args[1] === "graphql")).toEqual([]);
+    expect(size.options.map((o) => o.name)).toEqual(["S", "M", "XL"]);
+  });
+
+  test("fails loudly when the read-back shows the option ids were regenerated", () => {
+    const fake = complete();
+    const size = fake.state.fields.find((f) => f.name === "Size");
+    size.options = size.options.slice(0, 2);
+    fake.tweak.regenerateIds = true;
+    expect(() => run(fake)).toThrow(/Size options changed unexpectedly after the write.*Restore/);
+  });
+
+  test("fails loudly when the read-back is missing the new option", () => {
+    const fake = complete();
+    const size = fake.state.fields.find((f) => f.name === "Size");
+    size.options = size.options.slice(0, 2);
+    fake.tweak.beforeRead = (n) => {
+      if (n === 3) size.options = size.options.filter((o) => o.name !== "L");
+    };
+    expect(() => run(fake)).toThrow(/not added: \["L"\]/);
+  });
+
+  test("reports a closed project instead of creating a second one", () => {
+    const fake = fakeGitHub({
+      projects: [{ number: 4, title: defaultProjectTitle, closed: true }],
+    });
+    expect(() => run(fake)).toThrow(/is closed/);
+    expect(fake.writes().filter((w) => w.args[0] === "project")).toEqual([]);
+  });
+
+  test("lists closed projects and prefers an open one with the same title", () => {
+    const fake = fakeGitHub({
+      projects: [
+        { number: 4, title: defaultProjectTitle, closed: true },
+        { number: 11, title: defaultProjectTitle, closed: false },
+      ],
+    });
+    run(fake);
+    const list = fake.calls.find((c) => c.args[1] === "list" && c.args[0] === "project");
+    expect(list.args).toContain("--closed");
+    expect(fake.calls.find((c) => c.args[1] === "field-list").args[2]).toBe("11");
+  });
+
+  test("refuses to create a project when the list is full and may hide the real one", () => {
+    const projects = Array.from({ length: 100 }, (_, i) => ({ number: i, title: `P${i}` }));
+    const fake = fakeGitHub({ projects });
+    expect(() => run(fake)).toThrow(/100\+ projects/);
+    expect(fake.writes().filter((w) => w.args[0] === "project")).toEqual([]);
   });
 
   test("a dry run reports a missing option without reading or writing", () => {
@@ -363,16 +461,53 @@ describe("command line", () => {
     expect(() => parseCli(["--delete"])).toThrow();
   });
 
-  describe("with a stub gh on PATH (no network, no credentials)", () => {
-    // The stub logs every call and answers reads with an empty GitHub.
+  test.each([
+    "../..",
+    "a/..",
+    "a/.",
+    "a/b/c",
+    "/b",
+    "a/",
+    "-a/b",
+    "a--/b",
+    "a b/c",
+    "a/b c",
+    "a/b;x",
+  ])("rejects the repository %j before any call", (repo) => {
+    expect(() => parseCli([`--repo=${repo}`])).toThrow(/Invalid --repo/);
+    const gh = () => {
+      throw new Error("gh must not be called");
+    };
+    expect(() => setup({ gh, repo, owner, projectTitle: "P" })).toThrow(/Invalid --repo/);
+  });
+
+  test.each(["", "x y", "-x", "x-", "a/b", "../x", "x".repeat(40)])(
+    "rejects the owner %j before any call",
+    (bad) => {
+      expect(() => parseCli([`--owner=${bad}`])).toThrow(/Invalid --owner/);
+      const gh = () => {
+        throw new Error("gh must not be called");
+      };
+      expect(() => setup({ gh, repo, owner: bad, projectTitle: "P" })).toThrow(/Invalid --owner/);
+    },
+  );
+
+  test("accepts ordinary names", () => {
+    expect(
+      parseCli(["--repo", "Sabbir-Asif/HEAT-Learning-Platform.v2_x", "--owner", "a-b"]).owner,
+    ).toBe("a-b");
+  });
+
+  describe("with a stub gh as the only program on PATH (no network, no credentials)", () => {
+    // PATH holds only this directory, so a stub that cannot run fails the test instead of reaching a
+    // real gh. The stub logs every call to the file named in STUB_LOG and answers reads with an
+    // empty GitHub.
     const dir = mkdtempSync(join(tmpdir(), "gh-stub-"));
-    const log = join(dir, "calls.log");
     writeFileSync(
-      join(dir, "gh"),
-      `#!${process.execPath}
-const fs = require("node:fs");
+      join(dir, "stub.js"),
+      `const fs = require("node:fs");
 const args = process.argv.slice(2);
-fs.appendFileSync(${JSON.stringify(log)}, args.join(" ") + "\\n");
+fs.appendFileSync(process.env.STUB_LOG, args.join(" ") + "\\n");
 const [a, b] = args;
 if (a === "label") process.stdout.write("[]");
 else if (a === "api") process.stdout.write("[[]]");
@@ -380,31 +515,56 @@ else if (a === "project" && b === "list") process.stdout.write('{"projects":[]}'
 else process.exit(9);
 `,
     );
+    writeFileSync(
+      join(dir, "gh"),
+      `#!/bin/sh\nexec '${process.execPath}' '${join(dir, "stub.js")}' "$@"\n`,
+    );
     chmodSync(join(dir, "gh"), 0o755);
-    const cli = (...args) =>
-      spawnSync(process.execPath, [join(root, "packages/config/bin/github-setup.mjs"), ...args], {
-        encoding: "utf8",
-        env: { ...process.env, PATH: `${dir}:${process.env.PATH}` },
-      });
+    const cli = (...args) => {
+      const log = join(mkdtempSync(join(dir, "run-")), "calls.log");
+      const result = spawnSync(
+        process.execPath,
+        [join(root, "packages/config/bin/github-setup.mjs"), ...args],
+        {
+          encoding: "utf8",
+          env: {
+            PATH: dir,
+            STUB_LOG: log,
+            GH_TOKEN: "",
+            GH_CONFIG_DIR: dir,
+            GH_PROMPT_DISABLED: "1",
+          },
+        },
+      );
+      const calls = existsSync(log) ? readFileSync(log, "utf8").trim().split("\n") : [];
+      return { ...result, calls };
+    };
 
     test("--dry-run prints the plan and only reads", () => {
-      const result = cli("--dry-run");
+      const result = cli("--dry-run", "--repo", "example/does-not-exist");
       expect(result.status).toBe(0);
       expect(result.stdout).toContain("would create label type:feature");
       expect(result.stdout).toContain("would create project HEAT LMS");
-      const calls = readFileSync(log, "utf8").trim().split("\n");
-      expect(calls.map((call) => call.split(" ").slice(0, 2).join(" "))).toEqual([
+      expect(result.calls.map((call) => call.split(" ").slice(0, 2).join(" "))).toEqual([
         "label list",
         "api --paginate",
         "project list",
       ]);
     });
 
-    test("exits non-zero with a message when gh fails or the flags are wrong", () => {
-      const failing = cli("--repo", "owner/repo");
-      expect(failing.status).toBe(1);
-      expect(failing.stderr).toContain("github:setup failed");
-      expect(cli("--nope").status).toBe(1);
+    test("exits non-zero with a message when gh fails", () => {
+      const result = cli("--repo", "example/does-not-exist");
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("github:setup failed");
+      expect(result.calls.at(-1)).toMatch(/^project create /);
+    });
+
+    test("exits non-zero on bad flags without calling gh", () => {
+      for (const args of [["--nope"], ["--repo", "../.."], ["--owner", "x y"]]) {
+        const result = cli(...args);
+        expect(result.status).toBe(1);
+        expect(result.calls).toEqual([]);
+      }
     });
   });
 });
@@ -427,13 +587,20 @@ describe("issue forms and the pull request template", () => {
     const { name, description, body } = form(type);
     expect(name).toBeTruthy();
     expect(description).toBeTruthy();
-    const sectionLabels = body.map((item) => item.attributes.label);
+    const fields = body.filter((item) => item.type !== "markdown");
+    const sectionLabels = fields.map((item) => item.attributes.label);
     expect(required.map((pattern) => sectionLabels.filter((l) => pattern.test(l)).length)).toEqual(
       required.map(() => 1),
     );
     expect(sectionLabels).toHaveLength(required.length);
-    const ids = body.map((item) => item.id);
+    const ids = fields.map((item) => item.id);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  test("the bug form warns against pasting secrets or personal data", () => {
+    const [first] = form("bug").body;
+    expect(first.type).toBe("markdown");
+    expect(first.attributes.value).toMatch(/Do not paste .*personal data/);
   });
 
   test.each(forms)("%s form applies existing, managed labels", (type) => {

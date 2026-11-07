@@ -90,14 +90,21 @@ gh api -X PUT repos/Sabbir-Asif/HEAT-Learning-Platform/branches/main/protection 
 
 ### GitHub setup
 
-Issue forms (feature, bug, spike, chore) are in `.github/ISSUE_TEMPLATE/` and the pull request template is `.github/pull_request_template.md`. Labels, milestones and the "HEAT LMS" Project with its fields are kept in `packages/config/src/github-setup.mjs` and applied with the `gh` CLI (signed in with the `repo` and `project` scopes):
+Issue forms (feature, bug, spike, chore) are in `.github/ISSUE_TEMPLATE/` and the pull request template is `.github/pull_request_template.md`. Labels, milestones and the "HEAT LMS" Project with its fields are kept in `packages/config/src/github-setup.mjs` and applied with the `gh` CLI:
 
 ```sh
 pnpm github:setup --dry-run   # print the planned changes, make none
-pnpm github:setup                # apply them
+pnpm github:setup             # apply them
 ```
 
-It is safe to re-run. It creates what is missing, updates a label's colour and description in place, and adds missing options to a project field while keeping the existing options' ids. It never deletes or renames anything and never touches issues or project items; extra labels, milestones and options are left alone. It exits non-zero when something needs a person, such as a field of the wrong type. The Project Area options are the `area:*` labels, from one list in the script. `packages/config/test/github-setup.test.mjs` tests it against a fake `gh`, with no network or credentials.
+Run the dry run first. It reads only, but it still needs a token that can read this private repository and the Project. The owner of the Project is a user account, which GitHub's fine-grained tokens cannot reach, so use the `gh auth login` token or a classic one:
+
+| Run         | Scopes                                                                          |
+| ----------- | ------------------------------------------------------------------------------- |
+| `--dry-run` | `repo` and `read:project`                                                       |
+| apply       | `repo` and `project` (`gh auth refresh -s project` adds it to a signed-in `gh`) |
+
+It is safe to re-run. It creates what is missing, updates a label's colour and description in place, and never touches issues or project items. It does not delete or rename anything. Extra labels, milestones and options are left alone, and a closed project with the same title is reported instead of duplicated. Adding an option to an existing project field is the one risky write, because the API replaces the whole option list. The script reads the options twice and writes nothing if they changed, prints the current list first so it can be restored, passes every existing option back with its id, and reads the field again afterwards, failing if any option id or name is missing. It exits non-zero when something needs a person, such as a field of the wrong type. The Project Area options are the `area:*` labels, from one list in the script. `packages/config/test/github-setup.test.mjs` tests it against a fake `gh`, with no network or credentials.
 
 ### Conventions
 
