@@ -1,5 +1,7 @@
 import { basename } from "node:path";
+import { branchDenial, locate, planDenial } from "./edit-guards.mjs";
 import { envAccess, isEnvFile } from "./env-files.mjs";
+import { existsInBase } from "./git.mjs";
 import { gitInvocation } from "./invocation.mjs";
 import { parseShell } from "./shell.mjs";
 
@@ -7,6 +9,76 @@ const fileTools = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
 
 const envDenial = (path) =>
   `Access to environment files is denied: ${path}. They hold secrets; ask the owner for the value you need instead.`;
+
+const migrationPath = /(?:^|\/)prisma\/migrations(?:\/|$)/;
+const scratchTarget = /^(?:\$SCRATCH|\$\{SCRATCH\})(?:\/|$)/;
+const scriptOptions = new Set(["-e", "-f", "-E", "--expression", "--file"]);
+const directoryOptions = new Set(["-t", "--target-directory"]);
+
+const migrationDenial = (path) =>
+  `${path} is an applied migration (it exists on origin/main or an epic branch) and is never edited after merge. Add a new migration instead.`;
+
+function positionalArguments(args, valueOptions) {
+  const positional = [];
+  let literal = false;
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i];
+    if (!literal && arg === "--") literal = true;
+    else if (!literal && valueOptions.has(arg)) i += 1;
+    else if (arg !== "" && (literal || !arg.startsWith("-"))) positional.push(arg);
+  }
+  return positional;
+}
+
+function optionValue(args, names) {
+  for (let i = 0; i < args.length; i += 1) {
+    if (names.includes(args[i])) return args[i + 1];
+    const inline = names.find((name) => name.startsWith("--") && args[i].startsWith(`${name}=`));
+    if (inline) return args[i].slice(inline.length + 1);
+  }
+  return undefined;
+}
+
+function writeTargets(command) {
+  const [program = "", ...args] = command.words;
+  const name = basename(program);
+  if (["tee", "rm", "mv"].includes(name)) return positionalArguments(args, new Set());
+  if (name === "cp" || name === "install") {
+    const targetDirectory = optionValue(args, ["-t", "--target-directory"]);
+    if (targetDirectory) return [targetDirectory];
+    const positional = positionalArguments(args, directoryOptions);
+    return positional.length > 1 ? [positional.at(-1)] : [];
+  }
+  if (name === "dd") return args.filter((arg) => arg.startsWith("of=")).map((arg) => arg.slice(3));
+  const inPlace = args.some((arg) => /^-[a-zA-Z]*i/.test(arg) || arg.startsWith("--in-place"));
+  if ((name === "sed" || name === "perl") && inPlace) {
+    const positional = positionalArguments(args, scriptOptions);
+    return args.some((arg) => scriptOptions.has(arg)) ? positional : positional.slice(1);
+  }
+  return [];
+}
+
+function isAlwaysAllowed(target) {
+  return target.startsWith("/dev/") || scratchTarget.test(target);
+}
+
+function writeDenial(target, cwd) {
+  if (isAlwaysAllowed(target)) return null;
+  if (/[$`]/.test(target)) {
+    return `The write target "${target}" contains an unexpanded variable, so the guard cannot tell where it lands. Use the Write tool with an absolute path (or $SCRATCH for scratch files).`;
+  }
+  const location = locate(target, cwd);
+  if (!location) return null;
+  if (isEnvFile(location.real)) return envDenial(location.real);
+  const reason = branchDenial(location) ?? planDenial(location);
+  if (reason) return `Shell write blocked. ${reason}`;
+  return migrationDenialFor(location);
+}
+
+function migrationDenialFor(location) {
+  if (!migrationPath.test(location.relative)) return null;
+  return existsInBase(location.top, location.relative) ? migrationDenial(location.real) : null;
+}
 
 function firstEnvPath(paths) {
   return paths.find((path) => typeof path === "string" && isEnvFile(path)) ?? null;
@@ -53,6 +125,12 @@ function checkBash(input) {
   if (envPath) return { deny: envDenial(envPath) };
   if (commands.some(isForcePush)) return { deny: forceDenial };
   if (commands.some(isMigrateReset)) return { deny: resetDenial };
+  for (const command of commands) {
+    for (const target of [...command.writes, ...writeTargets(command)]) {
+      const deny = writeDenial(target, command.cwd);
+      if (deny) return { deny };
+    }
+  }
   return {};
 }
 
@@ -66,5 +144,9 @@ export function dangerGuard(input) {
   else if (tool === "Glob") paths = [toolInput.pattern, toolInput.path];
   else if (fileTools.has(tool)) paths = [toolInput.file_path ?? toolInput.notebook_path];
   const envPath = firstEnvPath(paths);
-  return envPath ? { deny: envDenial(envPath) } : {};
+  if (envPath) return { deny: envDenial(envPath) };
+  if (!fileTools.has(tool)) return {};
+  const location = locate(paths[0], input.cwd);
+  const deny = location && migrationDenialFor(location);
+  return deny ? { deny } : {};
 }
