@@ -13,7 +13,8 @@ apps/
 packages/
   contracts/  Zod schemas and shared types        db/       Prisma (added later)
   api-client/ Generated API client (added later)  ui/       Shared components and tokens
-  i18n/       Message catalogs                    config/   tsconfig presets
+  i18n/       Message catalogs
+  config/     tsconfig, ESLint, Prettier and Vitest presets; repository scripts (audit:deps, github:setup, ticket)
 ```
 
 ### Install and build
