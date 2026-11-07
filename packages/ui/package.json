@@ -10,21 +10,31 @@
     "format:check": "prettier --check . --ignore-path ../../.gitignore",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "storybook": "storybook dev --port 6006 --no-open",
+    "build-storybook": "storybook build",
+    "test:stories": "vitest run --config vitest.stories.config.mjs"
   },
   "peerDependencies": {
     "react": "catalog:"
   },
   "devDependencies": {
     "@heat/config": "workspace:*",
+    "@storybook/addon-a11y": "10.6.6",
+    "@storybook/addon-vitest": "10.6.6",
+    "@storybook/react-vite": "10.6.6",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@vitest/browser-playwright": "catalog:",
     "eslint": "catalog:",
+    "playwright": "1.65.0",
     "prettier": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "storybook": "10.6.6",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }
