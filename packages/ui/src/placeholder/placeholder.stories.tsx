@@ -18,7 +18,6 @@ const meta = {
   title: "Placeholder",
   component: Placeholder,
   tags: ["test"],
-  parameters: { a11y: { test: "error" } },
   args: english,
 } satisfies Meta<typeof Placeholder>;
 

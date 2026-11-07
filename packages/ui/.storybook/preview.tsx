@@ -20,6 +20,8 @@ const withGlobals: Decorator = (Story, context) => {
 };
 
 const preview: Preview = {
+  // axe violations fail the story test (and the CI job) for every story, with the rule id.
+  parameters: { a11y: { test: "error" } },
   decorators: [withGlobals],
   initialGlobals: { theme: "light", locale: "en" },
   globalTypes: {
