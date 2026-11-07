@@ -1,6 +1,3 @@
-// The GitHub rules of the /implement-issue skill (plan section 12): whether a ticket may start,
-// its branch name and base, the append-only refinement and the card moves. The skill calls these
-// through `pnpm ticket` so the rules live in tested code, not in the skill's prose.
 import { parseArgs } from "node:util";
 import { checkTarget } from "./github-setup.mjs";
 
@@ -10,17 +7,12 @@ export const approvalMarker = "<!-- implement-issue:plan-approved -->";
 const markerPattern = /implement-issue:plan-approved/;
 
 const startStatuses = ["Ready", "Refining"];
-// A ticket already under way is resumed from its branch rather than started again.
 const resumeStatuses = ["In progress", "In review"];
-// Author associations GitHub gives people with access to the repository. Anything else is an
-// outsider whose text never reaches the agent (plan section 14).
 export const collaborators = new Set(["OWNER", "MEMBER", "COLLABORATOR"]);
 const prefixes = { feature: "feat", bug: "fix", chore: "chore", docs: "docs", spike: "spike" };
 const stopWords = new Set(["a", "an", "and", "the", "with", "for", "of", "to", "in", "on"]);
 const maxSlugWords = 4;
 const maxSlugLength = 40;
-// Branch names reach shell commands in the skill, so only these shapes are used. A ref with any
-// other character (git allows `$`, backticks, quotes and `;`) is refused, never quoted around.
 const safeBranch = /^(?:feat|fix|chore|docs|spike)\/\d+-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const safeEpic = /^epic\/e\d+(?:-[a-z0-9]+)*$/;
 
@@ -52,7 +44,6 @@ const issueQuery = `query($owner: String!, $name: String!, $number: Int!) {
   }
 }`;
 
-/** Lower-case words of the title without filler, joined by hyphens; "issue" when nothing is left. */
 export function slugify(title) {
   const words = title
     .normalize("NFKD")
@@ -71,7 +62,6 @@ export function slugify(title) {
   return slug || words[0]?.slice(0, maxSlugLength) || "issue";
 }
 
-/** True when the pull request body uses a GitHub closing keyword on issue `number`. */
 export function closesIssue(body, number) {
   const keyword = /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b/gi;
   return [...(body ?? "").matchAll(keyword)].some((match) => Number(match[1]) === number);
@@ -80,7 +70,6 @@ export function closesIssue(body, number) {
 const json = (gh, args) => JSON.parse(gh(args));
 const login = (author) => author?.login ?? "ghost";
 
-/** Runs one of the issue queries above and returns the issue, failing when there is none. */
 function queryIssue(gh, repo, number, query) {
   const [owner, name] = repo.split("/");
   const result = json(gh, [
@@ -120,11 +109,6 @@ function remoteHeads(gh, repo) {
     .map((ref) => ref.replace(/^refs\/heads\//, ""));
 }
 
-/**
- * The branch for this issue: an existing `<type>/<N>-…` branch if there is one, otherwise a new
- * name from the type label and title. The base is the epic's `epic/<code>-…` branch on origin
- * when there is exactly one, otherwise main. `branch` is null when `problems` is not empty.
- */
 function resolveBranch({ number, title, type, epic }, heads, localBranches) {
   const forIssue = new RegExp(`^(?:${Object.values(prefixes).join("|")})/${number}-`);
   const existing = [...localBranches, ...heads].filter((branch) => forIssue.test(branch));
@@ -162,10 +146,6 @@ function resolveBranch({ number, title, type, epic }, heads, localBranches) {
 
 function checkBlockers(gh, repo, blockedBy, heads) {
   const open = blockedBy.filter((blocker) => blocker.state !== "CLOSED");
-  // Pull requests into an epic branch do not close issues, so a blocker merged there is still
-  // open on GitHub. Its closing pull request is what shows the work is in. Each epic branch is
-  // read on its own so pull requests into main do not push older ones past the limit, and pull
-  // requests from forks are ignored.
   const merged = open.length
     ? heads
         .filter((head) => safeEpic.test(head))
@@ -209,15 +189,9 @@ function findPr(gh, repo, branch) {
     "--json",
     "number,state,url,isCrossRepository",
   ]).filter((each) => !each.isCrossRepository);
-  // A fork can open a pull request from a branch with the same name; only our own counts.
   return pr ? { number: pr.number, state: pr.state, url: pr.url } : null;
 }
 
-/**
- * Loads an issue with everything stage 1 needs and decides whether it may start.
- * `gh(args)` runs the GitHub CLI and returns stdout; this function only reads. `refusals` is empty
- * when the ticket may start. Comments from outside the repository's collaborators are dropped.
- */
 export function loadTicket({ gh, repo, number, localBranches = [] }) {
   const issue = queryIssue(gh, repo, number, issueQuery);
   const labels = issue.labels.nodes.map((label) => label.name);
@@ -297,8 +271,6 @@ export function loadTicket({ gh, repo, number, localBranches = [] }) {
     resuming,
     pr: branch ? findPr(gh, repo, branch.name) : null,
     needsApproval: item?.size === "L" || labels.includes("security"),
-    // Only the owner approves plans (plan section 12). This is a record for a later session, not
-    // a gate: `gh` runs under the owner's account, so whatever the agent posts is the owner's too.
     planApproved: comments.some(
       (comment) => comment.association === "OWNER" && comment.body.includes(approvalMarker),
     ),
@@ -307,18 +279,12 @@ export function loadTicket({ gh, repo, number, localBranches = [] }) {
   };
 }
 
-/** Today's date in Asia/Dhaka, where every date in this project is kept, as YYYY-MM-DD. */
 export const today = () =>
   new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(new Date());
 
 const readBody = (gh, repo, number) =>
   json(gh, ["api", `repos/${repo}/issues/${number}`]).body ?? "";
 
-/**
- * Appends refinement text to the issue body and logs it in a comment. The owner's text is never
- * rewritten: the new body is the old one plus a "Refined" section (or a dated update under the
- * existing one), and the body is read back to prove it.
- */
 export function appendRefinement({ gh, repo, number, text, summary, date = today() }) {
   const addition = text.trim();
   if (!addition) throw new Error("Refinement text is empty");
@@ -330,15 +296,12 @@ export function appendRefinement({ gh, repo, number, text, summary, date = today
     ? `\n\n### Update ${date}\n\n${addition}\n`
     : `\n\n---\n\n## Refined\n\n${addition}\n`;
   const next = original + section;
-  // GitHub has no compare-and-swap for issue bodies; reading again just before the write keeps
-  // the window in which an owner's edit could be lost as small as it can be.
   if (readBody(gh, repo, number) !== original) {
     throw new Error(
       `Issue #${number} body changed while the refinement was prepared; run it again.`,
     );
   }
   gh(["issue", "edit", String(number), "--repo", repo, "--body-file", "-"], next);
-  // GitHub may store line endings differently, so they are compared without them.
   const lf = (value) => value.replace(/\r\n/g, "\n");
   if (lf(readBody(gh, repo, number)) !== lf(next)) {
     throw new Error(
@@ -375,7 +338,6 @@ const cardQuery = `query($owner: String!, $name: String!, $number: Int!) {
   }
 }`;
 
-/** Moves the issue's card to the stage's Status and sets the stage's labels. */
 export function moveCard({ gh, repo, number, stage }) {
   const want = stages[stage];
   if (!want) throw new Error(`Unknown stage "${stage}"; use ${Object.keys(stages).join(" or ")}`);
@@ -421,7 +383,6 @@ export const usage = [
   "Options: --repo owner/name (default " + defaultRepo + ")",
 ].join("\n");
 
-/** Parses the command line; throws on anything but the three commands above. */
 export function parseCli(argv) {
   const { values, positionals } = parseArgs({
     args: argv,

@@ -6,7 +6,6 @@ allowBuilds:
   esbuild: false
   "@scarf/scarf": false
 
-# One version of each shared dependency across the workspace.
 catalog:
   react: 19.3.1
   react-dom: 19.3.1

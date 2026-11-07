@@ -70,9 +70,6 @@ test("relative links and heading anchors in the instruction files resolve", () =
 });
 
 test("a rule is written in one file only: no sentence is repeated between files", () => {
-  // Sentences are compared as lower-case words, so wrapping, punctuation and
-  // markup do not hide a copy. Short sentences are ignored, and so is each area
-  // file's intro, which only names the area and points to the root file.
   const sentences = (file) =>
     read(file)
       .replace(file === "CLAUDE.md" ? /^$/ : /^[\s\S]*?(?=^## )/m, "")

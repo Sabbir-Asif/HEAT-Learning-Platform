@@ -49,7 +49,6 @@ describe("GitHub workflows", () => {
     const { required_status_checks } = JSON.parse(
       readFileSync(join(github, "branch-protection.json"), "utf8"),
     );
-    // Job names: literal `name:` lines, plus the task names of the CI matrix.
     const reported = new Set(
       workflows.flatMap(({ text }) => [
         ...[...text.matchAll(/^ {4}name: (?!\$\{\{)(.+)$/gm)].map((m) => m[1].trim()),

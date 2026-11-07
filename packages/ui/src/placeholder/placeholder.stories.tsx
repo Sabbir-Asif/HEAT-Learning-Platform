@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 import { Placeholder } from "./placeholder";
 
-// Story-local sample text. @heat/ui takes no i18n dependency; the apps translate their own copy.
 const english = {
   heading: "Setup check",
   text: "Storybook runs with the theme, locale and accessibility checks.",
@@ -19,7 +18,6 @@ const meta = {
   component: Placeholder,
   tags: ["test"],
   args: english,
-  // The sample text follows the locale global, so a pinned story and the toolbar agree.
   render: (args, { globals }) => (
     <Placeholder {...args} {...(globals["locale"] === "bn" ? bangla : {})} />
   ),
@@ -32,7 +30,6 @@ const lightForeground = "rgb(15, 23, 42)";
 const darkForeground = "rgb(229, 231, 235)";
 const fontFamily = "Noto Sans Bengali Variable";
 
-/** Follows the toolbar. The four stories below pin theme and locale, which locks the toolbar. */
 export const Default: Story = {};
 
 export const LightEnglish: Story = {
@@ -54,7 +51,6 @@ export const DarkEnglish: Story = {
   },
 };
 
-/** Bangla text must render in the self-hosted Bangla-capable family, with its face loaded. */
 const expectBanglaFont: NonNullable<Story["play"]> = async ({ canvasElement, canvas }) => {
   await expect(document.documentElement).toHaveAttribute("lang", "bn");
   await expect(canvasElement.querySelector('[lang="bn"]')).not.toBeNull();

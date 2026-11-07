@@ -1,7 +1,4 @@
 #!/usr/bin/env node
-// pnpm ticket load <N> | refine <N> --file <path> [--summary <text>] | move <N> start|review
-// The GitHub side of the /implement-issue skill. Needs `gh` signed in with the repo and project
-// scopes. `load` exits 3 when the ticket may not start; see src/ticket.mjs for the rules.
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { appendRefinement, loadTicket, moveCard, parseCli } from "../src/ticket.mjs";

@@ -23,7 +23,6 @@ updates:
     cooldown:
       default-days: 7
     ignore:
-      # Persisted volumes cannot jump a major version; upgrade those by hand.
       - dependency-name: postgres
         update-types: ["version-update:semver-major"]
       - dependency-name: redis

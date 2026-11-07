@@ -1,18 +1,17 @@
 #!/usr/bin/env node
-// Fails on high or critical advisories that are not in .github/audit-ignore.json.
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { evaluateAudit } from "../src/audit.mjs";
 
 const root = resolve(import.meta.dirname, "../../..");
+const MAX_REPORT_BYTES = 64 * 1024 * 1024;
 const ignores = JSON.parse(readFileSync(resolve(root, ".github/audit-ignore.json"), "utf8"));
 
-// pnpm exits non-zero when it finds anything, so the verdict comes from the report, not the exit code.
 const audit = spawnSync("pnpm", ["audit", "--json"], {
   cwd: root,
   encoding: "utf8",
-  maxBuffer: 64 * 1024 * 1024, // the report lists every dependency path in every workspace
+  maxBuffer: MAX_REPORT_BYTES,
 });
 let report;
 try {
