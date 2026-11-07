@@ -106,6 +106,66 @@ describe("envAccess", () => {
     expect(find(text)).toBeNull();
   });
 
+  test.each([
+    "grep -eSECRET .env",
+    "grep --regexp=SECRET .env",
+    "grep -f x .env",
+    "grep --file=x .env",
+    "grep -f .env patterns.txt",
+    "rg --file x .env",
+    "rg -fx .env",
+    "grep -rne SECRET .env",
+    "grep -ie SECRET apps/api/.env",
+    "grep -e SECRET -- .env",
+    "rg -e one -e two .env.local",
+  ])("a search that supplies its own pattern still reads the file: %s", (text) => {
+    expect(find(text)).toBeTruthy();
+  });
+
+  test("the same flags on a bare file that exists", () => {
+    const dir = tempDir("envcwd2");
+    writeFileSync(join(dir, "prod.env"), "x\n");
+    expect(find("rg --regexp=SECRET prod.env", dir)).toBe("prod.env");
+    expect(find("grep -eSECRET prod.env", dir)).toBe("prod.env");
+  });
+
+  test.each([
+    "grep -e process.env -e import.meta.env src",
+    "grep -eprocess.env src",
+    "rg --regexp=process.env src",
+    "grep -rne process.env src",
+    "grep -f patterns.txt src",
+    "rg --file patterns.txt apps",
+  ])("a search whose pattern mentions process.env is still allowed: %s", (text) => {
+    expect(find(text)).toBeNull();
+  });
+
+  test.each([
+    "cat *.env",
+    "cat prod.e?v",
+    "cat .e*",
+    "cat .*",
+    "cat apps/*/.env",
+    "cat config/*.env",
+    "cat prod.e[n]v",
+    "head -n1 stag*.env",
+  ])("a glob that can match an env file is denied: %s", (text) => {
+    expect(find(text)).toBeTruthy();
+  });
+
+  test.each([
+    "cat *",
+    "cat ?",
+    "cat *.txt",
+    "cat src/*.ts",
+    "cat [ab].md",
+    "ls *.env",
+    "cat README.m?",
+    "rg 'a*.env' src",
+  ])("an ordinary glob is allowed: %s", (text) => {
+    expect(find(text)).toBeNull();
+  });
+
   test("a bare name ending in .env is an env file when it exists on disk", () => {
     const dir = tempDir("envcwd");
     writeFileSync(join(dir, "prod.env"), "x\n");
