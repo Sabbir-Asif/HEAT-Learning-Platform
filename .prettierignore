@@ -1,0 +1,6 @@
+pnpm-lock.yaml
+docs
+prompt.md
+lms_production_implementation_plan.md
+GBV modules/
+*.png

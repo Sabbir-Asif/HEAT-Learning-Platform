@@ -6,8 +6,11 @@
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "node .next/standalone/apps/frontend-public/server.js",
+    "lint": "eslint .",
+    "format:check": "prettier --check . --ignore-path ../../.gitignore",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@heat/api-client": "workspace:*",
@@ -24,6 +27,8 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "babel-plugin-react-compiler": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
