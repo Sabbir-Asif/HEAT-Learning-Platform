@@ -1,18 +1,7 @@
 import { defineConfig } from "vitest/config";
 
-/** Minimum coverage, in percent, applied to every package unless it sets its own. */
 export const DEFAULT_COVERAGE_THRESHOLD = 85;
 
-/**
- * @typedef {object} PresetOptions
- * @property {number} [threshold] Coverage threshold override in percent; use 100 for rule packages.
- * @property {string[]} [coverageExclude] Extra globs left out of coverage, added to the defaults.
- */
-
-/**
- * @param {"node" | "jsdom"} environment
- * @param {PresetOptions} options
- */
 function preset(
   environment,
   { threshold = DEFAULT_COVERAGE_THRESHOLD, coverageExclude = [] } = {},
@@ -20,7 +9,6 @@ function preset(
   return defineConfig({
     test: {
       environment,
-      // Every package keeps its tests in test/, mirroring the paths under src/.
       include: ["test/**/*.test.{ts,tsx,mjs}"],
       coverage: {
         provider: "v8",
@@ -38,8 +26,6 @@ function preset(
   });
 }
 
-/** Vitest config for packages that run in Node. */
-export const nodePreset = (/** @type {PresetOptions} */ options) => preset("node", options);
+export const nodePreset = (options) => preset("node", options);
 
-/** Vitest config for packages that render React or touch the DOM. */
-export const jsdomPreset = (/** @type {PresetOptions} */ options) => preset("jsdom", options);
+export const jsdomPreset = (options) => preset("jsdom", options);

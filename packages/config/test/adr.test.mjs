@@ -5,16 +5,13 @@ import { expect, test } from "vitest";
 const root = resolve(import.meta.dirname, "../../..");
 const adrDir = join(root, "docs/adr");
 const read = (path) => readFileSync(join(root, path), "utf8");
-// Links between ADR files and to the plan are checked in docs.test.mjs.
 
 const files = readdirSync(adrDir);
 const numbered = files.filter((file) => /^\d{4}-.+\.md$/.test(file));
-// 0001 to 0016 are D1 to D16; 0017 is the text captcha accessibility exception.
 const decisions = Array.from({ length: 16 }, (_, index) => String(index + 1).padStart(4, "0"));
 const fileFor = (number) => numbered.filter((file) => file.startsWith(`${number}-`));
 const adrs = [...decisions, "0017"].flatMap(fileFor);
 
-// Section name -> body text. Optional sections are not required of every ADR.
 const optional = ["Open points for the owner"];
 const sectionsOf = (text) =>
   Object.fromEntries(
@@ -88,8 +85,6 @@ test("the index links every ADR and shows the same status as the file", () => {
   expect(problems).toEqual([]);
 });
 
-// The values the acceptance criteria name, asserted as whole phrases inside the
-// section that states the decision, so a changed value cannot hide behind a mention.
 test("D3 states its values in the Decision section", () => {
   const decision = adr("0003").Decision;
   const missing = [

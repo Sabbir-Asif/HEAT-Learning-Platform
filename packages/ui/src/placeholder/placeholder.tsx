@@ -4,10 +4,6 @@ export interface PlaceholderProps {
   actionLabel: string;
 }
 
-/**
- * Stand-in that proves the Storybook setup (theme, locale, axe). Not exported from the package;
- * delete it when the first real component (E1-3) lands.
- */
 export function Placeholder({ heading, text, actionLabel }: PlaceholderProps) {
   return (
     <section className="heat-placeholder">

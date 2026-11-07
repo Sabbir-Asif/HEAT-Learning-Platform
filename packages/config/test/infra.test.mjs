@@ -19,7 +19,6 @@ const composeEnv = parseEnv(read("infra/compose/.env.example"));
 const apps = ["api", "worker", "frontend-public", "frontend-internal"];
 const services = ["postgres", "redis", "mailpit", "nginx"];
 
-// The text of one top-level service block.
 const service = (name) =>
   compose.match(new RegExp(`^  ${name}:\\n((?:    .*\\n|\\n)+)`, "m"))?.[1] ?? "";
 const server = (host) =>
@@ -74,7 +73,6 @@ describe("dev Nginx config", () => {
       read(`apps/${app}/package.json`).match(/"dev": "next dev --port (\d+)"/)?.[1];
     expect(nginx).toContain(`server host.docker.internal:${port("frontend-public")};`);
     expect(nginx).toContain(`server host.docker.internal:${port("frontend-internal")};`);
-    // The API defaults to 4000 in main.ts.
     expect(read("apps/api/src/main.ts")).toContain("process.env.PORT ?? 4000");
     expect(nginx).toMatch(/upstream api \{\s*server host\.docker\.internal:4000;/);
   });

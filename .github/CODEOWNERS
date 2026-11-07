@@ -1,4 +1,3 @@
-# A pull request runs its own copy of the CI files, so the owner reads changes to the gate itself.
 /.github/ @Sabbir-Asif
 /packages/config/bin/audit.mjs @Sabbir-Asif
 /packages/config/src/audit.mjs @Sabbir-Asif

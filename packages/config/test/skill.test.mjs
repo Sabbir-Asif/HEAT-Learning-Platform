@@ -3,8 +3,6 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { describe, expect, test } from "vitest";
 import { load as parse } from "js-yaml";
 
-// Checks the /implement-issue skill and its agents (issue #24): the parts a careless edit would
-// break without any test noticing.
 const root = resolve(import.meta.dirname, "../../..");
 const skillDir = ".claude/skills/implement-issue";
 const skillFile = `${skillDir}/SKILL.md`;
@@ -62,7 +60,6 @@ describe("the implement-issue skill", () => {
 
   test("uses every pnpm ticket command and every agent", () => {
     const missing = [
-      // pnpm prints its own error line to stdout on a non-zero exit, which would corrupt the JSON.
       'node packages/config/bin/ticket.mjs load $N > "$SCRATCH/ticket-$N.json"',
       "pnpm ticket refine",
       "pnpm ticket move $N start",
@@ -114,7 +111,6 @@ describe("the agents", () => {
   });
 });
 
-// The forbidding word must come before the dangerous token in the same sentence.
 const dangerToken = String.raw`co-authored-by|generated with|--force|gh pr merge|migrate reset|\.env\b|environment files`;
 const danger = new RegExp(dangerToken, "i");
 const forbidden = new RegExp(String.raw`\b(?:never|do not|don't|no)\b[^.]*(?:${dangerToken})`, "i");

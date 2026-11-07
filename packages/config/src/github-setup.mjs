@@ -1,12 +1,8 @@
-// Idempotent setup of the repository labels, milestones and the GitHub Project (plan section 11).
-// It only creates things, or updates a label's colour and description in place. It never deletes or
-// renames anything and never touches issues or project items; anything else found is left alone.
 import { parseArgs } from "node:util";
 
 export const defaultRepo = "Sabbir-Asif/HEAT-Learning-Platform";
 export const defaultProjectTitle = "HEAT LMS";
 
-// One list feeds both the `area:*` labels and the Project's Area options, so they cannot drift.
 export const areas = [
   "api",
   "frontend-public",
@@ -18,7 +14,6 @@ export const areas = [
   "docs",
 ];
 
-// Colours and descriptions match what the initial import created, so a first run changes nothing.
 export const labels = [
   ...["feature", "chore", "spike", "docs", "bug"].map((type) => ({
     name: `type:${type}`,
@@ -58,8 +53,6 @@ export const milestones = [
 const range = (prefix, from, to) =>
   Array.from({ length: to - from + 1 }, (_, i) => `${prefix}${from + i}`);
 
-// A new project already has a Status field with GitHub's own options (Todo, In Progress, Done).
-// The managed options are added next to them; options are never removed.
 export const projectFields = [
   {
     name: "Status",
@@ -74,11 +67,9 @@ export const projectFields = [
 
 const singleSelect = "ProjectV2SingleSelectField";
 const projectListLimit = 100;
-// GitHub logins are letters, digits and single hyphens; repository names also allow . and _.
 const ownerPattern = /^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$/;
 const repoNamePattern = /^[\w.-]{1,100}$/;
 
-/** Throws unless `repo` is `owner/name` and both parts are valid GitHub names. */
 export function checkTarget(repo, owner) {
   const [repoOwner, name, ...rest] = repo.split("/");
   if (rest.length || !ownerPattern.test(repoOwner ?? "") || !repoNamePattern.test(name ?? "")) {
@@ -88,7 +79,6 @@ export function checkTarget(repo, owner) {
   if (!ownerPattern.test(owner)) throw new Error(`Invalid --owner "${owner}"`);
 }
 
-/** Parses the command line; throws on an unknown flag or a malformed repository. */
 export function parseCli(argv) {
   const { values } = parseArgs({
     args: argv,
@@ -109,17 +99,11 @@ export function parseCli(argv) {
   };
 }
 
-/**
- * Brings the repository and project in line with the lists above.
- * `gh(args, input)` runs the GitHub CLI and returns stdout. Returns the number of writes made (or
- * planned, in a dry run) and the problems that need a person.
- */
 export function setup({ gh, repo, owner, projectTitle, dryRun = false, log = console.log }) {
   checkTarget(repo, owner);
   let changes = 0;
   const problems = [];
   const json = (args) => JSON.parse(gh(args));
-  // Every write goes through here, so a dry run cannot make one by accident.
   const write = (description, args, input) => {
     changes += 1;
     log(`${dryRun ? "would " : ""}${description}`);
@@ -167,7 +151,6 @@ export function setup({ gh, repo, owner, projectTitle, dryRun = false, log = con
     ]);
   }
 
-  // Closed projects are listed too, so a closed one is reported instead of duplicated.
   const { projects } = json([
     "project",
     "list",
@@ -202,7 +185,6 @@ export function setup({ gh, repo, owner, projectTitle, dryRun = false, log = con
     ]);
     number = created && JSON.parse(created).number;
   }
-  // In a dry run with no project yet, nothing exists to compare against.
   const existingFields =
     number === undefined
       ? []
@@ -258,11 +240,6 @@ const optionMutation =
 
 const optionKey = (options, keys) => JSON.stringify(options.map((o) => keys.map((key) => o[key])));
 
-// The API only replaces a field's whole option list, so this is the one write that could lose data
-// (an option dropped, or ids regenerated so items lose their value). It is guarded three ways:
-// the options are read twice and nothing is written if they changed; the list is printed first so
-// it can be restored; and the field is read back and the script fails loudly if any option id or
-// name is gone. The existing options go back with their ids, and the new ones are appended.
 function addOptions({ gh, write, log, dryRun, field, missing }) {
   const description = `add option${missing.length === 1 ? "" : "s"} ${missing.join(", ")} to field ${field.name}`;
   if (dryRun) return write(description);
@@ -276,7 +253,6 @@ function addOptions({ gh, write, log, dryRun, field, missing }) {
   log(
     `backup of field ${field.name} options (for updateProjectV2Field): ${JSON.stringify(before)}`,
   );
-  // Read again as late as possible, so an option added in the web UI in between is not dropped.
   const latest = read();
   const all = ["id", "name", "color", "description"];
   if (optionKey(before, all) !== optionKey(latest, all)) {

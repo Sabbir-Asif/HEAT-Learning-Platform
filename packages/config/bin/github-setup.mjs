@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-// pnpm github:setup [--dry-run] [--repo owner/name] [--owner login] [--project title]
-// Needs `gh` signed in with the repo and project scopes. See src/github-setup.mjs for what it changes.
 import { execFileSync } from "node:child_process";
 import { parseCli, setup } from "../src/github-setup.mjs";
 

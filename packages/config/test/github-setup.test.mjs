@@ -20,7 +20,6 @@ const repo = "owner/repo";
 const owner = "owner";
 const flag = (args, name) => args[args.indexOf(name) + 1];
 
-// A stateful stand-in for the parts of GitHub the script talks to. Every call is recorded.
 function fakeGitHub(initial = {}) {
   const state = {
     labels: [],
@@ -30,7 +29,6 @@ function fakeGitHub(initial = {}) {
     ...structuredClone(initial),
   };
   const calls = [];
-  // Hooks that let a test change GitHub between the script's calls.
   const tweak = { beforeRead: undefined, regenerateIds: false };
   let reads = 0;
   const ids = (() => {
@@ -133,7 +131,6 @@ const run = (fake, extra = {}) => {
   return { ...result, lines };
 };
 
-// The only kinds of write the script may ever make: nothing deletes or renames.
 const writeKind = ({ args }) => {
   const [a, b] = args;
   if (a === "api") return args.includes("POST") ? "api POST" : "api graphql";
@@ -499,9 +496,6 @@ describe("command line", () => {
   });
 
   describe("with a stub gh as the only program on PATH (no network, no credentials)", () => {
-    // PATH holds only this directory, so a stub that cannot run fails the test instead of reaching a
-    // real gh. The stub logs every call to the file named in STUB_LOG and answers reads with an
-    // empty GitHub.
     const dir = mkdtempSync(join(tmpdir(), "gh-stub-"));
     writeFileSync(
       join(dir, "stub.js"),

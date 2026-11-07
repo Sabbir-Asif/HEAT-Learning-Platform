@@ -35,7 +35,6 @@ function issue(overrides = {}) {
   };
 }
 
-// Shapes the fixture like the GraphQL response the script asks for.
 function graphqlIssue(fixture) {
   const fieldValues = [
     { name: fixture.status, field: { name: "Status" } },
@@ -73,7 +72,6 @@ function graphqlIssue(fixture) {
   };
 }
 
-// A read-only stand-in for GitHub. Every call is recorded.
 function fakeGitHub({
   fixture = issue(),
   heads = [epicBranch, "main"],
@@ -390,7 +388,6 @@ describe("closesIssue", () => {
   });
 });
 
-// A stand-in for the issue body, its comments, labels and card, recording every call.
 function fakeIssue({ body = "Original text", labels = [], status = "Ready", options } = {}) {
   const state = { body, comments: [], labels: [...labels], status };
   const statusOptions = (options ?? ["Backlog", "Ready", "In progress", "In review"]).map(

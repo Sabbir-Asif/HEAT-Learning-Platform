@@ -2,11 +2,6 @@ import type { Decorator, Preview } from "@storybook/react-vite";
 import "../src/styles.css";
 import "./preview.css";
 
-/**
- * Applies the toolbar theme and locale. Dark is the `.dark` class (the shadcn and next-themes
- * default; E1-2 keeps it). Class and `lang` go on the story root and on <html>, so portalled
- * content follows. `dir` stays `ltr` for both locales.
- */
 const withGlobals: Decorator = (Story, context) => {
   const dark = context.globals["theme"] === "dark";
   const lang = context.globals["locale"] === "bn" ? "bn" : "en";
@@ -20,7 +15,6 @@ const withGlobals: Decorator = (Story, context) => {
 };
 
 const preview: Preview = {
-  // axe violations fail the story test (and the CI job) for every story, with the rule id.
   parameters: { a11y: { test: "error" } },
   decorators: [withGlobals],
   initialGlobals: { theme: "light", locale: "en" },

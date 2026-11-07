@@ -14,6 +14,8 @@ Learning platform for the HEAT gender-safety training at the University of Dhaka
 | Database             | `packages/db` (`@heat/db`)                 | [CLAUDE.md](packages/db/CLAUDE.md)            |
 | Contracts            | `packages/contracts` (`@heat/contracts`)   | [CLAUDE.md](packages/contracts/CLAUDE.md)     |
 | API client           | `packages/api-client` (`@heat/api-client`) | [CLAUDE.md](packages/api-client/CLAUDE.md)    |
+| Message catalogs     | `packages/i18n` (`@heat/i18n`)             | [README.md](README.md#development)            |
+| Tooling, workflow    | `packages/config` (`@heat/config`)         | [README.md](README.md#development)            |
 
 - Decisions: [docs/adr/](docs/adr/), one record per decision. ADR changes always go through the owner.
 - Plan: [docs/plan/heat-lms-project-plan.html](docs/plan/heat-lms-project-plan.html). Frontend design: [docs/superpowers/specs/](docs/superpowers/specs/).
