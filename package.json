@@ -16,7 +16,10 @@
     "format:check": "turbo run format:check //#format:root",
     "format:root": "prettier --check . '!apps/**' '!packages/**'",
     "test:coverage": "turbo run test:coverage",
-    "audit:deps": "node packages/config/bin/audit.mjs"
+    "audit:deps": "node packages/config/bin/audit.mjs",
+    "dev:up": "node infra/scripts/dev.mjs up",
+    "dev:down": "node infra/scripts/dev.mjs down",
+    "dev:reset": "node infra/scripts/dev.mjs reset"
   },
   "devDependencies": {
     "@heat/config": "workspace:*",
