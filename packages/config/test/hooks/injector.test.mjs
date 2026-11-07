@@ -149,6 +149,34 @@ describe("the data block", () => {
     for (const bad of ["\u0000", "\u001b", "\u202e"]) expect(context).not.toContain(bad);
   });
 
+  test("invisible and tag characters are removed so hidden text cannot ride along", () => {
+    const hidden = [
+      "\u{E0041}",
+      "\u{E0020}",
+      "\u{E007F}",
+      "\u200b",
+      "\u200d",
+      "\u200f",
+      "\u2060",
+      "\ufeff",
+      "\u2028",
+      "\u2029",
+    ];
+    const { context } = inject("#25", data(`vis${hidden.join("")}ible`));
+    for (const character of hidden) expect(context).not.toContain(character);
+    expect(context).toContain("| visible");
+  });
+
+  test("ordinary non-ASCII text, including Bangla and emoji, is kept", () => {
+    const { context } = inject(
+      "#25",
+      data("\u09aa\u09cd\u09b0\u09b6\u09bf\u0995\u09cd\u09b7\u09a3 \u{1F600} caf\u00e9"),
+    );
+    expect(context).toContain(
+      "\u09aa\u09cd\u09b0\u09b6\u09bf\u0995\u09cd\u09b7\u09a3 \u{1F600} caf\u00e9",
+    );
+  });
+
   test("the whole injection stays under the size cap, with a truncation note", () => {
     const big = "x".repeat(30000);
     const { context } = inject("#25 #26 #27", {

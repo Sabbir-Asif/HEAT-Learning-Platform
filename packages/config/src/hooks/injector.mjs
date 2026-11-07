@@ -7,11 +7,15 @@ const maxIssues = 3;
 const budgetMilliseconds = 10000;
 const maxCharacters = 9000;
 const issuePattern = /(?<![\w#&/:.=?@-])#(\d{1,5})(?![\w-])/g;
-const isControl = (code) =>
+const isHidden = (code) =>
   (code < 32 && code !== 10 && code !== 9) ||
   (code >= 127 && code <= 159) ||
-  (code >= 0x202a && code <= 0x202e) ||
-  (code >= 0x2066 && code <= 0x2069);
+  (code >= 0x200b && code <= 0x200f) ||
+  (code >= 0x2028 && code <= 0x202e) ||
+  code === 0x2060 ||
+  (code >= 0x2066 && code <= 0x2069) ||
+  code === 0xfeff ||
+  (code >= 0xe0000 && code <= 0xe007f);
 
 export function extractIssueNumbers(prompt) {
   const text = String(prompt ?? "")
@@ -45,8 +49,8 @@ function failureReason(error) {
 
 function neutralise(text) {
   return String(text ?? "")
-    .split("")
-    .filter((character) => !isControl(character.charCodeAt(0)))
+    .split(/(?:)/u)
+    .filter((character) => !isHidden(character.codePointAt(0)))
     .join("")
     .replace(/UNTRUSTED-DATA/gi, "UNTRUSTED_DATA")
     .replace(/</g, "‹");
