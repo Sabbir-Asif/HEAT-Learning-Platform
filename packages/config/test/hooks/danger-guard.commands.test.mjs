@@ -31,6 +31,8 @@ describe("force pushes", () => {
     'eval "git push -f"',
     "false || git push --force",
     "git push origin x -f | tee log",
+    "cat <<EOF\n$(git push -f)\nEOF",
+    "echo ${x:-$(git push --force)}",
   ])("blocks %s", (command) => {
     expect(bash(command).deny).toMatch(/force-push/i);
   });
@@ -48,6 +50,7 @@ describe("force pushes", () => {
     'rg "git push -f" docs',
     "git log --format=%H -f",
     "git status",
+    "cat <<'EOF'\n$(git push -f)\nEOF",
   ])("allows %s", (command) => {
     expect(bash(command)).toEqual({});
   });

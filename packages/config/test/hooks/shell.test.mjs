@@ -71,6 +71,12 @@ describe("nested commands", () => {
     expect(words('eval "git push" "-f"')).toContainEqual(["git", "push", "-f"]);
   });
 
+  test("substitutions inside ${...} are parsed", () => {
+    expect(words("echo ${x:-$(cat .env)}")).toContainEqual(["cat", ".env"]);
+    expect(words('echo "${x:-$(cat .env)}"')).toContainEqual(["cat", ".env"]);
+    expect(words("echo ${x:-`cat .env`}")).toContainEqual(["cat", ".env"]);
+  });
+
   test("parameter expansion keeps its braces in the word", () => {
     expect(words("cat ${SCRATCH}/a b")).toEqual([["cat", "${SCRATCH}/a", "b"]]);
   });
@@ -87,6 +93,26 @@ describe("heredocs", () => {
     expect(words("cat <<'END'\n$(rm x)\nEND\nls")).toEqual([["cat"], ["ls"]]);
     expect(words("cat <<-END\n\tgh pr create\n\tEND\nls")).toEqual([["cat"], ["ls"]]);
     expect(words("cat <<A <<B\n1\nA\n2\nB\nls")).toEqual([["cat"], ["ls"]]);
+  });
+
+  test("substitutions inside an unquoted heredoc body are commands", () => {
+    expect(words("cat <<EOF\n$(cat .env)\nEOF")).toContainEqual(["cat", ".env"]);
+    expect(words("cat <<EOF\nline\n`git push -f`\nEOF")).toContainEqual(["git", "push", "-f"]);
+    expect(words("cat <<-EOF\n\t$(git push -f)\n\tEOF")).toContainEqual(["git", "push", "-f"]);
+    expect(words("cat <<EOF\n${x:-$(git push -f)}\nEOF")).toContainEqual(["git", "push", "-f"]);
+    expect(words("cat <<EOF\n$(echo $(git push -f))\nEOF")).toContainEqual(["git", "push", "-f"]);
+  });
+
+  test("quoted delimiters and escaped substitutions stay data", () => {
+    for (const text of [
+      "cat <<'EOF'\n$(git push -f)\nEOF",
+      'cat <<"EOF"\n$(git push -f)\nEOF',
+      "cat <<\\EOF\n$(git push -f)\nEOF",
+      "cat <<EOF\n\\$(git push -f)\nEOF",
+      "cat <<EOF\n\\`git push -f`\nEOF",
+    ]) {
+      expect(words(text)).not.toContainEqual(["git", "push", "-f"]);
+    }
   });
 
   test("an unterminated heredoc swallows the rest", () => {

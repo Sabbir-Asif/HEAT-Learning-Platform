@@ -111,6 +111,27 @@ function scan(text, startCwd, out) {
 
   const nested = (inner) => scan(inner, cwd, out);
 
+  const scanExpansions = (body) => {
+    let i = 0;
+    while (i < body.length) {
+      if (body[i] === "\\") i += 2;
+      else if (body.startsWith("$(", i)) {
+        const close = findClose(body, i + 2, "(", ")");
+        nested(body.slice(i + 2, close));
+        i = close + 1;
+      } else if (body.startsWith("${", i)) {
+        const close = findClose(body, i + 2, "{", "}");
+        scanExpansions(body.slice(i + 2, close));
+        i = close + 1;
+      } else if (body[i] === "`") {
+        let close = i + 1;
+        while (close < body.length && body[close] !== "`") close += body[close] === "\\" ? 2 : 1;
+        nested(body.slice(i + 1, close));
+        i = close + 1;
+      } else i += 1;
+    }
+  };
+
   const readWord = (at) => {
     let word = "";
     let i = at;
@@ -154,6 +175,7 @@ function scan(text, startCwd, out) {
         i = close + 1;
       } else if (text.startsWith("${", i)) {
         const close = findClose(text, i + 2, "{", "}");
+        scanExpansions(text.slice(i + 2, close));
         word += text.slice(i, close + 1);
         i = close + 1;
       } else if (ch === "`") {
@@ -200,8 +222,9 @@ function scan(text, startCwd, out) {
       i = at + 2;
       const strip = text[i] === "-";
       if (strip) i += 1;
-      const [delimiter, next] = readWord(skipBlanks(i));
-      heredocs.push({ delimiter, strip });
+      const begin = skipBlanks(i);
+      const [delimiter, next] = readWord(begin);
+      heredocs.push({ delimiter, strip, quoted: /['"\\]/.test(text.slice(begin, next)) });
       return next;
     }
     if (text[i] === "&") {
@@ -214,14 +237,17 @@ function scan(text, startCwd, out) {
 
   const skipHeredocBodies = (at) => {
     let i = at;
-    for (const { delimiter, strip } of heredocs.splice(0)) {
+    for (const { delimiter, strip, quoted } of heredocs.splice(0)) {
+      const body = [];
       while (i < length) {
         const end = text.indexOf("\n", i);
         const stop = end === -1 ? length : end;
         const line = text.slice(i, stop);
         i = stop + 1;
         if ((strip ? line.replace(/^\t+/, "") : line) === delimiter) break;
+        body.push(line);
       }
+      if (!quoted) scanExpansions(body.join("\n"));
     }
     return Math.min(i, length);
   };

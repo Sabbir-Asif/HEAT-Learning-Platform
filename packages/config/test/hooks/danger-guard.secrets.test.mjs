@@ -56,6 +56,21 @@ describe("environment files through Bash", () => {
     expect(bash(command)).toEqual({});
   });
 
+  test.each([
+    "cat <<EOF\n$(cat .env)\nEOF",
+    "echo ${x:-$(cat .env)}",
+    "cat <<EOF\n`cat apps/api/.env`\nEOF",
+  ])("denies a substitution hidden in %j", (command) => {
+    expect(bash(command).deny).toMatch(/environment files/i);
+  });
+
+  test("allows heredocs that only carry text", () => {
+    expect(
+      bash("gh issue comment 25 --body-file - <<'EOF'\nmentions .env and $(cat .env)\nEOF"),
+    ).toEqual({});
+    expect(bash("git commit -F - <<EOF\nnever read .env files\nEOF")).toEqual({});
+  });
+
   test("allows the commands the workflow uses", () => {
     expect(bash("git add .env.example && git commit -m 'never read .env files'")).toEqual({});
   });
