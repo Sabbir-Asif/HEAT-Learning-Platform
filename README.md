@@ -12,8 +12,9 @@ apps/
   worker/             Same codebase as the API, no HTTP listener
 packages/
   contracts/  Zod schemas and shared types        db/       Prisma (added later)
-  api-client/ Generated API client (added later)  ui/       Shared components and tokens
-  i18n/       Message catalogs                    config/   tsconfig presets
+  api-client/ Generated API client and fetchers   ui/       Shared components and tokens
+  i18n/       Message catalogs
+  config/     tsconfig, ESLint, Prettier and Vitest presets; repository scripts (audit:deps, github:setup, ticket)
 ```
 
 ### Install and build
@@ -66,6 +67,48 @@ pnpm test:coverage   # Vitest with V8 coverage, 85% minimum
 
 All rules live in `@heat/config`. A package opts in with one-line files (`eslint.config.mjs`, `vitest.config.mjs`, a tsconfig that extends `@heat/config/tsconfig/*`) and the root `package.json` points Prettier at the shared config. A package that holds rule logic (unlock, scoring, certificates) raises its coverage gate with `nodePreset({ threshold: 100 })`.
 
+### Storybook
+
+`@heat/ui` has a Storybook 10 workbench with the accessibility addon (axe) and the Vitest addon. Stories sit next to their component as `src/**/*.stories.tsx`; the config is in `packages/ui/.storybook/`.
+
+```sh
+pnpm --filter @heat/ui storybook                              # dev server on http://localhost:6006
+pnpm --filter @heat/ui exec playwright install chromium       # one time: the browser the story tests use
+pnpm --filter @heat/ui test:stories                           # every story rendered in Chromium and checked with axe
+pnpm --filter @heat/ui build-storybook                        # static build in packages/ui/storybook-static (ignored by git)
+```
+
+The toolbar has a theme control (light, dark: the `.dark` class on the story root and on `<html>`) and a locale control (`en`, `bn`: the `lang` attribute; `dir` stays `ltr`). A story pins both with `globals: { theme, locale }`, which locks the toolbar for that story, so each component gets one story for every combination plus a `Default` story that follows the toolbar. Sample text is written in the story, because `@heat/ui` has no i18n dependency. The temporary Bangla and Latin font is self-hosted from `@fontsource-variable/noto-sans-bengali` through `.storybook/preview.css`.
+
+An axe violation fails the story test and the output names the rule, for example `button-name`. A story that must accept a known violation sets `parameters.a11y.test` to `"todo"` with a reason. Story tests are not part of `pnpm test` or the coverage gate; they run in `test:stories` and in the `storybook` CI job.
+
+### API client
+
+The API describes itself, and the browser and Server Components call it through code generated from that description (ADR 0015). Nothing is written by hand between the controllers and the hooks.
+
+```sh
+pnpm generate                      # build contracts and the API, emit the spec, run orval
+pnpm --filter api openapi          # only the spec, after `pnpm --filter api build`
+pnpm --filter @heat/api-client generate   # only orval, from the committed spec
+```
+
+1. Controllers use `nestjs-zod` DTOs built from `@heat/contracts` schemas and `@nestjs/swagger` decorators. `apps/api/src/openapi/` creates the application in preview mode (the module graph, no provider instantiated), so the spec needs no database, Redis or server. The output has sorted keys and no timestamp, path or environment value.
+2. `apps/api/openapi.json` is committed, so an API change shows in the diff.
+3. Orval 8 turns it into `packages/api-client/src/generated/`: TanStack Query hooks and MSW handlers (`client/`), plain typed functions for Server Components (`server/`) and Zod schemas (`zod/`). The generated files are committed, skipped by ESLint, Prettier and the coverage gate, and still type-checked.
+
+| Import                     | For                                                                                     |
+| -------------------------- | --------------------------------------------------------------------------------------- |
+| `@heat/api-client`         | Hooks, model types, `ApiError`, `registerRequestInterceptor`, `setUnauthorizedHandler`  |
+| `@heat/api-client/server`  | `serverFetch` and the server functions; `server-only`, a Client Component cannot use it |
+| `@heat/api-client/mocks`   | MSW handlers and response factories for tests and Storybook                             |
+| `@heat/api-client/schemas` | Generated Zod schemas, for parsing responses (forms use `@heat/contracts`)              |
+
+Errors have one shape: `{ "error": { "code", "message", "requestId", "fields": [{ "path", "code" }] } }`, with `code` from the closed list in `@heat/contracts`. A global filter in the API produces it with fixed message text. Both the browser mutator and the server fetcher throw an `ApiError` carrying the status, code, field paths, request id and `Retry-After`; when no envelope arrives (an Nginx error page, a network failure, an abort) the code is `UNEXPECTED_RESPONSE`, `NETWORK_ERROR` or `REQUEST_ABORTED`.
+
+The server fetcher reads `API_INTERNAL_URL`, the API's address on the internal network (`http://api:4000` in Docker, `http://localhost:4000` locally; the API listens on 4000, not the 3000 written in the first design text). It throws a configuration error when the variable is missing and has no fallback. It forwards only the incoming `Cookie` header, does not follow redirects and does not cache unless asked. Pass `forwardCookies: false` inside `'use cache'` functions.
+
+The CSRF header and the 401 refresh are not part of this package yet. They register through `registerRequestInterceptor` and `setUnauthorizedHandler` when their tickets land.
+
 ### Continuous integration
 
 Pull requests and pushes to `main` run these checks in GitHub Actions; each is a required status check:
@@ -75,6 +118,10 @@ Pull requests and pushes to `main` run these checks in GitHub Actions; each is a
 | `lint`, `format`, `typecheck`, `test`, `build` | The matching root script through Turborepo (`test` runs coverage)    |
 | `integration`                                  | `test:integration` in any package that defines it (Testcontainers)   |
 | `audit`                                        | `pnpm audit:deps`, also weekly; fails on high or critical advisories |
+
+The `storybook` job is separate and not yet a required check: it runs the story tests with axe and builds static Storybook, and uploads it as the `storybook-static` artifact (7 days, also when the tests fail). It runs on every pull request. The owner adds it to `.github/branch-protection.json` and re-applies the protection.
+
+The `api-client-drift` job is separate and not yet a required check either. It builds contracts and the API, regenerates `apps/api/openapi.json` and `packages/api-client/src/generated/`, and fails when any file differs from what is committed (modified, deleted or new), listing the files. Run `pnpm generate` and commit the result to fix it.
 
 Dependabot runs from `.github/dependabot.yml` (npm, GitHub Actions and the dev compose images; app Dockerfiles are added with the deployment tickets). CodeQL is left out: GitHub only stores its results for a private repository with code security enabled. Add it back if the repository goes public or code security is bought. In CI, Turborepo's cache lives in `.turbo` and is restored per task, so unchanged packages replay instead of re-running.
 
@@ -87,6 +134,65 @@ Workflow rules, enforced by `packages/config/test/workflows.test.mjs`: every ext
 ```sh
 gh api -X PUT repos/Sabbir-Asif/HEAT-Learning-Platform/branches/main/protection --input .github/branch-protection.json
 ```
+
+### GitHub setup
+
+Issue forms (feature, bug, spike, chore) are in `.github/ISSUE_TEMPLATE/` and the pull request template is `.github/pull_request_template.md`. Labels, milestones and the "HEAT LMS" Project with its fields are kept in `packages/config/src/github-setup.mjs` and applied with the `gh` CLI:
+
+```sh
+pnpm github:setup --dry-run   # print the planned changes, make none
+pnpm github:setup             # apply them
+```
+
+Run the dry run first. It reads only, but it still needs a token that can read this private repository and the Project. The owner of the Project is a user account, which GitHub's fine-grained tokens cannot reach, so use the `gh auth login` token or a classic one:
+
+| Run         | Scopes                                                                          |
+| ----------- | ------------------------------------------------------------------------------- |
+| `--dry-run` | `repo` and `read:project`                                                       |
+| apply       | `repo` and `project` (`gh auth refresh -s project` adds it to a signed-in `gh`) |
+
+It is safe to re-run. It creates what is missing, updates a label's colour and description in place, and never touches issues or project items. It does not delete or rename anything. Extra labels, milestones and options are left alone, and a closed project with the same title is reported instead of duplicated. Adding an option to an existing project field is the one risky write, because the API replaces the whole option list. The script reads the options twice and writes nothing if they changed, prints the current list first so it can be restored, passes every existing option back with its id, and reads the field again afterwards, failing if any option id or name is missing. It exits non-zero when something needs a person, such as a field of the wrong type. The Project Area options are the `area:*` labels, from one list in the script. `packages/config/test/github-setup.test.mjs` tests it against a fake `gh`, with no network or credentials.
+
+### Ticket command
+
+`pnpm ticket` is the GitHub side of the `/implement-issue` skill (`.claude/skills/implement-issue/`), kept in `packages/config/src/ticket.mjs` so the workflow rules are tested code:
+
+```sh
+pnpm ticket load 24                          # ticket JSON; exit 3 with the reasons when it may not start
+pnpm ticket refine 24 --file refined.md      # append to the issue's "Refined" section and log it
+pnpm ticket move 24 start                    # card to In progress, labels set (review: In review)
+```
+
+It needs `gh` with the `repo` and `project` scopes. `load` only reads, and keeps only comments from repository collaborators. `refine` never rewrites the owner's text: it appends, reads the body again just before writing and stops if it changed, then reads it back and fails if it is not exactly what was written. GitHub has no compare-and-swap for issue bodies, so an edit in the moment between that last read and the write can still be lost. `packages/config/test/ticket.test.mjs` tests it against a fake `gh`; `packages/config/test/skill.test.mjs` checks the skill and its agents.
+
+### Workflow hooks
+
+`.claude/settings.json` wires eight Claude Code hooks to `node packages/config/bin/hook.mjs <name>`. The logic is in `packages/config/src/hooks/` (Node built-ins only, so it runs before `pnpm install`) and is tested with throwaway git repos, worktrees and a fake `gh`, with no network. The hooks are guard rails for an agent session; branch protection and CI stay the gate (ADR 0010), because a hook can be bypassed through another tool.
+
+| Hook              | Event                     | What it does                                                                                                                                                                                   |
+| ----------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `context-loader`  | SessionStart              | Prints the branch, issue number, plan path and ticked tasks, offline. On `main` and epic branches it lists the ticket worktrees to resume.                                                     |
+| `ticket-injector` | UserPromptSubmit          | For `#N` in a prompt, adds the issue body and the owner, member and collaborator comments as delimited untrusted data. Never blocks the prompt.                                                |
+| `branch-guard`    | PreToolUse Edit, Write    | Blocks edits in a checkout on `main`, `master` or a detached HEAD. The repo is taken from the file, not from the session directory.                                                            |
+| `plan-gate`       | PreToolUse Edit, Write    | On `<type>/N-slug`, blocks every file but `docs/plans/issue-N.md` until that plan exists. Other branches, such as `epic/*`, are allowed.                                                       |
+| `danger-guard`    | PreToolUse Bash and files | Blocks force pushes, `prisma migrate reset`, edits to migrations already on `origin/main` or `origin/epic/*`, shell writes that skip the edit guards, and every read or write of `.env` files. |
+| `pr-gate`         | PreToolUse Bash           | Blocks `gh pr create`, `gh pr new` and pull request creation through the API unless the verification marker matches `HEAD` on a clean tree.                                                    |
+| `formatter`       | PostToolUse Edit, Write   | Runs ESLint fixes and Prettier on the touched file with the ignore files of `lint` and `format:check`. Skips `docs/`, generated files and images.                                              |
+| `stop-check`      | Stop                      | Runs `pnpm typecheck` in the last edited worktree after typed files changed, at most 3 blocks per session, never twice in one turn.                                                            |
+
+The four guards fail closed: malformed input, a crash or a timeout denies. The other four fail open with a one-line note.
+
+`pnpm verify` runs lint, format check, typecheck, coverage tests and build in order and, only if all pass on a clean tree, writes the commit sha to `heat-verified` in the worktree's own git directory (never committed). The PR gate accepts a marker only when it equals `HEAD` and the tree is clean, so any later commit needs another `pnpm verify`. Stage 6 of the skill calls it.
+
+Hook state for the stop check lives in `$HEAT_HOOKS_STATE_DIR` or a private `heat-hooks-<uid>/` directory (mode 0700, owner checked, never a symlink) under the system temp directory, outside every working tree. The plan gate allows editing the hook code and `.claude/settings.json` once the ticket's plan exists; `.github/CODEOWNERS` makes the owner read every change to them. A change to a hook takes effect in sessions started in a checkout that contains it.
+
+`.env` files are also denied by `permissions.deny` for Read and Edit. `.env.example` stays readable.
+
+What the hooks cannot do. They cannot protect themselves: an agent that edits `.claude/settings.json` or the hook code, once its plan exists, changes the guards for later sessions, so `.github/CODEOWNERS` (the hook code, `ticket.mjs`, the skill, the agents and every `CLAUDE.md`) and CI are the backstop, and the owner reads those diffs. Writes under `.git`, to any `heat-verified` file and to `.claude/settings.local.json` are denied from every tool. Reads of `.env` files are denied by name; indirection such as variables, globs, interpreters or computed strings can get around the Bash check, which is a limit of reading command text, not something a hook can close. If `node` or `packages/config/bin/hook.mjs` is missing, every guarded tool call is blocked because the guards fail closed; restore the branch, or restart the session from a checkout that has the file.
+
+### Conventions
+
+The quality bar, the delivery workflow and the rules for each app and package are in `CLAUDE.md` at the repo root and in each area's directory; the root file links to the rest. A rule is written in one file only. `packages/config/test/docs.test.mjs` fails if the root file reaches 200 lines, an area file is missing, a link or heading anchor in these files is dead, or a sentence is repeated between files.
 
 ### Where tests live
 

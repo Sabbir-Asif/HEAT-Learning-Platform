@@ -1,33 +1,14 @@
-/** Severities that fail the dependency audit. */
 export const BLOCKING_SEVERITIES = ["high", "critical"];
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const MAX_IGNORE_DAYS = 90;
 
-/**
- * @typedef {object} AuditIgnore
- * @property {string} advisory GitHub advisory id, for example GHSA-xxxx-xxxx-xxxx.
- * @property {string} reason Why the advisory does not apply or cannot be fixed yet.
- * @property {string} expires Last day the ignore holds, as YYYY-MM-DD.
- */
-
-/** True for a real calendar date written as YYYY-MM-DD. */
-const isDate = (/** @type {unknown} */ value) =>
+const isDate = (value) =>
   typeof value === "string" &&
   /^\d{4}-\d{2}-\d{2}$/.test(value) &&
   new Date(value).toISOString().slice(0, 10) === value;
 
-/**
- * Checks `pnpm audit --json` output against the ignore list.
- * An ignore needs a reason and an expiry no more than 90 days out; an expired ignore fails the audit.
- *
- * @param {{ error?: unknown, metadata?: object, advisories?: Record<string, { github_advisory_id: string, severity: string, module_name: string, title: string }> }} report
- * @param {AuditIgnore[]} ignores
- * @param {Date} today
- * @returns {string[]} Human-readable failures; empty when the audit passes.
- */
 export function evaluateAudit(report, ignores, today) {
-  // pnpm prints an error object, still valid JSON, when the registry is unreachable. That must not pass.
   if (report?.error || typeof report?.advisories !== "object" || !report.advisories) {
     const detail = report?.error ? JSON.stringify(report.error) : "no advisories field";
     return [`pnpm audit did not return a usable report: ${detail}`];

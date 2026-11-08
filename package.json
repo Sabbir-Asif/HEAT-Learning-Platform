@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "turbo run build",
+    "generate": "turbo run generate",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
@@ -17,6 +18,9 @@
     "format:root": "prettier --check . '!apps/**' '!packages/**'",
     "test:coverage": "turbo run test:coverage",
     "audit:deps": "node packages/config/bin/audit.mjs",
+    "github:setup": "node packages/config/bin/github-setup.mjs",
+    "ticket": "node packages/config/bin/ticket.mjs",
+    "verify": "node packages/config/bin/verify.mjs",
     "dev:up": "node infra/scripts/dev.mjs up",
     "dev:down": "node infra/scripts/dev.mjs down",
     "dev:reset": "node infra/scripts/dev.mjs reset"

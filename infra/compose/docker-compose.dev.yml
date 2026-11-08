@@ -1,5 +1,3 @@
-# Local dev services. The apps run on the host (`pnpm dev`); Nginx reaches them
-# through host.docker.internal. Start with `pnpm dev:up`.
 name: heat-lms-dev
 
 services:
@@ -19,7 +17,6 @@ services:
       timeout: 3s
       retries: 10
 
-  # BullMQ needs noeviction: Redis must never drop queue keys under memory pressure.
   redis:
     image: redis:7-alpine
     command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
@@ -33,7 +30,6 @@ services:
       timeout: 3s
       retries: 10
 
-  # Catches all outgoing mail. SMTP and web UI ports come from .env (defaults 1035 and 8035).
   mailpit:
     image: axllent/mailpit:v1.33.0
     ports:

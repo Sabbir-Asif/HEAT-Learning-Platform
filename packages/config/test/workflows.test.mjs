@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { load as parse } from "js-yaml";
 import { describe, expect, test } from "vitest";
 
 const github = resolve(import.meta.dirname, "../../../.github");
@@ -48,7 +49,6 @@ describe("GitHub workflows", () => {
     const { required_status_checks } = JSON.parse(
       readFileSync(join(github, "branch-protection.json"), "utf8"),
     );
-    // Job names: literal `name:` lines, plus the task names of the CI matrix.
     const reported = new Set(
       workflows.flatMap(({ text }) => [
         ...[...text.matchAll(/^ {4}name: (?!\$\{\{)(.+)$/gm)].map((m) => m[1].trim()),
@@ -63,5 +63,37 @@ describe("GitHub workflows", () => {
       .filter(({ text }) => /pull_request_target/.test(text))
       .map(({ name }) => name);
     expect(risky).toEqual([]);
+  });
+  describe("Storybook job", () => {
+    const ci = parse(workflows.find(({ name }) => name === "ci.yml").text);
+    const job = ci.jobs.storybook;
+    const runs = (job?.steps ?? []).map((step) => step.run).filter(Boolean);
+
+    test("exists, with a timeout, and runs on every pull request (no path filter)", () => {
+      expect(job).toBeDefined();
+      expect(job["timeout-minutes"]).toBeGreaterThan(0);
+      expect(JSON.stringify(ci.on)).not.toMatch(/paths/);
+    });
+
+    test("runs the story tests and builds static Storybook", () => {
+      expect(runs).toContain("pnpm --filter @heat/ui test:stories");
+      expect(runs).toContain("pnpm --filter @heat/ui build-storybook");
+    });
+
+    test("installs Chromium for Playwright", () => {
+      expect(runs.some((run) => /playwright install.*chromium/.test(run))).toBe(true);
+    });
+
+    test("uploads storybook-static for 7 days, also when the story tests fail", () => {
+      const upload = (job?.steps ?? []).find((step) =>
+        step.uses?.startsWith("actions/upload-artifact@"),
+      );
+      expect(upload.if).toBe("${{ !cancelled() }}");
+      expect(upload.with).toMatchObject({
+        name: "storybook-static",
+        path: "packages/ui/storybook-static",
+        "retention-days": 7,
+      });
+    });
   });
 });

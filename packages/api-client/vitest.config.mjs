@@ -1,3 +1,3 @@
-import { nodePreset } from "@heat/config/vitest";
+import { jsdomPreset } from "@heat/config/vitest";
 
-export default nodePreset();
+export default jsdomPreset({ coverageExclude: ["src/generated/**"] });

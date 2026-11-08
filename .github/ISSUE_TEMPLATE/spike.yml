@@ -1,0 +1,59 @@
+name: "Spike"
+description: "A time-boxed investigation that ends in a decision"
+labels: ["type:spike", "needs-refinement"]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: "Context and question"
+      description: "The question to answer, why it matters, and the time box."
+      placeholder: "Question: ... Time box: ..."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: One checkbox per criterion, each in Given, When, Then form.
+      value: |
+        - [ ] Given ..., when ..., then ...
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What this ticket does not do.
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: 'Tickets that must land first, as "Blocked by #N". Write "None" if there are none.'
+      placeholder: "Blocked by #12"
+    validations:
+      required: true
+  - type: textarea
+    id: test-plan
+    attributes:
+      label: Test plan
+      description: The tests to write and the checks to run, starting with the failing test.
+    validations:
+      required: true
+  - type: textarea
+    id: security-notes
+    attributes:
+      label: Security notes
+      description: 'Auth, permissions, uploads, personal data and secrets this touches, and how they are handled. Write "None" if it touches none.'
+    validations:
+      required: true
+  - type: checkboxes
+    id: definition-of-done
+    attributes:
+      label: Definition of done
+      options:
+        - label: Acceptance criteria met and demonstrated in the pull request
+        - label: Tests from the test plan added and passing in CI
+        - label: Lint, typecheck and build pass
+        - label: Security, privacy and accessibility points above handled
+        - label: Docs or ADR updated where behaviour or a decision changed
+        - label: Merged by the owner after green CI

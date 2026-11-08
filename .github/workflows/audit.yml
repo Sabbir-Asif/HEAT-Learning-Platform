@@ -5,7 +5,6 @@ on:
   push:
     branches: [main]
   schedule:
-    # New advisories appear without any commit, so check weekly too.
     - cron: "17 4 * * 1"
 
 permissions:
@@ -20,7 +19,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      # pnpm audit reads the lockfile, so nothing needs installing.
       - uses: ./.github/actions/setup
         with:
           install: "false"

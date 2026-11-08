@@ -5,7 +5,6 @@ on:
   push:
     branches: [main]
 
-# Pull requests use the pull_request event, so runs from forks get a read-only token and no secrets.
 permissions:
   contents: read
 
@@ -14,7 +13,6 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  # One job per task so each is its own required status check named after the task.
   check:
     name: ${{ matrix.task }}
     runs-on: ubuntu-24.04
@@ -33,7 +31,6 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
-      # Turborepo's local cache, kept per task. Unchanged packages replay from it instead of re-running.
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .turbo
@@ -43,7 +40,6 @@ jobs:
         env:
           TURBO_CACHE_DIR: .turbo
 
-  # Runs the Testcontainers suites (E2-5). Nothing defines test:integration yet, so it passes as a no-op.
   integration:
     name: integration
     runs-on: ubuntu-24.04
@@ -54,3 +50,49 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup
       - run: pnpm -r --if-present run test:integration
+
+  storybook:
+    name: storybook
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm --filter @heat/ui exec playwright install --with-deps chromium
+      - run: pnpm --filter @heat/ui build-storybook
+      - run: pnpm --filter @heat/ui test:stories
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: storybook-static
+          path: packages/ui/storybook-static
+          retention-days: 7
+
+  api-client-drift:
+    name: api-client-drift
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: pnpm generate --force
+      - name: Fail when the generated files changed
+        run: |
+          paths="apps/api/openapi.json packages/api-client/src/generated"
+          changed=$(git status --porcelain --untracked-files=all -- $paths)
+          if [ -n "$changed" ]; then
+            echo "::error title=Generated API client is out of date::Run pnpm generate and commit the result."
+            echo "Changed generated files (M modified, D deleted, ?? new):"
+            echo "$changed"
+            git diff --stat -- $paths
+            exit 1
+          fi
+          echo "Generated files are up to date."
