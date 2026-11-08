@@ -3,7 +3,9 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import {
+  MAX_ELEMENT_DEPTH,
   MAX_SOURCE_BYTES,
+  MAX_USE_ELEMENTS,
   MAX_SVG_BYTES,
   PIXEL_DIFFERENCE_LIMIT,
   buildBrand,
@@ -448,5 +450,174 @@ describe("legibility", () => {
     const [first] = problemsFor(mark("#0f172a"), dark);
     expect(first).toContain("#0b1220");
     expect(first).toMatch(/40 px|80 px/);
+  });
+});
+
+describe("sanitise attribute grammar", () => {
+  const withAttribute = (name, value) => svg(`<rect ${name}="${value}"/>`);
+  const reasons = (text) => sanitise(text).join("\n");
+
+  test.each([
+    ["url written with a CSS escape", "u\\72l(\\68ttps:\\2f\\2fevil.example/x.svg#a)"],
+    ["a relative url written with a CSS escape", "u\\72l(x.svg#a)"],
+    ["an uppercase hex escape with a trailing space", "\\55 RL(x.svg#a)"],
+    ["a escaped scheme", "\\68ttp://evil.example/x"],
+    ["a single backslash", "red\\"],
+  ])("rejects %s in fill and names the backslash", (_name, value) => {
+    expect(reasons(withAttribute("fill", value))).toContain("backslash");
+  });
+
+  test.each(["mask", "clip-path", "stroke", "stop-color", "transform", "d"])(
+    "rejects an escaped url( in %s",
+    (name) => {
+      expect(reasons(withAttribute(name, "\\75rl(#a)"))).toContain("backslash");
+    },
+  );
+
+  test("rejects a backslash that arrives through a character reference", () => {
+    expect(reasons(withAttribute("fill", "u&#92;72l(x.svg#a)"))).toContain("backslash");
+  });
+
+  test.each([
+    ["fill", "url(#a)"],
+    ["stroke", "url(#grad-1)"],
+    ["mask", "url(#m.1)"],
+    ["clip-path", "url(#c_2)"],
+  ])("accepts %s=%s", (name, value) => {
+    expect(sanitise(withAttribute(name, value))).toEqual([]);
+  });
+
+  test.each([
+    ["fill", "url(#a) red"],
+    ["fill", "url( #a)"],
+    ["fill", "URL(#a)"],
+    ["fill", "url(#a#b)"],
+    ["fill", "url(#a)url(#b)"],
+    ["mask", "url(#a) url(#b)"],
+    ["clip-path", "url('#a')"],
+    ["fill", "url(#)"],
+  ])("rejects the url form %s=%s", (name, value) => {
+    expect(sanitise(withAttribute(name, value)).length).toBeGreaterThan(0);
+  });
+
+  test.each([
+    ["fill", "calc(1 + 2)"],
+    ["opacity", "var(--x)"],
+    ["width", "calc(100% - 4px)"],
+    ["d", "M0 0 attr(x)"],
+    ["stroke-width", "env(x)"],
+    ["fill", "image(x.png)"],
+    ["clip-path", "polygon(0 0, 1 1, 0 1)"],
+    ["transform", "url(#a)"],
+    ["offset", "translate(1 2)"],
+  ])("rejects a parenthesis in %s=%s", (name, value) => {
+    expect(reasons(withAttribute(name, value))).toContain(name);
+  });
+
+  test.each([
+    ["transform", "translate(1 2) rotate(45)"],
+    ["transform", "matrix(1,0,0,1,5.5,-3e2)"],
+    ["gradientTransform", "scale(2) skewX(10)"],
+    ["fill", "rgb(10, 20, 30)"],
+    ["fill", "rgba(10,20,30,0.5)"],
+    ["stroke", "hsl(120, 50%, 50%)"],
+    ["stop-color", "hsla(120,50%,50%,0.3)"],
+    ["fill", "#0f172a"],
+    ["fill", "#fff"],
+    ["fill", "none"],
+    ["fill", "currentColor"],
+    ["fill", "darkblue"],
+  ])("accepts %s=%s", (name, value) => {
+    expect(sanitise(withAttribute(name, value))).toEqual([]);
+  });
+
+  test.each([
+    ["transform", "translate(1 2) foo(3)"],
+    ["transform", "translate(1 2"],
+    ["transform", "translate(url(#a))"],
+    ["fill", "rgb(1 2 3) url(#a)"],
+    ["fill", "rgb(url(#a))"],
+    ["fill", "hsl(1,2%,3%);"],
+    ["stop-color", "url(#a)"],
+    ["color", "url(#a)"],
+  ])("rejects the malformed value %s=%s", (name, value) => {
+    expect(sanitise(withAttribute(name, value)).length).toBeGreaterThan(0);
+  });
+
+  test.each(["d", "points", "viewBox"])("rejects a quote, semicolon or colon in %s", (name) => {
+    expect(sanitise(withAttribute(name, "0 0 1 1;x:y")).length).toBeGreaterThan(0);
+  });
+
+  test("keeps naming data:, javascript: and http: values", () => {
+    expect(reasons(withAttribute("fill", "data:image/png;base64,AAAA"))).toContain("data:");
+    expect(reasons(svg('<use href="javascript:alert(1)"/>'))).toContain("javascript:");
+    expect(reasons(withAttribute("fill", "http://example.com/x"))).toContain("http:");
+  });
+});
+
+describe("sanitise duplicate attributes", () => {
+  test.each([
+    ["fill", '<path fill="red" fill="url(//evil/x)"/>'],
+    ["href", '<use href="#a" href="javascript:alert(1)"/>'],
+    ["fill with a space around the equals sign", "<path fill = 'red' fill = 'blue'/>"],
+    [
+      "an xlink:href pair",
+      '<use xlink:href="#a" xlink:href="#b" xmlns:xlink="http://www.w3.org/1999/xlink"/>',
+    ],
+    [
+      "a duplicate on the root",
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1" viewBox="0 0 2 2"/>',
+    ],
+  ])("rejects a repeated attribute: %s", (_name, body) => {
+    const text = body.startsWith("<svg") ? body : svg(body);
+    expect(sanitise(text).join("\n")).toContain("repeated");
+  });
+
+  test("does not mistake an attribute name inside a value for a repeat", () => {
+    expect(sanitise(svg('<g id="fill=" fill="red"/>')).join("\n")).not.toContain("repeated");
+  });
+
+  test("allows the same attribute name on different elements", () => {
+    expect(sanitise(svg('<g fill="red"><path fill="blue" d="M0 0"/></g>'))).toEqual([]);
+  });
+});
+
+describe("sanitise reference limits", () => {
+  const chain = (levels) => {
+    const groups = Array.from({ length: levels }, (_, level) =>
+      level === 0
+        ? '<g id="a0"><rect width="1" height="1"/></g>'
+        : `<g id="a${level}"><use href="#a${level - 1}"/><use href="#a${level - 1}"/></g>`,
+    );
+    return svg(`<defs>${groups.join("")}</defs><use href="#a${levels - 1}"/>`);
+  };
+
+  test("rejects an exponential chain of use elements and names the limit", () => {
+    const report = sanitise(chain(30)).join("\n");
+    expect(report).toContain(`more than ${MAX_USE_ELEMENTS} <use>`);
+  });
+
+  test("accepts a few use elements", () => {
+    expect(sanitise(chain(4))).toEqual([]);
+  });
+
+  test("accepts exactly the use limit and rejects one more", () => {
+    const uses = (count) => svg(`<defs><g id="a"/></defs>${'<use href="#a"/>'.repeat(count)}`);
+    expect(sanitise(uses(MAX_USE_ELEMENTS))).toEqual([]);
+    expect(sanitise(uses(MAX_USE_ELEMENTS + 1)).join("\n")).toContain("<use>");
+  });
+
+  test("rejects elements nested deeper than the limit and names it", () => {
+    const nested = (levels) =>
+      svg(`${"<g>".repeat(levels)}<rect width="1" height="1"/>${"</g>".repeat(levels)}`);
+    expect(sanitise(nested(MAX_ELEMENT_DEPTH - 2))).toEqual([]);
+    expect(sanitise(nested(MAX_ELEMENT_DEPTH + 1)).join("\n")).toContain(
+      `nested deeper than ${MAX_ELEMENT_DEPTH}`,
+    );
+  });
+
+  test("reports a limit once however far it is exceeded", () => {
+    const report = sanitise(chain(30)).filter((line) => line.includes("<use>"));
+    expect(report).toHaveLength(1);
   });
 });

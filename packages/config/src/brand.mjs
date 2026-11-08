@@ -112,9 +112,40 @@ const forbiddenValues = [
   ["//", /(^|[\s(,'"])\/\//],
 ];
 
+const idPattern = /^[A-Za-z_][\w.-]*$/;
 const fragment = /^#[A-Za-z_][\w.-]*$/;
-const urlCall = /url\(\s*([^)]*?)\s*\)/gi;
+const idUrl = /^url\(#[A-Za-z_][\w.-]*\)$/;
+const colourHex = /^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+const colourKeyword = /^[A-Za-z]+$/;
+const colourFunction = /^(?:rgb|rgba|hsl|hsla)\(\s*[-+\d.%\s,/]+\)$/;
+const transformList =
+  /^\s*(?:(?:matrix|translate|scale|rotate|skewX|skewY)\(\s*[-+\d.eE\s,]*\)\s*,?\s*)+$/;
+const pathData = /^[MmLlHhVvCcSsQqTtAaZz0-9eE.,+\-\s]*$/;
+const classList = /^[\w\s-]*$/;
+const plainValue = /^[A-Za-z0-9\s.,%+\-#]*$/;
 const eventHandler = /^on/i;
+
+export const MAX_USE_ELEMENTS = 16;
+export const MAX_ELEMENT_DEPTH = 16;
+
+const isColour = (value) =>
+  colourHex.test(value) || colourKeyword.test(value) || colourFunction.test(value);
+
+const grammars = new Map([
+  ["fill", (value) => isColour(value) || idUrl.test(value)],
+  ["stroke", (value) => isColour(value) || idUrl.test(value)],
+  ["stop-color", isColour],
+  ["color", isColour],
+  ["clip-path", (value) => value === "none" || idUrl.test(value)],
+  ["mask", (value) => value === "none" || idUrl.test(value)],
+  ["transform", (value) => transformList.test(value)],
+  ["gradientTransform", (value) => transformList.test(value)],
+  ["href", (value) => fragment.test(value)],
+  ["xlink:href", (value) => fragment.test(value)],
+  ["id", (value) => idPattern.test(value)],
+  ["class", (value) => classList.test(value)],
+  ["d", (value) => pathData.test(value)],
+]);
 
 function checkAttribute(element, name, value, add) {
   if (eventHandler.test(name)) return add(`event handler attribute ${name} on <${element}>`);
@@ -128,13 +159,23 @@ function checkAttribute(element, name, value, add) {
     return;
   }
   if (!allowedAttributes.has(name)) return add(`attribute ${name} on <${element}> is not allowed`);
+  if (value.includes("\\")) return add(`backslash in ${name} on <${element}>`);
   for (const [label, pattern] of forbiddenValues)
     if (pattern.test(value)) add(`${label} value in ${name} on <${element}>`);
-  if ((name === "href" || name === "xlink:href") && !fragment.test(value))
-    add(`${name} on <${element}> must be a #fragment, found ${value.slice(0, 40)}`);
-  for (const [, target] of value.matchAll(urlCall))
-    if (!fragment.test(target)) add(`url( ) in ${name} on <${element}> must point to a #fragment`);
+  if (/url\(/i.test(value) && !idUrl.test(value))
+    add(`url( ) in ${name} on <${element}> must be url(#id)`);
+  if (name === "href" || name === "xlink:href") {
+    if (!fragment.test(value))
+      add(`${name} on <${element}> must be a #fragment, found ${value.slice(0, 40)}`);
+    return;
+  }
+  const accepted = grammars.get(name) ?? ((text) => plainValue.test(text));
+  if (!accepted(value))
+    add(`value of ${name} on <${element}> is not allowed: ${value.slice(0, 40)}`);
 }
+
+const attributeNames = (rawTag) =>
+  [...rawTag.matchAll(/([^\s=<>"'/]+)\s*=\s*(?:"[^"]*"|'[^']*')/g)].map((match) => match[1]);
 
 export function sanitise(source, { maxBytes = MAX_SVG_BYTES } = {}) {
   const found = new Set();
@@ -145,6 +186,7 @@ export function sanitise(source, { maxBytes = MAX_SVG_BYTES } = {}) {
 
   const parser = sax.parser(true, { lowercase: false });
   let depth = 0;
+  let useCount = 0;
   let sawRoot = false;
   let failed = false;
 
@@ -161,12 +203,22 @@ export function sanitise(source, { maxBytes = MAX_SVG_BYTES } = {}) {
   };
   parser.oncdata = () => add("CDATA is not allowed");
   parser.onopentag = ({ name, attributes }) => {
+    const seen = new Set();
+    for (const attribute of attributeNames(
+      text.slice(parser.startTagPosition - 1, parser.position),
+    ))
+      if (seen.has(attribute)) add(`attribute ${attribute} is repeated on <${name}>`);
+      else seen.add(attribute);
+    if (name === "use" && (useCount += 1) === MAX_USE_ELEMENTS + 1)
+      add(`more than ${MAX_USE_ELEMENTS} <use> elements`);
     if (depth === 0) {
       sawRoot = true;
       if (name !== "svg") add(`the root element must be <svg>, found <${name}>`);
       else if (!("viewBox" in attributes)) add("the <svg> element needs a viewBox");
     }
     depth += 1;
+    if (depth === MAX_ELEMENT_DEPTH + 1)
+      add(`elements are nested deeper than ${MAX_ELEMENT_DEPTH} levels`);
     if (namedElements.has(name))
       add(`<${name}> element is not allowed: ${namedElements.get(name)}`);
     else if (!allowedElements.has(name)) add(`<${name}> element is not allowed`);
