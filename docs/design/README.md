@@ -33,7 +33,7 @@ Three frames set the refined direction and are the ones to copy: `student-landin
 
 ### Owner additions of 2026-11-08 (afternoon)
 
-- Real logos from <https://heat.ugc.gov.bd/>: the HEAT logo, the Government of Bangladesh seal, the UGC logo and the World Bank logo are in `assets/logos/` and placed in the landing frame header and footer. The University of Dhaka crest has no official file yet and is a labelled placeholder.
+- Real logos from <https://heat.ugc.gov.bd/>: the HEAT logo, the Government of Bangladesh seal, the UGC logo and the World Bank logo are in `assets/logos/` and placed in the landing frame header and footer. The University of Dhaka crest is the official file supplied by the owner (`assets/logos/du.png`).
 - The look follows the macOS design language: frosted, translucent bars (white at about 78 percent with a soft white edge), layered soft shadows, rounded 20 to 32 px surfaces, vibrant Lucide icons and a window chrome (traffic-light dots) around product previews. Implementation uses `backdrop-blur` on the header and sidebar, never on content.
 - Buttons carry an icon and a label. Below the tablet width the label hides and only the icon stays, with an accessible name and a tooltip. Row actions in tables are icon-only at every width.
 - The player, the student screens and the insights page get the most design effort. The insights page must be informative: totals, trends, per-module completion and the people who need follow-up, not a single chart.
@@ -50,13 +50,13 @@ The public site uses few images on purpose: one hero photo, and module cards tha
 | `img-signup`            | Create account, left panel   | Student walking into a University of Dhaka building with a notebook, morning light, portrait     | 1248 x 1736                       |
 | `img-lesson-video`      | Lesson player                | Poster still of the lesson video, 16:9, one per lesson                                           | 1920 x 1080                       |
 | `img-module-cover-upload` | Module editor              | Optional module cover, uploaded by the admin                                                     | 874 x 440                         |
-| University of Dhaka crest | Header and footer          | Official crest file. The frames use a low-resolution crop from the demo mock                     | 256 x 256, transparent PNG or SVG |
+| University of Dhaka crest | Header and footer          | Official crest file, supplied by the owner and saved as `assets/logos/du.png`. The frames carry a small copy | 256 x 256, transparent PNG or SVG |
 | HEAT, Government of Bangladesh, UGC, World Bank | Header, footer, admin sidebar | Logo files taken from <https://heat.ugc.gov.bd/>, saved in `assets/logos/`   | as supplied                       |
 
 ### Buttons, rich text and footer
 
 - Every button has an icon. Below the tablet width the label hides and only the icon stays, with an accessible name and a tooltip. Row actions in tables are icon-only at every width.
-- Text areas that hold formatted content, such as the module description, use a rich text editor with this toolbar: undo, redo, heading, bold, italic, underline, bullet list, numbered list, quote, link, unlink and clear formatting. It shows a saved state and a character count. Stored output is sanitised HTML limited to those elements. The editor frame is `admin-module-editor-unlocked-laptop-light-en`.
+- Text areas that hold formatted content, such as the module description, use a rich text editor with this toolbar: undo, redo, heading, bold, italic, underline, bullet list, numbered list, quote and clear formatting. There are no links and no subscript or superscript. It shows a saved state and a character count. Stored output is sanitised HTML limited to those elements, with no anchors. The editor frame is `admin-module-editor-unlocked-laptop-light-en`.
 - The public footer has a call to action band, brand with the HEAT and University of Dhaka logos, link columns, contact, partner logos with their names and legal links. It appears on every public page; the landing frame is the reference.
 
 ## Files
