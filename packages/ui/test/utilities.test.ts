@@ -12,8 +12,9 @@ async function build(candidates: string[]): Promise<string> {
   const compiler = await compile(css, {
     base: dirname(require.resolve("tailwindcss/package.json")),
     loadStylesheet: async (id, base) => {
-      const path = id === "tailwindcss" ? require.resolve("tailwindcss/index.css") : id;
-      return { path, base: dirname(path), content: readFileSync(path, "utf8") || base };
+      if (id.startsWith("@fontsource-variable/")) return { path: id, base, content: "" };
+      const path = require.resolve("tailwindcss/index.css");
+      return { path, base: dirname(path), content: readFileSync(path, "utf8") };
     },
   });
   return compiler.build(candidates);
