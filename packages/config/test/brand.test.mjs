@@ -1,7 +1,13 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
-import { MAX_SVG_BYTES, sanitise } from "../src/brand.mjs";
+import {
+  MAX_SVG_BYTES,
+  PIXEL_DIFFERENCE_LIMIT,
+  optimise,
+  pixelDifference,
+  sanitise,
+} from "../src/brand.mjs";
 
 const fixture = (name) => readFileSync(resolve(import.meta.dirname, "fixtures/svg", name), "utf8");
 
@@ -145,5 +151,67 @@ describe("sanitise", () => {
   test("reports each problem once", () => {
     const report = sanitise(svg("<script/><script/>"));
     expect(report.filter((line) => line.includes("<script>"))).toHaveLength(1);
+  });
+});
+
+describe("optimise", () => {
+  const verbose = fixture("verbose.svg");
+
+  test("makes the file strictly smaller", () => {
+    expect(Buffer.byteLength(optimise(verbose))).toBeLessThan(Buffer.byteLength(verbose));
+  });
+
+  test("changes at most 0.2% of pixels at 512 px", () => {
+    expect(pixelDifference(verbose, optimise(verbose))).toBeLessThanOrEqual(PIXEL_DIFFERENCE_LIMIT);
+  });
+
+  test("gives the same bytes when run on its own output", () => {
+    const once = optimise(verbose);
+    expect(optimise(once)).toBe(once);
+  });
+
+  test("keeps the viewBox, width and height and drops metadata", () => {
+    const out = optimise(verbose);
+    expect(out).toContain('viewBox="0 0 120 80"');
+    expect(out).toContain('width="120"');
+    expect(out).toContain('height="80"');
+    expect(out).not.toMatch(/<title|<desc|<\?xml|<!--/);
+  });
+
+  test("keeps gradient references working", () => {
+    const out = optimise(verbose);
+    expect(out).toMatch(/fill="url\(#\w+\)"/);
+    expect(sanitise(out)).toEqual([]);
+  });
+
+  test("normalises a byte order mark and Windows line endings", () => {
+    const noisy = `${byteOrderMark}${verbose.replaceAll("\n", "\r\n")}`;
+    expect(optimise(noisy)).toBe(optimise(verbose));
+  });
+
+  test("throws on input that is not XML", () => {
+    expect(() => optimise("<svg")).toThrow();
+  });
+});
+
+describe("pixelDifference", () => {
+  const square = (fill) => svg(`<rect width="10" height="10" fill="${fill}"/>`);
+
+  test("is zero for the same picture", () => {
+    expect(pixelDifference(square("#ff0000"), square("#ff0000"))).toBe(0);
+  });
+
+  test("is one when every pixel changes", () => {
+    expect(pixelDifference(square("#ff0000"), square("#0000ff"))).toBe(1);
+  });
+
+  test("ignores colour steps of 8 or less", () => {
+    expect(pixelDifference(square("#ff0000"), square("#f80000"))).toBe(0);
+    expect(pixelDifference(square("#ff0000"), square("#f60000"))).toBe(1);
+  });
+
+  test("counts a different shape", () => {
+    const half = svg('<rect width="5" height="10" fill="#ff0000"/>');
+    expect(pixelDifference(square("#ff0000"), half)).toBeCloseTo(0.5, 1);
   });
 });

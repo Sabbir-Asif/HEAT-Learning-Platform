@@ -32,11 +32,13 @@
     "typescript-eslint": "^8.72.1"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "2.6.2",
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "js-yaml": "^5.5.0",
     "prettier": "catalog:",
     "sax": "1.6.1",
+    "svgo": "4.1.0",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

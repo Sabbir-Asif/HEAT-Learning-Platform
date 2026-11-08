@@ -1,6 +1,12 @@
+import { Resvg } from "@resvg/resvg-js";
 import sax from "sax";
+import { optimize } from "svgo";
+import svgoConfig from "../svgo.config.mjs";
 
 export const MAX_SVG_BYTES = 20 * 1024;
+export const PIXEL_DIFFERENCE_LIMIT = 0.002;
+export const PIXEL_CHANNEL_TOLERANCE = 8;
+export const COMPARISON_WIDTH = 512;
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 const XLINK_NAMESPACE = "http://www.w3.org/1999/xlink";
@@ -176,4 +182,39 @@ export function sanitise(source) {
   if (!sawRoot && !failed) add("not well-formed XML: no <svg> element");
   if (!sawRoot && failed) add("the root element must be <svg>");
   return [...found];
+}
+
+const normalise = (source) => {
+  const withoutMark = source.charCodeAt(0) === 0xfeff ? source.slice(1) : source;
+  return withoutMark.replaceAll("\r\n", "\n").replaceAll("\r", "\n");
+};
+
+export function optimise(source) {
+  const { data } = optimize(normalise(source), svgoConfig);
+  if (!data) throw new Error("SVGO produced no output, the source is not a complete SVG");
+  return data;
+}
+
+export function render(source, { width, height, background }) {
+  const fitTo = height ? { mode: "height", value: height } : { mode: "width", value: width };
+  const image = new Resvg(source, {
+    fitTo,
+    background,
+    font: { loadSystemFonts: false },
+  }).render();
+  return { width: image.width, height: image.height, pixels: image.pixels };
+}
+
+export function pixelDifference(before, after, width = COMPARISON_WIDTH) {
+  const a = render(before, { width, background: "#ffffff" });
+  const b = render(after, { width, background: "#ffffff" });
+  if (a.width !== b.width || a.height !== b.height) return 1;
+  let differing = 0;
+  for (let i = 0; i < a.pixels.length; i += 4)
+    for (let channel = 0; channel < 4; channel++)
+      if (Math.abs(a.pixels[i + channel] - b.pixels[i + channel]) > PIXEL_CHANNEL_TOLERANCE) {
+        differing += 1;
+        break;
+      }
+  return differing / (a.pixels.length / 4);
 }
