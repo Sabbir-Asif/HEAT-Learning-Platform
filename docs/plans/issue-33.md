@@ -27,15 +27,15 @@ Add `PageHeader`, `StatusBadge`, `EmptyState`, `ErrorState`, `StatCard` and `Con
 
 Each task is test first, then the code, then a commit `feat(ui): ... (#33)`.
 
-- [ ] 1. Guard test scans `composites/`. Failing: add the directory to `scanned`; with a stub file containing a colour literal the test fails, then remove the stub. Commit.
-- [ ] 2. `status.ts`. Failing test `status.test.ts`: every key of `tokens.json` `statusTones` has an entry with the same tone, a non-empty label and an icon; contract enum names (`PENDING_VERIFICATION` and so on) resolve to the same entries; an unknown value resolves to neutral with the raw value. Then the mapping and `resolveStatus`. Commit.
-- [ ] 3. `StatusBadge` and its story (every state, light, dark; axe in both). Commit.
-- [ ] 4. `confirmation.ts`. Failing test: exact match after trim and NFC passes, a different case fails, empty or over-long names disable the typed field. Commit.
-- [ ] 5. `ConfirmDialog` and its story with `play` tests: open, focus moves in, Tab cycles inside, Escape closes and returns focus, Confirm disabled until the name matches and re-disabled on edit, pending blocks a second press, a failure shows the inline error and the drawer stays open, bottom side under `md`. Commit.
-- [ ] 6. `EmptyState`, `ErrorState` (Retry calls `onRetry`) and stories. Commit.
-- [ ] 7. `PageHeader` and story (phone width: title wraps, label hides, accessible name and tooltip). Commit.
-- [ ] 8. `StatCard` and story. Commit.
-- [ ] 9. Exports, `index.test.ts`, coverage config, `packages/ui/CLAUDE.md` (composites folder, status mapping, ConfirmDialog levels). Commit.
+- [x] 1. Guard test scans `composites/`. Failing: add the directory to `scanned`; with a stub file containing a colour literal the test fails, then remove the stub. Commit.
+- [x] 2. `status.ts`. Failing test `status.test.ts`: every key of `tokens.json` `statusTones` has an entry with the same tone, a non-empty label and an icon; contract enum names (`PENDING_VERIFICATION` and so on) resolve to the same entries; an unknown value resolves to neutral with the raw value. Then the mapping and `resolveStatus`. Commit.
+- [x] 3. `StatusBadge` and its story (every state, light, dark; axe in both). Commit.
+- [x] 4. `confirmation.ts`. Failing test: exact match after trim and NFC passes, a different case fails, empty or over-long names disable the typed field. Commit.
+- [x] 5. `ConfirmDialog` and its story with `play` tests: open, focus moves in, Tab cycles inside, Escape closes and returns focus, Confirm disabled until the name matches and re-disabled on edit, pending blocks a second press, a failure shows the inline error and the drawer stays open, bottom side under `md`. Commit.
+- [x] 6. `EmptyState`, `ErrorState` (Retry calls `onRetry`) and stories. Commit.
+- [x] 7. `PageHeader` and story (phone width: title wraps, label hides, accessible name and tooltip). Commit.
+- [x] 8. `StatCard` and story. Commit.
+- [x] 9. Exports, `index.test.ts`, coverage config, `packages/ui/CLAUDE.md` (composites folder, status mapping, ConfirmDialog levels). Commit.
 
 ## Acceptance criteria to proof
 

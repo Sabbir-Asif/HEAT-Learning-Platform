@@ -1,5 +1,10 @@
 import { jsdomPreset } from "@heat/config/vitest";
 
 export default jsdomPreset({
-  coverageExclude: ["**/*.stories.tsx", "src/components/**", "src/hooks/**"],
+  coverageExclude: [
+    "**/*.stories.tsx",
+    "src/components/**",
+    "src/composites/**/*.tsx",
+    "src/hooks/**",
+  ],
 });
