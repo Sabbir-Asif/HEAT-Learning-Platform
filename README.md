@@ -104,7 +104,7 @@ pnpm --filter frontend-public test:e2e                           # build, start,
 pnpm turbo run test:e2e --filter=frontend-public                 # the same, with the packages built first (CI)
 ```
 
-Specs cover the `/` redirect rules, the 404 for unknown locales, the brand files and the language switch. The `/BN` check is skipped on macOS and Windows, where a case-insensitive file system serves the prerendered `/bn`. Reports go to `playwright-report/` and `test-results/` (ignored by git).
+Specs cover the `/` redirect rules, the 404 for unknown locales, the brand files and the language switch. The config always starts its own server, so a leftover one on port 3200 fails the run instead of being reused. Reports go to `playwright-report/` and `test-results/` (ignored by git).
 
 ### API client
 
@@ -169,7 +169,7 @@ The GoB seal, the UGC mark and the World Bank mark are third-party marks. These 
 
 ### Languages
 
-`frontend-public` serves every page under `/bn/...` or `/en/...` (ADR 0009) with next-intl 4 and the catalogs in `@heat/i18n`; `frontend-internal` is English only and has no locale segment. `<html lang>` follows the first path segment, `dir` stays `ltr`, and a first segment that is not `bn` or `en` returns 404.
+`frontend-public` serves every page under `/bn/...` or `/en/...` (ADR 0009) with next-intl 4 and the catalogs in `@heat/i18n`; `frontend-internal` is English only and has no locale segment. `<html lang>` follows the first path segment, `dir` stays `ltr`, and a first segment that is not `bn` or `en` returns 404, as does any path under a locale that has no page yet (`dynamicParams = false` on the locale layout). The layout imports `src/app/globals.css`, which only imports `@heat/ui/styles.css`.
 
 `GET /` is the only path that redirects (`apps/frontend-public/src/proxy.ts`, matcher `["/"]`; every other path passes through untouched). The language is chosen in this order:
 
@@ -177,11 +177,11 @@ The GoB seal, the UGC mark and the World Bank mark are third-party marks. These 
 2. `Accept-Language`, read by `negotiateLocale` in `@heat/i18n`: the highest `q` wins, the primary subtag is matched case-insensitively (`bn-BD`, `EN-us`), `q=0`, a malformed `q` and a `q` above 1 are ignored, equal values go to the first listed, and only the first 32 entries and 1 KB are read.
 3. Bangla.
 
-The answer is a 307 with `Location: /<locale>` plus the original query, `Cache-Control: private, no-store` and `Vary: Accept-Language, Cookie`. The header value is never copied into the response, and the redirect never sets the cookie, so a guess is not frozen. A shared `/en/...` link wins over a saved `bn` cookie because the URL decides. Next.js 16 writes the query back in form encoding (`%20` becomes `+`); the parsed values are the same.
+The answer is a 307 with `Location: /<locale>` plus the original query, `Cache-Control: private, no-store` and `Vary: Accept-Language, Cookie`. The header value is never copied into the response, and the redirect never sets the cookie, so a guess is not frozen. A shared `/en/...` link wins over a saved `bn` cookie because the URL decides. Next.js 16 rewrites the query before `proxy.ts` runs (`%20` becomes `+`, an empty pair is dropped, `%zz` becomes `%25zz`), and a relative `Location` from the proxy makes it fail, so the redirect cannot keep the original bytes; the parsed values are the same.
 
 `LocaleSwitch` from `@heat/ui` is a `<nav>` of links; the glue in `apps/frontend-public/src/components/locale-switch-control.tsx` keeps the page, query and hash, writes the preference with `serializeLocaleCookie` and does a full navigation, because the root layout changes. The cookie is `__Host-locale=<bn|en>; Path=/; Max-Age=31536000; SameSite=Lax; Secure`, with no `Domain` and no `HttpOnly`: it is a display preference, not a credential, so the credential cookie rules do not apply. Browsers refuse `Secure` cookies on plain-http hosts other than `localhost`; the switch still navigates there. The privacy notice should list this cookie.
 
-Catalogs are `packages/i18n/src/messages/{en,bn}/<namespace>.ts` plus an `index.ts` per language; `bn` is `satisfies typeof en`. `pnpm --filter @heat/i18n test` fails and names the key or file when a key exists in one language only, a value is empty, `{placeholder}` names differ, or a namespace file is missing in one language or not exported by its aggregate. Dates go through `formatDate`, `formatTime` and `formatDateTime`, which print Asia/Dhaka time under any server `TZ`, with Bengali digits and month names in `bn` and ASCII digits in `en`, and throw `RangeError` on an invalid date.
+Catalogs are `packages/i18n/src/messages/{en,bn}/<namespace>.ts` plus an `index.ts` per language; `bn` is `satisfies typeof en`. `pnpm --filter @heat/i18n test` fails and names the key or file when a key exists in one language only, a value is empty, `{placeholder}` names differ, or a namespace file is missing in one language or not exported by its aggregate. Dates go through `formatDate`, `formatTime` and `formatDateTime`, which print Asia/Dhaka time under any server `TZ`, with Bengali digits and month names in `bn` and ASCII digits in `en`, and throw `RangeError` on an invalid date. A string must be ISO 8601 with a time and `Z` or an offset (`2026-11-07T20:30:00Z`); a string without one is rejected instead of being read in the server's zone.
 
 ### Continuous integration
 

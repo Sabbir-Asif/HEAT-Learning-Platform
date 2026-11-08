@@ -61,6 +61,16 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 - [x] **C2: app glue.** Tests with jsdom: the click handler writes the cookie, preserves path, query and hash, and calls `window.location.assign` with `/bn/courses/x?tab=2#notes` from `/en/courses/x?tab=2#notes`. Then the client glue file and an e2e spec of the switch.
 - [x] **C3: docs.** README (cookie, redirect rules, Playwright, `allowBuilds`, CI `e2e` job) and `apps/frontend-public/CLAUDE.md` (i18n conventions). Docs tests stay green.
 
+## Review follow-ups
+
+- [x] **R1: stylesheet.** `globals.css`, the `./styles.css` export and an e2e check of the linked stylesheet and the 24 px targets.
+- [x] **R2: redirect query.** e2e comparison of parsed values for `a%20b`, `a=1&a=2&` and `a=%zz`; the byte-for-byte goal is not reachable in Next 16.4.5.
+- [x] **R3: unknown paths.** `dynamicParams = false`, catch-all removed, 404 specs.
+- [x] **R4: dates.** Strings without an offset throw `RangeError`, tested under two zones.
+- [x] **R5: parity.** Directory namespaces are discovered.
+- [x] **R6: Playwright.** `reuseExistingServer` is false.
+- [x] **R7: glue.** `LocaleSwitch` is generic over its option values and the dead guard is gone.
+
 ## Acceptance criteria mapped to checks
 
 | Criterion (refined)                                                                     | Check                                                  |
@@ -83,14 +93,15 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 
 ## Decisions made while building
 
-- **Catch-all placeholder.** `/bn/anything` must render, so `[locale]/[...rest]/page.tsx` re-exports the home page with `dynamic = "force-dynamic"`. Without it every distinct path would be written to the ISR disk cache. #37 and the route tickets replace it. `dynamicParams = false` on the layout was tried and rejected: it also turns every path under the catch-all into a 404.
-- **Proxy redirect.** `NextResponse.redirect` with an absolute URL built from the request, not a relative `Location`: Next's proxy adapter throws `Invalid URL` on a relative one. Next then makes a same-host `Location` relative, so a forged `Host` does not appear in the response (checked with curl and Playwright). Next also re-serialises the query (`%20` becomes `+`, `b` becomes `b=`); the proxy test asserts our own `Location` byte for byte and the e2e spec compares parsed values.
+- **No catch-all.** A `[locale]/[...rest]` placeholder was built first and removed after review. `dynamicParams = false` on the locale layout makes unknown locales and any path without a page a 404 without a render or a prerender-cache entry, on case-insensitive file systems too. The `hasLocale` and `notFound()` check in `request.ts` stays as defence in depth.
+- **Proxy redirect.** `NextResponse.redirect` with an absolute URL built from the request. A relative `Location` from the proxy makes Next throw `Invalid URL` (500), and Next makes a same-host `Location` relative, so a forged `Host` does not appear in the response. Next 16.4.5 also rewrites the query before `proxy.ts` or any route handler sees it (`a%20b` becomes `a+b`, a trailing `&` is dropped, `%zz` becomes `%25zz`), so the redirect cannot be byte for byte. The proxy unit test checks our own `Location` byte for byte; the e2e spec compares parsed values.
+- **Stylesheet.** `src/app/globals.css` holds only the `@heat/ui/styles.css` import, imported from the locale layout as `@/app/globals.css`, and `@heat/ui` exports `./styles.css`. The `@source` line is left out: with no Tailwind PostCSS plugin in the app it makes the build warn `Unknown at rule: @source`. `frontend-internal` renders nothing from `@heat/ui`, so it is unchanged.
+- **Date strings** must be ISO 8601 with a time and `Z` or an offset; others throw `RangeError`.
 - **`start` script.** `apps/frontend-public/scripts/start.mjs` copies `.next/static` and `public/` into the standalone folder and starts it, so the app and the Playwright `webServer` serve assets.
 - **Client glue takes props.** `LocaleSwitchControl` gets `label` and `current` from the layout and uses only `usePathname()`, so no `NextIntlClientProvider` ships to the client (about 12 KB gzipped saved on the first-load JS). A client tree that needs translations adds the provider with its own namespaces.
-- **Switch placement.** The control is rendered in the locale layout until #37 moves it into the header, so the Playwright specs can click it.
-- **Case-insensitive file systems.** `/BN` is skipped on macOS and Windows, where the prerendered `/bn` is served; Linux CI runs it.
+- **Switch placement.** The control is rendered in the locale layout until #37 moves it into the header, so the Playwright specs can click it. The path-preserving e2e check uses `/en?tab=2#notes`, because deeper paths are 404 now; unit tests cover deeper paths.
 - **Bangla site title** (`HEAT জেন্ডার নিরাপত্তা প্রশিক্ষণ`) is a draft for the owner to confirm.
-- **First-load JS** for `/bn` and `/en`: 132.8 KB gzipped (level 9) across seven module scripts, plus a 38.6 KB `noModule` polyfill chunk that modern browsers do not load. Budget 150 KB.
+- **First-load JS** for `/bn` and `/en`: 132.8 KB gzipped (level 9) across seven module scripts, plus a 38.6 KB `noModule` polyfill chunk that modern browsers do not load. The stylesheet adds 0.4 KB gzipped. Budget 150 KB.
 
 ## Verification
 
