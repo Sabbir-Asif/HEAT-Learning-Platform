@@ -8,27 +8,27 @@ Approach: the rules are pure functions with unit tests: `csv.ts` (cell neutralis
 
 - [x] 1. Test then code `src/charts/csv.ts`. Test in `test/charts/csv.test.ts`.
 - [x] 2. Test then code `src/upload/limits.ts`. Test in `test/upload/limits.test.ts`.
-- [x] 3. Extend the guard tests: `charts` and `upload` scanned, `recharts` only in `charts`, `@uppy/*` only in `upload`; bundle check for the root, `/charts` and `/upload`; add `./charts` and `./upload` to `exports`. Test in `test/data/subpath.test.ts` and `primitives.test.ts`.
+- [x] 3. Extend the guard tests: `charts` and `upload` scanned, `recharts` only in `charts`, `@uppy/*` only in `upload`; bundle check for the root, `/charts` and `/upload`; add `./charts` and `./upload` to `exports`. Test in `test/charts/subpath.test.ts` and `primitives.test.ts`.
 - [x] 4. `ChartCard` with stories: default, loading, empty, error, several series, CSV download content, phone width, light and dark.
-- [ ] 5. `FileUpload` with stories: idle, accepted, uploading, failed with Retry, limit rejected, keyboard, light and dark.
-- [ ] 6. Docs in `packages/ui/CLAUDE.md`, gzip sizes of `/charts` and `/upload` for the PR, final verify.
+- [x] 5. `FileUpload` with stories: idle, accepted, uploading, failed with Retry, limit rejected, keyboard, light and dark.
+- [x] 6. Docs in `packages/ui/CLAUDE.md`, gzip sizes of `/charts` and `/upload` for the PR, final verify.
 
 ## Acceptance criteria to proof
 
-| Criterion | Proof |
-| --- | --- |
-| CSV has exactly the rows shown, same columns and labels | `csv.test.ts`, ChartCard story |
-| Formula characters neutralised, quoting, negatives kept | `csv.test.ts` |
-| Dhaka dates in CSV | `csv.test.ts` |
-| Empty, loading, error states | ChartCard stories |
-| Series limited to five, colours from `--chart-N` | type, guard test, story |
-| Text alternative and data table | ChartCard story |
-| No horizontal scroll at 320 px | phone story |
-| Type, size, count, duplicate, name rules | `limits.test.ts` |
-| Rejection names the limit, keyboard use, status announced | FileUpload stories |
-| Server rendering safe, Uppy destroyed on unmount | FileUpload story, code |
-| Root, `/charts` and `/upload` stay separate | `subpath.test.ts` |
-| axe light and dark | stories |
+| Criterion                                                 | Proof                          |
+| --------------------------------------------------------- | ------------------------------ |
+| CSV has exactly the rows shown, same columns and labels   | `csv.test.ts`, ChartCard story |
+| Formula characters neutralised, quoting, negatives kept   | `csv.test.ts`                  |
+| Dhaka dates in CSV                                        | `csv.test.ts`                  |
+| Empty, loading, error states                              | ChartCard stories              |
+| Series limited to five, colours from `--chart-N`          | type, guard test, story        |
+| Text alternative and data table                           | ChartCard story                |
+| No horizontal scroll at 320 px                            | phone story                    |
+| Type, size, count, duplicate, name rules                  | `limits.test.ts`               |
+| Rejection names the limit, keyboard use, status announced | FileUpload stories             |
+| Server rendering safe, Uppy destroyed on unmount          | FileUpload story, code         |
+| Root, `/charts` and `/upload` stay separate               | `subpath.test.ts`              |
+| axe light and dark                                        | stories                        |
 
 ## Verification
 
