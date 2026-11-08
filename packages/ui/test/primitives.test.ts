@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
 const srcRoot = join(import.meta.dirname, "../src");
-const scanned = ["components", "composites", "lib", "hooks"];
+const scanned = ["components", "composites", "lib", "hooks", "data"];
 
 const allowedPackages = [
   "react",
@@ -18,6 +18,10 @@ const allowedPackages = [
   "@storybook/react-vite",
   "storybook/test",
 ];
+
+const folderPackages: Record<string, string[]> = {
+  data: ["@tanstack/react-table", "nuqs"],
+};
 
 const forbiddenPackagePrefixes = ["@radix-ui/", "@headlessui/", "@mui/", "@chakra-ui/", "antd"];
 
@@ -71,9 +75,9 @@ function importedPackages(source: string): string[] {
   return specifiers.map((match) => match[1] ?? "");
 }
 
-function isAllowed(specifier: string): boolean {
+function isAllowed(specifier: string, folder = ""): boolean {
   if (forbiddenPackagePrefixes.some((prefix) => specifier.startsWith(prefix))) return false;
-  return allowedPackages.some(
+  return [...allowedPackages, ...(folderPackages[folder] ?? [])].some(
     (allowed) => specifier === allowed || specifier.startsWith(`${allowed}/`),
   );
 }
@@ -103,6 +107,14 @@ describe("the rule checks themselves", () => {
     expect(isAllowed("@radix-ui/react-dialog")).toBe(false);
     expect(isAllowed("react-icons")).toBe(false);
   });
+
+  test("allow the table and URL libraries only inside the data folder", () => {
+    expect(isAllowed("@tanstack/react-table", "data")).toBe(true);
+    expect(isAllowed("nuqs/adapters/testing", "data")).toBe(true);
+    expect(isAllowed("@tanstack/react-table", "components")).toBe(false);
+    expect(isAllowed("nuqs", "composites")).toBe(false);
+    expect(isAllowed("nuqs")).toBe(false);
+  });
 });
 
 describe("every primitive source", () => {
@@ -119,7 +131,8 @@ describe("every primitive source", () => {
     "%s imports only allowed libraries",
     (_name, file) => {
       const unexpected = importedPackages(readFileSync(file as string, "utf8")).filter(
-        (specifier) => !isAllowed(specifier),
+        (specifier) =>
+          !isAllowed(specifier, (file as string).slice(srcRoot.length + 1).split("/")[0]),
       );
       expect(unexpected).toEqual([]);
     },

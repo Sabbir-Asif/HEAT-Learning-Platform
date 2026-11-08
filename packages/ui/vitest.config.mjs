@@ -5,6 +5,8 @@ export default jsdomPreset({
     "**/*.stories.tsx",
     "src/components/**",
     "src/composites/**/*.tsx",
+    "src/data/**/*.tsx",
+    "src/data/use-table-url-state.ts",
     "src/hooks/**",
   ],
 });
