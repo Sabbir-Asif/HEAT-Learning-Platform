@@ -15,6 +15,17 @@ Design rule from the owner (2026-11-08): one consistent, modern design that fits
 
 Owner decisions of 2026-11-08: the designs are English only for version 1, and dark frames of the screens come later. Only the specimen frames exist in dark; the dark colours are in the theme and the specimens.
 
+## Design direction and how to use these frames
+
+The frames are a baseline for implementation, not a pixel specification. The owner asked on 2026-11-08 for a high quality, modern, professional result, and for the first set of frames to be refined because they looked generic. Rules for implementation tickets (#31 onward):
+
+- Build from shadcn/ui primitives themed with `tokens.json`. Where a frame is rougher than the shadcn component, the component wins.
+- Icons come from Lucide (`lucide-react`), the shadcn default, and are used beside or instead of text on navigation, actions, status and empty states. The frames use the same set.
+- No dark frames are drawn. Dark theme is implemented from the dark tokens and checked in the browser.
+- English only for version 1.
+- Avoid the stock look: identical boxed cards, one radius everywhere, grey shadows on every panel, centred forms, gradient washes. Use rows and dividers before nested cards, a clear type hierarchy, and colour only where it means something (primary for the main action and the active item).
+- Type proposal for the refined frames: Source Serif 4 for display and page titles on student screens, Public Sans for interface text. The Bangla requirement behind Noto Sans Bengali is gone, so the font decision is reopened; #31 confirms the family, weights and woff2 sizes.
+
 ## Files
 
 | File                    | What it is                                                                                              |
