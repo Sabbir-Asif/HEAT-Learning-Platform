@@ -9,10 +9,11 @@ Five SVG logos (HEAT, Government of Bangladesh, University Grants Commission, Wo
 ## Chosen approach
 
 - **One source, generated copies.** Sources (light and dark) live in `packages/config/brand/source/*.svg`. `packages/config/src/brand.mjs` holds the logic (`sanitise`, `optimise`, `legible`, `build`); `packages/config/bin/brand.mjs` is the entry point behind the root script `pnpm brand`. It writes the optimised output byte-identically into `apps/frontend-public/public/brand/` and `apps/frontend-internal/public/brand/`. Both copies are committed so `public/` stays static.
-- **Sanitiser by allow-list.** `sax` in strict mode parses the file; any element or attribute not on the allow-list fails and the message names it. Rejected constructs are listed in the issue. A `viewBox` is required and each file is capped at 20 KB.
+- **Sanitiser by allow-list and grammar.** `sax` in strict mode parses the file; any element or attribute not on the allow-list fails and the message names it. Every attribute value must match an exact grammar: `url(#id)` only in `fill`, `stroke`, `clip-path` and `mask`, transform functions only in `transform` and `gradientTransform`, colour functions only in colour attributes, a `#fragment` for `href`, path commands for `d`, and a plain character set for the rest. A backslash anywhere fails, so CSS escapes cannot hide a URL. Repeated attributes fail (checked on the raw tag, because `sax` silently drops the second one). At most 16 `<use>` elements and 16 levels of nesting. A `viewBox` is required. Sources may be up to 128 KB (raw traces are 26 to 71 KB); shipped files are capped at 20 KB.
 - **SVGO** exact-pinned in `@heat/config`, config in `packages/config/svgo.config.mjs`: `preset-default`, `removeScripts`, keep `viewBox`, `width` and `height`, drop metadata, `<title>` and `<desc>`.
 - **Rasteriser** `@resvg/resvg-js` exact-pinned: renders without a browser and fetches nothing. It backs the pixel-difference check (optimise changes at most 0.2% of pixels at 512 px) and the legibility check (40 px high, 1x and 2x, over the theme's `--background` read from `packages/ui/src/styles.css`; at most 10% of painted pixels under 3:1 contrast, at least 1% painted).
-- **Sources.** The four site files are raster-wrapped (`<image href="data:image/png...">`). The PNGs are decoded in a scratch directory outside the repo and traced with a one-off tool that is not a repo dependency. The README records tool, version and settings. A trace that cannot be made legible within the cap becomes a shape-only placeholder. The crest is a shape-only placeholder with no `<text>`. No mark is redrawn by hand.
+- **Sources.** The four site files are raster-wrapped (`<image href="data:image/png...">`). The PNGs are decoded in a scratch directory outside the repo and traced with a one-off tool that is not a repo dependency. The README records tool, version and settings. A trace that cannot be made legible within the cap becomes a shape-only placeholder. The crest is a shape-only placeholder with no `<text>`, a hollow shield with `du-crest-dark.svg` as its lighter variant. No mark is redrawn by hand.
+- **Targets.** `pnpm brand` lstat-checks every entry in both app directories (and the directory and its parent), refuses symbolic links, and deletes only stray regular `.svg` files. A test checks that every `.svg` under `apps/*/public/` passes the sanitiser. Neither app has a `headers()` config, so `X-Content-Type-Options: nosniff` for `/brand/` is left for the PR note.
 - **Alt text.** A `brand` namespace in `@heat/i18n` with typed `en` and `bn` catalogs and keys `brand.logo.heat`, `gob`, `ugc`, `worldBank`, `du`. A test compares both key sets.
 - **Turborepo.** `@heat/config#test` and `test:coverage` get inputs covering `apps/*/public/brand/**` and `packages/ui/src/styles.css` so the parity and legibility checks cannot pass from cache.
 
@@ -24,9 +25,9 @@ Alternatives not chosen: SVGO as a build step inside each app (two sources of tr
 | ----------------------------------------------------------------------------- | -------------------------------------------- |
 | `packages/config/src/brand.mjs`, `bin/brand.mjs`, `svgo.config.mjs`           | new, logic, entry point, SVGO config         |
 | `packages/config/brand/source/*.svg`                                          | new, the sources                             |
-| `packages/config/test/brand.test.mjs`, `test/fixtures/svg/*`                  | new, sanitiser, optimise, legibility, parity |
+| `packages/config/test/brand.test.mjs`, `brand-assets.test.mjs`, `brand-readme.test.mjs`, `test/fixtures/svg/*` | new, sanitiser, optimise, legibility, parity, assets, README |
 | `apps/*/public/brand/*.svg`                                                   | new, generated copies                        |
-| `packages/i18n/src/messages/{en,bn}/brand.ts`, `src/index.ts`, `test/brand.test.ts` | new, alt text and parity                |
+| `packages/i18n/src/messages/{en,bn}/brand.ts`, `src/keys.ts`, `src/index.ts`, `test/keys.test.ts`, `test/messages/brand.test.ts` | new, alt text, key helpers and parity |
 | `package.json`, `packages/config/package.json`, `pnpm-lock.yaml`              | `brand` script, dependencies                 |
 | `turbo.json`                                                                  | test inputs                                  |
 | `README.md`                                                                   | `### Brand assets`                           |
@@ -42,6 +43,13 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 - [x] **Task 5: the assets.** Tests over the real tree: every source passes the sanitiser, is under the cap, optimises smaller, is legible in light and dark with the `-dark` file where required, and both app directories equal `optimise(source)`. Then trace, write sources, add dark variants only where the check needs them, run `pnpm brand`.
 - [x] **Task 6: alt text.** Test in `@heat/i18n`: `en` and `bn` define the same five keys, non-empty, missing key named. Then `messages/{en,bn}/brand.ts` and the export.
 - [x] **Task 7: README and Turborepo inputs.** Test: every file in `source/` has a row in the `### Brand assets` table with source, status and date, and the section says the owner's vectors replace the files before launch. Then the README section and `turbo.json` inputs.
+
+## Review follow-ups
+
+- [x] **Task 8: sanitiser grammar, repeats and limits** (security review). Backslash rejected, exact value grammars, repeated attributes, 16 `<use>` and 16 levels.
+- [x] **Task 9: target safety.** Symbolic links refused, only `.svg` files deleted, repo-wide public SVG check.
+- [x] **Task 10: legibility.** Enclosed blank-paper rule, `minContrast` option, `du-crest-dark.svg` at 3:1, README thresholds, SHA-256 of the source PNGs.
+- [x] **Task 11: i18n tests.** Key helper tests in `test/keys.test.ts`.
 
 ## Acceptance criteria mapped to checks
 
