@@ -19,13 +19,11 @@ The owner's priorities, in their words and choices:
 - Fast and light on slow mobile networks, on both phone and laptop layouts.
 - One component library and one way of fetching data, so every screen looks and behaves the same.
 - Validation, types and API calls generated or shared, never hand-copied between frontend and backend.
-- Accessible (WCAG 2.2 AA) and bilingual (Bangla / English) student experience.
+- Accessible (WCAG 2.2 AA) English student experience.
 
 ### Non-goals (v1)
 - Installable app / PWA, offline video, push notifications.
-- Admin app translation (English only).
 - Real-time sockets; polling is enough at this scale.
-- Bilingual course *content* (UI only).
 
 ### Anti-goals (a failure even if it works)
 - App-level CSS files, one-off styles, or decorative components that do not serve the screen's task.
@@ -40,7 +38,7 @@ The owner's priorities, in their words and choices:
 | Student devices | Phone and laptop equally — both layouts get equal design and test effort |
 | Network | Built for slow mobile data |
 | Dark mode | Both apps, following the device, with a manual switch |
-| Student app URLs | Language in the path: `/bn/...`, `/en/...` |
+| Student app URLs | No language prefix: `/`, `/courses/...`, `/learn/...` |
 | Admin devices | Laptop-first; approvals and the dashboard must work well on a phone |
 | Admin language | English only |
 | Rich text | Simple Word-like editor (headings, bold, italic, lists, links, images, quotes) |
@@ -49,7 +47,7 @@ The owner's priorities, in their words and choices:
 | Quiz | One question per screen, progress bar, review screen before submit |
 | Install as app | No — website only |
 | Emails for events | Request approved / rejected, removed / reinstated, certificate ready. News posts are bell-only |
-| Captions | Optional: admins may upload WebVTT files per video (Bangla and/or English); the player shows a captions menu when any exist |
+| Captions | Optional: admins may upload WebVTT files per video (any language); the player shows a captions menu when any exist |
 | Resources | Public — anyone can open and download |
 | Quiz question types | Single choice only in v1 |
 | Design gate | The owner approves the Open Pencil designs and theme before any screen work starts; setup and backend work continue meanwhile |
@@ -71,7 +69,6 @@ The owner's priorities, in their words and choices:
 | URL state | nuqs (tables, filters, tabs) | 2.x |
 | Tables | TanStack Table **v9** (do not copy v8 examples) | 9.x |
 | Charts | shadcn chart on Recharts v3 | 3.x |
-| i18n | next-intl with `next/root-params` (no `setRequestLocale`) | 4.x |
 | Video | **Video.js v10** (`@videojs/react` + `@videojs/hlsjs-video`, shadcn registry skin) on hls.js | 10.3 / 1.7 |
 | Rich text | **Tiptap v3**, stored as ProseMirror JSON; public rendering via `@tiptap/static-renderer` | 3.x |
 | Drag & drop | `@dnd-kit/react` behind a `SortableList` wrapper (pin exact; pre-1.0) | 0.5.x |
@@ -95,7 +92,6 @@ packages/
   ui/                   # @heat/ui — the only place styles are written
   contracts/            # @heat/contracts — Zod schemas, enums, error codes
   api-client/           # @heat/api-client — orval output + fetch mutator + server fetcher
-  i18n/                 # @heat/i18n — bn/en catalogs for frontend-public and emails
   config/               # eslint, tsconfig, vitest presets
 ```
 
@@ -128,17 +124,17 @@ One rule set for both apps:
    - In the browser, the orval mutator performs one shared refresh on 401 and retries once.
    - **Backend requirement:** refresh-token rotation gets a 20-second grace window in Redis so parallel refreshes do not trigger reuse detection and log the user out.
 5. **Cookies and CSRF.** Cookies use the `__Host-` prefix. The access cookie (10 minutes) is `SameSite=Lax` so links from emails arrive signed in; the refresh cookie is `SameSite=Strict` and limited to the refresh path. The mutator sends a CSRF token that is HMAC-bound to the session on every unsafe request, so a sibling subdomain cannot plant a valid one. Nginx blocks admin API paths on the student host.
-6. **Errors.** The API's stable error codes (from `@heat/contracts`) map to translated messages; form-level errors map to fields by path.
+6. **Errors.** The API's stable error codes (from `@heat/contracts`) map to messages; form-level errors map to fields by path.
 
-`proxy.ts` only does optimistic work (refresh, locale redirect, redirect to sign-in when no session cookie exists). Real authorization is always the API's.
+`proxy.ts` only does optimistic work (refresh, redirect to sign-in when no session cookie exists). Real authorization is always the API's.
 
 ## 6. `frontend-public`
 
 ### 6.1 Routes
 
-Language prefix is always present; `/` redirects to `/bn` or `/en` from a saved preference, then `Accept-Language`, defaulting to `bn`.
+The interface is English only, so routes carry no language prefix.
 
-| Area | Route (`/[locale]/…`) | Rendering |
+| Area | Route | Rendering |
 |---|---|---|
 | Public | `/` landing (overview, front-page courses and modules) | cached |
 | | `/about`, `/courses/[slug]` (overview, module list, enroll button) | cached |
@@ -175,7 +171,7 @@ Enrollment is checked **per course**, not per student (my call, following the pl
   - Bounded buffer (about 20 s ahead, 30 s behind) and a saved bandwidth estimate so the next video starts at a sensible quality.
   - Resume from the API's saved position.
   - Signed-cookie refresh at about 60% of the cookie's lifetime and on tab focus or reconnect. On a 403, one shared refresh, then playback resumes from the current time.
-  - Bangla and English labels, keyboard shortcuts. Captions menu appears only when the video has caption files; captions are styled with `::cue`.
+  - English labels, keyboard shortcuts. Captions menu appears only when the video has caption files; captions are styled with `::cue`.
   - On iPhone, fullscreen uses the system player; the layout accounts for that.
 - **Progress.** Every 15 s and on pause, seek, tab hide or end, the player sends the newly watched ranges (from `video.played`) with a sequence number; on page hide it uses `sendBeacon`. Unsent heartbeats are kept in memory and `localStorage` and retried on reconnect. The quiz button opens when the API reports 80% coverage. The server caps accepted ranges by the time elapsed since the playback session started multiplied by the top playback speed, so retried batches are accepted only within that budget.
 - **Quiz.** Single-choice questions (radio group), one question per screen, progress bar, Previous/Next, a review screen listing unanswered questions, then submit. Answers are saved locally while in progress so a dropped connection does not lose them. Submission carries an idempotency key. The result screen shows score, pass or fail, explanations after a pass, and a countdown when a waiting time applies.
@@ -191,7 +187,6 @@ Enrollment is checked **per course**, not per student (my call, following the pl
 ## 7. `frontend-internal`
 
 ### 7.1 Routes
-English only, no locale segment.
 
 | Area | Routes |
 |---|---|
@@ -221,11 +216,11 @@ English only, no locale segment.
 ## 8. `@heat/ui` design system
 
 - Base: shadcn/ui on Base UI, themed only through CSS variables in `styles.css` (light and dark). Tokens from the Open Pencil designs: color roles, type scale, radius, spacing, shadows, chart colors.
-- Font: one self-hosted family with full Bengali and Latin coverage (chosen during design; must render Bangla correctly at all weights used).
-- Composites shared by both apps: `AppShell` (sidebar + top bar + mobile bottom bar / sheet), `PageHeader`, `DataTable`, `FilterBar`, `FormField`, `StatusBadge` (one mapping for enrollment, video and course states), `EmptyState`, `ErrorState`, `ConfirmDialog`, `StatCard`, `ChartCard`, `FileUpload`, `VideoPlayer`, `RichTextEditor`, `RichTextRenderer`, `SortableList`, `CaptchaField`, `LocaleSwitch`, `ThemeSwitch`, `NotificationBell`.
+- Fonts: Source Serif 4 for display and headings, Public Sans for interface text, both self-hosted and set in `docs/design/tokens.json`.
+- Composites shared by both apps: `AppShell` (sidebar + top bar + mobile bottom bar / sheet), `PageHeader`, `DataTable`, `FilterBar`, `FormField`, `StatusBadge` (one mapping for enrollment, video and course states), `EmptyState`, `ErrorState`, `ConfirmDialog`, `StatCard`, `ChartCard`, `FileUpload`, `VideoPlayer`, `RichTextEditor`, `RichTextRenderer`, `SortableList`, `CaptchaField`, `ThemeSwitch`, `NotificationBell`.
 - **Styling rules, enforced by lint**: no `.css` files in apps other than the single entry that imports `@heat/ui/styles.css`; no inline `style`; no arbitrary Tailwind values (`[...]`) outside `@heat/ui`; class order and conflicts checked (`eslint-plugin-better-tailwindcss` or equivalent); apps use Tailwind only for layout (grid, flex, gap, spacing tokens).
 - **No-filler rule** in review checklists: every element on a screen must serve that screen's task; no decorative cards, banners or stat tiles unless the numbers are the point of the page.
-- Every component has a Storybook story with light/dark and bn/en variants and passes the axe check.
+- Every component has a Storybook story with light and dark variants and passes the axe check.
 
 ## 9. Images and files
 
@@ -273,7 +268,7 @@ Every uploaded image or file goes through one `media` module in the API and one 
 ## 11. Testing
 - `@heat/ui`: Storybook stories, Vitest interaction tests, axe checks per story.
 - Apps: Vitest for hooks and utilities; MSW mocks generated by orval for page-level tests.
-- Playwright journeys: enroll → verify → approved → watch → quiz → certificate; admin approve/reject/remove; course build and lock; directory delete rules. Run at phone and laptop sizes, light and dark, bn and en for student flows.
+- Playwright journeys: enroll → verify → approved → watch → quiz → certificate; admin approve/reject/remove; course build and lock; directory delete rules. Run at phone and laptop sizes, light and dark.
 - Accessibility: axe on key pages (lesson player, forms, data table, editor, quiz); keyboard tests for dialogs, menus and reordering.
 - Visual regression: Playwright `toHaveScreenshot()` in a pinned Docker image.
 - Performance: Lighthouse CI on landing, dashboard and lesson pages with the Slow 4G profile and the budgets in §6.4.

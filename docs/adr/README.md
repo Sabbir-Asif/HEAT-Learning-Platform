@@ -14,7 +14,7 @@ Records 0001 to 0016 are the design decisions D1 to D16 in section 02 of the [pr
 | 0006 | [Watched-interval progress the server can trust](0006-watched-interval-progress.md)                         | D6         | Accepted |
 | 0007 | [Transactional outbox for email and jobs](0007-transactional-outbox.md)                                     | D7         | Accepted |
 | 0008 | [Certificate PDFs from an HTML template](0008-certificate-pdfs-from-html-template.md)                       | D8         | Accepted |
-| 0009 | [Bangla and English interface from day one](0009-bangla-and-english-interface.md)                           | D9         | Accepted |
+| 0009 | [Bangla and English interface from day one](0009-bangla-and-english-interface.md)                           | D9         | Superseded by 0018 |
 | 0010 | [Hooks guide, CI and branch protection enforce](0010-hooks-guide-ci-and-branch-protection-enforce.md)       | D10        | Accepted |
 | 0011 | [Enrollment approval lifecycle](0011-enrollment-approval-lifecycle.md)                                      | D11        | Accepted |
 | 0012 | [Pluggable, quota-aware email](0012-pluggable-quota-aware-email.md)                                         | D12        | Accepted |
@@ -23,5 +23,6 @@ Records 0001 to 0016 are the design decisions D1 to D16 in section 02 of the [pr
 | 0015 | [One data path per kind of page](0015-one-data-path-per-kind-of-page.md)                                    | D15        | Accepted |
 | 0016 | [Images and files on local disk behind a storage interface](0016-local-disk-storage-behind-an-interface.md) | D16        | Accepted |
 | 0017 | [Text captcha accessibility exception](0017-text-captcha-accessibility-exception.md)                        | Section 01 | Accepted |
+| 0018 | [English only interface](0018-english-only-interface.md)                                                    | D9         | Proposed |
 
 Conventions for the whole repo: [CLAUDE.md](../../CLAUDE.md).

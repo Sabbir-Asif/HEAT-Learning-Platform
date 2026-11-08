@@ -5,8 +5,6 @@ packages:
 allowBuilds:
   esbuild: false
   "@scarf/scarf": false
-  "@parcel/watcher": false
-  "@swc/core": false
 
 catalog:
   react: 19.3.1

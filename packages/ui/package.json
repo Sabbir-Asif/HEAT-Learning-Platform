@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    ".": "./src/index.ts",
-    "./styles.css": "./src/styles.css"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "lint": "eslint .",
@@ -20,7 +19,6 @@
     "react": "catalog:"
   },
   "devDependencies": {
-    "@fontsource-variable/noto-sans-bengali": "5.3.0",
     "@heat/config": "workspace:*",
     "@storybook/addon-a11y": "10.6.6",
     "@storybook/addon-vitest": "10.6.6",

@@ -1,4 +1,0 @@
-{
-  "extends": "@heat/config/tsconfig/library.json",
-  "include": ["src", "test"]
-}

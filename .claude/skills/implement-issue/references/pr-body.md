@@ -22,7 +22,7 @@ Closes #N (part of <epic code>, #<epic number>). Targets <base branch>.
 
 ## Screenshots
 
-Phone and laptop width, light and dark, Bangla and English. Or "Not a UI change".
+Phone and laptop width, light and dark. Or "Not a UI change".
 
 ## Reviews
 
