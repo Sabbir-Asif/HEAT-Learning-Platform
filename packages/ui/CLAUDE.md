@@ -4,6 +4,7 @@ The shared design system and the only place styles are written. Ships TypeScript
 
 ## Rules
 
+- Lint (`@heat/config/eslint/ui`) checks class conflicts and order here; arbitrary values and any Tailwind class are allowed here and nowhere else. Apps may only lay out. Details in the [README](../../README.md#quality-checks).
 - Base is shadcn/ui on Base UI, themed only through CSS variables in `styles.css` (light and dark).
 - Composites shared by both apps live here (page header, data table, form field, status badge, empty and error state, confirm dialog, stat card, file upload and the others in the design spec). Add one only when a ticket needs it in an app.
 - `StatusBadge` holds the single mapping for enrollment, video and course states.
