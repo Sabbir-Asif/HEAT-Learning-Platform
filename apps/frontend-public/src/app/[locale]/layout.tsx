@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 import { LocaleSwitchControl } from "../../components/locale-switch-control";
+import "@/app/globals.css";
 
 export const dynamicParams = false;
 

@@ -49,17 +49,14 @@ test.describe("GET /", () => {
     });
   }
 
-  test("keeps the query", async ({ request }) => {
-    const response = await get(
-      request,
-      { "Accept-Language": "en" },
-      "/?utm_source=a%20b&x=%E0%A6%AC",
-    );
-    const location = new URL(response.headers()["location"] ?? "", "http://learn.test");
-    expect(location.pathname).toBe("/en");
-    expect(location.searchParams.get("utm_source")).toBe("a b");
-    expect(location.searchParams.get("x")).toBe("ব");
-  });
+  for (const query of ["utm_source=a%20b&x=%E0%A6%AC", "a=1&a=2&", "a=%zz", "q=%2B+%20"]) {
+    test(`keeps the parsed values of the query ?${query}`, async ({ request }) => {
+      const response = await get(request, { "Accept-Language": "en" }, `/?${query}`);
+      const location = new URL(response.headers()["location"] ?? "", "http://learn.test");
+      expect(location.pathname).toBe("/en");
+      expect([...location.searchParams]).toEqual([...new URLSearchParams(query)]);
+    });
+  }
 
   test("never puts a forged Host header in the response", async ({ request }) => {
     const response = await get(request, { Host: "evil.example" });

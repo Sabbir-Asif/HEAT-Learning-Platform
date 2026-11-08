@@ -68,4 +68,35 @@ test.describe("language switch", () => {
       "bn",
     );
   });
+
+  test("links the @heat/ui stylesheet and gives each option a target of at least 24px", async ({
+    page,
+    request,
+  }) => {
+    await page.goto("/en");
+    const hrefs = await page
+      .locator('link[rel="stylesheet"]')
+      .evaluateAll((links) => links.map((link) => (link as HTMLLinkElement).href));
+    expect(hrefs.length).toBeGreaterThan(0);
+    const sheets = await Promise.all(hrefs.map(async (href) => (await request.get(href)).text()));
+    expect(sheets.some((css) => css.includes(".heat-locale-switch"))).toBe(true);
+
+    for (const name of ["বাংলা", "English"]) {
+      const link = nav(page, "Language").getByRole("link", { name });
+      const sizes = await link.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          minHeight: parseFloat(style.minHeight),
+          minWidth: parseFloat(style.minWidth),
+          display: style.display,
+        };
+      });
+      expect(sizes.minHeight).toBeGreaterThanOrEqual(24);
+      expect(sizes.minWidth).toBeGreaterThanOrEqual(24);
+      expect(sizes.display).toBe("inline-flex");
+      const box = await link.boundingBox();
+      expect(box?.width).toBeGreaterThanOrEqual(24);
+      expect(box?.height).toBeGreaterThanOrEqual(24);
+    }
+  });
 });
