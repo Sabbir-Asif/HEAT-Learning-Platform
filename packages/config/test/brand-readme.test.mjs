@@ -19,7 +19,12 @@ const rows = () =>
   section()
     .split("\n")
     .filter((line) => /^\|\s*`[^`]+\.svg`/.test(line))
-    .map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
+    .map((line) =>
+      line
+        .split("|")
+        .slice(1, -1)
+        .map((cell) => cell.trim()),
+    );
 
 describe("README Brand assets", () => {
   test("has a Brand assets section under Development", () => {
