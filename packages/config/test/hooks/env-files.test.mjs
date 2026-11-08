@@ -166,76 +166,167 @@ describe("envAccess", () => {
     expect(find(text)).toBeNull();
   });
 
-  test.each([
-    "cat foo*",
-    "cat docs/adr/0013*",
-    "rg foo docs/adr/0013*",
-    "wc -l docs/adr/0013*",
-    "git log --oneline -- docs/adr/0013*",
-    "cat docs/adr/0013.*",
-    "cat apps/frontend-public/postcss*",
-    "cat src/*.ts",
-    "cat *.md",
-  ])(
-    "a trailing-star glob that cannot reach a dotfile is allowed without a directory: %s",
-    (text) => {
-      expect(find(text)).toBeNull();
-    },
-  );
+  describe("globs against the real directory", () => {
+    const touch = (dir, relative) => {
+      mkdirSync(join(dir, relative, ".."), { recursive: true });
+      writeFileSync(join(dir, relative), "x\n");
+    };
 
-  test.each(["cat .env*", "cat .en?", "cat .[e]nv", "cat .e*", "cat .*", "cat *.env"])(
-    "a glob that could start an env name is denied without a directory: %s",
-    (text) => {
-      expect(find(text)).toBeTruthy();
-    },
-  );
+    const plainDir = () => {
+      const dir = tempDir("globplain");
+      for (const file of [
+        "docs/adr/0013-x.md",
+        "apps/frontend-public/postcss.config.mjs",
+        "src/a.ts",
+        "README.md",
+      ]) {
+        touch(dir, file);
+      }
+      return dir;
+    };
 
-  describe("against a real directory", () => {
-    const makeDir = () => {
-      const dir = tempDir("globdir");
-      mkdirSync(join(dir, "docs/adr"), { recursive: true });
-      writeFileSync(join(dir, "docs/adr/0013-x.md"), "x\n");
-      writeFileSync(join(dir, "foo.env"), "x\n");
-      writeFileSync(join(dir, "foobar.txt"), "x\n");
-      writeFileSync(join(dir, ".env"), "x\n");
-      writeFileSync(join(dir, ".envrc"), "x\n");
-      writeFileSync(join(dir, "plain.txt"), "x\n");
+    const envDir = () => {
+      const dir = plainDir();
+      for (const file of [
+        ".env",
+        ".envrc",
+        "foo.env",
+        "foobar.txt",
+        "plain.txt",
+        "sub/prod.env",
+        "other/prod.env",
+      ]) {
+        touch(dir, file);
+      }
       symlinkSync(".env", join(dir, "link"));
       return dir;
     };
 
-    test("allows a glob whose real matches are not env files", () => {
-      const dir = makeDir();
-      for (const text of [
-        "cat foobar*",
-        "cat docs/adr/0013*",
-        "cat docs/adr/0013.*",
-        "cat plain*",
-        "cat *",
-        "cat *.txt",
-        "cat nothing*",
-        "rg foo docs/adr/0013*",
-      ]) {
-        expect(find(text, dir), text).toBeNull();
+    test.each([
+      "cat foo*",
+      "cat docs/adr/0013*",
+      "cat docs/adr/0013.*",
+      "cat apps/frontend-public/postcss*",
+      "cat src/*.ts",
+      "cat *.md",
+      "cat .e*x",
+      "wc -l docs/adr/0013*",
+      "head -n 3 docs/adr/0013*",
+      "grep KEY docs/adr/0013*",
+      "cat s*/prod*",
+      "cd docs; cat adr/0013*",
+    ])("a file reader on a glob with no env match is allowed: %s", (text) => {
+      expect(find(text, plainDir()), text).toBeNull();
+    });
+
+    test.each([
+      "cat foo*",
+      "cat docs/adr/0013*",
+      "cat apps/*/prod*",
+      "cat */prod*",
+      "cat prod*",
+      "rg foo docs/adr/0013*",
+      "git log --oneline -- docs/adr/0013*",
+    ])("without a readable directory the name check applies: %s", (text) => {
+      expect(find(text, "/w"), text).toBeTruthy();
+    });
+
+    test.each([
+      "cat foo*",
+      "cat *.env",
+      "cat .env*",
+      "cat .e*",
+      "cat .*",
+      "cat .ENV*",
+      "cat lin?",
+      "cat ?env",
+      "cat [.]env",
+      "cat .[!x]*",
+      "cat .e[[:alpha:]]v",
+      "cat .[]e]nv",
+      "cat .{e,x}nv",
+      "cat {.e,.x}nv",
+      "cat .e{n,x}v",
+      "cat .{a..f}nv",
+      "cat */prod*",
+      "cat s*/prod*",
+      "cat sub/prod*",
+      "cat o*/prod.en?",
+      "shopt -s dotglob; cat ?env",
+      "GLOBIGNORE=x; cat ?env",
+      "cat $PWD/prod*",
+      'cat "$PWD"/prod*',
+      "grep KEY .e*",
+      "tail -n1 .e*",
+    ])("a glob that really matches an env file is denied: %s", (text) => {
+      expect(find(text, envDir()), text).toBeTruthy();
+    });
+
+    test("a leading ~ is resolved to the home directory", () => {
+      const home = tempDir("globhome");
+      touch(home, "prod.env");
+      const saved = process.env.HOME;
+      process.env.HOME = home;
+      try {
+        expect(find("cat ~/prod*", plainDir())).toBeTruthy();
+        expect(find("cat ~/nothing*", plainDir())).toBeNull();
+      } finally {
+        process.env.HOME = saved;
       }
     });
 
-    test("denies a glob that really matches an env file", () => {
-      const dir = makeDir();
-      for (const text of ["cat foo*", "cat *.env", "cat .env*", "cat .e*", "cat .*", "cat .ENV*"]) {
-        expect(find(text, dir), text).toBeTruthy();
-      }
+    test.each([
+      "cat *",
+      "cat ?",
+      "cat plain*",
+      "cat foobar*",
+      "cat *.txt",
+      "cat nothing*",
+      "cat docs/adr/0013*",
+      "cat [!x]*.txt",
+      "cat .e[[:digit:]]v",
+    ])("a glob with no env match in the real directory is allowed: %s", (text) => {
+      expect(find(text, envDir()), text).toBeNull();
     });
 
-    test("denies a glob that matches a symlink to an env file", () => {
-      expect(find("cat lin?", makeDir())).toBeTruthy();
+    test.each([
+      "cd docs; find .. -name '.e*' -exec cat {} +",
+      "cd docs; rg -uu -g '.e*' KEY ..",
+      "cd docs; tar xf x.tar; cat .e*",
+      "cd docs; unzip x.zip && cat .e*",
+      "git checkout -- . && cat .e*",
+      "cp a b; cat .e*",
+      "touch .env; cat .e*",
+      "echo hi > out.txt; cat .e*",
+      "grep -r KEY .e*",
+      "grep -rn KEY foo*",
+      "xargs -a list rg KEY .e*",
+    ])("the real listing is not trusted here: %s", (text) => {
+      expect(find(text, plainDir()), text).toBeTruthy();
     });
 
-    test("a glob in a directory part falls back to the conservative check", () => {
-      const dir = makeDir();
-      expect(find("cat do*/adr/0013*", dir)).toBeNull();
-      expect(find("cat */.env", dir)).toBeTruthy();
-      expect(find("cat */.e*", dir)).toBeTruthy();
+    test("a grep without -r and a redirect to /dev/null still use the listing", () => {
+      expect(find("grep KEY foo* 2>/dev/null", plainDir())).toBeNull();
+    });
+
+    test.each([
+      "pushd docs >/dev/null; popd >/dev/null; cat .e*",
+      "cd docs; cd -; cat .e*",
+      "cd $X; cat .e*",
+      "cd `pwd`; cat .e*",
+      "cd ~other; cat .e*",
+      "cd d*; cat .e*",
+      "pushd; cat .e*",
+      "pushd +1; cat .e*",
+    ])("a directory that cannot be tracked falls back to the name check: %s", (text) => {
+      expect(find(text, plainDir()), text).toBeTruthy();
+    });
+
+    test("a tracked directory change keeps the listing", () => {
+      const dir = plainDir();
+      expect(find("cd docs; cat .e*", dir)).toBeNull();
+      expect(find("pushd docs >/dev/null; cat .e*", dir)).toBeNull();
+      expect(find(`cd /nowhere-x; cd ${dir}; cat .e*`, "/w")).toBeNull();
     });
   });
 

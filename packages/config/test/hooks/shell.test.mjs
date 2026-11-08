@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
-import { parseShell } from "../../src/hooks/shell.mjs";
+import { parseShell, parseShellDetailed } from "../../src/hooks/shell.mjs";
 
 const base = "/work/repo";
 const words = (text) => parseShell(text, base).map((command) => command.words);
@@ -200,5 +200,58 @@ describe("working directory", () => {
 
   test("a stray closing parenthesis does not lose the directory", () => {
     expect(parseShell("cd sub; ) echo a", base).at(-1).cwd).toBe(resolve(base, "sub"));
+  });
+
+  const knownAfter = (text) => parseShell(`${text}; echo z`, base).at(-1).cwdKnown;
+
+  test.each(["cd sub", "cd /abs", "pushd sub", "cd", "cd -P sub", "(popd); true"])(
+    "%s keeps the directory known",
+    (text) => {
+      expect(knownAfter(text)).toBe(true);
+    },
+  );
+
+  test.each([
+    "popd",
+    "cd -",
+    "cd $X",
+    "cd `pwd`",
+    "cd ~other",
+    "cd d*",
+    "pushd",
+    "pushd +1",
+    "cd sub; popd",
+  ])("%s makes the directory unknown", (text) => {
+    expect(knownAfter(text)).toBe(false);
+  });
+
+  test("an absolute cd after an unknown directory knows it again", () => {
+    expect(knownAfter("popd; cd /abs")).toBe(true);
+    expect(knownAfter("popd; cd sub")).toBe(false);
+  });
+
+  test("an unknown directory carries into nested scripts and groups", () => {
+    const parsed = parseShell("popd; bash -c 'echo a'; (echo b)", base);
+    expect(parsed.map((command) => command.cwdKnown)).toEqual([true, false, false, false]);
+  });
+});
+
+describe("assignments", () => {
+  test("a bare assignment is kept only by the detailed parse", () => {
+    expect(parseShell("FOO=1", base)).toEqual([]);
+    const [only] = parseShellDetailed("FOO=1 BAR=2", base);
+    expect(only.words).toEqual([]);
+    expect(only.assignments).toEqual(["FOO=1", "BAR=2"]);
+  });
+
+  test("a prefix assignment is attached to its command", () => {
+    const [command] = parseShell("FOO=1 cmd arg", base);
+    expect(command.words).toEqual(["cmd", "arg"]);
+    expect(command.assignments).toEqual(["FOO=1"]);
+  });
+
+  test("an assignment inside an argument is not an assignment", () => {
+    const [command] = parseShell(": a=zz", base);
+    expect(command.assignments).toEqual([]);
   });
 });
