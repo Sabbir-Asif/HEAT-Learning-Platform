@@ -6,10 +6,10 @@ Approach: the rules are pure functions with unit tests: `csv.ts` (cell neutralis
 
 ## Tasks
 
-- [ ] 1. Test then code `src/charts/csv.ts`. Test in `test/charts/csv.test.ts`.
-- [ ] 2. Test then code `src/upload/limits.ts`. Test in `test/upload/limits.test.ts`.
-- [ ] 3. Extend the guard tests: `charts` and `upload` scanned, `recharts` only in `charts`, `@uppy/*` only in `upload`; bundle check for the root, `/charts` and `/upload`; add `./charts` and `./upload` to `exports`. Test in `test/data/subpath.test.ts` and `primitives.test.ts`.
-- [ ] 4. `ChartCard` with stories: default, loading, empty, error, several series, CSV download content, phone width, light and dark.
+- [x] 1. Test then code `src/charts/csv.ts`. Test in `test/charts/csv.test.ts`.
+- [x] 2. Test then code `src/upload/limits.ts`. Test in `test/upload/limits.test.ts`.
+- [x] 3. Extend the guard tests: `charts` and `upload` scanned, `recharts` only in `charts`, `@uppy/*` only in `upload`; bundle check for the root, `/charts` and `/upload`; add `./charts` and `./upload` to `exports`. Test in `test/data/subpath.test.ts` and `primitives.test.ts`.
+- [x] 4. `ChartCard` with stories: default, loading, empty, error, several series, CSV download content, phone width, light and dark.
 - [ ] 5. `FileUpload` with stories: idle, accepted, uploading, failed with Retry, limit rejected, keyboard, light and dark.
 - [ ] 6. Docs in `packages/ui/CLAUDE.md`, gzip sizes of `/charts` and `/upload` for the PR, final verify.
 
