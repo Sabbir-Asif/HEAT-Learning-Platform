@@ -51,6 +51,28 @@ describe("README Brand assets", () => {
     }
   });
 
+  test("records the sha256 of the source PNG for each traced mark", () => {
+    const traced = rows().filter(([file]) =>
+      ["heat", "gob", "ugc", "world-bank"].includes(file.replaceAll("`", "").replace(".svg", "")),
+    );
+    expect(traced).toHaveLength(4);
+    for (const [file, , source] of traced)
+      expect({ file, hash: /sha256 `[0-9a-f]{64}`/.test(source) }).toEqual({ file, hash: true });
+  });
+
+  test("states the current legibility thresholds, the logotype exemption and the small-text caveat", () => {
+    const text = section().replace(/\s+/g, " ");
+    expect(text).toMatch(/under 2:1/);
+    expect(text).toMatch(/WCAG exempts logotypes/);
+    expect(text).toMatch(/small tagline/);
+    expect(text).not.toMatch(/first thresholds/);
+  });
+
+  test("documents the use and nesting limits", () => {
+    const text = section().replace(/\s+/g, " ");
+    expect(text).toMatch(/16 `<use>` elements and 16 levels/);
+  });
+
   test("says the owner's vectors replace these files before launch", () => {
     const text = section().replace(/\s+/g, " ");
     expect(text).toMatch(/owner's original vectors replace/i);

@@ -16,6 +16,8 @@ import {
 const root = resolve(import.meta.dirname, "../../..");
 const location = brandLocation(root);
 const ids = ["du-crest", "gob", "heat", "ugc", "world-bank"];
+const minimumContrast = { "du-crest": 3 };
+const contrastFor = (id) => ({ minContrast: minimumContrast[id] ?? 2 });
 const read = (dir, name) => readFileSync(join(dir, name), "utf8");
 const sourceNames = () => readdirSync(location.sourceDir).sort();
 const backgrounds = readThemeBackgrounds(
@@ -35,9 +37,11 @@ describe("brand sources", () => {
     for (const name of dark) {
       const plain = name.replace("-dark.svg", ".svg");
       expect(existsSync(join(location.sourceDir, plain))).toBe(true);
+      const id = plain.replace(".svg", "");
       const problems = legibility(
         optimise(read(location.sourceDir, plain)),
         backgrounds.dark,
+        contrastFor(id),
       ).problems;
       expect({ name, plainIsIllegible: problems.length > 0 }).toEqual({
         name,
@@ -48,13 +52,15 @@ describe("brand sources", () => {
 
   test.each(ids)("%s is legible at header size in both themes", (id) => {
     const plain = optimise(read(location.sourceDir, `${id}.svg`));
-    expect({ id, theme: "light", problems: legibility(plain, backgrounds.light).problems }).toEqual(
-      {
-        id,
-        theme: "light",
-        problems: [],
-      },
-    );
+    expect({
+      id,
+      theme: "light",
+      problems: legibility(plain, backgrounds.light, contrastFor(id)).problems,
+    }).toEqual({
+      id,
+      theme: "light",
+      problems: [],
+    });
     const darkName = existsSync(join(location.sourceDir, `${id}-dark.svg`))
       ? `${id}-dark.svg`
       : `${id}.svg`;
@@ -63,7 +69,7 @@ describe("brand sources", () => {
       id,
       theme: "dark",
       file: darkName,
-      problems: legibility(dark, backgrounds.dark).problems,
+      problems: legibility(dark, backgrounds.dark, contrastFor(id)).problems,
     }).toEqual({
       id,
       theme: "dark",
@@ -77,6 +83,27 @@ describe("every shipped file", () => {
   const sourceDirFiles = () => sourceNames().map((name) => ({ name, dir: location.sourceDir }));
   const shipped = () =>
     location.targetDirs.flatMap((dir) => readdirSync(dir).map((name) => ({ name, dir })));
+
+  test("every SVG under apps/*/public passes the sanitiser, not only public/brand", () => {
+    const found = [];
+    for (const app of readdirSync(join(root, "apps"))) {
+      const publicDir = join(root, "apps", app, "public");
+      if (!existsSync(publicDir)) continue;
+      const walk = (dir) =>
+        readdirSync(dir, { withFileTypes: true }).forEach((entry) => {
+          const path = join(dir, entry.name);
+          if (entry.isDirectory()) walk(path);
+          else if (entry.name.toLowerCase().endsWith(".svg")) found.push(path);
+        });
+      walk(publicDir);
+    }
+    expect(found.length).toBeGreaterThan(0);
+    for (const path of found)
+      expect({ path, problems: sanitise(readFileSync(path, "utf8")) }).toEqual({
+        path,
+        problems: [],
+      });
+  });
 
   test("sources pass the sanitiser with the source cap", () => {
     for (const { name, dir } of sourceDirFiles())
