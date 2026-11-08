@@ -52,3 +52,22 @@ export const IconOnly: Story = {
     await expect(canvas.getByRole("button", { name: "Search" })).toBeVisible();
   },
 };
+
+export const ResponsiveLabel: Story = {
+  render: () => (
+    <TooltipProvider>
+      <div className="p-4">
+        <Tooltip>
+          <TooltipTrigger render={<Button variant="outline" />}>
+            <PlusIcon data-icon="inline-start" />
+            <span className="max-md:sr-only">Add course</span>
+          </TooltipTrigger>
+          <TooltipContent>Add course</TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: "Add course" })).toBeInTheDocument();
+  },
+};

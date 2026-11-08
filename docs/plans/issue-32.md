@@ -37,14 +37,14 @@ Not chosen: Radix-based shadcn (ADR 0013 names Base UI); one barrel per primitiv
 
 Each task is one commit: failing test first, see it fail for the right reason, least code, tick the box in the same commit.
 
-- [ ] **Task 1: setup and `cn`.** Test first: `test/utils.test.ts` (`cn` merges and de-duplicates conflicting Tailwind classes) and `test/primitives.test.ts` (rules above, passing on an empty folder, then failing on a fixture with a hex colour). Red: modules missing. Then dependencies, `components.json`, `src/lib/utils.ts`.
-- [ ] **Task 2: Button, Badge, Separator, Skeleton, Progress, Card.** Stories first with axe; red: components missing. Generate, clean, export. Button label-hiding below tablet width with Tooltip is covered in Task 5.
-- [ ] **Task 3: Label, Field, Input, Textarea, Checkbox, RadioGroup.** Stories for default, focus, disabled, invalid (`aria-invalid`, error text linked with `aria-describedby`).
-- [ ] **Task 4: Select, Combobox.** Stories with long English strings and the empty-results state; keyboard `play` tests for Select.
-- [ ] **Task 5: Tooltip, Tabs, Breadcrumb, DropdownMenu.** Keyboard `play` tests for Tabs and DropdownMenu; Tooltip reachable by focus; icon-only Button keeps its accessible name.
-- [ ] **Task 6: Dialog, Sheet.** `play` tests: focus moves in, is trapped, Escape closes, focus returns to the trigger; 360 px viewport story.
-- [ ] **Task 7: Sidebar and Sonner.** Sidebar collapses into a Sheet on phones, no cookie; Sonner toaster story with live region.
-- [ ] **Task 8: export, placeholder removal, docs.** Test: `test/index.test.ts` lists every primitive export. Remove `src/placeholder` and its test. Update `packages/ui/CLAUDE.md`.
+- [x] **Task 1: setup and `cn`.** Test first: `test/utils.test.ts` (`cn` merges and de-duplicates conflicting Tailwind classes) and `test/primitives.test.ts` (rules above, passing on an empty folder, then failing on a fixture with a hex colour). Red: modules missing. Then dependencies, `components.json`, `src/lib/utils.ts`.
+- [x] **Task 2: Button, Badge, Separator, Skeleton, Progress, Card.** Stories first with axe; red: components missing. Generate, clean, export. Button label-hiding below tablet width with Tooltip is covered in Task 5.
+- [x] **Task 3: Label, Field, Input, Textarea, Checkbox, RadioGroup.** Stories for default, focus, disabled, invalid (`aria-invalid`, error text linked with `aria-describedby`).
+- [x] **Task 4: Select, Combobox.** Stories with long English strings and the empty-results state; keyboard `play` tests for Select.
+- [x] **Task 5: Tooltip, Tabs, Breadcrumb, DropdownMenu.** Keyboard `play` tests for Tabs and DropdownMenu; Tooltip reachable by focus; icon-only Button keeps its accessible name.
+- [x] **Task 6: Dialog, Sheet.** `play` tests: focus moves in, is trapped, Escape closes, focus returns to the trigger; 360 px viewport story.
+- [x] **Task 7: Sidebar and Sonner.** Sidebar collapses into a Sheet on phones, no cookie; Sonner toaster story with live region.
+- [x] **Task 8: export, placeholder removal, docs.** Test: `test/index.test.ts` lists every primitive export. Remove `src/placeholder` and its test. Update `packages/ui/CLAUDE.md`.
 
 ## Acceptance criteria mapped to checks
 
