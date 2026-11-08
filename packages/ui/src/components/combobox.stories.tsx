@@ -11,7 +11,7 @@ import {
 
 const departments = [
   "Anthropology",
-  "Bangla",
+  "Botany",
   "Chemistry",
   "Economics",
   "English",
