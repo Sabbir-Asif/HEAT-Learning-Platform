@@ -322,8 +322,9 @@ export const LEGIBLE_HEIGHT = 40;
 export const LEGIBLE_SCALES = [1, 2];
 export const MAX_LOW_CONTRAST_SHARE = 0.1;
 export const MIN_PAINTED_SHARE = 0.01;
-export const MIN_CONTRAST = 3;
+export const MIN_CONTRAST = 2;
 const PAINTED_ALPHA = 128;
+const BLANK_CONTRAST = 1.5;
 
 const hexChannels = (hex) => {
   const digits = hex.length === 4 ? [...hex.slice(1)].map((d) => d + d) : hex.slice(1).match(/../g);
@@ -361,6 +362,7 @@ export function readThemeBackgrounds(css) {
 
 export function legibility(source, background) {
   const backgroundChannels = hexChannels(background);
+  const lightBackground = luminance(backgroundChannels) > 0.5;
   const problems = [];
   const renders = LEGIBLE_SCALES.map((scale) => {
     const height = LEGIBLE_HEIGHT * scale;
@@ -370,11 +372,11 @@ export function legibility(source, background) {
     for (let i = 0; i < pixels.length; i += 4) {
       const alpha = pixels[i + 3];
       if (alpha < PAINTED_ALPHA) continue;
+      const colour = [0, 1, 2].map((c) => Math.min(255, Math.round((pixels[i + c] * 255) / alpha)));
+      const contrast = contrastRatio(colour, backgroundChannels);
+      if (lightBackground && contrast < BLANK_CONTRAST) continue;
       painted += 1;
-      const colour = [0, 1, 2].map(
-        (c) => pixels[i + c] + backgroundChannels[c] * (1 - alpha / 255),
-      );
-      if (contrastRatio(colour, backgroundChannels) < MIN_CONTRAST) lowContrast += 1;
+      if (contrast < MIN_CONTRAST) lowContrast += 1;
     }
     const canvas = pixels.length / 4;
     const paintedShare = painted / canvas;

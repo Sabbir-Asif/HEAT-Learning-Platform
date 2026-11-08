@@ -397,12 +397,12 @@ describe("legibility", () => {
 
   test("a light mark is legible on the dark background and not on the light one", () => {
     expect(problemsFor(mark("#e5e7eb"), dark)).toEqual([]);
-    expect(problemsFor(mark("#e5e7eb"), light).join("\n")).toMatch(/contrast/);
+    expect(problemsFor(mark("#e5e7eb"), light).join("\n")).toMatch(/painted/);
   });
 
   test("tolerates a small low-contrast share and fails a large one", () => {
     const body = (width) =>
-      `<rect width="10" height="10" fill="#0f172a"/><rect x="0" y="0" width="${width}" height="10" fill="#e5e7eb"/>`;
+      `<rect width="10" height="10" fill="#0f172a"/><rect x="0" y="0" width="${width}" height="10" fill="#b8bcc4"/>`;
     expect(problemsFor(svg(body(1)), light)).toEqual([]);
     expect(problemsFor(svg(body(5)), light).join("\n")).toMatch(/contrast/);
   });
@@ -419,6 +419,24 @@ describe("legibility", () => {
   test("renders at 40 px high at 1x and 2x and reports both", () => {
     const result = legibility(mark("#0f172a"), light);
     expect(result.renders.map((r) => r.height)).toEqual([40, 80]);
+  });
+
+  test("white inside a dark mark is the mark's own paper and is ignored on a light background", () => {
+    const disc = svg(
+      '<circle cx="5" cy="5" r="5" fill="#0f172a"/><circle cx="5" cy="5" r="3.5" fill="#ffffff"/>',
+    );
+    expect(problemsFor(disc, light)).toEqual([]);
+    expect(problemsFor(disc, dark).join("\n")).toMatch(/contrast/);
+  });
+
+  test("a white-only mark is invisible on a light background and legible on a dark one", () => {
+    expect(problemsFor(mark("#ffffff"), light).join("\n")).toMatch(/painted/);
+    expect(problemsFor(mark("#ffffff"), dark)).toEqual([]);
+  });
+
+  test("judges the colour of a thin line, not its anti-aliased blend with the background", () => {
+    const thin = svg('<rect x="0" y="4.6" width="10" height="0.8" fill="#0f172a"/>');
+    expect(problemsFor(thin, light)).toEqual([]);
   });
 
   test("does not count pixels below half opacity as painted", () => {
