@@ -106,6 +106,9 @@ describe("layout-only classes in apps", () => {
     "items-center justify-between self-end place-items-center content-start order-2",
     "overflow-hidden overflow-x-auto container hidden sm:block inline-flex contents",
     "space-y-2 col-span-2 row-span-1 grow shrink-0 basis-1/3 2xl:p-8",
+    "sr-only not-sr-only truncate aspect-video aspect-square aspect-4/3",
+    "motion-reduce:hidden print:hidden *:p-2 min-md:flex max-sm:hidden",
+    "@container @container/main @sm:flex @md:grid-cols-2 @max-lg:hidden @min-xl:p-4 @3xl:gap-2",
   ];
   const disallowed = [
     "bg-red-500",
@@ -120,6 +123,18 @@ describe("layout-only classes in apps", () => {
     "md:bg-red-500",
     "absolute",
     "p",
+    "relative",
+    "fixed",
+    "sticky",
+    "z-10",
+    "float-left",
+    "visible",
+    "invisible",
+    "motion-reduce:bg-red-500",
+    "print:text-lg",
+    "@sm:bg-red-500",
+    "*:bg-red-500",
+    "group-hover:flex",
   ];
 
   for (const classes of allowed) {

@@ -31,7 +31,14 @@ export const classOrderConfig = {
   },
 };
 
-const breakpointVariants = "(?:(?:max-)?(?:sm|md|lg|xl|2xl):)*";
+const breakpoints = "(?:sm|md|lg|xl|2xl)";
+const containerSizes = "(?:3xs|2xs|xs|sm|md|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl)";
+const layoutVariants = [
+  `(?:(?:min-|max-)?${breakpoints}:)`,
+  `(?:@(?:min-|max-)?${containerSizes}:)`,
+  "(?:motion-reduce:|print:|\\*:)",
+];
+const breakpointVariants = `(?:${layoutVariants.join("|")})*`;
 const layoutWords = [
   "flex",
   "grid",
@@ -45,6 +52,10 @@ const layoutWords = [
   "container",
   "grow",
   "shrink",
+  "sr-only",
+  "not-sr-only",
+  "truncate",
+  "@container(?:/[a-z0-9-]+)?",
 ];
 const layoutPrefixes = [
   "flex",
@@ -65,6 +76,7 @@ const layoutPrefixes = [
   "grow",
   "shrink",
   "basis",
+  "aspect",
   "p",
   "px",
   "py",
