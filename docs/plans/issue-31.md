@@ -70,3 +70,10 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 ## Verification (stage 6)
 
 `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:coverage && pnpm build`, then `pnpm verify`; `pnpm --filter @heat/ui test:stories`; run both apps in a real browser at phone and laptop width in light and dark to check the class follows the device setting with no flash; record woff2 sizes and a check of heading layout shift against the LCP budget.
+
+## Deviations recorded during implementation
+
+- Fonts come from fontsource `wght.css`, which declares Latin, Latin Extended and Vietnamese faces per family. The package has no Latin-only entry; `unicode-range` keeps the other files from downloading for English text, which the browser check confirmed.
+- `next-themes` puts a `light` class on `<html>` in light mode instead of leaving it bare. Every selector and the dark variant key off `.dark`, so it changes nothing; the test asserts the absence of `dark`.
+- `contrastRatio` is exported from `@heat/config` (with a type declaration) so `@heat/ui` tests reuse the rule.
+- Heading layout shift against the LCP budget is not measured here: the shell pages have no serif heading yet. It is checked with the first real page.
