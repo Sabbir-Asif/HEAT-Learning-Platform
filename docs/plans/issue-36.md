@@ -81,6 +81,17 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 | First-load JS within 150 KB gzipped                                                     | B5 build output, recorded in the PR                    |
 | Lint, format, typecheck, coverage and build pass, no comments                           | `pnpm verify`                                          |
 
+## Decisions made while building
+
+- **Catch-all placeholder.** `/bn/anything` must render, so `[locale]/[...rest]/page.tsx` re-exports the home page with `dynamic = "force-dynamic"`. Without it every distinct path would be written to the ISR disk cache. #37 and the route tickets replace it. `dynamicParams = false` on the layout was tried and rejected: it also turns every path under the catch-all into a 404.
+- **Proxy redirect.** `NextResponse.redirect` with an absolute URL built from the request, not a relative `Location`: Next's proxy adapter throws `Invalid URL` on a relative one. Next then makes a same-host `Location` relative, so a forged `Host` does not appear in the response (checked with curl and Playwright). Next also re-serialises the query (`%20` becomes `+`, `b` becomes `b=`); the proxy test asserts our own `Location` byte for byte and the e2e spec compares parsed values.
+- **`start` script.** `apps/frontend-public/scripts/start.mjs` copies `.next/static` and `public/` into the standalone folder and starts it, so the app and the Playwright `webServer` serve assets.
+- **Client glue takes props.** `LocaleSwitchControl` gets `label` and `current` from the layout and uses only `usePathname()`, so no `NextIntlClientProvider` ships to the client (about 12 KB gzipped saved on the first-load JS). A client tree that needs translations adds the provider with its own namespaces.
+- **Switch placement.** The control is rendered in the locale layout until #37 moves it into the header, so the Playwright specs can click it.
+- **Case-insensitive file systems.** `/BN` is skipped on macOS and Windows, where the prerendered `/bn` is served; Linux CI runs it.
+- **Bangla site title** (`HEAT জেন্ডার নিরাপত্তা প্রশিক্ষণ`) is a draft for the owner to confirm.
+- **First-load JS** for `/bn` and `/en`: 132.8 KB gzipped (level 9) across seven module scripts, plus a 38.6 KB `noModule` polyfill chunk that modern browsers do not load. Budget 150 KB.
+
 ## Verification
 
 ```sh
