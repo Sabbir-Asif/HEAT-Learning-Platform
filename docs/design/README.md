@@ -194,3 +194,15 @@ Filled in by 30b (student screens) and 30c (admin screens). Each screen has a ro
 | Quiz result (pass) | Understand the result | Score, pass mark, correct and incorrect answers with explanations, continue | The outcome and the learning, shown only after a pass; correct and incorrect carry words as well as colour |
 | Quiz result (fail) | Understand the result and the wait | Score, pass mark, countdown, review lessons, disabled retry | The outcome, when retrying opens, and the way back to the material |
 | Drawer: submit with unanswered | Decide whether to submit | Title, explanation, go back, submit anyway, close | A confirmation that would otherwise be a dialog; slides from the end edge on laptop and up from the bottom on phone |
+| Admin overview | See what needs action | List of items needing attention with one button each | Sends the admin straight to approvals, a failed video or a draft module |
+| Admin overview | See what needs action | Enrolments by status | The numbers are the point: pending, approved, completed and rejected counts, with badges that carry words |
+| Approvals | Decide on pending enrolments | Filter bar, table with select, approve and reject | Find, select and decide; reject is a separate outlined danger action, 40 px high on laptop |
+| Approvals (phone) | Decide on pending enrolments | Card list with 48 px approve and reject, bulk approve | Touch targets of at least 44 px; filters open in a drawer |
+| Approvals loading, empty, error | Recover from a missing state | Skeletons, empty message, error with code and Try again | Each state says what happened and what to do next |
+| Drawer: reject with reason | Reject and explain | Required reason field, character limit, confirm, close | Collects the reason the student will see; confirm is danger coloured |
+| Drawer: approve in bulk | Approve several at once | List of the people selected, confirm, close | Shows exactly who is approved before the decision |
+| Drawer: approvals filters (phone) | Narrow the queue | Role, sort, apply, close | Filters that do not fit the phone toolbar |
+| Students | Find a student and see their status | Filter bar, DataTable with sort, status badge, pagination | Search, filter and page through every enrolment; cards on phone |
+| Module editor (locked) | Fix wording safely | Lock note, read-only structure fields, editable wording fields, save | Says why fields are read-only and that wording changes are logged |
+| Module editor (unlocked) | Build a module | Title, description, position, pass mark, save draft, publish | The fields needed to create and publish a module |
+| Insights | Understand enrolment and quiz results | Filter bar, two chart cards each with Download CSV | The trend and the pass rate; the numbers are the point. The line chart is told apart by a labelled legend with different marker shapes and totals, not by colour alone; the lines themselves have no markers yet |

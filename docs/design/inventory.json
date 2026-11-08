@@ -346,6 +346,195 @@
       "width": "phone",
       "theme": "light",
       "lang": "en"
+    },
+    {
+      "id": "admin-approvals-empty-laptop-light-en",
+      "area": "admin",
+      "screen": "approvals-empty",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-empty-phone-light-en",
+      "area": "admin",
+      "screen": "approvals-empty",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-error-laptop-light-en",
+      "area": "admin",
+      "screen": "approvals-error",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-error-phone-light-en",
+      "area": "admin",
+      "screen": "approvals-error",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-laptop-light-en",
+      "area": "admin",
+      "screen": "approvals",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-loading-laptop-light-en",
+      "area": "admin",
+      "screen": "approvals-loading",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-loading-phone-light-en",
+      "area": "admin",
+      "screen": "approvals-loading",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-phone-light-en",
+      "area": "admin",
+      "screen": "approvals",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-insights-laptop-light-en",
+      "area": "admin",
+      "screen": "insights",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-insights-phone-light-en",
+      "area": "admin",
+      "screen": "insights",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-module-editor-locked-laptop-light-en",
+      "area": "admin",
+      "screen": "module-editor-locked",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-module-editor-locked-phone-light-en",
+      "area": "admin",
+      "screen": "module-editor-locked",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-module-editor-unlocked-laptop-light-en",
+      "area": "admin",
+      "screen": "module-editor-unlocked",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-module-editor-unlocked-phone-light-en",
+      "area": "admin",
+      "screen": "module-editor-unlocked",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-overview-laptop-light-en",
+      "area": "admin",
+      "screen": "overview",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-overview-phone-light-en",
+      "area": "admin",
+      "screen": "overview",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-students-laptop-light-en",
+      "area": "admin",
+      "screen": "students",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-students-phone-light-en",
+      "area": "admin",
+      "screen": "students",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "drawer-approvals-approve-bulk-laptop-light-en",
+      "area": "drawer",
+      "screen": "approvals-approve-bulk",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
+    },
+    {
+      "id": "drawer-approvals-approve-bulk-phone-light-en",
+      "area": "drawer",
+      "screen": "approvals-approve-bulk",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
+    },
+    {
+      "id": "drawer-approvals-filters-phone-light-en",
+      "area": "drawer",
+      "screen": "approvals-filters",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
+    },
+    {
+      "id": "drawer-approvals-reject-reason-laptop-light-en",
+      "area": "drawer",
+      "screen": "approvals-reject-reason",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
+    },
+    {
+      "id": "drawer-approvals-reject-reason-phone-light-en",
+      "area": "drawer",
+      "screen": "approvals-reject-reason",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
     }
   ]
 }
