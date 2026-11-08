@@ -11,7 +11,12 @@ Next.js app for the public site and the learner area, on `learn.<domain>` (port 
 
 ## Rules
 
-- Use next-intl with the `@heat/i18n` catalogs; the locale is a route segment.
+- Use next-intl with the `@heat/i18n` catalogs; the locale is a route segment. The behaviour is in the [README](../../README.md#languages).
+- Read the locale with `locale()` from `next/root-params` or next-intl's `getLocale()` in Server Components. Never call `headers()` or `cookies()` for it, or `/bn` and `/en` stop being static.
+- Only `/` redirects. Every other path needs its locale prefix and is a 404 without it.
+- Dates and numbers go through the `@heat/i18n` helpers, never `toLocaleString()` or date-fns `format` without `in`.
+- Give a client component its strings as props from a Server Component. Add `NextIntlClientProvider` only when a client tree needs translations, with just its namespaces; the client runtime is about 12 KB gzipped.
+- Specs for user journeys are Playwright files in `test/e2e/`, run with the CLI.
 - No secrets in `NEXT_PUBLIC_*`. No third-party scripts on student pages.
 - Images use `next/image` with the custom loader; the built-in Next.js image optimizer stays off. Fonts are self-hosted with `next/font`.
 - Load the player chunk only on lesson pages.
