@@ -7,6 +7,9 @@ import {
   PIXEL_DIFFERENCE_LIMIT,
   buildBrand,
   checkBrand,
+  contrastRatio,
+  legibility,
+  readThemeBackgrounds,
   optimise,
   pixelDifference,
   sanitise,
@@ -317,5 +320,92 @@ describe("buildBrand and checkBrand", () => {
     const location = workspace({ "mark.svg": mark, "notes.txt": "x" });
     buildBrand(location);
     expect(list(location.targetDirs[0])).toEqual(["mark.svg"]);
+  });
+});
+
+describe("contrastRatio", () => {
+  test("is 21 for black on white and 1 for identical colours", () => {
+    expect(contrastRatio("#000000", "#ffffff")).toBeCloseTo(21, 5);
+    expect(contrastRatio("#336699", "#336699")).toBe(1);
+  });
+
+  test("does not depend on the order of the colours", () => {
+    expect(contrastRatio("#1d4ed8", "#0b1220")).toBeCloseTo(
+      contrastRatio("#0b1220", "#1d4ed8"),
+      10,
+    );
+  });
+});
+
+describe("readThemeBackgrounds", () => {
+  test("reads --background from the :root and .dark blocks of the real stylesheet", () => {
+    const css = readFileSync(resolve(import.meta.dirname, "../../ui/src/styles.css"), "utf8");
+    expect(readThemeBackgrounds(css)).toEqual({ light: "#ffffff", dark: "#0b1220" });
+  });
+
+  test("reads the values of a different stylesheet", () => {
+    const css =
+      ":root { --background: #fafafa; --x: 1 }\n.dark { color: red; --background: #101010 }";
+    expect(readThemeBackgrounds(css)).toEqual({ light: "#fafafa", dark: "#101010" });
+  });
+
+  test.each([
+    ["no :root block", ".dark { --background: #000000 }"],
+    ["no .dark block", ":root { --background: #ffffff }"],
+    [
+      "a background that is not a hex colour",
+      ":root { --background: oklch(1 0 0) }\n.dark { --background: #000 }",
+    ],
+  ])("throws on %s and says what to update", (_name, css) => {
+    expect(() => readThemeBackgrounds(css)).toThrow(/--background/);
+  });
+});
+
+describe("legibility", () => {
+  const light = "#ffffff";
+  const dark = "#0b1220";
+  const mark = (fill) => svg(`<rect x="1" y="1" width="8" height="8" fill="${fill}"/>`);
+  const problemsFor = (text, background) => legibility(text, background).problems;
+
+  test("a dark mark is legible on the light background and not on the dark one", () => {
+    expect(problemsFor(mark("#0f172a"), light)).toEqual([]);
+    expect(problemsFor(mark("#0f172a"), dark).join("\n")).toMatch(/contrast/);
+  });
+
+  test("a light mark is legible on the dark background and not on the light one", () => {
+    expect(problemsFor(mark("#e5e7eb"), dark)).toEqual([]);
+    expect(problemsFor(mark("#e5e7eb"), light).join("\n")).toMatch(/contrast/);
+  });
+
+  test("tolerates a small low-contrast share and fails a large one", () => {
+    const body = (width) =>
+      `<rect width="10" height="10" fill="#0f172a"/><rect x="0" y="0" width="${width}" height="10" fill="#e5e7eb"/>`;
+    expect(problemsFor(svg(body(1)), light)).toEqual([]);
+    expect(problemsFor(svg(body(5)), light).join("\n")).toMatch(/contrast/);
+  });
+
+  test("an empty picture fails because nothing is painted", () => {
+    expect(problemsFor(svg("<g/>"), light).join("\n")).toMatch(/painted/);
+  });
+
+  test("a hairline that paints less than 1% of the canvas fails", () => {
+    const hairline = svg('<rect width="10" height="0.05" fill="#0f172a"/>');
+    expect(problemsFor(hairline, light).join("\n")).toMatch(/painted/);
+  });
+
+  test("renders at 40 px high at 1x and 2x and reports both", () => {
+    const result = legibility(mark("#0f172a"), light);
+    expect(result.renders.map((r) => r.height)).toEqual([40, 80]);
+  });
+
+  test("does not count pixels below half opacity as painted", () => {
+    const faint = svg('<rect width="10" height="10" fill="#0f172a" fill-opacity="0.4"/>');
+    expect(problemsFor(faint, light).join("\n")).toMatch(/painted/);
+  });
+
+  test("names the background and the failing scale in each problem", () => {
+    const [first] = problemsFor(mark("#0f172a"), dark);
+    expect(first).toContain("#0b1220");
+    expect(first).toMatch(/40 px|80 px/);
   });
 });

@@ -316,3 +316,77 @@ export function checkBrand({ sourceDir, targetDirs }) {
   }
   return problems;
 }
+
+export const LEGIBLE_HEIGHT = 40;
+export const LEGIBLE_SCALES = [1, 2];
+export const MAX_LOW_CONTRAST_SHARE = 0.1;
+export const MIN_PAINTED_SHARE = 0.01;
+export const MIN_CONTRAST = 3;
+const PAINTED_ALPHA = 128;
+
+const hexChannels = (hex) => {
+  const digits = hex.length === 4 ? [...hex.slice(1)].map((d) => d + d) : hex.slice(1).match(/../g);
+  return digits.map((pair) => parseInt(pair, 16));
+};
+
+const luminance = ([red, green, blue]) => {
+  const linear = (value) => {
+    const unit = value / 255;
+    return unit <= 0.04045 ? unit / 12.92 : ((unit + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue);
+};
+
+export function contrastRatio(first, second) {
+  const a = luminance(typeof first === "string" ? hexChannels(first) : first);
+  const b = luminance(typeof second === "string" ? hexChannels(second) : second);
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+}
+
+const hexColour = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+
+export function readThemeBackgrounds(css) {
+  const backgroundIn = (selector) => {
+    const block = css.match(new RegExp(`(?:^|[\\s}])${selector}\\s*\\{([^}]*)\\}`))?.[1] ?? "";
+    const value = block.match(/--background\s*:\s*([^;]+?)\s*(?:;|$)/)?.[1];
+    if (!value || !hexColour.test(value))
+      throw new Error(
+        `${selector} must define --background as a hex colour; update readThemeBackgrounds if the tokens moved`,
+      );
+    return value.toLowerCase();
+  };
+  return { light: backgroundIn(":root"), dark: backgroundIn("\\.dark") };
+}
+
+export function legibility(source, background) {
+  const backgroundChannels = hexChannels(background);
+  const problems = [];
+  const renders = LEGIBLE_SCALES.map((scale) => {
+    const height = LEGIBLE_HEIGHT * scale;
+    const { width, pixels } = render(source, { height });
+    let painted = 0;
+    let lowContrast = 0;
+    for (let i = 0; i < pixels.length; i += 4) {
+      const alpha = pixels[i + 3];
+      if (alpha < PAINTED_ALPHA) continue;
+      painted += 1;
+      const colour = [0, 1, 2].map(
+        (c) => pixels[i + c] + backgroundChannels[c] * (1 - alpha / 255),
+      );
+      if (contrastRatio(colour, backgroundChannels) < MIN_CONTRAST) lowContrast += 1;
+    }
+    const canvas = pixels.length / 4;
+    const paintedShare = painted / canvas;
+    const lowShare = painted ? lowContrast / painted : 0;
+    if (paintedShare < MIN_PAINTED_SHARE)
+      problems.push(
+        `at ${height} px high on ${background} only ${(paintedShare * 100).toFixed(2)}% of the canvas is painted, at least 1% is needed`,
+      );
+    else if (lowShare > MAX_LOW_CONTRAST_SHARE)
+      problems.push(
+        `at ${height} px high on ${background} ${(lowShare * 100).toFixed(1)}% of painted pixels have contrast under ${MIN_CONTRAST}:1, at most 10% is allowed`,
+      );
+    return { height, width, paintedShare, lowShare };
+  });
+  return { problems, renders };
+}
