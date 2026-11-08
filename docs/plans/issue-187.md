@@ -6,8 +6,8 @@ Approach: the mapping logic is a pure module (`form-errors.ts`) tested in jsdom.
 
 ## Tasks
 
-- [ ] 1. Test then code `form-errors.ts`: copy for every field code, form-level copy per error code, `toFormErrors(payload, knownPaths)` that splits matched fields from the form-level message, and a generic fallback for a payload that is not an error response. Test in `test/form-errors.test.ts`.
-- [ ] 2. Test then code `applyServerError(form, payload, options)`: sets field errors and `root.server`, leaf paths of `getValues()` are the known fields, focus goes to the first invalid field in DOM order. Test with a fake form in `test/apply-server-error.test.ts`.
+- [x] 1. Test then code `form-errors.ts`: copy for every field code, form-level copy per error code, `toFormErrors(payload, knownPaths)` that splits matched fields from the form-level message, and a generic fallback for a payload that is not an error response. Test in `test/form-errors.test.ts`.
+- [x] 2. Test then code `applyServerError(form, payload, options)`: sets field errors and `root.server`, leaf paths of `getValues()` are the known fields, focus goes to the first invalid field in DOM order. Test with a fake form in `test/apply-server-error.test.ts`.
 - [ ] 3. `Form`, `FormField`, `FormMessage` in `src/composites/form.tsx` with the ARIA wiring, and stories (Default, Light, Dark, ServerError with Input, Textarea and Select, FormLevel).
 - [ ] 4. Export from `src/index.ts`, extend `index.test.ts`, allow `react-hook-form` in `primitives.test.ts`, document in `packages/ui/CLAUDE.md` and the root `CLAUDE.md` Form row.
 
