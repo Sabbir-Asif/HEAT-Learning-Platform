@@ -13,6 +13,7 @@ Lint, in the editor hook's reach and in CI, keeps styling inside `@heat/ui` (ADR
 - **`style` and `<style>`** are banned in app `src` with `no-restricted-syntax` selectors; imports of any stylesheet other than `globals.css` (including `.module.css`, `.scss`) are banned with an `ImportDeclaration` selector.
 - **CSS files** are linted with `@eslint/css` (`language: "css/css"`, Tailwind at-rules tolerated) through one local rule on the `StyleSheet` node: a file under `apps/*/src` fails and the message names it, except `src/app/globals.css`, which may hold only `@import "@heat/ui/styles.css"` and `@source "..."`. `packages/ui` never gets the CSS entry.
 - **Tailwind resolution**: the plugin switches itself off with a one-time warning when it cannot resolve `tailwindcss` from the lint directory, so `tailwindcss` (catalog, 4.3.5) is a dev dependency of both apps, `@heat/ui` and `@heat/config`. A test lints with each package's real `eslint.config.mjs` and `cwd`, and fails if the conflict rule does not fire.
+- **Entry point**: the plugin prefixes every report with a warning when `entryPoint` is not set, so both presets set it to `packages/config/eslint/tailwind-entry.css` (`@import "tailwindcss";`). `packages/ui/src/styles.css` cannot be the entry yet because it holds throwaway tokens and no Tailwind import; #31 repoints the setting to it once it carries the theme.
 - **No `eslint-disable` escape hatch** (the no-comments test forbids comments). The editor hook is not changed. Arbitrary values stay allowed in `@heat/ui`.
 
 Alternatives not chosen: one shared config with `apps/*/src` globs (cannot match when loaded from a package directory); a Stylelint setup (a second linter for one rule); relying on review.
@@ -22,6 +23,7 @@ Alternatives not chosen: one shared config with `apps/*/src` globs (cannot match
 | File                                                                              | Change                                                      |
 | --------------------------------------------------------------------------------- | ----------------------------------------------------------- |
 | `packages/config/eslint/styling.js`                                               | new, shared rule sets and the local CSS rule                |
+| `packages/config/eslint/tailwind-entry.css`, `css-entry-rule.js` | new, Tailwind entry for the plugin; local rule for the app CSS entry |
 | `packages/config/eslint/app.js`, `ui.js`                                          | new presets                                                 |
 | `packages/config/package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`           | exports, dependencies, `tailwindcss` in the catalog         |
 | `apps/*/eslint.config.mjs`, `packages/ui/eslint.config.mjs`, their `package.json` | select the preset, add `tailwindcss`                        |

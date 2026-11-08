@@ -77,7 +77,7 @@ Styling stays inside `@heat/ui` (ADR 0013), and lint enforces it. The two Next.j
 | No `style` attribute, no `<style>` element, no stylesheet import other than `globals.css`                                                                                                                   | yes  | allowed     |
 | No `.css` file other than `src/app/globals.css`, which may hold only `@import "@heat/ui/styles.css"` and `@source` lines                                                                                    | yes  | not checked |
 
-Limits: a spread props object (`{...props}`) and class names built at run time are not inspected, and `test/` and Playwright files are not covered. The class rules are silent when `tailwindcss` cannot be resolved from the linted package, so each app, `@heat/ui` and `@heat/config` has `tailwindcss` as a dev dependency and `packages/config/test/styling-setup.test.mjs` fails if that breaks. The no-comments rule also rules out `eslint-disable` comments. The editor hook lints only script files, so the CSS rule is enforced by `pnpm lint` and CI.
+The Tailwind plugin reads its theme from `packages/config/eslint/tailwind-entry.css` until `@heat/ui` carries the real theme. Limits: a spread props object (`{...props}`) and class names built at run time are not inspected, and `test/` and Playwright files are not covered. The class rules are silent when `tailwindcss` cannot be resolved from the linted package, so each app, `@heat/ui` and `@heat/config` has `tailwindcss` as a dev dependency and `packages/config/test/styling-setup.test.mjs` fails if that breaks. The no-comments rule also rules out `eslint-disable` comments. The editor hook lints only script files, so the CSS rule is enforced by `pnpm lint` and CI.
 
 ### Storybook
 

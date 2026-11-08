@@ -1,13 +1,20 @@
 import css from "@eslint/css";
+import { fileURLToPath } from "node:url";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
 import { cssEntryOnly } from "./css-entry-rule.js";
 
 const sourceFiles = ["src/**/*.{ts,tsx}"];
 const plugins = { "better-tailwindcss": betterTailwindcss };
+const settings = {
+  "better-tailwindcss": {
+    entryPoint: fileURLToPath(new URL("./tailwind-entry.css", import.meta.url)),
+  },
+};
 
 export const classOrderConfig = {
   files: sourceFiles,
   plugins,
+  settings,
   rules: {
     "better-tailwindcss/no-conflicting-classes": "error",
     "better-tailwindcss/enforce-consistent-class-order": "error",
@@ -112,6 +119,7 @@ const restrictedSyntax = [
 export const appStylingConfig = {
   files: sourceFiles,
   plugins,
+  settings,
   rules: {
     "no-restricted-syntax": ["error", ...restrictedSyntax],
     "better-tailwindcss/no-restricted-classes": ["error", { restrict: restrictedClasses }],

@@ -240,3 +240,16 @@ describe("the single CSS entry in apps", () => {
     expect(outside?.messages ?? []).toEqual([]);
   });
 });
+
+describe("the Tailwind entry point", () => {
+  for (const [preset, file] of [
+    ["app", appFile],
+    ["ui", uiFile],
+  ]) {
+    test(`${preset} reports class problems without an entry point warning`, async () => {
+      const messages = await lint(preset, markup("p-2 p-4"), file);
+      expect(messages.length).toBeGreaterThan(0);
+      for (const message of messages) expect(message.message).not.toMatch(/entry point/i);
+    });
+  }
+});
