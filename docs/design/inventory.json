@@ -232,6 +232,120 @@
       "width": "phone",
       "theme": "light",
       "lang": "en"
+    },
+    {
+      "id": "drawer-quiz-submit-unanswered-laptop-light-en",
+      "area": "drawer",
+      "screen": "quiz-submit-unanswered",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
+    },
+    {
+      "id": "drawer-quiz-submit-unanswered-phone-light-en",
+      "area": "drawer",
+      "screen": "quiz-submit-unanswered",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
+    },
+    {
+      "id": "student-course-laptop-light-en",
+      "area": "student",
+      "screen": "course",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-course-phone-light-en",
+      "area": "student",
+      "screen": "course",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-lesson-laptop-light-en",
+      "area": "student",
+      "screen": "lesson",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-lesson-phone-light-en",
+      "area": "student",
+      "screen": "lesson",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-question-laptop-light-en",
+      "area": "student",
+      "screen": "quiz-question",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-question-phone-light-en",
+      "area": "student",
+      "screen": "quiz-question",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-result-fail-laptop-light-en",
+      "area": "student",
+      "screen": "quiz-result-fail",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-result-fail-phone-light-en",
+      "area": "student",
+      "screen": "quiz-result-fail",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-result-pass-laptop-light-en",
+      "area": "student",
+      "screen": "quiz-result-pass",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-result-pass-phone-light-en",
+      "area": "student",
+      "screen": "quiz-result-pass",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-review-laptop-light-en",
+      "area": "student",
+      "screen": "quiz-review",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-review-phone-light-en",
+      "area": "student",
+      "screen": "quiz-review",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
     }
   ]
 }

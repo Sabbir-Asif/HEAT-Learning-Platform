@@ -184,3 +184,13 @@ Filled in by 30b (student screens) and 30c (admin screens). Each screen has a ro
 | Dashboard | Resume learning | Continue card with progress bar and Resume lesson | The main action and where the student is |
 | Dashboard | Resume learning | Module list with status badges | Overall position and what is locked. The mock's four stat tiles are dropped; the one progress figure sits in the continue card |
 | Dashboard loading, empty, error | Recover from a missing state | Skeletons, empty message with contact, error message with code, Try again | Each state says what happened and what to do next |
+| Course | Find and open a lesson | Module cards with status badges and lesson list | Where the student is, what is done, and a single Resume action on the current lesson |
+| Course | Find and open a lesson | Locked module with the reason | Explains why module 3 cannot be opened yet |
+| Lesson | Watch and complete a lesson | Video player with captions control | The lesson itself; captions are required for accessibility |
+| Lesson | Watch and complete a lesson | Title, short description, previous and complete buttons | Context and the two navigation actions |
+| Lesson | Watch and complete a lesson | Objectives and module list (side panel on laptop, tabs on phone) | What the lesson should teach and where it sits in the course |
+| Quiz question | Answer one question | Progress bar, question, four options, previous and next | One question at a time with position shown; selection uses fill, outline and a filled marker, not colour alone |
+| Quiz review | Check before submitting | Answered and not answered list, go back, submit | Lets the student find a skipped question before submitting |
+| Quiz result (pass) | Understand the result | Score, pass mark, correct and incorrect answers with explanations, continue | The outcome and the learning, shown only after a pass; correct and incorrect carry words as well as colour |
+| Quiz result (fail) | Understand the result and the wait | Score, pass mark, countdown, review lessons, disabled retry | The outcome, when retrying opens, and the way back to the material |
+| Drawer: submit with unanswered | Decide whether to submit | Title, explanation, go back, submit anyway, close | A confirmation that would otherwise be a dialog; slides from the end edge on laptop and up from the bottom on phone |

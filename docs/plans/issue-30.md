@@ -66,14 +66,14 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 
 Owner decision 2026-11-08: designs are English only, so every frame has lang `en` and there are no Bangla frames. Each screen is built at laptop (1440) and phone (390), in light and dark, with literal token hex values per theme (the tools cannot switch a frame's variable mode). One task is one commit: the frames in `heat-lms.fig`, the exports, the inventory entries and the README no-filler rows for that screen. The file is saved and exports are written after each task.
 
-- [ ] **Task 11: public chrome and landing.** Header (HEAT logo placeholder, University of Dhaka crest placeholder, nav, theme switch, Sign in, Enroll), footer with partner placeholders, and `student-landing`: the course promise, one Enroll action, what the training covers, who runs it. Demo-mock elements are justified or dropped in the README.
-- [ ] **Task 12: enrolment.** `student-enroll-details`, `student-enroll-captcha` (captcha image, refresh, input, support contact), `student-enroll-success`.
-- [ ] **Task 13: awaiting approval.** `student-awaiting-approval` with resend verification and profile link, plus the removed, rejected and expired states with reason text.
-- [ ] **Task 14: learner shell and dashboard.** Sidebar and top bar on laptop, 5-item bottom bar on phone. `student-dashboard`, `student-dashboard-loading`, `student-dashboard-empty`, `student-dashboard-error`.
-- [ ] **Task 15: course and lesson.** `student-course` with module list and locked or completed marks, `student-lesson` (phone: video on top with Lesson, Objectives and Modules tabs; laptop: main column with side panel).
-- [ ] **Task 16: quiz.** `student-quiz-question`, `student-quiz-review`, `student-quiz-result-pass`, `student-quiz-result-fail` with the waiting-time countdown, and `drawer-quiz-submit-unanswered`.
+- [x] **Task 11: public chrome and landing.** Header (HEAT logo placeholder, University of Dhaka crest placeholder, nav, theme switch, Sign in, Enroll), footer with partner placeholders, and `student-landing`: the course promise, one Enroll action, what the training covers, who runs it. Demo-mock elements are justified or dropped in the README.
+- [x] **Task 12: enrolment.** `student-enroll-details`, `student-enroll-captcha` (captcha image, refresh, input, support contact), `student-enroll-success`.
+- [x] **Task 13: awaiting approval.** `student-awaiting-approval` with resend verification and profile link, plus the removed, rejected and expired states with reason text.
+- [x] **Task 14: learner shell and dashboard.** Sidebar and top bar on laptop, 5-item bottom bar on phone. `student-dashboard`, `student-dashboard-loading`, `student-dashboard-empty`, `student-dashboard-error`.
+- [x] **Task 15: course and lesson.** `student-course` with module list and locked or completed marks, `student-lesson` (phone: video on top with Lesson, Objectives and Modules tabs; laptop: main column with side panel).
+- [x] **Task 16: quiz.** `student-quiz-question`, `student-quiz-review`, `student-quiz-result-pass`, `student-quiz-result-fail` with the waiting-time countdown, and `drawer-quiz-submit-unanswered`.
 
-Slice 30c (admin screens, states, drawers, final no-filler table) is planned when 30b is reviewed.
+Slice 30b is built in light only (owner chose light first on 2026-11-08); the dark versions of every frame are a recolour pass still to do. Slice 30c (admin screens, states, drawers, final no-filler table) is planned when 30b is reviewed.
 
 ## Acceptance criteria mapped to checks
 
