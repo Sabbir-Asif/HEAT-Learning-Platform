@@ -1,5 +1,5 @@
 import { ESLint } from "eslint";
-import { createRequire } from "node:module";
+import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
 
@@ -11,11 +11,11 @@ const packages = [
   "apps/frontend-internal",
 ];
 
-describe("tailwindcss is resolvable from every linted package", () => {
+describe("tailwindcss is installed in every linted package", () => {
   for (const directory of packages) {
     test(directory, () => {
-      const requireFrom = createRequire(resolve(root, directory, "package.json"));
-      expect(() => requireFrom.resolve("tailwindcss/package.json")).not.toThrow();
+      const installed = resolve(root, directory, "node_modules/tailwindcss/package.json");
+      expect(existsSync(installed), installed).toBe(true);
     });
   }
 });
