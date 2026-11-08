@@ -59,7 +59,7 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 
 - [x] **C1: component.** Stories (light, dark, bn, en) with play functions: `<nav>` with accessible name, `<a lang hreflang>` with endonym, `aria-current` on the current option, Tab then Enter activates the other option and calls `onChange`, each link is at least 24 by 24 CSS px, fits at 360 px; axe passes. Unit test of the markup. Then `locale-switch.tsx`, styles, root export.
 - [x] **C2: app glue.** Tests with jsdom: the click handler writes the cookie, preserves path, query and hash, and calls `window.location.assign` with `/bn/courses/x?tab=2#notes` from `/en/courses/x?tab=2#notes`. Then the client glue file and an e2e spec of the switch.
-- [ ] **C3: docs.** README (cookie, redirect rules, Playwright, `allowBuilds`, CI `e2e` job) and `apps/frontend-public/CLAUDE.md` (i18n conventions). Docs tests stay green.
+- [x] **C3: docs.** README (cookie, redirect rules, Playwright, `allowBuilds`, CI `e2e` job) and `apps/frontend-public/CLAUDE.md` (i18n conventions). Docs tests stay green.
 
 ## Acceptance criteria mapped to checks
 
