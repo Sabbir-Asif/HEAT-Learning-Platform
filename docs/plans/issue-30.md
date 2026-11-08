@@ -15,7 +15,7 @@ One issue, one pull request, three slices committed in order on this branch.
 | Slice | Content                                                                                                                                                                       |
 | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 30a   | Tooling and its tests, `tokens.json`, `docs/design/README.md` skeleton, the font decision, the theme and specimen frames in `heat-lms.fig`, `design:contrast`, `design:check` |
-| 30b   | Student screens: landing, enrolment (details, captcha, success), awaiting approval, dashboard, course, lesson, quiz (question, review, result), with loading, empty and error  |
+| 30b   | Student screens: landing, enrollment (details, captcha, success), awaiting approval, dashboard, course, lesson, quiz (question, review, result), with loading, empty and error  |
 | 30c   | Admin screens: overview, approvals, students, module editor, insights, the drawers, loading, empty and error states, the final README no-filler table                         |
 
 ## Chosen approach
@@ -23,10 +23,10 @@ One issue, one pull request, three slices committed in order on this branch.
 - **Source of truth for values is `docs/design/tokens.json`.** The design file carries the same values as Open Pencil variables (collections with Light and Dark modes where the tool supports it, otherwise swatch frames labelled with hex). The README records how the two were compared. #31 turns `tokens.json` into `packages/ui/src/styles.css`; shadcn variable names are used so that mapping is one to one.
 - **Pure functions, Node built-ins only** in `packages/config/src` (`.mjs`, like `audit.mjs` and `ticket.mjs`), thin scripts in `packages/config/bin`, tests in `packages/config/test`. `contrast.mjs` is WCAG 2 relative luminance and ratio on hex strings, so #31 can run the same function on values parsed from `styles.css`.
 - **The pair list lives in `tokens.json`** (`pairs`), and `design-checks.mjs` derives the pairs that must exist from the roles (every `-foreground` on its base, the text and non-text pairs of the refined spec, the status tones). A missing required pair fails, so deleting a pair cannot make the check green.
-- **Status colours are tones**, not one colour set per state: `neutral`, `info`, `success`, `warning`, `danger`, `brand`, each with a fill, a foreground and a mark colour. `tokens.json` maps every enrolment, video and course state to a tone, so the same meaning always looks the same and a new state cannot be added without a tone.
+- **Status colours are tones**, not one colour set per state: `neutral`, `info`, `success`, `warning`, `danger`, `brand`, each with a fill, a foreground and a mark colour. `tokens.json` maps every enrollment, video and course state to a tone, so the same meaning always looks the same and a new state cannot be added without a tone.
 - **Inventory** is `docs/design/inventory.json`: one entry per frame with the id parts repeated as fields, so a test can check them against the id. Exports are `docs/design/exports/<frame-id>.png`.
 - **Drawer rule in data:** an entry with an `overlay` field must say `"drawer"`; an id or screen containing `modal`, `dialog` or `popup` fails.
-- **Font:** default is to keep Noto Sans Bengali Variable (one family, Bengali and Latin, OFL, already self-hosted at 130 KB for the two subsets, three weights). Hind Siliguri and Anek Bangla are measured and compared in the README; the default changes only for a measured reason.
+- **Font:** Source Serif 4 for headings and Public Sans for body, both Latin only, as set by the owner decision to drop Bangla.
 - **Open Pencil** is driven through its MCP tools. If the application is not connected the design file and exports are not produced and the slice reports the blocker; nothing is faked.
 
 Alternatives not chosen: a Style Dictionary or other build step (a dependency for a one-way copy that #31 owns); a pair list only in code (the design review needs to see it next to the colours); one status colour set per state (17 states, drift between equal meanings).
@@ -67,7 +67,7 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 Owner decision 2026-11-08: designs are English only, so every frame has lang `en` and there are no Bangla frames. Each screen is built at laptop (1440) and phone (390), in light and dark, with literal token hex values per theme (the tools cannot switch a frame's variable mode). One task is one commit: the frames in `heat-lms.fig`, the exports, the inventory entries and the README no-filler rows for that screen. The file is saved and exports are written after each task.
 
 - [x] **Task 11: public chrome and landing.** Header (HEAT logo placeholder, University of Dhaka crest placeholder, nav, theme switch, Sign in, Enroll), footer with partner placeholders, and `student-landing`: the course promise, one Enroll action, what the training covers, who runs it. Demo-mock elements are justified or dropped in the README.
-- [x] **Task 12: enrolment.** `student-enroll-details`, `student-enroll-captcha` (captcha image, refresh, input, support contact), `student-enroll-success`.
+- [x] **Task 12: enrollment.** `student-enroll-details`, `student-enroll-captcha` (captcha image, refresh, input, support contact), `student-enroll-success`.
 - [x] **Task 13: awaiting approval.** `student-awaiting-approval` with resend verification and profile link, plus the removed, rejected and expired states with reason text.
 - [x] **Task 14: learner shell and dashboard.** Sidebar and top bar on laptop, 5-item bottom bar on phone. `student-dashboard`, `student-dashboard-loading`, `student-dashboard-empty`, `student-dashboard-error`.
 - [x] **Task 15: course and lesson.** `student-course` with module list and locked or completed marks, `student-lesson` (phone: video on top with Lesson, Objectives and Modules tabs; laptop: main column with side panel).
@@ -84,7 +84,7 @@ Same rules as 30b: English only, laptop and phone, light first, one task per com
 - [x] **Task 19: students.** `admin-students` with the shared DataTable (pagination, sort, filter bar, StatusBadge) and a card list on phone.
 - [x] **Task 20: module editor.** `admin-module-editor-locked` (read-only fields with a lock note, wording-fix fields noting changes are logged) and `admin-module-editor-unlocked`.
 - [x] **Task 21: insights.** `admin-insights` with filter bar and chart cards, CSV action per card, series distinguishable without colour.
-- [ ] **Task 23: apply the refined direction to every remaining frame.** Owner feedback 2026-11-08: the first frames looked generic. The landing, dashboard and approvals laptop frames are redrawn as the reference set (Source Serif 4 and Public Sans, Lucide icons, dark ink hero band, rules instead of boxes, Sonner toast). Redraw the other frames in that style once the owner approves the reference set.
+- [x] **Task 23: apply the refined direction to every remaining frame.** Owner feedback 2026-11-08: the first frames looked generic. The landing, dashboard and approvals laptop frames are redrawn as the reference set (Source Serif 4 and Public Sans, Lucide icons, dark ink hero band, rules instead of boxes, Sonner toast). Redraw the other frames in that style once the owner approves the reference set.
 - [ ] **Task 22: review.** Final README no-filler table check, `pnpm design:check`, `pnpm verify`.
 
 ## Acceptance criteria mapped to checks

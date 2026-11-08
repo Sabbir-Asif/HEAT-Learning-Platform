@@ -76,7 +76,7 @@
       "width": "laptop",
       "theme": "light",
       "lang": "en",
-      "shows": "Account details, enrolment status and the Sign out button (icon and small text)"
+      "shows": "Account details, enrollment status and the Sign out button (icon and small text)"
     },
     {
       "id": "student-profile-phone-light-en",
@@ -85,7 +85,7 @@
       "width": "phone",
       "theme": "light",
       "lang": "en",
-      "shows": "Account details, enrolment status and the Sign out button (icon and small text)"
+      "shows": "Account details, enrollment status and the Sign out button (icon and small text)"
     },
     {
       "id": "student-dashboard-empty-laptop-light-en",
