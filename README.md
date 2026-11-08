@@ -200,6 +200,16 @@ Hook state for the stop check lives in `$HEAT_HOOKS_STATE_DIR` or a private `hea
 
 `.env` files are also denied by `permissions.deny` for Read and Edit. `.env.example` stays readable.
 
+A glob in a Bash word is denied if it could match an env file name (the text before the first glob character plus `.env` or `.envrc`), so `cat .e*` and `cat prod*` are denied. The one exception is a listing of the real directory, which is trusted only when every condition holds:
+
+- every command in the line is a plain reader from a short allow-list (`cat`, `head`, `tail`, `tac`, `nl`, `less`, `more`, `wc`, `od`, `xxd`, `strings`, `base64`, `md5sum`, `shasum`, `sha256sum`, plus the harmless `echo`, `pwd`, `true`, `ls`, `stat`, `file`, `cmp`), so any other program, `grep`, `diff`, `cd`, a package script or a writer withdraws the trust;
+- the line is straight-line: separators are `;` and newline (plus `for NAME in words; do ...; done`), with no `&&`, `||`, `|`, `&`, subshell, group, function, `$(`, backtick, keyword block, wrapper such as `env` or `xargs`, or command whose name is a variable;
+- no redirect writes anywhere except to `/dev/null`, `/dev/stdout`, `/dev/stderr` or `/dev/fd/N` (after normalising the path);
+- the text has no assignment word (`NAME=`), `export`, `declare`, `typeset`, `unset`, `local`, `readonly` or `HOME`;
+- the glob has no `**`, is not under a `~` path, has no `..` after a symlinked directory, and has no directory segment that starts with `.` or `[` and could match `.` or `..` (`.*/`, `.?/`), because some shells expand those.
+
+Then brace lists are expanded, directory parts are listed on disk, every entry is tested including hidden ones and symlink targets, and any entry whose name starts with `.env` counts as an env file, and `cat foo*`, `cat docs/adr/0013*` and `wc -l docs/adr/*` are allowed unless an entry is an env file. `cat *` is denied when one is present. `find`, `rg`, `git`, `tar` and every other program use the name check, so `rg foo docs/adr/0013*` is denied. The listing assumes default shell glob options.
+
 What the hooks cannot do. They cannot protect themselves: an agent that edits `.claude/settings.json` or the hook code, once its plan exists, changes the guards for later sessions, so `.github/CODEOWNERS` (the hook code, `ticket.mjs`, the skill, the agents and every `CLAUDE.md`) and CI are the backstop, and the owner reads those diffs. Writes under `.git`, to any `heat-verified` file and to `.claude/settings.local.json` are denied from every tool. Reads of `.env` files are denied by name; indirection such as variables, globs, interpreters or computed strings can get around the Bash check, which is a limit of reading command text, not something a hook can close. If `node` or `packages/config/bin/hook.mjs` is missing, every guarded tool call is blocked because the guards fail closed; restore the branch, or restart the session from a checkout that has the file.
 
 ### Conventions

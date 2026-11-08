@@ -58,16 +58,22 @@ function expandHome(path) {
 
 function stripWrappers(words) {
   let i = 0;
+  const skipped = [];
+  let wrapped = false;
   while (i < words.length) {
     const word = words[i];
-    if (assignment.test(word) || keywords.has(word)) i += 1;
-    else if (wrappers.has(word)) {
+    if (assignment.test(word)) i += 1;
+    else if (keywords.has(word)) {
+      skipped.push(word);
+      i += 1;
+    } else if (wrappers.has(word)) {
+      wrapped = true;
       i += 1;
       while (i < words.length && words[i].startsWith("-")) i += 1;
       if (["nice", "timeout"].includes(word) && numeric.test(words[i] ?? "")) i += 1;
     } else break;
   }
-  return words.slice(i);
+  return { words: words.slice(i), keywords: skipped, wrapped };
 }
 
 function embeddedScript(words) {
@@ -89,9 +95,17 @@ function scan(text, startCwd, out) {
   const length = text.length;
 
   const finish = () => {
-    const normalized = stripWrappers(words);
+    const stripped = stripWrappers(words);
+    const normalized = stripped.words;
     if (normalized.length || writes.length || reads.length) {
-      out.push({ words: normalized, cwd, writes, reads });
+      out.push({
+        words: normalized,
+        cwd,
+        writes,
+        reads,
+        keywords: stripped.keywords,
+        wrapped: stripped.wrapped,
+      });
       const script = embeddedScript(normalized);
       if (script) scan(script, cwd, out);
       if (["cd", "pushd"].includes(normalized[0])) {
@@ -289,4 +303,35 @@ export function parseShell(text, cwd) {
   const commands = [];
   scan(text, cwd, commands);
   return commands;
+}
+
+const structuralPrograms = new Set([
+  "bash",
+  "sh",
+  "zsh",
+  "dash",
+  "ksh",
+  "eval",
+  "source",
+  ".",
+  "trap",
+  "case",
+  "esac",
+  "function",
+  "select",
+  "coproc",
+]);
+
+export function isStraightLine(commands, text) {
+  const scanned = text.replace(/\$\{[A-Za-z_]\w*\}/g, "").replace(/[0-9]*>&[0-9-]*|&>>?|>\|/g, "");
+  if (/[&|(){}`]/.test(scanned)) return false;
+  return commands.every((command) => {
+    const program = command.words[0] ?? "";
+    return (
+      !command.wrapped &&
+      command.keywords.every((keyword) => keyword === "do" || keyword === "done") &&
+      !structuralPrograms.has(basename(program)) &&
+      !/[$`]/.test(program)
+    );
+  });
 }
