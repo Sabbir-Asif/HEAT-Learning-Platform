@@ -40,7 +40,7 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 
 ### Part A: `@heat/i18n`
 
-- [ ] **A1: locale constants.** Tests: `LOCALES` is `["bn", "en"]`, `DEFAULT_LOCALE` is `bn`, `isLocale` accepts exactly `bn` and `en` (rejects `BN`, `fr`, empty, non-string). Then `locale.ts`.
+- [x] **A1: locale constants.** Tests: `LOCALES` is `["bn", "en"]`, `DEFAULT_LOCALE` is `bn`, `isLocale` accepts exactly `bn` and `en` (rejects `BN`, `fr`, empty, non-string). Then `locale.ts`.
 - [ ] **A2: `negotiateLocale`.** Tests: cookie `bn` or `en` wins over the header; a cookie of `fr`, `BN`, empty, `bn;x` or over 16 characters is ignored; q-values (`en;q=0.8, bn;q=0.9` goes to bn); `bn-BD`, `bn-IN`, `EN-us` match on the primary subtag, any case; `en;q=0`, `en;q=abc`, `q` above 1 and `q=` with more than three decimals are ignored; equal q: first listed wins; `fr`, `*`, empty, absent and junk go to bn; 32-entry and 1 KB caps (an `en` beyond the cap is not seen); a 1 MB header and a pathological `;;;;` string finish in milliseconds. Then `negotiate.ts`.
 - [ ] **A3: `switchLocalePath`.** Tests: `/en`, `/en/`, `/bn/x?y=1#z`, `/x`, `//evil.com`, `/\evil.com`, `/en//evil.com`, `javascript:alert(1)`, empty, a path with a control character; the result always starts with `/<target>` and holds no `//`, scheme or backslash. Then `switch-locale-path.ts`.
 - [ ] **A4: `serializeLocaleCookie`.** Tests: exact string `__Host-locale=bn; Path=/; Max-Age=31536000; SameSite=Lax; Secure`, no `Domain`, no `HttpOnly`; a value that is not a locale throws. Then `cookie.ts`.
