@@ -1,7 +1,7 @@
 <title>HEAT LMS Project Plan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@500;600;700&family=Hind+Siliguri:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Public+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: long-form plan document; sticky contents rail on wide screens, single column under 960px. */
 :root {
@@ -20,8 +20,8 @@
   --warn-soft: #fbf0dc;
   --risk: #b0303b;
   --risk-soft: #fbe6e8;
-  --font-display: "Anek Bangla", "Hind Siliguri", system-ui, sans-serif;
-  --font-body: "Hind Siliguri", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Source Serif 4", Georgia, serif, sans-serif;
+  --font-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --step--1: 0.875rem;
   --step-0: 1rem;
@@ -278,7 +278,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; color: var(--mute
         <tr><td>Production grade, secure, user-facing at 10k users</td><td>OWASP ASVS Level 2 as the security target, SLOs, load tests before launch, off-site backups with restore drills, and monitoring from day one.</td></tr>
         <tr><td>Design with Claude frontend design, Open Pencil, shadcn, Tailwind</td><td>Key screens are designed in Open Pencil first and exported as tokens into a shared <code>@heat/ui</code> package (shadcn + Tailwind v4). The demo mock is a direction, not a spec.</td></tr>
         <tr><td>Reusable components, very little CSS, no filler</td><td>Both Next.js apps build only from <code>@heat/ui</code>. Styling comes from design tokens and Tailwind utilities inside those components; app code adds no custom CSS. Every element on a screen must serve the task on that screen. See decision D13.</td></tr>
-        <tr><td>Bangla / English switch</td><td>All interface text and emails in both languages. Course content is in one language per course for v1.</td></tr>
+        <tr><td>Language</td><td>The interface and emails are in English only.</td></tr>
         <tr><td>Logos</td><td>The 4 logos in the heat.ugc.gov.bd header (the HEAT mark and three partner marks) plus the University of Dhaka crest from the demo.</td></tr>
       </tbody>
     </table>
@@ -300,8 +300,8 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; color: var(--mute
     <div class="decision"><div class="id">D5</div><div><h4>Signed HLS delivered by Nginx, never proxied through Node</h4><p>The API issues a playback session and sets a short-lived HMAC-signed cookie scoped to <code>/hls/&lt;videoId&gt;/</code>. <strong>Nginx (njs) verifies the signature on every playlist and segment</strong> without touching the database. Originals stay outside the web root. A Phase 1 spike proves this on the real VPS before anything else depends on it.</p></div></div>
     <div class="decision"><div class="id">D6</div><div><h4>Watched-interval progress the server can trust</h4><p>The player sends watched ranges every 15 s and on pause, seek or tab hide. <strong>The server accepts ranges only up to the wall-clock time since the playback session started, multiplied by the highest allowed playback speed</strong>, so a script cannot report a whole video as watched. Late batches from an offline retry are accepted within that same budget. A video counts as complete at ≥ 80% coverage. Resume position is stored separately and never moves backwards from a stale request. Heartbeats are batched writes; Redis buffering is added only if load tests show a need.</p></div></div>
     <div class="decision"><div class="id">D7</div><div><h4>Transactional outbox for email and jobs</h4><p>Domain events (enrolled, verified, completed) are written to an <code>Outbox</code> table in the same transaction as the state change, then relayed to BullMQ. <strong>No email or certificate is lost if Redis restarts</strong>, and none is sent twice.</p></div></div>
-    <div class="decision"><div class="id">D8</div><div><h4>Certificate PDFs from an HTML template</h4><p>Names are entered in English, so any PDF approach works. <strong>Rendering an HTML template in Playwright Chromium inside the worker</strong> keeps the certificate design a normal web template that matches the site, and leaves room for Bangla text later. Each certificate gets a random number, a QR code linking to the verification page, and a stored SHA-256 of the file.</p></div></div>
-    <div class="decision"><div class="id">D9</div><div><h4>Bangla and English interface from day one</h4><p>The demo has a বাংলা / English toggle. <strong>Interface strings and emails go through <code>next-intl</code> from the first screen</strong>, so translation is never a retrofit. Course content is in one language per course, with the schema ready for translations later.</p></div></div>
+    <div class="decision"><div class="id">D8</div><div><h4>Certificate PDFs from an HTML template</h4><p>Names are entered in English, so any PDF approach works. <strong>Rendering an HTML template in Playwright Chromium inside the worker</strong> keeps the certificate design a normal web template that matches the site. Each certificate gets a random number, a QR code linking to the verification page, and a stored SHA-256 of the file.</p></div></div>
+    <div class="decision"><div class="id">D9</div><div><h4>English only interface</h4><p>The owner decided on 2026-11-08 that the platform has one language, English. <strong>There is no language switch, no locale in the address and no message catalog package.</strong></p></div></div>
     <div class="decision"><div class="id">D10</div><div><h4>Hooks guide, CI and branch protection enforce</h4><p>Claude Code hooks are shell commands that run on events, and some can be bypassed through other tools. <strong>An <code>/implement-issue</code> skill drives the eight stages</strong> (section 12), hooks act as guard rails, and the hard gates are branch protection and CI: nothing merges without green checks, and only you merge.</p></div></div>
     <div class="decision"><div class="id">D11</div><div><h4>Enrollment approval lifecycle</h4><p>Status moves <code>PENDING_VERIFICATION</code> → <code>PENDING_APPROVAL</code> → <code>APPROVED</code> → <code>COMPLETED</code>, or to <code>REJECTED</code>, <code>EXPIRED</code> or <code>REMOVED</code>. <strong>Content endpoints and playback sessions allow <code>APPROVED</code> and <code>COMPLETED</code></strong>; a removed student loses video access within one cookie lifetime (10 minutes). Removal is possible from either state, and reinstatement restores the state the student had. Rejection soft-deletes the account only when no other approved or completed enrollment exists. Email jobs store a copy of the recipient address, so the rejection email still goes out after the account is hidden. A new registration for an email that only has an unverified account replaces that account, and verifying an email signs out every session created before verification, so nobody can squat or pre-hijack an account. Registering an email that already has an account shows the normal success message and sends that address an “you already have an account” email, so the form never reveals who has enrolled.</p></div></div>
     <div class="decision"><div class="id">D12</div><div><h4>Pluggable, quota-aware email</h4><p>A <code>MailTransport</code> interface with an SMTP implementation chosen by configuration; personal Gmail first. <strong>All mail goes through a BullMQ queue</strong> with a Redis counter for the rolling 24-hour limit, split into per-category budgets so verification, password codes and resets always have capacity before approval and certificate mail. When a budget is used up, jobs wait until it frees instead of failing; Gmail quota errors (550 5.4.5) pause the queue the same way. Resend-verification and forgot-password require the captcha and are capped per email. The 7-day expiry for unverified registrations starts when the verification email is actually sent. Gmail SMTP gives no bounce reports, so failures are tracked from SMTP responses only.</p></div></div>
@@ -336,7 +336,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; color: var(--mute
         <tr><td>Quiz rules</td><td>Set by the admin per quiz: pass mark, attempt limit, waiting time between attempts.</td></tr>
         <tr><td>Watch rule</td><td>80% of each required video must be watched before the quiz opens.</td></tr>
         <tr><td>Scope from the demo</td><td>In v1: module text and learning objectives, Resources, News &amp; Updates, Contact. Scenario activities are deferred. No “Get help” page.</td></tr>
-        <tr><td>Language</td><td>Interface and emails in Bangla and English. Course content in one language.</td></tr>
+        <tr><td>Language</td><td>English only.</td></tr>
         <tr class="group"><td colspan="2">Admin, certificates, operations</td></tr>
         <tr><td>Admin sign-in</td><td>Password plus a required authenticator-app code for every admin.</td></tr>
         <tr><td>Student information</td><td>Filtered student list, per-student progress, CSV export and a summary dashboard.</td></tr>
@@ -422,7 +422,6 @@ flowchart TB
 │   ├── api-client/ <span class="c"># orval-generated hooks + fetch wrapper</span>
 │   ├── db/         <span class="c"># Prisma schema, migrations, seed</span>
 │   ├── ui/         <span class="c"># shadcn components, Tailwind tokens</span>
-│   ├── i18n/       <span class="c"># bn / en message catalogs</span>
 │   └── config/     <span class="c"># eslint, tsconfig, vitest presets</span>
 ├── infra/          <span class="c"># compose, nginx, njs, backup, grafana</span>
 ├── tests/          <span class="c"># playwright e2e, k6 load scripts</span>
@@ -485,7 +484,7 @@ flowchart TB
         <tr><td>Students use phones and laptops equally</td><td>Both layouts get the same design and test effort; every student journey is tested at phone and laptop width.</td></tr>
         <tr><td>Built for slow mobile data</td><td>Strict JavaScript and image budgets, lower starting video quality, progress and quiz answers that survive a dropped connection.</td></tr>
         <tr><td>Dark mode in both apps</td><td>Follows the device setting, with a manual switch. Every component is checked in both themes.</td></tr>
-        <tr><td>Language in the student app's address</td><td><code>/bn/…</code> and <code>/en/…</code>; <code>/</code> redirects by saved preference, then browser language, defaulting to Bangla.</td></tr>
+        <tr><td>Language in the student app's address</td><td>None. The interface is English only, so routes carry no language prefix.</td></tr>
         <tr><td>Admin app: laptop first, quick tasks on phone, English only</td><td>Approvals and the dashboard are designed for phones; other screens are laptop-first but usable.</td></tr>
         <tr><td>Learner area with a sidebar, as in the demo</td><td>Sidebar on laptop, a 5-item bottom bar on phones.</td></tr>
         <tr><td>One question per screen, single choice only</td><td>Progress bar, Previous / Next, review screen before submitting.</td></tr>
@@ -528,7 +527,6 @@ flowchart LR
       <li><code>@heat/ui</code>: the only place styles are written</li>
       <li><code>@heat/contracts</code>: Zod schemas and error codes, used by the forms and the API</li>
       <li><code>@heat/api-client</code>: generated hooks, request wrapper and server fetcher</li>
-      <li><code>@heat/i18n</code>: Bangla and English text for the student app and emails</li>
       <li>A CI check fails the build when the generated client is out of date with the API.</li>
     </ul></div>
   </div>
@@ -536,7 +534,7 @@ flowchart LR
   <h3>Pages</h3>
   <div class="grid2">
     <div class="box">
-      <h4><code>frontend-public</code> · learn.&lt;domain&gt;/[bn|en]</h4>
+      <h4><code>frontend-public</code> · learn.&lt;domain&gt;</h4>
       <div class="tbl"><table><tbody>
         <tr><td>Public</td><td><code>/</code>, <code>/about</code>, <code>/courses/[slug]</code>, <code>/resources</code>, <code>/news</code>, <code>/news/[slug]</code>, <code>/contact</code>, <code>/verify/[number]</code></td></tr>
         <tr><td>Account</td><td><code>/enroll</code>, <code>/sign-in</code>, <code>/forgot-password</code>, <code>/reset-password/[token]</code>, <code>/verify-email/[token]</code></td></tr>
@@ -565,7 +563,7 @@ flowchart LR
       <li>Auto quality capped at 480p on data-saver or 2G/3G, otherwise 720p; 1080p available by hand</li>
       <li>About 20 s buffered ahead, remembered quality and bandwidth</li>
       <li>Resumes from the saved position; recovers from an expired video cookie without stopping</li>
-      <li>Bangla and English labels, keyboard shortcuts, optional captions</li>
+      <li>English labels, keyboard shortcuts, optional captions</li>
     </ul></div>
     <div class="box"><h4>Progress and quiz</h4><ul>
       <li>Watched ranges sent every 15 s and on pause, seek or tab hide; unsent ones retried after reconnecting</li>
@@ -607,7 +605,7 @@ flowchart LR
       <li>No inline styles, and no arbitrary Tailwind values outside <code>@heat/ui</code></li>
       <li>Apps use Tailwind only for layout</li>
       <li>Every element must serve the screen's task: no filler cards, banners or stat tiles</li>
-      <li>Every component has a Storybook story in light and dark, Bangla and English, and passes an accessibility check</li>
+      <li>Every component has a Storybook story in light and dark, and passes an accessibility check</li>
     </ul></div>
   </div>
 
@@ -643,7 +641,7 @@ flowchart LR
         <tr><td>Forms</td><td>React Hook Form with Zod 4 schemas from <code>@heat/contracts</code></td></tr>
         <tr><td>Content</td><td>Tiptap 3 editor, stored as JSON and rendered on the server through an allow-list</td></tr>
         <tr><td>Media</td><td>Video.js 10 on hls.js 1.7; Uppy 6 with tus for video upload; dnd-kit for reordering</td></tr>
-        <tr><td>Language and dates</td><td>next-intl 4, date-fns 4</td></tr>
+        <tr><td>Dates</td><td>date-fns 4</td></tr>
         <tr><td>Quality</td><td>Storybook 10, Vitest, Playwright with axe and screenshots, Lighthouse CI, Sentry</td></tr>
       </tbody>
     </table>
@@ -851,7 +849,7 @@ sequenceDiagram
     </ul></div>
     <div class="box"><h3>User experience</h3><ul>
       <li>WCAG 2.2 AA: keyboard flows, focus states, contrast, captions support in the player</li>
-      <li>Bangla and English for every UI string</li>
+      <li>The interface is in English only</li>
       <li>Performance budget on a mid-range Android over 4G: LCP under 2.5 s on public pages</li>
       <li>Loading, empty and error states designed for every screen</li>
       <li>Every screen built from <code>@heat/ui</code> components; no app-level CSS files and no values outside the tokens</li>
@@ -912,14 +910,14 @@ sequenceDiagram
       <li>OpenAPI spec from NestJS and orval client generation with a CI drift check</li>
       <li>Storybook for <code>@heat/ui</code> with accessibility checks</li>
     </ol></details>
-    <details class="epic"><summary><span class="e">E1</span><span class="t">Design system and app shells<small>Open Pencil designs, one shared component library, logos, i18n</small></span><span class="c">P0 · 11 issues</span></summary><ol>
+    <details class="epic"><summary><span class="e">E1</span><span class="t">Design system and app shells<small>Open Pencil designs, one shared component library, logos</small></span><span class="c">P0 · 11 issues</span></summary><ol>
       <li>Open Pencil: landing, enrollment, awaiting approval, dashboard, course, quiz, admin list, editor and insights screens</li>
       <li>Design tokens into the <code>@heat/ui</code> Tailwind theme (light and dark) <span class="tags"><span class="tag p0">P0</span></span></li>
       <li>shadcn base components themed by tokens in <code>@heat/ui</code></li>
       <li>Shared composites: page header, data table, form field, status badge, empty state, confirm dialog, stat card, file upload, chart</li>
       <li>Lint rules that keep styling inside <code>@heat/ui</code> (no app CSS files, no arbitrary values)</li>
       <li>Logo assets: 4 HEAT header logos and the University of Dhaka crest, optimized SVG</li>
-      <li>next-intl setup with bn and en catalogs and a language switch</li>
+      <li>Date formatting in Asia/Dhaka time</li>
       <li><code>frontend-public</code> and <code>frontend-internal</code> shells built only from <code>@heat/ui</code></li>
       <li>Accessibility and visual regression baseline in Playwright</li>
       <li>Spike and ADR: Content Security Policy that keeps cached pages static</li>
@@ -1021,7 +1019,7 @@ sequenceDiagram
       <li><code>MailTransport</code> interface with a configurable SMTP adapter (Gmail first) <span class="tags"><span class="tag p0">P0</span></span></li>
       <li>Email queue: rolling 24-hour quota, delay when full, resume after reset, priorities <span class="tags"><span class="tag p0">P0</span></span></li>
       <li>Outbox relay into the email queue, delivery log</li>
-      <li>Email templates in Bangla and English</li>
+      <li>Email templates</li>
       <li>Email verification after registration: send, confirm, resend with limits</li>
       <li>Remove unverified registrations after 7 days</li>
       <li>Profile: name and avatar upload</li>
@@ -1065,7 +1063,6 @@ sequenceDiagram
     </ol></details>
     <details class="epic"><summary><span class="e">E16</span><span class="t">Later (v1.1)<small>Agreed to be out of v1</small></span><span class="c">Backlog · 4 issues</span></summary><ol>
       <li>Interactive scenario activities inside modules</li>
-      <li>Bilingual course content</li>
       <li>Insights: video engagement (watch share, drop-off points, quality used)</li>
       <li>Insights: student activity (active users, time to finish, inactive students, devices)</li>
     </ol></details>

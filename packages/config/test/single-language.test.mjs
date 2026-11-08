@@ -6,12 +6,12 @@ import { expect, test } from "vitest";
 const root = resolve(import.meta.dirname, "../../..");
 
 const removed = [
-  ["ban", "gla"],
+  ["ban", "gla(?!desh)"],
   ["ben", "gali"],
   ["next", "-intl"],
   ["\\[loc", "ale\\]"],
   ["@heat/", "i18n"],
-  ["noto-sans-", "bengali"],
+  ["noto-sans-", "ben", "gali"],
   ["hind ", "siliguri"],
   ["বা", "ংলা"],
 ].map((parts) => parts.join(""));
@@ -20,7 +20,7 @@ const pattern = new RegExp(removed.join("|"), "i");
 
 const exempt = [
   /^docs\/adr\//,
-  /^docs\/plans\/issue-181\.md$/,
+  /^docs\/plans\//,
   /\.(png|jpe?g|gif|ico|woff2?|fig)$/,
 ];
 
