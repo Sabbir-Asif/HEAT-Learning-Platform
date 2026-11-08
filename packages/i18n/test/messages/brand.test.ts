@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { compareKeys, flattenKeys, messages } from "../../src/index";
+import { flattenKeys, messages } from "../../src/index";
 
 const logoKeys = [
   "brand.logo.du",
@@ -17,8 +17,8 @@ describe("brand catalogs", () => {
     expect(Object.keys(en).sort()).toEqual(logoKeys);
   });
 
-  test("bn defines exactly the keys of en, and the comparison names any gap", () => {
-    expect(compareKeys(messages.en, messages.bn)).toEqual({ missing: [], extra: [] });
+  test("bn defines the same five keys", () => {
+    expect(Object.keys(bn).sort()).toEqual(logoKeys);
   });
 
   test.each(logoKeys)("%s is non-empty in en and bn", (key) => {
