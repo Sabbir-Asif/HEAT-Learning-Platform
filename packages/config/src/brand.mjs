@@ -1,3 +1,5 @@
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { Resvg } from "@resvg/resvg-js";
 import sax from "sax";
 import { optimize } from "svgo";
@@ -217,4 +219,100 @@ export function pixelDifference(before, after, width = COMPARISON_WIDTH) {
         break;
       }
   return differing / (a.pixels.length / 4);
+}
+
+export const brandLocation = (root) => ({
+  sourceDir: resolve(root, "packages/config/brand/source"),
+  targetDirs: [
+    resolve(root, "apps/frontend-public/public/brand"),
+    resolve(root, "apps/frontend-internal/public/brand"),
+  ],
+});
+
+const svgNames = (dir) =>
+  readdirSync(dir)
+    .filter((name) => name.endsWith(".svg"))
+    .sort();
+
+const readIfPresent = (path) => {
+  try {
+    return readFileSync(path, "utf8");
+  } catch (error) {
+    if (error.code === "ENOENT") return null;
+    throw error;
+  }
+};
+
+const namesIn = (dir) => {
+  try {
+    return readdirSync(dir).sort();
+  } catch (error) {
+    if (error.code === "ENOENT") return [];
+    throw error;
+  }
+};
+
+function optimisedSources(sourceDir) {
+  return svgNames(sourceDir).map((name) => {
+    const source = readFileSync(join(sourceDir, name), "utf8");
+    const failures = sanitise(source);
+    if (failures.length)
+      throw new Error(`${name} fails the sanitiser:\n  ${failures.join("\n  ")}`);
+    const output = optimise(source);
+    const afterFailures = sanitise(output);
+    if (afterFailures.length)
+      throw new Error(`${name} fails the sanitiser after SVGO:\n  ${afterFailures.join("\n  ")}`);
+    return { name, output };
+  });
+}
+
+export function buildBrand({ sourceDir, targetDirs }) {
+  const outputs = optimisedSources(sourceDir);
+  const written = [];
+  for (const dir of targetDirs) {
+    mkdirSync(dir, { recursive: true });
+    const wanted = new Set(outputs.map(({ name }) => name));
+    for (const name of namesIn(dir))
+      if (!wanted.has(name)) {
+        rmSync(join(dir, name), { recursive: true, force: true });
+        written.push(join(dir, name));
+      }
+    for (const { name, output } of outputs) {
+      const path = join(dir, name);
+      if (readIfPresent(path) === output) continue;
+      writeFileSync(path, output);
+      written.push(path);
+    }
+  }
+  return { written };
+}
+
+export function checkBrand({ sourceDir, targetDirs }) {
+  const problems = [];
+  let outputs;
+  try {
+    outputs = optimisedSources(sourceDir);
+  } catch (error) {
+    return [error.message];
+  }
+  const wanted = new Map(outputs.map(({ name, output }) => [name, output]));
+  for (const dir of targetDirs) {
+    for (const name of namesIn(dir))
+      if (!wanted.has(name))
+        problems.push(`${join(dir, name)} is a stray file, no source produces it`);
+    for (const [name, output] of wanted) {
+      const path = join(dir, name);
+      const actual = readIfPresent(path);
+      if (actual === null) problems.push(`${path} is missing, run pnpm brand`);
+      else if (actual !== output) {
+        const failures = sanitise(actual);
+        problems.push(
+          failures.length
+            ? `${path} fails the sanitiser: ${failures.join("; ")}`
+            : `${path} differs from the optimised source, run pnpm brand`,
+        );
+      }
+    }
+  }
+  return problems;
 }

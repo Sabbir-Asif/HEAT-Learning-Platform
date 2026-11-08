@@ -1,9 +1,12 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { describe, expect, test } from "vitest";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { afterEach, describe, expect, test } from "vitest";
 import {
   MAX_SVG_BYTES,
   PIXEL_DIFFERENCE_LIMIT,
+  buildBrand,
+  checkBrand,
   optimise,
   pixelDifference,
   sanitise,
@@ -213,5 +216,106 @@ describe("pixelDifference", () => {
   test("counts a different shape", () => {
     const half = svg('<rect width="5" height="10" fill="#ff0000"/>');
     expect(pixelDifference(square("#ff0000"), half)).toBeCloseTo(0.5, 1);
+  });
+});
+
+describe("buildBrand and checkBrand", () => {
+  const work = [];
+  afterEach(() => {
+    for (const dir of work.splice(0)) rmSync(dir, { recursive: true, force: true });
+  });
+
+  const mark = fixture("verbose.svg").replace(/ *<(title|desc)>.*<\/\1>\n/g, "");
+
+  const workspace = (sources = { "mark.svg": mark }) => {
+    const base = mkdtempSync(join(tmpdir(), "brand-"));
+    work.push(base);
+    const sourceDir = join(base, "source");
+    mkdirSync(sourceDir);
+    for (const [name, text] of Object.entries(sources)) writeFileSync(join(sourceDir, name), text);
+    return { sourceDir, targetDirs: [join(base, "a/brand"), join(base, "b/brand")] };
+  };
+
+  const list = (dir) => readdirSync(dir).sort();
+
+  test("writes the optimised file byte for byte into every target", () => {
+    const location = workspace();
+    buildBrand(location);
+    const expected = optimise(mark);
+    for (const dir of location.targetDirs)
+      expect(readFileSync(join(dir, "mark.svg"), "utf8")).toBe(expected);
+  });
+
+  test("a second run changes nothing and reports nothing written", () => {
+    const location = workspace();
+    buildBrand(location);
+    const before = readFileSync(join(location.targetDirs[0], "mark.svg"), "utf8");
+    expect(buildBrand(location).written).toEqual([]);
+    expect(readFileSync(join(location.targetDirs[0], "mark.svg"), "utf8")).toBe(before);
+  });
+
+  test("removes files in a target that no source produces", () => {
+    const location = workspace();
+    buildBrand(location);
+    writeFileSync(join(location.targetDirs[1], "stray.svg"), "<svg/>");
+    buildBrand(location);
+    expect(list(location.targetDirs[1])).toEqual(["mark.svg"]);
+  });
+
+  test("refuses a source that fails the sanitiser and names the file", () => {
+    const location = workspace({ "bad.svg": svg("<script/>") });
+    expect(() => buildBrand(location)).toThrow(/bad\.svg.*<script>/s);
+    expect(() => readdirSync(location.targetDirs[0])).toThrow();
+  });
+
+  test("refuses a source over the size cap and names it", () => {
+    const heavy = svg(`<path d="${"M0 0l1 1".repeat(MAX_SVG_BYTES / 2)}"/>`);
+    const location = workspace({ "heavy.svg": heavy });
+    expect(() => buildBrand(location)).toThrow(/heavy\.svg.*20 KB/s);
+  });
+
+  test("check passes right after a build", () => {
+    const location = workspace();
+    buildBrand(location);
+    expect(checkBrand(location)).toEqual([]);
+  });
+
+  test("check names a missing file", () => {
+    const location = workspace();
+    buildBrand(location);
+    rmSync(join(location.targetDirs[1], "mark.svg"));
+    expect(checkBrand(location).join("\n")).toMatch(/b\/brand\/mark\.svg.*missing/);
+  });
+
+  test("check names a stray file", () => {
+    const location = workspace();
+    buildBrand(location);
+    writeFileSync(join(location.targetDirs[0], "extra.svg"), "<svg/>");
+    expect(checkBrand(location).join("\n")).toMatch(/a\/brand\/extra\.svg.*stray/);
+  });
+
+  test("check names a hand-edited file", () => {
+    const location = workspace();
+    buildBrand(location);
+    writeFileSync(join(location.targetDirs[0], "mark.svg"), svg("<g/>"));
+    expect(checkBrand(location).join("\n")).toMatch(/a\/brand\/mark\.svg.*differs/);
+  });
+
+  test("check names a target that fails the sanitiser", () => {
+    const location = workspace();
+    buildBrand(location);
+    writeFileSync(join(location.targetDirs[0], "mark.svg"), svg("<script/>"));
+    expect(checkBrand(location).join("\n")).toMatch(/a\/brand\/mark\.svg.*<script>/);
+  });
+
+  test("check fails when a target directory does not exist", () => {
+    const location = workspace();
+    expect(checkBrand(location).join("\n")).toMatch(/mark\.svg.*missing/);
+  });
+
+  test("ignores files in the source directory that are not SVG", () => {
+    const location = workspace({ "mark.svg": mark, "notes.txt": "x" });
+    buildBrand(location);
+    expect(list(location.targetDirs[0])).toEqual(["mark.svg"]);
   });
 });
