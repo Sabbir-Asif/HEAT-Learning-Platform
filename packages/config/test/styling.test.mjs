@@ -177,6 +177,13 @@ describe("inline styles, style elements and extra stylesheets", () => {
     expect(syntax(await lint("app", 'import "@/app/globals.css";\n', appFile))).toEqual([]);
   });
 
+  test("app rejects a globals.css that is not the app entry", async () => {
+    for (const path of ["../../styles/globals.css", "./other/globals.css", "./my-globals.css"]) {
+      const messages = syntax(await lint("app", `import "${path}";\n`, appFile));
+      expect(messages, path).toHaveLength(1);
+    }
+  });
+
   test("app accepts a class name and a non-style attribute", async () => {
     expect(syntax(await lint("app", markup("flex"), appFile))).toEqual([]);
   });
@@ -225,19 +232,28 @@ describe("the single CSS entry in apps", () => {
     }
   });
 
-  test("CSS outside src, and CSS in the ui preset, is not reported", async () => {
-    const source = "a {\n  color: red;\n}\n";
-    const ui = new ESLint({ overrideConfigFile: true, overrideConfig: await configFor("ui") });
-    for (const file of ["src/styles.css", ".storybook/preview.css"]) {
-      const [result] = await ui.lintText(source, { filePath: file, warnIgnored: false });
+  test("CSS anywhere in the app package fails, not only under src", async () => {
+    for (const file of ["styles/extra.css", "public/x.css", "test/fixture.css", "src/styles.css"]) {
+      const messages = cssRule(await lint("app", "a {\n  color: red;\n}\n", file));
+      expect(messages, file).toHaveLength(1);
+      expect(messages[0].message).toContain(file);
+    }
+  });
+
+  test("build output and dependencies are not linted as CSS", async () => {
+    const app = new ESLint({ overrideConfigFile: true, overrideConfig: await configFor("app") });
+    for (const file of [".next/static/x.css", "coverage/x.css", "node_modules/pkg/x.css"]) {
+      const [result] = await app.lintText("a {}\n", { filePath: file, warnIgnored: false });
       expect(result?.messages ?? [], file).toEqual([]);
     }
-    const app = new ESLint({ overrideConfigFile: true, overrideConfig: await configFor("app") });
-    const [outside] = await app.lintText(source, {
-      filePath: "test/fixture.css",
-      warnIgnored: false,
-    });
-    expect(outside?.messages ?? []).toEqual([]);
+  });
+
+  test("CSS in the ui preset is not reported", async () => {
+    const ui = new ESLint({ overrideConfigFile: true, overrideConfig: await configFor("ui") });
+    for (const file of ["src/styles.css", ".storybook/preview.css"]) {
+      const [result] = await ui.lintText("a {}\n", { filePath: file, warnIgnored: false });
+      expect(result?.messages ?? [], file).toEqual([]);
+    }
   });
 });
 

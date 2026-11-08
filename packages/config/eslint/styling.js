@@ -99,7 +99,7 @@ const restrictedClasses = [
 ];
 
 const stylesheetImport = "ImportDeclaration[source.value=/\\.(?:css|scss|sass|less)$/]";
-const entryStylesheet = "[source.value=/(?:^|\\/)globals\\.css$/]";
+const entryStylesheet = "[source.value=/^(?:\\.|@\\/app)\\/globals\\.css$/]";
 
 const restrictedSyntax = [
   {
@@ -127,7 +127,7 @@ export const appStylingConfig = {
 };
 
 export const appCssConfig = {
-  files: ["src/**/*.css"],
+  files: ["**/*.css"],
   plugins: { css, "heat-styling": { rules: { "css-entry-only": cssEntryOnly } } },
   language: "css/css",
   languageOptions: { tolerant: true },
