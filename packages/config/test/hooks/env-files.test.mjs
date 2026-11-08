@@ -1,4 +1,4 @@
-import { writeFileSync } from "node:fs";
+import { mkdirSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, describe, expect, test } from "vitest";
 import { cleanupAll, tempDir } from "../fixtures/repo.mjs";
@@ -164,6 +164,79 @@ describe("envAccess", () => {
     "rg 'a*.env' src",
   ])("an ordinary glob is allowed: %s", (text) => {
     expect(find(text)).toBeNull();
+  });
+
+  test.each([
+    "cat foo*",
+    "cat docs/adr/0013*",
+    "rg foo docs/adr/0013*",
+    "wc -l docs/adr/0013*",
+    "git log --oneline -- docs/adr/0013*",
+    "cat docs/adr/0013.*",
+    "cat apps/frontend-public/postcss*",
+    "cat src/*.ts",
+    "cat *.md",
+  ])(
+    "a trailing-star glob that cannot reach a dotfile is allowed without a directory: %s",
+    (text) => {
+      expect(find(text)).toBeNull();
+    },
+  );
+
+  test.each(["cat .env*", "cat .en?", "cat .[e]nv", "cat .e*", "cat .*", "cat *.env"])(
+    "a glob that could start an env name is denied without a directory: %s",
+    (text) => {
+      expect(find(text)).toBeTruthy();
+    },
+  );
+
+  describe("against a real directory", () => {
+    const makeDir = () => {
+      const dir = tempDir("globdir");
+      mkdirSync(join(dir, "docs/adr"), { recursive: true });
+      writeFileSync(join(dir, "docs/adr/0013-x.md"), "x\n");
+      writeFileSync(join(dir, "foo.env"), "x\n");
+      writeFileSync(join(dir, "foobar.txt"), "x\n");
+      writeFileSync(join(dir, ".env"), "x\n");
+      writeFileSync(join(dir, ".envrc"), "x\n");
+      writeFileSync(join(dir, "plain.txt"), "x\n");
+      symlinkSync(".env", join(dir, "link"));
+      return dir;
+    };
+
+    test("allows a glob whose real matches are not env files", () => {
+      const dir = makeDir();
+      for (const text of [
+        "cat foobar*",
+        "cat docs/adr/0013*",
+        "cat docs/adr/0013.*",
+        "cat plain*",
+        "cat *",
+        "cat *.txt",
+        "cat nothing*",
+        "rg foo docs/adr/0013*",
+      ]) {
+        expect(find(text, dir), text).toBeNull();
+      }
+    });
+
+    test("denies a glob that really matches an env file", () => {
+      const dir = makeDir();
+      for (const text of ["cat foo*", "cat *.env", "cat .env*", "cat .e*", "cat .*", "cat .ENV*"]) {
+        expect(find(text, dir), text).toBeTruthy();
+      }
+    });
+
+    test("denies a glob that matches a symlink to an env file", () => {
+      expect(find("cat lin?", makeDir())).toBeTruthy();
+    });
+
+    test("a glob in a directory part falls back to the conservative check", () => {
+      const dir = makeDir();
+      expect(find("cat do*/adr/0013*", dir)).toBeNull();
+      expect(find("cat */.env", dir)).toBeTruthy();
+      expect(find("cat */.e*", dir)).toBeTruthy();
+    });
   });
 
   test("a bare name ending in .env is an env file when it exists on disk", () => {

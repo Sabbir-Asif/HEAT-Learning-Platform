@@ -1,5 +1,5 @@
-import { existsSync } from "node:fs";
-import { basename, resolve } from "node:path";
+import { existsSync, readdirSync, realpathSync } from "node:fs";
+import { basename, join, resolve } from "node:path";
 
 const plainName = /^[\w.*?[\]@+-]+$/;
 const safeCommands = new Set([
@@ -122,33 +122,110 @@ function isSafe(words) {
 const globCharacters = /[*?[]/;
 const envSuffixes = [".env", ".envrc"];
 
-function globRegExp(glob) {
-  let source = "";
+function globTokens(glob) {
+  const tokens = [];
   for (let i = 0; i < glob.length; i += 1) {
     const character = glob[i];
     const close = character === "[" ? glob.indexOf("]", i + 2) : -1;
-    if (character === "*") source += "[^/]*";
-    else if (character === "?") source += "[^/]";
+    if (character === "*") tokens.push({ kind: "star", source: "[^/]*" });
+    else if (character === "?") tokens.push({ kind: "one", source: "[^/]" });
     else if (close > 0) {
-      source += glob.slice(i, close + 1).replace(/\\/g, "\\\\");
+      tokens.push({ kind: "one", source: glob.slice(i, close + 1).replace(/\\/g, "\\\\") });
       i = close;
-    } else source += character.replace(/[.+^${}()|[\]\\]/g, "\\$&");
+    } else {
+      tokens.push({
+        kind: "literal",
+        character,
+        source: character.replace(/[.+^${}()|[\]\\]/g, "\\$&"),
+      });
+    }
   }
-  return new RegExp(`^${source}$`, "i");
+  return tokens;
 }
 
-function globMatchesEnv(word) {
-  const name = word.replace(/\/+$/, "").split("/").pop();
-  const first = name.search(globCharacters);
-  if (first < 0 || [...name].every((character) => "*?[]".includes(character))) return false;
+function globRegExp(glob) {
+  return new RegExp(
+    `^${globTokens(glob)
+      .map((token) => token.source)
+      .join("")}$`,
+    "i",
+  );
+}
+
+const expansionCharacters = [...envSuffixes.join(""), ".", "x"];
+const expansionLimit = 2000;
+
+function minimalExpansions(name) {
+  let names = [""];
+  for (const token of globTokens(name)) {
+    let options = [""];
+    if (token.kind === "literal") options = [token.character];
+    else if (token.kind === "one") {
+      const expression = new RegExp(`^${token.source}$`, "i");
+      options = expansionCharacters.filter((character) => expression.test(character));
+    }
+    if (names.length * options.length > expansionLimit) return null;
+    names = names.flatMap((prefix) => options.map((option) => prefix + option));
+  }
+  return names;
+}
+
+function couldStartEnvName(prefix) {
+  return prefix === "" || prefix === "." || prefix.toLowerCase().startsWith(".e");
+}
+
+function globMatchesEnvByName(name, first) {
   const expression = globRegExp(name);
   const prefix = name.slice(0, first);
-  return envSuffixes.some((suffix) =>
-    [0, 1, 2, 3, 4, 5].some((cut) => {
-      const candidate = prefix + suffix.slice(cut);
-      return expression.test(candidate) && isEnvFile(candidate);
-    }),
+  const dotfile =
+    couldStartEnvName(prefix) &&
+    envSuffixes.some((suffix) =>
+      [0, 1, 2, 3, 4, 5].some((cut) => {
+        const candidate = prefix + suffix.slice(cut);
+        return expression.test(candidate) && isEnvFile(candidate);
+      }),
+    );
+  if (dotfile) return true;
+  const expansions = minimalExpansions(name);
+  return expansions === null || expansions.some(isEnvFile);
+}
+
+function isEnvEntry(directory, entry) {
+  if (isEnvFile(entry)) return true;
+  try {
+    return isEnvFile(realpathSync(join(directory, entry)));
+  } catch {
+    return false;
+  }
+}
+
+function globMatchesEnvInDirectory(directory, name) {
+  let entries;
+  try {
+    entries = readdirSync(directory);
+  } catch {
+    return null;
+  }
+  const expression = globRegExp(name);
+  const dotted = name.startsWith(".");
+  return entries.some(
+    (entry) =>
+      (dotted || !entry.startsWith(".")) && expression.test(entry) && isEnvEntry(directory, entry),
   );
+}
+
+function globMatchesEnv(word, cwd) {
+  const trimmed = word.replace(/\/+$/, "");
+  const name = trimmed.split("/").pop();
+  const first = name.search(globCharacters);
+  if (first < 0 || [...name].every((character) => "*?[]".includes(character))) return false;
+  const directoryPart = trimmed.slice(0, trimmed.length - name.length);
+  if (!globCharacters.test(directoryPart)) {
+    const directory = directoryPart === "" ? cwd : resolve(cwd, directoryPart);
+    const found = globMatchesEnvInDirectory(directory, name);
+    if (found !== null) return found;
+  }
+  return globMatchesEnvByName(name, first);
 }
 
 function envWord(word, cwd) {
@@ -159,8 +236,9 @@ function envWord(word, cwd) {
     existsSync(resolve(cwd, value));
   const candidates = word.includes("=") ? [word, word.slice(word.indexOf("=") + 1)] : [word];
   return (
-    candidates.find((value) => (isEnvFile(value) || globMatchesEnv(value)) && pathLike(value)) ??
-    null
+    candidates.find(
+      (value) => (isEnvFile(value) || globMatchesEnv(value, cwd)) && pathLike(value),
+    ) ?? null
   );
 }
 
