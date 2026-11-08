@@ -6,7 +6,7 @@
 
 ## Context
 
-Names are entered in English, so any PDF approach would work. The certificate should look like the rest of the site and leave room for Bangla text later.
+Names are entered in English, so any PDF approach would work. The certificate should look like the rest of the site and leave room for longer names later.
 
 ## Decision
 

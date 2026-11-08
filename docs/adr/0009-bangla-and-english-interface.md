@@ -1,6 +1,6 @@
 # 0009. Bangla and English interface from day one
 
-- Status: Accepted
+- Status: Superseded by 0018
 - Date: 2026-11-07
 - Plan: [D9, section 02 Design decisions](../plan/heat-lms-project-plan.html#decisions)
 

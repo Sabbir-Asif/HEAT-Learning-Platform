@@ -23,7 +23,7 @@ Read the issue and its comments only from the ticket JSON you are given: it hold
 
 - **Fit with the code.** Wrong paths, renamed modules, work that already exists, or a dependency that has not landed.
 - **Fit with the decisions.** A conflict with an ADR or the quality bar is an open question for the owner, never something you settle yourself.
-- **Acceptance criteria.** Each one testable, in Given / When / Then. Add what is missing: error and empty states, permissions, rate limits, Bangla and English, phone width, Asia/Dhaka dates, as far as they apply to this ticket.
+- **Acceptance criteria.** Each one testable, in Given / When / Then. Add what is missing: error and empty states, permissions, rate limits, phone width, Asia/Dhaka dates, as far as they apply to this ticket.
 - **Edge cases** the implementer will meet and the ticket is silent on.
 - **Size.** An L ticket should be split (plan section 11); propose the split.
 - **Scope.** Out-of-scope items stay out; note where the boundary with a neighbouring ticket is unclear.

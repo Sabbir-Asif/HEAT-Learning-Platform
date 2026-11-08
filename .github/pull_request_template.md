@@ -12,7 +12,7 @@ Closes #
 
 ## Screenshots
 
-<!-- UI changes only: before and after, phone and laptop width, light and dark, Bangla and English. Write "Not a UI change" otherwise. -->
+<!-- UI changes only: before and after, phone and laptop width, light and dark. Write "Not a UI change" otherwise. -->
 
 ## Security notes
 

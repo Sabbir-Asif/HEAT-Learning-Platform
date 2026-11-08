@@ -13,7 +13,6 @@ apps/
 packages/
   contracts/  Zod schemas and shared types        db/       Prisma (added later)
   api-client/ Generated API client and fetchers   ui/       Shared components and tokens
-  i18n/       Message catalogs
   config/     tsconfig, ESLint, Prettier and Vitest presets; repository scripts (audit:deps, github:setup, ticket)
 ```
 
@@ -78,7 +77,7 @@ pnpm --filter @heat/ui test:stories                           # every story rend
 pnpm --filter @heat/ui build-storybook                        # static build in packages/ui/storybook-static (ignored by git)
 ```
 
-The toolbar has a theme control (light, dark: the `.dark` class on the story root and on `<html>`) and a locale control (`en`, `bn`: the `lang` attribute; `dir` stays `ltr`). A story pins both with `globals: { theme, locale }`, which locks the toolbar for that story, so each component gets one story for every combination plus a `Default` story that follows the toolbar. Sample text is written in the story, because `@heat/ui` has no i18n dependency. The temporary Bangla and Latin font is self-hosted from `@fontsource-variable/noto-sans-bengali` through `.storybook/preview.css`.
+The toolbar has a theme control (light, dark: the `.dark` class on the story root and on `<html>`). A story pins it with `globals: { theme }`, which locks the toolbar for that story, so each component gets one story for light and one for dark plus a `Default` story that follows the toolbar. The document language is `en`.
 
 An axe violation fails the story test and the output names the rule, for example `button-name`. A story that must accept a known violation sets `parameters.a11y.test` to `"todo"` with a reason. Story tests are not part of `pnpm test` or the coverage gate; they run in `test:stories` and in the `storybook` CI job.
 
@@ -208,5 +207,5 @@ This is enforced: the Vitest preset only runs `test/**`, and `packages/config/te
 
 - One React version for the whole workspace, set in the `catalog:` block of `pnpm-workspace.yaml`.
 - Public environment variables must start with `NEXT_PUBLIC_`; Turborepo includes them in the build cache key.
-- `contracts` and `db` compile to `dist/` because the API imports them; `ui`, `api-client` and `i18n` ship TypeScript source and are compiled by the Next.js apps (`transpilePackages`).
+- `contracts` and `db` compile to `dist/` because the API imports them; `ui` and `api-client` ship TypeScript source and are compiled by the Next.js apps (`transpilePackages`).
 - The worker imports the API's shared modules from `api/core`.

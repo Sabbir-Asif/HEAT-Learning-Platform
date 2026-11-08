@@ -169,14 +169,9 @@ describe("the data block", () => {
     expect(context).toContain("| visible");
   });
 
-  test("ordinary non-ASCII text, including Bangla and emoji, is kept", () => {
-    const { context } = inject(
-      "#25",
-      data("\u09aa\u09cd\u09b0\u09b6\u09bf\u0995\u09cd\u09b7\u09a3 \u{1F600} caf\u00e9"),
-    );
-    expect(context).toContain(
-      "\u09aa\u09cd\u09b0\u09b6\u09bf\u0995\u09cd\u09b7\u09a3 \u{1F600} caf\u00e9",
-    );
+  test("ordinary non-ASCII text, including accents and emoji, is kept", () => {
+    const { context } = inject("#25", data("na\u00efve \u{1F600} caf\u00e9"));
+    expect(context).toContain("na\u00efve \u{1F600} caf\u00e9");
   });
 
   test("the whole injection stays under the size cap, with a truncation note", () => {

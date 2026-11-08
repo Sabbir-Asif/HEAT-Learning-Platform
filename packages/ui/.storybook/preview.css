@@ -1,8 +1,6 @@
-@import "@fontsource-variable/noto-sans-bengali";
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Noto Sans Bengali Variable", sans-serif;
+  font-family: sans-serif;
   margin: 0;
 }
