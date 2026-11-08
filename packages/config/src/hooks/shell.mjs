@@ -76,15 +76,6 @@ function stripWrappers(words) {
   return { words: words.slice(i), keywords: skipped, wrapped };
 }
 
-function leadingAssignments(words) {
-  const found = [];
-  for (const word of words) {
-    if (assignment.test(word)) found.push(word);
-    else if (!keywords.has(word)) break;
-  }
-  return found;
-}
-
 function embeddedScript(words) {
   if (words[0] === "eval") return words.slice(1).join(" ");
   if (!shells.has(basename(words[0] ?? ""))) return null;
@@ -106,14 +97,12 @@ function scan(text, startCwd, out) {
   const finish = () => {
     const stripped = stripWrappers(words);
     const normalized = stripped.words;
-    const assignments = leadingAssignments(words);
-    if (normalized.length || writes.length || reads.length || assignments.length) {
+    if (normalized.length || writes.length || reads.length) {
       out.push({
         words: normalized,
         cwd,
         writes,
         reads,
-        assignments,
         keywords: stripped.keywords,
         wrapped: stripped.wrapped,
       });
@@ -310,16 +299,10 @@ function scan(text, startCwd, out) {
   finish();
 }
 
-export function parseShellDetailed(text, cwd) {
+export function parseShell(text, cwd) {
   const commands = [];
   scan(text, cwd, commands);
   return commands;
-}
-
-export function parseShell(text, cwd) {
-  return parseShellDetailed(text, cwd).filter(
-    (command) => command.words.length || command.writes.length || command.reads.length,
-  );
 }
 
 const structuralPrograms = new Set([

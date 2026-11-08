@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { afterAll, describe, expect, test } from "vitest";
 import { cleanupAll, tempDir } from "../fixtures/repo.mjs";
 import { envAccess, isEnvFile } from "../../src/hooks/env-files.mjs";
-import { parseShellDetailed } from "../../src/hooks/shell.mjs";
+import { parseShell } from "../../src/hooks/shell.mjs";
 
 describe("isEnvFile", () => {
   test.each([
@@ -41,7 +41,7 @@ describe("isEnvFile", () => {
 afterAll(cleanupAll);
 
 describe("envAccess", () => {
-  const find = (text, cwd = "/w") => envAccess(parseShellDetailed(text, cwd), text);
+  const find = (text, cwd = "/w") => envAccess(parseShell(text, cwd), text);
 
   test.each([
     "cat .env",
@@ -199,6 +199,7 @@ describe("envAccess", () => {
         "deep/inner/.env",
         "c/d/.env",
         "~name/.env",
+        "sub/.extra/.env",
       ]) {
         touch(dir, file);
       }
@@ -332,6 +333,8 @@ describe("envAccess", () => {
       "CDPATH=a cd b; cat .e*",
       "cd -- -x; cat .e*",
       "cd empty; cat .e*",
+      "chdir ..; cat .en*",
+      "chdir empty; cat .e*",
       "cd empty && cat .e*",
       "pushd empty >/dev/null; cat .e*",
       "pushd empty >/dev/null; popd >/dev/null; cat .e*",
@@ -353,6 +356,48 @@ describe("envAccess", () => {
     ])("an untrusted command falls back to the name check: %s", (text) => {
       expect(find(text, plainDir()), text).toBeTruthy();
       expect(find(text, envDir()), text).toBeTruthy();
+    });
+
+    test.each([
+      "grep --rec foo s*",
+      "grep --recur foo s*",
+      "grep --recursive foo s*",
+      "grep --dereference-recursive foo s*",
+      "grep --dir=recurse foo s*",
+      "grep --directories=recurse foo s*",
+      "grep --directories recurse foo s*",
+      "grep --d=recurse foo s*",
+      "grep -r foo s*",
+      "grep -R foo s*",
+      "grep -rn foo s*",
+      "grep -nr foo s*",
+      "grep -nrH foo s*",
+      "grep -d recurse foo s*",
+      "grep -drecurse foo s*",
+      "grep --unknown-future-flag foo s*",
+      "egrep --rec foo s*",
+      "fgrep --rec foo s*",
+      "diff --rec s* e*",
+      "diff --new s* e*",
+      "diff -rN s* e*",
+      "diff -Nr s* e*",
+      "diff -r s* e*",
+    ])("a reader that can recurse is not trusted: %s", (text) => {
+      expect(find(text, envDir()), text).toBeTruthy();
+    });
+
+    test.each([
+      "grep foo s*",
+      "grep -n foo s*",
+      "grep -in foo s*",
+      "grep --ignore-case foo s*",
+      "grep --line-number --count foo s*",
+      "grep --color=never foo s*",
+      "grep -e foo -- s*",
+      "diff --brief src/a.ts src/a.ts",
+      "diff -u s*",
+    ])("a reader without recursion flags keeps the listing: %s", (text) => {
+      expect(find(text, envDir()), text).toBeNull();
     });
 
     test("a command with cd or a pipe never gets the listing even for a harmless glob", () => {

@@ -4,7 +4,7 @@ import { envAccess, isEnvFile } from "./env-files.mjs";
 import { existsInBase } from "./git.mjs";
 import { resolveReal } from "./paths.mjs";
 import { gitInvocation } from "./invocation.mjs";
-import { isStraightLine, parseShellDetailed } from "./shell.mjs";
+import { parseShell } from "./shell.mjs";
 
 const fileTools = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
 
@@ -92,110 +92,7 @@ function isAlwaysAllowed(target) {
   return Boolean(match) && !target.slice(match[0].length).split("/").includes("..");
 }
 
-const variableReference = /\$(?:\{([A-Za-z_]\w*)\}|([A-Za-z_]\w*))/g;
-const expansionLimit = 200;
-const reservedVariables = new Set([
-  "PWD",
-  "OLDPWD",
-  "HOME",
-  "PATH",
-  "IFS",
-  "USER",
-  "SHELL",
-  "RANDOM",
-  "SECONDS",
-  "LINENO",
-]);
-const variableBuiltins = new Set([
-  "read",
-  "readonly",
-  "set",
-  "unset",
-  "eval",
-  "declare",
-  "typeset",
-  "local",
-  "let",
-  "mapfile",
-  "readarray",
-  "getopts",
-  "select",
-]);
-const unsafeValue = /[\s~*?[\]{}$`'"\\]/;
-const assignmentWord = /^([A-Za-z_]\w*)=([\s\S]*)$/;
-const compoundAssignment = /^([A-Za-z_]\w*)(?:\[[^\]]*\]\+?|\+)=/;
-
-function shellVariables(commands, text) {
-  const known = new Map();
-  const unknown = new Set();
-  let everything = !isStraightLine(commands, text) || /IFS|\(\(|\$\{[A-Za-z_]\w*:?=/.test(text);
-  for (const match of text.matchAll(/([A-Za-z_]\w*)\+?=\(/g)) unknown.add(match[1]);
-
-  const record = (name, values, at) => {
-    if (unknown.has(name) || known.has(name) || values.length === 0) {
-      unknown.add(name);
-      known.delete(name);
-    } else if (values.some((value) => unsafeValue.test(value))) unknown.add(name);
-    else known.set(name, { values, at });
-  };
-
-  for (const [at, command] of commands.entries()) {
-    const [program = "", ...args] = command.words;
-    const name = basename(program);
-    if (variableBuiltins.has(name)) everything = true;
-    if (name === "printf" && args.some((word) => /^-[A-Za-z]*v/.test(word))) everything = true;
-    for (const word of command.words) {
-      const compound = compoundAssignment.exec(word);
-      if (compound) unknown.add(compound[1]);
-    }
-    if (name === "for" && args[0]) {
-      if (args[1] === "in") record(args[0], args.slice(2), at);
-      else unknown.add(args[0]);
-    }
-    if (name === "export") {
-      for (const word of args) {
-        const assigned = assignmentWord.exec(word);
-        if (assigned) record(assigned[1], [assigned[2]], at);
-      }
-    }
-    for (const word of command.assignments ?? []) {
-      const assigned = assignmentWord.exec(word);
-      if (!assigned) continue;
-      if (command.words.length === 0) record(assigned[1], [assigned[2]], at);
-      else unknown.add(assigned[1]);
-    }
-  }
-
-  if (everything) return new Map();
-  for (const name of unknown) known.delete(name);
-  return known;
-}
-
-function substituteKnown(target, variables, at) {
-  let targets = [target];
-  for (const name of new Set([...target.matchAll(variableReference)].map((m) => m[1] ?? m[2]))) {
-    const assignment = variables.get(name);
-    if (name === "SCRATCH" || reservedVariables.has(name) || !assignment || assignment.at >= at) {
-      continue;
-    }
-    const reference = new RegExp(`\\$(?:\\{${name}\\}|${name}(?![A-Za-z0-9_]))`, "g");
-    targets = targets.flatMap((path) =>
-      assignment.values.map((value) => path.replace(reference, () => value)),
-    );
-    if (targets.length > expansionLimit) return [target];
-  }
-  return targets;
-}
-
-function writeDenial(target, cwd, variables = new Map(), at = 0) {
-  const substituted = substituteKnown(target, variables, at);
-  if (substituted.length !== 1 || substituted[0] !== target) {
-    for (const path of substituted) {
-      const deny = writeDenial(path, cwd);
-      if (deny) return deny;
-    }
-    return null;
-  }
+function writeDenial(target, cwd) {
   if (isAlwaysAllowed(target)) return null;
   if (scratchTarget.test(target)) {
     return `The write target "${target}" climbs out of $SCRATCH with "..". Use a path inside $SCRATCH, or the Write tool.`;
@@ -315,16 +212,15 @@ function isMigrateReset(command) {
 function checkBash(input) {
   const command = input.tool_input?.command;
   if (typeof command !== "string") throw new Error("Bash input has no command");
-  const commands = parseShellDetailed(command, input.cwd || process.cwd());
-  const variables = shellVariables(commands, command);
+  const commands = parseShell(command, input.cwd || process.cwd());
   const envPath = envAccess(commands, command);
   if (envPath) return { deny: envDenial(envPath) };
   if (commands.some(isForcePush)) return { deny: forceDenial };
   if (commands.some(isConfigWrite)) return { deny: configDenial };
   if (commands.some(isMigrateReset)) return { deny: resetDenial };
-  for (const [at, command] of commands.entries()) {
+  for (const command of commands) {
     for (const target of [...command.writes, ...writeTargets(command)]) {
-      const deny = writeDenial(target, command.cwd, variables, at);
+      const deny = writeDenial(target, command.cwd);
       if (deny) return { deny };
     }
   }

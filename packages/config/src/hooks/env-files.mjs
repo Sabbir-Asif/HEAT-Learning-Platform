@@ -490,15 +490,51 @@ const writerGitSubcommands = new Set([
   "worktree",
   "mv",
 ]);
-const recursiveFlag =
-  /^(?:-[A-Za-z]*[rRdN][A-Za-z]*|-d.*|--recursive|--dereference-recursive|--directories(?:=.*)?|--new-file)$/;
-
+const shortRecursiveFlag = /^-(?:[A-Za-z]*[rRdN][A-Za-z]*|d.*)$/;
+const quietLongFlags = new Set([
+  "--ignore-case",
+  "--no-ignore-case",
+  "--invert-match",
+  "--line-number",
+  "--count",
+  "--no-messages",
+  "--with-filename",
+  "--no-filename",
+  "--only-matching",
+  "--quiet",
+  "--silent",
+  "--word-regexp",
+  "--line-regexp",
+  "--fixed-strings",
+  "--extended-regexp",
+  "--basic-regexp",
+  "--files-with-matches",
+  "--files-without-match",
+  "--null",
+  "--text",
+  "--brief",
+  "--ignore-space-change",
+  "--ignore-all-space",
+  "--ignore-blank-lines",
+  "--side-by-side",
+]);
+const quietLongPattern = /^--(?:colou?r|unified|context)(?:=[\w]*)?$/;
 const recursiveReaders = new Set(["grep", "egrep", "fgrep", "diff"]);
+
+function canRecurse(words) {
+  for (const word of words.slice(1)) {
+    if (word === "--") return false;
+    if (word.startsWith("--")) {
+      if (!quietLongFlags.has(word) && !quietLongPattern.test(word)) return true;
+    } else if (shortRecursiveFlag.test(word)) return true;
+  }
+  return false;
+}
 
 function isFileReader(command) {
   const program = basename(command.words[0] ?? "");
   if (!fileReaders.has(program)) return false;
-  return !(recursiveReaders.has(program) && command.words.some((w) => recursiveFlag.test(w)));
+  return !(recursiveReaders.has(program) && canRecurse(command.words));
 }
 
 function isWriter(command) {
@@ -511,11 +547,11 @@ function isWriter(command) {
   return program === "git" && writerGitSubcommands.has(gitSubcommand(command.words));
 }
 
-const directoryCommands = new Set(["cd", "pushd", "popd"]);
+const directoryCommands = new Set(["cd", "chdir", "pushd", "popd"]);
 
 function listingTrusted(commands, text) {
   if (!isStraightLine(commands, text)) return false;
-  if (/CDPATH|(?<![\w./-])(?:cd|pushd|popd)(?![\w./-])/.test(text)) return false;
+  if (/CDPATH|(?<![\w./-])(?:cd|chdir|pushd|popd)(?![\w./-])/.test(text)) return false;
   return !commands.some((command) => directoryCommands.has(basename(command.words[0] ?? "")));
 }
 

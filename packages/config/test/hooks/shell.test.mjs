@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
-import { isStraightLine, parseShell, parseShellDetailed } from "../../src/hooks/shell.mjs";
+import { isStraightLine, parseShell } from "../../src/hooks/shell.mjs";
 
 const base = "/work/repo";
 const words = (text) => parseShell(text, base).map((command) => command.words);
@@ -203,28 +203,8 @@ describe("working directory", () => {
   });
 });
 
-describe("assignments", () => {
-  test("a bare assignment is kept only by the detailed parse", () => {
-    expect(parseShell("FOO=1", base)).toEqual([]);
-    const [only] = parseShellDetailed("FOO=1 BAR=2", base);
-    expect(only.words).toEqual([]);
-    expect(only.assignments).toEqual(["FOO=1", "BAR=2"]);
-  });
-
-  test("a prefix assignment is attached to its command", () => {
-    const [command] = parseShell("FOO=1 cmd arg", base);
-    expect(command.words).toEqual(["cmd", "arg"]);
-    expect(command.assignments).toEqual(["FOO=1"]);
-  });
-
-  test("an assignment inside an argument is not an assignment", () => {
-    const [command] = parseShell(": a=zz", base);
-    expect(command.assignments).toEqual([]);
-  });
-});
-
 describe("straight-line commands", () => {
-  const straight = (text) => isStraightLine(parseShellDetailed(text, base), text);
+  const straight = (text) => isStraightLine(parseShell(text, base), text);
 
   test.each([
     "echo hi",
