@@ -1,5 +1,4 @@
 import { existsSync, lstatSync, readdirSync, realpathSync, statSync } from "node:fs";
-import { homedir } from "node:os";
 import { basename, join, resolve } from "node:path";
 import { isStraightLine } from "./shell.mjs";
 
@@ -329,12 +328,7 @@ function matchingDirectories(base, segment) {
 function listDirectories(directoryPart, context) {
   if (/[$`]/.test(directoryPart)) return null;
   const segments = directoryPart.split("/").filter((segment) => segment !== "");
-  let start;
-  if (directoryPart.startsWith("/")) start = "/";
-  else if (directoryPart.startsWith("~/")) {
-    start = homedir();
-    segments.shift();
-  } else start = context.cwd;
+  const start = directoryPart.startsWith("/") ? "/" : context.cwd;
   if (segments.some((segment) => segment.startsWith("~"))) return null;
   const root = realOrNull(start);
   if (root === null) return null;
@@ -411,157 +405,52 @@ function envWord(word, context) {
   return null;
 }
 
-const fileReaders = new Set([
+const trustedPrograms = new Set([
   "cat",
   "head",
   "tail",
+  "tac",
+  "nl",
   "less",
   "more",
-  "bat",
-  "nl",
-  "tac",
   "wc",
-  "strings",
-  "xxd",
   "od",
-  "hexdump",
-  "rev",
-  "fold",
-  "cut",
-  "sort",
-  "uniq",
+  "xxd",
+  "strings",
   "base64",
   "md5sum",
   "shasum",
   "sha256sum",
-  "cksum",
+  "echo",
+  "pwd",
+  "true",
+  "ls",
+  "stat",
   "file",
-  "diff",
   "cmp",
-  "paste",
-  "column",
-  "grep",
-  "egrep",
-  "fgrep",
 ]);
-const writerPrograms = new Set([
-  "tar",
-  "bsdtar",
-  "unzip",
-  "gunzip",
-  "bunzip2",
-  "7z",
-  "7za",
-  "cp",
-  "mv",
-  "touch",
-  "tee",
-  "install",
-  "dd",
-  "rsync",
-  "ln",
-  "curl",
-  "wget",
-  "patch",
-  "truncate",
-  "node",
-  "python",
-  "python3",
-  "ruby",
-  "perl",
-  "php",
-  "deno",
-  "bun",
-]);
-const writerGitSubcommands = new Set([
-  "checkout",
-  "restore",
-  "switch",
-  "reset",
-  "stash",
-  "apply",
-  "am",
-  "merge",
-  "pull",
-  "clone",
-  "cherry-pick",
-  "rebase",
-  "clean",
-  "worktree",
-  "mv",
-]);
-const shortRecursiveFlag = /^-(?:[A-Za-z]*[rRdN][A-Za-z]*|d.*)$/;
-const quietLongFlags = new Set([
-  "--ignore-case",
-  "--no-ignore-case",
-  "--invert-match",
-  "--line-number",
-  "--count",
-  "--no-messages",
-  "--with-filename",
-  "--no-filename",
-  "--only-matching",
-  "--quiet",
-  "--silent",
-  "--word-regexp",
-  "--line-regexp",
-  "--fixed-strings",
-  "--extended-regexp",
-  "--basic-regexp",
-  "--files-with-matches",
-  "--files-without-match",
-  "--null",
-  "--text",
-  "--brief",
-  "--ignore-space-change",
-  "--ignore-all-space",
-  "--ignore-blank-lines",
-  "--side-by-side",
-]);
-const quietLongPattern = /^--(?:colou?r|unified|context)(?:=[\w]*)?$/;
-const recursiveReaders = new Set(["grep", "egrep", "fgrep", "diff"]);
+const stateWords =
+  /(?:^|[\s;&|(){}])[A-Za-z_]\w*\+?=|\b(?:export|declare|typeset|unset|local|readonly|HOME)\b/;
 
-function canRecurse(words) {
-  for (const word of words.slice(1)) {
-    if (word === "--") return false;
-    if (word.startsWith("--")) {
-      if (!quietLongFlags.has(word) && !quietLongPattern.test(word)) return true;
-    } else if (shortRecursiveFlag.test(word)) return true;
-  }
-  return false;
+function writesOutsideDevices(command) {
+  return command.writes.some((target) => !resolve(command.cwd, target).startsWith("/dev/"));
 }
-
-function isFileReader(command) {
-  const program = basename(command.words[0] ?? "");
-  if (!fileReaders.has(program)) return false;
-  return !(recursiveReaders.has(program) && canRecurse(command.words));
-}
-
-function isWriter(command) {
-  const program = basename(command.words[0] ?? "");
-  if (command.writes.some((target) => !target.startsWith("/dev/"))) return true;
-  if (writerPrograms.has(program)) return true;
-  if (["sed", "perl"].includes(program) && command.words.some((w) => /^-[A-Za-z]*i/.test(w))) {
-    return true;
-  }
-  return program === "git" && writerGitSubcommands.has(gitSubcommand(command.words));
-}
-
-const directoryCommands = new Set(["cd", "chdir", "pushd", "popd"]);
 
 function listingTrusted(commands, text) {
-  if (!isStraightLine(commands, text)) return false;
-  if (/CDPATH|(?<![\w./-])(?:cd|chdir|pushd|popd)(?![\w./-])/.test(text)) return false;
-  return !commands.some((command) => directoryCommands.has(basename(command.words[0] ?? "")));
+  if (!isStraightLine(commands, text) || stateWords.test(text)) return false;
+  return commands.every(
+    (command) =>
+      trustedPrograms.has(basename(command.words[0] ?? "")) && !writesOutsideDevices(command),
+  );
 }
 
 export function envAccess(commands, text = "") {
-  const trusted = listingTrusted(commands, text) && !commands.some(isWriter);
+  const trusted = listingTrusted(commands, text);
   for (const command of commands) {
     const redirected = [...command.writes, ...command.reads].find(isEnvFile);
     if (redirected) return redirected;
     if (isSafe(command.words)) continue;
-    const context = { cwd: command.cwd, listing: trusted && isFileReader(command) };
+    const context = { cwd: command.cwd, listing: trusted };
     const patterns = patternIndexes(command.words);
     for (const [index, word] of command.words.entries()) {
       if (index === 0 || patterns.has(index)) continue;

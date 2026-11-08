@@ -202,10 +202,11 @@ Hook state for the stop check lives in `$HEAT_HOOKS_STATE_DIR` or a private `hea
 
 A glob in a Bash word is denied if it could match an env file name (the text before the first glob character plus `.env` or `.envrc`), so `cat .e*` and `cat prod*` are denied. The one exception is a listing of the real directory, which is trusted only when every condition holds:
 
-- the command is straight-line: separators are `;` and newline (plus `for NAME in words; do ...; done`), with no `&&`, `||`, `|`, `&`, subshell, group, function, `$(`, backtick, `if`/`while`/`until`/`case`/`select`, `bash -c`, `eval`, `source`, `trap`, `time`, wrapper such as `env`, `sudo`, `nohup` or `xargs`, or command whose name is a variable;
-- there is no `cd`, `chdir`, `pushd`, `popd` or `CDPATH` anywhere in the command, and no writer or extractor (a redirect, `tar`, `unzip`, `cp`, `touch`, `tee`, `git checkout` and similar);
-- the program is in the plain-reader list (`cat`, `head`, `tail`, `less`, `wc`, `sort`, `base64`, `grep`, `diff` and similar), and for `grep` and `diff` no flag can recurse: only short flags without `r`, `R`, `d` or `N` and a short list of known long flags are accepted;
-- the glob has no `**`, no segment starting with `~` other than a leading `~/`, and no `..` after a symlinked directory.
+- every command in the line is a plain reader from a short allow-list (`cat`, `head`, `tail`, `tac`, `nl`, `less`, `more`, `wc`, `od`, `xxd`, `strings`, `base64`, `md5sum`, `shasum`, `sha256sum`, plus the harmless `echo`, `pwd`, `true`, `ls`, `stat`, `file`, `cmp`), so any other program, `grep`, `diff`, `cd`, a package script or a writer withdraws the trust;
+- the line is straight-line: separators are `;` and newline (plus `for NAME in words; do ...; done`), with no `&&`, `||`, `|`, `&`, subshell, group, function, `$(`, backtick, keyword block, wrapper such as `env` or `xargs`, or command whose name is a variable;
+- no redirect writes anywhere except to a path that normalises to under `/dev/`;
+- the text has no assignment word (`NAME=`), `export`, `declare`, `typeset`, `unset`, `local`, `readonly` or `HOME`;
+- the glob has no `**`, is not under a `~` path, and has no `..` after a symlinked directory.
 
 Then brace lists are expanded, directory parts are listed on disk, every entry is tested including hidden ones and symlink targets, and `cat foo*`, `cat docs/adr/0013*` and `wc -l docs/adr/*` are allowed unless an entry is an env file. `cat *` is denied when one is present. `find`, `rg`, `git`, `tar` and every other program use the name check, so `rg foo docs/adr/0013*` is denied. The listing assumes default shell glob options.
 
