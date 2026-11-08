@@ -147,3 +147,37 @@ describe("layout-only classes in apps", () => {
     expect(messages[0].message).toContain("Arbitrary value");
   });
 });
+
+describe("inline styles, style elements and extra stylesheets", () => {
+  const syntax = (messages) =>
+    messages.filter((message) => message.ruleId === "no-restricted-syntax");
+  const banned = {
+    "a style attribute on an element": 'export const a = <div style={{ color: "red" }} />;\n',
+    "a style attribute on a component": "export const a = <Card style={styles} />;\n",
+    "a style element": 'export const a = <style>{"a { color: red }"}</style>;\n',
+    "a CSS module import": 'import styles from "./card.module.css";\nexport const a = styles;\n',
+    "a Sass import": 'import "./card.scss";\n',
+    "a second stylesheet import": 'import "../styles/other.css";\n',
+  };
+
+  for (const [name, source] of Object.entries(banned)) {
+    test(`app rejects ${name}`, async () => {
+      const messages = syntax(await lint("app", source, appFile));
+      expect(messages).toHaveLength(1);
+      expect(messages[0].message).toContain("@heat/ui");
+    });
+
+    test(`ui accepts ${name}`, async () => {
+      expect(syntax(await lint("ui", source, uiFile))).toEqual([]);
+    });
+  }
+
+  test("app accepts the single globals.css entry import", async () => {
+    expect(syntax(await lint("app", 'import "./globals.css";\n', appFile))).toEqual([]);
+    expect(syntax(await lint("app", 'import "@/app/globals.css";\n', appFile))).toEqual([]);
+  });
+
+  test("app accepts a class name and a non-style attribute", async () => {
+    expect(syntax(await lint("app", markup("flex"), appFile))).toEqual([]);
+  });
+});

@@ -89,10 +89,29 @@ const restrictedClasses = [
   },
 ];
 
-export const appClassConfig = {
+const stylesheetImport = "ImportDeclaration[source.value=/\\.(?:css|scss|sass|less)$/]";
+const entryStylesheet = "[source.value=/(?:^|\\/)globals\\.css$/]";
+
+const restrictedSyntax = [
+  {
+    selector: "JSXAttribute[name.name='style']",
+    message: "Inline style is not allowed in an app. Styling lives in a @heat/ui component.",
+  },
+  {
+    selector: "JSXOpeningElement[name.name='style']",
+    message: "A style element is not allowed in an app. Styling lives in @heat/ui.",
+  },
+  {
+    selector: `${stylesheetImport}:not(${entryStylesheet})`,
+    message: "Only the globals.css entry may be imported in an app. Other styles live in @heat/ui.",
+  },
+];
+
+export const appStylingConfig = {
   files: sourceFiles,
   plugins,
   rules: {
+    "no-restricted-syntax": ["error", ...restrictedSyntax],
     "better-tailwindcss/no-restricted-classes": ["error", { restrict: restrictedClasses }],
   },
 };
