@@ -181,3 +181,62 @@ describe("inline styles, style elements and extra stylesheets", () => {
     expect(syntax(await lint("app", markup("flex"), appFile))).toEqual([]);
   });
 });
+
+describe("the single CSS entry in apps", () => {
+  const cssRule = (messages) =>
+    messages.filter((message) => message.ruleId === "heat-styling/css-entry-only");
+  const entry = "src/app/globals.css";
+  const entrySource = '@import "@heat/ui/styles.css";\n@source "../../../../packages/ui/src";\n';
+
+  test("a second CSS file fails and the message names it", async () => {
+    for (const file of ["src/components/extra.css", "src/app/dashboard/page.css", "src/x.css"]) {
+      const messages = cssRule(await lint("app", "a {\n  color: red;\n}\n", file));
+      expect(messages, file).toHaveLength(1);
+      expect(messages[0].message).toContain(file);
+      expect(messages[0].severity).toBe(2);
+    }
+  });
+
+  test("an empty second CSS file also fails", async () => {
+    expect(cssRule(await lint("app", "", "src/empty.css"))).toHaveLength(1);
+  });
+
+  test("the entry passes with only the shared import and source lines", async () => {
+    expect(await lint("app", entrySource, entry)).toEqual([]);
+    expect(await lint("app", '@import "@heat/ui/styles.css";\n', entry)).toEqual([]);
+  });
+
+  test("anything else in the entry fails", async () => {
+    const extras = [
+      ".a {\n  color: red;\n}\n",
+      "@theme {\n  --color-x: red;\n}\n",
+      '@import "other.css";\n',
+      '@plugin "x";\n',
+      "@utility tab-4 {\n  tab-size: 4;\n}\n",
+      "@custom-variant dark (&:where(.dark, .dark *));\n",
+      ".a {\n  @apply flex;\n}\n",
+    ];
+    for (const extra of extras) {
+      const messages = await lint("app", entrySource + extra, entry);
+      expect(
+        messages.map((message) => message.ruleId),
+        extra,
+      ).toEqual(["heat-styling/css-entry-only"]);
+    }
+  });
+
+  test("CSS outside src, and CSS in the ui preset, is not reported", async () => {
+    const source = "a {\n  color: red;\n}\n";
+    const ui = new ESLint({ overrideConfigFile: true, overrideConfig: await configFor("ui") });
+    for (const file of ["src/styles.css", ".storybook/preview.css"]) {
+      const [result] = await ui.lintText(source, { filePath: file, warnIgnored: false });
+      expect(result?.messages ?? [], file).toEqual([]);
+    }
+    const app = new ESLint({ overrideConfigFile: true, overrideConfig: await configFor("app") });
+    const [outside] = await app.lintText(source, {
+      filePath: "test/fixture.css",
+      warnIgnored: false,
+    });
+    expect(outside?.messages ?? []).toEqual([]);
+  });
+});

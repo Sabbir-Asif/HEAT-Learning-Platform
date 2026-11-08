@@ -1,5 +1,10 @@
 import tseslint from "typescript-eslint";
 import react from "./react.js";
-import { appStylingConfig, classOrderConfig } from "./styling.js";
+import { appCssConfig, appStylingConfig, classOrderConfig, scopeToScripts } from "./styling.js";
 
-export default tseslint.config(...react, classOrderConfig, appStylingConfig);
+export default tseslint.config(
+  ...scopeToScripts(react),
+  classOrderConfig,
+  appStylingConfig,
+  appCssConfig,
+);

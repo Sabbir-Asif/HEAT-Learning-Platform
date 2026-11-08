@@ -38,7 +38,7 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 - [x] **Task 3: no arbitrary values in apps.** Tests: `mt-[13px]`, `md:w-[40%]`, `[&>*]:p-2`, `bg-[var(--x)]` fail in `className`, a template literal and `cn`, `clsx`, `cva` arguments; the same pass in the `ui` preset; `className={x}` does not crash.
 - [x] **Task 4: layout-only classes in apps.** Tests: allow-list classes with breakpoint variants pass; `bg-red-500`, `text-lg`, `rounded`, `dark:flex`, `hover:p-2` fail naming the class; the same pass in `ui`.
 - [x] **Task 5: no inline styles, style elements or extra stylesheets in apps.** Tests: `style={{...}}` on an element and a component, `<style>` and imports of `./x.module.css` and `./x.scss` fail; `import "./globals.css"` and the `ui` preset pass.
-- [ ] **Task 6: one CSS entry in apps.** Tests: `src/components/extra.css` fails and the message names it; `src/app/globals.css` with only the allowed `@import` and `@source` passes; an extra rule or at-rule in it fails; Tailwind at-rules parse; CSS under `packages/ui` is not reported.
+- [x] **Task 6: one CSS entry in apps.** Tests: `src/components/extra.css` fails and the message names it; `src/app/globals.css` with only the allowed `@import` and `@source` passes; an extra rule or at-rule in it fails; Tailwind at-rules parse; CSS under `packages/ui` is not reported.
 - [ ] **Task 7: docs and whole-repo check.** README Quality checks and `packages/ui/CLAUDE.md` mention the rules; `pnpm lint` over the real repo reports nothing.
 
 ## Acceptance criteria mapped to checks

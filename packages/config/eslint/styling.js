@@ -1,4 +1,6 @@
+import css from "@eslint/css";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
+import { cssEntryOnly } from "./css-entry-rule.js";
 
 const sourceFiles = ["src/**/*.{ts,tsx}"];
 const plugins = { "better-tailwindcss": betterTailwindcss };
@@ -115,3 +117,19 @@ export const appStylingConfig = {
     "better-tailwindcss/no-restricted-classes": ["error", { restrict: restrictedClasses }],
   },
 };
+
+export const appCssConfig = {
+  files: ["src/**/*.css"],
+  plugins: { css, "heat-styling": { rules: { "css-entry-only": cssEntryOnly } } },
+  language: "css/css",
+  languageOptions: { tolerant: true },
+  rules: { "heat-styling/css-entry-only": "error" },
+};
+
+const scriptFiles = ["**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}"];
+
+export const scopeToScripts = (configs) =>
+  configs.map((config) => {
+    const globalIgnores = Object.keys(config).length === 1 && "ignores" in config;
+    return globalIgnores || config.files ? config : { ...config, files: scriptFiles };
+  });
