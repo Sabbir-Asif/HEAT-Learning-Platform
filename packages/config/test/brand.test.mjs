@@ -482,7 +482,7 @@ describe("legibility", () => {
 
   test("a light mark is legible on the dark background and not on the light one", () => {
     expect(problemsFor(mark("#e5e7eb"), dark)).toEqual([]);
-    expect(problemsFor(mark("#e5e7eb"), light).join("\n")).toMatch(/painted/);
+    expect(problemsFor(mark("#e5e7eb"), light).join("\n")).toMatch(/contrast/);
   });
 
   test("tolerates a small low-contrast share and fails a large one", () => {
@@ -514,8 +514,36 @@ describe("legibility", () => {
     expect(problemsFor(disc, dark).join("\n")).toMatch(/contrast/);
   });
 
+  test("a pale wordmark beside a dark shape fails on a light background", () => {
+    const wordmark = svg(
+      '<rect width="4" height="10" fill="#0f172a"/><rect x="5" y="3" width="5" height="4" fill="#e5e7eb"/>',
+    );
+    expect(problemsFor(wordmark, light).join("\n")).toMatch(/contrast/);
+    expect(problemsFor(wordmark, dark).join("\n")).toMatch(/contrast/);
+  });
+
+  test("pale pixels connected to the outside count even when ink is next to them", () => {
+    const open = svg(
+      '<path fill="#0f172a" d="M0 0h10v3H4v4h6v3H0z"/><rect x="4" y="3" width="6" height="4" fill="#ffffff"/>',
+    );
+    expect(problemsFor(open, light).join("\n")).toMatch(/contrast/);
+  });
+
+  test("pale paper fully enclosed by ink is ignored on a light background", () => {
+    const enclosed = svg(
+      '<circle cx="5" cy="5" r="5" fill="#0f172a"/><circle cx="5" cy="5" r="3.5" fill="#f1f5f9"/>',
+    );
+    expect(problemsFor(enclosed, light)).toEqual([]);
+  });
+
+  test("a stricter minimum contrast can be asked for", () => {
+    const blue = mark("#1d4ed8");
+    expect(legibility(blue, dark).problems).toEqual([]);
+    expect(legibility(blue, dark, { minContrast: 3 }).problems.join("\n")).toMatch(/under 3:1/);
+  });
+
   test("a white-only mark is invisible on a light background and legible on a dark one", () => {
-    expect(problemsFor(mark("#ffffff"), light).join("\n")).toMatch(/painted/);
+    expect(problemsFor(mark("#ffffff"), light).join("\n")).toMatch(/contrast/);
     expect(problemsFor(mark("#ffffff"), dark)).toEqual([]);
   });
 

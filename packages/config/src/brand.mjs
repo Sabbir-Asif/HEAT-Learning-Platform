@@ -405,6 +405,9 @@ export const MIN_PAINTED_SHARE = 0.01;
 export const MIN_CONTRAST = 2;
 const PAINTED_ALPHA = 128;
 const BLANK_CONTRAST = 1.5;
+const KIND_EMPTY = 0;
+const KIND_PALE = 1;
+const KIND_INK = 2;
 
 const hexChannels = (hex) => {
   const digits = hex.length === 4 ? [...hex.slice(1)].map((d) => d + d) : hex.slice(1).match(/../g);
@@ -440,25 +443,70 @@ export function readThemeBackgrounds(css) {
   return { light: backgroundIn(":root"), dark: backgroundIn("\\.dark") };
 }
 
-export function legibility(source, background) {
+const NEIGHBOURS = [
+  [1, 0],
+  [-1, 0],
+  [0, 1],
+  [0, -1],
+];
+
+function outsideOf(kinds, width, height) {
+  const reached = new Uint8Array(kinds.length);
+  const queue = [];
+  const visit = (x, y) => {
+    const index = y * width + x;
+    if (reached[index] || kinds[index] === KIND_INK) return;
+    reached[index] = 1;
+    queue.push(index);
+  };
+  for (let x = 0; x < width; x++) {
+    visit(x, 0);
+    visit(x, height - 1);
+  }
+  for (let y = 0; y < height; y++) {
+    visit(0, y);
+    visit(width - 1, y);
+  }
+  for (let head = 0; head < queue.length; head++) {
+    const x = queue[head] % width;
+    const y = Math.floor(queue[head] / width);
+    for (const [dx, dy] of NEIGHBOURS)
+      if (x + dx >= 0 && x + dx < width && y + dy >= 0 && y + dy < height) visit(x + dx, y + dy);
+  }
+  return reached;
+}
+
+export function legibility(source, background, { minContrast = MIN_CONTRAST } = {}) {
   const backgroundChannels = hexChannels(background);
   const lightBackground = luminance(backgroundChannels) > 0.5;
   const problems = [];
   const renders = LEGIBLE_SCALES.map((scale) => {
     const height = LEGIBLE_HEIGHT * scale;
     const { width, pixels } = render(source, { height });
+    const canvas = pixels.length / 4;
+    const kinds = new Uint8Array(canvas);
+    const contrasts = new Float64Array(canvas);
+    for (let pixel = 0; pixel < canvas; pixel++) {
+      const alpha = pixels[pixel * 4 + 3];
+      if (alpha < PAINTED_ALPHA) {
+        kinds[pixel] = KIND_EMPTY;
+        continue;
+      }
+      const colour = [0, 1, 2].map((c) =>
+        Math.min(255, Math.round((pixels[pixel * 4 + c] * 255) / alpha)),
+      );
+      contrasts[pixel] = contrastRatio(colour, backgroundChannels);
+      kinds[pixel] = lightBackground && contrasts[pixel] < BLANK_CONTRAST ? KIND_PALE : KIND_INK;
+    }
+    const outside = outsideOf(kinds, width, height);
     let painted = 0;
     let lowContrast = 0;
-    for (let i = 0; i < pixels.length; i += 4) {
-      const alpha = pixels[i + 3];
-      if (alpha < PAINTED_ALPHA) continue;
-      const colour = [0, 1, 2].map((c) => Math.min(255, Math.round((pixels[i + c] * 255) / alpha)));
-      const contrast = contrastRatio(colour, backgroundChannels);
-      if (lightBackground && contrast < BLANK_CONTRAST) continue;
+    for (let pixel = 0; pixel < canvas; pixel++) {
+      if (kinds[pixel] === KIND_EMPTY) continue;
+      if (kinds[pixel] === KIND_PALE && !outside[pixel]) continue;
       painted += 1;
-      if (contrast < MIN_CONTRAST) lowContrast += 1;
+      if (contrasts[pixel] < minContrast) lowContrast += 1;
     }
-    const canvas = pixels.length / 4;
     const paintedShare = painted / canvas;
     const lowShare = painted ? lowContrast / painted : 0;
     if (paintedShare < MIN_PAINTED_SHARE)
@@ -467,7 +515,7 @@ export function legibility(source, background) {
       );
     else if (lowShare > MAX_LOW_CONTRAST_SHARE)
       problems.push(
-        `at ${height} px high on ${background} ${(lowShare * 100).toFixed(1)}% of painted pixels have contrast under ${MIN_CONTRAST}:1, at most 10% is allowed`,
+        `at ${height} px high on ${background} ${(lowShare * 100).toFixed(1)}% of painted pixels have contrast under ${minContrast}:1, at most 10% is allowed`,
       );
     return { height, width, paintedShare, lowShare };
   });
