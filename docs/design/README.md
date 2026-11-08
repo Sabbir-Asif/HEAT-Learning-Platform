@@ -9,11 +9,11 @@ Design rule from the owner (2026-11-08): one consistent, modern design that fits
 | Slice | Content                                                                                 | State                                                                    |
 | ----- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | 30a   | Tooling, `tokens.json`, font decision, checks, README skeleton                          | Done                                                                     |
-| 30a   | `heat-lms.fig` with the theme variables and specimen frames, exports, inventory entries | Done: colour, type, shape and status specimens, light and dark, English  |
-| 30b   | Student screens                                                                         | Done in light, English only. Dark frames not designed yet                |
-| 30c   | Admin screens, drawers, loading, empty and error states, the no-filler table below      | Done in light, English only. Dark frames not designed yet                |
+| 30a   | `heat-lms.fig` with the theme variables and specimen frames, exports, inventory entries | Done: colour, type, shape and status specimens, light, English       |
+| 30b   | Student screens                                                                         | Done in light, English only                                              |
+| 30c   | Admin screens, drawers, loading, empty and error states, the no-filler table below      | Done in light, English only                                              |
 
-Owner decisions of 2026-11-08: the designs are English only for version 1, and dark frames of the screens come later. Only the specimen frames exist in dark; the dark colours are in the theme and the specimens.
+Owner decisions of 2026-11-08: the designs are English only for version 1, and every frame is light. No dark frames are drawn; the dark colours exist only in `tokens.json` and the theme variables.
 
 ## Design direction and how to use these frames
 

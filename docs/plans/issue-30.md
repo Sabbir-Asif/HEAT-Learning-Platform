@@ -73,7 +73,9 @@ Owner decision 2026-11-08: designs are English only, so every frame has lang `en
 - [x] **Task 15: course and lesson.** `student-course` with module list and locked or completed marks, `student-lesson` (phone: video on top with Lesson, Objectives and Modules tabs; laptop: main column with side panel).
 - [x] **Task 16: quiz.** `student-quiz-question`, `student-quiz-review`, `student-quiz-result-pass`, `student-quiz-result-fail` with the waiting-time countdown, and `drawer-quiz-submit-unanswered`.
 
-Slice 30b is built in light only (owner chose light first on 2026-11-08); the dark versions of every frame are a recolour pass still to do. ## Tasks (slice 30c, admin screens)
+Owner rule 2026-11-08: frames are drawn in light and English only. There are no dark frames and no other language, so no dark recolour pass.
+
+## Tasks (slice 30c, admin screens)
 
 Same rules as 30b: English only, laptop and phone, light first, one task per commit with frames, exports, inventory entries and README no-filler rows. Phone frames are lighter on detail and never rely on horizontal scroll.
 
@@ -94,7 +96,7 @@ Same rules as 30b: English only, laptop and phone, light first, one task per com
 | Light and dark keys identical; every `-foreground` has a pair; pairs name real roles | Task 2 tests; `design-files.test.mjs`                                                         |
 | Each token matches the design file                                                   | Task 10, method in the README (by eye and by variable read-back)                              |
 | Every frame has an export and every export an entry                                  | Task 4 tests; `pnpm design:check`                                                             |
-| Every listed screen at phone and laptop, light and dark, in English                  | Inventory and exports reviewed by eye in 30b and 30c                                          |
+| Every listed screen at phone and laptop, light, in English                           | Inventory and exports reviewed by eye in 30b and 30c                                          |
 | Overlays are drawers                                                                 | Task 4 tests; `pnpm design:check`; drawer frames reviewed by eye                              |
 | Text pairs 4.5:1, non-text 3:1, large text only when declared, disabled exempt       | Tasks 1, 3 and 7; `pnpm design:contrast` exits 0                                              |
 | Font: one family, Bengali and Latin, at most three weights, Bangla specimen          | Task 2 tests (weights); specimen frames and README decision (by eye)                          |
