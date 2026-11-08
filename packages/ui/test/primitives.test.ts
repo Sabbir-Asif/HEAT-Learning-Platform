@@ -32,6 +32,7 @@ const arbitraryValue =
   /(?<![\w-])(?!(?:data|aria|has|in|group|peer|supports|nth)-)[a-z][\w-]*-\[([^\]]*)\]/g;
 const literalInsideBrackets =
   /\d(?:px|rem|em|vh|vw|svh|dvh|ch|deg|%)|#[0-9a-fA-F]{3,8}|rgb|hsl|oklch/i;
+const offScaleRadius = /\brounded(?:-[a-z]+)*-(?:xs|2xl|3xl|4xl)\b/;
 const comment = /(?:^|[^:"'`\w])\/\/|\/\*/;
 
 function listSources(directory: string): string[] {
@@ -60,6 +61,7 @@ function violations(source: string): string[] {
   for (const match of source.matchAll(arbitraryValue)) {
     if (literalInsideBrackets.test(match[1] ?? "")) found.push(`arbitrary value ${match[0]}`);
   }
+  if (offScaleRadius.test(source)) found.push("radius outside the scale");
   if (source.split("\n").some((line) => comment.test(line))) found.push("comment");
   return found;
 }
@@ -122,4 +124,9 @@ describe("every primitive source", () => {
       expect(unexpected).toEqual([]);
     },
   );
+});
+
+test("the radius check flags off-scale radii only", () => {
+  expect(violations('<span className="rounded-4xl" />')).toContain("radius outside the scale");
+  expect(violations('<span className="rounded-full rounded-md rounded-t-lg" />')).toEqual([]);
 });

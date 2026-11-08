@@ -20,18 +20,18 @@ Not chosen: Radix-based shadcn (ADR 0013 names Base UI); one barrel per primitiv
 
 ## Files
 
-| File                                           | Change                                                                |
-| ---------------------------------------------- | --------------------------------------------------------------------- |
-| `packages/ui/components.json`                  | new, shadcn config                                                    |
-| `packages/ui/src/lib/utils.ts`                 | new, `cn`                                                             |
-| `packages/ui/src/components/*.tsx`             | new, one file per primitive                                           |
-| `packages/ui/src/components/*.stories.tsx`     | new, stories (placed beside each primitive)                           |
-| `packages/ui/src/hooks/use-mobile.ts`          | new, used by Sidebar                                                  |
-| `packages/ui/src/index.ts`                     | export the primitives                                                 |
-| `packages/ui/src/placeholder/`                 | removed, with its test                                                |
-| `packages/ui/test/primitives.test.ts`          | new, token-only, no-comment and allowed-library checks               |
-| `packages/ui/package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` | new runtime dependencies, catalog entries             |
-| `packages/ui/CLAUDE.md`, `CLAUDE.md` (root)    | reference row only if a pattern lands first; note on adding primitives |
+| File                                                                | Change                                                                 |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `packages/ui/components.json`                                       | new, shadcn config                                                     |
+| `packages/ui/src/lib/utils.ts`                                      | new, `cn`                                                              |
+| `packages/ui/src/components/*.tsx`                                  | new, one file per primitive                                            |
+| `packages/ui/src/components/*.stories.tsx`                          | new, stories (placed beside each primitive)                            |
+| `packages/ui/src/hooks/use-mobile.ts`                               | new, used by Sidebar                                                   |
+| `packages/ui/src/index.ts`                                          | export the primitives                                                  |
+| `packages/ui/src/placeholder/`                                      | removed, with its test                                                 |
+| `packages/ui/test/primitives.test.ts`                               | new, token-only, no-comment and allowed-library checks                 |
+| `packages/ui/package.json`, `pnpm-lock.yaml` | new runtime dependencies, pinned exactly like the existing ones                              |
+| `packages/ui/CLAUDE.md`, `CLAUDE.md` (root)                         | reference row only if a pattern lands first; note on adding primitives |
 
 ## Tasks
 
@@ -48,16 +48,16 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 
 ## Acceptance criteria mapped to checks
 
-| Criterion (refined)                              | Check                                                                |
-| ------------------------------------------------ | -------------------------------------------------------------------- |
-| shadcn CLI writes into `packages/ui` with tokens | `components.json` committed; `pnpm dlx shadcn add` dry run          |
-| Light, dark, default story, axe clean            | `pnpm --filter @heat/ui test:stories`                                |
-| Keyboard behaviour of five overlays/controls     | `play` tests in Dialog, Sheet, DropdownMenu, Tabs, Select stories    |
-| Token-only source, no comments                   | `test/primitives.test.ts`                                            |
-| No other UI library bundled                      | `test/primitives.test.ts` import check; `pnpm build` of both apps    |
-| Root export resolves                             | `test/index.test.ts`; app `pnpm typecheck` importing `Button`        |
-| Form control states                              | stories for default, focus, disabled, invalid                        |
-| Phone width containment                          | 360 px stories checked in the browser                                |
+| Criterion (refined)                              | Check                                                                                  |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| shadcn CLI writes into `packages/ui` with tokens | `components.json` committed; `pnpm dlx shadcn add` dry run                             |
+| Light, dark, default story, axe clean            | `pnpm --filter @heat/ui test:stories`                                                  |
+| Keyboard behaviour of five overlays/controls     | `play` tests in Dialog, Sheet, DropdownMenu, Tabs, Select stories                      |
+| Token-only source, no comments                   | `test/primitives.test.ts`                                                              |
+| No other UI library bundled                      | `test/primitives.test.ts` import check; `pnpm build` of both apps                      |
+| Root export resolves                             | `test/index.test.ts`; app `pnpm typecheck` importing `Button`                          |
+| Form control states                              | stories for default, focus, disabled, invalid                                          |
+| Phone width containment                          | 360 px stories checked in the browser                                                  |
 | Lint, format, typecheck, coverage pass           | `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:coverage && pnpm build` |
 
 ## Verification
