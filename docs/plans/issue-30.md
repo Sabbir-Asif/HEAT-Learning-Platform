@@ -73,7 +73,16 @@ Owner decision 2026-11-08: designs are English only, so every frame has lang `en
 - [x] **Task 15: course and lesson.** `student-course` with module list and locked or completed marks, `student-lesson` (phone: video on top with Lesson, Objectives and Modules tabs; laptop: main column with side panel).
 - [x] **Task 16: quiz.** `student-quiz-question`, `student-quiz-review`, `student-quiz-result-pass`, `student-quiz-result-fail` with the waiting-time countdown, and `drawer-quiz-submit-unanswered`.
 
-Slice 30b is built in light only (owner chose light first on 2026-11-08); the dark versions of every frame are a recolour pass still to do. Slice 30c (admin screens, states, drawers, final no-filler table) is planned when 30b is reviewed.
+Slice 30b is built in light only (owner chose light first on 2026-11-08); the dark versions of every frame are a recolour pass still to do. ## Tasks (slice 30c, admin screens)
+
+Same rules as 30b: English only, laptop and phone, light first, one task per commit with frames, exports, inventory entries and README no-filler rows. Phone frames are lighter on detail and never rely on horizontal scroll.
+
+- [ ] **Task 17: admin shell and overview.** Sidebar, top bar and `admin-overview`.
+- [ ] **Task 18: approvals.** `admin-approvals` (laptop table, phone card list with 44 px approve and reject), loading, empty and error states, `drawer-approvals-reject-reason`, `drawer-approvals-approve-bulk`, `drawer-approvals-filters` on phone.
+- [ ] **Task 19: students.** `admin-students` with the shared DataTable (pagination, sort, filter bar, StatusBadge) and a card list on phone.
+- [ ] **Task 20: module editor.** `admin-module-editor-locked` (read-only fields with a lock note, wording-fix fields noting changes are logged) and `admin-module-editor-unlocked`.
+- [ ] **Task 21: insights.** `admin-insights` with filter bar and chart cards, CSV action per card, series distinguishable without colour.
+- [ ] **Task 22: review.** Final README no-filler table check, `pnpm design:check`, `pnpm verify`.
 
 ## Acceptance criteria mapped to checks
 
