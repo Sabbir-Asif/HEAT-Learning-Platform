@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",
-    "start": "node .next/standalone/apps/frontend-public/server.js",
+    "start": "node scripts/start.mjs",
     "lint": "eslint .",
     "format:check": "prettier --check . --ignore-path ../../.gitignore",
     "typecheck": "tsc --noEmit",

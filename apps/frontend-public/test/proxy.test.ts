@@ -10,11 +10,16 @@ function request(
   return new NextRequest(`${origin}${path}`, { headers });
 }
 
+function destination(response: Response) {
+  const url = new URL(response.headers.get("location") ?? "", "http://learn.localhost");
+  return `${url.pathname}${url.search}`;
+}
+
 describe("redirect from /", () => {
   test("sends en-US,en;q=0.9 to /en with 307 and the cache headers", () => {
     const response = proxy(request("/", { "accept-language": "en-US,en;q=0.9" }));
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toBe("/en");
+    expect(destination(response)).toBe("/en");
     expect(response.headers.get("cache-control")).toBe("private, no-store");
     expect(response.headers.get("vary")).toBe("Accept-Language, Cookie");
   });
@@ -26,7 +31,7 @@ describe("redirect from /", () => {
         request("/", acceptLanguage === undefined ? {} : { "accept-language": acceptLanguage }),
       );
       expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe("/bn");
+      expect(destination(response)).toBe("/bn");
     },
   );
 
@@ -42,21 +47,21 @@ describe("redirect from /", () => {
     ["bn, en", "/bn"],
   ])("sends Accept-Language %j to %s", (acceptLanguage, location) => {
     const response = proxy(request("/", { "accept-language": acceptLanguage }));
-    expect(response.headers.get("location")).toBe(location);
+    expect(destination(response)).toBe(location);
   });
 
   test("the locale cookie wins over Accept-Language", () => {
     const response = proxy(request("/", { cookie: "__Host-locale=bn", "accept-language": "en" }));
-    expect(response.headers.get("location")).toBe("/bn");
+    expect(destination(response)).toBe("/bn");
     const other = proxy(request("/", { cookie: "__Host-locale=en", "accept-language": "bn" }));
-    expect(other.headers.get("location")).toBe("/en");
+    expect(destination(other)).toBe("/en");
   });
 
   test("finds the cookie among others", () => {
     const response = proxy(
       request("/", { cookie: "a=1; __Host-locale=en; b=2", "accept-language": "bn" }),
     );
-    expect(response.headers.get("location")).toBe("/en");
+    expect(destination(response)).toBe("/en");
   });
 
   test.each(["fr", "BN", "", "bn%3Bx", "bnbnbnbnbnbnbnbnbnbn"])(
@@ -65,7 +70,7 @@ describe("redirect from /", () => {
       const response = proxy(
         request("/", { cookie: `__Host-locale=${value}`, "accept-language": "en" }),
       );
-      expect(response.headers.get("location")).toBe("/en");
+      expect(destination(response)).toBe("/en");
     },
   );
 
@@ -73,7 +78,7 @@ describe("redirect from /", () => {
     const response = proxy(
       request("/?utm_source=a%20b&x=%E0%A6%AC&y=", { "accept-language": "bn" }),
     );
-    expect(response.headers.get("location")).toBe("/bn?utm_source=a%20b&x=%E0%A6%AC&y=");
+    expect(destination(response)).toBe("/bn?utm_source=a%20b&x=%E0%A6%AC&y=");
   });
 
   test("never sets a cookie", () => {
@@ -82,10 +87,11 @@ describe("redirect from /", () => {
     expect(response.cookies.getAll()).toEqual([]);
   });
 
-  test("never echoes the Host header", () => {
+  test("points at the same host the request came to, so Next.js can make it relative", () => {
     const response = proxy(request("/", { "accept-language": "en" }, "http://evil.example"));
-    expect(response.headers.get("location")).toBe("/en");
-    expect(JSON.stringify([...response.headers])).not.toContain("evil.example");
+    expect(destination(response)).toBe("/en");
+    expect(new URL(response.headers.get("location") ?? "").origin).toBe("http://evil.example");
+    expect(JSON.stringify([...response.headers])).not.toMatch(/http:\/\/(?!evil\.example)/);
   });
 
   test.each([
@@ -101,7 +107,7 @@ describe("redirect from /", () => {
     } catch {
       return;
     }
-    expect(["/en", "/bn"]).toContain(response.headers.get("location"));
+    expect(["/en", "/bn"]).toContain(destination(response));
     expect(JSON.stringify([...response.headers])).not.toContain("evil");
     expect(response.headers.get("set-cookie")).toBeNull();
   });
