@@ -31,6 +31,31 @@ The frames are a baseline for implementation, not a pixel specification. The own
 
 Three frames set the refined direction and are the ones to copy: `student-landing-laptop-light-en` (dark ink band, serif headline, course path as a timeline, rules instead of boxes), `student-dashboard-laptop-light-en` (resume panel, path rows with status icons) and `admin-approvals-laptop-light-en` (icon-led sidebar, avatar rows, icon plus text actions, Sonner toast). The other frames still use the first, plainer layout and are listed for coverage; implement them in the style of the three reference frames.
 
+### Owner additions of 2026-11-08 (afternoon)
+
+- Real logos from <https://heat.ugc.gov.bd/>: the HEAT logo, the Government of Bangladesh seal, the UGC logo and the World Bank logo are in `assets/logos/` and placed in the landing frame header and footer. The University of Dhaka crest has no official file yet and is a labelled placeholder.
+- The look follows the macOS design language: frosted, translucent bars (white at about 78 percent with a soft white edge), layered soft shadows, rounded 20 to 32 px surfaces, vibrant Lucide icons and a window chrome (traffic-light dots) around product previews. Implementation uses `backdrop-blur` on the header and sidebar, never on content.
+- Buttons carry an icon and a label. Below the tablet width the label hides and only the icon stays, with an accessible name and a tooltip. Row actions in tables are icon-only at every width.
+- The player, the student screens and the insights page get the most design effort. The insights page must be informative: totals, trends, per-module completion and the people who need follow-up, not a single chart.
+- The footer is a full footer with brand, link columns, contact, partner logos and legal links, on every public page.
+- Placeholder images are drawn as labelled frames (`img-...`) that say which image is needed. The list is below.
+
+### Images and logos needed
+
+| Frame layer      | Where                    | Image needed                                                                                          | Size (px)   |
+| ---------------- | ------------------------ | ----------------------------------------------------------------------------------------------------- | ----------- |
+| `img-hero`       | Landing hero             | Candid photo of three University of Dhaka students of different genders talking on a campus lawn      | 1400 x 1040 |
+| `img-module-1`   | Landing, module 1 cover  | Illustration: two students at a table with a gender symbol collage                                    | 874 x 440   |
+| `img-module-2`   | Landing, module 2 cover  | Illustration: scales of justice beside a university building                                          | 874 x 440   |
+| `img-module-3`   | Landing, module 3 cover  | Illustration: a student speaking up while a friend listens                                            | 874 x 440   |
+| `img-module-4`   | Landing, module 4 cover  | Illustration: a lit, welcoming campus path in the evening                                             | 874 x 440   |
+| `img-module-5`   | Landing, module 5 cover  | Illustration: a counsellor and a student in a calm office                                             | 874 x 440   |
+| `img-module-6`   | Landing, module 6 cover  | Illustration: a group of students joining hands                                                       | 874 x 440   |
+| `img-about`      | Landing, about the project | Wide photo of Curzon Hall, University of Dhaka, at golden hour with students walking                | 1280 x 840  |
+| `logo-du-placeholder` | Landing footer      | University of Dhaka crest, official file (replaces the placeholder)                                   | 256 x 256, transparent PNG or SVG |
+
+The module cover images are reused on the dashboard, the course page and the player outline. The same list applies to every screen that shows a module; the file names are decided in #35.
+
 ## Files
 
 | File                    | What it is                                                                                              |
