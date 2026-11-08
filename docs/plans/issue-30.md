@@ -64,7 +64,7 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 
 ## Tasks (slice 30b, student screens)
 
-Owner decision 2026-11-08: designs are English only, so every frame has lang `en` and there are no Bangla frames. Each screen is built at laptop (1440) and phone (390), in light and dark, with literal token hex values per theme (the tools cannot switch a frame's variable mode). One task is one commit: the frames in `heat-lms.fig`, the exports, the inventory entries and the README no-filler rows for that screen. The file is saved and exports are written after each task.
+Owner decision 2026-11-08: designs are English only, so every frame has lang `en` and there are no Bangla frames. Each screen is built at laptop (1440) and phone (390), in light, with literal token hex values (the tools cannot switch a frame's variable mode). One task is one commit: the frames in `heat-lms.fig`, the exports, the inventory entries and the README no-filler rows for that screen. The file is saved and exports are written after each task.
 
 - [x] **Task 11: public chrome and landing.** Header (HEAT logo placeholder, University of Dhaka crest placeholder, nav, theme switch, Sign in, Enroll), footer with partner placeholders, and `student-landing`: the course promise, one Enroll action, what the training covers, who runs it. Demo-mock elements are justified or dropped in the README.
 - [x] **Task 12: enrollment.** `student-enroll-details`, `student-enroll-captcha` (captcha image, refresh, input, support contact), `student-enroll-success`.
@@ -84,7 +84,7 @@ Same rules as 30b: English only, laptop and phone, light first, one task per com
 - [x] **Task 19: students.** `admin-students` with the shared DataTable (pagination, sort, filter bar, StatusBadge) and a card list on phone.
 - [x] **Task 20: module editor.** `admin-module-editor-locked` (read-only fields with a lock note, wording-fix fields noting changes are logged) and `admin-module-editor-unlocked`.
 - [x] **Task 21: insights.** `admin-insights` with filter bar and chart cards, CSV action per card, series distinguishable without colour.
-- [x] **Task 23: apply the refined direction to every remaining frame.** Owner feedback 2026-11-08: the first frames looked generic. The landing, dashboard and approvals laptop frames are redrawn as the reference set (Source Serif 4 and Public Sans, Lucide icons, dark ink hero band, rules instead of boxes, Sonner toast). Redraw the other frames in that style once the owner approves the reference set.
+- [x] **Task 23: apply the refined direction to every remaining frame.** Owner feedback 2026-11-08: the first frames looked generic. The landing, dashboard and approvals laptop frames are redrawn as the reference set (Source Serif 4 and Public Sans, Lucide icons, deep purple hero band, rules instead of boxes, Sonner toast). The remaining frames were redrawn in the same style.
 - [ ] **Task 22: review.** Final README no-filler table check, `pnpm design:check`, `pnpm verify`.
 
 ## Acceptance criteria mapped to checks
@@ -99,7 +99,7 @@ Same rules as 30b: English only, laptop and phone, light first, one task per com
 | Every listed screen at phone and laptop, light, in English                           | Inventory and exports reviewed by eye in 30b and 30c                                          |
 | Overlays are drawers                                                                 | Task 4 tests; `pnpm design:check`; drawer frames reviewed by eye                              |
 | Text pairs 4.5:1, non-text 3:1, large text only when declared, disabled exempt       | Tasks 1, 3 and 7; `pnpm design:contrast` exits 0                                              |
-| Font: one family, Bengali and Latin, at most three weights, Bangla specimen          | Task 2 tests (weights); specimen frames and README decision (by eye)                          |
+| Font: Source Serif 4 and Public Sans, Latin only, at most three weights each         | Task 2 tests (weights); specimen frames and README decision (by eye)                          |
 | No-filler table per screen                                                           | README rows filled in 30b and 30c; reviewer reads them                                        |
 | Owner approval comment                                                               | Owner's comment on #30, outside this branch                                                   |
 
@@ -120,5 +120,5 @@ The `.fig` is opened in Open Pencil and its frames are compared with the exports
 - `*.png` is listed in `.prettierignore`, not in `.gitignore`; `git check-ignore` confirms exports are tracked without a change. The refined text assumed a `.gitignore` rule, which does not exist.
 - The Open Pencil MCP server only writes inside its configured root, which is the main checkout, not this worktree. The file has to be created where the server may write, or the root pointed at the worktree, and then copied here without touching the main checkout's tracked or untracked files.
 - A binary `.fig` merges badly: one editor at a time.
-- Bangla is longer and taller than Latin: every specimen and screen is checked for clipped matras and wrapping at 390 px.
+- Open Pencil text can render stale spaces and symbols in frames loaded from the file: re-set the text of the affected nodes, or re-render the frame, before exporting, and read each export.
 - No comments in code: the scripts and tests carry meaning through names; `docs/` prose is exempt.

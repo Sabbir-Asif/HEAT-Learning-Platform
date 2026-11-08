@@ -266,6 +266,16 @@ describe("validateTokens", () => {
     expect(problems(tokens)).toMatch(/font.*license/i);
   });
 
+  test("fails when the body font is not Public Sans", () => {
+    const tokens = mutated((t) => (t.font.family = "Noto Sans"));
+    expect(problems(tokens)).toMatch(/font\.family.*Public Sans/i);
+  });
+
+  test("fails when the display font is not Source Serif 4", () => {
+    const tokens = mutated((t) => (t.fontDisplay.family = "Noto Serif"));
+    expect(problems(tokens)).toMatch(/fontDisplay\.family.*Source Serif 4/i);
+  });
+
   test("fails when the display font lacks a key", () => {
     const tokens = mutated((t) => delete t.fontDisplay.family);
     expect(problems(tokens)).toMatch(/fontDisplay.*family/i);
@@ -429,6 +439,7 @@ describe("checkInventory", () => {
     ["student-landing-tablet-light-en", "unknown width"],
     ["student-landing-phone-sepia-bn", "unknown theme"],
     ["student-landing-phone-light-fr", "unknown language"],
+    ["student-landing-phone-dark-en", "dark frames are not drawn"],
   ])("fails on the id %s (%s)", (id) => {
     expect(checkWith([frame({ id })])).toMatch(new RegExp(id));
   });

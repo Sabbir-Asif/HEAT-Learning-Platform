@@ -296,12 +296,17 @@ function checkShadows(tokens, failures) {
   }
 }
 
+const FONT_FAMILIES = { font: "Public Sans", fontDisplay: "Source Serif 4" };
+
 function checkFont(tokens, failures) {
-  for (const name of ["font", "fontDisplay"]) {
+  for (const [name, family] of Object.entries(FONT_FAMILIES)) {
     const font = tokens[name];
     if (!isRecord(font)) {
       failures.push(`${name} is missing`);
       continue;
+    }
+    if ("family" in font && font.family !== family) {
+      failures.push(`${name}.family is ${JSON.stringify(font.family)}; the design uses ${family}`);
     }
     for (const key of REQUIRED_FONT_KEYS) {
       if (!(key in font)) failures.push(`${name}.${key} is missing`);
@@ -354,8 +359,9 @@ export const failingRows = (rows) => rows.filter((row) => row.status === "fail")
 const AREAS = ["student", "admin", "specimen", "drawer"];
 const WIDTHS = ["phone", "laptop"];
 const LANGS = ["en"];
+const FRAME_THEMES = ["light"];
 const FRAME_ID = new RegExp(
-  `^(${AREAS.join("|")})-([a-z0-9]+(?:-[a-z0-9]+)*)-(${WIDTHS.join("|")})-(${THEMES.join("|")})-(${LANGS.join("|")})$`,
+  `^(${AREAS.join("|")})-([a-z0-9]+(?:-[a-z0-9]+)*)-(${WIDTHS.join("|")})-(${FRAME_THEMES.join("|")})-(${LANGS.join("|")})$`,
 );
 const OVERLAY_WORDS = /(^|-)(modal|dialog|popup)(-|$)/;
 

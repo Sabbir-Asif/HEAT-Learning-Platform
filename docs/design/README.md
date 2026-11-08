@@ -29,7 +29,7 @@ The frames are the design the app is built to. Implementation tickets (#31 onwar
 
 ### Reference frames
 
-Three frames set the refined direction and are the ones to copy: `student-landing-laptop-light-en` (dark ink band, serif headline, course path as a timeline, rules instead of boxes), `student-dashboard-laptop-light-en` (resume panel, path rows with status icons) and `admin-approvals-laptop-light-en` (icon-led sidebar, avatar rows, icon plus text actions, Sonner toast). Three more frames carry the macOS-style direction and the extra effort the owner asked for: `student-enroll-details-laptop-light-en` (create account: split layout, icon fields, password strength, step progress), `student-lesson-laptop-light-en` (the player: window chrome, glass control bar, tabs, outline panel) and `admin-insights-laptop-light-en` (KPIs with trends, registrations and completions chart, learner journey, module completion, hardest questions, follow-up list with icon-only row actions). Every other frame follows the same style: icon plus label buttons, icon-only row actions, bottom navigation on phones, and the real logos.
+Three frames set the refined direction and are the ones to copy: `student-landing-laptop-light-en` (deep purple hero band, serif headline, course path as a timeline, rules instead of boxes), `student-dashboard-laptop-light-en` (resume panel, path rows with status icons) and `admin-approvals-laptop-light-en` (icon-led sidebar, avatar rows, icon plus text actions, Sonner toast). Three more frames carry the macOS-style direction and the extra effort the owner asked for: `student-enroll-details-laptop-light-en` (create account: split layout, icon fields, password strength, step progress), `student-lesson-laptop-light-en` (the player: control bar, tabs, outline panel) and `admin-insights-laptop-light-en` (KPIs with trends, registrations and completions chart, learner journey, module completion, hardest questions, follow-up list with icon-only row actions). Every other frame follows the same style: icon plus label buttons, icon-only row actions, bottom navigation on phones, and the real logos.
 
 ### Owner additions of 2026-11-08 (afternoon)
 
@@ -42,11 +42,10 @@ Three frames set the refined direction and are the ones to copy: `student-landin
 
 ### Images and logos needed
 
-The public site uses few images on purpose: one hero photo, and module cards that use a coloured icon tile. Module cover images are optional and only used where the owner uploads one in the module editor.
+The public site uses few images on purpose: a sign-up panel photo and the lesson poster frames. Module cover images are optional and only used where the owner uploads one in the module editor.
 
 | Frame layer             | Where                        | Image needed                                                                                    | Size (px)                         |
 | ----------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------- |
-| `img-hero`              | Landing hero                 | Candid photo of three University of Dhaka students of different genders talking on a campus lawn | 1400 x 1040                       |
 | `img-signup`            | Create account, left panel   | Student walking into a University of Dhaka building with a notebook, morning light, portrait     | 1248 x 1736                       |
 | `img-lesson-video`      | Lesson player                | Poster still of the lesson video, 16:9, one per lesson                                           | 1920 x 1080                       |
 | `img-module-cover-upload` | Module editor              | Optional module cover, uploaded by the admin                                                     | 874 x 440                         |
@@ -89,7 +88,6 @@ Every table uses one pagination bar. On laptop it shows rows per page, the range
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | Application version   | 0.16.0 (`/Applications/OpenPencil.app`, `@open-pencil/mcp` 0.16.0)                                                                           |
 | Tool limits found     | The MCP server only writes inside its configured root (`OPENPENCIL_MCP_ROOT`, by default the directory the bridge was started in). Its tools fail with "not connected" until the application is running with a document open. |
-
 | Modes                 | The tools cannot add a mode to a collection. A collection is created by importing one token file per mode (`Colors/Light.json`, `Colors/Dark.json`), which gives real Light and Dark modes. |
 | Frame fills           | Frames cannot be switched between modes through the tools, so each specimen frame uses literal hex values equal to the variable for its theme. |
 | Saving                | The tools write only inside the MCP root, and not into hidden folders. The file and PNGs were written to the main checkout and copied into the worktree. |
@@ -105,8 +103,8 @@ Frame id: `<area>-<screen>-<width>-<theme>-<lang>`, lower case, hyphens only. Th
 | `area`   | `student`, `admin`, `specimen`, `drawer`                                                                  |
 | `screen` | kebab-case screen or state name, for example `dashboard`, `dashboard-loading`, `module-editor-locked`    |
 | `width`  | `phone` (390 px) or `laptop` (1440 px)                                                                    |
-| `theme`  | `light` or `dark`                                                                                         |
-| `lang`   | `bn` or `en`. The admin console is English only, so `admin` frames are always `en`                       |
+| `theme`  | `light`. Dark colours exist only in `tokens.json`; no frame is drawn dark                                 |
+| `lang`   | `en`. Version 1 is English only                                                                           |
 
 Drawers are named `drawer-<purpose>-<width>-<theme>-<lang>` (area `drawer`, screen is the purpose) and carry `"overlay": "drawer"` in `inventory.json`. A drawer slides in from the inline-end edge on laptop and from the bottom on phone, has a title and a visible Close button (no drag gesture needed, WCAG 2.5.7), and its notes cover focus on open, Escape and focus return. Menus, tooltips and select lists are not overlays in this sense.
 
@@ -216,23 +214,26 @@ Filled in by 30b (student screens) and 30c (admin screens). Each screen has a ro
 | Screen | Task | Element group | Part of the task it serves |
 | ------ | ---- | ------------- | -------------------------- |
 | Landing | Decide to enroll | Header with logos, nav, Sign in, Enroll | Reach enrollment or sign-in from anywhere on the page |
-| Landing | Decide to enroll | Headline, one paragraph, Enroll now | State what the course is and give the single action |
+| Landing | Decide to enroll | Headline, one paragraph, Enroll now, See modules, three facts (modules, hours, certificate) | State what the course is, give the single action and the way to the module list; the facts answer how long and what you get |
 | Landing | Decide to enroll | The course path: six modules with durations | Show what the training covers and how long it takes before asking for an account |
 | Landing | Decide to enroll | How it works (three steps) | Set expectations for verification, approval and the certificate |
+| Landing | Decide to enroll | Part of the HEAT project: heading and one paragraph | Says who runs the course, which a student checks before giving personal details |
 | Landing | Decide to enroll | Footer with partners and policy links | Credibility and the privacy and accessibility links. The mock's speech bubble, four feature tiles, skyline, hero photo placeholder, info cards and repeated call-to-action band are dropped |
-| Enroll details | Create an account | Name, email, role, department, password, consent | The data the training team needs to approve the enrollment |
+| Enroll details | Create an account | First and last name, university email, student ID, university, faculty, department, password with strength meter, consent | The data the training team needs to approve the enrollment; no role field, the role is set by the team |
+| Enroll details | Create an account | Step 1 of 3 progress bar | Shows how many steps remain before the captcha and confirmation |
 | Enroll details | Create an account | Breach note under the password | Explains why a password can be refused |
 | Enroll captcha | Prove you are a person | Captcha image, new image, input | Bot check; support email beside it is the accessible fallback (ADR 0017) |
 | Enroll success | Confirm the email | Status badge, instruction, what happens next, resend | Tells the student the one thing to do now and what follows |
 | Awaiting approval | Know where the enrollment stands | Status badge, explanation, submitted and email, check details, contact support | The state, the expected wait, and the two ways to act |
 | Awaiting approval (rejected) | Understand a refusal | Reason from the team, Enroll again, contact support | The reason and the next step |
 | Dashboard | Resume learning | Continue card with progress bar and Resume lesson | The main action and where the student is |
-| Dashboard | Resume learning | Module list with status badges | Overall position and what is locked. The mock's four stat tiles are dropped; the one progress figure sits in the continue card |
+| Dashboard | Resume learning | Module list with a status icon and the status word | Overall position and what is locked. The mock's four stat tiles are dropped; the one progress figure sits in the continue card |
 | Dashboard loading, empty, error | Recover from a missing state | Skeletons, empty message with contact, error message with code, Try again | Each state says what happened and what to do next |
 | Course | Find and open a lesson | Module cards with status badges and lesson list | Where the student is, what is done, and a single Resume action on the current lesson |
 | Course | Find and open a lesson | Locked module with the reason | Explains why module 3 cannot be opened yet |
 | Lesson | Watch and complete a lesson | Video player with captions control | The lesson itself; captions are required for accessibility |
 | Lesson | Watch and complete a lesson | Title, short description, previous and complete buttons | Context and the two navigation actions |
+| Lesson | Watch and complete a lesson | Tabs: Overview, Transcript, My notes, Resources | The transcript is the text alternative to the video; notes and resources are the two things a student returns to while learning. |
 | Lesson | Watch and complete a lesson | Objectives and module list (side panel on laptop, tabs on phone) | What the lesson should teach and where it sits in the course |
 | Quiz question | Answer one question | Progress bar, question, four options, previous and next | One question at a time with position shown; selection uses fill, outline and a filled marker, not colour alone |
 | Quiz review | Check before submitting | Answered and not answered list, go back, submit | Lets the student find a skipped question before submitting |
@@ -251,7 +252,7 @@ Filled in by 30b (student screens) and 30c (admin screens). Each screen has a ro
 | Module editor (locked) | Fix wording safely | Lock note, read-only structure fields, editable wording fields, save | Says why fields are read-only and that wording changes are logged |
 | Module editor (unlocked) | Build a module | Title, description, position, pass mark, save draft, publish | The fields needed to create and publish a module |
 | Insights | Understand enrollment and quiz results | Filter bar, two chart cards each with Download CSV | The trend and the pass rate; the numbers are the point. The line chart is told apart by a labelled legend with different marker shapes and totals, not by colour alone; the lines themselves have no markers yet |
-| Sign in | Get back into the course | Email, password, Forgot password link, Sign in, Enrol | The single task, with the way to a new account beside it. The side panel is three lines of text and no image |
+| Sign in | Get back into the course | Email, password, Forgot password link, Sign in, Enroll | The single task, with the way to a new account beside it. The side panel is three lines of text and no image |
 | Forgot password | Regain access | Email, Send reset link, Back to sign in | One field and one action; the sent state says the link works for one hour and does not reveal whether the account exists |
 | Certificate | Get the certificate | Preview, Download PDF, number, verification link | The document itself and the two things a student does with it |
 | Help | Find an answer or contact the team | Question list, support email, confidential help note | Answers first, then the way to reach a person |
