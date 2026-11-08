@@ -8,6 +8,8 @@
     "./tsconfig/*": "./tsconfig/*",
     "./eslint/base": "./eslint/base.js",
     "./eslint/react": "./eslint/react.js",
+    "./eslint/app": "./eslint/app.js",
+    "./eslint/ui": "./eslint/ui.js",
     "./eslint/nest": "./eslint/nest.js",
     "./prettier": "./prettier/index.json",
     "./vitest": "./vitest/index.js"
