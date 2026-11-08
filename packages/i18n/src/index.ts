@@ -15,5 +15,8 @@ export type { NegotiationInput } from "./negotiate";
 export { switchLocalePath } from "./switch-locale-path";
 export { serializeLocaleCookie } from "./cookie";
 
+export { TIME_ZONE, formatDate, formatDateTime, formatTime } from "./dates";
+export type { DateInput } from "./dates";
+
 export const messages = { en, bn };
 export type Messages = typeof en;

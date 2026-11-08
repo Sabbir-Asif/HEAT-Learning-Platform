@@ -45,7 +45,7 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 - [x] **A3: `switchLocalePath`.** Tests: `/en`, `/en/`, `/bn/x?y=1#z`, `/x`, `//evil.com`, `/\evil.com`, `/en//evil.com`, `javascript:alert(1)`, empty, a path with a control character; the result always starts with `/<target>` and holds no `//`, scheme or backslash. Then `switch-locale-path.ts`.
 - [x] **A4: `serializeLocaleCookie`.** Tests: exact string `__Host-locale=bn; Path=/; Max-Age=31536000; SameSite=Lax; Secure`, no `Domain`, no `HttpOnly`; a value that is not a locale throws. Then `cookie.ts`.
 - [x] **A5: catalog aggregates and parity.** Tests: `messages` is `{ en, bn }` with `brand` and `site`; parity names `missing: ["..."]`, `extra`, empty values, placeholder mismatches (`{name}` vs `{nome}`) and a namespace file present in one language only or not exported by the aggregate, each with its key or file; reconcile `keys.ts` and the #35 brand test to the new aggregate. Then `messages/{en,bn}/{site,index}.ts` and `index.ts`.
-- [ ] **A6: dates.** Tests under `TZ=UTC` and `TZ=America/New_York`: `2026-11-07T20:30:00Z` prints 8 November 2026, 02:30 in en and bn; bn uses Bengali digits and bn month names, en uses ASCII digits; an invalid `Date` throws `RangeError`. Then `dates.ts`, date-fns and @date-fns/tz, `allowBuilds` check.
+- [x] **A6: dates.** Tests under `TZ=UTC` and `TZ=America/New_York`: `2026-11-07T20:30:00Z` prints 8 November 2026, 02:30 in en and bn; bn uses Bengali digits and bn month names, en uses ASCII digits; an invalid `Date` throws `RangeError`. Then `dates.ts`, date-fns and @date-fns/tz, `allowBuilds` check.
 
 ### Part B: `frontend-public`
 
