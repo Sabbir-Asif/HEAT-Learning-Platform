@@ -170,13 +170,8 @@ describe("the data block", () => {
   });
 
   test("ordinary non-ASCII text, including accents and emoji, is kept", () => {
-    const { context } = inject(
-      "#25",
-      data("na\u00efve \u{1F600} caf\u00e9"),
-    );
-    expect(context).toContain(
-      "na\u00efve \u{1F600} caf\u00e9",
-    );
+    const { context } = inject("#25", data("na\u00efve \u{1F600} caf\u00e9"));
+    expect(context).toContain("na\u00efve \u{1F600} caf\u00e9");
   });
 
   test("the whole injection stays under the size cap, with a truncation note", () => {

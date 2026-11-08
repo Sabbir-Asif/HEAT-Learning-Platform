@@ -18,11 +18,7 @@ const removed = [
 
 const pattern = new RegExp(removed.join("|"), "i");
 
-const exempt = [
-  /^docs\/adr\//,
-  /^docs\/plans\//,
-  /\.(png|jpe?g|gif|ico|woff2?|fig)$/,
-];
+const exempt = [/^docs\/adr\//, /^docs\/plans\//, /\.(png|jpe?g|gif|ico|woff2?|fig)$/];
 
 const tracked = () =>
   execFileSync("git", ["ls-files", "-z"], { cwd: root, encoding: "utf8" })
