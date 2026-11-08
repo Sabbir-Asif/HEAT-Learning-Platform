@@ -16,8 +16,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const lightForeground = "rgb(15, 23, 42)";
-const darkForeground = "rgb(229, 231, 235)";
+const lightForeground = "rgb(27, 21, 48)";
+const darkForeground = "rgb(236, 232, 246)";
 
 export const Default: Story = {};
 
