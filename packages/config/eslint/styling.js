@@ -12,10 +12,80 @@ export const classOrderConfig = {
   },
 };
 
+const breakpointVariants = "(?:(?:max-)?(?:sm|md|lg|xl|2xl):)*";
+const layoutWords = [
+  "flex",
+  "grid",
+  "block",
+  "hidden",
+  "contents",
+  "inline",
+  "inline-block",
+  "inline-flex",
+  "inline-grid",
+  "container",
+  "grow",
+  "shrink",
+];
+const layoutPrefixes = [
+  "flex",
+  "grid",
+  "col",
+  "row",
+  "gap",
+  "gap-x",
+  "gap-y",
+  "space-x",
+  "space-y",
+  "items",
+  "justify",
+  "content",
+  "place",
+  "self",
+  "order",
+  "grow",
+  "shrink",
+  "basis",
+  "p",
+  "px",
+  "py",
+  "pt",
+  "pr",
+  "pb",
+  "pl",
+  "ps",
+  "pe",
+  "m",
+  "mx",
+  "my",
+  "mt",
+  "mr",
+  "mb",
+  "ml",
+  "ms",
+  "me",
+  "w",
+  "h",
+  "size",
+  "min-w",
+  "min-h",
+  "max-w",
+  "max-h",
+  "overflow",
+  "overflow-x",
+  "overflow-y",
+];
+const layoutClass = `${breakpointVariants}-?(?:${layoutWords.join("|")}|(?:${layoutPrefixes.join("|")})-[a-z0-9./-]+)`;
+
 const restrictedClasses = [
   {
     pattern: "^(.*\\[.*)$",
     message: "Arbitrary value '$1' is not allowed in an app. Add a token or a variant to @heat/ui.",
+  },
+  {
+    pattern: `^(?![^\\[]*\\[)(?!${layoutClass}$)(.+)$`,
+    message:
+      "Class '$1' is not a layout utility. Apps may only lay out; styling lives in a @heat/ui component.",
   },
 ];
 

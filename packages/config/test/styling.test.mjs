@@ -96,3 +96,54 @@ describe("arbitrary values", () => {
     }
   });
 });
+
+describe("layout-only classes in apps", () => {
+  const allowed = [
+    "flex flex-col gap-4",
+    "md:grid md:grid-cols-3 lg:gap-x-6",
+    "p-4 px-2 -mt-2 m-auto mx-4",
+    "w-1/2 h-screen size-8 min-h-0 max-w-screen-md",
+    "items-center justify-between self-end place-items-center content-start order-2",
+    "overflow-hidden overflow-x-auto container hidden sm:block inline-flex contents",
+    "space-y-2 col-span-2 row-span-1 grow shrink-0 basis-1/3 2xl:p-8",
+  ];
+  const disallowed = [
+    "bg-red-500",
+    "text-lg",
+    "font-bold",
+    "rounded",
+    "shadow-md",
+    "border",
+    "opacity-50",
+    "dark:flex",
+    "hover:p-2",
+    "md:bg-red-500",
+    "absolute",
+    "p",
+  ];
+
+  for (const classes of allowed) {
+    test(`app accepts ${classes}`, async () => {
+      expect(restricted(await lint("app", markup(classes), appFile))).toEqual([]);
+    });
+  }
+
+  for (const className of disallowed) {
+    test(`app rejects ${className}, names it and points to @heat/ui`, async () => {
+      const messages = restricted(await lint("app", markup(className), appFile));
+      expect(messages).toHaveLength(1);
+      expect(messages[0].message).toContain(`'${className}'`);
+      expect(messages[0].message).toContain("@heat/ui");
+    });
+
+    test(`ui accepts ${className}`, async () => {
+      expect(restricted(await lint("ui", markup(className), uiFile))).toEqual([]);
+    });
+  }
+
+  test("an arbitrary value is reported once, as an arbitrary value", async () => {
+    const messages = restricted(await lint("app", markup("mt-[13px]"), appFile));
+    expect(messages).toHaveLength(1);
+    expect(messages[0].message).toContain("Arbitrary value");
+  });
+});
