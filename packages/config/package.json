@@ -36,6 +36,7 @@
     "eslint": "catalog:",
     "js-yaml": "^5.5.0",
     "prettier": "catalog:",
+    "sax": "1.6.1",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
