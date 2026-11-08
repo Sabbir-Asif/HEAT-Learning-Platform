@@ -29,7 +29,7 @@ The frames are a baseline for implementation, not a pixel specification. The own
 
 ### Reference frames for the refined direction
 
-Three frames set the refined direction and are the ones to copy: `student-landing-laptop-light-en` (dark ink band, serif headline, course path as a timeline, rules instead of boxes), `student-dashboard-laptop-light-en` (resume panel, path rows with status icons) and `admin-approvals-laptop-light-en` (icon-led sidebar, avatar rows, icon plus text actions, Sonner toast). The other frames still use the first, plainer layout and are listed for coverage; implement them in the style of the three reference frames.
+Three frames set the refined direction and are the ones to copy: `student-landing-laptop-light-en` (dark ink band, serif headline, course path as a timeline, rules instead of boxes), `student-dashboard-laptop-light-en` (resume panel, path rows with status icons) and `admin-approvals-laptop-light-en` (icon-led sidebar, avatar rows, icon plus text actions, Sonner toast). Three more frames carry the macOS-style direction and the extra effort the owner asked for: `student-enroll-details-laptop-light-en` (create account: split layout, icon fields, password strength, step progress), `student-lesson-laptop-light-en` (the player: window chrome, glass control bar, tabs, outline panel) and `admin-insights-laptop-light-en` (KPIs with trends, registrations and completions chart, learner journey, module completion, hardest questions, follow-up list with icon-only row actions). The other frames still use the first, plainer layout and are listed for coverage; implement them in the style of the reference frames.
 
 ### Owner additions of 2026-11-08 (afternoon)
 
@@ -52,6 +52,8 @@ Three frames set the refined direction and are the ones to copy: `student-landin
 | `img-module-5`   | Landing, module 5 cover  | Illustration: a counsellor and a student in a calm office                                             | 874 x 440   |
 | `img-module-6`   | Landing, module 6 cover  | Illustration: a group of students joining hands                                                       | 874 x 440   |
 | `img-about`      | Landing, about the project | Wide photo of Curzon Hall, University of Dhaka, at golden hour with students walking                | 1280 x 840  |
+| `img-signup`     | Create account, left panel | Student walking into a University of Dhaka building with a notebook, morning light, portrait       | 1248 x 1736 |
+| `img-lesson-video` | Lesson player          | Poster still of the lesson video, 16:9, one per lesson                                                | 1920 x 1080 |
 | `logo-du-placeholder` | Landing footer      | University of Dhaka crest, official file (replaces the placeholder)                                   | 256 x 256, transparent PNG or SVG |
 
 The module cover images are reused on the dashboard, the course page and the player outline. The same list applies to every screen that shows a module; the file names are decided in #35.
