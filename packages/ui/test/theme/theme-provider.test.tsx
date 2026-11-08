@@ -55,7 +55,7 @@ describe("ThemeProvider", () => {
     expect(document.documentElement.classList.contains("dark")).toBe(true);
   });
 
-  test("a light device setting leaves no theme class", async () => {
+  test("a light device setting does not add the dark class", async () => {
     stubDevice(false);
     await mount();
     expect(document.documentElement.classList.contains("dark")).toBe(false);
