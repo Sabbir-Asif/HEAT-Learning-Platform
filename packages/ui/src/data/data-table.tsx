@@ -11,6 +11,13 @@ import {
   XIcon,
 } from "lucide-react";
 import { Button } from "../components/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/select";
 import { Skeleton } from "../components/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/table";
 import { EmptyState } from "../composites/empty-state";
@@ -39,6 +46,7 @@ type DataTableProps<Row extends RowData> = {
   pageSize: PageSize;
   sort: SortState | null;
   onToggleSort: (id: string) => void;
+  onSortChange?: (sort: SortState | null) => void;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: PageSize) => void;
   status?: DataTableStatus;
@@ -66,6 +74,7 @@ function DataTable<Row extends RowData>({
   pageSize,
   sort,
   onToggleSort,
+  onSortChange,
   onPageChange,
   onPageSizeChange,
   status = "ready",
@@ -121,25 +130,32 @@ function DataTable<Row extends RowData>({
         description={emptyDescription}
       />
     ) : isMobile ? (
-      <ul className="flex flex-col gap-3" aria-label={label}>
-        {table.getRowModel().rows.map((row) => (
-          <li key={row.id} className="flex flex-col gap-2 rounded-lg border p-3">
-            <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
-              {row.getAllCells().map((cell) => (
-                <React.Fragment key={cell.id}>
-                  <dt className="text-muted-foreground">{String(cell.column.columnDef.header)}</dt>
-                  <dd className="min-w-0 break-words">
-                    <table.FlexRender cell={cell} />
-                  </dd>
-                </React.Fragment>
-              ))}
-            </dl>
-            {hasActions ? (
-              <div className="flex items-center justify-end gap-1">{actions(row.original)}</div>
-            ) : null}
-          </li>
-        ))}
-      </ul>
+      <div className="flex flex-col gap-3">
+        {onSortChange && sortableIds.size > 0 ? (
+          <MobileSort columns={columns} sort={sort} onSortChange={onSortChange} />
+        ) : null}
+        <ul className="flex flex-col gap-3" aria-label={label}>
+          {table.getRowModel().rows.map((row) => (
+            <li key={row.id} className="flex flex-col gap-2 rounded-lg border p-3">
+              <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+                {row.getAllCells().map((cell) => (
+                  <React.Fragment key={cell.id}>
+                    <dt className="text-muted-foreground">
+                      {String(cell.column.columnDef.header)}
+                    </dt>
+                    <dd className="min-w-0 break-words">
+                      <table.FlexRender cell={cell} />
+                    </dd>
+                  </React.Fragment>
+                ))}
+              </dl>
+              {hasActions ? (
+                <div className="flex items-center justify-end gap-1">{actions(row.original)}</div>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      </div>
     ) : (
       <Table aria-label={label}>
         <TableHeader>
@@ -209,7 +225,12 @@ function DataTable<Row extends RowData>({
       aria-busy={status === "loading" || fetching}
       className={cn("flex flex-col gap-4", className)}
     >
-      <div className={cn(fetching && "opacity-60 transition-opacity")}>{body}</div>
+      {fetching ? (
+        <p role="status" className="text-muted-foreground text-xs">
+          Updating
+        </p>
+      ) : null}
+      <div>{body}</div>
       <Pagination
         page={page}
         pageSize={pageSize}
@@ -218,6 +239,48 @@ function DataTable<Row extends RowData>({
         onPageSizeChange={onPageSizeChange}
       />
     </div>
+  );
+}
+
+type MobileSortProps<Row extends RowData> = {
+  columns: DataTableColumn<Row>[];
+  sort: SortState | null;
+  onSortChange: (sort: SortState | null) => void;
+};
+
+function MobileSort<Row extends RowData>({ columns, sort, onSortChange }: MobileSortProps<Row>) {
+  const items = [
+    { value: "", label: "Default order" },
+    ...columns
+      .filter((column) => column.sortable)
+      .flatMap((column) => [
+        { value: column.id, label: `${column.header}, ascending` },
+        { value: `-${column.id}`, label: `${column.header}, descending` },
+      ]),
+  ];
+  const current = sort ? (sort.desc ? `-${sort.id}` : sort.id) : "";
+  return (
+    <Select
+      items={items}
+      value={current}
+      onValueChange={(value) => {
+        const next = String(value ?? "");
+        if (!next) return onSortChange(null);
+        const desc = next.startsWith("-");
+        onSortChange({ id: desc ? next.slice(1) : next, desc });
+      }}
+    >
+      <SelectTrigger aria-label="Sort by" className="w-full">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {items.map((item) => (
+          <SelectItem key={item.value} value={item.value}>
+            {item.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
 

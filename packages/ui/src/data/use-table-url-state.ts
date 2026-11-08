@@ -1,10 +1,12 @@
 "use client";
 
-import { createParser, parseAsString, useQueryStates, type Parser } from "nuqs";
+import { parseAsString, useQueryStates } from "nuqs";
 import * as React from "react";
 import {
   clampPage,
   defaultPageSize,
+  isValidPage,
+  isValidPageSize,
   nextSort,
   parsePage,
   parsePageSize,
@@ -14,21 +16,10 @@ import {
   type SortState,
 } from "./url-state";
 
-const pageParser = createParser({
-  parse: (value) => parsePage(value),
-  serialize: (value) => String(value),
-}).withDefault(1);
-
-const pageSizeParser = createParser({
-  parse: (value) => parsePageSize(value),
-  serialize: (value) => String(value),
-}).withDefault(defaultPageSize);
-
-type FilterParsers = Record<string, Parser<string>>;
-
 type UseTableUrlStateOptions = {
   sortable: readonly string[];
-  filters?: string[];
+  filters?: readonly string[];
+  filterOptions?: Record<string, readonly string[]>;
 };
 
 type TableUrlState = {
@@ -39,6 +30,7 @@ type TableUrlState = {
   filters: Record<string, string>;
   setPage: (page: number) => void;
   setPageSize: (pageSize: PageSize) => void;
+  setSort: (sort: SortState | null) => void;
   toggleSort: (id: string) => void;
   setQuery: (query: string) => void;
   setFilter: (key: string, value: string | null) => void;
@@ -46,46 +38,82 @@ type TableUrlState = {
   activeFilterCount: number;
 };
 
-function useTableUrlState({ sortable, filters = [] }: UseTableUrlStateOptions): TableUrlState {
-  const parsers = React.useMemo(() => {
-    const filterParsers: FilterParsers = Object.fromEntries(
-      filters.map((key) => [key, parseAsString.withDefault("")]),
-    );
-    return {
-      page: pageParser,
-      pageSize: pageSizeParser,
+function useTableUrlState({
+  sortable,
+  filters = [],
+  filterOptions = {},
+}: UseTableUrlStateOptions): TableUrlState {
+  const filterKey = filters.join(",");
+  const parsers = React.useMemo(
+    () => ({
+      page: parseAsString,
+      pageSize: parseAsString,
       sort: parseAsString,
-      q: parseAsString.withDefault(""),
-      ...filterParsers,
-    };
-  }, [filters]);
+      q: parseAsString,
+      ...Object.fromEntries(
+        filterKey
+          .split(",")
+          .filter(Boolean)
+          .map((key) => [key, parseAsString]),
+      ),
+    }),
+    [filterKey],
+  );
 
-  const [state, setState] = useQueryStates(parsers, { history: "push" });
+  const [state, setState] = useQueryStates(parsers);
+  const raw: Record<string, string | null | undefined> = state;
 
-  const pageSize = state.pageSize as PageSize;
-  const page = state.page as number;
-  const sort = parseSort(state.sort as string | null, sortable);
+  const sort = parseSort(raw.sort ?? null, sortable);
+  const filterValues = Object.fromEntries(
+    filters.map((key) => {
+      const value = raw[key] ?? "";
+      const allowed = filterOptions[key];
+      return [key, allowed && !allowed.includes(value) ? "" : value];
+    }),
+  );
 
-  const values: Record<string, unknown> = state;
-  const filterValues = Object.fromEntries(filters.map((key) => [key, String(values[key] ?? "")]));
-  const activeFilterCount = filters.filter((key) => filterValues[key]).length + (state.q ? 1 : 0);
+  const stale: string[] = [];
+  if (raw.page != null && !isValidPage(raw.page)) stale.push("page");
+  if (raw.pageSize != null && !isValidPageSize(raw.pageSize)) stale.push("pageSize");
+  if (raw.sort != null && !sort) stale.push("sort");
+  for (const key of filters) {
+    if ((raw[key] ?? "") !== filterValues[key]) stale.push(key);
+  }
+  const staleKeys = stale.join(",");
+
+  React.useEffect(() => {
+    if (!staleKeys) return;
+    void setState(Object.fromEntries(staleKeys.split(",").map((key) => [key, null])), {
+      history: "replace",
+    });
+  }, [staleKeys, setState]);
+
+  const resetPage = { page: null };
+  const push = { history: "push" } as const;
 
   return {
-    page,
-    pageSize,
+    page: parsePage(raw.page ?? null),
+    pageSize: parsePageSize(raw.pageSize ?? null),
     sort,
-    query: state.q as string,
+    query: raw.q ?? "",
     filters: filterValues,
-    setPage: (next) => void setState({ page: next }),
-    setPageSize: (next) => void setState({ pageSize: next, page: 1 }),
+    setPage: (next) => void setState({ page: next === 1 ? null : String(next) }, push),
+    setPageSize: (next) =>
+      void setState(
+        { pageSize: next === defaultPageSize ? null : String(next), ...resetPage },
+        push,
+      ),
+    setSort: (next) => void setState({ sort: serializeSort(next), ...resetPage }, push),
     toggleSort: (id) =>
-      void setState({ sort: serializeSort(nextSort(sort, id)), page: 1 }, { history: "replace" }),
-    setQuery: (next) => void setState({ q: next || null, page: 1 }, { history: "replace" }),
-    setFilter: (key, value) =>
-      void setState({ [key]: value || null, page: 1 }, { history: "replace" }),
+      void setState({ sort: serializeSort(nextSort(sort, id)), ...resetPage }, push),
+    setQuery: (next) => void setState({ q: next || null, ...resetPage }, { history: "replace" }),
+    setFilter: (key, value) => void setState({ [key]: value || null, ...resetPage }, push),
     clearFilters: () =>
-      void setState({ q: null, page: 1, ...Object.fromEntries(filters.map((key) => [key, null])) }),
-    activeFilterCount,
+      void setState(
+        { q: null, ...resetPage, ...Object.fromEntries(filters.map((key) => [key, null])) },
+        push,
+      ),
+    activeFilterCount: filters.filter((key) => filterValues[key]).length + (raw.q ? 1 : 0),
   };
 }
 

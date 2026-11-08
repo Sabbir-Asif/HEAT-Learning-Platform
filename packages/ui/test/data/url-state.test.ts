@@ -2,6 +2,8 @@ import { describe, expect, test } from "vitest";
 import {
   clampPage,
   defaultPageSize,
+  isValidPage,
+  isValidPageSize,
   nextSort,
   pageCount,
   pageSizes,
@@ -115,5 +117,16 @@ describe("go to page input", () => {
     const result = validatePageInput(raw, 6);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.message).toContain("6");
+  });
+});
+
+describe("raw value validators", () => {
+  test("flag only values that would be replaced by a default", () => {
+    expect(isValidPage("2")).toBe(true);
+    expect(isValidPage("0")).toBe(false);
+    expect(isValidPage("x")).toBe(false);
+    expect(isValidPageSize("50")).toBe(true);
+    expect(isValidPageSize("7")).toBe(false);
+    expect(isValidPageSize(null)).toBe(false);
   });
 });

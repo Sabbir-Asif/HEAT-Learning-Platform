@@ -68,9 +68,7 @@ function Pagination({
       )}
       {...props}
     >
-      <p className="text-muted-foreground text-sm" aria-live="polite">
-        {rangeText(page, pageSize, total)}
-      </p>
+      <p className="text-muted-foreground text-sm">{rangeText(page, pageSize, total)}</p>
       <div className="flex flex-wrap items-center gap-3">
         <Select
           items={sizeItems}

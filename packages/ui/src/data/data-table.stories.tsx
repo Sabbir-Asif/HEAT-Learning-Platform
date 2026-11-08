@@ -35,10 +35,12 @@ const columns: DataTableColumn<Student>[] = [
 const sortable = ["name", "joined"];
 const filterKeys = ["status"];
 
-type DemoProps = { scenario?: DataTableStatus | "empty" };
+type DemoProps = { scenario?: DataTableStatus | "empty"; fetching?: boolean; noActions?: boolean };
 
-function Demo({ scenario = "ready" }: DemoProps) {
-  const url = useTableUrlState({ sortable, filters: filterKeys });
+const filterOptions = { status: statuses };
+
+function Demo({ scenario = "ready", fetching = false, noActions = false }: DemoProps) {
+  const url = useTableUrlState({ sortable, filters: filterKeys, filterOptions });
   const matching = students.filter(
     (student) =>
       (!url.query || student.name.toLowerCase().includes(url.query.toLowerCase())) &&
@@ -97,6 +99,8 @@ function Demo({ scenario = "ready" }: DemoProps) {
         pageSize={url.pageSize}
         sort={url.sort}
         onToggleSort={url.toggleSort}
+        onSortChange={url.setSort}
+        fetching={fetching}
         onPageChange={url.setPage}
         onPageSizeChange={url.setPageSize}
         status={scenario === "loading" ? "loading" : scenario === "error" ? "error" : "ready"}
@@ -104,11 +108,15 @@ function Demo({ scenario = "ready" }: DemoProps) {
         filtersActive={url.activeFilterCount > 0}
         onClearFilters={url.clearFilters}
         emptyTitle="No students yet"
-        actions={(row) => (
-          <Button variant="ghost" size="icon" aria-label={`Edit ${row.name}`}>
-            <PencilIcon />
-          </Button>
-        )}
+        actions={
+          noActions
+            ? undefined
+            : (row) => (
+                <Button variant="ghost" size="icon" aria-label={`Edit ${row.name}`}>
+                  <PencilIcon />
+                </Button>
+              )
+        }
       />
     </div>
   );
@@ -118,6 +126,7 @@ const onRetry = fn();
 const onUrlUpdate = fn();
 
 function withUrl(searchParams = "") {
+  onUrlUpdate.mockClear();
   const Adapter = withNuqsTestingAdapter({ searchParams, hasMemory: true, onUrlUpdate });
   function UrlDecorator(Story: () => React.ReactElement) {
     return (
@@ -229,11 +238,12 @@ export const RestoredFromUrl: Story = {
 };
 
 export const InvalidUrlValues: Story = {
-  decorators: [withUrl("?page=-3&pageSize=7&sort=email")],
+  decorators: [withUrl("?page=-3&pageSize=7&sort=email&status=bogus")],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await waitFor(() => expect(canvas.getByText("1 to 25 of 134")).toBeInTheDocument());
     await expect(canvas.getByRole("table", { name: "Students" })).toBeInTheDocument();
+    await waitFor(() => expect(lastQuery()).toBe(""));
   },
 };
 
@@ -242,6 +252,7 @@ export const PageBeyondTheEnd: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await waitFor(() => expect(canvas.getByText("126 to 134 of 134")).toBeInTheDocument());
+    await waitFor(() => expect(lastQuery()).toContain("page=6"));
   },
 };
 
@@ -307,4 +318,68 @@ export const PhoneFilterDrawer: Story = {
     await waitFor(() => expect(lastQuery()).toContain("status=pending"));
     await waitFor(() => expect(trigger).toHaveFocus());
   },
+};
+
+export const SortByKeyboard: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const header = await canvas.findByRole("columnheader", { name: /Name/ });
+    const button = within(header).getByRole("button");
+    button.focus();
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(header).toHaveAttribute("aria-sort", "ascending"));
+    await userEvent.keyboard(" ");
+    await waitFor(() => expect(header).toHaveAttribute("aria-sort", "descending"));
+    await expect(button).toHaveFocus();
+  },
+};
+
+export const InlineFilters: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(await canvas.findByLabelText("Search students")).toBeVisible();
+    await expect(canvas.getByRole("combobox", { name: "Status" })).toBeVisible();
+    await expect(canvas.queryByRole("button", { name: /^Filters/ })).toBeNull();
+  },
+};
+
+export const BusyRefetch: Story = {
+  args: { fetching: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(await canvas.findByText("Student 001")).toBeInTheDocument();
+    await expect(canvasElement.querySelector('[data-slot="data-table"]')).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+    await expect(canvas.queryByText("No students yet")).toBeNull();
+  },
+};
+
+export const WithoutActions: Story = {
+  args: { noActions: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await canvas.findByText("Student 001");
+    await expect(canvas.getAllByRole("columnheader")).toHaveLength(3);
+    await expect(canvas.queryByRole("button", { name: /^Edit/ })).toBeNull();
+  },
+};
+
+export const PhoneSort: Story = {
+  globals: { viewport: { value: "mobile1", isRotated: false } },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(await canvas.findByRole("combobox", { name: "Sort by" }));
+    await userEvent.click(await screen.findByRole("option", { name: "Name, descending" }));
+    await waitFor(() => expect(lastQuery()).toContain("sort=-name"));
+    await waitFor(() => expect(canvas.getByText("Student 134")).toBeInTheDocument());
+  },
+};
+
+export const PhoneDark: Story = { ...Phone, globals: { ...Phone.globals, theme: "dark" } };
+
+export const PhoneFilterDrawerDark: Story = {
+  ...PhoneFilterDrawer,
+  globals: { ...PhoneFilterDrawer.globals, theme: "dark" },
 };

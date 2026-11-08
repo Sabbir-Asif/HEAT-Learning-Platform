@@ -11,6 +11,16 @@ function readInteger(raw: string | null): number | null {
   return Number(raw.trim());
 }
 
+export function isValidPage(raw: string | null): boolean {
+  const value = readInteger(raw);
+  return value !== null && value >= 1;
+}
+
+export function isValidPageSize(raw: string | null): boolean {
+  const value = readInteger(raw);
+  return pageSizes.some((size) => size === value);
+}
+
 export function parsePageSize(raw: string | null): PageSize {
   const value = readInteger(raw);
   return pageSizes.find((size) => size === value) ?? defaultPageSize;

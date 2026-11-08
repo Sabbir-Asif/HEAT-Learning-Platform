@@ -66,7 +66,9 @@ function FilterBar({
         <SheetContent side="bottom">
           <SheetHeader>
             <SheetTitle>Filters</SheetTitle>
-            <SheetDescription>Narrow the list. Changes apply as you make them.</SheetDescription>
+            <SheetDescription>
+              Narrow the list. Each change applies at once, and Apply closes this panel.
+            </SheetDescription>
           </SheetHeader>
           <div className="flex flex-col gap-4 px-4">{children}</div>
           <SheetFooter>
