@@ -42,21 +42,22 @@ Three frames set the refined direction and are the ones to copy: `student-landin
 
 ### Images and logos needed
 
-| Frame layer      | Where                    | Image needed                                                                                          | Size (px)   |
-| ---------------- | ------------------------ | ----------------------------------------------------------------------------------------------------- | ----------- |
-| `img-hero`       | Landing hero             | Candid photo of three University of Dhaka students of different genders talking on a campus lawn      | 1400 x 1040 |
-| `img-module-1`   | Landing, module 1 cover  | Illustration: two students at a table with a gender symbol collage                                    | 874 x 440   |
-| `img-module-2`   | Landing, module 2 cover  | Illustration: scales of justice beside a university building                                          | 874 x 440   |
-| `img-module-3`   | Landing, module 3 cover  | Illustration: a student speaking up while a friend listens                                            | 874 x 440   |
-| `img-module-4`   | Landing, module 4 cover  | Illustration: a lit, welcoming campus path in the evening                                             | 874 x 440   |
-| `img-module-5`   | Landing, module 5 cover  | Illustration: a counsellor and a student in a calm office                                             | 874 x 440   |
-| `img-module-6`   | Landing, module 6 cover  | Illustration: a group of students joining hands                                                       | 874 x 440   |
-| `img-about`      | Landing, about the project | Wide photo of Curzon Hall, University of Dhaka, at golden hour with students walking                | 1280 x 840  |
-| `img-signup`     | Create account, left panel | Student walking into a University of Dhaka building with a notebook, morning light, portrait       | 1248 x 1736 |
-| `img-lesson-video` | Lesson player          | Poster still of the lesson video, 16:9, one per lesson                                                | 1920 x 1080 |
-| `logo-du-placeholder` | Landing footer      | University of Dhaka crest, official file (replaces the placeholder)                                   | 256 x 256, transparent PNG or SVG |
+The public site uses few images on purpose: one hero photo, and module cards that use a coloured icon tile. Module cover images are optional and only used where the owner uploads one in the module editor.
 
-The module cover images are reused on the dashboard, the course page and the player outline. The same list applies to every screen that shows a module; the file names are decided in #35.
+| Frame layer             | Where                        | Image needed                                                                                    | Size (px)                         |
+| ----------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------- |
+| `img-hero`              | Landing hero                 | Candid photo of three University of Dhaka students of different genders talking on a campus lawn | 1400 x 1040                       |
+| `img-signup`            | Create account, left panel   | Student walking into a University of Dhaka building with a notebook, morning light, portrait     | 1248 x 1736                       |
+| `img-lesson-video`      | Lesson player                | Poster still of the lesson video, 16:9, one per lesson                                           | 1920 x 1080                       |
+| `img-module-cover-upload` | Module editor              | Optional module cover, uploaded by the admin                                                     | 874 x 440                         |
+| University of Dhaka crest | Header and footer          | Official crest file. The frames use a low-resolution crop from the demo mock                     | 256 x 256, transparent PNG or SVG |
+| HEAT, Government of Bangladesh, UGC, World Bank | Header, footer, admin sidebar | Logo files taken from <https://heat.ugc.gov.bd/>, saved in `assets/logos/`   | as supplied                       |
+
+### Buttons, rich text and footer
+
+- Every button has an icon. Below the tablet width the label hides and only the icon stays, with an accessible name and a tooltip. Row actions in tables are icon-only at every width.
+- Text areas that hold formatted content, such as the module description, use a rich text editor with this toolbar: undo, redo, heading, bold, italic, underline, bullet list, numbered list, quote, link, unlink and clear formatting. It shows a saved state and a character count. Stored output is sanitised HTML limited to those elements. The editor frame is `admin-module-editor-unlocked-laptop-light-en`.
+- The public footer has a call to action band, brand with the HEAT and University of Dhaka logos, link columns, contact, partner logos with their names and legal links. It appears on every public page; the landing frame is the reference.
 
 ## Files
 
