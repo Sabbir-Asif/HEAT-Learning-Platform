@@ -14,7 +14,6 @@ Learning platform for the HEAT gender-safety training at the University of Dhaka
 | Database             | `packages/db` (`@heat/db`)                 | [CLAUDE.md](packages/db/CLAUDE.md)            |
 | Contracts            | `packages/contracts` (`@heat/contracts`)   | [CLAUDE.md](packages/contracts/CLAUDE.md)     |
 | API client           | `packages/api-client` (`@heat/api-client`) | [CLAUDE.md](packages/api-client/CLAUDE.md)    |
-| Message catalogs     | `packages/i18n` (`@heat/i18n`)             | [README.md](README.md#development)            |
 | Tooling, workflow    | `packages/config` (`@heat/config`)         | [README.md](README.md#development)            |
 
 - Decisions: [docs/adr/](docs/adr/), one record per decision. ADR changes always go through the owner.
@@ -82,7 +81,7 @@ Every ticket is reviewed against these rules. Implementer and reviewers read the
 ### User experience
 
 - WCAG 2.2 AA: keyboard flows, focus states, contrast, captions support in the player
-- Bangla and English for every UI string
+- The interface is in English only
 - Performance budget on a mid-range Android over 4G: LCP under 2.5 s on public pages
 - Loading, empty and error states designed for every screen
 - Every screen built from `@heat/ui` components; no app-level CSS files and no values outside the tokens
@@ -111,7 +110,7 @@ For any change to a screen, in either frontend or in `@heat/ui`. A failed item b
 - [ ] Tailwind in apps only for layout: grid, flex, gap and spacing tokens
 - [ ] Colour, type, radius and spacing come from the tokens
 - [ ] No-filler rule: every element serves the screen's task; no decorative cards, banners or stat tiles unless the numbers are the point of the page
-- [ ] Loading, empty and error states present; works at phone and laptop width, light and dark, Bangla and English where the app is bilingual
+- [ ] Loading, empty and error states present; works at phone and laptop width, light and dark
 - [ ] Same table, form, dialog and feedback pattern as the rest of both apps
 
 ## Reference implementations

@@ -5,27 +5,23 @@
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",
-    "start": "node scripts/start.mjs",
+    "start": "node .next/standalone/apps/frontend-public/server.js",
     "lint": "eslint .",
     "format:check": "prettier --check . --ignore-path ../../.gitignore",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test"
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@heat/api-client": "workspace:*",
     "@heat/contracts": "workspace:*",
-    "@heat/i18n": "workspace:*",
     "@heat/ui": "workspace:*",
     "next": "catalog:",
-    "next-intl": "4.14.9",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
   "devDependencies": {
     "@heat/config": "workspace:*",
-    "@playwright/test": "1.65.0",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

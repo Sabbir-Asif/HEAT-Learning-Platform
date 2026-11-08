@@ -4,7 +4,6 @@ Next.js admin console on `admin.<domain>` (port 3001). Shared rules: [root CLAUD
 
 ## Rules
 
-- English only, no locale segment.
 - Send `X-Robots-Tag: noindex`. Never link to this app from the public site.
 - Hide role-restricted pages in the navigation, and rely on the API to enforce them. Admin sessions expire after 30 minutes idle.
 - Every list uses the shared `DataTable` with server-side pagination, sorting and filters. Keep that state in the URL with nuqs, using the parsers shared through `@heat/contracts`. Under `md` the table becomes a card list.

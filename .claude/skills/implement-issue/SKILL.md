@@ -136,7 +136,7 @@ pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:coverage && pnpm b
 
 Commit everything, then finish with `pnpm verify`. It runs the same five checks (Turbo caches the repeats) and, only when all pass on a clean tree, writes the verification marker that the pull request hook looks for. A later commit invalidates the marker, so run it again after any fix.
 
-Also run `test:integration` in each affected package that defines it, the Playwright journeys the change touches, and each acceptance criterion and test-plan item for real (a command, a request, a browser check). For a UI change, open the screen in a real browser through Chrome DevTools at phone and laptop width, light and dark, Bangla and English, go through the UI review checklist in the root CLAUDE.md, and save screenshots for the pull request in `$SCRATCH`, outside the repository, because a file in the tree invalidates the verification marker.
+Also run `test:integration` in each affected package that defines it, the Playwright journeys the change touches, and each acceptance criterion and test-plan item for real (a command, a request, a browser check). For a UI change, open the screen in a real browser through Chrome DevTools at phone and laptop width, light and dark, go through the UI review checklist in the root CLAUDE.md, and save screenshots for the pull request in `$SCRATCH`, outside the repository, because a file in the tree invalidates the verification marker.
 
 Write the commands and their result lines to `$SCRATCH/verify-$N.md`. A failure is fixed and then everything is run again. Only a green run you have just watched counts as green.
 
