@@ -40,7 +40,7 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 - [x] **Task 3: `pnpm brand` and parity.** Tests: building into temp app directories writes identical bytes to both; a stray, missing or hand-edited file fails and names it; a second run changes nothing. Then `bin/brand.mjs`, the root script and a `build` function.
 - [x] **Task 4: legibility check.** Tests: dark-on-dark fixture fails, the same with a light fill passes, an empty file fails, the theme backgrounds come from `styles.css`. Then `legible`.
 - [x] **Task 5: the assets.** Tests over the real tree: every source passes the sanitiser, is under the cap, optimises smaller, is legible in light and dark with the `-dark` file where required, and both app directories equal `optimise(source)`. Then trace, write sources, add dark variants only where the check needs them, run `pnpm brand`.
-- [ ] **Task 6: alt text.** Test in `@heat/i18n`: `en` and `bn` define the same five keys, non-empty, missing key named. Then `messages/{en,bn}/brand.ts` and the export.
+- [x] **Task 6: alt text.** Test in `@heat/i18n`: `en` and `bn` define the same five keys, non-empty, missing key named. Then `messages/{en,bn}/brand.ts` and the export.
 - [ ] **Task 7: README and Turborepo inputs.** Test: every file in `source/` has a row in the `### Brand assets` table with source, status and date, and the section says the owner's vectors replace the files before launch. Then the README section and `turbo.json` inputs.
 
 ## Acceptance criteria mapped to checks
