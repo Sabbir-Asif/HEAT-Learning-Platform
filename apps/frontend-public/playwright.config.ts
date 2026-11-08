@@ -19,7 +19,7 @@ export default defineConfig({
     command: "pnpm build && pnpm start",
     url: `http://127.0.0.1:${port}/bn`,
     env: { PORT: String(port), HOSTNAME: "127.0.0.1" },
-    reuseExistingServer: !ci,
+    reuseExistingServer: false,
     timeout: 300_000,
   },
 });

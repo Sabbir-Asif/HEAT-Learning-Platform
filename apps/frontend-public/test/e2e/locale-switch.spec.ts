@@ -7,7 +7,7 @@ test.describe("language switch", () => {
     page,
     context,
   }) => {
-    await page.goto("/en/courses/x?tab=2#notes");
+    await page.goto("/en?tab=2#notes");
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     const switcher = nav(page, "Language");
     await expect(switcher.getByRole("link", { name: "English" })).toHaveAttribute(
@@ -17,7 +17,7 @@ test.describe("language switch", () => {
 
     await switcher.getByRole("link", { name: "বাংলা" }).click();
 
-    await expect(page).toHaveURL(/\/bn\/courses\/x\?tab=2#notes$/);
+    await expect(page).toHaveURL(/\/bn\?tab=2#notes$/);
     await expect(page.locator("html")).toHaveAttribute("lang", "bn");
     await expect(nav(page, "ভাষা").getByRole("link", { name: "বাংলা" })).toHaveAttribute(
       "aria-current",
@@ -44,9 +44,9 @@ test.describe("language switch", () => {
   });
 
   test("switches back to English the same way", async ({ page }) => {
-    await page.goto("/bn/courses/x?tab=2#notes");
+    await page.goto("/bn?tab=2#notes");
     await nav(page, "ভাষা").getByRole("link", { name: "English" }).click();
-    await expect(page).toHaveURL(/\/en\/courses\/x\?tab=2#notes$/);
+    await expect(page).toHaveURL(/\/en\?tab=2#notes$/);
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
   });
 
@@ -62,7 +62,7 @@ test.describe("language switch", () => {
     await page.goto("/en");
     await nav(page, "Language").getByRole("link", { name: "বাংলা" }).click();
     await expect(page).toHaveURL(/\/bn$/);
-    await page.goto("/en/courses/x");
+    await page.goto("/en?shared=1");
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     expect((await context.cookies()).find((cookie) => cookie.name === "__Host-locale")?.value).toBe(
       "bn",

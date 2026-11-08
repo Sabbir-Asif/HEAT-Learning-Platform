@@ -1,13 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-const caseInsensitiveFileSystem = process.platform === "darwin" || process.platform === "win32";
-
 for (const [locale, heading] of [
   ["bn", "HEAT জেন্ডার নিরাপত্তা প্রশিক্ষণ"],
   ["en", "HEAT Gender Safety Training"],
 ] as const) {
   test.describe(`/${locale}`, () => {
-    for (const path of [`/${locale}`, `/${locale}/anything`, `/${locale}/courses/x?tab=2`]) {
+    for (const path of [`/${locale}`, `/${locale}?tab=2`]) {
       test(`${path} sets lang and dir and takes the text from the catalog`, async ({ page }) => {
         const response = await page.goto(path);
         expect(response?.status()).toBe(200);
@@ -20,22 +18,24 @@ for (const [locale, heading] of [
   });
 }
 
-test.describe("paths whose first segment is not a locale", () => {
-  for (const path of ["/fr", "/fr/x", "/sign-in", "/BN/x", "/EN/x", "/en-US", "/xx"]) {
+test.describe("paths with no page", () => {
+  for (const path of [
+    "/fr",
+    "/fr/x",
+    "/sign-in",
+    "/BN",
+    "/BN/x",
+    "/EN/x",
+    "/en-US",
+    "/xx",
+    "/bn/anything",
+    "/en/courses/x",
+  ]) {
     test(`${path} is a 404`, async ({ request }) => {
       const response = await request.get(path, { maxRedirects: 0 });
       expect(response.status()).toBe(404);
     });
   }
-
-  test("/BN is a 404", async ({ request }) => {
-    test.skip(
-      caseInsensitiveFileSystem,
-      "a case-insensitive file system serves the prerendered /bn",
-    );
-    const response = await request.get("/BN", { maxRedirects: 0 });
-    expect(response.status()).toBe(404);
-  });
 });
 
 test.describe("static files", () => {

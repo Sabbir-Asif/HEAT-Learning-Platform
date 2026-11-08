@@ -4,6 +4,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 import { LocaleSwitchControl } from "../../components/locale-switch-control";
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
 }
