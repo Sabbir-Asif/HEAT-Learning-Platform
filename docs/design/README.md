@@ -34,7 +34,7 @@ Three frames set the refined direction and are the ones to copy: `student-landin
 ### Owner additions of 2026-11-08 (afternoon)
 
 - Real logos from <https://heat.ugc.gov.bd/>: the HEAT logo, the Government of Bangladesh seal, the UGC logo and the World Bank logo are in `assets/logos/` and placed in the landing frame header and footer. The University of Dhaka crest is the official file supplied by the owner (`assets/logos/du.png`).
-- The look follows the macOS design language: frosted, translucent bars (white at about 78 percent with a soft white edge), layered soft shadows, rounded 20 to 32 px surfaces, vibrant Lucide icons and a window chrome (traffic-light dots) around product previews. Implementation uses `backdrop-blur` on the header and sidebar, never on content.
+- The look follows the macOS design language: frosted, translucent bars (white at about 78 percent with a soft white edge), layered soft shadows, rounded 20 to 32 px surfaces, vibrant Lucide icons and a title bar around the video player. The player has no close, minimise or full-screen controls. Implementation uses `backdrop-blur` on the header and sidebar, never on content.
 - Buttons carry an icon and a label. Below the tablet width the label hides and only the icon stays, with an accessible name and a tooltip. Row actions in tables are icon-only at every width.
 - The player, the student screens and the insights page get the most design effort. The insights page must be informative: totals, trends, per-module completion and the people who need follow-up, not a single chart.
 - The footer is a full footer with brand, link columns, contact, partner logos and legal links, on every public page.
