@@ -14,7 +14,7 @@ packages/
   contracts/  Zod schemas and shared types        db/       Prisma (added later)
   api-client/ Generated API client and fetchers   ui/       Shared components and tokens
   i18n/       Message catalogs
-  config/     tsconfig, ESLint, Prettier and Vitest presets; repository scripts (audit:deps, github:setup, ticket)
+  config/     tsconfig, ESLint, Prettier and Vitest presets; repository scripts (audit:deps, brand, github:setup, ticket)
 ```
 
 ### Install and build
@@ -120,6 +120,38 @@ Errors have one shape: `{ "error": { "code", "message", "requestId", "fields": [
 The server fetcher reads `API_INTERNAL_URL`, the API's address on the internal network (`http://api:4000` in Docker, `http://localhost:4000` locally; the API listens on 4000, not the 3000 written in the first design text). It throws a configuration error when the variable is missing and has no fallback. It forwards only the incoming `Cookie` header, does not follow redirects and does not cache unless asked. Pass `forwardCookies: false` inside `'use cache'` functions.
 
 The CSRF header and the 401 refresh are not part of this package yet. They register through `registerRequestInterceptor` and `setUnauthorizedHandler` when their tickets land.
+
+### Brand assets
+
+The logos are static SVG files served at `/brand/<name>.svg` by both frontends. One source of truth feeds both apps: `packages/config/brand/source/*.svg` is run through SVGO (`packages/config/svgo.config.mjs`) and written byte for byte into `apps/frontend-public/public/brand/` and `apps/frontend-internal/public/brand/`. Both copies are committed, so `public/` stays static.
+
+```sh
+pnpm brand            # sanitise, optimise and write both copies; a second run changes nothing
+pnpm brand --check    # exit 1 and name any missing, stray or hand-edited file
+```
+
+To replace a mark, drop the new vector into `packages/config/brand/source/` under the same name, run `pnpm brand` and commit the source and both copies. Do not edit the copies by hand. `<name>-dark.svg` is used on the dark theme and exists only where the plain file fails the legibility check. Choosing the file by theme belongs to the shells.
+
+`packages/config/test/brand.test.mjs` and `brand-assets.test.mjs` enforce the rules:
+
+- Sanitiser: strict XML parse plus an allow-list (`svg g path rect circle ellipse line polyline polygon defs linearGradient radialGradient stop clipPath mask use`, presentation and geometry attributes, `href` only as `#fragment`). A `<script>`, `<foreignObject>`, `<style>`, `<image>`, `<text>`, `on*` or `style` attribute, `data:`, `http:`, `https:` or `//` value, `url()` that is not `url(#id)`, `<!DOCTYPE`, `<!ENTITY` or processing instruction fails and the message names it. A `viewBox` is required. Text and `<style>` classes must be converted to outlines and presentation attributes. Sources may be up to 128 KB; shipped files are capped at 20 KB.
+- Optimisation: each shipped file is strictly smaller than its source, differs from it in at most 0.2% of pixels (channel difference over 8, both rendered at 512 px with `@resvg/resvg-js`) and is unchanged by a second run.
+- Legibility: each file is rendered 40 px high at 1x and 2x over the `--background` of its theme, read from `packages/ui/src/styles.css`. Pixels with at least half opacity count as painted; on the light theme pixels under 1.5:1 against the background count as blank paper. At least 1% of the canvas must be painted and at most 10% of the painted pixels may have contrast under 2:1. The first thresholds were 3:1; the brand blue of the HEAT bars on the dark theme is 2.7:1, so the check uses 2:1 and keeps the brand colours. If `--background` moves out of hex (#31), update `readThemeBackgrounds` with it.
+
+| File                  | Organisation                                           | Source                                                                  | Status      | Date       |
+| --------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------- | ----------- | ---------- |
+| `heat.svg`            | HEAT, Higher Education Acceleration and Transformation | `logo.svg` on heat.ugc.gov.bd, a 1000 px PNG traced to vectors          | traced      | 2026-11-08 |
+| `heat-dark.svg`       | HEAT                                                   | `heat.svg` with near-black and navy fills recoloured to `#e5e7eb`       | traced      | 2026-11-08 |
+| `gob.svg`             | Government of the People's Republic of Bangladesh      | `right-logo1.svg` on heat.ugc.gov.bd, a 1000 px PNG traced to vectors   | traced      | 2026-11-08 |
+| `ugc.svg`             | University Grants Commission                           | `right-logo2.svg` on heat.ugc.gov.bd, a 1000 px PNG traced to vectors   | traced      | 2026-11-08 |
+| `ugc-dark.svg`        | University Grants Commission                           | `ugc.svg` with near-black and navy fills recoloured to `#e5e7eb`        | traced      | 2026-11-08 |
+| `world-bank.svg`      | The World Bank                                         | `right-logo3.svg` on heat.ugc.gov.bd, a 500 px PNG traced to vectors    | traced      | 2026-11-08 |
+| `world-bank-dark.svg` | The World Bank                                         | `world-bank.svg` with near-black and navy fills recoloured to `#e5e7eb` | traced      | 2026-11-08 |
+| `du-crest.svg`        | University of Dhaka                                    | Generic shield, shapes only; no usable source for the crest exists yet  | placeholder | 2026-11-08 |
+
+The files on heat.ugc.gov.bd are SVG in name only: each wraps one embedded PNG in an `<image>` with a `data:` URI, which the sanitiser rejects. The PNGs were decoded and traced once, outside the repository, with `vtracer` 0.6.15 (Python binding, Pillow 13.0.0 for preparation); the tool is not a dependency. Preparation: alpha cut at 128, cropped to the painted area, colours reduced with Pillow's median cut and no dithering (`heat` 6 colours, `gob` 8, `ugc` 6, `world-bank` 8). Tracing: colour mode, `hierarchical="stacked"`, `mode="spline"`, `color_precision=8`, `layer_difference=24`, `path_precision=0`, `corner_threshold=60`, `length_threshold=8`, `splice_threshold=60`, `filter_speckle=10` (20 for `ugc`). The `-dark` files change only fill colours, by script. No mark was redrawn by hand. The HEAT mark and the Bangla text in the seal and the UGC mark are image art, so their names live in the alt texts in `@heat/i18n` (`brand.logo.*`).
+
+The GoB seal, the UGC mark and the World Bank mark are third-party marks. These traced files are interim: the owner's original vectors replace these files before launch, and the usage terms of each mark stay with its owner. `du-crest.svg` is a placeholder and not the University of Dhaka crest.
 
 ### Continuous integration
 

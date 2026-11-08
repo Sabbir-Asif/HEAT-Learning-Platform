@@ -20,6 +20,25 @@
     "test": {
       "dependsOn": ["^build"]
     },
+    "@heat/config#test": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/apps/*/public/brand/**",
+        "$TURBO_ROOT$/packages/ui/src/styles.css",
+        "$TURBO_ROOT$/README.md"
+      ]
+    },
+    "@heat/config#test:coverage": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/apps/*/public/brand/**",
+        "$TURBO_ROOT$/packages/ui/src/styles.css",
+        "$TURBO_ROOT$/README.md"
+      ]
+    },
     "format:check": {},
     "//#format:root": {},
     "test:coverage": {
