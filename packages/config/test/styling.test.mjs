@@ -269,3 +269,49 @@ describe("the Tailwind entry point", () => {
     });
   }
 });
+
+describe("class-like attributes and plain JavaScript sources", () => {
+  const sources = {
+    "a containerClassName attribute": 'export const a = <Card containerClassName="mt-[13px]" />;\n',
+    "a classNames object": 'export const a = <Card classNames={{ root: "mt-[13px]" }} />;\n',
+    "a wrapperClass attribute": 'export const a = <Card wrapperClass="mt-[13px]" />;\n',
+  };
+
+  for (const [name, source] of Object.entries(sources)) {
+    test(`app rejects ${name}`, async () => {
+      expect(restricted(await lint("app", source, appFile))).toHaveLength(1);
+    });
+
+    test(`ui accepts ${name}`, async () => {
+      expect(restricted(await lint("ui", source, uiFile))).toEqual([]);
+    });
+  }
+
+  test("app does not treat unrelated attributes as classes", async () => {
+    const source = 'export const a = <Card title="mt-[13px]" label="bg-red-500" />;\n';
+    expect(restricted(await lint("app", source, appFile))).toEqual([]);
+  });
+
+  test("conflicts in a class-like attribute are reported in both presets", async () => {
+    const source = 'export const a = <Card containerClassName="p-2 p-4" />;\n';
+    for (const [preset, file] of [
+      ["app", appFile],
+      ["ui", uiFile],
+    ]) {
+      const found = (await lint(preset, source, file)).map((message) => message.ruleId);
+      expect(found).toContain("better-tailwindcss/no-conflicting-classes");
+    }
+  });
+
+  test("the class and style rules also cover .js and .jsx under src", async () => {
+    for (const file of ["src/app/page.jsx", "src/lib/helpers.js"]) {
+      const source = 'export const a = <div style={{ color: "red" }} className="mt-[13px]" />;\n';
+      const messages = await lint("app", source, file);
+      expect(restricted(messages), file).toHaveLength(1);
+      expect(
+        messages.filter((message) => message.ruleId === "no-restricted-syntax"),
+        file,
+      ).toHaveLength(1);
+    }
+  });
+});

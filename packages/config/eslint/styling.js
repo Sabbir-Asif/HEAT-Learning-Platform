@@ -1,13 +1,23 @@
 import css from "@eslint/css";
 import { resolve } from "node:path";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
+import { getDefaultSelectors } from "eslint-plugin-better-tailwindcss/defaults";
+import { MatcherType, SelectorKind } from "eslint-plugin-better-tailwindcss/types";
 import { cssEntryOnly } from "./css-entry-rule.js";
 
-const sourceFiles = ["src/**/*.{ts,tsx}"];
+const sourceFiles = ["src/**/*.{js,jsx,ts,tsx}"];
 const plugins = { "better-tailwindcss": betterTailwindcss };
 const settings = {
   "better-tailwindcss": {
     entryPoint: resolve(import.meta.dirname, "tailwind-entry.css"),
+    selectors: [
+      ...getDefaultSelectors(),
+      {
+        kind: SelectorKind.Attribute,
+        name: "^(?:.+[cC]lass(?:Name)?s?|classNames)$",
+        match: [{ type: MatcherType.String }, { type: MatcherType.ObjectValue }],
+      },
+    ],
   },
 };
 
