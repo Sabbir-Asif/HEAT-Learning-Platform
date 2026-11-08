@@ -2,7 +2,7 @@
 
 Goal: a table with server-side paging, sorting and filters kept in the URL, cards under `md`, a bottom-drawer filter bar and a pagination bar, behind the `@heat/ui/data` subpath so a page that does not use them does not load TanStack Table or nuqs.
 
-Approach: the URL rules (allowed page sizes, parsing, clamping, sort cycle, range text) are pure functions in `src/data/url-state.ts`, unit tested. A `useTableUrlState` hook wraps them with nuqs. TanStack Table (manual sorting, no client row models) owns headers, rows and sort state. The table renders the rows it is given and reports changes, so the caller fetches. The nuqs provider belongs to the apps; stories use the nuqs testing adapter. Page size is in the URL (10, 25, 50, default 25).
+Approach: the URL rules (allowed page sizes, parsing, clamping, sort cycle, range text) are pure functions in `src/data/url-state.ts`, unit tested. A `useTableUrlState` hook wraps them with nuqs. TanStack Table (no client row models) owns header groups, rows and cell rendering; sort state comes from the URL through props, because a display column cannot report a sort in v9. The table renders the rows it is given and reports changes, so the caller fetches. The nuqs provider belongs to the apps; stories use the nuqs testing adapter. Page size is in the URL (10, 25, 50, default 25).
 
 ## Tasks
 
