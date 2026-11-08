@@ -72,6 +72,166 @@
       "theme": "dark",
       "lang": "en",
       "shows": "One StatusBadge per enrollment, video and course state, dark theme"
+    },
+    {
+      "id": "student-awaiting-approval-laptop-light-en",
+      "area": "student",
+      "screen": "awaiting-approval",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-awaiting-approval-phone-light-en",
+      "area": "student",
+      "screen": "awaiting-approval",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-awaiting-approval-rejected-laptop-light-en",
+      "area": "student",
+      "screen": "awaiting-approval-rejected",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-awaiting-approval-rejected-phone-light-en",
+      "area": "student",
+      "screen": "awaiting-approval-rejected",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-empty-laptop-light-en",
+      "area": "student",
+      "screen": "dashboard-empty",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-empty-phone-light-en",
+      "area": "student",
+      "screen": "dashboard-empty",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-error-laptop-light-en",
+      "area": "student",
+      "screen": "dashboard-error",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-error-phone-light-en",
+      "area": "student",
+      "screen": "dashboard-error",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-laptop-light-en",
+      "area": "student",
+      "screen": "dashboard",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-loading-laptop-light-en",
+      "area": "student",
+      "screen": "dashboard-loading",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-loading-phone-light-en",
+      "area": "student",
+      "screen": "dashboard-loading",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-phone-light-en",
+      "area": "student",
+      "screen": "dashboard",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-enroll-captcha-laptop-light-en",
+      "area": "student",
+      "screen": "enroll-captcha",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-enroll-captcha-phone-light-en",
+      "area": "student",
+      "screen": "enroll-captcha",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-enroll-details-laptop-light-en",
+      "area": "student",
+      "screen": "enroll-details",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-enroll-details-phone-light-en",
+      "area": "student",
+      "screen": "enroll-details",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-enroll-success-laptop-light-en",
+      "area": "student",
+      "screen": "enroll-success",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-enroll-success-phone-light-en",
+      "area": "student",
+      "screen": "enroll-success",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-landing-laptop-light-en",
+      "area": "student",
+      "screen": "landing",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-landing-phone-light-en",
+      "area": "student",
+      "screen": "landing",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
     }
   ]
 }

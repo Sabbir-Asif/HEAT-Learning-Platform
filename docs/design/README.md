@@ -170,3 +170,17 @@ Filled in by 30b (student screens) and 30c (admin screens). Each screen has a ro
 
 | Screen | Task | Element group | Part of the task it serves |
 | ------ | ---- | ------------- | -------------------------- |
+| Landing | Decide to enroll | Header with logos, nav, Sign in, Enroll | Reach enrolment or sign-in from anywhere on the page |
+| Landing | Decide to enroll | Headline, one paragraph, Enroll now | State what the course is and give the single action |
+| Landing | Decide to enroll | What you will learn (three items) | Show what the training covers before asking for an account |
+| Landing | Decide to enroll | How it works (three steps) | Set expectations for verification, approval and the certificate |
+| Landing | Decide to enroll | Footer with partners and policy links | Credibility and the privacy and accessibility links. The mock's speech bubble, four feature tiles and skyline are dropped |
+| Enroll details | Create an account | Name, email, role, department, password, consent | The data the training team needs to approve the enrolment |
+| Enroll details | Create an account | Breach note under the password | Explains why a password can be refused |
+| Enroll captcha | Prove you are a person | Captcha image, new image, input | Bot check; support email beside it is the accessible fallback (ADR 0017) |
+| Enroll success | Confirm the email | Status badge, instruction, what happens next, resend | Tells the student the one thing to do now and what follows |
+| Awaiting approval | Know where the enrolment stands | Status badge, explanation, submitted and email, check details, contact support | The state, the expected wait, and the two ways to act |
+| Awaiting approval (rejected) | Understand a refusal | Reason from the team, Enroll again, contact support | The reason and the next step |
+| Dashboard | Resume learning | Continue card with progress bar and Resume lesson | The main action and where the student is |
+| Dashboard | Resume learning | Module list with status badges | Overall position and what is locked. The mock's four stat tiles are dropped; the one progress figure sits in the continue card |
+| Dashboard loading, empty, error | Recover from a missing state | Skeletons, empty message with contact, error message with code, Try again | Each state says what happened and what to do next |
