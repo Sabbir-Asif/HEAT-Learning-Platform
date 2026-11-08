@@ -94,6 +94,15 @@ The toolbar has a theme control (light, dark: the `.dark` class on the story roo
 
 An axe violation fails the story test and the output names the rule, for example `button-name`. A story that must accept a known violation sets `parameters.a11y.test` to `"todo"` with a reason. Story tests are not part of `pnpm test` or the coverage gate; they run in `test:stories` and in the `storybook` CI job.
 
+### Design file and theme
+
+The Open Pencil designs, the theme and the screen inventory live in `docs/design/` (see its README). Two checks run over them, and `packages/config/test/design-files.test.mjs` runs both in `pnpm test`:
+
+```sh
+pnpm design:contrast   # every colour pair in light and dark with its WCAG 2 ratio; exits 1 on any failure
+pnpm design:check      # token structure, contrast, inventory against exports, drawer-only overlays
+```
+
 ### API client
 
 The API describes itself, and the browser and Server Components call it through code generated from that description (ADR 0015). Nothing is written by hand between the controllers and the hooks.
