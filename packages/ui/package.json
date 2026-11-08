@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css"
   },
   "scripts": {
     "lint": "eslint .",
@@ -23,6 +24,7 @@
     "@storybook/addon-a11y": "10.6.6",
     "@storybook/addon-vitest": "10.6.6",
     "@storybook/react-vite": "10.6.6",
+    "@tailwindcss/vite": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
@@ -37,5 +39,10 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
+  },
+  "dependencies": {
+    "@fontsource-variable/public-sans": "5.3.0",
+    "@fontsource-variable/source-serif-4": "5.3.1",
+    "next-themes": "0.4.6"
   }
 }

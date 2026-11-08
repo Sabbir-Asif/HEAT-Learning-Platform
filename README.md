@@ -102,6 +102,8 @@ pnpm design:contrast   # every colour pair in light and dark with its WCAG 2 rat
 pnpm design:check      # token structure, contrast, inventory against exports, drawer-only overlays
 ```
 
+`packages/ui/src/styles.css` is the Tailwind theme built from `docs/design/tokens.json`. Change both together: `packages/ui/test/tokens.test.ts` fails when a value drifts, and `contrast.test.ts` checks every contrast pair in both themes. Each app has one CSS entry, `src/app/globals.css`, that imports `@heat/ui/styles.css` and scans `packages/ui/src`. The theme follows the device setting through `ThemeProvider` (next-themes, `dark` class on `<html>`); a visible switch comes with the shells. The inline script next-themes adds, and the style element it injects on each theme change (`disableTransitionOnChange`), both need the CSP nonce once the CSP lands (#39), which means `ThemeProvider` gains a `nonce` prop then. Storybook shows every token in light and dark on Foundations, Tokens.
+
 ### API client
 
 The API describes itself, and the browser and Server Components call it through code generated from that description (ADR 0015). Nothing is written by hand between the controllers and the hooks.
