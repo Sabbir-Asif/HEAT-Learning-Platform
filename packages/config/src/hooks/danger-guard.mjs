@@ -4,7 +4,7 @@ import { envAccess, isEnvFile } from "./env-files.mjs";
 import { existsInBase } from "./git.mjs";
 import { resolveReal } from "./paths.mjs";
 import { gitInvocation } from "./invocation.mjs";
-import { parseShellDetailed } from "./shell.mjs";
+import { isStraightLine, parseShellDetailed } from "./shell.mjs";
 
 const fileTools = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
 
@@ -108,6 +108,8 @@ const reservedVariables = new Set([
 ]);
 const variableBuiltins = new Set([
   "read",
+  "readonly",
+  "set",
   "unset",
   "eval",
   "declare",
@@ -123,17 +125,10 @@ const unsafeValue = /[\s~*?[\]{}$`'"\\]/;
 const assignmentWord = /^([A-Za-z_]\w*)=([\s\S]*)$/;
 const compoundAssignment = /^([A-Za-z_]\w*)(?:\[[^\]]*\]\+?|\+)=/;
 
-function changesPositionals(args) {
-  return args.some(
-    (word, i) =>
-      word === "--" || (!/^[-+]/.test(word) && !["-o", "+o"].includes(args[i - 1] ?? "")),
-  );
-}
-
 function shellVariables(commands, text) {
   const known = new Map();
   const unknown = new Set();
-  let everything = /\(\(|\$\{[A-Za-z_]\w*:?=/.test(text);
+  let everything = !isStraightLine(commands, text) || /IFS|\(\(|\$\{[A-Za-z_]\w*:?=/.test(text);
   for (const match of text.matchAll(/([A-Za-z_]\w*)\+?=\(/g)) unknown.add(match[1]);
 
   const record = (name, values, at) => {
@@ -148,8 +143,7 @@ function shellVariables(commands, text) {
     const [program = "", ...args] = command.words;
     const name = basename(program);
     if (variableBuiltins.has(name)) everything = true;
-    if (name === "printf" && args.includes("-v")) everything = true;
-    if (name === "set" && changesPositionals(args)) everything = true;
+    if (name === "printf" && args.some((word) => /^-[A-Za-z]*v/.test(word))) everything = true;
     for (const word of command.words) {
       const compound = compoundAssignment.exec(word);
       if (compound) unknown.add(compound[1]);
@@ -323,7 +317,7 @@ function checkBash(input) {
   if (typeof command !== "string") throw new Error("Bash input has no command");
   const commands = parseShellDetailed(command, input.cwd || process.cwd());
   const variables = shellVariables(commands, command);
-  const envPath = envAccess(commands);
+  const envPath = envAccess(commands, command);
   if (envPath) return { deny: envDenial(envPath) };
   if (commands.some(isForcePush)) return { deny: forceDenial };
   if (commands.some(isConfigWrite)) return { deny: configDenial };

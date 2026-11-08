@@ -1,5 +1,5 @@
 import { homedir } from "node:os";
-import { basename, isAbsolute, join, resolve } from "node:path";
+import { basename, join, resolve } from "node:path";
 
 const assignment = /^[A-Za-z_][A-Za-z0-9_]*=/;
 const keywords = new Set([
@@ -58,16 +58,22 @@ function expandHome(path) {
 
 function stripWrappers(words) {
   let i = 0;
+  const skipped = [];
+  let wrapped = false;
   while (i < words.length) {
     const word = words[i];
-    if (assignment.test(word) || keywords.has(word)) i += 1;
-    else if (wrappers.has(word)) {
+    if (assignment.test(word)) i += 1;
+    else if (keywords.has(word)) {
+      skipped.push(word);
+      i += 1;
+    } else if (wrappers.has(word)) {
+      wrapped = true;
       i += 1;
       while (i < words.length && words[i].startsWith("-")) i += 1;
       if (["nice", "timeout"].includes(word) && numeric.test(words[i] ?? "")) i += 1;
     } else break;
   }
-  return words.slice(i);
+  return { words: words.slice(i), keywords: skipped, wrapped };
 }
 
 function leadingAssignments(words) {
@@ -79,25 +85,6 @@ function leadingAssignments(words) {
   return found;
 }
 
-const dynamicTarget = /[$`*?[{]/;
-
-function directoryChange(program, operands, state) {
-  if (program === "popd") return { ...state, known: false };
-  if (program !== "cd" && program !== "pushd") return state;
-  const target = operands.find((word) => !word.startsWith("-"));
-  const stack = /^[+-]\d+$/.test(target ?? "");
-  const unknown =
-    operands.includes("-") ||
-    stack ||
-    (program === "pushd" && target === undefined) ||
-    dynamicTarget.test(target ?? "") ||
-    (target?.startsWith("~") && target !== "~" && !target.startsWith("~/"));
-  if (unknown) return { ...state, known: false };
-  const cwd = resolve(state.cwd, expandHome(target ?? "~"));
-  const anchored = isAbsolute(expandHome(target ?? "~"));
-  return { cwd, known: anchored || state.known };
-}
-
 function embeddedScript(words) {
   if (words[0] === "eval") return words.slice(1).join(" ");
   if (!shells.has(basename(words[0] ?? ""))) return null;
@@ -107,9 +94,8 @@ function embeddedScript(words) {
   return null;
 }
 
-function scan(text, startCwd, out, startKnown = true) {
+function scan(text, startCwd, out) {
   let cwd = startCwd;
-  let known = startKnown;
   let words = [];
   let writes = [];
   let reads = [];
@@ -118,13 +104,25 @@ function scan(text, startCwd, out, startKnown = true) {
   const length = text.length;
 
   const finish = () => {
-    const normalized = stripWrappers(words);
+    const stripped = stripWrappers(words);
+    const normalized = stripped.words;
     const assignments = leadingAssignments(words);
     if (normalized.length || writes.length || reads.length || assignments.length) {
-      out.push({ words: normalized, cwd, cwdKnown: known, writes, reads, assignments });
+      out.push({
+        words: normalized,
+        cwd,
+        writes,
+        reads,
+        assignments,
+        keywords: stripped.keywords,
+        wrapped: stripped.wrapped,
+      });
       const script = embeddedScript(normalized);
-      if (script) scan(script, cwd, out, known);
-      ({ cwd, known } = directoryChange(normalized[0], normalized.slice(1), { cwd, known }));
+      if (script) scan(script, cwd, out);
+      if (["cd", "pushd"].includes(normalized[0])) {
+        const target = normalized.slice(1).find((word) => !word.startsWith("-"));
+        cwd = resolve(cwd, expandHome(target ?? "~"));
+      }
     }
     words = [];
     writes = [];
@@ -137,7 +135,7 @@ function scan(text, startCwd, out, startKnown = true) {
     return i;
   };
 
-  const nested = (inner) => scan(inner, cwd, out, known);
+  const nested = (inner) => scan(inner, cwd, out);
 
   const scanExpansions = (body) => {
     let i = 0;
@@ -296,8 +294,8 @@ function scan(text, startCwd, out, startKnown = true) {
       i = capture(i, writes);
     } else if (separators.has(ch)) {
       finish();
-      if (ch === "(") groups.push({ cwd, known });
-      else if (ch === ")") ({ cwd, known } = groups.pop() ?? { cwd, known });
+      if (ch === "(") groups.push(cwd);
+      else if (ch === ")") cwd = groups.pop() ?? cwd;
       i += 1;
     } else if (ch === ">" || ch === "<") i = redirect(i);
     else {
@@ -322,4 +320,35 @@ export function parseShell(text, cwd) {
   return parseShellDetailed(text, cwd).filter(
     (command) => command.words.length || command.writes.length || command.reads.length,
   );
+}
+
+const structuralPrograms = new Set([
+  "bash",
+  "sh",
+  "zsh",
+  "dash",
+  "ksh",
+  "eval",
+  "source",
+  ".",
+  "trap",
+  "case",
+  "esac",
+  "function",
+  "select",
+  "coproc",
+]);
+
+export function isStraightLine(commands, text) {
+  const scanned = text.replace(/\$\{[A-Za-z_]\w*\}/g, "").replace(/[0-9]*>&[0-9-]*|&>>?|>\|/g, "");
+  if (/[&|(){}`]/.test(scanned)) return false;
+  return commands.every((command) => {
+    const program = command.words[0] ?? "";
+    return (
+      !command.wrapped &&
+      command.keywords.every((keyword) => keyword === "do" || keyword === "done") &&
+      !structuralPrograms.has(basename(program)) &&
+      !/[$`]/.test(program)
+    );
+  });
 }

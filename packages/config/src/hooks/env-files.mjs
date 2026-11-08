@@ -1,6 +1,7 @@
-import { existsSync, readdirSync, realpathSync, statSync } from "node:fs";
+import { existsSync, lstatSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, join, resolve } from "node:path";
+import { isStraightLine } from "./shell.mjs";
 
 const plainName = /^[\w.*?[\]@+-]+$/;
 const safeCommands = new Set([
@@ -284,38 +285,73 @@ function isDirectory(path) {
   }
 }
 
+function realOrNull(path) {
+  try {
+    return realpathSync(path);
+  } catch {
+    return null;
+  }
+}
+
+function descend(base, segment) {
+  if (segment === ".") return [base];
+  if (segment === "..") {
+    return base.linked ? null : [{ path: resolve(base.path, ".."), linked: false }];
+  }
+  const path = join(base.path, segment);
+  const real = realOrNull(path);
+  return [{ path: real ?? path, linked: base.linked || (real !== null && real !== path) }];
+}
+
+function matchingDirectories(base, segment) {
+  let entries;
+  try {
+    entries = readdirSync(base.path);
+  } catch {
+    return null;
+  }
+  const expression = globRegExp(segment);
+  const found = [];
+  for (const entry of entries) {
+    const path = join(base.path, entry);
+    if (!expression.test(entry) || !isDirectory(path)) continue;
+    let symlink;
+    try {
+      symlink = lstatSync(path).isSymbolicLink();
+    } catch {
+      symlink = true;
+    }
+    found.push({ path: realOrNull(path) ?? path, linked: base.linked || symlink });
+  }
+  return found;
+}
+
 function listDirectories(directoryPart, context) {
   if (/[$`]/.test(directoryPart)) return null;
   const segments = directoryPart.split("/").filter((segment) => segment !== "");
-  let bases;
-  if (directoryPart.startsWith("/")) bases = ["/"];
-  else if (segments[0] === "~") {
-    bases = [homedir()];
+  let start;
+  if (directoryPart.startsWith("/")) start = "/";
+  else if (directoryPart.startsWith("~/")) {
+    start = homedir();
     segments.shift();
-  } else if (context.cwdKnown) bases = [context.cwd];
-  else return null;
+  } else start = context.cwd;
+  if (segments.some((segment) => segment.startsWith("~"))) return null;
+  const root = realOrNull(start);
+  if (root === null) return null;
+  let bases = [{ path: root, linked: false }];
   for (const segment of segments) {
     const next = [];
     for (const base of bases) {
-      if (!globCharacters.test(segment)) next.push(resolve(base, segment));
-      else {
-        let entries;
-        try {
-          entries = readdirSync(base);
-        } catch {
-          return null;
-        }
-        const expression = globRegExp(segment);
-        for (const entry of entries) {
-          if (expression.test(entry) && isDirectory(join(base, entry)))
-            next.push(join(base, entry));
-        }
-      }
+      const found = globCharacters.test(segment)
+        ? matchingDirectories(base, segment)
+        : descend(base, segment);
+      if (found === null) return null;
+      next.push(...found);
     }
     bases = next;
     if (bases.length > braceLimit) return null;
   }
-  return bases;
+  return bases.map((base) => base.path);
 }
 
 function directoryHasEnvMatch(directory, expression) {
@@ -331,13 +367,16 @@ function directoryHasEnvMatch(directory, expression) {
 function globMatchesEnv(word, context) {
   const trimmed = word.replace(/\/+$/, "");
   const name = trimmed.split("/").pop();
-  if (!globCharacters.test(name) || [...name].every((character) => "*?[]".includes(character))) {
-    return false;
+  if (!globCharacters.test(name)) return false;
+  const directories =
+    context.listing && !trimmed.includes("**")
+      ? listDirectories(trimmed.slice(0, trimmed.length - name.length), context)
+      : null;
+  if (directories === null) {
+    return (
+      ![...name].every((character) => "*?[]".includes(character)) && globMatchesEnvByName(name)
+    );
   }
-  const directories = context.listing
-    ? listDirectories(trimmed.slice(0, trimmed.length - name.length), context)
-    : null;
-  if (directories === null) return globMatchesEnvByName(name);
   const expression = globRegExp(name);
   let unreadable = false;
   for (const directory of directories) {
@@ -451,14 +490,15 @@ const writerGitSubcommands = new Set([
   "worktree",
   "mv",
 ]);
-const recursiveFlag = /^(?:-[A-Za-z]*[rR][A-Za-z]*|--recursive|--dereference-recursive|-d)$/;
+const recursiveFlag =
+  /^(?:-[A-Za-z]*[rRdN][A-Za-z]*|-d.*|--recursive|--dereference-recursive|--directories(?:=.*)?|--new-file)$/;
+
+const recursiveReaders = new Set(["grep", "egrep", "fgrep", "diff"]);
 
 function isFileReader(command) {
   const program = basename(command.words[0] ?? "");
   if (!fileReaders.has(program)) return false;
-  return !(
-    ["grep", "egrep", "fgrep"].includes(program) && command.words.some((w) => recursiveFlag.test(w))
-  );
+  return !(recursiveReaders.has(program) && command.words.some((w) => recursiveFlag.test(w)));
 }
 
 function isWriter(command) {
@@ -471,17 +511,21 @@ function isWriter(command) {
   return program === "git" && writerGitSubcommands.has(gitSubcommand(command.words));
 }
 
-export function envAccess(commands) {
-  const writing = commands.some(isWriter);
+const directoryCommands = new Set(["cd", "pushd", "popd"]);
+
+function listingTrusted(commands, text) {
+  if (!isStraightLine(commands, text)) return false;
+  if (/CDPATH|(?<![\w./-])(?:cd|pushd|popd)(?![\w./-])/.test(text)) return false;
+  return !commands.some((command) => directoryCommands.has(basename(command.words[0] ?? "")));
+}
+
+export function envAccess(commands, text = "") {
+  const trusted = listingTrusted(commands, text) && !commands.some(isWriter);
   for (const command of commands) {
     const redirected = [...command.writes, ...command.reads].find(isEnvFile);
     if (redirected) return redirected;
     if (isSafe(command.words)) continue;
-    const context = {
-      cwd: command.cwd,
-      cwdKnown: command.cwdKnown !== false,
-      listing: !writing && command.cwdKnown !== false && isFileReader(command),
-    };
+    const context = { cwd: command.cwd, listing: trusted && isFileReader(command) };
     const patterns = patternIndexes(command.words);
     for (const [index, word] of command.words.entries()) {
       if (index === 0 || patterns.has(index)) continue;

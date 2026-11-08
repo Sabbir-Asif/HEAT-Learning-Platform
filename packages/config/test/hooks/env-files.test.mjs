@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { afterAll, describe, expect, test } from "vitest";
 import { cleanupAll, tempDir } from "../fixtures/repo.mjs";
 import { envAccess, isEnvFile } from "../../src/hooks/env-files.mjs";
-import { parseShell } from "../../src/hooks/shell.mjs";
+import { parseShellDetailed } from "../../src/hooks/shell.mjs";
 
 describe("isEnvFile", () => {
   test.each([
@@ -41,7 +41,7 @@ describe("isEnvFile", () => {
 afterAll(cleanupAll);
 
 describe("envAccess", () => {
-  const find = (text, cwd = "/w") => envAccess(parseShell(text, cwd));
+  const find = (text, cwd = "/w") => envAccess(parseShellDetailed(text, cwd), text);
 
   test.each([
     "cat .env",
@@ -179,6 +179,7 @@ describe("envAccess", () => {
         "apps/frontend-public/postcss.config.mjs",
         "src/a.ts",
         "README.md",
+        "empty/keep.txt",
       ]) {
         touch(dir, file);
       }
@@ -195,10 +196,14 @@ describe("envAccess", () => {
         "plain.txt",
         "sub/prod.env",
         "other/prod.env",
+        "deep/inner/.env",
+        "c/d/.env",
+        "~name/.env",
       ]) {
         touch(dir, file);
       }
       symlinkSync(".env", join(dir, "link"));
+      symlinkSync(join(dir, "deep/inner"), join(dir, "empty/lk"));
       return dir;
     };
 
@@ -209,13 +214,19 @@ describe("envAccess", () => {
       "cat apps/frontend-public/postcss*",
       "cat src/*.ts",
       "cat *.md",
+      "cat *",
+      "cat ?",
       "cat .e*x",
+      "wc -l docs/adr/*",
       "wc -l docs/adr/0013*",
       "head -n 3 docs/adr/0013*",
       "grep KEY docs/adr/0013*",
-      "cat s*/prod*",
-      "cd docs; cat adr/0013*",
-    ])("a file reader on a glob with no env match is allowed: %s", (text) => {
+      "cat s*/a*",
+      "cat foo*; wc -l docs/adr/*",
+      "cat foo*\ncat docs/adr/0013*",
+      "cat foo* 2>&1",
+      "grep KEY foo* 2>/dev/null",
+    ])("a plain reader on a glob with no env match is allowed: %s", (text) => {
       expect(find(text, plainDir()), text).toBeNull();
     });
 
@@ -258,11 +269,15 @@ describe("envAccess", () => {
       'cat "$PWD"/prod*',
       "grep KEY .e*",
       "tail -n1 .e*",
+      "cat *",
+      "cat ?*",
+      "cat ~name/.e*",
+      "cat ./~name/.e*",
     ])("a glob that really matches an env file is denied: %s", (text) => {
       expect(find(text, envDir()), text).toBeTruthy();
     });
 
-    test("a leading ~ is resolved to the home directory", () => {
+    test("a leading ~/ is resolved to the home directory", () => {
       const home = tempDir("globhome");
       touch(home, "prod.env");
       const saved = process.env.HOME;
@@ -276,8 +291,6 @@ describe("envAccess", () => {
     });
 
     test.each([
-      "cat *",
-      "cat ?",
       "cat plain*",
       "cat foobar*",
       "cat *.txt",
@@ -301,32 +314,58 @@ describe("envAccess", () => {
       "grep -r KEY .e*",
       "grep -rn KEY foo*",
       "xargs -a list rg KEY .e*",
+      "grep --directories=recurse foo s*",
+      "grep -d recurse foo s*",
+      "grep -drecurse foo s*",
+      "diff -rN s* e*",
+      "diff -r s* e*",
+      "diff --new-file s* e*",
     ])("the real listing is not trusted here: %s", (text) => {
       expect(find(text, plainDir()), text).toBeTruthy();
     });
 
-    test("a grep without -r and a redirect to /dev/null still use the listing", () => {
-      expect(find("grep KEY foo* 2>/dev/null", plainDir())).toBeNull();
-    });
-
     test.each([
-      "pushd docs >/dev/null; popd >/dev/null; cat .e*",
+      "false && cd empty; cat .e*",
+      "true || cd empty; cat .e*",
+      "cd empty | cat .e*",
+      "env cd empty; cat .e*",
+      "CDPATH=a cd b; cat .e*",
+      "cd -- -x; cat .e*",
+      "cd empty; cat .e*",
+      "cd empty && cat .e*",
+      "pushd empty >/dev/null; cat .e*",
+      "pushd empty >/dev/null; popd >/dev/null; cat .e*",
       "cd docs; cd -; cat .e*",
+      "c''d empty; cat .e*",
+      "(cd empty; cat .e*)",
+      "{ cd empty; cat .e*; }",
       "cd $X; cat .e*",
-      "cd `pwd`; cat .e*",
-      "cd ~other; cat .e*",
-      "cd d*; cat .e*",
-      "pushd; cat .e*",
-      "pushd +1; cat .e*",
-    ])("a directory that cannot be tracked falls back to the name check: %s", (text) => {
+      "cat .e* | head",
+      "cat .e* &",
+      "echo $(cat .e*)",
+      "CDPATH=a; cat .e*",
+      "cd empty/lk; cat ../.e*",
+      "cat **/.e*",
+      "cat ***/.e*",
+      "cat c/**/.e*",
+      "cat ./**/.e*",
+      "cat foo**",
+    ])("an untrusted command falls back to the name check: %s", (text) => {
       expect(find(text, plainDir()), text).toBeTruthy();
+      expect(find(text, envDir()), text).toBeTruthy();
     });
 
-    test("a tracked directory change keeps the listing", () => {
+    test("a command with cd or a pipe never gets the listing even for a harmless glob", () => {
       const dir = plainDir();
-      expect(find("cd docs; cat .e*", dir)).toBeNull();
-      expect(find("pushd docs >/dev/null; cat .e*", dir)).toBeNull();
-      expect(find(`cd /nowhere-x; cd ${dir}; cat .e*`, "/w")).toBeNull();
+      expect(find("cd docs; cat adr/0013*", dir)).toBeTruthy();
+      expect(find("cat docs/adr/0013* | head", dir)).toBeTruthy();
+      expect(find("cat docs/adr/0013* && true", dir)).toBeTruthy();
+    });
+
+    test("a .. segment after a symlinked directory falls back, a real one does not", () => {
+      const dir = envDir();
+      expect(find("cat empty/lk/../.e*", dir)).toBeTruthy();
+      expect(find("cat docs/../src/a*", plainDir())).toBeNull();
     });
   });
 

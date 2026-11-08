@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
-import { parseShell, parseShellDetailed } from "../../src/hooks/shell.mjs";
+import { isStraightLine, parseShell, parseShellDetailed } from "../../src/hooks/shell.mjs";
 
 const base = "/work/repo";
 const words = (text) => parseShell(text, base).map((command) => command.words);
@@ -201,39 +201,6 @@ describe("working directory", () => {
   test("a stray closing parenthesis does not lose the directory", () => {
     expect(parseShell("cd sub; ) echo a", base).at(-1).cwd).toBe(resolve(base, "sub"));
   });
-
-  const knownAfter = (text) => parseShell(`${text}; echo z`, base).at(-1).cwdKnown;
-
-  test.each(["cd sub", "cd /abs", "pushd sub", "cd", "cd -P sub", "(popd); true"])(
-    "%s keeps the directory known",
-    (text) => {
-      expect(knownAfter(text)).toBe(true);
-    },
-  );
-
-  test.each([
-    "popd",
-    "cd -",
-    "cd $X",
-    "cd `pwd`",
-    "cd ~other",
-    "cd d*",
-    "pushd",
-    "pushd +1",
-    "cd sub; popd",
-  ])("%s makes the directory unknown", (text) => {
-    expect(knownAfter(text)).toBe(false);
-  });
-
-  test("an absolute cd after an unknown directory knows it again", () => {
-    expect(knownAfter("popd; cd /abs")).toBe(true);
-    expect(knownAfter("popd; cd sub")).toBe(false);
-  });
-
-  test("an unknown directory carries into nested scripts and groups", () => {
-    const parsed = parseShell("popd; bash -c 'echo a'; (echo b)", base);
-    expect(parsed.map((command) => command.cwdKnown)).toEqual([true, false, false, false]);
-  });
 });
 
 describe("assignments", () => {
@@ -253,5 +220,63 @@ describe("assignments", () => {
   test("an assignment inside an argument is not an assignment", () => {
     const [command] = parseShell(": a=zz", base);
     expect(command.assignments).toEqual([]);
+  });
+});
+
+describe("straight-line commands", () => {
+  const straight = (text) => isStraightLine(parseShellDetailed(text, base), text);
+
+  test.each([
+    "echo hi",
+    "a=x; echo hi > apps/$a/f",
+    "a=x\ncp README.md apps/${a}/f",
+    "for a in x y; do echo hi > apps/$a/f; done",
+    "for a in x y\ndo\n  tee $a\ndone",
+    "cmd 2>&1",
+    "cmd &>/dev/null",
+    "cmd >| out",
+    "cat foo* > /dev/null 2>&1",
+    "wc -l docs/adr/*",
+  ])("%j is straight-line", (text) => {
+    expect(straight(text)).toBe(true);
+  });
+
+  test.each([
+    "a && b",
+    "a || b",
+    "a | b",
+    "a &",
+    "(a)",
+    "{ a; }",
+    "echo `a`",
+    "echo $(a)",
+    "cat <(a)",
+    "f() { a; }",
+    "if a; then b; fi",
+    "while a; do b; done",
+    "until a; do b; done",
+    "case x in x) a;; esac",
+    "select a in b; do c; done",
+    "function f { a; }",
+    "bash -c 'a'",
+    "sh -c a",
+    "/bin/zsh -c a",
+    "eval a",
+    "source x",
+    ". ./x.sh",
+    "trap 'a' DEBUG",
+    "env A=1 cmd",
+    "sudo cmd",
+    "nohup cmd",
+    "xargs cmd",
+    "time cmd",
+    "command cmd",
+    "exec cmd",
+    "$r X",
+    "`r` X",
+    "e''nv A=1 cmd",
+    "! a",
+  ])("%j is not straight-line", (text) => {
+    expect(straight(text)).toBe(false);
   });
 });
