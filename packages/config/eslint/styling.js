@@ -1,5 +1,5 @@
 import css from "@eslint/css";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
 import { cssEntryOnly } from "./css-entry-rule.js";
 
@@ -7,7 +7,7 @@ const sourceFiles = ["src/**/*.{ts,tsx}"];
 const plugins = { "better-tailwindcss": betterTailwindcss };
 const settings = {
   "better-tailwindcss": {
-    entryPoint: fileURLToPath(new URL("./tailwind-entry.css", import.meta.url)),
+    entryPoint: resolve(import.meta.dirname, "tailwind-entry.css"),
   },
 };
 
