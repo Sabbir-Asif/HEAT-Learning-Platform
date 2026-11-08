@@ -59,6 +59,40 @@ describe("inputs", () => {
     expect(formatDateTime(instant, "bn")).not.toMatch(/[0-9]/);
   });
 
+  test.each(zones)("with the process time zone %s a string needs an explicit offset", (zone) => {
+    inZone(zone);
+    for (const text of [
+      "2026-11-07T20:30:00",
+      "2026-11-07T20:30",
+      "2026-11-07",
+      "2026-11-07 20:30:00",
+      "2026-11-07T20:30:00 ",
+      "Nov 7 2026 20:30",
+      "Sat, 07 Nov 2026 20:30:00",
+      "2026-11-07T20:30:00+6",
+      "2026-11-07T20:30:00z",
+    ]) {
+      expect(() => formatDateTime(text, "en"), text).toThrow(RangeError);
+      expect(() => formatDate(text, "bn"), text).toThrow(RangeError);
+      expect(() => formatTime(text, "en"), text).toThrow(RangeError);
+    }
+  });
+
+  test.each(zones)("with the process time zone %s offsets and Z are honoured", (zone) => {
+    inZone(zone);
+    for (const text of [
+      "2026-11-07T20:30:00Z",
+      "2026-11-07T20:30Z",
+      "2026-11-07T20:30:00.123Z",
+      "2026-11-08T02:30:00+06:00",
+      "2026-11-08T02:30:00+0600",
+      "2026-11-07T15:30:00-05:00",
+      "2026-11-07T15:30:00.000000000-05:00",
+    ]) {
+      expect(formatDateTime(text, "en"), text).toBe("8 November 2026, 02:30");
+    }
+  });
+
   test.each([
     ["an invalid Date", new Date(Number.NaN)],
     ["unparseable text", "not a date"],
