@@ -9,7 +9,7 @@ Design rule from the owner (2026-11-08): one consistent, modern design that fits
 | Slice | Content                                                                                    | State                                                    |
 | ----- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
 | 30a   | Tooling, `tokens.json`, font decision, checks, README skeleton                             | Done                                                     |
-| 30a   | `heat-lms.fig` with the theme variables and specimen frames, exports, inventory entries    | Not done: the Open Pencil application was not connected  |
+| 30a   | `heat-lms.fig` with the theme variables and specimen frames, exports, inventory entries    | Done: colour, type, shape and status specimens, English  |
 | 30b   | Student screens                                                                            | Not started                                              |
 | 30c   | Admin screens, drawers, loading, empty and error states, the no-filler table below         | Not started                                              |
 
@@ -35,6 +35,12 @@ Design rule from the owner (2026-11-08): one consistent, modern design that fits
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | Application version   | 0.16.0 (`/Applications/OpenPencil.app`, `@open-pencil/mcp` 0.16.0)                                                                           |
 | Tool limits found     | The MCP server only writes inside its configured root (`OPENPENCIL_MCP_ROOT`, by default the directory the bridge was started in). Its tools fail with "not connected" until the application is running with a document open. |
+
+| Language of the designs | English only for version 1 (owner decision, 2026-11-08). The Bangla variants are not designed. |
+| Bangla glyphs         | Open Pencil 0.16.0 draws Noto Sans Bengali Regular from the installed font, but its Bold and SemiBold faces come from Google and drop whole lines that contain digits or some conjuncts; SemiBold drew no Bangla at all. Bangla weights cannot be checked in the file. |
+| Modes                 | The tools cannot add a mode to a collection. A collection is created by importing one token file per mode (`Colors/Light.json`, `Colors/Dark.json`), which gives real Light and Dark modes. |
+| Frame fills           | Frames cannot be switched between modes through the tools, so each specimen frame uses literal hex values equal to the variable for its theme. |
+| Saving                | The tools write only inside the MCP root, and not into hidden folders. The file and PNGs were written to the main checkout and copied into the worktree. |
 
 Limits found while building the file are added to this table as they appear.
 
@@ -137,7 +143,7 @@ Sizes are the woff2 files measured on disk (`wght` files for the variable builds
 
 A finding for #31: the package's default `index.css` imports the `wght` files above, so the default import is the small one. The `standard` and `wdth` files are 190,040 B for Bengali and 44,580 B for Latin and should not be imported.
 
-Open item: the Bangla specimen (conjuncts ক্ষ, জ্ঞ, ন্দ্র, স্ত্র; reph র্ক; vowel signs; ya-phala; khanda-ta ৎ; Bengali digits at every weight) has to be checked by eye in Open Pencil before approval. This is blocked until the design file exists.
+Bangla is out of scope for the designs in version 1, so the following check is parked until Bangla is designed. Open item: the Bangla specimen (conjuncts ক্ষ, জ্ঞ, ন্দ্র, স্ত্র; reph র্ক; vowel signs; ya-phala; khanda-ta ৎ; Bengali digits at every weight) has to be checked by eye in Open Pencil before approval. Open Pencil cannot draw the Bold and SemiBold Bangla faces (see Open Pencil above), so that check needs the font installed locally or a browser check in #31.
 
 ## Constraints and what is not designed
 
@@ -154,7 +160,9 @@ Open item: the Bangla specimen (conjuncts ক্ষ, জ্ঞ, ন্দ্র,
 
 ## How the tokens were compared with the file
 
-To be recorded when the file exists. The plan: the theme is created as Open Pencil variable collections with Light and Dark modes if the application supports modes, and otherwise as swatch frames labelled with hex values. The variables are read back through the tools and compared with `tokens.json` role by role; the specimen frames are compared by eye.
+The theme is an Open Pencil collection named `Colors` with Light and Dark modes and 56 colour variables, created by importing `tokens.json` colours one file per mode. After saving, `list_variables` returned 56 colour variables with a value for each mode; the values read back match `tokens.json` in every spot check (for example `background` is `#fbfafe` in Light and `#0f0b1a` in Dark, `primary` is `#5b2d9a` and `#b99cf3`). The comparison was not run role by role by a script. The specimen frames use the same hex values and were compared by eye against the exports in `exports/`.
+
+Radius, spacing and shadow are shown on the shape specimen with the token values; they are not stored as variables.
 
 ## Per-screen no-filler table
 

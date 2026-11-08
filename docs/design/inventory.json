@@ -1,4 +1,77 @@
 {
   "version": 1,
-  "frames": []
+  "frames": [
+    {
+      "id": "specimen-colors-laptop-light-en",
+      "area": "specimen",
+      "screen": "colors",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Every colour role with its hex, light theme"
+    },
+    {
+      "id": "specimen-colors-laptop-dark-en",
+      "area": "specimen",
+      "screen": "colors",
+      "width": "laptop",
+      "theme": "dark",
+      "lang": "en",
+      "shows": "Every colour role with its hex, dark theme"
+    },
+    {
+      "id": "specimen-type-laptop-light-en",
+      "area": "specimen",
+      "screen": "type",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Type scale at every style and weight, light theme"
+    },
+    {
+      "id": "specimen-type-laptop-dark-en",
+      "area": "specimen",
+      "screen": "type",
+      "width": "laptop",
+      "theme": "dark",
+      "lang": "en",
+      "shows": "Type scale at every style and weight, dark theme"
+    },
+    {
+      "id": "specimen-shape-laptop-light-en",
+      "area": "specimen",
+      "screen": "shape",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Radius, spacing and shadow steps, light theme"
+    },
+    {
+      "id": "specimen-shape-laptop-dark-en",
+      "area": "specimen",
+      "screen": "shape",
+      "width": "laptop",
+      "theme": "dark",
+      "lang": "en",
+      "shows": "Radius, spacing and shadow steps, dark theme"
+    },
+    {
+      "id": "specimen-status-laptop-light-en",
+      "area": "specimen",
+      "screen": "status",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "One StatusBadge per enrollment, video and course state, light theme"
+    },
+    {
+      "id": "specimen-status-laptop-dark-en",
+      "area": "specimen",
+      "screen": "status",
+      "width": "laptop",
+      "theme": "dark",
+      "lang": "en",
+      "shows": "One StatusBadge per enrollment, video and course state, dark theme"
+    }
+  ]
 }
