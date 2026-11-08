@@ -448,7 +448,13 @@ describe("contrastRatio", () => {
 describe("readThemeBackgrounds", () => {
   test("reads --background from the :root and .dark blocks of the real stylesheet", () => {
     const css = readFileSync(resolve(import.meta.dirname, "../../ui/src/styles.css"), "utf8");
-    expect(readThemeBackgrounds(css)).toEqual({ light: "#ffffff", dark: "#0b1220" });
+    const { colors } = JSON.parse(
+      readFileSync(resolve(import.meta.dirname, "../../../docs/design/tokens.json"), "utf8"),
+    );
+    expect(readThemeBackgrounds(css)).toEqual({
+      light: colors.light.background,
+      dark: colors.dark.background,
+    });
   });
 
   test("reads the values of a different stylesheet", () => {
