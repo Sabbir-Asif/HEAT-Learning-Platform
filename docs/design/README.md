@@ -228,7 +228,7 @@ Filled in by 30b (student screens) and 30c (admin screens). Each screen has a ro
 | Awaiting approval (rejected) | Understand a refusal | Reason from the team, Enroll again, contact support | The reason and the next step |
 | Dashboard | Resume learning | Continue card with progress bar and Resume lesson | The main action and where the student is |
 | Dashboard | Resume learning | Module list with a status icon and the status word | Overall position and what is locked. The mock's four stat tiles are dropped; the one progress figure sits in the continue card |
-| Dashboard loading, empty, error | Recover from a missing state | Skeletons, empty message with contact, error message with code, Try again | Each state says what happened and what to do next |
+| Dashboard loading, empty, error | Recover from a missing state | Skeletons, empty message with contact, error message with code and a contact link | Each state says what happened and what to do next |
 | Course | Find and open a lesson | Module cards with status badges and lesson list | Where the student is, what is done, and a single Resume action on the current lesson |
 | Course | Find and open a lesson | Locked module with the reason | Explains why module 3 cannot be opened yet |
 | Lesson | Watch and complete a lesson | Video player with captions control | The lesson itself; captions are required for accessibility |
@@ -244,7 +244,7 @@ Filled in by 30b (student screens) and 30c (admin screens). Each screen has a ro
 | Admin overview | See what needs action | Enrollments by status | The numbers are the point: pending, approved, completed and rejected counts, with badges that carry words |
 | Approvals | Decide on pending enrollments | Filter bar, table with select, approve and reject | Find, select and decide; reject is a separate outlined danger action, 40 px high on laptop |
 | Approvals (phone) | Decide on pending enrollments | Card list with 48 px approve and reject, bulk approve | Touch targets of at least 44 px; filters open in a drawer |
-| Approvals loading, empty, error | Recover from a missing state | Skeletons, empty message, error with code and Try again | Each state says what happened and what to do next |
+| Approvals loading, empty, error | Recover from a missing state | Skeletons, empty message, error with code | Each state says what happened and what to do next |
 | Drawer: reject with reason | Reject and explain | Required reason field, character limit, confirm, close | Collects the reason the student will see; confirm is danger coloured |
 | Drawer: approve in bulk | Approve several at once | List of the people selected, confirm, close | Shows exactly who is approved before the decision |
 | Drawer: approvals filters (phone) | Narrow the queue | Role, sort, apply, close | Filters that do not fit the phone toolbar |
