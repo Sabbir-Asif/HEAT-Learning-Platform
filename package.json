@@ -19,6 +19,8 @@
     "test:coverage": "turbo run test:coverage",
     "audit:deps": "node packages/config/bin/audit.mjs",
     "github:setup": "node packages/config/bin/github-setup.mjs",
+    "design:contrast": "node packages/config/bin/design-contrast.mjs",
+    "design:check": "node packages/config/bin/design-check.mjs",
     "ticket": "node packages/config/bin/ticket.mjs",
     "verify": "node packages/config/bin/verify.mjs",
     "dev:up": "node infra/scripts/dev.mjs up",
