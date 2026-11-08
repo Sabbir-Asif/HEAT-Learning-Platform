@@ -14,7 +14,7 @@ packages/
   contracts/  Zod schemas and shared types        db/       Prisma (added later)
   api-client/ Generated API client and fetchers   ui/       Shared components and tokens
   i18n/       Message catalogs
-  config/     tsconfig, ESLint, Prettier and Vitest presets; repository scripts (audit:deps, github:setup, ticket)
+  config/     tsconfig, ESLint, Prettier and Vitest presets; repository scripts (audit:deps, brand, github:setup, ticket)
 ```
 
 ### Install and build
@@ -34,7 +34,7 @@ pnpm turbo build lint typecheck test
 | `api`               | `pnpm --filter api dev`               | `pnpm --filter api build && pnpm --filter api start`                             |
 | `worker`            | `pnpm --filter worker dev`            | `pnpm --filter worker build && pnpm --filter worker start`                       |
 
-`pnpm dev` starts everything through Turborepo. Check the apps with `curl localhost:4000/api/health` and by opening ports 3000 and 3001. The worker logs `Worker ready` and opens no port.
+`frontend-public` builds a standalone server; its `start` script copies `.next/static` and `public/` next to it and then runs it, so styles, scripts and the brand files are served. `pnpm dev` starts everything through Turborepo. Check the apps with `curl localhost:4000/api/health` and by opening ports 3000 and 3001. The worker logs `Worker ready` and opens no port.
 
 ### Local services (Docker)
 
@@ -103,6 +103,19 @@ pnpm design:contrast   # every colour pair in light and dark with its WCAG 2 rat
 pnpm design:check      # token structure, contrast, inventory against exports, drawer-only overlays
 ```
 
+
+### End-to-end tests
+
+Playwright specs for `frontend-public` sit in `apps/frontend-public/test/e2e/*.spec.ts`. The config builds the app and starts the standalone server on port 3200 itself, then runs one Chromium project. Run it with the Playwright CLI.
+
+```sh
+pnpm --filter frontend-public exec playwright install chromium   # one time
+pnpm --filter frontend-public test:e2e                           # build, start, run the specs
+pnpm turbo run test:e2e --filter=frontend-public                 # the same, with the packages built first (CI)
+```
+
+Specs cover the `/` redirect rules, the 404 for unknown locales, the brand files and the language switch. The config always starts its own server, so a leftover one on port 3200 fails the run instead of being reused. Reports go to `playwright-report/` and `test-results/` (ignored by git).
+
 ### API client
 
 The API describes itself, and the browser and Server Components call it through code generated from that description (ADR 0015). Nothing is written by hand between the controllers and the hooks.
@@ -130,6 +143,56 @@ The server fetcher reads `API_INTERNAL_URL`, the API's address on the internal n
 
 The CSRF header and the 401 refresh are not part of this package yet. They register through `registerRequestInterceptor` and `setUnauthorizedHandler` when their tickets land.
 
+### Brand assets
+
+The logos are static SVG files served at `/brand/<name>.svg` by both frontends. One source of truth feeds both apps: `packages/config/brand/source/*.svg` is run through SVGO (`packages/config/svgo.config.mjs`) and written byte for byte into `apps/frontend-public/public/brand/` and `apps/frontend-internal/public/brand/`. Both copies are committed, so `public/` stays static.
+
+```sh
+pnpm brand            # sanitise, optimise and write both copies; a second run changes nothing
+pnpm brand --check    # exit 1 and name any missing, stray or hand-edited file
+```
+
+To replace a mark, drop the new vector into `packages/config/brand/source/` under the same name, run `pnpm brand` and commit the source and both copies. Do not edit the copies by hand. `<name>-dark.svg` is used on the dark theme and exists only where the plain file fails the legibility check. Choosing the file by theme belongs to the shells.
+
+`packages/config/test/brand.test.mjs` and `brand-assets.test.mjs` enforce the rules:
+
+- Sanitiser: strict XML parse plus an allow-list (`svg g path rect circle ellipse line polyline polygon defs linearGradient radialGradient stop clipPath mask use`). Every attribute has an exact grammar: `fill` and `stroke` take a colour (keyword, `#hex`, `rgb`, `rgba`, `hsl`, `hsla`) or `url(#id)`; `clip-path` and `mask` take `none` or `url(#id)`; `transform` and `gradientTransform` take only transform functions; `href` is a `#fragment`; `d` holds path commands and numbers; every other attribute is letters, digits, spaces and `. , % + - #`. A backslash anywhere in a value fails (CSS escapes such as `u\72l(` cannot hide a URL), so does any other `(`, a repeated attribute, a `<script>`, `<foreignObject>`, `<style>`, `<image>`, `<text>`, an `on*` or `style` attribute, `data:`, `http:`, `https:` or `//`, `<!DOCTYPE`, `<!ENTITY` or a processing instruction, and the message names it. A `viewBox` is required. Text and `<style>` classes must be converted to outlines and presentation attributes. At most 16 `<use>` elements and 16 levels of nesting, so a chain of references cannot multiply into a render bomb. Sources may be up to 128 KB; shipped files are capped at 20 KB.
+- Every `.svg` under `apps/*/public/` passes the sanitiser, not only `public/brand/`. `pnpm brand` refuses a symbolic link or a directory named `*.svg` in a target and deletes only stray regular `.svg` files; `--check` reports any other stray file.
+- Optimisation: each shipped file is strictly smaller than its source, differs from it in at most 0.2% of pixels (channel difference over 8, both rendered at 512 px with `@resvg/resvg-js`) and is unchanged by a second run.
+- Legibility: each file is rendered 40 px high at 1x and 2x over the `--background` of its theme, read from `packages/ui/src/styles.css`. A pixel with at least half opacity is painted and is judged by its own colour, not its anti-aliased blend. At least 1% of the canvas must be painted and at most 10% of the painted pixels may have contrast under 2:1 (3:1 for the `du-crest` placeholder, which is ours). On the light theme a pale pixel (under 1.5:1) counts as blank paper only when ink encloses it, found by flood fill from the transparent outside; pale pixels connected to the outside count as low contrast, so a pale wordmark beside a dark shape fails. WCAG exempts logotypes from the text contrast rule, so 2:1 is an interim bar for the partner marks, not a claim of 3:1: the HEAT bars measure 2.78 to 3.15:1 on the dark background and the GoB seal's orange map is about 2.3:1 on white. The owner may tighten it once the original vectors arrive. The check says nothing about whether the small tagline or the Bangla lines can be read at 40 px; they cannot, which is why the names live in the alt texts. If `--background` moves out of hex (#31), update `readThemeBackgrounds` with it.
+
+| File                  | Organisation                                           | Source                                                                                                                                          | Status      | Date       |
+| --------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ---------- |
+| `heat.svg`            | HEAT, Higher Education Acceleration and Transformation | `logo.svg` on heat.ugc.gov.bd, 1000 px PNG, sha256 `36d1925b0ca4e0006c7c0ece9eba6e1797d81fc67939a06a702e9ec7ed89871e`, traced to vectors        | traced      | 2026-11-08 |
+| `heat-dark.svg`       | HEAT                                                   | `heat.svg` with near-black and navy fills recoloured to `#e5e7eb`                                                                               | traced      | 2026-11-08 |
+| `gob.svg`             | Government of the People's Republic of Bangladesh      | `right-logo1.svg` on heat.ugc.gov.bd, 1000 px PNG, sha256 `b60133e7abd0cac1063844aa75f6b54c16f243bfe425a40129728685c72b0075`, traced to vectors | traced      | 2026-11-08 |
+| `ugc.svg`             | University Grants Commission                           | `right-logo2.svg` on heat.ugc.gov.bd, 1000 px PNG, sha256 `dea8b7970ae3d029398608b13144fa700a7c4c763bd5d469ae780db3dfa27ce4`, traced to vectors | traced      | 2026-11-08 |
+| `ugc-dark.svg`        | University Grants Commission                           | `ugc.svg` with near-black and navy fills recoloured to `#e5e7eb`                                                                                | traced      | 2026-11-08 |
+| `world-bank.svg`      | The World Bank                                         | `right-logo3.svg` on heat.ugc.gov.bd, 500 px PNG, sha256 `feb950613bdf58e1520488b9cab3d3c483e340714594e53d904df00834c7e5e8`, traced to vectors  | traced      | 2026-11-08 |
+| `world-bank-dark.svg` | The World Bank                                         | `world-bank.svg` with near-black and navy fills recoloured to `#e5e7eb`                                                                         | traced      | 2026-11-08 |
+| `du-crest.svg`        | University of Dhaka                                    | Generic shield, shapes only; no usable source for the crest exists yet                                                                          | placeholder | 2026-11-08 |
+| `du-crest-dark.svg`   | University of Dhaka                                    | `du-crest.svg` with a lighter blue, so the placeholder reaches 3:1 on the dark theme                                                            | placeholder | 2026-11-08 |
+
+The files on heat.ugc.gov.bd (downloaded 2026-11-08) are SVG in name only: each wraps one embedded PNG in an `<image>` with a `data:` URI, which the sanitiser rejects. The sha256 sums in the table are of the decoded PNGs. The PNGs were decoded and traced once, outside the repository, with `vtracer` 0.6.15 (Python binding, Pillow 13.0.0 for preparation); the tool is not a dependency. Preparation: alpha cut at 128, cropped to the painted area, colours reduced with Pillow's median cut and no dithering (`heat` 6 colours, `gob` 8, `ugc` 6, `world-bank` 8). Tracing: colour mode, `hierarchical="stacked"`, `mode="spline"`, `color_precision=8`, `layer_difference=24`, `path_precision=0`, `corner_threshold=60`, `length_threshold=8`, `splice_threshold=60`, `filter_speckle=10` (20 for `ugc`). The `-dark` files change only fill colours, by script. No mark was redrawn by hand. The HEAT mark and the Bangla text in the seal and the UGC mark are image art, so their names live in the alt texts in `@heat/i18n` (`brand.logo.*`).
+
+The GoB seal, the UGC mark and the World Bank mark are third-party marks. These traced files are interim: the owner's original vectors replace these files before launch, and the usage terms of each mark stay with its owner. `du-crest.svg` is a placeholder and not the University of Dhaka crest.
+
+### Languages
+
+`frontend-public` serves every page under `/bn/...` or `/en/...` (ADR 0009) with next-intl 4 and the catalogs in `@heat/i18n`; `frontend-internal` is English only and has no locale segment. `<html lang>` follows the first path segment, `dir` stays `ltr`, and a first segment that is not `bn` or `en` returns 404, as does any path under a locale that has no page yet (`dynamicParams = false` on the locale layout). The layout imports `src/app/globals.css`, which only imports `@heat/ui/styles.css`.
+
+`GET /` is the only path that redirects (`apps/frontend-public/src/proxy.ts`, matcher `["/"]`; every other path passes through untouched). The language is chosen in this order:
+
+1. The `__Host-locale` cookie, when its value is exactly `bn` or `en`. Anything else (`fr`, `BN`, empty, over 16 characters) is ignored.
+2. `Accept-Language`, read by `negotiateLocale` in `@heat/i18n`: the highest `q` wins, the primary subtag is matched case-insensitively (`bn-BD`, `EN-us`), `q=0`, a malformed `q` and a `q` above 1 are ignored, equal values go to the first listed, and only the first 32 entries and 1 KB are read.
+3. Bangla.
+
+The answer is a 307 with `Location: /<locale>` plus the original query, `Cache-Control: private, no-store` and `Vary: Accept-Language, Cookie`. The header value is never copied into the response, and the redirect never sets the cookie, so a guess is not frozen. A shared `/en/...` link wins over a saved `bn` cookie because the URL decides. Next.js 16 rewrites the query before `proxy.ts` runs (`%20` becomes `+`, an empty pair is dropped, `%zz` becomes `%25zz`), and a relative `Location` from the proxy makes it fail, so the redirect cannot keep the original bytes; the parsed values are the same.
+
+`LocaleSwitch` from `@heat/ui` is a `<nav>` of links; the glue in `apps/frontend-public/src/components/locale-switch-control.tsx` keeps the page, query and hash, writes the preference with `serializeLocaleCookie` and does a full navigation, because the root layout changes. The cookie is `__Host-locale=<bn|en>; Path=/; Max-Age=31536000; SameSite=Lax; Secure`, with no `Domain` and no `HttpOnly`: it is a display preference, not a credential, so the credential cookie rules do not apply. Browsers refuse `Secure` cookies on plain-http hosts other than `localhost`; the switch still navigates there. The privacy notice should list this cookie.
+
+Catalogs are `packages/i18n/src/messages/{en,bn}/<namespace>.ts` plus an `index.ts` per language; `bn` is `satisfies typeof en`. `pnpm --filter @heat/i18n test` fails and names the key or file when a key exists in one language only, a value is empty, `{placeholder}` names differ, or a namespace file is missing in one language or not exported by its aggregate. Dates go through `formatDate`, `formatTime` and `formatDateTime`, which print Asia/Dhaka time under any server `TZ`, with Bengali digits and month names in `bn` and ASCII digits in `en`, and throw `RangeError` on an invalid date. A string must be ISO 8601 with a time and `Z` or an offset (`2026-11-07T20:30:00Z`); a string without one is rejected instead of being read in the server's zone.
+
 ### Continuous integration
 
 Pull requests and pushes to `main` run these checks in GitHub Actions; each is a required status check:
@@ -141,6 +204,8 @@ Pull requests and pushes to `main` run these checks in GitHub Actions; each is a
 | `audit`                                        | `pnpm audit:deps`, also weekly; fails on high or critical advisories |
 
 The `storybook` job is separate and not yet a required check: it runs the story tests with axe and builds static Storybook, and uploads it as the `storybook-static` artifact (7 days, also when the tests fail). It runs on every pull request. The owner adds it to `.github/branch-protection.json` and re-applies the protection.
+
+The `e2e` job is separate and not yet a required check: it installs Chromium, runs the Playwright specs of `frontend-public` through Turborepo on every pull request, and uploads `playwright-report` (7 days, also when the specs fail). The owner adds it to `.github/branch-protection.json` and re-applies the protection.
 
 The `api-client-drift` job is separate and not yet a required check either. It builds contracts and the API, regenerates `apps/api/openapi.json` and `packages/api-client/src/generated/`, and fails when any file differs from what is committed (modified, deleted or new), listing the files. Run `pnpm generate` and commit the result to fix it.
 
@@ -241,3 +306,4 @@ This is enforced: the Vitest preset only runs `test/**`, and `packages/config/te
 - Public environment variables must start with `NEXT_PUBLIC_`; Turborepo includes them in the build cache key.
 - `contracts` and `db` compile to `dist/` because the API imports them; `ui`, `api-client` and `i18n` ship TypeScript source and are compiled by the Next.js apps (`transpilePackages`).
 - The worker imports the API's shared modules from `api/core`.
+- pnpm 11 skips dependency install scripts. `allowBuilds` in `pnpm-workspace.yaml` lists every package that has one and sets it to `false`: `esbuild`, `@scarf/scarf`, and `@parcel/watcher` and `@swc/core`, which next-intl needs only for its optional message extractor. Set a package to `true` only with the reason in the pull request.

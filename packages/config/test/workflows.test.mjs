@@ -96,4 +96,32 @@ describe("GitHub workflows", () => {
       });
     });
   });
+
+  describe("end-to-end job", () => {
+    const ci = parse(workflows.find(({ name }) => name === "ci.yml").text);
+    const job = ci.jobs.e2e;
+    const steps = job?.steps ?? [];
+    const runs = steps.map((step) => step.run).filter(Boolean);
+
+    test("exists, with a timeout, and runs on every pull request", () => {
+      expect(job).toBeDefined();
+      expect(job["timeout-minutes"]).toBeGreaterThan(0);
+      expect(JSON.stringify(ci.on)).not.toMatch(/paths/);
+    });
+
+    test("installs Chromium and runs the Playwright specs through Turborepo", () => {
+      expect(runs.some((run) => /playwright install.*chromium/.test(run))).toBe(true);
+      expect(runs).toContain("pnpm turbo run test:e2e --filter=frontend-public");
+    });
+
+    test("uploads the Playwright report for 7 days, also when the specs fail", () => {
+      const upload = steps.find((step) => step.uses?.startsWith("actions/upload-artifact@"));
+      expect(upload.if).toBe("${{ !cancelled() }}");
+      expect(upload.with).toMatchObject({
+        name: "playwright-report",
+        path: "apps/frontend-public/playwright-report",
+        "retention-days": 7,
+      });
+    });
+  });
 });
