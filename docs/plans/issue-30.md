@@ -62,9 +62,18 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 - [x] **Task 9: Open Pencil theme and specimen file.** `docs/design/heat-lms.fig` holds the `Colors` collection with Light and Dark modes (56 roles) and eight specimen frames in English: colours, type scale, radius, spacing and shadow, and one StatusBadge per state, each in light and dark, exported to `docs/design/exports/` and listed in `inventory.json`. Owner decision 2026-11-08: designs are English only for version 1, so no Bangla frames. Open Pencil cannot draw Bold or SemiBold Bangla, recorded in the README.
 - [x] **Task 10: verify tokens against the file** and record the method in the README. Read back with `list_variables`; all 56 roles have both modes and the spot checks match `tokens.json`. Not run role by role by a script.
 
-## Tasks (slices 30b and 30c)
+## Tasks (slice 30b, student screens)
 
-Planned when 30a is reviewed; they reuse the variables, the frame naming and the inventory from 30a. Each screen is one commit with its frames, exports and inventory entries, plus the README no-filler rows.
+Owner decision 2026-11-08: designs are English only, so every frame has lang `en` and there are no Bangla frames. Each screen is built at laptop (1440) and phone (390), in light and dark, with literal token hex values per theme (the tools cannot switch a frame's variable mode). One task is one commit: the frames in `heat-lms.fig`, the exports, the inventory entries and the README no-filler rows for that screen. The file is saved and exports are written after each task.
+
+- [ ] **Task 11: public chrome and landing.** Header (HEAT logo placeholder, University of Dhaka crest placeholder, nav, theme switch, Sign in, Enroll), footer with partner placeholders, and `student-landing`: the course promise, one Enroll action, what the training covers, who runs it. Demo-mock elements are justified or dropped in the README.
+- [ ] **Task 12: enrolment.** `student-enroll-details`, `student-enroll-captcha` (captcha image, refresh, input, support contact), `student-enroll-success`.
+- [ ] **Task 13: awaiting approval.** `student-awaiting-approval` with resend verification and profile link, plus the removed, rejected and expired states with reason text.
+- [ ] **Task 14: learner shell and dashboard.** Sidebar and top bar on laptop, 5-item bottom bar on phone. `student-dashboard`, `student-dashboard-loading`, `student-dashboard-empty`, `student-dashboard-error`.
+- [ ] **Task 15: course and lesson.** `student-course` with module list and locked or completed marks, `student-lesson` (phone: video on top with Lesson, Objectives and Modules tabs; laptop: main column with side panel).
+- [ ] **Task 16: quiz.** `student-quiz-question`, `student-quiz-review`, `student-quiz-result-pass`, `student-quiz-result-fail` with the waiting-time countdown, and `drawer-quiz-submit-unanswered`.
+
+Slice 30c (admin screens, states, drawers, final no-filler table) is planned when 30b is reviewed.
 
 ## Acceptance criteria mapped to checks
 
@@ -75,7 +84,7 @@ Planned when 30a is reviewed; they reuse the variables, the frame naming and the
 | Light and dark keys identical; every `-foreground` has a pair; pairs name real roles | Task 2 tests; `design-files.test.mjs`                                                         |
 | Each token matches the design file                                                   | Task 10, method in the README (by eye and by variable read-back)                              |
 | Every frame has an export and every export an entry                                  | Task 4 tests; `pnpm design:check`                                                             |
-| Every listed screen at phone and laptop, light and dark, student also in Bangla      | Inventory and exports reviewed by eye in 30b and 30c                                          |
+| Every listed screen at phone and laptop, light and dark, in English                  | Inventory and exports reviewed by eye in 30b and 30c                                          |
 | Overlays are drawers                                                                 | Task 4 tests; `pnpm design:check`; drawer frames reviewed by eye                              |
 | Text pairs 4.5:1, non-text 3:1, large text only when declared, disabled exempt       | Tasks 1, 3 and 7; `pnpm design:contrast` exits 0                                              |
 | Font: one family, Bengali and Latin, at most three weights, Bangla specimen          | Task 2 tests (weights); specimen frames and README decision (by eye)                          |
