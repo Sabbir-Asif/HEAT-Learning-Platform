@@ -61,11 +61,15 @@ function ComboboxInput({
             variant="ghost"
             render={<ComboboxTrigger />}
             data-slot="input-group-button"
+            aria-label="Show options"
+            tabIndex={-1}
             className="group-has-data-[slot=combobox-clear]/input-group:hidden data-pressed:bg-transparent"
             disabled={disabled}
           />
         )}
-        {showClear && <ComboboxClear disabled={disabled} />}
+        {showClear && (
+          <ComboboxClear disabled={disabled} aria-label="Clear selection" tabIndex={-1} />
+        )}
       </InputGroupAddon>
       {children}
     </InputGroup>
