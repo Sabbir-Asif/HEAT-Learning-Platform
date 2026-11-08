@@ -53,11 +53,11 @@ Each task is one commit: failing test first, see it fail for the right reason, l
 - [x] **B2: proxy.** Unit tests with `NextRequest`: every redirect criterion (status, `Location`, `Cache-Control`, `Vary`, query byte for byte, cookie and header precedence), pass-through for `/bn`, `/en/x`, `/sign-in`, `/_next/static/x.js`, `/api/revalidate`, `/brand/heat.svg`, `/favicon.ico`, no `Set-Cookie`, no echo of `Host` or `Accept-Language` with CR, LF or a URL. Then `src/proxy.ts`.
 - [x] **B3: routing and request config.** Tests: `request.ts` returns messages and `Asia/Dhaka` for a valid locale, `notFound()` for others, `onError` and `getMessageFallback` log and do not throw; `generateStaticParams` lists bn and en; `next-config.test.ts` still passes with the plugin. Then `[locale]/layout.tsx`, `page.tsx`, `request.ts`, `global.d.ts`, `next.config.ts`; delete the old layout and page.
 - [x] **B4: Playwright bootstrap.** Specs: `/` with `Accept-Language: en-US,en;q=0.9` lands on `/en` with `lang="en"`; no header or `fr` lands on `/bn`; cookie `bn` wins; `/fr`, `/BN` and `/sign-in` are 404; `/brand/heat.svg` is 200 without a redirect; `/bn` and `/en` carry the catalog heading. Then `playwright.config.ts`, the `test:e2e` script, `turbo.json` and the `e2e` CI job.
-- [ ] **B5: size.** Record the first-load JS of `/[locale]` (gzip) from the build; stays within 150 KB.
+- [x] **B5: size.** Record the first-load JS of `/[locale]` (gzip) from the build; stays within 150 KB.
 
 ### Part C: `LocaleSwitch` and glue
 
-- [ ] **C1: component.** Stories (light, dark, bn, en) with play functions: `<nav>` with accessible name, `<a lang hreflang>` with endonym, `aria-current` on the current option, Tab then Enter activates the other option and calls `onChange`, each link is at least 24 by 24 CSS px, fits at 360 px; axe passes. Unit test of the markup. Then `locale-switch.tsx`, styles, root export.
+- [x] **C1: component.** Stories (light, dark, bn, en) with play functions: `<nav>` with accessible name, `<a lang hreflang>` with endonym, `aria-current` on the current option, Tab then Enter activates the other option and calls `onChange`, each link is at least 24 by 24 CSS px, fits at 360 px; axe passes. Unit test of the markup. Then `locale-switch.tsx`, styles, root export.
 - [ ] **C2: app glue.** Tests with jsdom: the click handler writes the cookie, preserves path, query and hash, and calls `window.location.assign` with `/bn/courses/x?tab=2#notes` from `/en/courses/x?tab=2#notes`. Then the client glue file and an e2e spec of the switch.
 - [ ] **C3: docs.** README (cookie, redirect rules, Playwright, `allowBuilds`, CI `e2e` job) and `apps/frontend-public/CLAUDE.md` (i18n conventions). Docs tests stay green.
 
