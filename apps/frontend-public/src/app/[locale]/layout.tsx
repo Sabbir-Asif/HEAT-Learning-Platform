@@ -2,6 +2,7 @@ import { LOCALES } from "@heat/i18n";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
+import { LocaleSwitchControl } from "../../components/locale-switch-control";
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
@@ -14,9 +15,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const locale = await getLocale();
+  const t = await getTranslations("site.localeSwitch");
   return (
     <html lang={locale} dir="ltr">
-      <body>{children}</body>
+      <body>
+        <LocaleSwitchControl label={t("label")} current={locale} />
+        {children}
+      </body>
     </html>
   );
 }

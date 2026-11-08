@@ -8,7 +8,7 @@ export type { Catalog } from "./keys";
 export { checkParity } from "./parity";
 export type { ParityReport } from "./parity";
 export { placeholderNames } from "./placeholders";
-export { DEFAULT_LOCALE, LOCALE_COOKIE, LOCALES, isLocale } from "./locale";
+export { DEFAULT_LOCALE, LOCALE_COOKIE, LOCALE_NAMES, LOCALES, isLocale } from "./locale";
 export type { Locale } from "./locale";
 export { negotiateLocale } from "./negotiate";
 export type { NegotiationInput } from "./negotiate";
