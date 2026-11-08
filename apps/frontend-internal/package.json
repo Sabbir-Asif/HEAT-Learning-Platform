@@ -29,6 +29,7 @@
     "babel-plugin-react-compiler": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
+    "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
