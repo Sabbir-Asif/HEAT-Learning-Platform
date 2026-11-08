@@ -217,9 +217,9 @@ Filled in by 30b (student screens) and 30c (admin screens). Each screen has a ro
 | ------ | ---- | ------------- | -------------------------- |
 | Landing | Decide to enroll | Header with logos, nav, Sign in, Enroll | Reach enrollment or sign-in from anywhere on the page |
 | Landing | Decide to enroll | Headline, one paragraph, Enroll now | State what the course is and give the single action |
-| Landing | Decide to enroll | What you will learn (three items) | Show what the training covers before asking for an account |
+| Landing | Decide to enroll | The course path: six modules with durations | Show what the training covers and how long it takes before asking for an account |
 | Landing | Decide to enroll | How it works (three steps) | Set expectations for verification, approval and the certificate |
-| Landing | Decide to enroll | Footer with partners and policy links | Credibility and the privacy and accessibility links. The mock's speech bubble, four feature tiles and skyline are dropped |
+| Landing | Decide to enroll | Footer with partners and policy links | Credibility and the privacy and accessibility links. The mock's speech bubble, four feature tiles, skyline, hero photo placeholder, info cards and repeated call-to-action band are dropped |
 | Enroll details | Create an account | Name, email, role, department, password, consent | The data the training team needs to approve the enrollment |
 | Enroll details | Create an account | Breach note under the password | Explains why a password can be refused |
 | Enroll captcha | Prove you are a person | Captcha image, new image, input | Bot check; support email beside it is the accessible fallback (ADR 0017) |
