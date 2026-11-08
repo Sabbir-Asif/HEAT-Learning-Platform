@@ -200,6 +200,8 @@ Hook state for the stop check lives in `$HEAT_HOOKS_STATE_DIR` or a private `hea
 
 `.env` files are also denied by `permissions.deny` for Read and Edit. `.env.example` stays readable.
 
+A glob in a Bash word is expanded against the command's working directory and denied only if a real match is an env file (symlinks resolved); when the directory cannot be read or the glob is in a directory part, it is denied only if it could match an env file name, so `cat .e*` is denied and `cat docs/adr/0013*` is allowed. A shell write target with a variable is judged with the literal values assigned in the same command (`a=x` or `for a in x y`); a variable without such a value, or any command substitution, is denied.
+
 What the hooks cannot do. They cannot protect themselves: an agent that edits `.claude/settings.json` or the hook code, once its plan exists, changes the guards for later sessions, so `.github/CODEOWNERS` (the hook code, `ticket.mjs`, the skill, the agents and every `CLAUDE.md`) and CI are the backstop, and the owner reads those diffs. Writes under `.git`, to any `heat-verified` file and to `.claude/settings.local.json` are denied from every tool. Reads of `.env` files are denied by name; indirection such as variables, globs, interpreters or computed strings can get around the Bash check, which is a limit of reading command text, not something a hook can close. If `node` or `packages/config/bin/hook.mjs` is missing, every guarded tool call is blocked because the guards fail closed; restore the branch, or restart the session from a checkout that has the file.
 
 ### Conventions

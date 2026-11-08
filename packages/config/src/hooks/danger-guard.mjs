@@ -92,7 +92,60 @@ function isAlwaysAllowed(target) {
   return Boolean(match) && !target.slice(match[0].length).split("/").includes("..");
 }
 
-function writeDenial(target, cwd) {
+const literalPiece = /^(?:'[^']*'|"[^"$`\\]*"|[^\s;|&()<>"'$`\\*?[\]{}~]+)+/;
+const variableReference = /\$(?:\{([A-Za-z_]\w*)\}|([A-Za-z_]\w*))/g;
+const expansionLimit = 200;
+
+const unquote = (value) => value.replace(/['"]/g, "");
+
+function shellVariables(text) {
+  const variables = new Map();
+  const add = (name, value) => {
+    if (variables.get(name) === null) return;
+    variables.set(name, (variables.get(name) ?? new Set()).add(value));
+  };
+  const assignments = /(?:^|[\s;&|({])([A-Za-z_]\w*)(\+?)=/g;
+  for (const match of text.matchAll(assignments)) {
+    const rest = text.slice(match.index + match[0].length);
+    const value = literalPiece.exec(rest)?.[0] ?? "";
+    const next = rest[value.length];
+    const complete = next === undefined || /[\s;&|()<>]/.test(next);
+    if (complete && match[2] === "") add(match[1], unquote(value));
+    else variables.set(match[1], null);
+  }
+  const loops = /(?:^|[\s;&|({])for\s+([A-Za-z_]\w*)\s+in\s+([^;\n]*)/g;
+  for (const match of text.matchAll(loops)) {
+    const words = match[2].trim().split(/\s+/);
+    const literal = words.every((word) => word !== "" && literalPiece.exec(word)?.[0] === word);
+    if (!literal) variables.set(match[1], null);
+    else for (const word of words) add(match[1], unquote(word));
+  }
+  return variables;
+}
+
+function substituteKnown(target, variables) {
+  let targets = [target];
+  for (const name of new Set([...target.matchAll(variableReference)].map((m) => m[1] ?? m[2]))) {
+    const values = variables.get(name);
+    if (name === "SCRATCH" || !values) continue;
+    const reference = new RegExp(`\\$(?:\\{${name}\\}|${name}(?![A-Za-z0-9_]))`, "g");
+    targets = targets.flatMap((path) =>
+      [...values].map((value) => path.replace(reference, () => value)),
+    );
+    if (targets.length > expansionLimit) return [target];
+  }
+  return targets;
+}
+
+function writeDenial(target, cwd, variables = new Map()) {
+  const substituted = substituteKnown(target, variables);
+  if (substituted.length !== 1 || substituted[0] !== target) {
+    for (const path of substituted) {
+      const deny = writeDenial(path, cwd);
+      if (deny) return deny;
+    }
+    return null;
+  }
   if (isAlwaysAllowed(target)) return null;
   if (scratchTarget.test(target)) {
     return `The write target "${target}" climbs out of $SCRATCH with "..". Use a path inside $SCRATCH, or the Write tool.`;
@@ -213,6 +266,7 @@ function checkBash(input) {
   const command = input.tool_input?.command;
   if (typeof command !== "string") throw new Error("Bash input has no command");
   const commands = parseShell(command, input.cwd || process.cwd());
+  const variables = shellVariables(command);
   const envPath = envAccess(commands);
   if (envPath) return { deny: envDenial(envPath) };
   if (commands.some(isForcePush)) return { deny: forceDenial };
@@ -220,7 +274,7 @@ function checkBash(input) {
   if (commands.some(isMigrateReset)) return { deny: resetDenial };
   for (const command of commands) {
     for (const target of [...command.writes, ...writeTargets(command)]) {
-      const deny = writeDenial(target, command.cwd);
+      const deny = writeDenial(target, command.cwd, variables);
       if (deny) return { deny };
     }
   }

@@ -125,6 +125,62 @@ describe("shell writes that bypass the edit guards", () => {
     expect(bash(command, withPlan).deny).toMatch(/Write tool/);
   });
 
+  describe("variables assigned a literal value in the same command", () => {
+    const allowed = [
+      "a=frontend-public; echo hi > apps/$a/eslint.config.mjs",
+      'a=frontend-public && echo hi > "apps/${a}/eslint.config.mjs"',
+      "a='frontend-public'; echo hi > apps/$a/eslint.config.mjs",
+      "export a=frontend-public; echo hi > apps/$a/eslint.config.mjs",
+      "a=frontend-public b=eslint.config.mjs; cp README.md apps/$a/$b",
+      "a=frontend-public; printf x | tee apps/$a/eslint.config.mjs",
+      "for a in frontend-public frontend-internal; do echo hi > apps/$a/eslint.config.mjs; done",
+      "for a in frontend-public frontend-internal\ndo\n  echo hi > apps/$a/eslint.config.mjs\ndone",
+      "a=/dev/null; echo hi > $a",
+    ];
+
+    test.each(allowed)("allows %j on a branch with its plan", (command) => {
+      expect(bash(command, withPlan), command).toEqual({});
+    });
+
+    test.each(allowed.filter((command) => !command.includes("/dev/null")))(
+      "judges the resulting path, so %j is blocked on main",
+      (command) => {
+        expect(bash(command, main).deny, command).toMatch(/"main"/);
+      },
+    );
+
+    test("judges every value of a loop and of repeated assignments", () => {
+      expect(bash("for d in src .git; do echo x > $d/config; done", withPlan).deny).toMatch(
+        /\.git/,
+      );
+      expect(bash("a=src; a=.git; echo x > $a/config", withPlan).deny).toMatch(/\.git/);
+      expect(bash("for d in src docs; do echo x > $d/a.md; done", withoutPlan).deny).toContain(
+        "docs/plans/issue-7.md",
+      );
+    });
+
+    test.each([
+      "a=frontend-public; echo hi > apps/$b/eslint.config.mjs",
+      "a=$(pwd); echo hi > $a/f",
+      "a=`pwd`; echo hi > $a/f",
+      'a="$HOME"; echo hi > $a/f',
+      "a=src; a=$(pwd); echo hi > $a/f",
+      "a=src; echo hi > ${a:-other}/f",
+      "a=src; echo hi > $(echo $a)/f",
+      "for a in apps/*; do echo hi > $a/f; done",
+      "for a in $(ls); do echo hi > $a/f; done",
+      "for a in $LIST; do echo hi > $a/f; done",
+      "a=src; echo hi > $a$b/f",
+    ])("still blocks what cannot be resolved: %s", (command) => {
+      expect(bash(command, withPlan).deny).toMatch(/Write tool/);
+    });
+
+    test("$SCRATCH stays allowed and an assignment never loosens its rule", () => {
+      expect(bash('d=out; echo x > "$SCRATCH/$d/a.md"', main)).toEqual({});
+      expect(bash("d=..; echo x > $SCRATCH/$d/a.md", main).deny).toMatch(/SCRATCH/);
+    });
+  });
+
   test("blocks writes into .env even where writes are allowed", () => {
     expect(bash("echo x > apps/api/.env", withPlan).deny).toMatch(/environment files/i);
   });
