@@ -149,14 +149,17 @@ describe("shell writes that bypass the edit guards", () => {
       },
     );
 
-    test("judges every value of a loop and of repeated assignments", () => {
+    test("judges every value of a loop", () => {
       expect(bash("for d in src .git; do echo x > $d/config; done", withPlan).deny).toMatch(
         /\.git/,
       );
-      expect(bash("a=src; a=.git; echo x > $a/config", withPlan).deny).toMatch(/\.git/);
       expect(bash("for d in src docs; do echo x > $d/a.md; done", withoutPlan).deny).toContain(
         "docs/plans/issue-7.md",
       );
+    });
+
+    test("a variable used before its assignment is not substituted", () => {
+      expect(bash("echo x > apps/$a/f; a=frontend-public", withPlan).deny).toMatch(/Write tool/);
     });
 
     test.each([
@@ -171,8 +174,61 @@ describe("shell writes that bypass the edit guards", () => {
       "for a in $(ls); do echo hi > $a/f; done",
       "for a in $LIST; do echo hi > $a/f; done",
       "a=src; echo hi > $a$b/f",
+      "a=src; a=docs; echo hi > $a/f",
+      "a=src; for a in docs; do echo hi > $a/f; done",
+      "a=src; a+=x; echo hi > $a/f",
+      ": a=zz; tee $a.git/hooks/pre-commit",
+      "a=zz tee $a.git/hooks/pre-commit",
+      "env a=zz tee $a/f",
+      "d=docs; eval 'd=.git'; tee $d/hooks/x",
+      "d=docs; read d <<< .git; tee $d/x",
+      "d=docs; while read d; do tee $d/x; done",
+      "a=(.git/hooks/h); tee $a",
+      "a=src; a=(.git/hooks/h); tee $a",
+      "a=zz; unset a; tee $a.git/hooks/x",
+      "a=docs; declare a=.git; tee $a/x",
+      "b=.git; typeset -n a=b; echo x > $a/f",
+      "a=docs; local a=.git; tee $a/x",
+      "a=docs; let a=1; tee $a/x",
+      "a=docs; (( a = 1 )); tee $a/x",
+      "a=docs; mapfile a < list; tee $a/x",
+      "a=docs; readarray a < list; tee $a/x",
+      "a=docs; getopts x a; tee $a/x",
+      "a=docs; select a in .git; do tee $a/x; done",
+      "a=docs; printf -v a .git; tee $a/x",
+      "a=docs; : ${a:=.git}; tee $a/x",
+      "a=src; set -- .git; for a; do echo x > $a/config; done",
+      "a=src; set -- .git; echo x > $a/config",
+      "for a; do echo x > $a/config; done",
+      "a='docs/x /other/file'; tee $a",
+      'a="x .git/hooks/pre-commit"; tee $a',
+      "a='.g*'; rm -rf $a",
+      "a='.git/h[o]oks'; tee $a",
+      "a='{x,.git}'; tee $a/f",
+      "d='~'; tee $d/x",
+      'a="it\'s"; tee $a',
+      "for a in 'x y'; do tee $a; done",
+      "for a in docs?; do tee $a; done",
+      "a=; for a in; do tee $a/f; done",
+      "a[0]=docs; tee $a/x",
+      "a=src; echo hi > $a/f$(a=.git)",
     ])("still blocks what cannot be resolved: %s", (command) => {
       expect(bash(command, withPlan).deny).toMatch(/Write tool/);
+    });
+
+    test.each([
+      ": PWD=/tmp; tee $PWD/f",
+      "PWD=/tmp; tee $PWD/f",
+      "HOME=/tmp; tee $HOME/f",
+      "PATH=/tmp; tee $PATH/f",
+      "IFS=x; tee $IFS/f",
+      "OLDPWD=/tmp; tee $OLDPWD/f",
+      "USER=x; tee $USER/f",
+      "SHELL=x; tee $SHELL/f",
+    ])("never substitutes reserved names, on any checkout: %s", (command) => {
+      for (const cwd of [main, withPlan]) {
+        expect(bash(command, cwd).deny, command).toMatch(/Write tool/);
+      }
     });
 
     test("$SCRATCH stays allowed and an assignment never loosens its rule", () => {

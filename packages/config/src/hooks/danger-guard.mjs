@@ -4,7 +4,7 @@ import { envAccess, isEnvFile } from "./env-files.mjs";
 import { existsInBase } from "./git.mjs";
 import { resolveReal } from "./paths.mjs";
 import { gitInvocation } from "./invocation.mjs";
-import { parseShell } from "./shell.mjs";
+import { parseShellDetailed } from "./shell.mjs";
 
 const fileTools = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
 
@@ -92,53 +92,109 @@ function isAlwaysAllowed(target) {
   return Boolean(match) && !target.slice(match[0].length).split("/").includes("..");
 }
 
-const literalPiece = /^(?:'[^']*'|"[^"$`\\]*"|[^\s;|&()<>"'$`\\*?[\]{}~]+)+/;
 const variableReference = /\$(?:\{([A-Za-z_]\w*)\}|([A-Za-z_]\w*))/g;
 const expansionLimit = 200;
+const reservedVariables = new Set([
+  "PWD",
+  "OLDPWD",
+  "HOME",
+  "PATH",
+  "IFS",
+  "USER",
+  "SHELL",
+  "RANDOM",
+  "SECONDS",
+  "LINENO",
+]);
+const variableBuiltins = new Set([
+  "read",
+  "unset",
+  "eval",
+  "declare",
+  "typeset",
+  "local",
+  "let",
+  "mapfile",
+  "readarray",
+  "getopts",
+  "select",
+]);
+const unsafeValue = /[\s~*?[\]{}$`'"\\]/;
+const assignmentWord = /^([A-Za-z_]\w*)=([\s\S]*)$/;
+const compoundAssignment = /^([A-Za-z_]\w*)(?:\[[^\]]*\]\+?|\+)=/;
 
-const unquote = (value) => value.replace(/['"]/g, "");
-
-function shellVariables(text) {
-  const variables = new Map();
-  const add = (name, value) => {
-    if (variables.get(name) === null) return;
-    variables.set(name, (variables.get(name) ?? new Set()).add(value));
-  };
-  const assignments = /(?:^|[\s;&|({])([A-Za-z_]\w*)(\+?)=/g;
-  for (const match of text.matchAll(assignments)) {
-    const rest = text.slice(match.index + match[0].length);
-    const value = literalPiece.exec(rest)?.[0] ?? "";
-    const next = rest[value.length];
-    const complete = next === undefined || /[\s;&|()<>]/.test(next);
-    if (complete && match[2] === "") add(match[1], unquote(value));
-    else variables.set(match[1], null);
-  }
-  const loops = /(?:^|[\s;&|({])for\s+([A-Za-z_]\w*)\s+in\s+([^;\n]*)/g;
-  for (const match of text.matchAll(loops)) {
-    const words = match[2].trim().split(/\s+/);
-    const literal = words.every((word) => word !== "" && literalPiece.exec(word)?.[0] === word);
-    if (!literal) variables.set(match[1], null);
-    else for (const word of words) add(match[1], unquote(word));
-  }
-  return variables;
+function changesPositionals(args) {
+  return args.some(
+    (word, i) =>
+      word === "--" || (!/^[-+]/.test(word) && !["-o", "+o"].includes(args[i - 1] ?? "")),
+  );
 }
 
-function substituteKnown(target, variables) {
+function shellVariables(commands, text) {
+  const known = new Map();
+  const unknown = new Set();
+  let everything = /\(\(|\$\{[A-Za-z_]\w*:?=/.test(text);
+  for (const match of text.matchAll(/([A-Za-z_]\w*)\+?=\(/g)) unknown.add(match[1]);
+
+  const record = (name, values, at) => {
+    if (unknown.has(name) || known.has(name) || values.length === 0) {
+      unknown.add(name);
+      known.delete(name);
+    } else if (values.some((value) => unsafeValue.test(value))) unknown.add(name);
+    else known.set(name, { values, at });
+  };
+
+  for (const [at, command] of commands.entries()) {
+    const [program = "", ...args] = command.words;
+    const name = basename(program);
+    if (variableBuiltins.has(name)) everything = true;
+    if (name === "printf" && args.includes("-v")) everything = true;
+    if (name === "set" && changesPositionals(args)) everything = true;
+    for (const word of command.words) {
+      const compound = compoundAssignment.exec(word);
+      if (compound) unknown.add(compound[1]);
+    }
+    if (name === "for" && args[0]) {
+      if (args[1] === "in") record(args[0], args.slice(2), at);
+      else unknown.add(args[0]);
+    }
+    if (name === "export") {
+      for (const word of args) {
+        const assigned = assignmentWord.exec(word);
+        if (assigned) record(assigned[1], [assigned[2]], at);
+      }
+    }
+    for (const word of command.assignments ?? []) {
+      const assigned = assignmentWord.exec(word);
+      if (!assigned) continue;
+      if (command.words.length === 0) record(assigned[1], [assigned[2]], at);
+      else unknown.add(assigned[1]);
+    }
+  }
+
+  if (everything) return new Map();
+  for (const name of unknown) known.delete(name);
+  return known;
+}
+
+function substituteKnown(target, variables, at) {
   let targets = [target];
   for (const name of new Set([...target.matchAll(variableReference)].map((m) => m[1] ?? m[2]))) {
-    const values = variables.get(name);
-    if (name === "SCRATCH" || !values) continue;
+    const assignment = variables.get(name);
+    if (name === "SCRATCH" || reservedVariables.has(name) || !assignment || assignment.at >= at) {
+      continue;
+    }
     const reference = new RegExp(`\\$(?:\\{${name}\\}|${name}(?![A-Za-z0-9_]))`, "g");
     targets = targets.flatMap((path) =>
-      [...values].map((value) => path.replace(reference, () => value)),
+      assignment.values.map((value) => path.replace(reference, () => value)),
     );
     if (targets.length > expansionLimit) return [target];
   }
   return targets;
 }
 
-function writeDenial(target, cwd, variables = new Map()) {
-  const substituted = substituteKnown(target, variables);
+function writeDenial(target, cwd, variables = new Map(), at = 0) {
+  const substituted = substituteKnown(target, variables, at);
   if (substituted.length !== 1 || substituted[0] !== target) {
     for (const path of substituted) {
       const deny = writeDenial(path, cwd);
@@ -265,16 +321,16 @@ function isMigrateReset(command) {
 function checkBash(input) {
   const command = input.tool_input?.command;
   if (typeof command !== "string") throw new Error("Bash input has no command");
-  const commands = parseShell(command, input.cwd || process.cwd());
-  const variables = shellVariables(command);
+  const commands = parseShellDetailed(command, input.cwd || process.cwd());
+  const variables = shellVariables(commands, command);
   const envPath = envAccess(commands);
   if (envPath) return { deny: envDenial(envPath) };
   if (commands.some(isForcePush)) return { deny: forceDenial };
   if (commands.some(isConfigWrite)) return { deny: configDenial };
   if (commands.some(isMigrateReset)) return { deny: resetDenial };
-  for (const command of commands) {
+  for (const [at, command] of commands.entries()) {
     for (const target of [...command.writes, ...writeTargets(command)]) {
-      const deny = writeDenial(target, command.cwd, variables);
+      const deny = writeDenial(target, command.cwd, variables, at);
       if (deny) return { deny };
     }
   }
