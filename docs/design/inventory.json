@@ -589,6 +589,42 @@
       "theme": "light",
       "lang": "en",
       "shows": "Earned certificate on a phone with download and verification link"
+    },
+    {
+      "id": "student-help-laptop-light-en",
+      "area": "student",
+      "screen": "help",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Common questions as an expandable list, support email and a note on confidential help"
+    },
+    {
+      "id": "student-help-phone-light-en",
+      "area": "student",
+      "screen": "help",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Common questions and support contact on a phone"
+    },
+    {
+      "id": "admin-certificates-laptop-light-en",
+      "area": "admin",
+      "screen": "certificates",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Issued certificates table with search, status, icon-only row actions and the pagination bar"
+    },
+    {
+      "id": "admin-certificates-phone-light-en",
+      "area": "admin",
+      "screen": "certificates",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Issued certificates as rows with icon-only actions and the pagination bar"
     }
   ]
 }
