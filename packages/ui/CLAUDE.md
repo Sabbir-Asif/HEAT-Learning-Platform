@@ -14,6 +14,7 @@ The shared design system and the only place styles are written. Ships TypeScript
 - `Sidebar` keeps no cookie. Open state is a prop or local state; persistence belongs to the app shell. `backdrop-blur` is for the header and sidebar only.
 - Composites shared by both apps live here (page header, data table, form field, status badge, empty and error state, confirm dialog, stat card, file upload and the others in the design spec). Add one only when a ticket needs it in an app.
 - `StatusBadge` holds the single mapping for enrollment, video and course states.
+- Composites are in `src/composites`, one file and one story each, built only from the primitives. Overlays are drawers (`Sheet`), never modals. `ConfirmDialog` has two levels: a typed name (`confirmationName`) for irreversible deletes, a plain confirm for reversible actions.
 - Heavy pieces sit behind subpath exports (`/data`, `/charts`, `/editor`, `/content`, `/player`, `/upload`, `/sortable`) so a page that does not use them does not load them.
 - Author content (lesson text, news) is rendered only through `/content`, an allow-listed static renderer. Links are limited to `https:` and `mailto:`. Never use `dangerouslySetInnerHTML` with author content anywhere.
 - Every component has a Storybook story with light and dark variants and passes the axe check. Keyboard behaviour of dialogs, menus and reordering has a test.
