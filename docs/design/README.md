@@ -53,7 +53,11 @@ The public site uses few images on purpose: one hero photo, and module cards tha
 | University of Dhaka crest | Header and footer          | Official crest file, supplied by the owner and saved as `assets/logos/du.png`. The frames carry a small copy | 256 x 256, transparent PNG or SVG |
 | HEAT, Government of Bangladesh, UGC, World Bank | Header, footer, admin sidebar | Logo files taken from <https://heat.ugc.gov.bd/>, saved in `assets/logos/`   | as supplied                       |
 
-### Pagination
+### Icons
+
+Every icon is a Lucide icon placed from the icon library. No icon is drawn by hand or as custom SVG. Icons sit on buttons, navigation, status and list rows where they help the task. Result and confirmation screens carry no large decorative hero icon.
+
+## Pagination
 
 Every table uses one pagination bar. On laptop it shows rows per page, the range and total (for example 1 to 5 of 495), first, previous, page numbers with an ellipsis, next and last, then Go to page with a number field and a go button. All controls are icon-only, with accessible names. On phone it shows the range and rows per page, then previous and next icons around Page n of N with the same jump field. Frames: `admin-students-*` and `admin-approvals-laptop-light-en`.
 
