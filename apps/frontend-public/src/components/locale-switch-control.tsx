@@ -1,6 +1,6 @@
 "use client";
 
-import { LOCALES, LOCALE_NAMES, isLocale, switchLocalePath, type Locale } from "@heat/i18n";
+import { LOCALES, LOCALE_NAMES, switchLocalePath, type Locale } from "@heat/i18n";
 import { LocaleSwitch } from "@heat/ui";
 import { usePathname } from "next/navigation";
 import { changeLocale } from "../i18n/change-locale";
@@ -24,7 +24,6 @@ export function LocaleSwitchControl({ label, current }: LocaleSwitchControlProps
       current={current}
       options={options}
       onChange={(value) => {
-        if (!isLocale(value)) return;
         changeLocale({
           target: value,
           pathname,

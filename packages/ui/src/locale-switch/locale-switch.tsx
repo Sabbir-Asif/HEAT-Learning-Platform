@@ -1,22 +1,27 @@
 import type { MouseEvent } from "react";
 
-export interface LocaleSwitchOption {
-  value: string;
+export interface LocaleSwitchOption<T extends string = string> {
+  value: T;
   label: string;
   href: string;
 }
 
-export interface LocaleSwitchProps {
+export interface LocaleSwitchProps<T extends string = string> {
   label: string;
-  current: string;
-  options: LocaleSwitchOption[];
-  onChange?: (value: string) => void;
+  current: T;
+  options: LocaleSwitchOption<T>[];
+  onChange?: (value: T) => void;
 }
 
 const isPlainClick = (event: MouseEvent) =>
   event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey;
 
-export function LocaleSwitch({ label, current, options, onChange }: LocaleSwitchProps) {
+export function LocaleSwitch<T extends string = string>({
+  label,
+  current,
+  options,
+  onChange,
+}: LocaleSwitchProps<T>) {
   return (
     <nav aria-label={label} className="heat-locale-switch">
       <ul>
