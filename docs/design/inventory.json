@@ -553,6 +553,42 @@
       "theme": "light",
       "lang": "en",
       "overlay": "drawer"
+    },
+    {
+      "id": "student-sign-in-laptop-light-en",
+      "area": "student",
+      "screen": "sign-in",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Email and password sign in, forgot password link, link to enrol"
+    },
+    {
+      "id": "student-sign-in-phone-light-en",
+      "area": "student",
+      "screen": "sign-in",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Email and password sign in on a phone"
+    },
+    {
+      "id": "student-certificate-laptop-light-en",
+      "area": "student",
+      "screen": "certificate",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Earned certificate preview, download as PDF, number and verification link"
+    },
+    {
+      "id": "student-certificate-phone-light-en",
+      "area": "student",
+      "screen": "certificate",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Earned certificate on a phone with download and verification link"
     }
   ]
 }
