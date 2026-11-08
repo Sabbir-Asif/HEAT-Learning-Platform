@@ -14,7 +14,7 @@ const lint = async (preset, code, filePath) => {
 };
 
 describe("eslint presets", () => {
-  for (const preset of ["base", "nest", "react"]) {
+  for (const preset of ["base", "nest", "react", "app", "ui"]) {
     test(`${preset} rejects an explicit any and names the rule`, async () => {
       const messages = await lint(preset, "export const value: any = 1;\n", "fixture.ts");
       expect(messages.map((m) => m.ruleId)).toContain("@typescript-eslint/no-explicit-any");

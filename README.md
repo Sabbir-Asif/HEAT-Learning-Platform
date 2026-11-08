@@ -58,7 +58,7 @@ pnpm dev:reset   # stop, delete the Postgres and Redis volumes, start again empt
 ### Quality checks
 
 ```sh
-pnpm lint            # ESLint, no explicit any
+pnpm lint            # ESLint, no explicit any, styling rules below
 pnpm format:check    # Prettier; `pnpm format` fixes
 pnpm typecheck       # strict TypeScript
 pnpm test            # Vitest
@@ -66,6 +66,18 @@ pnpm test:coverage   # Vitest with V8 coverage, 85% minimum
 ```
 
 All rules live in `@heat/config`. A package opts in with one-line files (`eslint.config.mjs`, `vitest.config.mjs`, a tsconfig that extends `@heat/config/tsconfig/*`) and the root `package.json` points Prettier at the shared config. A package that holds rule logic (unlock, scoring, certificates) raises its coverage gate with `nodePreset({ threshold: 100 })`.
+
+Styling stays inside `@heat/ui` (ADR 0013), and lint enforces it. The two Next.js apps use `@heat/config/eslint/app`, `@heat/ui` uses `@heat/config/eslint/ui`; the rules live in `packages/config/eslint/styling.js` and the script rules apply to `src` (`.js`, `.jsx`, `.ts`, `.tsx`) only. The CSS rule covers every `.css` file in an app (build output excluded).
+
+| Rule                                                                                                                                                                                                                                                                                | Apps | `@heat/ui`  |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ----------- |
+| Conflicting Tailwind classes (`p-2 p-4`) and class order are errors; `eslint --fix` reorders                                                                                                                                                                                        | yes  | yes         |
+| No arbitrary values (`mt-[13px]`, `[&>*]:p-2`) in strings, template literals, `cn`, `clsx`, `cva`                                                                                                                                                                                   | yes  | allowed     |
+| Layout classes only: display, flex, grid, gap, space, alignment, padding, margin, sizing, `aspect-*`, overflow, `container`, `truncate`, `sr-only`, with the variants `sm` to `2xl`, `min-*`, `max-*`, `@sm` container variants, `motion-reduce` and `print`. Everything else fails | yes  | allowed     |
+| No `style` attribute, no `<style>` element, no stylesheet import other than `./globals.css` or `@/app/globals.css`                                                                                                                                                                  | yes  | allowed     |
+| No `.css` file anywhere in the app other than `src/app/globals.css`, which may hold only `@import "@heat/ui/styles.css"` and `@source` lines                                                                                                                                        | yes  | not checked |
+
+The Tailwind plugin reads its theme from `packages/config/eslint/tailwind-entry.css` until `@heat/ui` carries the real theme. The class rules read `class`, `className`, any attribute ending in `Class`, `ClassName` or `ClassNames` (such as `containerClassName`), the values of a `classNames` object, and the arguments of `cn`, `clsx`, `cva`, `twMerge` and the plugin's other default helpers. Remaining gaps: a spread props object (`{...props}`), `React.createElement("div", { style })`, class names built at run time or held in an unrelated variable, and `test/` and Playwright files are not inspected. The class rules are silent when `tailwindcss` cannot be resolved from the linted package, so each app, `@heat/ui` and `@heat/config` has `tailwindcss` as a dev dependency and `packages/config/test/styling-setup.test.mjs` fails if that breaks. The no-comments rule also rules out `eslint-disable` comments. The editor hook lints only script files, so the CSS rule is enforced by `pnpm lint` and CI.
 
 ### Storybook
 

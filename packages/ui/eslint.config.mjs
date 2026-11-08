@@ -1,1 +1,1 @@
-export { default } from "@heat/config/eslint/react";
+export { default } from "@heat/config/eslint/ui";
