@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import {
+  MAX_SOURCE_BYTES,
   MAX_SVG_BYTES,
   PIXEL_DIFFERENCE_LIMIT,
   buildBrand,
@@ -271,10 +272,32 @@ describe("buildBrand and checkBrand", () => {
     expect(() => readdirSync(location.targetDirs[0])).toThrow();
   });
 
-  test("refuses a source over the size cap and names it", () => {
-    const heavy = svg(`<path d="${"M0 0l1 1".repeat(MAX_SVG_BYTES / 2)}"/>`);
+  test("refuses a source over the source cap and names it", () => {
+    const heavy = svg(`<path d="${"M0 0".repeat(MAX_SOURCE_BYTES)}"/>`);
     const location = workspace({ "heavy.svg": heavy });
-    expect(() => buildBrand(location)).toThrow(/heavy\.svg.*20 KB/s);
+    expect(() => buildBrand(location)).toThrow(/heavy\.svg.*128 KB/s);
+  });
+
+  test("accepts a source over 20 KB and refuses its output when still over 20 KB", () => {
+    const coordinates = Array.from(
+      { length: 6000 },
+      (_, i) => `${(i * 7919) % 997} ${(i * 104729) % 991}`,
+    );
+    const heavy = svg(`<path d="M${coordinates.join("L")}"/>`);
+    expect(Buffer.byteLength(heavy)).toBeGreaterThan(MAX_SVG_BYTES);
+    expect(sanitise(heavy, { maxBytes: MAX_SOURCE_BYTES })).toEqual([]);
+    const location = workspace({ "heavy.svg": heavy });
+    expect(() => buildBrand(location)).toThrow(/heavy\.svg.*after SVGO.*20 KB/s);
+  });
+
+  test("accepts a source over 20 KB when its output fits under 20 KB", () => {
+    const padded = svg(
+      `<path d="${"M 0.000000 0.000000 L 1.000000 1.000000 ".repeat(1000)}" fill="#000"/>`,
+    );
+    expect(Buffer.byteLength(padded)).toBeGreaterThan(MAX_SVG_BYTES);
+    const location = workspace({ "padded.svg": padded });
+    buildBrand(location);
+    expect(checkBrand(location)).toEqual([]);
   });
 
   test("check passes right after a build", () => {

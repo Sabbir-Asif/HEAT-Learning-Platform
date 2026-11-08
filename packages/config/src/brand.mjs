@@ -6,6 +6,7 @@ import { optimize } from "svgo";
 import svgoConfig from "../svgo.config.mjs";
 
 export const MAX_SVG_BYTES = 20 * 1024;
+export const MAX_SOURCE_BYTES = 128 * 1024;
 export const PIXEL_DIFFERENCE_LIMIT = 0.002;
 export const PIXEL_CHANNEL_TOLERANCE = 8;
 export const COMPARISON_WIDTH = 512;
@@ -135,12 +136,12 @@ function checkAttribute(element, name, value, add) {
     if (!fragment.test(target)) add(`url( ) in ${name} on <${element}> must point to a #fragment`);
 }
 
-export function sanitise(source) {
+export function sanitise(source, { maxBytes = MAX_SVG_BYTES } = {}) {
   const found = new Set();
   const add = (message) => found.add(message);
   const text = source.charCodeAt(0) === 0xfeff ? source.slice(1) : source;
 
-  if (Buffer.byteLength(source) > MAX_SVG_BYTES) add(`file is larger than 20 KB`);
+  if (Buffer.byteLength(source) > maxBytes) add(`file is larger than ${maxBytes / 1024} KB`);
 
   const parser = sax.parser(true, { lowercase: false });
   let depth = 0;
@@ -255,7 +256,7 @@ const namesIn = (dir) => {
 function optimisedSources(sourceDir) {
   return svgNames(sourceDir).map((name) => {
     const source = readFileSync(join(sourceDir, name), "utf8");
-    const failures = sanitise(source);
+    const failures = sanitise(source, { maxBytes: MAX_SOURCE_BYTES });
     if (failures.length)
       throw new Error(`${name} fails the sanitiser:\n  ${failures.join("\n  ")}`);
     const output = optimise(source);
