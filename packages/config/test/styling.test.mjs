@@ -53,3 +53,46 @@ describe("class conflicts and order are errors", () => {
     });
   }
 });
+
+const restricted = (messages) =>
+  messages.filter((message) => message.ruleId === "better-tailwindcss/no-restricted-classes");
+
+describe("arbitrary values", () => {
+  const arbitrary = ["mt-[13px]", "md:w-[40%]", "[&>*]:p-2", "bg-[var(--x)]"];
+
+  for (const className of arbitrary) {
+    test(`app rejects ${className} in a className string and names it`, async () => {
+      const messages = restricted(await lint("app", markup(className), appFile));
+      expect(messages).toHaveLength(1);
+      expect(messages[0].message).toContain(className);
+      expect(messages[0].message).toContain("@heat/ui");
+    });
+
+    test(`ui accepts ${className}`, async () => {
+      expect(restricted(await lint("ui", markup(className), uiFile))).toEqual([]);
+    });
+  }
+
+  test("app rejects arbitrary values in template literals and class helpers", async () => {
+    const sources = [
+      "export const a = <div className={`mt-[13px] ${x}`} />;\n",
+      'export const a = <div className={cn("flex", "mt-[13px]")} />;\n',
+      'export const a = <div className={clsx("flex", { "mt-[13px]": on })} />;\n',
+      'export const a = cva("flex", { variants: { size: { sm: "mt-[13px]" } } });\n',
+    ];
+    for (const source of sources) {
+      expect(restricted(await lint("app", source, appFile)), source).toHaveLength(1);
+    }
+  });
+
+  test("app ignores non-literal expressions without crashing", async () => {
+    const sources = [
+      "export const a = <div className={x} />;\n",
+      "export const a = <div className={font.className} />;\n",
+      "export const a = <div className={cn(x, y)} />;\n",
+    ];
+    for (const source of sources) {
+      expect(await lint("app", source, appFile), source).toEqual([]);
+    }
+  });
+});
