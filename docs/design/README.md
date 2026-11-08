@@ -17,19 +17,19 @@ Owner decisions of 2026-11-08: the designs are English only for version 1, and d
 
 ## Design direction and how to use these frames
 
-The frames are a baseline for implementation, not a pixel specification. The owner asked on 2026-11-08 for a high quality, modern, professional result, and for the first set of frames to be refined because they looked generic. Rules for implementation tickets (#31 onward):
+The frames are the design the app is built to. Implementation tickets (#31 onward) follow them: layout, type, spacing, icons and copy. The owner asked on 2026-11-08 for a high quality, modern, professional result, and the frames were refined until they met it. Rules for implementation tickets:
 
-- Build from shadcn/ui primitives themed with `tokens.json`. Where a frame is rougher than the shadcn component, the component wins.
+- Build from shadcn/ui primitives themed with `tokens.json`, arranged and worded as the frames show. Where a frame leaves a state or detail open, use the shadcn component's behaviour.
 - Icons come from Lucide (`lucide-react`), the shadcn default, and are used beside or instead of text on navigation, actions, status and empty states. The frames use the same set.
 - No dark frames are drawn. Dark theme is implemented from the dark tokens and checked in the browser.
 - Toasts use Sonner, the toast library shadcn ships, mounted once at the app root. The approvals frame shows the pattern: icon, one-line title, one line of detail, and an Undo action where the action can be reversed. Toasts confirm; they never carry the only record of an error.
 - English only for version 1.
 - Avoid the stock look: identical boxed cards, one radius everywhere, grey shadows on every panel, centred forms, gradient washes. Use rows and dividers before nested cards, a clear type hierarchy, and colour only where it means something (primary for the main action and the active item).
-- Type proposal for the refined frames: Source Serif 4 for display and page titles on student screens, Public Sans for interface text. The Bangla requirement behind Noto Sans Bengali is gone, so the font decision is reopened; #31 confirms the family, weights and woff2 sizes.
+- Type: Source Serif 4 for display and page titles, Public Sans for interface text. See Font below.
 
-### Reference frames for the refined direction
+### Reference frames
 
-Three frames set the refined direction and are the ones to copy: `student-landing-laptop-light-en` (dark ink band, serif headline, course path as a timeline, rules instead of boxes), `student-dashboard-laptop-light-en` (resume panel, path rows with status icons) and `admin-approvals-laptop-light-en` (icon-led sidebar, avatar rows, icon plus text actions, Sonner toast). Three more frames carry the macOS-style direction and the extra effort the owner asked for: `student-enroll-details-laptop-light-en` (create account: split layout, icon fields, password strength, step progress), `student-lesson-laptop-light-en` (the player: window chrome, glass control bar, tabs, outline panel) and `admin-insights-laptop-light-en` (KPIs with trends, registrations and completions chart, learner journey, module completion, hardest questions, follow-up list with icon-only row actions). The other frames still use the first, plainer layout and are listed for coverage; implement them in the style of the reference frames.
+Three frames set the refined direction and are the ones to copy: `student-landing-laptop-light-en` (dark ink band, serif headline, course path as a timeline, rules instead of boxes), `student-dashboard-laptop-light-en` (resume panel, path rows with status icons) and `admin-approvals-laptop-light-en` (icon-led sidebar, avatar rows, icon plus text actions, Sonner toast). Three more frames carry the macOS-style direction and the extra effort the owner asked for: `student-enroll-details-laptop-light-en` (create account: split layout, icon fields, password strength, step progress), `student-lesson-laptop-light-en` (the player: window chrome, glass control bar, tabs, outline panel) and `admin-insights-laptop-light-en` (KPIs with trends, registrations and completions chart, learner journey, module completion, hardest questions, follow-up list with icon-only row actions). Every other frame follows the same style: icon plus label buttons, icon-only row actions, bottom navigation on phones, and the real logos.
 
 ### Owner additions of 2026-11-08 (afternoon)
 
@@ -80,7 +80,7 @@ Every table uses one pagination bar. On laptop it shows rows per page, the range
 
 1. Install Open Pencil (the desktop application). The version used for the file is recorded under Open Pencil below.
 2. Open `docs/design/heat-lms.fig`.
-3. Install the font from Font below, or Open Pencil falls back to a different face and Bangla specimens will look wrong.
+3. Install Source Serif 4 and Public Sans (see Font below), or Open Pencil falls back to a different face.
 4. Without Open Pencil, read the PNGs in `exports/`. `inventory.json` lists what each one shows.
 
 ## Open Pencil
@@ -90,8 +90,6 @@ Every table uses one pagination bar. On laptop it shows rows per page, the range
 | Application version   | 0.16.0 (`/Applications/OpenPencil.app`, `@open-pencil/mcp` 0.16.0)                                                                           |
 | Tool limits found     | The MCP server only writes inside its configured root (`OPENPENCIL_MCP_ROOT`, by default the directory the bridge was started in). Its tools fail with "not connected" until the application is running with a document open. |
 
-| Language of the designs | English only for version 1 (owner decision, 2026-11-08). The Bangla variants are not designed. |
-| Bangla glyphs         | Open Pencil 0.16.0 draws Noto Sans Bengali Regular from the installed font, but its Bold and SemiBold faces come from Google and drop whole lines that contain digits or some conjuncts; SemiBold drew no Bangla at all. Bangla weights cannot be checked in the file. |
 | Modes                 | The tools cannot add a mode to a collection. A collection is created by importing one token file per mode (`Colors/Light.json`, `Colors/Dark.json`), which gives real Light and Dark modes. |
 | Frame fills           | Frames cannot be switched between modes through the tools, so each specimen frame uses literal hex values equal to the variable for its theme. |
 | Saving                | The tools write only inside the MCP root, and not into hidden folders. The file and PNGs were written to the main checkout and copied into the worktree. |
@@ -166,43 +164,36 @@ Contrast rules checked in `pnpm design:contrast`:
 
 The spec asks for the focus ring on the sidebar fill; the sidebar uses its own `sidebar-ring`, so that is the role checked there.
 
-Type scale (`type.styles`), size and line height in px for Latin and Bangla. Bangla line height is always looser than Latin so matras and conjuncts are not clipped, and body text is never under 16 px:
+Type scale (`type.styles`), size and line height in px. Body text is never under 16 px:
 
-| Style       | Size | Weight | Latin | Bangla |
-| ----------- | ---- | ------ | ----- | ------ |
-| `display`   | 40   | 700    | 48    | 60     |
-| `heading-1` | 32   | 700    | 40    | 52     |
-| `heading-2` | 24   | 600    | 32    | 40     |
-| `heading-3` | 20   | 600    | 28    | 36     |
-| `body-lg`   | 18   | 400    | 28    | 32     |
-| `body`      | 16   | 400    | 24    | 28     |
-| `label`     | 14   | 600    | 20    | 24     |
-| `small`     | 14   | 400    | 20    | 24     |
+| Style       | Size | Weight | Line height | Family         |
+| ----------- | ---- | ------ | ----------- | -------------- |
+| `display`   | 40   | 600    | 48          | Source Serif 4 |
+| `heading-1` | 32   | 600    | 40          | Source Serif 4 |
+| `heading-2` | 24   | 600    | 32          | Source Serif 4 |
+| `heading-3` | 20   | 600    | 28          | Source Serif 4 |
+| `body-lg`   | 18   | 400    | 28          | Public Sans    |
+| `body`      | 16   | 400    | 24          | Public Sans    |
+| `label`     | 14   | 600    | 20          | Public Sans    |
+| `small`     | 14   | 400    | 20          | Public Sans    |
 
 Radius: 6, 10, 14, 20 and full. Spacing: 4 px base with steps 4, 8, 12, 16, 20, 24, 32, 40, 48, 64. Shadows: `sm`, `md`, `lg` for each theme, shown as layers of x, y, blur, spread, colour and opacity.
 
 ## Font
 
-The font is Noto Sans Bengali, as the self-hosted variable build `@fontsource-variable/noto-sans-bengali` 5.3.0 (the temporary font in `@heat/ui` today). Licence: SIL Open Font License 1.1. Weights used: 400, 600, 700. Subsets: Bengali and Latin only, `font-display: swap`, no CDN. The package's `latin-ext` file is declared with a `unicode-range`, so it downloads only when a page uses those characters.
+Two families, both self-hosted variable builds under the SIL Open Font License 1.1, `font-display: swap`, no CDN, Latin subset only:
 
-Decision: keep Noto Sans Bengali. One family covers Bengali and Latin, it is OFL, it is already in the repository, and it is the smallest of the three candidates that were measured. Hind Siliguri and Anek Bangla were compared on woff2 size only; their rendering was not compared by eye (see the open item below).
+| Role | Family | Weights | Package |
+| ---- | ------ | ------- | ------- |
+| Display and page titles (`display`, `heading-1` to `heading-3`) | Source Serif 4 | 600, 700 | `@fontsource-variable/source-serif-4` |
+| Interface, body, labels | Public Sans | 400, 600, 700 | `@fontsource-variable/public-sans` |
 
-| Candidate                            | Licence | Bengali    | Latin     | Total (Bengali + Latin) | Notes                                                       |
-| ------------------------------------ | ------- | ---------- | --------- | ----------------------- | ----------------------------------------------------------- |
-| Noto Sans Bengali Variable 5.3.0     | OFL 1.1 | 107,720 B  | 25,604 B  | 133,324 B (130 KiB)     | One variable file per subset covers every weight            |
-| Hind Siliguri 5.3.0 (static)         | OFL 1.1 | 218,816 B  | 43,676 B  | 262,492 B (256 KiB)     | Three weights, three files per subset                       |
-| Anek Bangla Variable 5.3.0           | OFL 1.1 | 155,676 B  | 42,816 B  | 198,492 B (194 KiB)     | One variable file per subset, `wght` axis                   |
-
-Sizes are the woff2 files measured on disk (`wght` files for the variable builds; weights 400, 600 and 700 for Hind Siliguri). The 133 KB for Noto is within the slow-network budget in the frontend design (section 6.4), because the two files load once and are cached.
-
-A finding for #31: the package's default `index.css` imports the `wght` files above, so the default import is the small one. The `standard` and `wdth` files are 190,040 B for Bengali and 44,580 B for Latin and should not be imported.
-
-Bangla is out of scope for the designs in version 1, so the following check is parked until Bangla is designed. Open item: the Bangla specimen (conjuncts ক্ষ, জ্ঞ, ন্দ্র, স্ত্র; reph র্ক; vowel signs; ya-phala; khanda-ta ৎ; Bengali digits at every weight) has to be checked by eye in Open Pencil before approval. Open Pencil cannot draw the Bold and SemiBold Bangla faces (see Open Pencil above), so that check needs the font installed locally or a browser check in #31.
+Both are in `tokens.json` (`fontDisplay` and `font`). The frames use them as drawn. #31 measures the woff2 files against the slow-network budget in the frontend design (section 6.4) and installs the packages.
 
 ## Constraints and what is not designed
 
 - Widths: 390 px (phone) and 1440 px (laptop) only. Widths below 390 px and the 768 px tablet width are not designed; the layout switches at the `md` breakpoint.
-- Bengali digits in `bn` frames, Latin digits in `en` frames. Dates are in Asia/Dhaka time.
+- Dates are in Asia/Dhaka time.
 - Logos are clearly marked placeholders. The final marks arrive with #35 and are not part of the approval.
 - The text captcha is an accepted accessibility exception (ADR 0017); the support contact sits beside it.
 - Touch targets for approve and reject on phone are at least 44 px.
@@ -260,6 +251,11 @@ Filled in by 30b (student screens) and 30c (admin screens). Each screen has a ro
 | Module editor (locked) | Fix wording safely | Lock note, read-only structure fields, editable wording fields, save | Says why fields are read-only and that wording changes are logged |
 | Module editor (unlocked) | Build a module | Title, description, position, pass mark, save draft, publish | The fields needed to create and publish a module |
 | Insights | Understand enrolment and quiz results | Filter bar, two chart cards each with Download CSV | The trend and the pass rate; the numbers are the point. The line chart is told apart by a labelled legend with different marker shapes and totals, not by colour alone; the lines themselves have no markers yet |
+| Sign in | Get back into the course | Email, password, Forgot password link, Sign in, Enrol | The single task, with the way to a new account beside it. The side panel is three lines of text and no image |
+| Forgot password | Regain access | Email, Send reset link, Back to sign in | One field and one action; the sent state says the link works for one hour and does not reveal whether the account exists |
+| Certificate | Get the certificate | Preview, Download PDF, number, verification link | The document itself and the two things a student does with it |
+| Help | Find an answer or contact the team | Question list, support email, confidential help note | Answers first, then the way to reach a person |
+| Certificates (admin) | Find an issued certificate | Search, date filter, table with icon-only row actions, pagination | Look up, open or download a certificate and see whether it was revoked |
 
 ## Sign out
 

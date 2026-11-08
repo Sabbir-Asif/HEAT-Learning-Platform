@@ -78,11 +78,7 @@ function validTokens() {
     ...requiredPairs(names),
     { foreground: "disabled-foreground", background: "disabled", kind: "text", exempt: "disabled" },
   ];
-  const typeStyle = (size, weight, latin, bangla) => ({
-    size,
-    weight,
-    lineHeight: { latin, bangla },
-  });
+  const typeStyle = (size, weight, lineHeight) => ({ size, weight, lineHeight });
   const layer = { x: 0, y: 1, blur: 2, spread: 0, color: "#000000", opacity: 0.1 };
   const shadows = { sm: [layer], md: [layer], lg: [layer] };
   return {
@@ -92,27 +88,36 @@ function validTokens() {
     pairs,
     type: {
       styles: {
-        display: typeStyle(40, 700, 48, 56),
-        "heading-1": typeStyle(32, 700, 40, 48),
-        "heading-2": typeStyle(24, 600, 32, 40),
-        "heading-3": typeStyle(20, 600, 28, 32),
-        "body-lg": typeStyle(18, 400, 28, 32),
-        body: typeStyle(16, 400, 24, 28),
-        label: typeStyle(14, 600, 20, 24),
-        small: typeStyle(14, 400, 20, 24),
+        display: typeStyle(40, 700, 48),
+        "heading-1": typeStyle(32, 700, 40),
+        "heading-2": typeStyle(24, 600, 32),
+        "heading-3": typeStyle(20, 600, 28),
+        "body-lg": typeStyle(18, 400, 28),
+        body: typeStyle(16, 400, 24),
+        label: typeStyle(14, 600, 20),
+        small: typeStyle(14, 400, 20),
       },
     },
     radius: { sm: 4, md: 8, lg: 12, xl: 16, full: 9999 },
     spacing: { base: 4, scale: { 1: 4, 2: 8, 3: 12, 4: 16, 6: 24, 8: 32 } },
     shadows: { light: clone(shadows), dark: clone(shadows) },
     font: {
-      family: "Noto Sans Bengali",
-      cssFamily: "Noto Sans Bengali Variable",
+      family: "Public Sans",
+      cssFamily: "Public Sans Variable",
       weights: [400, 600, 700],
-      subsets: ["bengali", "latin"],
-      source: "@fontsource-variable/noto-sans-bengali",
+      subsets: ["latin"],
+      source: "@fontsource-variable/public-sans",
       license: "OFL-1.1",
       fallbackStack: ["system-ui", "sans-serif"],
+    },
+    fontDisplay: {
+      family: "Source Serif 4",
+      cssFamily: "Source Serif 4 Variable",
+      weights: [600, 700],
+      subsets: ["latin"],
+      source: "@fontsource-variable/source-serif-4",
+      license: "OFL-1.1",
+      fallbackStack: ["Georgia", "serif"],
     },
   };
 }
@@ -226,9 +231,9 @@ describe("validateTokens", () => {
     expect(problems(tokens)).toMatch(/body.*16/);
   });
 
-  test("fails when Bangla line height is not looser than Latin", () => {
-    const tokens = mutated((t) => (t.type.styles["heading-1"].lineHeight.bangla = 40));
-    expect(problems(tokens)).toMatch(/heading-1.*bangla/i);
+  test("fails when a line height is below its size", () => {
+    const tokens = mutated((t) => (t.type.styles["heading-1"].lineHeight = 30));
+    expect(problems(tokens)).toMatch(/heading-1.*line height/i);
   });
 
   test("fails when a required type style is missing", () => {
@@ -259,6 +264,11 @@ describe("validateTokens", () => {
   test("fails when the font object lacks a key", () => {
     const tokens = mutated((t) => delete t.font.license);
     expect(problems(tokens)).toMatch(/font.*license/i);
+  });
+
+  test("fails when the display font lacks a key", () => {
+    const tokens = mutated((t) => delete t.fontDisplay.family);
+    expect(problems(tokens)).toMatch(/fontDisplay.*family/i);
   });
 
   test("fails when the font declares more than three weights", () => {
@@ -373,12 +383,12 @@ describe("roleNames", () => {
 });
 
 const frame = (overrides = {}) => ({
-  id: "student-landing-phone-light-bn",
+  id: "student-landing-phone-light-en",
   area: "student",
   screen: "landing",
   width: "phone",
   theme: "light",
-  lang: "bn",
+  lang: "en",
   ...overrides,
 });
 const inventoryOf = (...frames) => ({ version: 1, frames });
@@ -387,7 +397,7 @@ const checkWith = (frames, files) =>
 
 describe("checkInventory", () => {
   test("accepts frames that each have an export", () => {
-    expect(checkInventory(inventoryOf(frame()), ["student-landing-phone-light-bn.png"])).toEqual(
+    expect(checkInventory(inventoryOf(frame()), ["student-landing-phone-light-en.png"])).toEqual(
       [],
     );
   });
@@ -398,7 +408,7 @@ describe("checkInventory", () => {
 
   test("fails when an export is missing", () => {
     expect(checkInventory(inventoryOf(frame()), []).join()).toMatch(
-      /student-landing-phone-light-bn.*no export/i,
+      /student-landing-phone-light-en.*no export/i,
     );
   });
 
@@ -413,10 +423,10 @@ describe("checkInventory", () => {
   });
 
   test.each([
-    ["student-landing-phone-bn", "too few parts"],
-    ["Student-landing-phone-light-bn", "capital letters"],
-    ["student_landing_phone_light_bn", "underscores"],
-    ["student-landing-tablet-light-bn", "unknown width"],
+    ["student-landing-phone-en", "too few parts"],
+    ["Student-landing-phone-light-en", "capital letters"],
+    ["student_landing_phone_light_en", "underscores"],
+    ["student-landing-tablet-light-en", "unknown width"],
     ["student-landing-phone-sepia-bn", "unknown theme"],
     ["student-landing-phone-light-fr", "unknown language"],
   ])("fails on the id %s (%s)", (id) => {
@@ -426,25 +436,19 @@ describe("checkInventory", () => {
   test("fails when the id parts disagree with the fields", () => {
     expect(checkWith([frame({ theme: "dark" })])).toMatch(/theme/i);
     expect(checkWith([frame({ width: "laptop" })])).toMatch(/width/i);
-    expect(checkWith([frame({ lang: "en" })])).toMatch(/lang/i);
+    expect(checkWith([frame({ lang: "fr" })])).toMatch(/lang/i);
     expect(checkWith([frame({ screen: "dashboard" })])).toMatch(/screen/i);
   });
 
   test("fails on an unknown area", () => {
-    const id = "teacher-landing-phone-light-bn";
+    const id = "teacher-landing-phone-light-en";
     expect(checkWith([frame({ id, area: "teacher" })])).toMatch(/area/i);
   });
 
   test("fails on a duplicate id", () => {
-    expect(checkWith([frame(), frame()], ["student-landing-phone-light-bn.png"])).toMatch(
+    expect(checkWith([frame(), frame()], ["student-landing-phone-light-en.png"])).toMatch(
       /duplicate/i,
     );
-  });
-
-  test("the admin console is English only", () => {
-    const id = "admin-approvals-laptop-light-bn";
-    const admin = frame({ id, area: "admin", screen: "approvals", width: "laptop" });
-    expect(checkWith([admin])).toMatch(/admin.*english/i);
   });
 
   test("an overlay must be a drawer", () => {
@@ -462,7 +466,7 @@ describe("checkInventory", () => {
   });
 
   test("an id that names a modal or dialog fails", () => {
-    const id = "student-confirm-dialog-phone-light-bn";
+    const id = "student-confirm-dialog-phone-light-en";
     expect(checkWith([frame({ id, screen: "confirm-dialog" })])).toMatch(/modal|dialog/i);
     const popup = "admin-popup-laptop-light-en";
     expect(

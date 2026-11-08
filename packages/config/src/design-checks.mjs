@@ -237,19 +237,13 @@ function checkType(tokens, failures) {
   }
   for (const [name, style] of Object.entries(styles)) {
     const { size, weight, lineHeight } = style ?? {};
-    if (!isNumber(size) || !isNumber(lineHeight?.latin) || !isNumber(lineHeight?.bangla)) {
-      failures.push(
-        `Type style ${name} needs size and lineHeight.latin and lineHeight.bangla as numbers`,
-      );
+    if (!isNumber(size) || !isNumber(lineHeight)) {
+      failures.push(`Type style ${name} needs size and lineHeight as numbers`);
       continue;
     }
     if (!weights.includes(weight))
       failures.push(`Type style ${name} uses weight ${weight}, which the font does not declare`);
-    if (lineHeight.bangla <= lineHeight.latin) {
-      failures.push(`Type style ${name} needs a Bangla line height looser than Latin`);
-    }
-    if (lineHeight.latin < size)
-      failures.push(`Type style ${name} has a line height below its size`);
+    if (lineHeight < size) failures.push(`Type style ${name} has a line height below its size`);
   }
   if (isNumber(styles.body?.size) && styles.body.size < MIN_BODY_SIZE) {
     failures.push(`Type style body must be at least ${MIN_BODY_SIZE} px`);
@@ -303,16 +297,18 @@ function checkShadows(tokens, failures) {
 }
 
 function checkFont(tokens, failures) {
-  const font = tokens.font;
-  if (!isRecord(font)) {
-    failures.push("font is missing");
-    return;
-  }
-  for (const key of REQUIRED_FONT_KEYS) {
-    if (!(key in font)) failures.push(`font.${key} is missing`);
-  }
-  if (Array.isArray(font.weights) && font.weights.length > MAX_FONT_WEIGHTS) {
-    failures.push(`font declares ${font.weights.length} weights; use at most three weights`);
+  for (const name of ["font", "fontDisplay"]) {
+    const font = tokens[name];
+    if (!isRecord(font)) {
+      failures.push(`${name} is missing`);
+      continue;
+    }
+    for (const key of REQUIRED_FONT_KEYS) {
+      if (!(key in font)) failures.push(`${name}.${key} is missing`);
+    }
+    if (Array.isArray(font.weights) && font.weights.length > MAX_FONT_WEIGHTS) {
+      failures.push(`${name} declares ${font.weights.length} weights; use at most three weights`);
+    }
   }
 }
 
@@ -357,7 +353,7 @@ export const failingRows = (rows) => rows.filter((row) => row.status === "fail")
 
 const AREAS = ["student", "admin", "specimen", "drawer"];
 const WIDTHS = ["phone", "laptop"];
-const LANGS = ["bn", "en"];
+const LANGS = ["en"];
 const FRAME_ID = new RegExp(
   `^(${AREAS.join("|")})-([a-z0-9]+(?:-[a-z0-9]+)*)-(${WIDTHS.join("|")})-(${THEMES.join("|")})-(${LANGS.join("|")})$`,
 );
@@ -380,8 +376,6 @@ function checkFrame(frame, failures) {
         `Frame ${id} has ${field} ${JSON.stringify(frame[field])}, but its id says ${value}`,
       );
   }
-  if (area === "admin" && lang !== "en")
-    failures.push(`Frame ${id}: the admin console is English only`);
   if (OVERLAY_WORDS.test(screen))
     failures.push(`Frame ${id} names a modal, dialog or popup; use a drawer`);
   const overlay = frame.overlay;

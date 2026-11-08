@@ -625,6 +625,42 @@
       "theme": "light",
       "lang": "en",
       "shows": "Issued certificates as rows with icon-only actions and the pagination bar"
+    },
+    {
+      "id": "student-forgot-password-laptop-light-en",
+      "area": "student",
+      "screen": "forgot-password",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Reset request with one email field and the send action"
+    },
+    {
+      "id": "student-forgot-password-phone-light-en",
+      "area": "student",
+      "screen": "forgot-password",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Reset request with one email field and the send action"
+    },
+    {
+      "id": "student-forgot-password-sent-laptop-light-en",
+      "area": "student",
+      "screen": "forgot-password-sent",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Confirmation that a reset link was sent, with send again and back to sign in"
+    },
+    {
+      "id": "student-forgot-password-sent-phone-light-en",
+      "area": "student",
+      "screen": "forgot-password-sent",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Confirmation that a reset link was sent, with send again and back to sign in"
     }
   ]
 }

@@ -132,12 +132,12 @@ describe("designReport", () => {
     writeDesign({
       frames: [
         {
-          id: "student-landing-phone-light-bn",
+          id: "student-landing-phone-light-en",
           area: "student",
           screen: "landing",
           width: "phone",
           theme: "light",
-          lang: "bn",
+          lang: "en",
         },
       ],
     });
@@ -150,15 +150,15 @@ describe("designReport", () => {
     writeDesign({
       frames: [
         {
-          id: "student-landing-phone-light-bn",
+          id: "student-landing-phone-light-en",
           area: "student",
           screen: "landing",
           width: "phone",
           theme: "light",
-          lang: "bn",
+          lang: "en",
         },
       ],
-      files: ["student-landing-phone-light-bn.png"],
+      files: ["student-landing-phone-light-en.png"],
     });
     expect(designReport(dir, { structure: false })).toMatchObject({ ok: true });
   });
