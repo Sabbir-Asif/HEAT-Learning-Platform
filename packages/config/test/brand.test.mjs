@@ -1,4 +1,12 @@
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
@@ -300,6 +308,81 @@ describe("buildBrand and checkBrand", () => {
     const location = workspace({ "padded.svg": padded });
     buildBrand(location);
     expect(checkBrand(location)).toEqual([]);
+  });
+
+  test("refuses a symbolic link in a target and does not write through it", () => {
+    const location = workspace();
+    buildBrand(location);
+    const outside = join(work[0], "outside.svg");
+    writeFileSync(outside, "keep");
+    rmSync(join(location.targetDirs[0], "mark.svg"));
+    symlinkSync(outside, join(location.targetDirs[0], "mark.svg"));
+    expect(() => buildBrand(location)).toThrow(/a\/brand\/mark\.svg.*symbolic link/s);
+    expect(readFileSync(outside, "utf8")).toBe("keep");
+  });
+
+  test("refuses a symbolic link named like a stray file and leaves it in place", () => {
+    const location = workspace();
+    buildBrand(location);
+    const outside = join(work[0], "outside.svg");
+    writeFileSync(outside, "keep");
+    symlinkSync(outside, join(location.targetDirs[1], "stray.svg"));
+    expect(() => buildBrand(location)).toThrow(/stray\.svg.*symbolic link/s);
+    expect(readFileSync(outside, "utf8")).toBe("keep");
+    expect(list(location.targetDirs[1])).toContain("stray.svg");
+  });
+
+  test("refuses a symbolic link whose name is not .svg", () => {
+    const location = workspace();
+    buildBrand(location);
+    symlinkSync(location.sourceDir, join(location.targetDirs[0], "link"));
+    expect(() => buildBrand(location)).toThrow(/link.*symbolic link/s);
+  });
+
+  test("refuses a target directory that is a symbolic link", () => {
+    const location = workspace();
+    const real = join(work[0], "real");
+    mkdirSync(real);
+    mkdirSync(join(work[0], "a"));
+    symlinkSync(real, location.targetDirs[0]);
+    expect(() => buildBrand(location)).toThrow(/a\/brand.*symbolic link/s);
+    expect(list(real)).toEqual([]);
+  });
+
+  test("refuses a public directory that is a symbolic link", () => {
+    const location = workspace();
+    const real = join(work[0], "real-public");
+    mkdirSync(join(real, "brand"), { recursive: true });
+    symlinkSync(real, join(work[0], "a"));
+    expect(() => buildBrand(location)).toThrow(/symbolic link/);
+    expect(list(join(real, "brand"))).toEqual([]);
+  });
+
+  test("refuses a directory named like an SVG", () => {
+    const location = workspace();
+    buildBrand(location);
+    mkdirSync(join(location.targetDirs[0], "folder.svg"));
+    expect(() => buildBrand(location)).toThrow(/folder\.svg.*not a regular file/s);
+  });
+
+  test("deletes only .svg files and leaves other strays for check to report", () => {
+    const location = workspace();
+    buildBrand(location);
+    writeFileSync(join(location.targetDirs[0], "notes.html"), "<p>x</p>");
+    writeFileSync(join(location.targetDirs[0], "stray.svg"), "<svg/>");
+    buildBrand(location);
+    expect(list(location.targetDirs[0])).toEqual(["mark.svg", "notes.html"]);
+    expect(checkBrand(location).join("\n")).toMatch(/notes\.html.*stray/);
+  });
+
+  test("check reports a symbolic link instead of reading through it", () => {
+    const location = workspace();
+    buildBrand(location);
+    const outside = join(work[0], "outside.svg");
+    writeFileSync(outside, optimise(mark));
+    rmSync(join(location.targetDirs[0], "mark.svg"));
+    symlinkSync(outside, join(location.targetDirs[0], "mark.svg"));
+    expect(checkBrand(location).join("\n")).toMatch(/a\/brand\/mark\.svg.*symbolic link/);
   });
 
   test("check passes right after a build", () => {

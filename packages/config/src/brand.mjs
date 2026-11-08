@@ -1,5 +1,5 @@
-import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { lstatSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { Resvg } from "@resvg/resvg-js";
 import sax from "sax";
 import { optimize } from "svgo";
@@ -287,6 +287,15 @@ const svgNames = (dir) =>
     .filter((name) => name.endsWith(".svg"))
     .sort();
 
+const lstatIfPresent = (path) => {
+  try {
+    return lstatSync(path);
+  } catch (error) {
+    if (error.code === "ENOENT") return null;
+    throw error;
+  }
+};
+
 const readIfPresent = (path) => {
   try {
     return readFileSync(path, "utf8");
@@ -296,14 +305,25 @@ const readIfPresent = (path) => {
   }
 };
 
-const namesIn = (dir) => {
-  try {
-    return readdirSync(dir).sort();
-  } catch (error) {
-    if (error.code === "ENOENT") return [];
-    throw error;
+function inspectTarget(dir) {
+  const problems = [];
+  for (const path of [dirname(dir), dir])
+    if (lstatIfPresent(path)?.isSymbolicLink())
+      problems.push(`${path} is a symbolic link, refusing to read or write through it`);
+  if (problems.length) return { problems, entries: [] };
+  const entries = [];
+  const present = lstatIfPresent(dir) ? readdirSync(dir).sort() : [];
+  for (const name of present) {
+    const path = join(dir, name);
+    const stat = lstatSync(path);
+    if (stat.isSymbolicLink())
+      problems.push(`${path} is a symbolic link, refusing to read or write through it`);
+    else if (!stat.isFile() && name.endsWith(".svg"))
+      problems.push(`${path} is not a regular file, remove it by hand`);
+    else entries.push({ name, path, regular: stat.isFile() });
   }
-};
+  return { problems, entries };
+}
 
 function optimisedSources(sourceDir) {
   return svgNames(sourceDir).map((name) => {
@@ -321,14 +341,17 @@ function optimisedSources(sourceDir) {
 
 export function buildBrand({ sourceDir, targetDirs }) {
   const outputs = optimisedSources(sourceDir);
+  const inspected = targetDirs.map((dir) => ({ dir, ...inspectTarget(dir) }));
+  const problems = inspected.flatMap((target) => target.problems);
+  if (problems.length) throw new Error(problems.join("\n"));
+  const wanted = new Set(outputs.map(({ name }) => name));
   const written = [];
-  for (const dir of targetDirs) {
+  for (const { dir, entries } of inspected) {
     mkdirSync(dir, { recursive: true });
-    const wanted = new Set(outputs.map(({ name }) => name));
-    for (const name of namesIn(dir))
-      if (!wanted.has(name)) {
-        rmSync(join(dir, name), { recursive: true, force: true });
-        written.push(join(dir, name));
+    for (const { name, path } of entries)
+      if (!wanted.has(name) && name.endsWith(".svg")) {
+        rmSync(path);
+        written.push(path);
       }
     for (const { name, output } of outputs) {
       const path = join(dir, name);
@@ -350,21 +373,26 @@ export function checkBrand({ sourceDir, targetDirs }) {
   }
   const wanted = new Map(outputs.map(({ name, output }) => [name, output]));
   for (const dir of targetDirs) {
-    for (const name of namesIn(dir))
-      if (!wanted.has(name))
-        problems.push(`${join(dir, name)} is a stray file, no source produces it`);
+    const target = inspectTarget(dir);
+    problems.push(...target.problems);
+    if (target.problems.length) continue;
+    const names = new Set(target.entries.map(({ name }) => name));
+    for (const { name, path } of target.entries)
+      if (!wanted.has(name)) problems.push(`${path} is a stray file, no source produces it`);
     for (const [name, output] of wanted) {
       const path = join(dir, name);
-      const actual = readIfPresent(path);
-      if (actual === null) problems.push(`${path} is missing, run pnpm brand`);
-      else if (actual !== output) {
-        const failures = sanitise(actual);
-        problems.push(
-          failures.length
-            ? `${path} fails the sanitiser: ${failures.join("; ")}`
-            : `${path} differs from the optimised source, run pnpm brand`,
-        );
+      if (!names.has(name)) {
+        problems.push(`${path} is missing, run pnpm brand`);
+        continue;
       }
+      const actual = readFileSync(path, "utf8");
+      if (actual === output) continue;
+      const failures = sanitise(actual);
+      problems.push(
+        failures.length
+          ? `${path} fails the sanitiser: ${failures.join("; ")}`
+          : `${path} differs from the optimised source, run pnpm brand`,
+      );
     }
   }
   return problems;
