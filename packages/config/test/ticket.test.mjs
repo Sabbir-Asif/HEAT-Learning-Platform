@@ -363,7 +363,7 @@ describe("slugify", () => {
     ["Fix the README link to the ADRs", "fix-readme-link-adrs"],
     ["Café menu", "cafe-menu"],
     ["¿?", "issue"],
-    ["বাংলা শিরোনাম", "issue"],
+    ["日本語のタイトル", "issue"],
     ["a".repeat(30) + " " + "b".repeat(30), "a".repeat(30)],
     ["x".repeat(60), "x".repeat(40)],
   ])("%j becomes %j", (title, slug) => {
