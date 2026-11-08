@@ -13,7 +13,6 @@
 - The interface, emails and certificates are in English only.
 - No translation library, no message catalog package, no language switch, no language segment in any address, and no language-specific font or line-height rules.
 - Course content is in one language per course, which is English.
-- Captions, when an admin uploads them, are not tied to a language choice.
 - Fonts come from the design tokens: Source Serif 4 for display and headings, Public Sans for interface text.
 
 ## Consequences

@@ -124,7 +124,7 @@ One rule set for both apps:
    - In the browser, the orval mutator performs one shared refresh on 401 and retries once.
    - **Backend requirement:** refresh-token rotation gets a 20-second grace window in Redis so parallel refreshes do not trigger reuse detection and log the user out.
 5. **Cookies and CSRF.** Cookies use the `__Host-` prefix. The access cookie (10 minutes) is `SameSite=Lax` so links from emails arrive signed in; the refresh cookie is `SameSite=Strict` and limited to the refresh path. The mutator sends a CSRF token that is HMAC-bound to the session on every unsafe request, so a sibling subdomain cannot plant a valid one. Nginx blocks admin API paths on the student host.
-6. **Errors.** The API's stable error codes (from `@heat/contracts`) map to translated messages; form-level errors map to fields by path.
+6. **Errors.** The API's stable error codes (from `@heat/contracts`) map to messages; form-level errors map to fields by path.
 
 `proxy.ts` only does optimistic work (refresh, redirect to sign-in when no session cookie exists). Real authorization is always the API's.
 

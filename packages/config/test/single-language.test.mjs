@@ -10,9 +10,11 @@ const removed = [
   ["ben", "gali"],
   ["next", "-intl"],
   ["\\[loc", "ale\\]"],
-  ["@heat/", "i18n"],
+  ["@heat/i1", "8n"],
   ["noto-sans-", "ben", "gali"],
   ["hind ", "siliguri"],
+  ["use", "-?locale"],
+  ["\\bi1", "8n\\b"],
   ["বা", "ংলা"],
 ].map((parts) => parts.join(""));
 
