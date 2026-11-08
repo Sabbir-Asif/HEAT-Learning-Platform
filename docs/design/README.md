@@ -260,3 +260,7 @@ Filled in by 30b (student screens) and 30c (admin screens). Each screen has a ro
 | Module editor (locked) | Fix wording safely | Lock note, read-only structure fields, editable wording fields, save | Says why fields are read-only and that wording changes are logged |
 | Module editor (unlocked) | Build a module | Title, description, position, pass mark, save draft, publish | The fields needed to create and publish a module |
 | Insights | Understand enrolment and quiz results | Filter bar, two chart cards each with Download CSV | The trend and the pass rate; the numbers are the point. The line chart is told apart by a labelled legend with different marker shapes and totals, not by colour alone; the lines themselves have no markers yet |
+
+## Sign out
+
+Sign out is not in any header. It lives on the profile page (`student-profile-*`) as an icon and small text button. Sign in and log in buttons elsewhere use the same icon and small text pattern.

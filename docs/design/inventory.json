@@ -106,6 +106,24 @@
       "lang": "en"
     },
     {
+      "id": "student-profile-laptop-light-en",
+      "area": "student",
+      "screen": "profile",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Account details, enrolment status and the Sign out button (icon and small text)"
+    },
+    {
+      "id": "student-profile-phone-light-en",
+      "area": "student",
+      "screen": "profile",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Account details, enrolment status and the Sign out button (icon and small text)"
+    },
+    {
       "id": "student-dashboard-empty-laptop-light-en",
       "area": "student",
       "screen": "dashboard-empty",
