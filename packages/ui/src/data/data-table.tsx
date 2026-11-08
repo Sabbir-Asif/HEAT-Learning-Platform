@@ -46,7 +46,7 @@ type DataTableProps<Row extends RowData> = {
   pageSize: PageSize;
   sort: SortState | null;
   onToggleSort: (id: string) => void;
-  onSortChange?: (sort: SortState | null) => void;
+  onSortChange: (sort: SortState | null) => void;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: PageSize) => void;
   status?: DataTableStatus;
@@ -131,7 +131,7 @@ function DataTable<Row extends RowData>({
       />
     ) : isMobile ? (
       <div className="flex flex-col gap-3">
-        {onSortChange && sortableIds.size > 0 ? (
+        {sortableIds.size > 0 ? (
           <MobileSort columns={columns} sort={sort} onSortChange={onSortChange} />
         ) : null}
         <ul className="flex flex-col gap-3" aria-label={label}>
