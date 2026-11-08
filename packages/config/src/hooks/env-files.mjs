@@ -267,10 +267,12 @@ function globMatchesEnvByName(name) {
   );
 }
 
+const isEnvLike = (name) => isEnvFile(name) || name.toLowerCase().startsWith(".env");
+
 function isEnvEntry(directory, entry) {
-  if (isEnvFile(entry)) return true;
+  if (isEnvLike(entry)) return true;
   try {
-    return isEnvFile(realpathSync(join(directory, entry)));
+    return isEnvLike(basename(realpathSync(join(directory, entry))));
   } catch {
     return false;
   }
@@ -310,6 +312,7 @@ function matchingDirectories(base, segment) {
     return null;
   }
   const expression = globRegExp(segment);
+  if (/^[.[]/.test(segment) && (expression.test(".") || expression.test(".."))) return null;
   const found = [];
   for (const entry of entries) {
     const path = join(base.path, entry);
@@ -432,8 +435,10 @@ const trustedPrograms = new Set([
 const stateWords =
   /(?:^|[\s;&|(){}])[A-Za-z_]\w*\+?=|\b(?:export|declare|typeset|unset|local|readonly|HOME)\b/;
 
+const harmlessDevices = /^\/dev\/(?:null|stdout|stderr|fd\/\d+)$/;
+
 function writesOutsideDevices(command) {
-  return command.writes.some((target) => !resolve(command.cwd, target).startsWith("/dev/"));
+  return command.writes.some((target) => !harmlessDevices.test(resolve(command.cwd, target)));
 }
 
 function listingTrusted(commands, text) {
@@ -444,7 +449,7 @@ function listingTrusted(commands, text) {
   );
 }
 
-export function envAccess(commands, text = "") {
+export function envAccess(commands, text) {
   const trusted = listingTrusted(commands, text);
   for (const command of commands) {
     const redirected = [...command.writes, ...command.reads].find(isEnvFile);

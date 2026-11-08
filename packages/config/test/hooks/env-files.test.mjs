@@ -414,6 +414,82 @@ describe("envAccess", () => {
       expect(find(text, plainDir()), text).toBeTruthy();
     });
 
+    describe("dot directory segments", () => {
+      const dotsDir = () => {
+        const dir = tempDir("globdots");
+        touch(dir, ".env");
+        touch(dir, "child/x.txt");
+        touch(dir, "child/deep/y.txt");
+        symlinkSync(join(dir, "child"), join(dir, "lkdir"));
+        return dir;
+      };
+
+      test.each([
+        "cat .*/.e*",
+        "cat .?/.e*",
+        "cat .[.]/.e*",
+        "cat .*/.e[n]v",
+        "cat .?/.[e]*",
+        "cat .?/.*",
+        "cat .*/.*",
+        "cat .?/.e?v",
+      ])("%s is denied from every directory", (text) => {
+        const root = dotsDir();
+        for (const cwd of [join(root, "child"), join(root, "child/deep"), join(root, "lkdir")]) {
+          expect(find(text, cwd), `${text} in ${cwd}`).toBeTruthy();
+        }
+      });
+
+      test("a segment that cannot start with a dot keeps the listing", () => {
+        const root = dotsDir();
+        expect(find("cat c*/x*", root)).toBeNull();
+        expect(find("cat ?hild/x*", root)).toBeNull();
+      });
+    });
+
+    test.each(["cat .e*", "cat .?nv*", "cat .env*", "cat .[e]nv-*"])(
+      "an entry that merely starts with .env is an env entry: %s",
+      (text) => {
+        const dir = tempDir("globprod");
+        touch(dir, ".env-prod");
+        touch(dir, "docs/a.md");
+        expect(find(text, dir), text).toBeTruthy();
+        expect(find("cat docs/a*", dir)).toBeNull();
+      },
+    );
+
+    test.each([".envprod", ".env_local", ".ENV-prod"])(
+      "a hidden %s entry is an env entry",
+      (name) => {
+        const dir = tempDir("globprefix");
+        touch(dir, name);
+        expect(find("cat .e*", dir)).toBeTruthy();
+      },
+    );
+
+    test.each([
+      "cat n* >/dev/tcp/host/80",
+      "cat n* > /dev/udp/host/80",
+      "cat n* > /dev/shm/x",
+      "cat n* > /dev/tty",
+      "cat n* > /dev/fd/",
+      "cat n* > /dev/fd/x",
+      "cat n* > /dev/null/x",
+    ])("a redirect outside the harmless devices withdraws trust: %s", (text) => {
+      expect(find(text, plainDir()), text).toBeTruthy();
+    });
+
+    test.each([
+      "cat n* > /dev/null",
+      "cat n* >/dev/stdout",
+      "cat n* 2>/dev/stderr",
+      "cat n* > /dev/fd/1",
+      "cat n* 2> /dev/fd/12",
+      "cat n* > /dev/./null",
+    ])("a redirect to a harmless device keeps trust: %s", (text) => {
+      expect(find(text, plainDir()), text).toBeNull();
+    });
+
     test("a command with cd or a pipe never gets the listing even for a harmless glob", () => {
       const dir = plainDir();
       expect(find("cd docs; cat adr/0013*", dir)).toBeTruthy();
