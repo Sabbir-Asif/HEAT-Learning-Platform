@@ -4,11 +4,10 @@ import "./preview.css";
 
 const withGlobals: Decorator = (Story, context) => {
   const dark = context.globals["theme"] === "dark";
-  const lang = context.globals["locale"] === "bn" ? "bn" : "en";
   document.documentElement.classList.toggle("dark", dark);
-  document.documentElement.lang = lang;
+  document.documentElement.lang = "en";
   return (
-    <div className={dark ? "dark" : undefined} lang={lang}>
+    <div className={dark ? "dark" : undefined} lang="en">
       <Story />
     </div>
   );
@@ -17,7 +16,7 @@ const withGlobals: Decorator = (Story, context) => {
 const preview: Preview = {
   parameters: { a11y: { test: "error" } },
   decorators: [withGlobals],
-  initialGlobals: { theme: "light", locale: "en" },
+  initialGlobals: { theme: "light" },
   globalTypes: {
     theme: {
       description: "Colour theme",
@@ -28,18 +27,6 @@ const preview: Preview = {
         items: [
           { value: "light", title: "Light" },
           { value: "dark", title: "Dark" },
-        ],
-      },
-    },
-    locale: {
-      description: "Interface language",
-      toolbar: {
-        title: "Locale",
-        icon: "globe",
-        dynamicTitle: true,
-        items: [
-          { value: "en", title: "English" },
-          { value: "bn", title: "বাংলা" },
         ],
       },
     },
