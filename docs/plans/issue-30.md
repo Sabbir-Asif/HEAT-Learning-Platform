@@ -82,6 +82,7 @@ Same rules as 30b: English only, laptop and phone, light first, one task per com
 - [x] **Task 19: students.** `admin-students` with the shared DataTable (pagination, sort, filter bar, StatusBadge) and a card list on phone.
 - [x] **Task 20: module editor.** `admin-module-editor-locked` (read-only fields with a lock note, wording-fix fields noting changes are logged) and `admin-module-editor-unlocked`.
 - [x] **Task 21: insights.** `admin-insights` with filter bar and chart cards, CSV action per card, series distinguishable without colour.
+- [ ] **Task 23: apply the refined direction to every remaining frame.** Owner feedback 2026-11-08: the first frames looked generic. The landing, dashboard and approvals laptop frames are redrawn as the reference set (Source Serif 4 and Public Sans, Lucide icons, dark ink hero band, rules instead of boxes, Sonner toast). Redraw the other frames in that style once the owner approves the reference set.
 - [ ] **Task 22: review.** Final README no-filler table check, `pnpm design:check`, `pnpm verify`.
 
 ## Acceptance criteria mapped to checks

@@ -22,9 +22,14 @@ The frames are a baseline for implementation, not a pixel specification. The own
 - Build from shadcn/ui primitives themed with `tokens.json`. Where a frame is rougher than the shadcn component, the component wins.
 - Icons come from Lucide (`lucide-react`), the shadcn default, and are used beside or instead of text on navigation, actions, status and empty states. The frames use the same set.
 - No dark frames are drawn. Dark theme is implemented from the dark tokens and checked in the browser.
+- Toasts use Sonner, the toast library shadcn ships, mounted once at the app root. The approvals frame shows the pattern: icon, one-line title, one line of detail, and an Undo action where the action can be reversed. Toasts confirm; they never carry the only record of an error.
 - English only for version 1.
 - Avoid the stock look: identical boxed cards, one radius everywhere, grey shadows on every panel, centred forms, gradient washes. Use rows and dividers before nested cards, a clear type hierarchy, and colour only where it means something (primary for the main action and the active item).
 - Type proposal for the refined frames: Source Serif 4 for display and page titles on student screens, Public Sans for interface text. The Bangla requirement behind Noto Sans Bengali is gone, so the font decision is reopened; #31 confirms the family, weights and woff2 sizes.
+
+### Reference frames for the refined direction
+
+Three frames set the refined direction and are the ones to copy: `student-landing-laptop-light-en` (dark ink band, serif headline, course path as a timeline, rules instead of boxes), `student-dashboard-laptop-light-en` (resume panel, path rows with status icons) and `admin-approvals-laptop-light-en` (icon-led sidebar, avatar rows, icon plus text actions, Sonner toast). The other frames still use the first, plainer layout and are listed for coverage; implement them in the style of the three reference frames.
 
 ## Files
 
