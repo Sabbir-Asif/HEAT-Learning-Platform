@@ -238,7 +238,7 @@ Filled in by 30b (student screens) and 30c (admin screens). Each screen has a ro
 | Quiz question | Answer one question | Progress bar, question, four options, previous and next | One question at a time with position shown; selection uses fill, outline and a filled marker, not colour alone |
 | Quiz review | Check before submitting | Answered and not answered list, go back, submit | Lets the student find a skipped question before submitting |
 | Quiz result (pass) | Understand the result | Score, pass mark, correct and incorrect answers with explanations, continue | The outcome and the learning, shown only after a pass; correct and incorrect carry words as well as colour |
-| Quiz result (fail) | Understand the result and the wait | Score, pass mark, countdown, review lessons, disabled retry | The outcome, when retrying opens, and the way back to the material |
+| Quiz result (fail) | Understand the result and the wait | Score, pass mark, review lessons | The outcome and the way back to the material |
 | Drawer: submit with unanswered | Decide whether to submit | Title, explanation, go back, submit anyway, close | A confirmation that would otherwise be a dialog; slides from the end edge on laptop and up from the bottom on phone |
 | Admin overview | See what needs action | List of items needing attention with one button each | Sends the admin straight to approvals, a failed video or a draft module |
 | Admin overview | See what needs action | Enrollments by status | The numbers are the point: pending, approved, completed and rejected counts, with badges that carry words |
