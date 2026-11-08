@@ -26,12 +26,19 @@ function Form<T extends FieldValues>({
   children,
   ...props
 }: FormProps<T>) {
-  function submit(event: React.FormEvent<HTMLFormElement>) {
-    if (form.formState.isSubmitting) {
+  const submitting = React.useRef(false);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    if (submitting.current) {
       event.preventDefault();
       return;
     }
-    void form.handleSubmit(onSubmit)(event);
+    submitting.current = true;
+    try {
+      await form.handleSubmit(onSubmit)(event);
+    } finally {
+      submitting.current = false;
+    }
   }
 
   return (
@@ -85,7 +92,7 @@ function FormField<T extends FieldValues, N extends FieldPath<T> = FieldPath<T>>
       render={({ field, fieldState }) => {
         const invalid = fieldState.invalid;
         const describedBy =
-          [description ? descriptionId : undefined, invalid ? errorId : undefined]
+          [description ? descriptionId : undefined, fieldState.error?.message ? errorId : undefined]
             .filter(Boolean)
             .join(" ") || undefined;
         return (

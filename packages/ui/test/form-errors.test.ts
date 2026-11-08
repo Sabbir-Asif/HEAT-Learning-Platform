@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import { clientErrorCodes, errorCodes, fieldErrorCodes } from "../../contracts/src/errors";
 import {
   fieldErrorCopy,
   formErrorCopy,
@@ -31,6 +32,16 @@ describe("copy", () => {
   test("rate limits and network failures have their own form-level text", () => {
     expect(formErrorCopy.RATE_LIMITED).not.toBe(formErrorCopy.NETWORK_ERROR);
     expect(formErrorCopy.RATE_LIMITED).not.toBe(genericFormMessage);
+  });
+});
+
+describe("copy against the shared contract", () => {
+  test("has text for exactly the field error codes", () => {
+    expect(Object.keys(fieldErrorCopy).sort()).toEqual([...fieldErrorCodes].sort());
+  });
+
+  test("has form-level text for exactly the error codes and client error codes", () => {
+    expect(Object.keys(formErrorCopy).sort()).toEqual([...errorCodes, ...clientErrorCodes].sort());
   });
 });
 

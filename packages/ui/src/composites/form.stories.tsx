@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "../components/select";
 import { Textarea } from "../components/textarea";
+import * as React from "react";
 import { applyServerError } from "./apply-server-error";
 import { Form, FormField, FormMessage } from "./form";
 
@@ -66,6 +67,31 @@ function Demo({ response }: DemoProps) {
         />
         <FormMessage />
         <Button type="submit">Save</Button>
+      </Form>
+    </div>
+  );
+}
+
+function PendingDemo() {
+  const form = useForm<{ email: string }>({ defaultValues: { email: "" } });
+  const [calls, setCalls] = React.useState(0);
+
+  return (
+    <div className="max-w-sm p-4">
+      <Form
+        form={form}
+        onSubmit={async () => {
+          setCalls((count) => count + 1);
+          await new Promise((resolve) => setTimeout(resolve, 300));
+        }}
+      >
+        <FormField
+          name="email"
+          label="Email"
+          render={({ field, controlProps }) => <Input {...field} {...controlProps} />}
+        />
+        <Button type="submit">Save</Button>
+        <p>Submitted {calls} times</p>
       </Form>
     </div>
   );
@@ -170,5 +196,20 @@ export const RateLimited: Story = {
 
     await expect(await canvas.findByRole("alert")).toHaveTextContent("Too many attempts");
     await expect(canvas.getByLabelText("Email")).toHaveAttribute("aria-invalid", "false");
+  },
+};
+
+export const PendingSubmit: Story = {
+  render: () => <PendingDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const save = canvas.getByRole("button", { name: "Save" });
+    await userEvent.click(save);
+    await userEvent.click(save);
+    await waitFor(() => expect(canvas.getByText("Submitted 1 times")).toBeInTheDocument());
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await expect(canvas.getByText("Submitted 1 times")).toBeInTheDocument();
+    await userEvent.click(save);
+    await waitFor(() => expect(canvas.getByText("Submitted 2 times")).toBeInTheDocument());
   },
 };

@@ -34,6 +34,7 @@ export * from "./composites/page-header";
 export * from "./composites/stat-card";
 export * from "./composites/status-badge";
 export { applyServerError } from "./composites/apply-server-error";
+export type { ApplyServerErrorOptions, ServerErrorForm } from "./composites/apply-server-error";
 export { fieldErrorCopy, formErrorCopy, genericFormMessage } from "./composites/form-errors";
 export { resolveStatus, statusEntries } from "./composites/status";
 export type { StatusEntry, StatusKey, StatusKind, StatusTone } from "./composites/status";
