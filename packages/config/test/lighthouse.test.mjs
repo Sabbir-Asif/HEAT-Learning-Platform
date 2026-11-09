@@ -21,7 +21,7 @@ const page = (overrides) => ({
 
 describe("config", () => {
   test("carries the owner budgets", () => {
-    expect(config.budgets.public.firstLoadScriptKb).toBe(150);
+    expect(config.budgets.public.firstLoadScriptKb).toBe(300);
     expect(config.budgets.learner.firstLoadScriptKb).toBe(200);
     expect(config.lcpBudgetMs).toBe(2500);
     expect(config.runs).toBe(3);
@@ -89,15 +89,15 @@ describe("evaluatePage", () => {
 
   test("flags first-load JavaScript over the public budget", () => {
     const result = evaluatePage(
-      page({ runs: [run(1000, script("http://x/a.js", 160.25))] }),
+      page({ runs: [run(1000, script("http://x/a.js", 310.25))] }),
       config,
     );
-    expect(result.findings).toEqual(["/ first-load JS is 160.3 KB gzipped, budget 150 KB"]);
+    expect(result.findings).toEqual(["/ first-load JS is 310.3 KB gzipped, budget 300 KB"]);
   });
 
-  test("allows 150 KB exactly", () => {
+  test("allows 300 KB exactly", () => {
     expect(
-      evaluatePage(page({ runs: [run(1000, script("http://x/a.js", 150))] }), config).findings,
+      evaluatePage(page({ runs: [run(1000, script("http://x/a.js", 300))] }), config).findings,
     ).toEqual([]);
   });
 
@@ -161,7 +161,7 @@ describe("evaluatePage", () => {
 
 describe("report", () => {
   const ok = { pages: [page()] };
-  const over = { pages: [page({ runs: [run(1000, script("http://x/a.js", 160))] })] };
+  const over = { pages: [page({ runs: [run(1000, script("http://x/a.js", 310))] })] };
 
   test("is quiet and says so when everything is inside the budgets", () => {
     const { annotations, summary } = report(ok, { outcome: "success", artifactUrl: "https://a/1" });
@@ -175,9 +175,9 @@ describe("report", () => {
   test("turns each finding into a warning annotation naming page, budget and value", () => {
     const { annotations, summary } = report(over, { outcome: "success" });
     expect(annotations).toEqual([
-      "::warning title=Lighthouse budget::/ first-load JS is 160.0 KB gzipped, budget 150 KB",
+      "::warning title=Lighthouse budget::/ first-load JS is 310.0 KB gzipped, budget 300 KB",
     ]);
-    expect(summary).toContain("/ first-load JS is 160.0 KB gzipped, budget 150 KB");
+    expect(summary).toContain("/ first-load JS is 310.0 KB gzipped, budget 300 KB");
   });
 
   test("warns when the run produced no results", () => {

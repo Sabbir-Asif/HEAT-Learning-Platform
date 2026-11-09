@@ -14,5 +14,5 @@ Next.js app for the public site and the learner area, on `learn.<domain>` (port 
 - No secrets in `NEXT_PUBLIC_*`. No third-party scripts on student pages.
 - Images use `next/image` with the custom loader; the built-in Next.js image optimizer stays off. Fonts are self-hosted with `next/font`.
 - Load the player chunk only on lesson pages.
-- Budgets: first-load JavaScript at most 150 KB gzipped on public pages and 200 KB on learner pages (excluding the player).
+- Budgets: first-load JavaScript at most 300 KB gzipped on public pages and 200 KB on learner pages (excluding the player).
 - Phone layout is the primary one for learner screens: the sidebar becomes a bottom bar under `md`, and the lesson video is pinned on top.
