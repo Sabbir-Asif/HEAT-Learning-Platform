@@ -6,7 +6,7 @@
 
 ## Context
 
-[0009](0009-bangla-and-english-interface.md) put the interface in two languages from the first screen. On 2026-11-08 the owner decided that the platform needs one language, English, and asked for the second language and every multi-language feature to be removed.
+Record 0009, since removed, put the interface in two languages from the first screen. On 2026-11-08 the owner decided that the platform needs one language, English, and asked for the second language and every multi-language feature to be removed.
 
 ## Decision
 
