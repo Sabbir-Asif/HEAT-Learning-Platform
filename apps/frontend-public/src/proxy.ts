@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import {
-  accessCookieName,
-  decideGate,
-  pathnameHeader,
-  protectedPrefixes,
-} from "./auth/session-gate";
+import { accessCookieName, decideGate, pathnameHeader } from "./auth/session-gate";
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
