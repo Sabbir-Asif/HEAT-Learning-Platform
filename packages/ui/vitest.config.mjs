@@ -5,7 +5,10 @@ export default jsdomPreset({
     "**/*.stories.tsx",
     "src/components/**",
     "src/composites/**/*.tsx",
+    "src/charts/**/*.tsx",
+    "src/upload/**/*.tsx",
     "src/data/**/*.tsx",
     "src/hooks/**",
+    "src/shell/**/*.tsx",
   ],
 });

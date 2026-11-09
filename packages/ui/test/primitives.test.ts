@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
 const srcRoot = join(import.meta.dirname, "../src");
-const scanned = ["components", "composites", "lib", "hooks", "data"];
+const scanned = ["components", "composites", "lib", "hooks", "charts", "data", "shell", "upload"];
 
 const allowedPackages = [
   "react",
@@ -21,7 +21,9 @@ const allowedPackages = [
 ];
 
 const folderPackages: Record<string, string[]> = {
+  charts: ["recharts"],
   data: ["@tanstack/react-table", "nuqs"],
+  upload: ["@uppy/core"],
 };
 
 const forbiddenPackagePrefixes = ["@radix-ui/", "@headlessui/", "@mui/", "@chakra-ui/", "antd"];
@@ -107,6 +109,15 @@ describe("the rule checks themselves", () => {
     expect(isAllowed("lucide-react")).toBe(true);
     expect(isAllowed("@radix-ui/react-dialog")).toBe(false);
     expect(isAllowed("react-icons")).toBe(false);
+  });
+
+  test("allow the chart and upload libraries only inside their own folders", () => {
+    expect(isAllowed("recharts", "charts")).toBe(true);
+    expect(isAllowed("@uppy/core", "upload")).toBe(true);
+    expect(isAllowed("recharts", "upload")).toBe(false);
+    expect(isAllowed("@uppy/core", "charts")).toBe(false);
+    expect(isAllowed("recharts", "components")).toBe(false);
+    expect(isAllowed("@uppy/core")).toBe(false);
   });
 
   test("allow the table and URL libraries only inside the data folder", () => {
