@@ -95,7 +95,7 @@ describe("pinning to a revision", () => {
         database.prisma.enrollment.create({
           data: { userId: student.id, courseId: course.id, status },
         }),
-      ).rejects.toThrow(/check|constraint/i);
+      ).rejects.toThrow(/Enrollment_pinned_revision_check/);
     },
   );
 
@@ -148,7 +148,23 @@ describe("removal remembers the previous state", () => {
           status: "REMOVED",
         },
       }),
-    ).rejects.toThrow(/check|constraint/i);
+    ).rejects.toThrow(/Enrollment_removal_state_check/);
+  });
+
+  test("REMOVED after approval without a pinned revision is rejected", async () => {
+    const student = await createStudent();
+    const { course } = await createCourse();
+
+    await expect(
+      database.prisma.enrollment.create({
+        data: {
+          userId: student.id,
+          courseId: course.id,
+          status: "REMOVED",
+          statusBeforeRemoval: "APPROVED",
+        },
+      }),
+    ).rejects.toThrow(/Enrollment_pinned_revision_check/);
   });
 
   test("a previous state on an enrollment that is not removed is rejected", async () => {
@@ -164,7 +180,7 @@ describe("removal remembers the previous state", () => {
           statusBeforeRemoval: "APPROVED",
         },
       }),
-    ).rejects.toThrow(/check|constraint/i);
+    ).rejects.toThrow(/Enrollment_removal_state_check/);
   });
 
   test("REMOVED with the previous state is accepted", async () => {
@@ -229,6 +245,43 @@ describe("decisions", () => {
     expect(
       await database.prisma.enrollmentDecision.count({ where: { enrollmentId: enrollment.id } }),
     ).toBe(3);
+  });
+
+  test("a decision cannot name a student as the admin", async () => {
+    const student = await createStudent();
+    const other = await createStudent();
+    const { course } = await createCourse();
+    const enrollment = await database.prisma.enrollment.create({
+      data: { userId: student.id, courseId: course.id },
+    });
+
+    await expect(
+      database.prisma.enrollmentDecision.create({
+        data: { enrollmentId: enrollment.id, adminId: other.id, action: "APPROVE" },
+      }),
+    ).rejects.toThrow(/admin/i);
+  });
+
+  test("a super admin can decide", async () => {
+    const student = await createStudent();
+    const superAdmin = await database.prisma.user.create({
+      data: {
+        email: `${unique()}@example.com`,
+        passwordHash: "argon2id-hash",
+        role: "SUPER_ADMIN",
+        realm: "ADMIN",
+      },
+    });
+    const { course } = await createCourse();
+    const enrollment = await database.prisma.enrollment.create({
+      data: { userId: student.id, courseId: course.id },
+    });
+
+    const decision = await database.prisma.enrollmentDecision.create({
+      data: { enrollmentId: enrollment.id, adminId: superAdmin.id, action: "APPROVE" },
+    });
+
+    expect(decision.adminId).toBe(superAdmin.id);
   });
 
   test("a decision needs an existing admin", async () => {

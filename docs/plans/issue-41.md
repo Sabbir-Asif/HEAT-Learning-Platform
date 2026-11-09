@@ -105,3 +105,11 @@ Then `pnpm verify` on a clean tree. Also confirm the CI `integration` job passes
 - Prisma 7 changes (config file, no `url` in the datasource, generated client location) are new to this repository; task 1 is where surprises show up.
 - The pnpm minimum release age may block a freshly published package version; pin an older patch if so, do not add an exclusion without the owner.
 - The `integration` job needs Docker on the CI runner; GitHub-hosted runners have it.
+
+## Follow-ups for later tickets
+
+Found in the code review of this ticket and left for the ticket that owns the area:
+
+- **E2-3 (soft delete, partial unique email):** `Course.slug`, `Tag.slug`, the order constraints on `Module`, `Video` and `LessonSection`, and `@@unique([userId, courseId])` on `Enrollment` are plain unique constraints over rows that also have `deletedAt`. A soft-deleted row keeps its slug, order or enrollment slot. E2-3 replaces each with a unique index `WHERE "deletedAt" IS NULL` in a new migration. The email index needs the case rule decided there: store lower case with a check `email = lower(email)`, or use `citext`.
+- **E3 (auth):** the admin-only triggers check the user's realm when a row is written. Changing a user's role afterwards does not re-check existing credential or decision rows; the admin management endpoints must never change a user's role.
+- **Optional hardening, not done:** a database check for the session format on `StudentProfile.session`, and `>= 0` checks on orders, durations and bitrates. The session format is checked in `@heat/contracts` as planned; orders and durations are left to API validation.

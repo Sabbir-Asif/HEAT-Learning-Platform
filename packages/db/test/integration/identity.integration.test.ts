@@ -84,7 +84,7 @@ describe("secrets are stored only as hashes", () => {
           expiresAt: new Date(Date.now() + 60_000),
         },
       }),
-    ).rejects.toThrow(/check|constraint/i);
+    ).rejects.toThrow(/Session_refreshTokenHash_sha256_check/);
   });
 
   test("an auth token rejects a token hash that is not 64 hex characters", async () => {
@@ -99,7 +99,7 @@ describe("secrets are stored only as hashes", () => {
           expiresAt: new Date(Date.now() + 60_000),
         },
       }),
-    ).rejects.toThrow(/check|constraint/i);
+    ).rejects.toThrow(/AuthToken_tokenHash_sha256_check/);
   });
 
   test("a recovery code rejects a hash that is not 64 hex characters", async () => {
@@ -107,7 +107,7 @@ describe("secrets are stored only as hashes", () => {
 
     await expect(
       database.prisma.recoveryCode.create({ data: { userId: admin.id, codeHash: "123456" } }),
-    ).rejects.toThrow(/check|constraint/i);
+    ).rejects.toThrow(/RecoveryCode_codeHash_sha256_check/);
   });
 
   test("hashes of the right shape are accepted", async () => {
@@ -152,7 +152,7 @@ describe("user realm follows role", () => {
           realm: "ADMIN",
         },
       }),
-    ).rejects.toThrow(/check|constraint/i);
+    ).rejects.toThrow(/User_realm_matches_role_check/);
   });
 
   test("an admin cannot be placed in the student realm", async () => {
@@ -165,7 +165,7 @@ describe("user realm follows role", () => {
           realm: "STUDENT",
         },
       }),
-    ).rejects.toThrow(/check|constraint/i);
+    ).rejects.toThrow(/User_realm_matches_role_check/);
   });
 
   test("a super admin belongs to the admin realm", async () => {
@@ -251,6 +251,37 @@ describe("admin credentials", () => {
     await expect(database.prisma.recoveryCode.create({ data })).rejects.toMatchObject({
       code: "P2002",
     });
+  });
+});
+
+describe("admin-only rows belong to admins", () => {
+  test("a student cannot have an authenticator credential", async () => {
+    const student = await createStudent();
+
+    await expect(
+      database.prisma.adminCredential.create({
+        data: { userId: student.id, totpSecretEncrypted: Buffer.from("ciphertext") },
+      }),
+    ).rejects.toThrow(/admin/i);
+  });
+
+  test("a student cannot have recovery codes", async () => {
+    const student = await createStudent();
+
+    await expect(
+      database.prisma.recoveryCode.create({ data: { userId: student.id, codeHash: hash() } }),
+    ).rejects.toThrow(/admin/i);
+  });
+
+  test("a student cannot decide a profile change request", async () => {
+    const student = await createStudent();
+    const other = await createStudent();
+
+    await expect(
+      database.prisma.profileChangeRequest.create({
+        data: { userId: student.id, requestedName: "A. Rahman", decidedById: other.id },
+      }),
+    ).rejects.toThrow(/admin/i);
   });
 });
 

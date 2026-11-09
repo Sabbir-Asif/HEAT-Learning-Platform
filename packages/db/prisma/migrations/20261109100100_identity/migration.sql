@@ -1,16 +1,11 @@
--- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('SUPER_ADMIN', 'ADMIN', 'STUDENT');
 
--- CreateEnum
 CREATE TYPE "Realm" AS ENUM ('STUDENT', 'ADMIN');
 
--- CreateEnum
 CREATE TYPE "AuthTokenPurpose" AS ENUM ('VERIFY_EMAIL', 'RESET_PASSWORD', 'INVITE', 'PASSWORD_CODE');
 
--- CreateEnum
 CREATE TYPE "ProfileChangeStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
--- CreateTable
 CREATE TABLE "User" (
     "id" UUID NOT NULL,
     "email" TEXT NOT NULL,
@@ -27,7 +22,6 @@ CREATE TABLE "User" (
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "StudentProfile" (
     "id" UUID NOT NULL,
     "userId" UUID NOT NULL,
@@ -41,7 +35,6 @@ CREATE TABLE "StudentProfile" (
     CONSTRAINT "StudentProfile_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "Session" (
     "id" UUID NOT NULL,
     "userId" UUID NOT NULL,
@@ -58,7 +51,6 @@ CREATE TABLE "Session" (
     CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "AuthToken" (
     "id" UUID NOT NULL,
     "userId" UUID NOT NULL,
@@ -72,7 +64,6 @@ CREATE TABLE "AuthToken" (
     CONSTRAINT "AuthToken_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "AdminCredential" (
     "id" UUID NOT NULL,
     "userId" UUID NOT NULL,
@@ -84,7 +75,6 @@ CREATE TABLE "AdminCredential" (
     CONSTRAINT "AdminCredential_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "RecoveryCode" (
     "id" UUID NOT NULL,
     "userId" UUID NOT NULL,
@@ -96,7 +86,6 @@ CREATE TABLE "RecoveryCode" (
     CONSTRAINT "RecoveryCode_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "ProfileChangeRequest" (
     "id" UUID NOT NULL,
     "userId" UUID NOT NULL,
@@ -113,78 +102,70 @@ CREATE TABLE "ProfileChangeRequest" (
     CONSTRAINT "ProfileChangeRequest_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
 CREATE INDEX "User_email_idx" ON "User"("email");
 
--- CreateIndex
 CREATE UNIQUE INDEX "StudentProfile_userId_key" ON "StudentProfile"("userId");
 
--- CreateIndex
 CREATE INDEX "StudentProfile_departmentId_idx" ON "StudentProfile"("departmentId");
 
--- CreateIndex
 CREATE UNIQUE INDEX "Session_refreshTokenHash_key" ON "Session"("refreshTokenHash");
 
--- CreateIndex
 CREATE INDEX "Session_userId_idx" ON "Session"("userId");
 
--- CreateIndex
 CREATE INDEX "Session_familyId_idx" ON "Session"("familyId");
 
--- CreateIndex
 CREATE UNIQUE INDEX "AuthToken_tokenHash_key" ON "AuthToken"("tokenHash");
 
--- CreateIndex
 CREATE INDEX "AuthToken_userId_purpose_idx" ON "AuthToken"("userId", "purpose");
 
--- CreateIndex
 CREATE UNIQUE INDEX "AdminCredential_userId_key" ON "AdminCredential"("userId");
 
--- CreateIndex
 CREATE UNIQUE INDEX "RecoveryCode_userId_codeHash_key" ON "RecoveryCode"("userId", "codeHash");
 
--- CreateIndex
 CREATE INDEX "ProfileChangeRequest_userId_idx" ON "ProfileChangeRequest"("userId");
 
--- CreateIndex
 CREATE INDEX "ProfileChangeRequest_status_idx" ON "ProfileChangeRequest"("status");
 
--- AddForeignKey
 ALTER TABLE "StudentProfile" ADD CONSTRAINT "StudentProfile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "StudentProfile" ADD CONSTRAINT "StudentProfile_departmentId_fkey" FOREIGN KEY ("departmentId") REFERENCES "Department"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "AuthToken" ADD CONSTRAINT "AuthToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "AdminCredential" ADD CONSTRAINT "AdminCredential_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "RecoveryCode" ADD CONSTRAINT "RecoveryCode_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "ProfileChangeRequest" ADD CONSTRAINT "ProfileChangeRequest_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "ProfileChangeRequest" ADD CONSTRAINT "ProfileChangeRequest_decidedById_fkey" FOREIGN KEY ("decidedById") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "ProfileChangeRequest" ADD CONSTRAINT "ProfileChangeRequest_requestedDepartmentId_fkey" FOREIGN KEY ("requestedDepartmentId") REFERENCES "Department"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
--- AddCheckConstraint
 ALTER TABLE "User" ADD CONSTRAINT "User_realm_matches_role_check" CHECK (("role" = 'STUDENT') = ("realm" = 'STUDENT'));
 
--- AddCheckConstraint
 ALTER TABLE "Session" ADD CONSTRAINT "Session_refreshTokenHash_sha256_check" CHECK ("refreshTokenHash" ~ '^[0-9a-f]{64}$');
 
--- AddCheckConstraint
 ALTER TABLE "AuthToken" ADD CONSTRAINT "AuthToken_tokenHash_sha256_check" CHECK ("tokenHash" ~ '^[0-9a-f]{64}$');
 
--- AddCheckConstraint
 ALTER TABLE "RecoveryCode" ADD CONSTRAINT "RecoveryCode_codeHash_sha256_check" CHECK ("codeHash" ~ '^[0-9a-f]{64}$');
+
+CREATE FUNCTION "assert_admin_user"() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE
+  target uuid;
+BEGIN
+  target := (to_jsonb(NEW) ->> TG_ARGV[0])::uuid;
+  IF EXISTS (SELECT 1 FROM "User" WHERE "id" = target AND "realm" <> 'ADMIN') THEN
+    RAISE EXCEPTION 'user % is not an admin', target USING ERRCODE = '23514';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER "AdminCredential_admin_only" BEFORE INSERT OR UPDATE OF "userId" ON "AdminCredential" FOR EACH ROW EXECUTE FUNCTION "assert_admin_user"('userId');
+
+CREATE TRIGGER "RecoveryCode_admin_only" BEFORE INSERT OR UPDATE OF "userId" ON "RecoveryCode" FOR EACH ROW EXECUTE FUNCTION "assert_admin_user"('userId');
+
+CREATE TRIGGER "ProfileChangeRequest_decider_admin_only" BEFORE INSERT OR UPDATE OF "decidedById" ON "ProfileChangeRequest" FOR EACH ROW EXECUTE FUNCTION "assert_admin_user"('decidedById');

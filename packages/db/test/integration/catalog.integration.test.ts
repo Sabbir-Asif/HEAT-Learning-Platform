@@ -154,7 +154,7 @@ describe("media is referenced by asset key", () => {
         where: { id: asset.id },
         data: { referenceCount: -1 },
       }),
-    ).rejects.toThrow(/check|constraint/i);
+    ).rejects.toThrow(/VideoAsset_referenceCount_nonnegative_check/);
   });
 });
 

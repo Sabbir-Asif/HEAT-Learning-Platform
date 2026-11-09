@@ -1,10 +1,7 @@
--- CreateEnum
 CREATE TYPE "CourseStatus" AS ENUM ('DRAFT', 'PUBLISHED');
 
--- CreateEnum
 CREATE TYPE "VideoAssetStatus" AS ENUM ('UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED');
 
--- CreateTable
 CREATE TABLE "Course" (
     "id" UUID NOT NULL,
     "slug" TEXT NOT NULL,
@@ -20,7 +17,6 @@ CREATE TABLE "Course" (
     CONSTRAINT "Course_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "CourseRevision" (
     "id" UUID NOT NULL,
     "courseId" UUID NOT NULL,
@@ -33,7 +29,6 @@ CREATE TABLE "CourseRevision" (
     CONSTRAINT "CourseRevision_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "Module" (
     "id" UUID NOT NULL,
     "revisionId" UUID NOT NULL,
@@ -46,7 +41,6 @@ CREATE TABLE "Module" (
     CONSTRAINT "Module_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "LessonSection" (
     "id" UUID NOT NULL,
     "moduleId" UUID NOT NULL,
@@ -61,7 +55,6 @@ CREATE TABLE "LessonSection" (
     CONSTRAINT "LessonSection_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "VideoAsset" (
     "id" UUID NOT NULL,
     "assetKey" TEXT NOT NULL,
@@ -74,7 +67,6 @@ CREATE TABLE "VideoAsset" (
     CONSTRAINT "VideoAsset_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "Video" (
     "id" UUID NOT NULL,
     "moduleId" UUID NOT NULL,
@@ -88,7 +80,6 @@ CREATE TABLE "Video" (
     CONSTRAINT "Video_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "VideoRendition" (
     "id" UUID NOT NULL,
     "assetId" UUID NOT NULL,
@@ -100,7 +91,6 @@ CREATE TABLE "VideoRendition" (
     CONSTRAINT "VideoRendition_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "VideoCaption" (
     "id" UUID NOT NULL,
     "assetId" UUID NOT NULL,
@@ -112,7 +102,6 @@ CREATE TABLE "VideoCaption" (
     CONSTRAINT "VideoCaption_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "Tag" (
     "id" UUID NOT NULL,
     "slug" TEXT NOT NULL,
@@ -125,7 +114,6 @@ CREATE TABLE "Tag" (
     CONSTRAINT "Tag_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "CourseTag" (
     "courseId" UUID NOT NULL,
     "tagId" UUID NOT NULL,
@@ -135,7 +123,6 @@ CREATE TABLE "CourseTag" (
     CONSTRAINT "CourseTag_pkey" PRIMARY KEY ("courseId","tagId")
 );
 
--- CreateTable
 CREATE TABLE "ModuleTag" (
     "moduleId" UUID NOT NULL,
     "tagId" UUID NOT NULL,
@@ -145,7 +132,6 @@ CREATE TABLE "ModuleTag" (
     CONSTRAINT "ModuleTag_pkey" PRIMARY KEY ("moduleId","tagId")
 );
 
--- CreateTable
 CREATE TABLE "SiteSetting" (
     "id" UUID NOT NULL,
     "key" TEXT NOT NULL,
@@ -156,75 +142,50 @@ CREATE TABLE "SiteSetting" (
     CONSTRAINT "SiteSetting_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
 CREATE UNIQUE INDEX "Course_slug_key" ON "Course"("slug");
 
--- CreateIndex
 CREATE UNIQUE INDEX "CourseRevision_courseId_number_key" ON "CourseRevision"("courseId", "number");
 
--- CreateIndex
 CREATE UNIQUE INDEX "Module_revisionId_order_key" ON "Module"("revisionId", "order");
 
--- CreateIndex
 CREATE UNIQUE INDEX "LessonSection_moduleId_order_key" ON "LessonSection"("moduleId", "order");
 
--- CreateIndex
 CREATE UNIQUE INDEX "VideoAsset_assetKey_key" ON "VideoAsset"("assetKey");
 
--- CreateIndex
 CREATE INDEX "Video_assetId_idx" ON "Video"("assetId");
 
--- CreateIndex
 CREATE UNIQUE INDEX "Video_moduleId_order_key" ON "Video"("moduleId", "order");
 
--- CreateIndex
 CREATE UNIQUE INDEX "VideoRendition_assetId_label_key" ON "VideoRendition"("assetId", "label");
 
--- CreateIndex
 CREATE UNIQUE INDEX "VideoCaption_captionKey_key" ON "VideoCaption"("captionKey");
 
--- CreateIndex
 CREATE UNIQUE INDEX "VideoCaption_assetId_language_key" ON "VideoCaption"("assetId", "language");
 
--- CreateIndex
 CREATE UNIQUE INDEX "Tag_slug_key" ON "Tag"("slug");
 
--- CreateIndex
 CREATE UNIQUE INDEX "SiteSetting_key_key" ON "SiteSetting"("key");
 
--- AddForeignKey
 ALTER TABLE "CourseRevision" ADD CONSTRAINT "CourseRevision_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "Course"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "Module" ADD CONSTRAINT "Module_revisionId_fkey" FOREIGN KEY ("revisionId") REFERENCES "CourseRevision"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "LessonSection" ADD CONSTRAINT "LessonSection_moduleId_fkey" FOREIGN KEY ("moduleId") REFERENCES "Module"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "Video" ADD CONSTRAINT "Video_moduleId_fkey" FOREIGN KEY ("moduleId") REFERENCES "Module"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "Video" ADD CONSTRAINT "Video_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "VideoAsset"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "VideoRendition" ADD CONSTRAINT "VideoRendition_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "VideoAsset"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "VideoCaption" ADD CONSTRAINT "VideoCaption_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "VideoAsset"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "CourseTag" ADD CONSTRAINT "CourseTag_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "Course"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "CourseTag" ADD CONSTRAINT "CourseTag_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "ModuleTag" ADD CONSTRAINT "ModuleTag_moduleId_fkey" FOREIGN KEY ("moduleId") REFERENCES "Module"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "ModuleTag" ADD CONSTRAINT "ModuleTag_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
--- AddCheckConstraint
 ALTER TABLE "VideoAsset" ADD CONSTRAINT "VideoAsset_referenceCount_nonnegative_check" CHECK ("referenceCount" >= 0);
