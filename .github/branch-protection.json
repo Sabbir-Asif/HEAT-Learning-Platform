@@ -1,7 +1,16 @@
 {
   "required_status_checks": {
     "strict": false,
-    "contexts": ["lint", "format", "typecheck", "test", "build", "integration", "audit"]
+    "contexts": [
+      "lint",
+      "format",
+      "typecheck",
+      "test",
+      "build",
+      "integration",
+      "audit",
+      "accessibility"
+    ]
   },
   "enforce_admins": true,
   "required_pull_request_reviews": { "required_approving_review_count": 0 },

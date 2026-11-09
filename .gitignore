@@ -14,3 +14,6 @@ next-env.d.ts
 *.env
 .envrc
 .claude/settings.local.json
+test-results
+playwright-report
+.work-*
