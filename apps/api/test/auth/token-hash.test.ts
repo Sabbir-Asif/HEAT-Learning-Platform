@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { generateRefreshToken, hashRefreshToken, safeEqualHex } from "../../src/auth/token-hash";
+import { generateRefreshToken, hashRefreshToken } from "../../src/auth/token-hash";
 
 describe("token hashing", () => {
   test("hashes to 64 lowercase hex characters, deterministically", () => {
@@ -11,11 +11,5 @@ describe("token hashing", () => {
     const a = generateRefreshToken();
     expect(a).toMatch(/^[A-Za-z0-9_-]{43}$/);
     expect(a).not.toBe(generateRefreshToken());
-  });
-
-  test("compares equal, different and different length values", () => {
-    expect(safeEqualHex("aa", "aa")).toBe(true);
-    expect(safeEqualHex("aa", "ab")).toBe(false);
-    expect(safeEqualHex("aa", "aaa")).toBe(false);
   });
 });

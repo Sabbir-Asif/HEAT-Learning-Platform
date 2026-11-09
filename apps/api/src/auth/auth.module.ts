@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { CoreModule } from "../core";
 import { AccessTokenService } from "./access-token.service";
 import { BreachedPasswordProvider } from "./breached-password.provider";
+import { CLAIM_POLLING, defaultClaimPolling } from "./claim-polling";
 import { CookieWriter } from "./cookie-writer";
 import { HibpBreachedPasswordProvider } from "./hibp-breached-password.provider";
 import { PasswordService } from "./password.service";
@@ -18,6 +19,7 @@ import { SessionStore } from "./session.store";
     CookieWriter,
     PasswordService,
     SessionService,
+    { provide: CLAIM_POLLING, useValue: defaultClaimPolling },
     { provide: BreachedPasswordProvider, useClass: HibpBreachedPasswordProvider },
     { provide: SessionStore, useClass: PrismaSessionStore },
     { provide: RotationClaimStore, useClass: RedisRotationClaimStore },

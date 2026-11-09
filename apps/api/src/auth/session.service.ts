@@ -1,14 +1,16 @@
 import { randomUUID } from "node:crypto";
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { Inject, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { z } from "zod";
 import { APP_CONFIG, CLOCK, SecretBox } from "../core";
 import type { AppConfig, Clock } from "../core";
 import { AccessTokenService } from "./access-token.service";
 import type { AuthenticatedSession, AuthRealm, SessionMetadata, SessionTokens } from "./auth.types";
+import { CLAIM_POLLING } from "./claim-polling";
+import type { ClaimPolling } from "./claim-polling";
 import { RotationClaimStore } from "./rotation-claim.store";
 import { SessionStore } from "./session.store";
 import type { NewSession, RealmName, SessionRow, SessionUserRow } from "./session.store";
-import { generateRefreshToken, hashRefreshToken, safeEqualHex } from "./token-hash";
+import { generateRefreshToken, hashRefreshToken } from "./token-hash";
 
 const realmNames: Record<AuthRealm, RealmName> = { student: "STUDENT", admin: "ADMIN" };
 const realmByName: Record<RealmName, AuthRealm> = { STUDENT: "student", ADMIN: "admin" };
@@ -33,6 +35,8 @@ const isUsable = (user: SessionUserRow | null, realm: AuthRealm): user is Sessio
 
 @Injectable()
 export class SessionService {
+  private readonly logger = new Logger(SessionService.name);
+
   constructor(
     @Inject(APP_CONFIG) private readonly config: AppConfig,
     @Inject(CLOCK) private readonly clock: Clock,
@@ -40,6 +44,7 @@ export class SessionService {
     private readonly claims: RotationClaimStore,
     private readonly accessTokens: AccessTokenService,
     private readonly secretBox: SecretBox,
+    @Inject(CLAIM_POLLING) private readonly polling: ClaimPolling,
   ) {}
 
   async create(
@@ -58,9 +63,7 @@ export class SessionService {
   async refresh(refreshToken: string, realm: AuthRealm): Promise<SessionTokens> {
     const hash = hashRefreshToken(refreshToken);
     const row = await this.store.findByHash(hash);
-    if (row === null || !safeEqualHex(row.refreshTokenHash, hash) || row.revokedAt !== null) {
-      throw rejected();
-    }
+    if (row === null || row.revokedAt !== null) throw rejected();
     const user = await this.store.findUser(row.userId);
     if (!isUsable(user, realm)) throw rejected();
     if (row.rotatedAt !== null) return this.replay(row, hash);
@@ -101,12 +104,23 @@ export class SessionService {
   }
 
   private async replay(row: SessionRow, hash: string): Promise<SessionTokens> {
-    const sealed = await this.claims.read(claimKey(hash));
-    if (sealed === null) {
-      await this.store.revokeFamily(row.familyId, this.clock.now());
-      throw rejected();
+    const now = this.clock.now();
+    const rotatedAt = row.rotatedAt ?? now;
+    const withinGrace = now.getTime() - rotatedAt.getTime() <= this.graceMilliseconds();
+    const sealed = await this.findClaim(claimKey(hash), withinGrace);
+    if (sealed !== null) return this.open(sealed);
+    if (!withinGrace) await this.store.revokeFamily(row.familyId, now);
+    throw rejected();
+  }
+
+  private async findClaim(key: string, patient: boolean): Promise<string | null> {
+    const attempts = patient ? Math.ceil(this.polling.timeoutMs / this.polling.intervalMs) : 0;
+    for (let attempt = 0; attempt <= attempts; attempt += 1) {
+      const sealed = await this.claims.read(key);
+      if (sealed !== null) return sealed;
+      if (attempt < attempts) await this.polling.sleep(this.polling.intervalMs);
     }
-    return this.open(sealed);
+    return null;
   }
 
   private async rotate(row: SessionRow, hash: string, realm: AuthRealm): Promise<SessionTokens> {
@@ -119,29 +133,33 @@ export class SessionService {
     const refreshToken = generateRefreshToken();
     const next = this.newSession(row.userId, row.familyId, refreshToken);
     const tokens = await this.issue(row.userId, realm, refreshToken, next);
-    const key = claimKey(hash);
-    const won = await this.claims.claim(
-      key,
-      this.secretBox.encrypt(JSON.stringify(tokens)),
-      this.config.auth.refreshGraceSeconds,
-    );
-    if (!won) {
-      const sealed = await this.claims.read(key);
-      if (sealed === null) throw rejected();
-      return this.open(sealed);
+    if (!(await this.store.rotate(row.id, now, next))) {
+      const current = await this.store.findByHash(hash);
+      if (current === null || current.revokedAt !== null) throw rejected();
+      return this.replay(current, hash);
     }
+    await this.publish(claimKey(hash), tokens);
+    return tokens;
+  }
+
+  private async publish(key: string, tokens: SessionTokens): Promise<void> {
     try {
-      if (await this.store.rotate(row.id, now, next)) return tokens;
-    } catch (error) {
-      await this.claims.release(key);
-      throw error;
+      await this.claims.claim(
+        key,
+        this.secretBox.encrypt(JSON.stringify(tokens)),
+        this.config.auth.refreshGraceSeconds,
+      );
+    } catch {
+      this.logger.warn("Rotation claim could not be published");
     }
-    await this.claims.release(key);
-    throw rejected();
   }
 
   private open(sealed: string): SessionTokens {
     return storedTokensSchema.parse(JSON.parse(this.secretBox.decrypt(sealed)));
+  }
+
+  private graceMilliseconds(): number {
+    return this.config.auth.refreshGraceSeconds * 1000;
   }
 
   private idleMilliseconds(): number {

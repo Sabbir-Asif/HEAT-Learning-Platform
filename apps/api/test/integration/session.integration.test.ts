@@ -54,6 +54,10 @@ describe("session service on real Postgres and Redis", () => {
     const first = await sessions().create(await student(), "student");
     const second = await sessions().refresh(first.refreshToken, "student");
     await redis().del(`auth:rotation:${hashRefreshToken(first.refreshToken)}`);
+    await testApp().database.prisma.session.updateMany({
+      where: { familyId: first.familyId, rotatedAt: { not: null } },
+      data: { rotatedAt: new Date(Date.now() - 21_000) },
+    });
 
     await expect(sessions().refresh(first.refreshToken, "student")).rejects.toMatchObject({
       status: 401,
@@ -69,6 +73,22 @@ describe("session service on real Postgres and Redis", () => {
     await expect(sessions().authenticate(second.accessToken, "student")).rejects.toMatchObject({
       status: 401,
     });
+  });
+
+  test("losing the claim inside the grace window refuses without revoking the family", async () => {
+    const first = await sessions().create(await student(), "student");
+    const second = await sessions().refresh(first.refreshToken, "student");
+    await redis().del(`auth:rotation:${hashRefreshToken(first.refreshToken)}`);
+
+    await expect(sessions().refresh(first.refreshToken, "student")).rejects.toMatchObject({
+      status: 401,
+    });
+
+    const rows = await testApp().database.prisma.session.findMany({
+      where: { familyId: first.familyId },
+    });
+    expect(rows.every((row) => row.revokedAt === null)).toBe(true);
+    await expect(sessions().refresh(second.refreshToken, "student")).resolves.toBeDefined();
   });
 
   test("no raw refresh token is stored in the database", async () => {

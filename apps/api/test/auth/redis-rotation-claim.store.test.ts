@@ -6,7 +6,6 @@ const build = (setResult: "OK" | null) => {
   const redis = {
     set: vi.fn().mockResolvedValue(setResult),
     get: vi.fn().mockResolvedValue("sealed"),
-    del: vi.fn().mockResolvedValue(1),
   };
   return { redis, store: new RedisRotationClaimStore(redis as unknown as Redis) };
 };
@@ -21,12 +20,9 @@ describe("RedisRotationClaimStore", () => {
     expect(won.redis.set).toHaveBeenCalledWith("k", "v", "EX", 20, "NX");
   });
 
-  test("reads and releases a claim", async () => {
-    const { redis, store } = build("OK");
+  test("reads a claim", async () => {
+    const { store } = build("OK");
 
     await expect(store.read("k")).resolves.toBe("sealed");
-    await store.release("k");
-
-    expect(redis.del).toHaveBeenCalledWith("k");
   });
 });

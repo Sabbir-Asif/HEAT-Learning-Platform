@@ -1,5 +1,5 @@
 import { UnauthorizedException } from "@nestjs/common";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { hashRefreshToken } from "../../src/auth/token-hash";
 import { buildSessionHarness } from "../support/auth-fixtures";
 
@@ -164,7 +164,7 @@ describe("refresh", () => {
     );
   });
 
-  test("releases the claim and rethrows when the database rotation fails", async () => {
+  test("a database failure on rotation leaves no claim and the token still works", async () => {
     const { service, store, claims, student } = setup();
     const first = await service.create(student.id, "student");
     store.failNextRotation = new Error("database down");
@@ -175,30 +175,127 @@ describe("refresh", () => {
     await expect(service.refresh(first.refreshToken, "student")).resolves.toBeDefined();
   });
 
-  test("releases the claim and refuses when the token was already rotated elsewhere", async () => {
+  test("publishes the claim only after the database rotation committed", async () => {
     const { service, store, claims, student } = setup();
     const first = await service.create(student.id, "student");
+    const seen: string[][] = [];
+    const rotate = store.rotate.bind(store);
+    store.rotate = async (...args) => {
+      const result = await rotate(...args);
+      seen.push(claims.keys());
+      return result;
+    };
+
+    await service.refresh(first.refreshToken, "student");
+
+    expect(seen).toEqual([[]]);
+    expect(claims.keys()).toHaveLength(1);
+  });
+
+  test("a loser polls until the winner publishes, and gets the winner's pair", async () => {
+    const { service, store, claims, student, hooks } = setup();
+    const first = await service.create(student.id, "student");
+    const claim = claims.claim.bind(claims);
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    claims.claim = async (...args) => {
+      await gate;
+      return claim(...args);
+    };
+
+    const winner = service.refresh(first.refreshToken, "student");
+    await vi.waitFor(() => expect(store.rows).toHaveLength(2));
+    hooks.onSleep = (count) => {
+      if (count === 3) release();
+    };
+    const loser = service.refresh(first.refreshToken, "student");
+
+    expect(await loser).toEqual(await winner);
+  });
+
+  test("a loser whose guard failed re-reads the row and refuses without revoking when no claim appears", async () => {
+    const { service, store, student, sleeps } = setup();
+    const first = await service.create(student.id, "student");
     store.rotateResult = false;
+    const row = store.rows[0];
+    if (row) row.rotatedAt = new Date();
 
     await expect(service.refresh(first.refreshToken, "student")).rejects.toBeInstanceOf(
       UnauthorizedException,
     );
-    expect(claims.keys()).toEqual([]);
+
+    expect(sleeps.length).toBeGreaterThanOrEqual(20);
+    expect(store.rows.every((r) => r.revokedAt === null)).toBe(true);
   });
 
-  test("refuses when a competing claim disappears before it can be read", async () => {
-    const { service, claims, student } = setup();
+  test("a loser refuses when the row vanished or was revoked meanwhile", async () => {
+    const { service, store, student } = setup();
     const first = await service.create(student.id, "student");
-    const original = claims.claim.bind(claims);
-    claims.claim = async (key, value, ttl) => {
-      await original(key, value, ttl);
-      await claims.release(key);
-      return false;
+    store.rotateResult = false;
+    const row = store.rows[0];
+    if (row) row.revokedAt = null;
+    const findByHash = store.findByHash.bind(store);
+    let calls = 0;
+    store.findByHash = async (hash) => {
+      calls += 1;
+      return calls === 1 ? findByHash(hash) : null;
     };
 
     await expect(service.refresh(first.refreshToken, "student")).rejects.toBeInstanceOf(
       UnauthorizedException,
     );
+  });
+
+  test("with no claim but a rotation inside the grace window, refuses and keeps the family", async () => {
+    const { service, store, claims, clock, student } = setup();
+    const first = await service.create(student.id, "student");
+    const second = await service.refresh(first.refreshToken, "student");
+    clock.advanceSeconds(5);
+    for (const key of claims.keys()) await claims.delete(key);
+
+    await expect(service.refresh(first.refreshToken, "student")).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
+
+    expect(store.rows.every((row) => row.revokedAt === null)).toBe(true);
+    await expect(service.refresh(second.refreshToken, "student")).resolves.toBeDefined();
+  });
+
+  test("with no claim and a rotation older than the grace window, revokes the family without polling", async () => {
+    const { service, store, claims, clock, student, sleeps } = setup();
+    const first = await service.create(student.id, "student");
+    await service.refresh(first.refreshToken, "student");
+    clock.advanceSeconds(30);
+    for (const key of claims.keys()) await claims.delete(key);
+
+    await expect(service.refresh(first.refreshToken, "student")).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
+
+    expect(store.rows.every((row) => row.revokedAt !== null)).toBe(true);
+    expect(sleeps).toEqual([]);
+  });
+
+  test("a replay inside the grace window still refuses a revoked family", async () => {
+    const { service, clock, student } = setup();
+    const first = await service.create(student.id, "student");
+    await service.refresh(first.refreshToken, "student");
+    await service.revoke(first.familyId);
+    clock.advanceSeconds(2);
+
+    await expect(service.refresh(first.refreshToken, "student")).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
+  });
+
+  test("a claim that cannot be published does not fail the refresh", async () => {
+    const { service, claims, student } = setup();
+    const first = await service.create(student.id, "student");
+    claims.claim = () => Promise.reject(new Error("redis down"));
+
+    await expect(service.refresh(first.refreshToken, "student")).resolves.toBeDefined();
   });
 
   test("keeps no raw refresh token in the claim store", async () => {

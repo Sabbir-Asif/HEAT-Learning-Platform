@@ -21,6 +21,26 @@ export const buildSessionHarness = (overrides: Record<string, string> = {}) => {
   const claims = new InMemoryClaimStore(clock);
   const accessTokens = new AccessTokenService(config, clock);
   const secretBox = new SecretBox(config.auth.encryptionKey);
-  const service = new SessionService(config, clock, store, claims, accessTokens, secretBox);
-  return { config, clock, store, claims, accessTokens, service };
+  const sleeps: number[] = [];
+  const hooks: { onSleep: (count: number) => void } = { onSleep: () => undefined };
+  const polling = {
+    intervalMs: 50,
+    timeoutMs: 1000,
+    sleep: async (milliseconds: number) => {
+      sleeps.push(milliseconds);
+      hooks.onSleep(sleeps.length);
+      clock.advanceSeconds(milliseconds / 1000);
+      await new Promise((resolve) => setImmediate(resolve));
+    },
+  };
+  const service = new SessionService(
+    config,
+    clock,
+    store,
+    claims,
+    accessTokens,
+    secretBox,
+    polling,
+  );
+  return { config, clock, store, claims, accessTokens, service, sleeps, hooks };
 };

@@ -41,7 +41,7 @@ export class InMemoryClaimStore extends RotationClaimStore {
     return Promise.resolve(this.live(key));
   }
 
-  release(key: string): Promise<void> {
+  delete(key: string): Promise<void> {
     this.entries.delete(key);
     return Promise.resolve();
   }

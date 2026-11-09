@@ -16,8 +16,4 @@ export class RedisRotationClaimStore extends RotationClaimStore {
   read(key: string): Promise<string | null> {
     return this.redis.get(key);
   }
-
-  async release(key: string): Promise<void> {
-    await this.redis.del(key);
-  }
 }
