@@ -27,7 +27,7 @@ Phone and laptop width, light and dark. Or "Not a UI change".
 ## Reviews
 
 - Code review: <findings by severity, and for each: fixed in <commit> or answered with the reason>
-- Security review: <same, or "Not run: not a security ticket and no security-relevant files touched">
+- Security review: <same, or "Not run: not requested">
 
 ## Security notes
 
