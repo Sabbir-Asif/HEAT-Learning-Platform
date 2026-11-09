@@ -1,6 +1,6 @@
 # 0018. English only interface
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-11-08
 - Plan: [D9, section 02 Design decisions](../plan/heat-lms-project-plan.html#decisions)
 

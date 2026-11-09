@@ -1,6 +1,6 @@
 # 0019. Content-Security-Policy with nonces for dynamic pages and hashes for cached pages
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-11-09
 - Plan: [D15 and section 08](../plan/heat-lms-project-plan.html#decisions)
 
@@ -22,7 +22,7 @@ What was measured:
 
 ## Decision
 
-Proposed, for the owner to accept or change.
+Accepted by the owner on 2026-11-09, as written.
 
 1. Two policies, chosen by page kind, never one policy for all.
    - Dynamic signed-in pages (frontend-public learner area, all of frontend-internal): rendered per request without Cache Components partial prerendering. `proxy.ts` makes a nonce per request, sets the policy on the response and the nonce on the request. Policy shape: `script-src 'self' 'nonce-<n>' 'sha256-<theme script>' 'strict-dynamic'`.
@@ -58,7 +58,7 @@ Proposed, for the owner to accept or change.
 - Proposed fallback if the per-page hash generation or the revalidation problem proves too costly: serve cached public pages with `script-src 'self'` plus the generated hashes only at deploy time, and shorten or remove time-based revalidation in favour of tag revalidation that triggers regeneration of the policy. If that is still too costly, accept `'unsafe-inline'` for scripts on public cached pages only, as a recorded exception, behind a ticket to remove it.
 - Proposed: a follow-up ticket to build the hash generation step and to decide whether the learner area can share an app with cached pages.
 
-## Note for production (added in the E1 final review; the status stays Proposed)
+## Note for production (added in the E1 final review)
 
 - Hashes in production must be generated at build time from the real build output, never typed in. The spike keeps the next-themes script hash and style hashes as constants only because it is throwaway. The spike suite fails if the served script hash or the injected transition style text drifts from those constants. The origin of the second style hash was not traced to a next-themes string, so it is unverified and the build step must derive every style hash from the output as well.
 - The next-themes script is minified in the production build, so its hash differs from what the library renders in a plain Node process. Only the built HTML is a valid source for the hash.
