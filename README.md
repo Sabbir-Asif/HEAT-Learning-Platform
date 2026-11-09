@@ -146,6 +146,18 @@ pnpm design:check      # token structure, contrast, inventory against exports, d
 
 `packages/ui/src/styles.css` is the Tailwind theme built from `docs/design/tokens.json`. Change both together: `packages/ui/test/tokens.test.ts` fails when a value drifts, and `contrast.test.ts` checks every contrast pair in both themes. Each app has one CSS entry, `src/app/globals.css`, that imports `@heat/ui/styles.css` and scans `packages/ui/src`. The theme follows the device setting through `ThemeProvider` (next-themes, `dark` class on `<html>`); a visible switch comes with the shells. The inline script next-themes adds, and the style element it injects on each theme change (`disableTransitionOnChange`), are covered by the CSP of ADR 0019 (hashes on cached pages, a nonce on dynamic pages), so `ThemeProvider` needs no change. Storybook shows every token in light and dark on Foundations, Tokens.
 
+### Database
+
+The schema is in `packages/db/prisma/schema/`, one file per concern, and the generated client in `packages/db/src/generated/` is not committed. Turborepo runs `prisma:generate` before build, lint, typecheck and test, so a fresh checkout needs only `pnpm install`.
+
+```sh
+pnpm --filter @heat/db prisma:generate     # regenerate the client after a schema change
+pnpm --filter @heat/db test:integration    # schema tests on Postgres 17 in Testcontainers; needs Docker
+pnpm --filter @heat/db er-diagram          # rewrite docs/data-model.md from the schema
+```
+
+Each integration test file gets its own database, created from the committed migrations with `prisma migrate deploy`, so the tests prove the migrations and not only the schema. `docs/data-inventory.md` lists the personal data columns; a schema change that adds one updates it in the same pull request.
+
 ### API client
 
 The API describes itself, and the browser and Server Components call it through code generated from that description (ADR 0015). Nothing is written by hand between the controllers and the hooks.
