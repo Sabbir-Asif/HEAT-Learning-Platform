@@ -1,13 +1,14 @@
-import { Controller, Get, UseGuards } from "@nestjs/common";
+import { Controller, Get } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
-import { CurrentSession, StudentAuthGuard } from "../auth";
+import { Audience } from "../access";
+import { CurrentSession } from "../auth";
 import type { AuthenticatedSession } from "../auth";
 import { MeResponseDto } from "./me.dto";
 import { MeService } from "./me.service";
 
 @ApiTags("me")
 @Controller("me")
-@UseGuards(StudentAuthGuard)
+@Audience("student")
 export class MeController {
   constructor(private readonly me: MeService) {}
 

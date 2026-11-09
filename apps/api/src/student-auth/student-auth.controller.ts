@@ -1,20 +1,11 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  Post,
-  Req,
-  Res,
-  UnauthorizedException,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, HttpCode, Post, Req, Res, UnauthorizedException } from "@nestjs/common";
 import { ApiNoContentResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { Audience } from "../access";
 import {
   CookieWriter,
   CurrentSession,
   Public,
   SessionService,
-  StudentAuthGuard,
   readCookie,
   realmCookies,
 } from "../auth";
@@ -28,7 +19,6 @@ const userAgentLimit = 255;
 
 @ApiTags("auth")
 @Controller("auth")
-@UseGuards(StudentAuthGuard)
 export class StudentAuthController {
   constructor(
     private readonly signInService: StudentSignInService,
@@ -72,6 +62,7 @@ export class StudentAuthController {
     }
   }
 
+  @Audience("student")
   @Post("sign-out")
   @HttpCode(204)
   @ApiNoContentResponse()

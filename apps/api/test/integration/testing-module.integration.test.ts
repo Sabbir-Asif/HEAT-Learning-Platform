@@ -1,8 +1,10 @@
 import { Controller, Get, Inject } from "@nestjs/common";
+import { Public } from "../../src/auth";
 import { describe, expect, test } from "vitest";
 import { TEST_DATABASE, TEST_REDIS_URL, useTestApp } from "../support/testing-module";
 import type { HeatClient } from "@heat/db";
 
+@Public()
 @Controller("probe")
 class ProbeController {
   constructor(
