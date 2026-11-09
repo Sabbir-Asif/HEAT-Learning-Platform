@@ -44,6 +44,11 @@ model User {
   decidedChangeRequests ProfileChangeRequest[] @relation("DecidedBy")
   enrollments           Enrollment[]
   enrollmentDecisions   EnrollmentDecision[]
+  attemptGrants         AttemptGrant[]
+  mediaAssets           MediaAsset[]
+  newsPosts             NewsPost[]
+  emailJobs             EmailJob[]
+  notifications         Notification[]
 
   @@index([email])
 }

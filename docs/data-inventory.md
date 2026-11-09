@@ -1,6 +1,6 @@
 # Personal data inventory
 
-Columns that hold personal data or credentials in the schema from #41 (identity, directory, enrollment and catalog). The privacy work in E15-6 reads this list to decide retention, export and erasure. Tables added by later schema tickets append their own rows. Update this file in the same pull request as any schema change that adds, renames or removes such a column.
+Columns that hold personal data or credentials in the schema from #41 (identity, directory, enrollment and catalog) and #42 (learning, assessment, certificates, content, email and audit). The privacy work in E15-6 reads this list to decide retention, export and erasure. Tables added by later schema tickets append their own rows. Update this file in the same pull request as any schema change that adds, renames or removes such a column.
 
 | Table                  | Column                                                       | What it holds                                                   | Kind              | Notes                                                                                 |
 | ---------------------- | ------------------------------------------------------------ | --------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------- |
@@ -18,5 +18,15 @@ Columns that hold personal data or credentials in the schema from #41 (identity,
 | `ProfileChangeRequest` | `reason`                                                     | Free text from the deciding admin                               | Free text         | May contain personal data; shown to the student                                       |
 | `Enrollment`           | `userId`, `courseId` and the event timestamps                | Which student took which course and when                        | Learning record   | Hard delete is restricted; history is kept                                            |
 | `EnrollmentDecision`   | `adminId`, `reason`, `decidedAt`                             | Who approved, rejected, removed or reinstated and why           | Free text, actor  | The reason may contain personal data; append-only in practice, never edited           |
+| `PlaybackSession`, `VideoProgress`, `ModuleProgress` | `enrollmentId`, watched intervals, resume position and the event timestamps | What a student watched, where they stopped and when modules unlocked or completed | Learning record | Hard delete is restricted; follows the enrollment |
+| `QuizAttempt`, `Answer` | `enrollmentId`, `scorePercent`, `passMarkSnapshot`, chosen options, timestamps | Every quiz attempt a student made and how they answered | Learning record | Never rewritten after submission; the snapshot keeps the pass mark of the time |
+| `AttemptGrant` | `adminId`, `reason`, `grantedAt` | Extra attempts an admin gave a student and why | Free text, actor | The reason may contain personal data |
+| `Certificate` | `recipientName`, `number`, `fileKey`, `fileSha256`, `issuedAt`, `revokedAt` | Name printed on the certificate and the issued file | Direct identifier | The name is a snapshot and does not follow later profile changes; the number is random and public through verification |
+| `MediaAsset` | `uploaderId`, `key`, `altText` | Who uploaded a file and where it is stored | Actor | Content files are not personal data; the uploader is an admin |
+| `NewsPost` | `authorId` | The admin who wrote a post | Actor | |
+| `EmailJob` | `recipientAddress`, `userId`, `smtpResponse`, `sentAt` | A copy of the address mail was sent to and the server reply | Direct identifier | The address stays when the user row is soft-deleted; falls under the retention policy in E15-6 |
+| `Outbox` | `payload` | Domain event data awaiting relay | Learning record | Payloads carry ids, not names or addresses |
+| `Notification` | `userId`, `type`, `data`, `readAt` | In-app messages for one student | Learning record | |
+| `AuditLog` | `actorId`, `ipAddress`, `before`, `after`, `requestId` | Who changed what, from where, with before and after values | Actor, device identifier | Append-only for the application role; `actorId` has no foreign key so the record outlives the user and becomes anonymous after permanent deletion; before and after may hold personal data |
 
 Not personal data: directory names (university, faculty, department), course content, video assets and the system tags.

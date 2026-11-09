@@ -1,0 +1,107 @@
+enum QuestionType {
+  SINGLE_CHOICE
+}
+
+model Quiz {
+  id              String    @id @default(uuid(7)) @db.Uuid
+  moduleId        String    @unique @db.Uuid
+  passMarkPercent Int       @default(70)
+  attemptLimit    Int?
+  waitMinutes     Int       @default(10)
+  deletedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  module    Module         @relation(fields: [moduleId], references: [id], onDelete: Restrict)
+  questions Question[]
+  attempts  QuizAttempt[]
+  grants    AttemptGrant[]
+}
+
+model Question {
+  id          String       @id @default(uuid(7)) @db.Uuid
+  quizId      String       @db.Uuid
+  order       Int
+  type        QuestionType @default(SINGLE_CHOICE)
+  text        String
+  explanation String?
+  deletedAt   DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  quiz    Quiz     @relation(fields: [quizId], references: [id], onDelete: Restrict)
+  options Option[]
+  answers Answer[]
+
+  @@unique([quizId, order])
+}
+
+model Option {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  questionId String   @db.Uuid
+  order      Int
+  text       String
+  isCorrect  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  answers  Answer[]
+
+  @@unique([questionId, order])
+}
+
+model QuizAttempt {
+  id               String    @id @default(uuid(7)) @db.Uuid
+  enrollmentId     String    @db.Uuid
+  quizId           String    @db.Uuid
+  idempotencyKey   String
+  passMarkSnapshot Int
+  scorePercent     Int?
+  passed           Boolean?
+  startedAt        DateTime  @default(now())
+  submittedAt      DateTime?
+  createdAt        DateTime  @default(now())
+
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  quiz       Quiz       @relation(fields: [quizId], references: [id], onDelete: Restrict)
+  answers    Answer[]
+
+  @@unique([enrollmentId, quizId, idempotencyKey])
+  @@index([quizId])
+}
+
+model Answer {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  attemptId  String   @db.Uuid
+  questionId String   @db.Uuid
+  optionId   String   @db.Uuid
+  createdAt  DateTime @default(now())
+
+  attempt  QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
+  question Question    @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  option   Option      @relation(fields: [optionId], references: [id], onDelete: Restrict)
+
+  @@unique([attemptId, questionId])
+  @@index([questionId])
+  @@index([optionId])
+}
+
+model AttemptGrant {
+  id            String   @id @default(uuid(7)) @db.Uuid
+  enrollmentId  String   @db.Uuid
+  quizId        String   @db.Uuid
+  adminId       String   @db.Uuid
+  extraAttempts Int
+  reason        String?
+  grantedAt     DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  quiz       Quiz       @relation(fields: [quizId], references: [id], onDelete: Restrict)
+  admin      User       @relation(fields: [adminId], references: [id], onDelete: Restrict)
+
+  @@index([enrollmentId, quizId])
+  @@index([quizId])
+  @@index([adminId])
+}
