@@ -10,7 +10,6 @@ const pkg = join(root, "packages/e2e");
 const modes = {
   update: "pnpm exec playwright test screenshots --update-snapshots",
   visual: "pnpm exec playwright test screenshots",
-  a11y: "pnpm exec playwright test accessibility",
 };
 
 export function pnpmPin(packageManager) {

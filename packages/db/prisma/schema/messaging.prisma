@@ -1,0 +1,75 @@
+enum EmailCategory {
+  VERIFICATION
+  PASSWORD
+  ENROLLMENT
+  CERTIFICATE
+}
+
+enum EmailJobStatus {
+  QUEUED
+  DELAYED
+  SENDING
+  SENT
+  FAILED
+}
+
+enum NotificationType {
+  ENROLLMENT_APPROVED
+  ENROLLMENT_REJECTED
+  ENROLLMENT_REMOVED
+  ENROLLMENT_REINSTATED
+  CERTIFICATE_READY
+  NEWS_PUBLISHED
+}
+
+model Outbox {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  eventType   String
+  payload     Json
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  emailJobs EmailJob[]
+
+  @@index([processedAt, createdAt])
+}
+
+model EmailJob {
+  id               String         @id @default(uuid(7)) @db.Uuid
+  outboxId         String?        @db.Uuid
+  userId           String?        @db.Uuid
+  recipientAddress String
+  category         EmailCategory
+  template         String
+  locale           String         @default("en")
+  status           EmailJobStatus @default(QUEUED)
+  attempts         Int            @default(0)
+  smtpResponse     String?
+  queuedAt         DateTime       @default(now())
+  sentAt           DateTime?
+  failedAt         DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  outbox Outbox? @relation(fields: [outboxId], references: [id], onDelete: Restrict)
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([status, category])
+  @@index([userId])
+  @@index([outboxId])
+  @@index([sentAt])
+}
+
+model Notification {
+  id        String           @id @default(uuid(7)) @db.Uuid
+  userId    String           @db.Uuid
+  type      NotificationType
+  data      Json             @default("{}")
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+}

@@ -305,7 +305,9 @@ describe("history cannot be deleted from under an enrollment", () => {
     const { course } = await createCourse();
     await database.prisma.enrollment.create({ data: { userId: student.id, courseId: course.id } });
 
-    await expect(database.prisma.user.delete({ where: { id: student.id } })).rejects.toMatchObject({
+    await expect(
+      database.hardDeleting.user.delete({ where: { id: student.id } }),
+    ).rejects.toMatchObject({
       code: "P2003",
     });
   });
@@ -315,9 +317,9 @@ describe("history cannot be deleted from under an enrollment", () => {
     const { course } = await createCourse();
     await database.prisma.enrollment.create({ data: { userId: student.id, courseId: course.id } });
 
-    await expect(database.prisma.course.delete({ where: { id: course.id } })).rejects.toMatchObject(
-      { code: "P2003" },
-    );
+    await expect(
+      database.hardDeleting.course.delete({ where: { id: course.id } }),
+    ).rejects.toMatchObject({ code: "P2003" });
   });
 
   test("a revision pinned by an enrollment cannot be hard deleted", async () => {
@@ -333,7 +335,7 @@ describe("history cannot be deleted from under an enrollment", () => {
     });
 
     await expect(
-      database.prisma.courseRevision.delete({ where: { id: revision.id } }),
+      database.hardDeleting.courseRevision.delete({ where: { id: revision.id } }),
     ).rejects.toMatchObject({ code: "P2003" });
   });
 
@@ -348,7 +350,9 @@ describe("history cannot be deleted from under an enrollment", () => {
       data: { enrollmentId: enrollment.id, adminId: admin.id, action: "APPROVE" },
     });
 
-    await expect(database.prisma.user.delete({ where: { id: admin.id } })).rejects.toMatchObject({
+    await expect(
+      database.hardDeleting.user.delete({ where: { id: admin.id } }),
+    ).rejects.toMatchObject({
       code: "P2003",
     });
   });

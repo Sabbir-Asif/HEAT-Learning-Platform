@@ -1,0 +1,79 @@
+enum MediaKind {
+  IMAGE
+  DOCUMENT
+}
+
+enum MediaVisibility {
+  PUBLIC
+  PROTECTED
+  PRIVATE
+}
+
+enum ResourceKind {
+  FILE
+  LINK
+}
+
+model MediaAsset {
+  id           String          @id @default(uuid(7)) @db.Uuid
+  key          String          @unique
+  kind         MediaKind
+  visibility   MediaVisibility @default(PRIVATE)
+  mimeType     String
+  sizeBytes    Int
+  width        Int?
+  height       Int?
+  sha256       String
+  variants     Json            @default("[]")
+  uploaderId   String          @db.Uuid
+  altText      String?
+  linkedEntity String?
+  linkedId     String?         @db.Uuid
+  deletedAt    DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  uploader  User       @relation(fields: [uploaderId], references: [id], onDelete: Restrict)
+  resources Resource[]
+
+  @@index([uploaderId])
+  @@index([linkedEntity, linkedId])
+}
+
+model Resource {
+  id           String       @id @default(uuid(7)) @db.Uuid
+  courseId     String?      @db.Uuid
+  title        String
+  description  String?
+  kind         ResourceKind
+  url          String?
+  mediaAssetId String?      @db.Uuid
+  displayOrder Int          @default(0)
+  deletedAt    DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  course     Course?     @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  mediaAsset MediaAsset? @relation(fields: [mediaAssetId], references: [id], onDelete: Restrict)
+
+  @@index([courseId])
+  @@index([mediaAssetId])
+}
+
+model NewsPost {
+  id            String    @id @default(uuid(7)) @db.Uuid
+  authorId      String    @db.Uuid
+  slug          String    @unique
+  title         String
+  body          Json
+  schemaVersion Int
+  publishedAt   DateTime?
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([authorId])
+  @@index([publishedAt])
+}

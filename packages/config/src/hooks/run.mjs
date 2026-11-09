@@ -1,6 +1,6 @@
 import { contextLoader } from "./context-loader.mjs";
 import { dangerGuard } from "./danger-guard.mjs";
-import { branchGuard, planGate } from "./edit-guards.mjs";
+import { branchGuard } from "./edit-guards.mjs";
 import { formatter } from "./formatter.mjs";
 import { ticketInjector } from "./injector.mjs";
 import { prGate } from "./pr-gate.mjs";
@@ -8,7 +8,6 @@ import { stopCheck } from "./stop-check.mjs";
 
 const specs = {
   "branch-guard": { event: "PreToolUse", closed: true, run: branchGuard },
-  "plan-gate": { event: "PreToolUse", closed: true, run: planGate },
   "danger-guard": { event: "PreToolUse", closed: true, run: dangerGuard },
   "pr-gate": { event: "PreToolUse", closed: true, run: prGate },
   "context-loader": { event: "SessionStart", closed: false, run: contextLoader },

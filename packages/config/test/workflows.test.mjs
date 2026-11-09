@@ -143,4 +143,41 @@ describe("GitHub workflows", () => {
       });
     });
   });
+  describe("Migrations job", () => {
+    const ci = parse(workflows.find(({ name }) => name === "ci.yml").text);
+    const job = ci.jobs.migrations;
+    const runs = (job?.steps ?? []).map((step) => step.run).filter(Boolean);
+    const protection = JSON.parse(readFileSync(join(github, "branch-protection.json"), "utf8"));
+
+    test("exists, with a timeout, a Postgres service and full git history", () => {
+      expect(job["timeout-minutes"]).toBeGreaterThan(0);
+      expect(job.services.postgres.image).toMatch(/^postgres:17/);
+      const checkout = job.steps.find((step) => step.uses?.startsWith("actions/checkout@"));
+      expect(checkout.with["fetch-depth"]).toBe(0);
+    });
+
+    test("checks immutability against the pull request base on pull requests only", () => {
+      const step = job.steps.find((s) => s.run?.includes("migrations.mjs immutable"));
+      expect(step.if).toBe("github.event_name == 'pull_request'");
+      expect(step.run).toBe('node packages/config/bin/migrations.mjs immutable "$BASE_REF"');
+      expect(step.env.BASE_REF).toBe("origin/${{ github.base_ref }}");
+    });
+
+    test("applies migrations, then fails on any difference from the schema", () => {
+      const deploy = runs.findIndex((run) => run.includes("prisma migrate deploy"));
+      const diff = runs.findIndex((run) => run.includes("prisma migrate diff"));
+      expect(deploy).toBeGreaterThanOrEqual(0);
+      expect(diff).toBeGreaterThan(deploy);
+      expect(runs[diff]).toContain("--exit-code");
+    });
+
+    test("is not a required check until the owner adds it", () => {
+      expect(protection.required_status_checks.contexts).not.toContain("migrations");
+    });
+
+    test("the pull request template links the migration review checklist", () => {
+      const template = readFileSync(join(github, "pull_request_template.md"), "utf8");
+      expect(template).toContain("docs/runbooks/migration-review.md");
+    });
+  });
 });

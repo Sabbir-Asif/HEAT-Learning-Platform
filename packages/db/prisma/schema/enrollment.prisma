@@ -33,10 +33,16 @@ model Enrollment {
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 
-  user           User                 @relation(fields: [userId], references: [id], onDelete: Restrict)
-  course         Course               @relation(fields: [courseId], references: [id], onDelete: Restrict)
-  courseRevision CourseRevision?      @relation(fields: [courseId, courseRevisionId], references: [courseId, id], onDelete: Restrict)
-  decisions      EnrollmentDecision[]
+  user             User                 @relation(fields: [userId], references: [id], onDelete: Restrict)
+  course           Course               @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  courseRevision   CourseRevision?      @relation(fields: [courseId, courseRevisionId], references: [courseId, id], onDelete: Restrict)
+  decisions        EnrollmentDecision[]
+  playbackSessions PlaybackSession[]
+  videoProgress    VideoProgress[]
+  moduleProgress   ModuleProgress[]
+  quizAttempts     QuizAttempt[]
+  attemptGrants    AttemptGrant[]
+  certificate      Certificate?
 
   @@unique([userId, courseId])
   @@index([courseId, status])

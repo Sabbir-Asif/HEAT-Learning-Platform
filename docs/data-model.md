@@ -4,6 +4,77 @@ Generated from `packages/db/prisma/schema` by `pnpm --filter @heat/db er-diagram
 
 ```mermaid
 erDiagram
+  Quiz {
+    String id PK
+    String moduleId FK
+    Int passMarkPercent
+    Int attemptLimit
+    Int waitMinutes
+    DateTime deletedAt
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  Question {
+    String id PK
+    String quizId FK
+    Int order
+    QuestionType type
+    String text
+    String explanation
+    DateTime deletedAt
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  Option {
+    String id PK
+    String questionId FK
+    Int order
+    String text
+    Boolean isCorrect
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  QuizAttempt {
+    String id PK
+    String enrollmentId FK
+    String quizId FK
+    String idempotencyKey
+    Int passMarkSnapshot
+    Int scorePercent
+    Boolean passed
+    DateTime startedAt
+    DateTime submittedAt
+    DateTime createdAt
+  }
+  Answer {
+    String id PK
+    String attemptId FK
+    String questionId FK
+    String optionId FK
+    DateTime createdAt
+  }
+  AttemptGrant {
+    String id PK
+    String enrollmentId FK
+    String quizId FK
+    String adminId FK
+    Int extraAttempts
+    String reason
+    DateTime grantedAt
+    DateTime createdAt
+  }
+  AuditLog {
+    String id PK
+    String actorId
+    String action
+    String entity
+    String entityId
+    Json before
+    Json after
+    String requestId
+    String ipAddress
+    DateTime occurredAt
+  }
   Course {
     String id PK
     String slug
@@ -105,6 +176,62 @@ erDiagram
     String id PK
     String key
     Json value
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  Certificate {
+    String id PK
+    String enrollmentId FK
+    String number
+    String recipientName
+    String fileKey
+    String fileSha256
+    DateTime issuedAt
+    DateTime revokedAt
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  MediaAsset {
+    String id PK
+    String key
+    MediaKind kind
+    MediaVisibility visibility
+    String mimeType
+    Int sizeBytes
+    Int width
+    Int height
+    String sha256
+    Json variants
+    String uploaderId FK
+    String altText
+    String linkedEntity
+    String linkedId
+    DateTime deletedAt
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  Resource {
+    String id PK
+    String courseId FK
+    String title
+    String description
+    ResourceKind kind
+    String url
+    String mediaAssetId FK
+    Int displayOrder
+    DateTime deletedAt
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  NewsPost {
+    String id PK
+    String authorId FK
+    String slug
+    String title
+    Json body
+    Int schemaVersion
+    DateTime publishedAt
+    DateTime deletedAt
     DateTime createdAt
     DateTime updatedAt
   }
@@ -238,6 +365,84 @@ erDiagram
     DateTime createdAt
     DateTime updatedAt
   }
+  PlaybackSession {
+    String id PK
+    String enrollmentId FK
+    String videoId FK
+    DateTime startedAt
+    DateTime lastSeenAt
+    DateTime endedAt
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  VideoProgress {
+    String id PK
+    String enrollmentId FK
+    String videoId FK
+    Json watchedIntervals
+    Float coverage
+    Int resumePositionSeconds
+    Int lastSequence
+    DateTime firstWatchedAt
+    DateTime completedAt
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  ModuleProgress {
+    String id PK
+    String enrollmentId FK
+    String moduleId FK
+    ModuleProgressStatus status
+    DateTime unlockedAt
+    DateTime startedAt
+    DateTime quizReadyAt
+    DateTime completedAt
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  Outbox {
+    String id PK
+    String eventType
+    Json payload
+    DateTime processedAt
+    DateTime createdAt
+  }
+  EmailJob {
+    String id PK
+    String outboxId FK
+    String userId FK
+    String recipientAddress
+    EmailCategory category
+    String template
+    String locale
+    EmailJobStatus status
+    Int attempts
+    String smtpResponse
+    DateTime queuedAt
+    DateTime sentAt
+    DateTime failedAt
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  Notification {
+    String id PK
+    String userId FK
+    NotificationType type
+    Json data
+    DateTime readAt
+    DateTime createdAt
+  }
+  Module ||--o| Quiz : module
+  Quiz ||--o{ Question : quiz
+  Question ||--o{ Option : question
+  Enrollment ||--o{ QuizAttempt : enrollment
+  Quiz ||--o{ QuizAttempt : quiz
+  QuizAttempt ||--o{ Answer : attempt
+  Question ||--o{ Answer : question
+  Option ||--o{ Answer : option
+  Enrollment ||--o{ AttemptGrant : enrollment
+  Quiz ||--o{ AttemptGrant : quiz
+  User ||--o{ AttemptGrant : admin
   Course ||--o{ CourseRevision : course
   CourseRevision ||--o{ Module : revision
   Module ||--o{ LessonSection : module
@@ -249,6 +454,11 @@ erDiagram
   Tag ||--o{ CourseTag : tag
   Module ||--o{ ModuleTag : module
   Tag ||--o{ ModuleTag : tag
+  Enrollment ||--o| Certificate : enrollment
+  User ||--o{ MediaAsset : uploader
+  Course |o--o{ Resource : course
+  MediaAsset |o--o{ Resource : mediaAsset
+  User ||--o{ NewsPost : author
   University ||--o{ UniversityFaculty : university
   Faculty ||--o{ UniversityFaculty : faculty
   UniversityFaculty ||--o{ Department : universityFaculty
@@ -266,4 +476,13 @@ erDiagram
   User ||--o{ ProfileChangeRequest : user
   User |o--o{ ProfileChangeRequest : decidedBy
   Department |o--o{ ProfileChangeRequest : requestedDepartment
+  Enrollment ||--o{ PlaybackSession : enrollment
+  Video ||--o{ PlaybackSession : video
+  Enrollment ||--o{ VideoProgress : enrollment
+  Video ||--o{ VideoProgress : video
+  Enrollment ||--o{ ModuleProgress : enrollment
+  Module ||--o{ ModuleProgress : module
+  Outbox |o--o{ EmailJob : outbox
+  User |o--o{ EmailJob : user
+  User ||--o{ Notification : user
 ```

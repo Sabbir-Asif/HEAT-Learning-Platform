@@ -28,8 +28,6 @@ const stop = (extra = {}) => stopCheck({ session_id: "s1", ...extra }, { env, ex
 beforeEach(() => {
   env = { HEAT_HOOKS_STATE_DIR: tempDir("state") };
   tree = addWorktree(makeRepo(), "chore/40-stop");
-  write(tree, "docs/plans/issue-40.md");
-  commitAll(tree, "docs: add plan (#40)");
   calls = [];
   outcome = { status: "ok", output: "" };
   updateState("s1", { worktree: tree, typedDirty: true, blocks: 0 }, env);
@@ -119,12 +117,7 @@ describe("skips", () => {
     expect(calls).toEqual([tree]);
   });
 
-  test("while waiting for plan approval: only the committed plan changed", () => {
-    expect(stop()).toEqual({});
-    expect(calls).toEqual([]);
-  });
-
-  test("a clean tree whose last commit is not only the plan still runs the check", () => {
+  test("a clean tree still runs the check", () => {
     write(tree, "src/a.ts");
     commitAll(tree);
     stop();

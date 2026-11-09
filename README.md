@@ -78,25 +78,21 @@ Styling stays inside `@heat/ui` (ADR 0013), and lint enforces it. The two Next.j
 
 The Tailwind plugin reads its theme from `packages/config/eslint/tailwind-entry.css` until `@heat/ui` carries the real theme. The class rules read `class`, `className`, any attribute ending in `Class`, `ClassName` or `ClassNames` (such as `containerClassName`), the values of a `classNames` object, and the arguments of `cn`, `clsx`, `cva`, `twMerge` and the plugin's other default helpers. Remaining gaps: a spread props object (`{...props}`), `React.createElement("div", { style })`, class names built at run time or held in an unrelated variable, and `test/` and Playwright files are not inspected. The class rules are silent when `tailwindcss` cannot be resolved from the linted package, so each app, `@heat/ui` and `@heat/config` has `tailwindcss` as a dev dependency and `packages/config/test/styling-setup.test.mjs` fails if that breaks. The no-comments rule also rules out `eslint-disable` comments. The editor hook lints only script files, so the CSS rule is enforced by `pnpm lint` and CI.
 
-### Accessibility and visual baselines
+### Visual baselines
 
-`packages/e2e` (`@heat/e2e`) holds the Playwright config and two suites for both apps. They read the route manifests in `apps/*/src/routes/manifest.ts`, so a new route is scanned without editing the suite, and they run against the production `output: "standalone"` build of each app, the same server the deployment runs, started by `packages/e2e/bin/standalone.mjs` (it copies `.next/static` and `public` next to `server.js`, then runs `node server.js` with `PORT` and `HOSTNAME`) on ports 3000 and 3001. No sign-in or API is needed. Besides the axe and screenshot suites, `shell.e2e.ts` checks the bottom bar (five items at 390 px, none at 1440 px), one main landmark, the skip link and the admin drawer focus return, and `robots.e2e.ts` checks `X-Robots-Tag: noindex` on the admin console (page, `/_next/static/` asset and 404) and its absence on the public site.
+`packages/e2e` (`@heat/e2e`) holds the Playwright config and the suites for both apps. They read the route manifests in `apps/*/src/routes/manifest.ts`, so a new route is scanned without editing the suite, and they run against the production `output: "standalone"` build of each app, the same server the deployment runs, started by `packages/e2e/bin/standalone.mjs` (it copies `.next/static` and `public` next to `server.js`, then runs `node server.js` with `PORT` and `HOSTNAME`) on ports 3000 and 3001. No sign-in or API is needed. Besides the screenshot suite, `shell.e2e.ts` checks the bottom bar (five items at 390 px, none at 1440 px), one main landmark, the skip link and the admin drawer focus return, and `robots.e2e.ts` checks `X-Robots-Tag: noindex` on the admin console (page, `/_next/static/` asset and 404) and its absence on the public site.
 
 | Command                  | Runs                                                                                                                                                                                                                                        |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `pnpm e2e`               | Both suites on the host, after `pnpm turbo build --filter=frontend-public --filter=frontend-internal`. Needs `pnpm --filter @heat/e2e exec playwright install chromium` once. Screenshots rendered on the host will not match the baselines |
-| `pnpm e2e:a11y`          | The axe suite on the host                                                                                                                                                                                                                   |
-| `pnpm e2e:docker:a11y`   | The axe suite in the pinned image, as CI runs it                                                                                                                                                                                            |
 | `pnpm e2e:docker:visual` | The screenshot comparison in the pinned image, as CI runs it                                                                                                                                                                                |
 | `pnpm e2e:docker:update` | Regenerates every baseline in the pinned image on any host OS and replaces `packages/e2e/test/*/__screenshots__`                                                                                                                            |
 
 The image is `mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d`, the Playwright 1.65 image (tag and digest). The Playwright version is pinned once in the `catalog:` block of `pnpm-workspace.yaml`; when it changes, change the tag and digest in `packages/e2e/bin/docker.mjs` and here, then regenerate the baselines. `packages/config/test/e2e.test.mjs` fails if they drift apart. The commands copy the tracked files into a work folder inside `packages/e2e`, install and build there as the current user, and need about 4 GB of memory for Docker. pnpm inside the image is installed from the npm tarball and checked against the sha512 in the root `packageManager` field before it is used (the image has no Corepack); `packages/config/test/e2e.test.mjs` covers the check. Update that hash together with the version.
 
-The accessibility suite scans every manifest route at 390 and 1440 px, light and dark (the emulated colour scheme sets the theme), with the axe tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and `wcag22aa`. Axe has no WCAG 2.2 level A tag, so the 2.2 AA rules are the new ones. A failure prints the rule id, the impact and the selector. It also exercises the theme switch once per app, scans the open admin navigation sheet at phone width, and checks that the first tab stops of each layout show a focus indicator. Do not silence a rule with `disableRules`; fix the page or open an issue.
-
 The screenshot suite covers representative pages only, named `{app}-{page}-{width}-{theme}.png`, with animations disabled, the caret hidden, fonts awaited and the `dark` class asserted before capture. Two runs of the same commit in the image differ by zero pixels, so no pixel tolerance is set. Review the changed PNGs in a pull request like any other change.
 
-Two CI jobs run on every pull request: `accessibility` is a required check, `screenshots` is not. The screenshot job never fails the run; it writes a `::warning` annotation and a job summary naming the changed screens and uploads actual, expected and diff images as the `screenshot-diffs` artifact for 7 days.
+The `screenshots` CI job runs on every pull request and is not a required check. It never fails the run; it writes a `::warning` annotation and a job summary naming the changed screens and uploads actual, expected and diff images as the `screenshot-diffs` artifact for 7 days.
 
 ### Performance budgets (Lighthouse)
 
@@ -154,9 +150,24 @@ The schema is in `packages/db/prisma/schema/`, one file per concern, and the gen
 pnpm --filter @heat/db prisma:generate     # regenerate the client after a schema change
 pnpm --filter @heat/db test:integration    # schema tests on Postgres 17 in Testcontainers; needs Docker
 pnpm --filter @heat/db er-diagram          # rewrite docs/data-model.md from the schema
+SUPER_ADMIN_EMAIL=... SUPER_ADMIN_PASSWORD=... DATABASE_URL=... pnpm --filter @heat/db exec prisma db seed
 ```
 
-Each integration test file gets its own database, created from the committed migrations with `prisma migrate deploy`, so the tests prove the migrations and not only the schema. `docs/data-inventory.md` lists the personal data columns; a schema change that adds one updates it in the same pull request.
+The seed creates the super admin (who must change the password at first sign-in), the University of Dhaka and the `frontpage` tag. Add `SEED_SAMPLE_DIRECTORY=true` in development and staging for sample faculties and departments; production leaves it unset. Details are in `packages/db/CLAUDE.md`.
+
+`docs/data-inventory.md` lists the personal data columns; a schema change that adds one updates it in the same pull request.
+
+### Integration tests
+
+Integration tests run on real Postgres 17 and Redis 7 in Testcontainers, with no Docker Compose stack, in `packages/db` and `apps/api` (`pnpm -r --if-present run test:integration`; needs Docker, and set `DOCKER_HOST=unix:///var/run/docker.sock` when the Docker Desktop socket is missing). The harness is `packages/db/src/testing`, exported as `@heat/db/testing`.
+
+- Global setup starts both containers once per run, creates one template database and applies the committed migrations to it with `prisma migrate deploy`, so the tests prove the migrations. Testcontainers stops the containers when the run ends, and its Ryuk reaper removes them if the process dies, so a failed run leaves no orphans.
+- Isolation is a template clone per test: `useTestDatabase()` (and `useTestApp()` in the API) runs `create database ... template ...` before each test and drops it after. A clone costs tens of milliseconds, tests in one file cannot see each other, and nothing needs truncating. Transaction rollback was rejected because the code under test opens its own transactions and connections. Files that share one database in `beforeAll` can call `withDatabase()` and clean up themselves.
+- Redis has no clone, so `useTestRedis()` gives each test a random key prefix and deletes its keys afterwards. Never use `flushall`.
+- `createFactories(prisma)` builds users, admins, universities, faculties, departments, students with profiles, courses with a first revision, enrollments (pinned revision and approval decision when approved) and `approvedStudentInPublishedCourse()`. Values are unique, so tests never collide.
+- `apps/api/test/support/testing-module.ts` builds the real `AppModule` on the containers: `useTestApp({ controllers, providers, imports })` returns the app, base URL, database, factories and Redis URL, provides `TEST_DATABASE` and `TEST_REDIS_URL`, and sets `DATABASE_URL` and `REDIS_URL`.
+- `harness.integration.test.ts` is the self-test: two tests insert the same unique email and both pass.
+- The CI `integration` job builds `@heat/db` and `api` first, because the API tests import the compiled harness, and has a 15 minute limit. The suite takes about 20 seconds locally; the limit leaves room for image pulls and a slower runner.
 
 ### API client
 
@@ -231,7 +242,9 @@ Pull requests and pushes to `main` run these checks in GitHub Actions; each is a
 
 The `storybook` job is separate and not yet a required check: it runs the story tests with axe and builds static Storybook, and uploads it as the `storybook-static` artifact (7 days, also when the tests fail). It runs on every pull request. The owner adds it to `.github/branch-protection.json` and re-applies the protection.
 
-The `accessibility` check runs the axe suite for both apps and is required; `.github/branch-protection.json` lists it, so re-apply the protection after merging. The `screenshots` job is not required. See Accessibility and visual baselines.
+The `migrations` job is separate and not yet a required check. On pull requests it fails when a migration directory that exists on the base branch is modified or deleted (`packages/config/bin/migrations.mjs immutable`, naming each file), then applies the migrations to an empty Postgres 17 service with `prisma migrate deploy` and fails when `prisma migrate diff` finds the schema differs. It is a quick pre-check for the drift test in `packages/db/test/integration/migrate.integration.test.ts`, which the required `integration` job also runs. Review rules for migrations are in [docs/runbooks/migration-review.md](docs/runbooks/migration-review.md). The owner adds `migrations` to `.github/branch-protection.json` and re-applies the protection.
+
+The `screenshots` job is not required. See Visual baselines.
 
 The `lighthouse` job is separate and not a required check: it audits the production build against the performance budgets and only warns. See Performance budgets (Lighthouse).
 
@@ -281,14 +294,13 @@ It needs `gh` with the `repo` and `project` scopes. `load` only reads, and keeps
 
 ### Workflow hooks
 
-`.claude/settings.json` wires eight Claude Code hooks to `node packages/config/bin/hook.mjs <name>`. The logic is in `packages/config/src/hooks/` (Node built-ins only, so it runs before `pnpm install`) and is tested with throwaway git repos, worktrees and a fake `gh`, with no network. The hooks are guard rails for an agent session; branch protection and CI stay the gate (ADR 0010), because a hook can be bypassed through another tool.
+`.claude/settings.json` wires seven Claude Code hooks to `node packages/config/bin/hook.mjs <name>`. The logic is in `packages/config/src/hooks/` (Node built-ins only, so it runs before `pnpm install`) and is tested with throwaway git repos, worktrees and a fake `gh`, with no network. The hooks are guard rails for an agent session; branch protection and CI stay the gate (ADR 0010), because a hook can be bypassed through another tool.
 
 | Hook              | Event                     | What it does                                                                                                                                                                                   |
 | ----------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `context-loader`  | SessionStart              | Prints the branch, issue number, plan path and ticked tasks, offline. On `main` and epic branches it lists the ticket worktrees to resume.                                                     |
+| `context-loader`  | SessionStart              | Prints the branch, issue number, offline. On `main` and epic branches it lists the ticket worktrees to resume.                                                                                 |
 | `ticket-injector` | UserPromptSubmit          | For `#N` in a prompt, adds the issue body and the owner, member and collaborator comments as delimited untrusted data. Never blocks the prompt.                                                |
 | `branch-guard`    | PreToolUse Edit, Write    | Blocks edits in a checkout on `main`, `master` or a detached HEAD. The repo is taken from the file, not from the session directory.                                                            |
-| `plan-gate`       | PreToolUse Edit, Write    | On `<type>/N-slug`, blocks every file but `docs/plans/issue-N.md` until that plan exists. Other branches, such as `epic/*`, are allowed.                                                       |
 | `danger-guard`    | PreToolUse Bash and files | Blocks force pushes, `prisma migrate reset`, edits to migrations already on `origin/main` or `origin/epic/*`, shell writes that skip the edit guards, and every read or write of `.env` files. |
 | `pr-gate`         | PreToolUse Bash           | Blocks `gh pr create`, `gh pr new` and pull request creation through the API unless the verification marker matches `HEAD` on a clean tree.                                                    |
 | `formatter`       | PostToolUse Edit, Write   | Runs ESLint fixes and Prettier on the touched file with the ignore files of `lint` and `format:check`. Skips `docs/`, generated files and images.                                              |
@@ -298,7 +310,7 @@ The four guards fail closed: malformed input, a crash or a timeout denies. The o
 
 `pnpm verify` runs lint, format check, typecheck, coverage tests and build in order and, only if all pass on a clean tree, writes the commit sha to `heat-verified` in the worktree's own git directory (never committed). The PR gate accepts a marker only when it equals `HEAD` and the tree is clean, so any later commit needs another `pnpm verify`. Stage 6 of the skill calls it.
 
-Hook state for the stop check lives in `$HEAT_HOOKS_STATE_DIR` or a private `heat-hooks-<uid>/` directory (mode 0700, owner checked, never a symlink) under the system temp directory, outside every working tree. The plan gate allows editing the hook code and `.claude/settings.json` once the ticket's plan exists; `.github/CODEOWNERS` makes the owner read every change to them. A change to a hook takes effect in sessions started in a checkout that contains it.
+Hook state for the stop check lives in `$HEAT_HOOKS_STATE_DIR` or a private `heat-hooks-<uid>/` directory (mode 0700, owner checked, never a symlink) under the system temp directory, outside every working tree. `.github/CODEOWNERS` makes the owner read every change to them. A change to a hook takes effect in sessions started in a checkout that contains it.
 
 `.env` files are also denied by `permissions.deny` for Read and Edit. `.env.example` stays readable.
 
@@ -312,7 +324,7 @@ A glob in a Bash word is denied if it could match an env file name (the text bef
 
 Then brace lists are expanded, directory parts are listed on disk, every entry is tested including hidden ones and symlink targets, and any entry whose name starts with `.env` counts as an env file, and `cat foo*`, `cat docs/adr/0013*` and `wc -l docs/adr/*` are allowed unless an entry is an env file. `cat *` is denied when one is present. `find`, `rg`, `git`, `tar` and every other program use the name check, so `rg foo docs/adr/0013*` is denied. The listing assumes default shell glob options.
 
-What the hooks cannot do. They cannot protect themselves: an agent that edits `.claude/settings.json` or the hook code, once its plan exists, changes the guards for later sessions, so `.github/CODEOWNERS` (the hook code, `ticket.mjs`, the skill, the agents and every `CLAUDE.md`) and CI are the backstop, and the owner reads those diffs. Writes under `.git`, to any `heat-verified` file and to `.claude/settings.local.json` are denied from every tool. Reads of `.env` files are denied by name; indirection such as variables, globs, interpreters or computed strings can get around the Bash check, which is a limit of reading command text, not something a hook can close. If `node` or `packages/config/bin/hook.mjs` is missing, every guarded tool call is blocked because the guards fail closed; restore the branch, or restart the session from a checkout that has the file.
+What the hooks cannot do. They cannot protect themselves: an agent that edits `.claude/settings.json` or the hook code changes the guards for later sessions, so `.github/CODEOWNERS` (the hook code, `ticket.mjs`, the skill, the agents and every `CLAUDE.md`) and CI are the backstop, and the owner reads those diffs. Writes under `.git`, to any `heat-verified` file and to `.claude/settings.local.json` are denied from every tool. Reads of `.env` files are denied by name; indirection such as variables, globs, interpreters or computed strings can get around the Bash check, which is a limit of reading command text, not something a hook can close. If `node` or `packages/config/bin/hook.mjs` is missing, every guarded tool call is blocked because the guards fail closed; restore the branch, or restart the session from a checkout that has the file.
 
 ### Conventions
 

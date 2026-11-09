@@ -28,6 +28,7 @@ model Course {
   revisions   CourseRevision[]
   tags        CourseTag[]
   enrollments Enrollment[]
+  resources   Resource[]
 }
 
 model CourseRevision {
@@ -56,10 +57,12 @@ model Module {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  revision       CourseRevision  @relation(fields: [revisionId], references: [id], onDelete: Restrict)
+  revision       CourseRevision   @relation(fields: [revisionId], references: [id], onDelete: Restrict)
   lessonSections LessonSection[]
   videos         Video[]
   tags           ModuleTag[]
+  progress       ModuleProgress[]
+  quiz           Quiz?
 
   @@unique([revisionId, order])
 }
@@ -106,6 +109,9 @@ model Video {
 
   module Module     @relation(fields: [moduleId], references: [id], onDelete: Restrict)
   asset  VideoAsset @relation(fields: [assetId], references: [id], onDelete: Restrict)
+
+  playbackSessions PlaybackSession[]
+  progress         VideoProgress[]
 
   @@unique([moduleId, order])
   @@index([assetId])

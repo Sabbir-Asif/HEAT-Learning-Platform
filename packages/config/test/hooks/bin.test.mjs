@@ -9,13 +9,10 @@ afterAll(cleanupAll);
 
 let main;
 let ticket;
-let planned;
 
 beforeAll(() => {
   main = makeRepo();
   ticket = addWorktree(main, "chore/25-hooks");
-  planned = addWorktree(main, "chore/26-hooks");
-  write(planned, "docs/plans/issue-26.md");
 });
 
 const write_ = (file) => ({ tool_name: "Write", tool_input: { file_path: file }, cwd: main });
@@ -32,19 +29,6 @@ describe("branch-guard as a child process", () => {
   test("allows an edit in a worktree on a feature branch, whatever the session cwd", () => {
     const result = runBin("branch-guard", write_(join(ticket, "src/a.ts")));
     expect(result).toMatchObject({ code: 0, stdout: "" });
-  });
-});
-
-describe("plan-gate as a child process", () => {
-  test("blocks a source edit without the plan", () => {
-    const result = runBin("plan-gate", write_(join(ticket, "src/a.ts")));
-    expect(decisionOf(result)).toBe("deny");
-    expect(result.json.hookSpecificOutput.permissionDecisionReason).toContain("issue-25.md");
-  });
-
-  test("allows the plan file, and source edits once the plan exists", () => {
-    expect(runBin("plan-gate", write_(join(ticket, "docs/plans/issue-25.md"))).stdout).toBe("");
-    expect(runBin("plan-gate", write_(join(planned, "src/a.ts"))).stdout).toBe("");
   });
 });
 
@@ -67,7 +51,7 @@ describe("danger-guard as a child process", () => {
     "pnpm install --frozen-lockfile",
     "pnpm dev:reset",
   ])("allows %s", (command) => {
-    expect(runBin("danger-guard", bash(command, planned))).toMatchObject({ code: 0, stdout: "" });
+    expect(runBin("danger-guard", bash(command))).toMatchObject({ code: 0, stdout: "" });
   });
 });
 
@@ -242,7 +226,7 @@ describe("formatter as a child process", () => {
 });
 
 describe("failing closed and open", () => {
-  test.each(["branch-guard", "plan-gate", "danger-guard", "pr-gate"])(
+  test.each(["branch-guard", "danger-guard", "pr-gate"])(
     "%s denies on empty and malformed input",
     (name) => {
       expect(decisionOf(runBin(name, null, { raw: "" }))).toBe("deny");

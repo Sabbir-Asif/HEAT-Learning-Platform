@@ -8,7 +8,6 @@ const typecheckTimeout = 100000;
 const tailLines = 40;
 const tailCharacters = 3000;
 const testFile = /(?:^|\/)test\/|\.(?:test|spec)\.[cm]?[jt]sx?$/;
-const planFile = /^docs\/plans\/issue-\d+\.md$/;
 
 export function runTypecheck(cwd) {
   try {
@@ -35,17 +34,9 @@ function changedPaths(worktree) {
     .map((line) => line.slice(3).split(" -> ").pop());
 }
 
-function onlyPlanCommitted(worktree) {
-  const files = (git(worktree, ["show", "--name-only", "--format=", "HEAD"]) ?? "")
-    .split("\n")
-    .filter(Boolean);
-  return files.length > 0 && files.every((file) => planFile.test(file));
-}
-
 function shouldSkip(worktree) {
   const changed = changedPaths(worktree);
-  if (changed.length) return changed.every((path) => testFile.test(path));
-  return onlyPlanCommitted(worktree);
+  return changed.length > 0 && changed.every((path) => testFile.test(path));
 }
 
 function tail(output) {

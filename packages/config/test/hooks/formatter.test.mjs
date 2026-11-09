@@ -103,7 +103,7 @@ describe("what it runs", () => {
 
 describe("what it leaves alone", () => {
   test.each([
-    "docs/plans/issue-50.md",
+    "docs/guide/other.md",
     "packages/api-client/src/generated/hooks.ts",
     "apps/api/openapi.json",
     "assets/logo.png",

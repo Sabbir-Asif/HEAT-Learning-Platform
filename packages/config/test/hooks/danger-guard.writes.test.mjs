@@ -16,16 +16,13 @@ afterAll(cleanupAll);
 
 const migration = "apps/api/prisma/migrations/001_init/migration.sql";
 let main;
-let withoutPlan;
-let withPlan;
+let ticket;
 let outside;
 
 beforeAll(() => {
   main = makeRepo({ files: { [migration]: "create table a();\n", "src/a.ts": "a\n" } });
   addOrigin(main, ["main"]);
-  withoutPlan = addWorktree(main, "chore/7-no-plan");
-  withPlan = addWorktree(main, "chore/8-with-plan");
-  write(withPlan, "docs/plans/issue-8.md", "plan\n");
+  ticket = addWorktree(main, "chore/7-ticket");
   outside = tempDir("outside");
 });
 
@@ -62,18 +59,12 @@ describe("shell writes that bypass the edit guards", () => {
 
   test("blocks absolute targets and targets reached through another cwd", () => {
     expect(bash(`rm ${join(main, "src/a.ts")}`, outside).deny).toMatch(/"main"/);
-    expect(bash(`echo x > ${join(main, "src/a.ts")}`, withPlan).deny).toMatch(/"main"/);
+    expect(bash(`echo x > ${join(main, "src/a.ts")}`, ticket).deny).toMatch(/"main"/);
     expect(bash("echo x > ../src/a.ts", join(main, "src")).deny).toBeTruthy();
   });
 
-  test("blocks on a ticket branch without its plan, names the plan, allows the plan itself", () => {
-    const denied = bash("echo x > src/a.ts", withoutPlan).deny;
-    expect(denied).toContain("docs/plans/issue-7.md");
-    expect(bash("echo x > docs/plans/issue-7.md", withoutPlan)).toEqual({});
-  });
-
-  test("allows writes once the plan exists", () => {
-    expect(bash("echo x > src/a.ts && rm src/b.ts && sed -i 's/a/b/' src/a.ts", withPlan)).toEqual(
+  test("allows writes on a ticket branch", () => {
+    expect(bash("echo x > src/a.ts && rm src/b.ts && sed -i 's/a/b/' src/a.ts", ticket)).toEqual(
       {},
     );
   });
@@ -100,7 +91,7 @@ describe("shell writes that bypass the edit guards", () => {
     "echo x > ${SCRATCH}/../x",
     "cp a $SCRATCH/sub/../../b",
   ])("blocks a $SCRATCH target that climbs out: %s", (command) => {
-    expect(bash(command, withPlan).deny).toMatch(/SCRATCH/);
+    expect(bash(command, ticket).deny).toMatch(/SCRATCH/);
   });
 
   test("allows $SCRATCH targets whose names merely contain dots", () => {
@@ -110,7 +101,7 @@ describe("shell writes that bypass the edit guards", () => {
 
   test("the working directory is restored after a ( ... ) group", () => {
     expect(bash("(cd src && true); echo x > a.ts", main).deny).toMatch(/"main"/);
-    expect(bash(`(cd ${outside} && true); echo x > a.ts`, withoutPlan).deny).toMatch(/issue-7\.md/);
+    expect(bash(`(cd ${outside} && true); echo x > a.ts`, ticket)).toEqual({});
     expect(bash(`(cd ${outside}; echo x > a.ts)`, main)).toEqual({});
   });
 
@@ -122,11 +113,11 @@ describe("shell writes that bypass the edit guards", () => {
     "tee $HOME_DIR/x",
     "cp a $DEST",
   ])("blocks an unexpanded variable target: %s", (command) => {
-    expect(bash(command, withPlan).deny).toMatch(/Write tool/);
+    expect(bash(command, ticket).deny).toMatch(/Write tool/);
   });
 
   test("blocks writes into .env even where writes are allowed", () => {
-    expect(bash("echo x > apps/api/.env", withPlan).deny).toMatch(/environment files/i);
+    expect(bash("echo x > apps/api/.env", ticket).deny).toMatch(/environment files/i);
   });
 
   test("does not mistake reads and the skill's normal commands for writes", () => {
@@ -150,7 +141,7 @@ describe("shell writes that bypass the edit guards", () => {
       "ls -la && pwd",
       "node -e 'console.log(1)'",
     ];
-    for (const cwd of [main, withoutPlan]) {
+    for (const cwd of [main, ticket]) {
       for (const command of normal) expect(bash(command, cwd), command).toEqual({});
     }
   });
@@ -168,7 +159,6 @@ describe("applied migrations", () => {
 
   beforeAll(() => {
     tree = addWorktree(main, "chore/9-migrations");
-    write(tree, "docs/plans/issue-9.md");
   });
 
   const file = (name, input) => dangerGuard({ tool_name: name, tool_input: input, cwd: main });

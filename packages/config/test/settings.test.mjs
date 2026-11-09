@@ -6,7 +6,7 @@ import { hookSpecs } from "../src/hooks/run.mjs";
 const root = resolve(import.meta.dirname, "../../..");
 const settings = JSON.parse(readFileSync(resolve(root, ".claude/settings.json"), "utf8"));
 const command = /^node "\$CLAUDE_PROJECT_DIR\/packages\/config\/bin\/hook\.mjs" ([a-z-]+)$/;
-const guards = ["branch-guard", "plan-gate", "danger-guard", "pr-gate"];
+const guards = ["branch-guard", "danger-guard", "pr-gate"];
 
 const wired = Object.entries(settings.hooks).flatMap(([event, groups]) =>
   groups.flatMap((group) =>
@@ -28,9 +28,9 @@ describe("hook wiring", () => {
     for (const entry of wired) expect(hookSpecs[nameOf(entry)].event).toBe(entry.event);
   });
 
-  test("all eight hooks are wired", () => {
+  test("all seven hooks are wired", () => {
     expect([...new Set(wired.map(nameOf))].sort()).toEqual(Object.keys(hookSpecs).sort());
-    expect(Object.keys(hookSpecs)).toHaveLength(8);
+    expect(Object.keys(hookSpecs)).toHaveLength(7);
   });
 
   test("the guards block when they fail or time out; the others never do", () => {
@@ -60,7 +60,7 @@ describe("hook wiring", () => {
     }
   });
 
-  test("file tools run the branch guard, plan gate and danger guard; Bash runs the danger guard and PR gate", () => {
+  test("file tools run the branch guard and danger guard; Bash runs the danger guard and PR gate", () => {
     const names = (tool) =>
       wired
         .filter(
@@ -70,7 +70,7 @@ describe("hook wiring", () => {
         .map(nameOf)
         .sort();
     for (const tool of ["Edit", "Write", "NotebookEdit"]) {
-      expect(names(tool)).toEqual(["branch-guard", "danger-guard", "plan-gate"]);
+      expect(names(tool)).toEqual(["branch-guard", "danger-guard"]);
     }
     expect(names("Bash")).toEqual(["danger-guard", "pr-gate"]);
     for (const tool of ["Read", "Grep", "Glob"]) expect(names(tool)).toEqual(["danger-guard"]);
@@ -134,7 +134,7 @@ describe("permissions.deny for environment files", () => {
       ".env.example",
       "apps/api/.env.example",
       "infra/compose/.env.example",
-      "docs/plans/issue-25.md",
+      "docs/guide/page.md",
       ".claude/settings.json",
       "packages/config/src/hooks/env-files.mjs",
       "packages/config/test/hooks/danger-guard.secrets.test.mjs",

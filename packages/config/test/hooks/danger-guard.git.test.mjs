@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { dangerGuard } from "../../src/hooks/danger-guard.mjs";
-import { addWorktree, cleanupAll, git, makeRepo, tempDir, write } from "../fixtures/repo.mjs";
+import { addWorktree, cleanupAll, git, makeRepo, tempDir } from "../fixtures/repo.mjs";
 
 afterAll(cleanupAll);
 
@@ -12,7 +12,6 @@ let gitDir;
 beforeAll(() => {
   main = makeRepo({ branch: "epic/e0-x" });
   tree = addWorktree(main, "chore/60-gitdir");
-  write(tree, "docs/plans/issue-60.md");
   gitDir = git(tree, "rev-parse", "--absolute-git-dir");
 });
 
