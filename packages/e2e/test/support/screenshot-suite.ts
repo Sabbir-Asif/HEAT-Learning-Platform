@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { grantAccess } from "./session";
+import { accessCookieName, adminAccessCookieName, grantAccess } from "./session";
 import { settle, themes, viewportFor, widthNames, widths } from "./matrix";
 
 export interface ScreenshotPage {
@@ -15,7 +15,12 @@ export function defineScreenshotSuite(app: string, pages: ReadonlyArray<Screensh
 
         for (const { name, path } of pages) {
           test(`${name} matches its baseline`, async ({ page, context, baseURL }) => {
-            await grantAccess(context, baseURL);
+            await grantAccess(
+              context,
+              baseURL,
+              600,
+              app === "internal" ? adminAccessCookieName : accessCookieName,
+            );
             await page.goto(path);
             await settle(page, theme);
             await expect(page).toHaveScreenshot(`${app}-${name}-${widths[width]}-${theme}.png`, {

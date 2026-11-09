@@ -26,7 +26,7 @@ import { adminName, heatLogo } from "./brand";
 import { buildBreadcrumbs } from "./breadcrumbs";
 import { adminNavigation } from "./navigation";
 
-export function AdminShell({ children }: { children: ReactNode }) {
+export function AdminShell({ children, email }: { children: ReactNode; email?: string }) {
   const pathname = usePathname();
   const groups = useMemo(() => adminNavigation(), []);
   const crumbs = buildBreadcrumbs(pathname, groups);
@@ -68,6 +68,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <ThemeSwitch />
             <UserMenu
               name="Administrator"
+              email={email}
               items={[{ href: "/account", label: "Account", icon: UserCogIcon }]}
               link={Link}
             />
