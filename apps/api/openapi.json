@@ -1,6 +1,63 @@
 {
   "components": {
     "schemas": {
+      "AdminMeResponseDto": {
+        "properties": {
+          "user": {
+            "properties": {
+              "email": {
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "mustChangePassword": {
+                "type": "boolean"
+              },
+              "role": {
+                "enum": [
+                  "SUPER_ADMIN",
+                  "ADMIN",
+                  "STUDENT"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "email",
+              "role",
+              "mustChangePassword"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "user"
+        ],
+        "type": "object"
+      },
+      "ChangePasswordRequestDto": {
+        "properties": {
+          "currentPassword": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+          },
+          "newPassword": {
+            "maxLength": 256,
+            "minLength": 12,
+            "type": "string"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
+        "type": "object"
+      },
       "HealthResponseDto": {
         "properties": {
           "status": {
@@ -128,6 +185,110 @@
   },
   "openapi": "3.0.0",
   "paths": {
+    "/api/admin/account/change-password": {
+      "post": {
+        "operationId": "adminAccountChangePassword",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-account"
+        ]
+      }
+    },
+    "/api/admin/auth/refresh": {
+      "post": {
+        "operationId": "adminAuthRefresh",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-auth"
+        ]
+      }
+    },
+    "/api/admin/auth/sign-in": {
+      "post": {
+        "operationId": "adminAuthSignIn",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMeResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-auth"
+        ]
+      }
+    },
+    "/api/admin/auth/sign-out": {
+      "post": {
+        "operationId": "adminAuthSignOut",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-auth"
+        ]
+      }
+    },
+    "/api/admin/me": {
+      "get": {
+        "operationId": "adminMeDescribe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMeResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-me"
+        ]
+      }
+    },
     "/api/auth/refresh": {
       "post": {
         "operationId": "studentAuthRefresh",
