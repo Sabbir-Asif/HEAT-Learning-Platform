@@ -17,7 +17,8 @@ describe("SecretBox", () => {
 
   test("rejects a tampered value", () => {
     const bytes = Buffer.from(box.encrypt("secret"), "base64url");
-    bytes[bytes.length - 1] ^= 1;
+    const last = bytes.length - 1;
+    bytes.writeUInt8(bytes.readUInt8(last) ^ 1, last);
     expect(() => box.decrypt(bytes.toString("base64url"))).toThrow();
   });
 
