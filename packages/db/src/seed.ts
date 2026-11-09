@@ -6,7 +6,7 @@ export const frontpageTag = { slug: "frontpage", name: "Front page" } as const;
 export const minimumPasswordLength = 12;
 
 export const sampleDirectory: Readonly<Record<string, readonly string[]>> = {
-  "Faculty of Arts": ["Bangla", "English", "History", "Philosophy", "Linguistics"],
+  "Faculty of Arts": ["English", "History", "Philosophy", "Linguistics"],
   "Faculty of Science": ["Physics", "Chemistry", "Mathematics", "Statistics", "Computer Science"],
   "Faculty of Social Sciences": [
     "Economics",
