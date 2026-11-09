@@ -1,0 +1,60 @@
+enum EnrollmentStatus {
+  PENDING_VERIFICATION
+  PENDING_APPROVAL
+  APPROVED
+  COMPLETED
+  REJECTED
+  EXPIRED
+  REMOVED
+}
+
+enum DecisionAction {
+  APPROVE
+  REJECT
+  REMOVE
+  REINSTATE
+}
+
+model Enrollment {
+  id                  String            @id @default(uuid(7)) @db.Uuid
+  userId              String            @db.Uuid
+  courseId            String            @db.Uuid
+  courseRevisionId    String?           @db.Uuid
+  status              EnrollmentStatus  @default(PENDING_VERIFICATION)
+  statusBeforeRemoval EnrollmentStatus?
+  requestedAt         DateTime          @default(now())
+  verifiedAt          DateTime?
+  approvedAt          DateTime?
+  rejectedAt          DateTime?
+  removedAt           DateTime?
+  completedAt         DateTime?
+  expiredAt           DateTime?
+  deletedAt           DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  user           User                 @relation(fields: [userId], references: [id], onDelete: Restrict)
+  course         Course               @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  courseRevision CourseRevision?      @relation(fields: [courseId, courseRevisionId], references: [courseId, id], onDelete: Restrict)
+  decisions      EnrollmentDecision[]
+
+  @@unique([userId, courseId])
+  @@index([courseId, status])
+  @@index([courseRevisionId])
+}
+
+model EnrollmentDecision {
+  id           String         @id @default(uuid(7)) @db.Uuid
+  enrollmentId String         @db.Uuid
+  adminId      String         @db.Uuid
+  action       DecisionAction
+  reason       String?
+  decidedAt    DateTime       @default(now())
+  createdAt    DateTime       @default(now())
+
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  admin      User       @relation(fields: [adminId], references: [id], onDelete: Restrict)
+
+  @@index([enrollmentId])
+  @@index([adminId])
+}

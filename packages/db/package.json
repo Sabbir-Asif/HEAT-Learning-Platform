@@ -11,19 +11,31 @@
     }
   },
   "scripts": {
+    "prisma:generate": "prisma generate",
     "build": "tsc -p tsconfig.build.json",
     "lint": "eslint .",
     "format:check": "prettier --check . --ignore-path ../../.gitignore",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "prisma generate && vitest run --config vitest.integration.config.mjs",
+    "er-diagram": "tsc -p tsconfig.build.json && node bin/er-diagram.mjs"
   },
   "devDependencies": {
     "@heat/config": "workspace:*",
+    "@testcontainers/postgresql": "12.2.1",
     "@types/node": "catalog:",
+    "@types/pg": "8.23.1",
     "eslint": "catalog:",
     "prettier": "catalog:",
+    "prisma": "7.10.1",
+    "testcontainers": "12.2.1",
     "typescript": "catalog:",
     "vitest": "catalog:"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "pg": "8.23.1"
   }
 }

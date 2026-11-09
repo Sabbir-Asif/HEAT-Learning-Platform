@@ -1,0 +1,183 @@
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum VideoAssetStatus {
+  UPLOADING
+  UPLOADED
+  QUEUED
+  PROCESSING
+  READY
+  FAILED
+  REJECTED
+}
+
+model Course {
+  id          String       @id @default(uuid(7)) @db.Uuid
+  slug        String       @unique
+  title       String
+  description String?
+  status      CourseStatus @default(DRAFT)
+  lockedAt    DateTime?
+  publishedAt DateTime?
+  deletedAt   DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  revisions   CourseRevision[]
+  tags        CourseTag[]
+  enrollments Enrollment[]
+}
+
+model CourseRevision {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  courseId    String    @db.Uuid
+  number      Int
+  publishedAt DateTime?
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  course      Course       @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  modules     Module[]
+  enrollments Enrollment[]
+
+  @@unique([courseId, number])
+  @@unique([courseId, id])
+}
+
+model Module {
+  id         String    @id @default(uuid(7)) @db.Uuid
+  revisionId String    @db.Uuid
+  order      Int
+  title      String
+  deletedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  revision       CourseRevision  @relation(fields: [revisionId], references: [id], onDelete: Restrict)
+  lessonSections LessonSection[]
+  videos         Video[]
+  tags           ModuleTag[]
+
+  @@unique([revisionId, order])
+}
+
+model LessonSection {
+  id            String    @id @default(uuid(7)) @db.Uuid
+  moduleId      String    @db.Uuid
+  order         Int
+  body          Json
+  schemaVersion Int
+  objectives    String[]
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Restrict)
+
+  @@unique([moduleId, order])
+}
+
+model VideoAsset {
+  id              String           @id @default(uuid(7)) @db.Uuid
+  assetKey        String           @unique
+  status          VideoAssetStatus @default(UPLOADING)
+  referenceCount  Int              @default(0)
+  durationSeconds Int?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  videos     Video[]
+  renditions VideoRendition[]
+  captions   VideoCaption[]
+}
+
+model Video {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  moduleId  String    @db.Uuid
+  order     Int
+  title     String
+  assetId   String    @db.Uuid
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  module Module     @relation(fields: [moduleId], references: [id], onDelete: Restrict)
+  asset  VideoAsset @relation(fields: [assetId], references: [id], onDelete: Restrict)
+
+  @@unique([moduleId, order])
+  @@index([assetId])
+}
+
+model VideoRendition {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  assetId     String   @db.Uuid
+  label       String
+  bitrateKbps Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  asset VideoAsset @relation(fields: [assetId], references: [id], onDelete: Restrict)
+
+  @@unique([assetId, label])
+}
+
+model VideoCaption {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  assetId    String   @db.Uuid
+  language   String
+  captionKey String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  asset VideoAsset @relation(fields: [assetId], references: [id], onDelete: Restrict)
+
+  @@unique([assetId, language])
+}
+
+model Tag {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  slug      String    @unique
+  name      String
+  isSystem  Boolean   @default(false)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  courses CourseTag[]
+  modules ModuleTag[]
+}
+
+model CourseTag {
+  courseId     String   @db.Uuid
+  tagId        String   @db.Uuid
+  displayOrder Int
+  createdAt    DateTime @default(now())
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Restrict)
+
+  @@id([courseId, tagId])
+}
+
+model ModuleTag {
+  moduleId     String   @db.Uuid
+  tagId        String   @db.Uuid
+  displayOrder Int
+  createdAt    DateTime @default(now())
+
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Restrict)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Restrict)
+
+  @@id([moduleId, tagId])
+}
+
+model SiteSetting {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

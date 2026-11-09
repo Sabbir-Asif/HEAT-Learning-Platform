@@ -1,0 +1,47 @@
+model University {
+  id         String    @id @default(uuid(7)) @db.Uuid
+  name       String    @unique
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  faculties UniversityFaculty[]
+}
+
+model Faculty {
+  id         String    @id @default(uuid(7)) @db.Uuid
+  name       String    @unique
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  universities UniversityFaculty[]
+}
+
+model UniversityFaculty {
+  universityId String   @db.Uuid
+  facultyId    String   @db.Uuid
+  createdAt    DateTime @default(now())
+
+  university  University   @relation(fields: [universityId], references: [id], onDelete: Restrict)
+  faculty     Faculty      @relation(fields: [facultyId], references: [id], onDelete: Restrict)
+  departments Department[]
+
+  @@id([universityId, facultyId])
+}
+
+model Department {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  name         String
+  universityId String    @db.Uuid
+  facultyId    String    @db.Uuid
+  archivedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  profiles          StudentProfile[]
+  changeRequests    ProfileChangeRequest[]
+  universityFaculty UniversityFaculty      @relation(fields: [universityId, facultyId], references: [universityId, facultyId], onDelete: Restrict)
+
+  @@unique([universityId, facultyId, name])
+}
