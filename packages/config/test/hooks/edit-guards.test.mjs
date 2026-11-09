@@ -2,7 +2,7 @@ import { mkdirSync, rmSync, symlinkSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, describe, expect, test } from "vitest";
 import { branchDenial, branchGuard, locate, targetOf } from "../../src/hooks/edit-guards.mjs";
-import { addWorktree, cleanupAll, git, makeRepo, tempDir, write } from "../fixtures/repo.mjs";
+import { addWorktree, cleanupAll, git, makeRepo, tempDir } from "../fixtures/repo.mjs";
 
 afterAll(cleanupAll);
 

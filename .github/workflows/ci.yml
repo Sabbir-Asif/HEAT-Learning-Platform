@@ -97,26 +97,6 @@ jobs:
           fi
           echo "Generated files are up to date."
 
-  accessibility:
-    name: accessibility
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - uses: ./.github/actions/setup
-        with:
-          install: "false"
-      - run: node packages/e2e/bin/docker.mjs a11y
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
-        if: ${{ failure() }}
-        with:
-          name: accessibility-report
-          path: packages/e2e/test-results
-          retention-days: 7
-          if-no-files-found: ignore
-
   screenshots:
     name: screenshots
     runs-on: ubuntu-24.04

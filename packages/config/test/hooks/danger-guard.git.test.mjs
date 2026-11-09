@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { dangerGuard } from "../../src/hooks/danger-guard.mjs";
-import { addWorktree, cleanupAll, git, makeRepo, tempDir, write } from "../fixtures/repo.mjs";
+import { addWorktree, cleanupAll, git, makeRepo, tempDir } from "../fixtures/repo.mjs";
 
 afterAll(cleanupAll);
 
