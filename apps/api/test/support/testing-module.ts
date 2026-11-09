@@ -9,6 +9,7 @@ import {
 } from "@heat/db/testing";
 import { afterEach, beforeEach, inject } from "vitest";
 import type { InfrastructureHandle } from "@heat/db/testing";
+import { applyEnvironment, authTestEnvironment } from "./auth-env";
 import { AppModule } from "../../src/app.module";
 import { configureApp } from "../../src/app.setup";
 
@@ -51,9 +52,11 @@ export const createTestApp = async (options: TestAppOptions = {}): Promise<TestA
   })
   class TestInfrastructureModule {}
 
-  const previous = { DATABASE_URL: process.env.DATABASE_URL, REDIS_URL: process.env.REDIS_URL };
-  process.env.DATABASE_URL = database.url;
-  process.env.REDIS_URL = redisUrl;
+  const restoreEnvironment = applyEnvironment({
+    ...authTestEnvironment,
+    DATABASE_URL: database.url,
+    REDIS_URL: redisUrl,
+  });
 
   try {
     const moduleRef = await Test.createTestingModule({
@@ -75,23 +78,13 @@ export const createTestApp = async (options: TestAppOptions = {}): Promise<TestA
       close: async () => {
         await app.close();
         await database.close();
-        restoreEnvironment(previous);
+        restoreEnvironment();
       },
     };
   } catch (error) {
     await database.close();
-    restoreEnvironment(previous);
+    restoreEnvironment();
     throw error;
-  }
-};
-
-const restoreEnvironment = (previous: Record<string, string | undefined>): void => {
-  for (const [key, value] of Object.entries(previous)) {
-    if (value === undefined) {
-      delete process.env[key];
-    } else {
-      process.env[key] = value;
-    }
   }
 };
 

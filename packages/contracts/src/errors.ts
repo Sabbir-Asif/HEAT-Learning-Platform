@@ -5,6 +5,7 @@ export const errorCodes = [
   "FORBIDDEN",
   "INTERNAL",
   "NOT_FOUND",
+  "PASSWORD_BREACHED",
   "RATE_LIMITED",
   "UNAUTHENTICATED",
   "VALIDATION_FAILED",
