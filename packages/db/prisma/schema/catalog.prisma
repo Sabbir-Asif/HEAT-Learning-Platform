@@ -25,8 +25,9 @@ model Course {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
-  revisions CourseRevision[]
-  tags      CourseTag[]
+  revisions   CourseRevision[]
+  tags        CourseTag[]
+  enrollments Enrollment[]
 }
 
 model CourseRevision {
@@ -38,10 +39,12 @@ model CourseRevision {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  course  Course   @relation(fields: [courseId], references: [id], onDelete: Restrict)
-  modules Module[]
+  course      Course       @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  modules     Module[]
+  enrollments Enrollment[]
 
   @@unique([courseId, number])
+  @@unique([courseId, id])
 }
 
 model Module {

@@ -42,6 +42,8 @@ model User {
   recoveryCodes         RecoveryCode[]
   profileChangeRequests ProfileChangeRequest[] @relation("RequestedBy")
   decidedChangeRequests ProfileChangeRequest[] @relation("DecidedBy")
+  enrollments           Enrollment[]
+  enrollmentDecisions   EnrollmentDecision[]
 
   @@index([email])
 }
