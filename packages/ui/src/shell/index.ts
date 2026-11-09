@@ -1,3 +1,5 @@
+export { BrandLink } from "./brand-link";
+export type { BrandLinkProps } from "./brand-link";
 export { AuthLayout } from "./auth-layout";
 export type { AuthLayoutProps, AuthPanelPoint } from "./auth-layout";
 export { PageError, PageLoading } from "./page-states";
