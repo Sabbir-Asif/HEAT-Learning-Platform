@@ -51,7 +51,14 @@ describe("PrismaSessionStore", () => {
 
     expect(user.findUnique).toHaveBeenCalledWith({
       where: { id: "u" },
-      select: { id: true, realm: true, role: true, deactivatedAt: true, deletedAt: true },
+      select: {
+        id: true,
+        realm: true,
+        role: true,
+        deactivatedAt: true,
+        deletedAt: true,
+        mustChangePassword: true,
+      },
     });
   });
 

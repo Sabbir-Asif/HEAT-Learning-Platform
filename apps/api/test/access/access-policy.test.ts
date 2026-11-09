@@ -1,6 +1,11 @@
 import { Reflector } from "@nestjs/core";
 import { describe, expect, test } from "vitest";
-import { Audience, RequireCourseAccess, Roles } from "../../src/access/access.decorators";
+import {
+  AllowWhilePasswordChangeRequired,
+  Audience,
+  RequireCourseAccess,
+  Roles,
+} from "../../src/access/access.decorators";
 import { resolveAccessPolicy } from "../../src/access/access-policy";
 import { Public } from "../../src/auth/public.decorator";
 
@@ -83,6 +88,25 @@ class AdminCourse {
   handler(): void {}
 }
 
+class AdminAllowed {
+  @Audience("admin")
+  @Roles("ADMIN", "SUPER_ADMIN")
+  @AllowWhilePasswordChangeRequired()
+  handler(): void {}
+}
+
+class StudentAllowed {
+  @Audience("student")
+  @AllowWhilePasswordChangeRequired()
+  handler(): void {}
+}
+
+class PublicAllowed {
+  @Public()
+  @AllowWhilePasswordChangeRequired()
+  handler(): void {}
+}
+
 @Audience("student")
 class ClassStudent {
   handler(): void {}
@@ -138,6 +162,7 @@ describe("resolveAccessPolicy", () => {
       kind: "protected",
       audience: "student",
       roles: ["STUDENT"],
+      allowWhilePasswordChangeRequired: false,
     });
   });
 
@@ -151,6 +176,7 @@ describe("resolveAccessPolicy", () => {
       kind: "protected",
       audience: "admin",
       roles: ["ADMIN", "SUPER_ADMIN"],
+      allowWhilePasswordChangeRequired: false,
     });
   });
 
@@ -162,8 +188,17 @@ describe("resolveAccessPolicy", () => {
     ["Roles without an audience", RolesOnly],
     ["Public together with Audience on the handler", PublicAndAudience],
     ["course access on an admin route", AdminCourse],
+    ["AllowWhilePasswordChangeRequired on a student route", StudentAllowed],
+    ["Public with AllowWhilePasswordChangeRequired", PublicAllowed],
   ])("%s is denied", (_name, controller) => {
     expect(policyOf(controller)).toMatchObject({ kind: "denied" });
+  });
+
+  test("AllowWhilePasswordChangeRequired is carried on an admin route", () => {
+    expect(policyOf(AdminAllowed)).toMatchObject({
+      kind: "protected",
+      allowWhilePasswordChangeRequired: true,
+    });
   });
 
   test("class-level metadata applies", () => {

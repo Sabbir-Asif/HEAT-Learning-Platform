@@ -2,7 +2,12 @@ import type { ExecutionContext } from "@nestjs/common";
 import type { Reflector } from "@nestjs/core";
 import { IS_PUBLIC } from "../auth/public.decorator";
 import type { AuthRealm, UserRoleName } from "../auth/auth.types";
-import { AUDIENCE_KEY, COURSE_ACCESS_KEY, ROLES_KEY } from "./access.decorators";
+import {
+  ALLOW_PASSWORD_CHANGE_KEY,
+  AUDIENCE_KEY,
+  COURSE_ACCESS_KEY,
+  ROLES_KEY,
+} from "./access.decorators";
 
 export type AccessTargets = [
   handler: ReturnType<ExecutionContext["getHandler"]>,
@@ -11,7 +16,13 @@ export type AccessTargets = [
 
 export type AccessPolicy =
   | { kind: "public" }
-  | { kind: "protected"; audience: AuthRealm; roles: UserRoleName[]; courseParam?: string }
+  | {
+      kind: "protected";
+      audience: AuthRealm;
+      roles: UserRoleName[];
+      courseParam?: string;
+      allowWhilePasswordChangeRequired: boolean;
+    }
   | { kind: "denied"; reason: string };
 
 const adminRoles: readonly UserRoleName[] = ["ADMIN", "SUPER_ADMIN"];
@@ -29,13 +40,16 @@ export const resolveAccessPolicy = (reflector: Reflector, targets: AccessTargets
   const audience = read<AuthRealm>(AUDIENCE_KEY);
   const roles = read<UserRoleName[]>(ROLES_KEY);
   const courseParam = read<string>(COURSE_ACCESS_KEY);
+  const allowPasswordChange = read<boolean>(ALLOW_PASSWORD_CHANGE_KEY) === true;
 
   if (isPublic) {
-    const combined = [AUDIENCE_KEY, ROLES_KEY, COURSE_ACCESS_KEY].some((key) =>
-      targets.some((target) => reflector.get<unknown>(key, target) !== undefined),
+    const combined = [AUDIENCE_KEY, ROLES_KEY, COURSE_ACCESS_KEY, ALLOW_PASSWORD_CHANGE_KEY].some(
+      (key) => targets.some((target) => reflector.get<unknown>(key, target) !== undefined),
     );
     return combined
-      ? denied("Public cannot be combined with Audience, Roles or RequireCourseAccess at any level")
+      ? denied(
+          "Public cannot be combined with Audience, Roles, RequireCourseAccess or AllowWhilePasswordChangeRequired at any level",
+        )
       : { kind: "public" };
   }
   if (audience === undefined) {
@@ -54,8 +68,12 @@ export const resolveAccessPolicy = (reflector: Reflector, targets: AccessTargets
   if (courseParam !== undefined && audience !== "student") {
     return denied("RequireCourseAccess is only valid for the student audience");
   }
+  if (allowPasswordChange && audience !== "admin") {
+    return denied("AllowWhilePasswordChangeRequired is only valid for the admin audience");
+  }
   return {
     kind: "protected",
+    allowWhilePasswordChangeRequired: allowPasswordChange,
     audience,
     roles: roles ?? [...studentRoles],
     ...(courseParam === undefined ? {} : { courseParam }),

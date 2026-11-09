@@ -26,6 +26,7 @@ const messages: Record<ErrorCode, string> = {
   INVALID_CREDENTIALS: "The email or password is not correct.",
   NOT_FOUND: "The requested resource was not found.",
   PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
+  PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
   RATE_LIMITED: "Too many requests. Try again later.",
   UNAUTHENTICATED: "Sign in to continue.",
   VALIDATION_FAILED: "Some fields are not valid.",

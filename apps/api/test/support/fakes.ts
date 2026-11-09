@@ -74,6 +74,7 @@ export class InMemorySessionStore extends SessionStore {
       role: "STUDENT",
       deactivatedAt: null,
       deletedAt: null,
+      mustChangePassword: false,
       ...user,
     };
     this.users.set(created.id, created);

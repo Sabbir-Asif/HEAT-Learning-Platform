@@ -49,7 +49,14 @@ export class PrismaSessionStore extends SessionStore {
   findUser(userId: string): Promise<SessionUserRow | null> {
     return this.database.user.findUnique({
       where: { id: userId },
-      select: { id: true, realm: true, role: true, deactivatedAt: true, deletedAt: true },
+      select: {
+        id: true,
+        realm: true,
+        role: true,
+        deactivatedAt: true,
+        deletedAt: true,
+        mustChangePassword: true,
+      },
     });
   }
 

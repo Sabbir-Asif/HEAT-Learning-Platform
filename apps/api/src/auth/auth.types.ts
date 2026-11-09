@@ -21,4 +21,5 @@ export interface AuthenticatedSession {
   familyId: string;
   realm: AuthRealm;
   role: UserRoleName;
+  mustChangePassword: boolean;
 }

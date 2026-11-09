@@ -17,6 +17,7 @@ export interface SessionUserRow {
   role: "SUPER_ADMIN" | "ADMIN" | "STUDENT";
   deactivatedAt: Date | null;
   deletedAt: Date | null;
+  mustChangePassword: boolean;
 }
 
 export interface NewSession {
