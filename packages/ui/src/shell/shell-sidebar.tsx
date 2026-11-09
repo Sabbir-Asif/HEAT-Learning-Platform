@@ -52,7 +52,7 @@ function SidebarNav({
                 return (
                   <SidebarMenuItem key={href}>
                     <SidebarMenuButton
-                      size="lg"
+                      className="h-10"
                       isActive={active}
                       onClick={() => setOpenMobile(false)}
                       render={linkElement(link, {

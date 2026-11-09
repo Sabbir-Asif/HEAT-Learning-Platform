@@ -27,13 +27,13 @@ function BottomBar({ items, pathname, label, link }: BottomBarProps) {
                 href,
                 "aria-current": active ? "page" : undefined,
                 className: cn(
-                  "focus-visible:ring-ring flex min-h-14 flex-col items-center justify-center gap-1 px-1 text-xs outline-hidden focus-visible:ring-2 focus-visible:ring-inset",
+                  "focus-visible:ring-ring flex min-h-14 flex-col items-center justify-start gap-1 px-0.5 pt-2 text-center text-xs leading-tight outline-hidden focus-visible:ring-2 focus-visible:ring-inset",
                   active ? "text-primary font-semibold" : "text-muted-foreground",
                 ),
                 children: (
                   <>
                     <Icon aria-hidden="true" className="size-5" />
-                    <span className="max-w-full truncate">{itemLabel}</span>
+                    <span>{itemLabel}</span>
                   </>
                 ),
               })}

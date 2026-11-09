@@ -13,7 +13,10 @@ const segmentLabels: Record<string, string> = {
 };
 
 function cleanSegments(pathname: string): string[] {
-  return pathname.replace(/[?#].*$/, "").split("/").filter(Boolean);
+  return pathname
+    .replace(/[?#].*$/, "")
+    .split("/")
+    .filter(Boolean);
 }
 
 export function buildBreadcrumbs(pathname: string, groups: ReadonlyArray<NavGroup>): Crumb[] {

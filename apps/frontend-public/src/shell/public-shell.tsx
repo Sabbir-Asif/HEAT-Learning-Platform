@@ -12,7 +12,7 @@ import { footerColumns, legalLinks, publicNavigation } from "./navigation";
 export function PublicShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   return (
-    <>
+    <div className="flex min-h-svh flex-col">
       <SkipLink />
       <PublicHeader
         brand={{
@@ -52,6 +52,6 @@ export function PublicShell({ children }: { children: ReactNode }) {
         copyright="Copyright 2026 University of Dhaka. All rights reserved."
         link={Link}
       />
-    </>
+    </div>
   );
 }
