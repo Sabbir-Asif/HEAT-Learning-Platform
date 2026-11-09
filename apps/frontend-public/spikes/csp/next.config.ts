@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   cacheComponents: partial,
   partialPrefetching: partial,
   ...(partial ? {} : { experimental: { useCache: true } }),
-  distDir: partial ? ".next-spike-partial" : ".next-spike-dynamic",
+  distDir: partial ? ".next/partial" : ".next/dynamic",
   outputFileTracingRoot: path.join(__dirname, "../../../.."),
   transpilePackages: ["@heat/ui"],
 };
