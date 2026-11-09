@@ -25,7 +25,11 @@ function cellText(cell: CsvCell): string {
   if (cell instanceof Date) return formatDhakaDate(cell);
   if (typeof cell === "number") return String(cell);
   if (typeof cell === "boolean") return String(cell);
-  return formulaTriggers.some((trigger) => cell.startsWith(trigger)) ? `'${cell}` : cell;
+  const visible = cell.replace(/^[\s\u00a0\ufeff]+/u, "");
+  const risky = formulaTriggers.some(
+    (trigger) => cell.startsWith(trigger) || visible.startsWith(trigger),
+  );
+  return risky ? `'${cell}` : cell;
 }
 
 function escapeCell(text: string): string {

@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { cpSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 export const image =
@@ -12,6 +12,28 @@ const modes = {
   visual: "pnpm exec playwright test screenshots",
   a11y: "pnpm exec playwright test accessibility",
 };
+
+export function pnpmPin(packageManager) {
+  const match = /^pnpm@(\d+\.\d+\.\d+)\+sha512\.([0-9a-f]{128})$/.exec(packageManager ?? "");
+  if (!match) throw new Error("packageManager in package.json must be pnpm@X.Y.Z+sha512.<hex>");
+  return { version: match[1], sha512: match[2] };
+}
+
+export function installScript({ version, sha512 }) {
+  return [
+    "set -e",
+    "export HOME=/work/.home",
+    "export PATH=$HOME/.npm-global/bin:$PATH",
+    "cd $HOME",
+    `npm pack pnpm@${version} --silent`,
+    `echo "${sha512}  pnpm-${version}.tgz" | sha512sum --check --strict -`,
+    `npm install --global --prefix $HOME/.npm-global ./pnpm-${version}.tgz`,
+    "cd /work",
+    "pnpm install --frozen-lockfile",
+    "pnpm turbo build --filter=frontend-public --filter=frontend-internal --concurrency=1",
+    "cd packages/e2e",
+  ].join("\n");
+}
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, { stdio: "inherit", ...options });
@@ -51,16 +73,10 @@ export function main(mode) {
       typeof process.getuid === "function"
         ? ["--user", `${process.getuid()}:${process.getgid()}`]
         : [];
-    const script = [
-      "set -e",
-      "export HOME=/work/.home",
-      "export PATH=$HOME/.npm-global/bin:$PATH",
-      "npm install --global --prefix $HOME/.npm-global pnpm@11.28.11",
-      "pnpm install --frozen-lockfile",
-      "pnpm turbo build --filter=frontend-public --filter=frontend-internal --concurrency=1",
-      "cd packages/e2e",
-      command,
-    ].join("\n");
+    const pin = pnpmPin(
+      JSON.parse(readFileSync(join(root, "package.json"), "utf8")).packageManager,
+    );
+    const script = `${installScript(pin)}\n${command}`;
     const status = run("docker", [
       "run",
       "--rm",

@@ -80,7 +80,7 @@ The Tailwind plugin reads its theme from `packages/config/eslint/tailwind-entry.
 
 ### Accessibility and visual baselines
 
-`packages/e2e` (`@heat/e2e`) holds the Playwright config and two suites for both apps. They read the route manifests in `apps/*/src/routes/manifest.ts`, so a new route is scanned without editing the suite, and they run against `next build` plus `next start` on ports 3000 and 3001. No sign-in or API is needed.
+`packages/e2e` (`@heat/e2e`) holds the Playwright config and two suites for both apps. They read the route manifests in `apps/*/src/routes/manifest.ts`, so a new route is scanned without editing the suite, and they run against the production `output: "standalone"` build of each app, the same server the deployment runs, started by `packages/e2e/bin/standalone.mjs` (it copies `.next/static` and `public` next to `server.js`, then runs `node server.js` with `PORT` and `HOSTNAME`) on ports 3000 and 3001. No sign-in or API is needed. Besides the axe and screenshot suites, `shell.e2e.ts` checks the bottom bar (five items at 390 px, none at 1440 px), one main landmark, the skip link and the admin drawer focus return, and `robots.e2e.ts` checks `X-Robots-Tag: noindex` on the admin console (page, `/_next/static/` asset and 404) and its absence on the public site.
 
 | Command                  | Runs                                                                                                                                                                                                                                        |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -90,7 +90,7 @@ The Tailwind plugin reads its theme from `packages/config/eslint/tailwind-entry.
 | `pnpm e2e:docker:visual` | The screenshot comparison in the pinned image, as CI runs it                                                                                                                                                                                |
 | `pnpm e2e:docker:update` | Regenerates every baseline in the pinned image on any host OS and replaces `packages/e2e/test/*/__screenshots__`                                                                                                                            |
 
-The image is `mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d`, the Playwright 1.65 image (tag and digest). The Playwright version is pinned once in the `catalog:` block of `pnpm-workspace.yaml`; when it changes, change the tag and digest in `packages/e2e/bin/docker.mjs` and here, then regenerate the baselines. `packages/config/test/e2e.test.mjs` fails if they drift apart. The commands copy the tracked files into a work folder inside `packages/e2e`, install and build there as the current user, and need about 4 GB of memory for Docker.
+The image is `mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d`, the Playwright 1.65 image (tag and digest). The Playwright version is pinned once in the `catalog:` block of `pnpm-workspace.yaml`; when it changes, change the tag and digest in `packages/e2e/bin/docker.mjs` and here, then regenerate the baselines. `packages/config/test/e2e.test.mjs` fails if they drift apart. The commands copy the tracked files into a work folder inside `packages/e2e`, install and build there as the current user, and need about 4 GB of memory for Docker. pnpm inside the image is installed from the npm tarball and checked against the sha512 in the root `packageManager` field before it is used (the image has no Corepack); `packages/config/test/e2e.test.mjs` covers the check. Update that hash together with the version.
 
 The accessibility suite scans every manifest route at 390 and 1440 px, light and dark (the emulated colour scheme sets the theme), with the axe tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and `wcag22aa`. Axe has no WCAG 2.2 level A tag, so the 2.2 AA rules are the new ones. A failure prints the rule id, the impact and the selector. It also exercises the theme switch once per app, scans the open admin navigation sheet at phone width, and checks that the first tab stops of each layout show a focus indicator. Do not silence a rule with `disableRules`; fix the page or open an issue.
 
@@ -100,7 +100,7 @@ Two CI jobs run on every pull request: `accessibility` is a required check, `scr
 
 ### Performance budgets (Lighthouse)
 
-The `lighthouse` job audits pages of the production build (`next build`, then `next start` on port 3000, no secrets, database or API) with Lighthouse in `packages/e2e/lighthouse`. It runs on every pull request, is not a required check, and never fails the run.
+The `lighthouse` job audits pages of the production build (`next build`, then the standalone server on port 3000 through `packages/e2e/bin/standalone.mjs`, no secrets, database or API) with Lighthouse in `packages/e2e/lighthouse`. It runs on every pull request, is not a required check, and never fails the run.
 
 | Budget                               | Limit                                            |
 | ------------------------------------ | ------------------------------------------------ |
@@ -225,9 +225,9 @@ The `lighthouse` job is separate and not a required check: it audits the product
 
 The `api-client-drift` job is separate and not yet a required check either. It builds contracts and the API, regenerates `apps/api/openapi.json` and `packages/api-client/src/generated/`, and fails when any file differs from what is committed (modified, deleted or new), listing the files. Run `pnpm generate` and commit the result to fix it.
 
-Dependabot runs from `.github/dependabot.yml` (npm, GitHub Actions and the dev compose images; app Dockerfiles are added with the deployment tickets). CodeQL is left out: GitHub only stores its results for a private repository with code security enabled. Add it back if the repository goes public or code security is bought. In CI, Turborepo's cache lives in `.turbo` and is restored per task, so unchanged packages replay instead of re-running.
+Dependabot runs from `.github/dependabot.yml` and bumps SHA-pinned actions without needing a version comment (npm, GitHub Actions and the dev compose images; app Dockerfiles are added with the deployment tickets). CodeQL is left out: GitHub only stores its results for a private repository with code security enabled. Add it back if the repository goes public or code security is bought. In CI, Turborepo's cache lives in `.turbo` and is restored per task, so unchanged packages replay instead of re-running.
 
-Workflow rules, enforced by `packages/config/test/workflows.test.mjs`: every external action is pinned to a commit SHA, each workflow sets `permissions`, and `pull_request_target` is not used.
+Workflow rules, enforced by `packages/config/test/workflows.test.mjs`: every external action is pinned to a commit SHA with no trailing version comment (comments are not allowed in workflow files), each workflow sets `permissions`, and `pull_request_target` is not used.
 
 **Audit ignore list.** To accept an advisory you cannot fix yet, add `{ "advisory": "GHSA-...", "reason": "...", "expires": "YYYY-MM-DD" }` to `.github/audit-ignore.json`. A reason is required, the expiry is at most 90 days out, and an expired entry fails the audit.
 

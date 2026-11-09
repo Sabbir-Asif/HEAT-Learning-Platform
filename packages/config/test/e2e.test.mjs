@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { load as parse } from "js-yaml";
 import { describe, expect, test } from "vitest";
-import { image } from "../../e2e/bin/docker.mjs";
+import { image, installScript, pnpmPin } from "../../e2e/bin/docker.mjs";
 import { changedScreens, report } from "../../e2e/bin/report-visual.mjs";
 
 const root = resolve(import.meta.dirname, "../../..");
@@ -93,5 +93,24 @@ describe("visual report", () => {
     expect(report([], "failure").annotations[0]).toMatch(
       /^::warning title=Screenshot run did not finish/,
     );
+  });
+});
+
+describe("pnpm inside the image", () => {
+  const { packageManager } = JSON.parse(read("package.json"));
+
+  test("the root packageManager carries a sha512 and the script checks the tarball against it", () => {
+    const pin = pnpmPin(packageManager);
+    const script = installScript(pin);
+    expect(script).toContain(`${pin.sha512}  pnpm-${pin.version}.tgz`);
+    expect(script.indexOf("sha512sum --check")).toBeLessThan(
+      script.indexOf("npm install --global"),
+    );
+    expect(script).not.toMatch(/npm install --global --prefix \S+ pnpm@/);
+  });
+
+  test("a packageManager without a hash is rejected", () => {
+    expect(() => pnpmPin("pnpm@11.28.11")).toThrow();
+    expect(() => pnpmPin(undefined)).toThrow();
   });
 });

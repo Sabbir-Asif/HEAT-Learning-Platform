@@ -3,7 +3,7 @@ import { defineConfig } from "@playwright/test";
 const ports = { public: 3000, internal: 3001 } as const;
 
 const server = (app: "public" | "internal") => ({
-  command: `pnpm --filter frontend-${app} exec next start --port ${ports[app]}`,
+  command: `node packages/e2e/bin/standalone.mjs frontend-${app} ${ports[app]}`,
   cwd: "../..",
   url: `http://localhost:${ports[app]}`,
   reuseExistingServer: !process.env.CI,
