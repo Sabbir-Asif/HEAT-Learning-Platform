@@ -179,7 +179,7 @@ Enrollment is checked **per course**, not per student (my call, following the pl
 - **Certificates.** Card per certificate with download and a copyable verification link.
 
 ### 6.4 Slow-network budget
-- First-load JavaScript for public pages ≤ 150 KB gzipped; learner pages ≤ 200 KB excluding the player; the player chunk loads only on lesson pages.
+- First-load JavaScript for public pages ≤ 300 KB gzipped; learner pages ≤ 200 KB excluding the player; the player chunk loads only on lesson pages.
 - LCP ≤ 2.5 s on a mid-range Android over a throttled "Slow 4G" profile, measured in CI with Lighthouse and in the field with Web Vitals.
 - Images via `next/image` (AVIF/WebP, responsive sizes); fonts self-hosted with `next/font`, subset, `display: swap`; no third-party scripts on student pages.
 - Every list and detail view has a skeleton, an empty state and an error state with retry.

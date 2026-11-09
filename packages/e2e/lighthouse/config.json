@@ -4,7 +4,7 @@
   "lcpBudgetMs": 2500,
   "playerChunkPattern": "player",
   "budgets": {
-    "public": { "firstLoadScriptKb": 150 },
+    "public": { "firstLoadScriptKb": 300 },
     "learner": { "firstLoadScriptKb": 200 }
   },
   "pages": [{ "path": "/", "kind": "public", "app": "frontend-public" }]

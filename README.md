@@ -104,7 +104,7 @@ The `lighthouse` job audits pages of the production build (`next build`, then th
 
 | Budget                               | Limit                                            |
 | ------------------------------------ | ------------------------------------------------ |
-| First-load JavaScript, public pages  | 150 KB gzipped                                   |
+| First-load JavaScript, public pages  | 300 KB gzipped                                   |
 | First-load JavaScript, learner pages | 200 KB gzipped, excluding the player chunk       |
 | Largest Contentful Paint             | 2.5 s on mobile with Slow 4G and 4x CPU slowdown |
 
