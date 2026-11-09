@@ -20,6 +20,7 @@ interface ResponseLike {
 
 const messages: Record<ErrorCode, string> = {
   BAD_REQUEST: "The request could not be processed.",
+  ENROLLMENT_NOT_ACTIVE: "Your enrollment in this course is not active.",
   FORBIDDEN: "You are not allowed to do this.",
   INTERNAL: "Something went wrong on the server.",
   INVALID_CREDENTIALS: "The email or password is not correct.",

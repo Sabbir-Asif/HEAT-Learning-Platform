@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const errorCodes = [
   "BAD_REQUEST",
+  "ENROLLMENT_NOT_ACTIVE",
   "FORBIDDEN",
   "INTERNAL",
   "INVALID_CREDENTIALS",
