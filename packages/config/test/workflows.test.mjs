@@ -96,4 +96,51 @@ describe("GitHub workflows", () => {
       });
     });
   });
+  describe("Lighthouse job", () => {
+    const ci = parse(workflows.find(({ name }) => name === "ci.yml").text);
+    const job = ci.jobs.lighthouse;
+    const steps = job?.steps ?? [];
+    const protection = JSON.parse(readFileSync(join(github, "branch-protection.json"), "utf8"));
+
+    test("exists, with a timeout, and runs on every pull request (no path filter)", () => {
+      expect(job).toBeDefined();
+      expect(job["timeout-minutes"]).toBeGreaterThan(0);
+      expect(JSON.stringify(ci.on)).not.toMatch(/paths/);
+    });
+
+    test("is not a required check", () => {
+      expect(protection.required_status_checks.contexts).not.toContain("lighthouse");
+    });
+
+    test("builds the public app, installs Chromium and runs the audit without secrets", () => {
+      const runs = steps.map((step) => step.run).filter(Boolean);
+      expect(runs.some((run) => /playwright install.*chromium/.test(run))).toBe(true);
+      expect(runs.some((run) => /build.*frontend-public/.test(run))).toBe(true);
+      expect(runs).toContain("pnpm --filter @heat/e2e lighthouse");
+      expect(JSON.stringify(job)).not.toMatch(/secrets\./);
+    });
+
+    test("never fails the run: the audit continues on error and the report warns", () => {
+      const audit = steps.find((step) => step.run === "pnpm --filter @heat/e2e lighthouse");
+      expect(audit.id).toBe("audit");
+      expect(audit["continue-on-error"]).toBe(true);
+      const reporter = steps.find(
+        (step) => step.run === "pnpm --filter @heat/e2e lighthouse:report",
+      );
+      expect(reporter.if).toBe("${{ !cancelled() }}");
+      expect(reporter.env.RUN_OUTCOME).toBe("${{ steps.audit.outcome }}");
+      expect(reporter.env.ARTIFACT_URL).toBe("${{ steps.upload.outputs.artifact-url }}");
+    });
+
+    test("uploads the reports for 7 days, also when the audit fails", () => {
+      const upload = steps.find((step) => step.uses?.startsWith("actions/upload-artifact@"));
+      expect(upload.id).toBe("upload");
+      expect(upload.if).toBe("${{ !cancelled() }}");
+      expect(upload.with).toMatchObject({
+        name: "lighthouse-reports",
+        path: "packages/e2e/lighthouse-results",
+        "retention-days": 7,
+      });
+    });
+  });
 });
