@@ -22,6 +22,7 @@ const messages: Record<ErrorCode, string> = {
   BAD_REQUEST: "The request could not be processed.",
   FORBIDDEN: "You are not allowed to do this.",
   INTERNAL: "Something went wrong on the server.",
+  INVALID_CREDENTIALS: "The email or password is not correct.",
   NOT_FOUND: "The requested resource was not found.",
   PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
   RATE_LIMITED: "Too many requests. Try again later.",

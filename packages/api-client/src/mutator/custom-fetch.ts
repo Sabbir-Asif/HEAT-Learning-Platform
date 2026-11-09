@@ -22,7 +22,12 @@ export async function customFetch<T>(url: string, options: RequestInit = {}): Pr
     return await send<T>(url, options);
   } catch (error) {
     const handler = getUnauthorizedHandler();
-    if (isApiError(error) && error.status === 401 && handler && (await handler(error))) {
+    if (
+      isApiError(error) &&
+      error.status === 401 &&
+      handler &&
+      (await handler(error, { url: toApiPath(url) }))
+    ) {
       return send<T>(url, options);
     }
     throw error;

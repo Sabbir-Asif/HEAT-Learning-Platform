@@ -11,6 +11,7 @@ import { RedisRotationClaimStore } from "./redis-rotation-claim.store";
 import { RotationClaimStore } from "./rotation-claim.store";
 import { SessionService } from "./session.service";
 import { SessionStore } from "./session.store";
+import { StudentAuthGuard } from "./student-auth.guard";
 
 @Module({
   imports: [CoreModule],
@@ -19,11 +20,12 @@ import { SessionStore } from "./session.store";
     CookieWriter,
     PasswordService,
     SessionService,
+    StudentAuthGuard,
     { provide: CLAIM_POLLING, useValue: defaultClaimPolling },
     { provide: BreachedPasswordProvider, useClass: HibpBreachedPasswordProvider },
     { provide: SessionStore, useClass: PrismaSessionStore },
     { provide: RotationClaimStore, useClass: RedisRotationClaimStore },
   ],
-  exports: [AccessTokenService, CookieWriter, PasswordService, SessionService],
+  exports: [AccessTokenService, CookieWriter, PasswordService, SessionService, StudentAuthGuard],
 })
 export class AuthModule {}

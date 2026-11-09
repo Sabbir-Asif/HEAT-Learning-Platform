@@ -6,6 +6,67 @@
  */
 import * as zod from 'zod';
 
+export const StudentAuthRefreshResponse = zod.void()
+
+
+export const studentAuthSignInBodyPasswordMax = 256;
+
+
+
+export const StudentAuthSignInBody = zod.object({
+  "email": zod.string(),
+  "password": zod.string().min(1).max(studentAuthSignInBodyPasswordMax)
+})
+
+export const studentAuthSignInResponseEnrollmentsItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentAuthSignInResponseUserIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const StudentAuthSignInResponse = zod.object({
+  "enrollments": zod.array(zod.object({
+  "courseId": zod.uuid().regex(studentAuthSignInResponseEnrollmentsItemCourseIdRegExp),
+  "courseSlug": zod.string(),
+  "courseTitle": zod.string(),
+  "reason": zod.string().optional(),
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED'])
+})),
+  "user": zod.object({
+  "email": zod.string(),
+  "emailVerified": zod.boolean(),
+  "id": zod.uuid().regex(studentAuthSignInResponseUserIdRegExp),
+  "mustChangePassword": zod.boolean(),
+  "name": zod.string().optional(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT'])
+})
+})
+
+
+export const StudentAuthSignOutResponse = zod.void()
+
+
 export const HealthCheckResponse = zod.object({
   "status": zod.enum(['ok'])
+})
+
+
+export const meDescribeResponseEnrollmentsItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const meDescribeResponseUserIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const MeDescribeResponse = zod.object({
+  "enrollments": zod.array(zod.object({
+  "courseId": zod.uuid().regex(meDescribeResponseEnrollmentsItemCourseIdRegExp),
+  "courseSlug": zod.string(),
+  "courseTitle": zod.string(),
+  "reason": zod.string().optional(),
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED'])
+})),
+  "user": zod.object({
+  "email": zod.string(),
+  "emailVerified": zod.boolean(),
+  "id": zod.uuid().regex(meDescribeResponseUserIdRegExp),
+  "mustChangePassword": zod.boolean(),
+  "name": zod.string().optional(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT'])
+})
 })

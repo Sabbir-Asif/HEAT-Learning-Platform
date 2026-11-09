@@ -14,16 +14,55 @@ import {
 } from 'msw';
 import type {
   HttpResponseResolver,
+  PathParams,
   RequestHandlerOptions
 } from 'msw';
 
 import type {
-  HealthResponseDto
+  HealthResponseDto,
+  MeResponseDto,
+  SignInRequestDto
 } from './model';
 
 
+export const getStudentAuthSignInResponseMock = (overrideResponse: Partial<Extract<MeResponseDto, object>> = {}): MeResponseDto => ({enrollments: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), reason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const)})), user: {email: faker.string.alpha({length: {min: 10, max: 20}}), emailVerified: faker.datatype.boolean(), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
+
 export const getHealthCheckResponseMock = (overrideResponse: Partial<Extract<HealthResponseDto, object>> = {}): HealthResponseDto => ({status: faker.helpers.arrayElement(['ok'] as const), ...overrideResponse})
 
+export const getMeDescribeResponseMock = (overrideResponse: Partial<Extract<MeResponseDto, object>> = {}): MeResponseDto => ({enrollments: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), reason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const)})), user: {email: faker.string.alpha({length: {min: 10, max: 20}}), emailVerified: faker.datatype.boolean(), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
+
+
+export const getStudentAuthRefreshMockHandler = (overrideResponse?: void | ((info: Parameters<HttpResponseResolver>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.post('*/api/auth/refresh', async (info: Parameters<HttpResponseResolver>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
+
+export const getStudentAuthSignInMockHandler = (overrideResponse?: MeResponseDto | ((info: Parameters<HttpResponseResolver<PathParams, SignInRequestDto>>[0]) => Promise<MeResponseDto> | MeResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, SignInRequestDto>('*/api/auth/sign-in', async (info: Parameters<HttpResponseResolver<PathParams, SignInRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getStudentAuthSignInResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getStudentAuthSignOutMockHandler = (overrideResponse?: void | ((info: Parameters<HttpResponseResolver>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.post('*/api/auth/sign-out', async (info: Parameters<HttpResponseResolver>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
 
 export const getHealthCheckMockHandler = (overrideResponse?: HealthResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<HealthResponseDto> | HealthResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/health', async (info: Parameters<HttpResponseResolver>[0]) => {
@@ -36,6 +75,22 @@ export const getHealthCheckMockHandler = (overrideResponse?: HealthResponseDto |
       })
   }, options)
 }
+
+export const getMeDescribeMockHandler = (overrideResponse?: MeResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<MeResponseDto> | MeResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/me', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getMeDescribeResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 export const getHeatLmsApiMock = () => [
-  getHealthCheckMockHandler()
+  getStudentAuthRefreshMockHandler(),
+  getStudentAuthSignInMockHandler(),
+  getStudentAuthSignOutMockHandler(),
+  getHealthCheckMockHandler(),
+  getMeDescribeMockHandler()
 ]

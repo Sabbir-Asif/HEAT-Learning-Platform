@@ -5,22 +5,28 @@
  * OpenAPI spec version: 1.0.0
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
-  HealthResponseDto
+  HealthResponseDto,
+  MeResponseDto,
+  SignInRequestDto
 } from './model';
 
 import { customFetch } from '../../mutator/custom-fetch';
@@ -45,6 +51,224 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getStudentAuthRefreshUrl = () => {
+
+
+
+
+  return `/api/auth/refresh`
+}
+
+export const studentAuthRefresh = async ( options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getStudentAuthRefreshUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getStudentAuthRefreshMutationKey = () => ['studentAuthRefresh'] as const;
+
+export const getStudentAuthRefreshMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentAuthRefresh>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof studentAuthRefresh>>, TError,void, TContext> => {
+
+const mutationKey = getStudentAuthRefreshMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof studentAuthRefresh>>, void> = () => {
+
+
+          return  studentAuthRefresh(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StudentAuthRefreshMutationResult = NonNullable<Awaited<ReturnType<typeof studentAuthRefresh>>>
+
+    export type StudentAuthRefreshMutationError = ErrorType<unknown>
+
+
+    export const useStudentAuthRefresh = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentAuthRefresh>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof studentAuthRefresh>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getStudentAuthRefreshMutationOptions(options), queryClient);
+    }
+
+export const getStudentAuthSignInUrl = () => {
+
+
+
+
+  return `/api/auth/sign-in`
+}
+
+export const studentAuthSignIn = async (signInRequestDto: SignInRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<MeResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<MeResponseDto>(getStudentAuthSignInUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(signInRequestDto)
+  }
+);}
+
+
+
+
+
+export const getStudentAuthSignInMutationKey = () => ['studentAuthSignIn'] as const;
+
+export const getStudentAuthSignInMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentAuthSignIn>>, TError,StudentAuthSignInMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof studentAuthSignIn>>, TError,StudentAuthSignInMutationVariables, TContext> => {
+
+const mutationKey = getStudentAuthSignInMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof studentAuthSignIn>>, StudentAuthSignInMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  studentAuthSignIn(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StudentAuthSignInMutationResult = NonNullable<Awaited<ReturnType<typeof studentAuthSignIn>>>
+    export type StudentAuthSignInMutationBody = SignInRequestDto
+    export type StudentAuthSignInMutationError = ErrorType<unknown>
+    export type StudentAuthSignInMutationVariables = {data: SignInRequestDto}
+
+    export const useStudentAuthSignIn = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentAuthSignIn>>, TError,StudentAuthSignInMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof studentAuthSignIn>>,
+        TError,
+        StudentAuthSignInMutationVariables,
+        TContext
+      > => {
+      return useMutation(getStudentAuthSignInMutationOptions(options), queryClient);
+    }
+
+export const getStudentAuthSignOutUrl = () => {
+
+
+
+
+  return `/api/auth/sign-out`
+}
+
+export const studentAuthSignOut = async ( options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getStudentAuthSignOutUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getStudentAuthSignOutMutationKey = () => ['studentAuthSignOut'] as const;
+
+export const getStudentAuthSignOutMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentAuthSignOut>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof studentAuthSignOut>>, TError,void, TContext> => {
+
+const mutationKey = getStudentAuthSignOutMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof studentAuthSignOut>>, void> = () => {
+
+
+          return  studentAuthSignOut(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StudentAuthSignOutMutationResult = NonNullable<Awaited<ReturnType<typeof studentAuthSignOut>>>
+
+    export type StudentAuthSignOutMutationError = ErrorType<unknown>
+
+
+    export const useStudentAuthSignOut = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentAuthSignOut>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof studentAuthSignOut>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getStudentAuthSignOutMutationOptions(options), queryClient);
+    }
 
 export const getHealthCheckUrl = () => {
 
@@ -129,6 +353,101 @@ export function useHealthCheck<TData = Awaited<ReturnType<typeof healthCheck>>, 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getHealthCheckQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getMeDescribeUrl = () => {
+
+
+
+
+  return `/api/me`
+}
+
+export const meDescribe = async ( options?: Parameters<typeof customFetch>[1]): Promise<MeResponseDto> => {
+
+  return customFetch<MeResponseDto>(getMeDescribeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMeDescribeQueryKey = () => {
+    return [
+    `/api/me`
+    ] as const;
+    }
+
+
+export const getMeDescribeQueryOptions = <TData = Awaited<ReturnType<typeof meDescribe>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meDescribe>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMeDescribeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof meDescribe>>> = ({ signal }) => meDescribe({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof meDescribe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MeDescribeQueryResult = NonNullable<Awaited<ReturnType<typeof meDescribe>>>
+export type MeDescribeQueryError = ErrorType<unknown>
+
+
+export function useMeDescribe<TData = Awaited<ReturnType<typeof meDescribe>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof meDescribe>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof meDescribe>>,
+          TError,
+          Awaited<ReturnType<typeof meDescribe>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMeDescribe<TData = Awaited<ReturnType<typeof meDescribe>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meDescribe>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof meDescribe>>,
+          TError,
+          Awaited<ReturnType<typeof meDescribe>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMeDescribe<TData = Awaited<ReturnType<typeof meDescribe>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meDescribe>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMeDescribe<TData = Awaited<ReturnType<typeof meDescribe>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meDescribe>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMeDescribeQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

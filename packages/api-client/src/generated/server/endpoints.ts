@@ -16,6 +16,138 @@ export interface HealthResponseDto {
   status: HealthResponseDtoStatus;
 }
 
+export type MeResponseDtoEnrollmentsItemStatus = typeof MeResponseDtoEnrollmentsItemStatus[keyof typeof MeResponseDtoEnrollmentsItemStatus];
+
+
+export const MeResponseDtoEnrollmentsItemStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
+export type MeResponseDtoEnrollmentsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId: string;
+  courseSlug: string;
+  courseTitle: string;
+  reason?: string;
+  status: MeResponseDtoEnrollmentsItemStatus;
+};
+
+export type MeResponseDtoUserRole = typeof MeResponseDtoUserRole[keyof typeof MeResponseDtoUserRole];
+
+
+export const MeResponseDtoUserRole = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  ADMIN: 'ADMIN',
+  STUDENT: 'STUDENT',
+} as const;
+
+export type MeResponseDtoUser = {
+  email: string;
+  emailVerified: boolean;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  mustChangePassword: boolean;
+  name?: string;
+  role: MeResponseDtoUserRole;
+};
+
+export interface MeResponseDto {
+  enrollments: MeResponseDtoEnrollmentsItem[];
+  user: MeResponseDtoUser;
+}
+
+export interface SignInRequestDto {
+  email: string;
+  /**
+     * @minLength 1
+     * @maxLength 256
+     */
+  password: string;
+}
+
+export const getStudentAuthRefreshUrl = () => {
+
+
+
+
+  return `/api/auth/refresh`
+}
+
+export const studentAuthRefresh = async ( options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getStudentAuthRefreshUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getStudentAuthSignInUrl = () => {
+
+
+
+
+  return `/api/auth/sign-in`
+}
+
+export const studentAuthSignIn = async (signInRequestDto: SignInRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<MeResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<MeResponseDto>(getStudentAuthSignInUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(signInRequestDto)
+  }
+);}
+
+
+
+export const getStudentAuthSignOutUrl = () => {
+
+
+
+
+  return `/api/auth/sign-out`
+}
+
+export const studentAuthSignOut = async ( options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getStudentAuthSignOutUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
 export const getHealthCheckUrl = () => {
 
 
@@ -27,6 +159,27 @@ export const getHealthCheckUrl = () => {
 export const healthCheck = async ( options?: Parameters<typeof serverFetch>[1]): Promise<HealthResponseDto> => {
 
   return serverFetch<HealthResponseDto>(getHealthCheckUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getMeDescribeUrl = () => {
+
+
+
+
+  return `/api/me`
+}
+
+export const meDescribe = async ( options?: Parameters<typeof serverFetch>[1]): Promise<MeResponseDto> => {
+
+  return serverFetch<MeResponseDto>(getMeDescribeUrl(),
   {
     ...options,
     method: 'GET'

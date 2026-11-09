@@ -7,7 +7,14 @@ export interface ApiRequest {
 
 export type RequestInterceptor = (request: ApiRequest) => ApiRequest | Promise<ApiRequest>;
 
-export type UnauthorizedHandler = (error: ApiError) => boolean | Promise<boolean>;
+export interface UnauthorizedContext {
+  url: string;
+}
+
+export type UnauthorizedHandler = (
+  error: ApiError,
+  context: UnauthorizedContext,
+) => boolean | Promise<boolean>;
 
 const interceptors: RequestInterceptor[] = [];
 let unauthorizedHandler: UnauthorizedHandler | undefined;
