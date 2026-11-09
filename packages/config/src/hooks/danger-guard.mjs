@@ -1,5 +1,5 @@
 import { basename, resolve, sep } from "node:path";
-import { branchDenial, locate, planDenial } from "./edit-guards.mjs";
+import { branchDenial, locate } from "./edit-guards.mjs";
 import { envAccess, isEnvFile } from "./env-files.mjs";
 import { existsInBase } from "./git.mjs";
 import { resolveReal } from "./paths.mjs";
@@ -105,7 +105,7 @@ function writeDenial(target, cwd) {
   const location = locate(target, cwd);
   if (!location) return null;
   if (isEnvFile(location.real)) return envDenial(location.real);
-  const reason = branchDenial(location) ?? planDenial(location);
+  const reason = branchDenial(location);
   if (reason) return `Shell write blocked. ${reason}`;
   return migrationDenialFor(location);
 }

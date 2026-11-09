@@ -12,7 +12,6 @@ let gitDir;
 beforeAll(() => {
   main = makeRepo({ branch: "epic/e0-x" });
   tree = addWorktree(main, "chore/60-gitdir");
-  write(tree, "docs/plans/issue-60.md");
   gitDir = git(tree, "rev-parse", "--absolute-git-dir");
 });
 

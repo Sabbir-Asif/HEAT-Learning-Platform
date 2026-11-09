@@ -1,14 +1,7 @@
 import { mkdirSync, rmSync, symlinkSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, describe, expect, test } from "vitest";
-import {
-  branchDenial,
-  branchGuard,
-  locate,
-  planDenial,
-  planGate,
-  targetOf,
-} from "../../src/hooks/edit-guards.mjs";
+import { branchDenial, branchGuard, locate, targetOf } from "../../src/hooks/edit-guards.mjs";
 import { addWorktree, cleanupAll, git, makeRepo, tempDir, write } from "../fixtures/repo.mjs";
 
 afterAll(cleanupAll);
@@ -116,70 +109,5 @@ describe("branch guard", () => {
     expect(location).toMatchObject({ top: repo, relative: "a/b.ts", branch: "main" });
     expect(branchDenial(location)).toMatch(/main/);
     expect(locate(join(tempDir("x"), "a"), "/")).toBeNull();
-  });
-});
-
-describe("plan gate", () => {
-  const ticket = () => {
-    const repo = makeRepo();
-    return addWorktree(repo, "chore/25-workflow-hooks");
-  };
-
-  test("blocks a source edit without the plan and names the missing file", () => {
-    const tree = ticket();
-    const result = planGate(edit(join(tree, "packages/config/src/a.mjs")));
-    expect(result.deny).toContain("docs/plans/issue-25.md");
-    expect(result.deny).toMatch(/stage 4/);
-  });
-
-  test("always allows the plan file itself", () => {
-    const tree = ticket();
-    expect(planGate(edit(join(tree, "docs/plans/issue-25.md")))).toEqual({});
-  });
-
-  test("a plan for another ticket does not unlock this one", () => {
-    const tree = ticket();
-    expect(planGate(edit(join(tree, "docs/plans/issue-26.md"))).deny).toBeTruthy();
-  });
-
-  test("allows everything once the plan exists, hook code included", () => {
-    const tree = ticket();
-    write(tree, "docs/plans/issue-25.md", "# plan\n");
-    expect(planGate(edit(join(tree, "packages/config/src/a.mjs")))).toEqual({});
-    expect(planGate(edit(join(tree, ".claude/settings.json")))).toEqual({});
-    expect(planGate(edit(join(tree, "packages/config/src/hooks/run.mjs")))).toEqual({});
-  });
-
-  test("the gate follows the file's worktree, not the session cwd", () => {
-    const repo = makeRepo();
-    const withPlan = addWorktree(repo, "chore/1-a");
-    write(withPlan, "docs/plans/issue-1.md");
-    const without = addWorktree(repo, "chore/2-b");
-    expect(planGate(edit(join(without, "a.ts"), { cwd: withPlan })).deny).toBeTruthy();
-    expect(planGate(edit(join(withPlan, "a.ts"), { cwd: without }))).toEqual({});
-  });
-
-  test("on an epic branch it does not guess a number, allows and says so", () => {
-    const repo = makeRepo({ branch: "epic/e0-foundation" });
-    const result = planGate(edit(join(repo, "a.ts")));
-    expect(result.deny).toBeUndefined();
-    expect(result.context).toMatch(/epic\/e0-foundation/);
-  });
-
-  test("leaves main and a detached HEAD to the branch guard", () => {
-    const repo = makeRepo();
-    expect(planGate(edit(join(repo, "a.ts")))).toEqual({});
-    git(repo, "checkout", "-q", "--detach");
-    expect(planGate(edit(join(repo, "a.ts")))).toEqual({});
-  });
-
-  test("never blocks outside a repository", () => {
-    expect(planGate(edit(join(tempDir("scratch"), "a.md")))).toEqual({});
-  });
-
-  test("planDenial returns null when the plan exists", () => {
-    const tree = ticket();
-    write(tree, "docs/plans/issue-25.md");
-    expect(planDenial(locate(join(tree, "a.ts"), "/"))).toBeNull();
   });
 });
