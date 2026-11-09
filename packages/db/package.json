@@ -18,7 +18,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:integration": "prisma generate && vitest run --config vitest.integration.config.mjs"
+    "test:integration": "prisma generate && vitest run --config vitest.integration.config.mjs",
+    "er-diagram": "tsc -p tsconfig.build.json && node bin/er-diagram.mjs"
   },
   "devDependencies": {
     "@heat/config": "workspace:*",
