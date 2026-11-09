@@ -3,11 +3,14 @@ import { randomUUID } from "node:crypto";
 import { promisify } from "node:util";
 import { Client, type QueryResult, type QueryResultRow } from "pg";
 import { inject } from "vitest";
+import { createClient } from "../../src/client";
+import type { PrismaClient } from "../../src/generated/client";
 
 const run = promisify(execFile);
 
 export interface TestDatabase {
   url: string;
+  prisma: PrismaClient;
   query: (sql: string, values?: unknown[]) => Promise<QueryResult<QueryResultRow>>;
   close: () => Promise<void>;
 }
@@ -36,9 +39,15 @@ export const withDatabase = async (): Promise<TestDatabase> => {
   const client = new Client({ connectionString: url });
   await client.connect();
 
+  const prisma = createClient(url);
+
   return {
     url,
+    prisma,
     query: (sql, values) => client.query(sql, values),
-    close: () => client.end(),
+    close: async () => {
+      await prisma.$disconnect();
+      await client.end();
+    },
   };
 };
