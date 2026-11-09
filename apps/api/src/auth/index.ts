@@ -12,3 +12,9 @@ export type {
   SessionTokens,
   UserRoleName,
 } from "./auth.types";
+export { CurrentSession } from "./current-session.decorator";
+export { IS_PUBLIC, Public } from "./public.decorator";
+export { StudentAuthGuard } from "./student-auth.guard";
+export { readCookie } from "./cookie-reader";
+export type { CookieHeader } from "./cookie-reader";
+export type { AuthenticatedRequest } from "./authenticated-request";

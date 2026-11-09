@@ -4,6 +4,7 @@ export const errorCodes = [
   "BAD_REQUEST",
   "FORBIDDEN",
   "INTERNAL",
+  "INVALID_CREDENTIALS",
   "NOT_FOUND",
   "PASSWORD_BREACHED",
   "RATE_LIMITED",
