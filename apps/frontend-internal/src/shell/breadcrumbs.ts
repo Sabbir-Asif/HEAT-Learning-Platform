@@ -13,7 +13,7 @@ const segmentLabels: Record<string, string> = {
 };
 
 function cleanSegments(pathname: string): string[] {
-  return (pathname.split(/[?#]/)[0] ?? "").split("/").filter(Boolean);
+  return pathname.replace(/[?#].*$/, "").split("/").filter(Boolean);
 }
 
 export function buildBreadcrumbs(pathname: string, groups: ReadonlyArray<NavGroup>): Crumb[] {
@@ -32,7 +32,7 @@ export function buildBreadcrumbs(pathname: string, groups: ReadonlyArray<NavGrou
     const label = segmentLabels[segment] ?? "Details";
     if (crumbs[crumbs.length - 1]?.label !== label) crumbs.push({ label });
   }
-  const last = crumbs[crumbs.length - 1];
-  if (last) delete last.href;
-  return crumbs;
+  return crumbs.map((crumb, index) =>
+    index === crumbs.length - 1 ? { label: crumb.label } : crumb,
+  );
 }
