@@ -28,3 +28,13 @@ Prisma schema, migrations and client. Compiles to `dist/` because the API import
 - Soft delete never triggers a database RESTRICT. Services check usage first with `assertNotInUse([{ name, count }])`, which throws `RecordInUseError` listing what blocks the delete.
 - Email is unique among active users only: the `User_email_active_key` partial unique index on `lower("email") WHERE "deletedAt" IS NULL` is raw SQL in migration `20261109110000_user_email_active_unique`.
 - A new model with `deletedAt` must be added to `softDeletedModels`; a unit test fails when the list and the schema differ.
+
+## Seed
+
+`pnpm --filter @heat/db exec prisma db seed` runs `src/seed-cli.ts` (configured in `prisma.config.ts`) against `DATABASE_URL`. It is idempotent: every row is an upsert keyed by its natural key, so a re-run changes nothing.
+
+- Always seeded: the super admin (`SUPER_ADMIN_EMAIL`, `SUPER_ADMIN_PASSWORD`, at least 12 characters), the University of Dhaka and the reserved `frontpage` system tag.
+- The super admin is `SUPER_ADMIN` in the `ADMIN` realm with `mustChangePassword` set, no TOTP, and an argon2id hash from `src/password.ts`. If a user with that email already exists the seed leaves it untouched, so a re-run never resets its password; it fails if that user is not a super admin.
+- Empty or missing super admin variables fail with a clear message before anything is written. The password is never logged.
+- Sample faculties and departments (linked through `UniversityFaculty`) are seeded only when `SEED_SAMPLE_DIRECTORY=true`. Leave it unset in production.
+- Seed tests are in `test/integration/seed.integration.test.ts`.

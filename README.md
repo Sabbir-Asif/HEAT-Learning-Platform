@@ -150,7 +150,10 @@ The schema is in `packages/db/prisma/schema/`, one file per concern, and the gen
 pnpm --filter @heat/db prisma:generate     # regenerate the client after a schema change
 pnpm --filter @heat/db test:integration    # schema tests on Postgres 17 in Testcontainers; needs Docker
 pnpm --filter @heat/db er-diagram          # rewrite docs/data-model.md from the schema
+SUPER_ADMIN_EMAIL=... SUPER_ADMIN_PASSWORD=... DATABASE_URL=... pnpm --filter @heat/db exec prisma db seed
 ```
+
+The seed creates the super admin (who must change the password at first sign-in), the University of Dhaka and the `frontpage` tag. Add `SEED_SAMPLE_DIRECTORY=true` in development and staging for sample faculties and departments; production leaves it unset. Details are in `packages/db/CLAUDE.md`.
 
 `docs/data-inventory.md` lists the personal data columns; a schema change that adds one updates it in the same pull request.
 

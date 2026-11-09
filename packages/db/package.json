@@ -36,12 +36,14 @@
     "prettier": "catalog:",
     "prisma": "7.10.1",
     "testcontainers": "12.2.1",
+    "tsx": "4.21.0",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
+    "argon2": "0.45.2",
     "pg": "8.23.1"
   }
 }

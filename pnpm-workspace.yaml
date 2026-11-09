@@ -10,6 +10,7 @@ allowBuilds:
   cpu-features: false
   protobufjs: false
   ssh2: false
+  argon2: false
 
 catalog:
   react: 19.3.1
