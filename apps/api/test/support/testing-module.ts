@@ -12,6 +12,7 @@ import type { InfrastructureHandle } from "@heat/db/testing";
 import { applyEnvironment, authTestEnvironment } from "./auth-env";
 import { AppModule } from "../../src/app.module";
 import { configureApp } from "../../src/app.setup";
+import { createHttpAdapter } from "../../src/http/http-adapter";
 
 declare module "vitest" {
   export interface ProvidedContext {
@@ -64,7 +65,7 @@ export const createTestApp = async (options: TestAppOptions = {}): Promise<TestA
       providers: options.providers,
       controllers: options.controllers,
     }).compile();
-    const app = moduleRef.createNestApplication();
+    const app = moduleRef.createNestApplication(createHttpAdapter());
     configureApp(app);
     await app.listen(0);
 
