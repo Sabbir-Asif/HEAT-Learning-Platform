@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
 const srcRoot = join(import.meta.dirname, "../src");
-const scanned = ["components", "composites", "lib", "hooks", "charts", "upload"];
+const scanned = ["components", "composites", "lib", "hooks", "charts", "data", "upload"];
 
 const allowedPackages = [
   "react",
@@ -15,12 +15,14 @@ const allowedPackages = [
   "clsx",
   "tailwind-merge",
   "next-themes",
+  "react-hook-form",
   "@storybook/react-vite",
   "storybook/test",
 ];
 
 const folderPackages: Record<string, string[]> = {
   charts: ["recharts"],
+  data: ["@tanstack/react-table", "nuqs"],
   upload: ["@uppy/core"],
 };
 
@@ -116,6 +118,14 @@ describe("the rule checks themselves", () => {
     expect(isAllowed("@uppy/core", "charts")).toBe(false);
     expect(isAllowed("recharts", "components")).toBe(false);
     expect(isAllowed("@uppy/core")).toBe(false);
+  });
+
+  test("allow the table and URL libraries only inside the data folder", () => {
+    expect(isAllowed("@tanstack/react-table", "data")).toBe(true);
+    expect(isAllowed("nuqs/adapters/testing", "data")).toBe(true);
+    expect(isAllowed("@tanstack/react-table", "components")).toBe(false);
+    expect(isAllowed("nuqs", "composites")).toBe(false);
+    expect(isAllowed("nuqs")).toBe(false);
   });
 });
 
