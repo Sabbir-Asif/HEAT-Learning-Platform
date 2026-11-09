@@ -41,6 +41,29 @@ describe("buildCsv", () => {
     },
   );
 
+  test.each(["\n=1+1", " =1+1", "\n\n+cmd", "  @SUM(A1)", "\u00a0-5", "\r\n=1"])(
+    "neutralises a text cell with leading whitespace before a trigger: %j",
+    (text) => {
+      const csv = buildCsv(columns, [{ month: text, enrolled: 1 }]);
+      const body = csv.slice(csv.indexOf("\r\n") + 2);
+      expect(body.replace(/^"/, "").startsWith("'")).toBe(true);
+    },
+  );
+
+  test("leaves text with leading whitespace but no trigger untouched", () => {
+    const csv = buildCsv(columns, [{ month: " Oct", enrolled: 1 }]);
+    expect(csv.endsWith(" Oct,1")).toBe(true);
+  });
+
+  test("numeric-looking strings from text columns are neutralised while real numbers stay numbers", () => {
+    const csv = buildCsv(columns, [
+      { month: "-5", enrolled: -5 },
+      { month: "+7", enrolled: 7 },
+      { month: "5", enrolled: 5 },
+    ]);
+    expect(csv.split("\r\n").slice(1)).toEqual(["'-5,-5", "'+7,7", "5,5"]);
+  });
+
   test("keeps the sign of negative and positive numbers", () => {
     const csv = buildCsv(columns, [{ month: "Oct", enrolled: -5 }]);
     expect(csv.endsWith("Oct,-5")).toBe(true);
