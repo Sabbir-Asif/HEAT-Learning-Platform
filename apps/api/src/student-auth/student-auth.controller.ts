@@ -19,7 +19,6 @@ const userAgentLimit = 255;
 
 @ApiTags("auth")
 @Controller("auth")
-@Audience("student")
 export class StudentAuthController {
   constructor(
     private readonly signInService: StudentSignInService,
@@ -63,6 +62,7 @@ export class StudentAuthController {
     }
   }
 
+  @Audience("student")
   @Post("sign-out")
   @HttpCode(204)
   @ApiNoContentResponse()

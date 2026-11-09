@@ -31,12 +31,11 @@ export const resolveAccessPolicy = (reflector: Reflector, targets: AccessTargets
   const courseParam = read<string>(COURSE_ACCESS_KEY);
 
   if (isPublic) {
-    const [handler] = targets;
-    const onHandler = [AUDIENCE_KEY, ROLES_KEY, COURSE_ACCESS_KEY].some(
-      (key) => reflector.get<unknown>(key, handler) !== undefined,
+    const combined = [AUDIENCE_KEY, ROLES_KEY, COURSE_ACCESS_KEY].some((key) =>
+      targets.some((target) => reflector.get<unknown>(key, target) !== undefined),
     );
-    return onHandler
-      ? denied("Public cannot be combined with Audience, Roles or RequireCourseAccess")
+    return combined
+      ? denied("Public cannot be combined with Audience, Roles or RequireCourseAccess at any level")
       : { kind: "public" };
   }
   if (audience === undefined) {

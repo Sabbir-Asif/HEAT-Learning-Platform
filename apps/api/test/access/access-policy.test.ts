@@ -86,9 +86,35 @@ class AdminCourse {
 @Audience("student")
 class ClassStudent {
   handler(): void {}
+}
 
+@Public()
+@Roles("ADMIN")
+class ClassPublicClassRoles {
+  handler(): void {}
+}
+
+@Public()
+class ClassPublicHandlerAudience {
+  @Audience("student")
+  handler(): void {}
+}
+
+@Audience("student")
+class ClassAudienceHandlerPublic {
   @Public()
-  open(): void {}
+  handler(): void {}
+}
+
+@Public()
+@RequireCourseAccess()
+class ClassPublicClassCourse {
+  handler(): void {}
+}
+
+@Public()
+class ClassPublicOnly {
+  handler(): void {}
 }
 
 @Audience("admin")
@@ -140,11 +166,18 @@ describe("resolveAccessPolicy", () => {
     expect(policyOf(controller)).toMatchObject({ kind: "denied" });
   });
 
-  test("class-level metadata applies and a method-level Public overrides it", () => {
+  test("class-level metadata applies", () => {
     expect(policyOf(ClassStudent)).toMatchObject({ kind: "protected", audience: "student" });
-    expect(
-      resolveAccessPolicy(new Reflector(), [ClassStudent.prototype.open, ClassStudent]),
-    ).toEqual({ kind: "public" });
+    expect(policyOf(ClassPublicOnly)).toEqual({ kind: "public" });
+  });
+
+  test.each([
+    ["class Public with class Roles", ClassPublicClassRoles],
+    ["class Public with handler Audience", ClassPublicHandlerAudience],
+    ["class Audience with handler Public", ClassAudienceHandlerPublic],
+    ["class Public with class RequireCourseAccess", ClassPublicClassCourse],
+  ])("%s is denied", (_name, controller) => {
+    expect(policyOf(controller)).toMatchObject({ kind: "denied" });
   });
 
   test("method-level Roles override class-level Roles", () => {
