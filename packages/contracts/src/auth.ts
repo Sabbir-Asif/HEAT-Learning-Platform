@@ -70,3 +70,38 @@ export const studentSessionCookies = {
   refresh: "__Secure-heat_refresh",
   refreshPath: "/api/auth/refresh",
 } as const;
+
+export const adminSessionCookies = {
+  access: "__Host-heat_admin_access",
+  refresh: "__Secure-heat_admin_refresh",
+  refreshPath: "/api/admin/auth/refresh",
+} as const;
+
+export const passwordMinLength = 12;
+export const passwordMaxLength = 256;
+
+export const adminMeResponseSchema = z.object({
+  user: z.object({
+    id: z.uuid(),
+    email: z.string(),
+    role: userRoleSchema,
+    mustChangePassword: z.boolean(),
+  }),
+});
+
+export type AdminMeResponse = z.infer<typeof adminMeResponseSchema>;
+
+export const changePasswordRequestSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Enter your current password.").max(passwordMaxLength),
+    newPassword: z
+      .string()
+      .min(passwordMinLength, `Use at least ${passwordMinLength} characters.`)
+      .max(passwordMaxLength, `Use at most ${passwordMaxLength} characters.`),
+  })
+  .refine((value) => value.currentPassword !== value.newPassword, {
+    path: ["newPassword"],
+    message: "Choose a password you have not used here before.",
+  });
+
+export type ChangePasswordRequest = z.infer<typeof changePasswordRequestSchema>;
