@@ -78,6 +78,26 @@ Styling stays inside `@heat/ui` (ADR 0013), and lint enforces it. The two Next.j
 
 The Tailwind plugin reads its theme from `packages/config/eslint/tailwind-entry.css` until `@heat/ui` carries the real theme. The class rules read `class`, `className`, any attribute ending in `Class`, `ClassName` or `ClassNames` (such as `containerClassName`), the values of a `classNames` object, and the arguments of `cn`, `clsx`, `cva`, `twMerge` and the plugin's other default helpers. Remaining gaps: a spread props object (`{...props}`), `React.createElement("div", { style })`, class names built at run time or held in an unrelated variable, and `test/` and Playwright files are not inspected. The class rules are silent when `tailwindcss` cannot be resolved from the linted package, so each app, `@heat/ui` and `@heat/config` has `tailwindcss` as a dev dependency and `packages/config/test/styling-setup.test.mjs` fails if that breaks. The no-comments rule also rules out `eslint-disable` comments. The editor hook lints only script files, so the CSS rule is enforced by `pnpm lint` and CI.
 
+### Accessibility and visual baselines
+
+`packages/e2e` (`@heat/e2e`) holds the Playwright config and two suites for both apps. They read the route manifests in `apps/*/src/routes/manifest.ts`, so a new route is scanned without editing the suite, and they run against `next build` plus `next start` on ports 3000 and 3001. No sign-in or API is needed.
+
+| Command                  | Runs                                                                                                                                                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm e2e`               | Both suites on the host, after `pnpm turbo build --filter=frontend-public --filter=frontend-internal`. Needs `pnpm --filter @heat/e2e exec playwright install chromium` once. Screenshots rendered on the host will not match the baselines |
+| `pnpm e2e:a11y`          | The axe suite on the host                                                                                                                                                                                                                   |
+| `pnpm e2e:docker:a11y`   | The axe suite in the pinned image, as CI runs it                                                                                                                                                                                            |
+| `pnpm e2e:docker:visual` | The screenshot comparison in the pinned image, as CI runs it                                                                                                                                                                                |
+| `pnpm e2e:docker:update` | Regenerates every baseline in the pinned image on any host OS and replaces `packages/e2e/test/*/__screenshots__`                                                                                                                            |
+
+The image is `mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d`, the Playwright 1.65 image (tag and digest). The Playwright version is pinned once in the `catalog:` block of `pnpm-workspace.yaml`; when it changes, change the tag and digest in `packages/e2e/bin/docker.mjs` and here, then regenerate the baselines. `packages/config/test/e2e.test.mjs` fails if they drift apart. The commands copy the tracked files into a work folder inside `packages/e2e`, install and build there as the current user, and need about 4 GB of memory for Docker.
+
+The accessibility suite scans every manifest route at 390 and 1440 px, light and dark (the emulated colour scheme sets the theme), with the axe tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and `wcag22aa`. Axe has no WCAG 2.2 level A tag, so the 2.2 AA rules are the new ones. A failure prints the rule id, the impact and the selector. It also exercises the theme switch once per app, scans the open admin navigation sheet at phone width, and checks that the first tab stops of each layout show a focus indicator. Do not silence a rule with `disableRules`; fix the page or open an issue.
+
+The screenshot suite covers representative pages only, named `{app}-{page}-{width}-{theme}.png`, with animations disabled, the caret hidden, fonts awaited and the `dark` class asserted before capture. Two runs of the same commit in the image differ by zero pixels, so no pixel tolerance is set. Review the changed PNGs in a pull request like any other change.
+
+Two CI jobs run on every pull request: `accessibility` is a required check, `screenshots` is not. The screenshot job never fails the run; it writes a `::warning` annotation and a job summary naming the changed screens and uploads actual, expected and diff images as the `screenshot-diffs` artifact for 7 days.
+
 ### Storybook
 
 `@heat/ui` has a Storybook 10 workbench with the accessibility addon (axe) and the Vitest addon. Stories sit next to their component as `src/**/*.stories.tsx`; the config is in `packages/ui/.storybook/`.
@@ -176,6 +196,8 @@ Pull requests and pushes to `main` run these checks in GitHub Actions; each is a
 | `audit`                                        | `pnpm audit:deps`, also weekly; fails on high or critical advisories |
 
 The `storybook` job is separate and not yet a required check: it runs the story tests with axe and builds static Storybook, and uploads it as the `storybook-static` artifact (7 days, also when the tests fail). It runs on every pull request. The owner adds it to `.github/branch-protection.json` and re-applies the protection.
+
+The `accessibility` check runs the axe suite for both apps and is required; `.github/branch-protection.json` lists it, so re-apply the protection after merging. The `screenshots` job is not required. See Accessibility and visual baselines.
 
 The `api-client-drift` job is separate and not yet a required check either. It builds contracts and the API, regenerates `apps/api/openapi.json` and `packages/api-client/src/generated/`, and fails when any file differs from what is committed (modified, deleted or new), listing the files. Run `pnpm generate` and commit the result to fix it.
 
