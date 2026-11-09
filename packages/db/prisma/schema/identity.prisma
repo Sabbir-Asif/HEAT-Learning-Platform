@@ -1,0 +1,142 @@
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  STUDENT
+}
+
+enum Realm {
+  STUDENT
+  ADMIN
+}
+
+enum AuthTokenPurpose {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+  INVITE
+  PASSWORD_CODE
+}
+
+enum ProfileChangeStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id                 String    @id @default(uuid(7)) @db.Uuid
+  email              String
+  passwordHash       String
+  role               UserRole
+  realm              Realm
+  emailVerifiedAt    DateTime?
+  mustChangePassword Boolean   @default(false)
+  deactivatedAt      DateTime?
+  deletedAt          DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  profile               StudentProfile?
+  sessions              Session[]
+  authTokens            AuthToken[]
+  adminCredential       AdminCredential?
+  recoveryCodes         RecoveryCode[]
+  profileChangeRequests ProfileChangeRequest[] @relation("RequestedBy")
+  decidedChangeRequests ProfileChangeRequest[] @relation("DecidedBy")
+
+  @@index([email])
+}
+
+model StudentProfile {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  userId       String    @unique @db.Uuid
+  name         String
+  departmentId String    @db.Uuid
+  session      String
+  deletedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+
+  @@index([departmentId])
+}
+
+model Session {
+  id               String    @id @default(uuid(7)) @db.Uuid
+  userId           String    @db.Uuid
+  refreshTokenHash String    @unique
+  familyId         String    @db.Uuid
+  expiresAt        DateTime
+  rotatedAt        DateTime?
+  revokedAt        DateTime?
+  userAgent        String?
+  ipAddress        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+}
+
+model AuthToken {
+  id        String           @id @default(uuid(7)) @db.Uuid
+  userId    String           @db.Uuid
+  purpose   AuthTokenPurpose
+  tokenHash String           @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+}
+
+model AdminCredential {
+  id                  String    @id @default(uuid(7)) @db.Uuid
+  userId              String    @unique @db.Uuid
+  totpSecretEncrypted Bytes
+  enabledAt           DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RecoveryCode {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  userId    String    @db.Uuid
+  codeHash  String
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, codeHash])
+}
+
+model ProfileChangeRequest {
+  id                    String              @id @default(uuid(7)) @db.Uuid
+  userId                String              @db.Uuid
+  requestedName         String?
+  requestedDepartmentId String?             @db.Uuid
+  requestedSession      String?
+  status                ProfileChangeStatus @default(PENDING)
+  decidedById           String?             @db.Uuid
+  decidedAt             DateTime?
+  reason                String?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  user                User        @relation("RequestedBy", fields: [userId], references: [id], onDelete: Cascade)
+  decidedBy           User?       @relation("DecidedBy", fields: [decidedById], references: [id], onDelete: Restrict)
+  requestedDepartment Department? @relation(fields: [requestedDepartmentId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([status])
+}

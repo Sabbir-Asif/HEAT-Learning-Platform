@@ -39,7 +39,9 @@ model Department {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  universityFaculty UniversityFaculty @relation(fields: [universityId, facultyId], references: [universityId, facultyId], onDelete: Restrict)
+  profiles          StudentProfile[]
+  changeRequests    ProfileChangeRequest[]
+  universityFaculty UniversityFaculty      @relation(fields: [universityId, facultyId], references: [universityId, facultyId], onDelete: Restrict)
 
   @@unique([universityId, facultyId, name])
 }
