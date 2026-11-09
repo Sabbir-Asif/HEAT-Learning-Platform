@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { evaluatePage, median, report, scriptBytes } from "../../e2e/lighthouse/budget.mjs";
+import { waitForServer } from "../../e2e/lighthouse/server.mjs";
 
 const root = resolve(import.meta.dirname, "../../..");
 const config = JSON.parse(
@@ -196,5 +197,31 @@ describe("report", () => {
       const { annotations } = report(results, { outcome: "failure" });
       expect(annotations.every((line) => line.startsWith("::warning "))).toBe(true);
     }
+  });
+});
+
+describe("waitForServer", () => {
+  test("sleeps after a non-OK response and after a network error, then returns once ready", async () => {
+    const responses = [
+      () => Promise.resolve({ ok: false }),
+      () => Promise.reject(new Error("refused")),
+      () => Promise.resolve({ ok: true }),
+    ];
+    const fetchFn = vi.fn(() => responses.shift()());
+    const sleep = vi.fn(() => Promise.resolve());
+    await waitForServer("http://localhost:3000/", { fetchFn, sleep, intervalMs: 5 });
+    expect(fetchFn).toHaveBeenCalledTimes(3);
+    expect(sleep).toHaveBeenCalledTimes(2);
+    expect(sleep).toHaveBeenCalledWith(5);
+  });
+
+  test("does not busy-loop when the server keeps answering with an error", async () => {
+    const fetchFn = vi.fn(() => Promise.resolve({ ok: false }));
+    const sleep = vi.fn(() => new Promise((done) => setTimeout(done, 5)));
+    await expect(
+      waitForServer("http://localhost:3000/", { fetchFn, sleep, timeoutMs: 60, intervalMs: 5 }),
+    ).rejects.toThrow("did not start");
+    expect(sleep.mock.calls.length).toBeGreaterThan(0);
+    expect(fetchFn.mock.calls.length).toBe(sleep.mock.calls.length);
   });
 });

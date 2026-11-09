@@ -1,15 +1,13 @@
-import { spawn } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 import { chromium } from "@playwright/test";
 import { launch } from "chrome-launcher";
 import lighthouse from "lighthouse";
 import { config } from "./budget.mjs";
 import { resultsDir } from "./paths.mjs";
+import { startServer, waitForServer } from "./server.mjs";
 
-const root = resolve(import.meta.dirname, "../../..");
 const runTimeoutMs = 120_000;
-const serverTimeoutMs = 60_000;
 
 const settings = {
   formFactor: "mobile",
@@ -19,39 +17,6 @@ const settings = {
 };
 
 const slug = (path) => (path === "/" ? "home" : path.replace(/^\/|\/$/g, "").replaceAll("/", "-"));
-const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
-
-function startServer(app) {
-  const child = spawn(
-    "pnpm",
-    ["--filter", app, "exec", "next", "start", "--port", String(config.port)],
-    {
-      cwd: root,
-      detached: true,
-      stdio: "ignore",
-      env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" },
-    },
-  );
-  return () => {
-    try {
-      process.kill(-child.pid, "SIGTERM");
-    } catch {
-      child.kill("SIGTERM");
-    }
-  };
-}
-
-async function waitForServer(url) {
-  const deadline = Date.now() + serverTimeoutMs;
-  while (Date.now() < deadline) {
-    try {
-      if ((await fetch(url)).ok) return;
-    } catch {
-      await sleep(500);
-    }
-  }
-  throw new Error(`Server at ${url} did not start within ${serverTimeoutMs / 1000} s`);
-}
 
 async function withTimeout(work, label) {
   let timer;
@@ -103,7 +68,7 @@ async function main() {
   let failed = false;
   const apps = [...new Set(config.pages.map(({ app }) => app))];
   for (const app of apps) {
-    const stop = startServer(app);
+    const stop = startServer(app, config.port);
     try {
       await waitForServer(`http://localhost:${config.port}/`);
       for (const entry of config.pages.filter((candidate) => candidate.app === app)) {
