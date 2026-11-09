@@ -98,6 +98,28 @@ The screenshot suite covers representative pages only, named `{app}-{page}-{widt
 
 Two CI jobs run on every pull request: `accessibility` is a required check, `screenshots` is not. The screenshot job never fails the run; it writes a `::warning` annotation and a job summary naming the changed screens and uploads actual, expected and diff images as the `screenshot-diffs` artifact for 7 days.
 
+### Performance budgets (Lighthouse)
+
+The `lighthouse` job audits pages of the production build (`next build`, then `next start` on port 3000, no secrets, database or API) with Lighthouse in `packages/e2e/lighthouse`. It runs on every pull request, is not a required check, and never fails the run.
+
+| Budget                               | Limit                                            |
+| ------------------------------------ | ------------------------------------------------ |
+| First-load JavaScript, public pages  | 150 KB gzipped                                   |
+| First-load JavaScript, learner pages | 200 KB gzipped, excluding the player chunk       |
+| Largest Contentful Paint             | 2.5 s on mobile with Slow 4G and 4x CPU slowdown |
+
+First-load JavaScript is the sum of the transfer size of every script request Lighthouse records during the first load, as Next serves it with gzip; that includes response headers. Each page is audited 3 times and the median is judged. A breach, a script request matching `playerChunkPattern` on a page that does not set `allowsPlayer`, or a run that crashes or times out becomes a `::warning` annotation and a job summary naming the page, the budget and the measured value. The HTML and JSON reports are the `lighthouse-reports` artifact for 7 days, also when the run fails.
+
+`packages/e2e/lighthouse/config.json` holds the budgets and the audited pages. To audit another page, add one entry to `pages` with `path`, `kind` (`public` or `learner`) and `app`; set `allowsPlayer` on lesson pages. The workflow does not change. Entries that need sign-in (`auth`) are not supported by the runner yet. Only `/` of `frontend-public` is audited today, and the learner budget is configured but unused.
+
+```sh
+pnpm turbo build --filter=frontend-public
+pnpm --filter @heat/e2e lighthouse
+pnpm --filter @heat/e2e lighthouse:report
+```
+
+Run it after `pnpm --filter @heat/e2e exec playwright install chromium`. Reports land in `packages/e2e/lighthouse-results`.
+
 ### Storybook
 
 `@heat/ui` has a Storybook 10 workbench with the accessibility addon (axe) and the Vitest addon. Stories sit next to their component as `src/**/*.stories.tsx`; the config is in `packages/ui/.storybook/`.
@@ -198,6 +220,8 @@ Pull requests and pushes to `main` run these checks in GitHub Actions; each is a
 The `storybook` job is separate and not yet a required check: it runs the story tests with axe and builds static Storybook, and uploads it as the `storybook-static` artifact (7 days, also when the tests fail). It runs on every pull request. The owner adds it to `.github/branch-protection.json` and re-applies the protection.
 
 The `accessibility` check runs the axe suite for both apps and is required; `.github/branch-protection.json` lists it, so re-apply the protection after merging. The `screenshots` job is not required. See Accessibility and visual baselines.
+
+The `lighthouse` job is separate and not a required check: it audits the production build against the performance budgets and only warns. See Performance budgets (Lighthouse).
 
 The `api-client-drift` job is separate and not yet a required check either. It builds contracts and the API, regenerates `apps/api/openapi.json` and `packages/api-client/src/generated/`, and fails when any file differs from what is committed (modified, deleted or new), listing the files. Run `pnpm generate` and commit the result to fix it.
 

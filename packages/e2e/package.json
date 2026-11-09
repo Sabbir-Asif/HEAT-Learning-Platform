@@ -9,15 +9,19 @@
     "e2e": "playwright test",
     "e2e:a11y": "playwright test accessibility",
     "e2e:visual": "playwright test screenshots",
-    "e2e:visual:update": "playwright test screenshots --update-snapshots"
+    "e2e:visual:update": "playwright test screenshots --update-snapshots",
+    "lighthouse": "node lighthouse/run.mjs",
+    "lighthouse:report": "node lighthouse/report.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "catalog:",
     "@heat/config": "workspace:*",
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
+    "chrome-launcher": "^1.2.3",
     "eslint": "catalog:",
     "globals": "^17.14.0",
+    "lighthouse": "^13.6.0",
     "prettier": "catalog:",
     "typescript": "catalog:"
   }
