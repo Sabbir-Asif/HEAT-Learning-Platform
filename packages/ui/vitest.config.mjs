@@ -7,5 +7,6 @@ export default jsdomPreset({
     "src/composites/**/*.tsx",
     "src/data/**/*.tsx",
     "src/hooks/**",
+    "src/shell/**/*.tsx",
   ],
 });
