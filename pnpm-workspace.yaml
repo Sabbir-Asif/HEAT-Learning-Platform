@@ -5,6 +5,11 @@ packages:
 allowBuilds:
   esbuild: false
   "@scarf/scarf": false
+  "@prisma/engines": false
+  prisma: false
+  cpu-features: false
+  protobufjs: false
+  ssh2: false
 
 catalog:
   react: 19.3.1
