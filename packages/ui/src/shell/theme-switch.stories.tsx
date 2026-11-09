@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, screen, userEvent, waitFor, within } from "storybook/test";
 import { ThemeProvider } from "../theme/theme-provider";
 import { ThemeSwitch } from "./theme-switch";
 
@@ -21,15 +21,21 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   play: async ({ canvasElement }) => {
+    await expect(within(canvasElement).getByRole("button", { name: "Choose theme" })).toBeVisible();
+  },
+};
+
+export const Keyboard: Story = {
+  play: async ({ canvasElement }) => {
     const trigger = within(canvasElement).getByRole("button", { name: "Choose theme" });
-    await expect(trigger).toBeVisible();
     trigger.focus();
     await userEvent.keyboard("{Enter}");
-    const menu = within(document.body);
-    await expect(await menu.findByRole("menuitemradio", { name: "Light" })).toBeVisible();
-    await expect(menu.getByRole("menuitemradio", { name: "Dark" })).toBeVisible();
-    await expect(menu.getByRole("menuitemradio", { name: "System" })).toBeVisible();
+    await expect(await screen.findByRole("menuitemradio", { name: "Light" })).toBeVisible();
+    await expect(screen.getByRole("menuitemradio", { name: "Dark" })).toBeVisible();
+    await expect(screen.getByRole("menuitemradio", { name: "System" })).toBeVisible();
     await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
+    await expect(trigger).toHaveFocus();
   },
 };
 
