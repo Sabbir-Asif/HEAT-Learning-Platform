@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Catch, HttpException, Logger } from "@nestjs/common";
 import type { ArgumentsHost, ExceptionFilter } from "@nestjs/common";
 import { ZodValidationException } from "nestjs-zod";
+import { ApiException } from "./api-exception";
 import { z } from "zod";
 import { fieldErrorCodes } from "@heat/contracts";
 import type { ErrorCode, ErrorResponse, FieldError, FieldErrorCode } from "@heat/contracts";
@@ -22,6 +23,7 @@ const messages: Record<ErrorCode, string> = {
   FORBIDDEN: "You are not allowed to do this.",
   INTERNAL: "Something went wrong on the server.",
   NOT_FOUND: "The requested resource was not found.",
+  PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
   RATE_LIMITED: "Too many requests. Try again later.",
   UNAUTHENTICATED: "Sign in to continue.",
   VALIDATION_FAILED: "Some fields are not valid.",
@@ -96,6 +98,9 @@ interface Classified {
 function classify(exception: unknown): Classified {
   if (exception instanceof ZodValidationException) {
     return { status: 400, code: "VALIDATION_FAILED", fields: fieldErrors(exception.getZodError()) };
+  }
+  if (exception instanceof ApiException) {
+    return { status: exception.getStatus(), code: exception.code };
   }
   const status =
     exception instanceof HttpException ? exception.getStatus() : middlewareStatus(exception);
