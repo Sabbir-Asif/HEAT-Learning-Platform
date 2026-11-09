@@ -15,6 +15,7 @@ const allowedPackages = [
   "clsx",
   "tailwind-merge",
   "next-themes",
+  "react-hook-form",
   "@storybook/react-vite",
   "storybook/test",
 ];
