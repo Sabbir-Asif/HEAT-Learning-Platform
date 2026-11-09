@@ -16,6 +16,7 @@
     "@heat/api-client": "workspace:*",
     "@heat/contracts": "workspace:*",
     "@heat/ui": "workspace:*",
+    "lucide-react": "1.70.0",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"

@@ -6,6 +6,7 @@
     ".": "./src/index.ts",
     "./charts": "./src/charts/index.ts",
     "./data": "./src/data/index.ts",
+    "./shell": "./src/shell/index.ts",
     "./upload": "./src/upload/index.ts",
     "./styles.css": "./src/styles.css"
   },

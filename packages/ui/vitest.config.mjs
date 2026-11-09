@@ -9,5 +9,6 @@ export default jsdomPreset({
     "src/upload/**/*.tsx",
     "src/data/**/*.tsx",
     "src/hooks/**",
+    "src/shell/**/*.tsx",
   ],
 });

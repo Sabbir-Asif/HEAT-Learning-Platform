@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
 const srcRoot = join(import.meta.dirname, "../src");
-const scanned = ["components", "composites", "lib", "hooks", "charts", "data", "upload"];
+const scanned = ["components", "composites", "lib", "hooks", "charts", "data", "shell", "upload"];
 
 const allowedPackages = [
   "react",
