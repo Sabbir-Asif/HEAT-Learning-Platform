@@ -74,7 +74,7 @@ describe("one certificate per enrollment", () => {
     await database.prisma.certificate.create({ data: certificateData(enrollment.id) });
 
     await expect(
-      database.prisma.enrollment.delete({ where: { id: enrollment.id } }),
+      database.hardDeleting.enrollment.delete({ where: { id: enrollment.id } }),
     ).rejects.toMatchObject({ code: "P2003" });
   });
 });

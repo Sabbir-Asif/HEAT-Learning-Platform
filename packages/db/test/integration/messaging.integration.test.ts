@@ -65,7 +65,7 @@ describe("email jobs", () => {
       },
     });
 
-    await database.prisma.user.update({
+    await database.prisma.$includingDeleted().user.update({
       where: { id: student.id },
       data: { deletedAt: new Date(), email: `deleted-${student.id}@example.invalid` },
     });
@@ -86,7 +86,9 @@ describe("email jobs", () => {
       },
     });
 
-    await expect(database.prisma.user.delete({ where: { id: student.id } })).rejects.toMatchObject({
+    await expect(
+      database.hardDeleting.user.delete({ where: { id: student.id } }),
+    ).rejects.toMatchObject({
       code: "P2003",
     });
   });

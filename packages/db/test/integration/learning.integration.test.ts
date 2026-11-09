@@ -183,7 +183,9 @@ describe("history cannot be deleted from under progress", () => {
       data: { enrollmentId: enrollment.id, videoId: video.id },
     });
 
-    await expect(database.prisma.video.delete({ where: { id: video.id } })).rejects.toMatchObject({
+    await expect(
+      database.hardDeleting.video.delete({ where: { id: video.id } }),
+    ).rejects.toMatchObject({
       code: "P2003",
     });
   });
@@ -195,7 +197,7 @@ describe("history cannot be deleted from under progress", () => {
     });
 
     await expect(
-      database.prisma.enrollment.delete({ where: { id: enrollment.id } }),
+      database.hardDeleting.enrollment.delete({ where: { id: enrollment.id } }),
     ).rejects.toMatchObject({ code: "P2003" });
   });
 });

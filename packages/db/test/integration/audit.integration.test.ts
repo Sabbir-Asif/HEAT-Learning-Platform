@@ -67,7 +67,7 @@ describe("audit log rows", () => {
       data: { actorId: actor.id, action: "admin.sign-in", entity: "User" },
     });
 
-    await database.prisma.user.delete({ where: { id: actor.id } });
+    await database.hardDeleting.user.delete({ where: { id: actor.id } });
 
     expect(await database.prisma.auditLog.findUnique({ where: { id: entry.id } })).not.toBeNull();
   });

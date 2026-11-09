@@ -227,7 +227,7 @@ describe("courses, tags and settings", () => {
     await createModule(revision.id, 1);
 
     await expect(
-      database.prisma.courseRevision.delete({ where: { id: revision.id } }),
+      database.hardDeleting.courseRevision.delete({ where: { id: revision.id } }),
     ).rejects.toMatchObject({ code: "P2003" });
   });
 });

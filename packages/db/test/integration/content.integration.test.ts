@@ -92,7 +92,9 @@ describe("media assets", () => {
     const admin = await createAdmin();
     await database.prisma.mediaAsset.create({ data: assetData(admin.id) });
 
-    await expect(database.prisma.user.delete({ where: { id: admin.id } })).rejects.toMatchObject({
+    await expect(
+      database.hardDeleting.user.delete({ where: { id: admin.id } }),
+    ).rejects.toMatchObject({
       code: "P2003",
     });
   });
@@ -200,7 +202,9 @@ describe("news posts", () => {
       },
     });
 
-    await expect(database.prisma.user.delete({ where: { id: admin.id } })).rejects.toMatchObject({
+    await expect(
+      database.hardDeleting.user.delete({ where: { id: admin.id } }),
+    ).rejects.toMatchObject({
       code: "P2003",
     });
   });

@@ -4,13 +4,16 @@ import { promisify } from "node:util";
 import { Client, type QueryResult, type QueryResultRow } from "pg";
 import { inject } from "vitest";
 import { createClient } from "../../src/client";
-import type { PrismaClient } from "../../src/generated/client";
+import type { HeatClient } from "../../src/client";
+import { PrismaClient } from "../../src/generated/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 const run = promisify(execFile);
 
 export interface TestDatabase {
   url: string;
-  prisma: PrismaClient;
+  prisma: HeatClient;
+  hardDeleting: PrismaClient;
   query: (sql: string, values?: unknown[]) => Promise<QueryResult<QueryResultRow>>;
   close: () => Promise<void>;
 }
@@ -40,13 +43,16 @@ export const withDatabase = async (): Promise<TestDatabase> => {
   await client.connect();
 
   const prisma = createClient(url);
+  const hardDeleting = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
 
   return {
     url,
     prisma,
+    hardDeleting,
     query: (sql, values) => client.query(sql, values),
     close: async () => {
       await prisma.$disconnect();
+      await hardDeleting.$disconnect();
       await client.end();
     },
   };
