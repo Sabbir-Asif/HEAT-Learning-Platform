@@ -242,11 +242,8 @@ Pull requests and pushes to `main` run these checks in GitHub Actions; each is a
 
 The `storybook` job is separate and not yet a required check: it runs the story tests with axe and builds static Storybook, and uploads it as the `storybook-static` artifact (7 days, also when the tests fail). It runs on every pull request. The owner adds it to `.github/branch-protection.json` and re-applies the protection.
 
-<<<<<<< HEAD
-=======
 The `migrations` job is separate and not yet a required check. On pull requests it fails when a migration directory that exists on the base branch is modified or deleted (`packages/config/bin/migrations.mjs immutable`, naming each file), then applies the migrations to an empty Postgres 17 service with `prisma migrate deploy` and fails when `prisma migrate diff` finds the schema differs. It is a quick pre-check for the drift test in `packages/db/test/integration/migrate.integration.test.ts`, which the required `integration` job also runs. Review rules for migrations are in [docs/runbooks/migration-review.md](docs/runbooks/migration-review.md). The owner adds `migrations` to `.github/branch-protection.json` and re-applies the protection.
 
->>>>>>> origin/epic/e2-data-model
 The `screenshots` job is not required. See Visual baselines.
 
 The `lighthouse` job is separate and not a required check: it audits the production build against the performance budgets and only warns. See Performance budgets (Lighthouse).
