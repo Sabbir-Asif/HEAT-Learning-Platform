@@ -23,6 +23,7 @@ Records 0001 to 0016 are the design decisions D1 to D16 in section 02 of the [pr
 | 0015 | [One data path per kind of page](0015-one-data-path-per-kind-of-page.md)                                    | D15        | Accepted |
 | 0016 | [Images and files on local disk behind a storage interface](0016-local-disk-storage-behind-an-interface.md) | D16        | Accepted |
 | 0017 | [Text captcha accessibility exception](0017-text-captcha-accessibility-exception.md)                        | Section 01 | Accepted |
-| 0018 | [English only interface](0018-english-only-interface.md)                                                    | D9         | Proposed |
+| 0018 | [English only interface](0018-english-only-interface.md)                                                    | D9         | Accepted |
+| 0019 | [Content-Security-Policy with nonces and hashes](0019-content-security-policy-nonces-and-hashes.md) | D15 | Accepted |
 
 Conventions for the whole repo: [CLAUDE.md](../../CLAUDE.md).

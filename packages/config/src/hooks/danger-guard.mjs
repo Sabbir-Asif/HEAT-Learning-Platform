@@ -213,7 +213,7 @@ function checkBash(input) {
   const command = input.tool_input?.command;
   if (typeof command !== "string") throw new Error("Bash input has no command");
   const commands = parseShell(command, input.cwd || process.cwd());
-  const envPath = envAccess(commands);
+  const envPath = envAccess(commands, command);
   if (envPath) return { deny: envDenial(envPath) };
   if (commands.some(isForcePush)) return { deny: forceDenial };
   if (commands.some(isConfigWrite)) return { deny: configDenial };

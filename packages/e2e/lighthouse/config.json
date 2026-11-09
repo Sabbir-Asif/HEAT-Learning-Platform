@@ -1,0 +1,11 @@
+{
+  "port": 3000,
+  "runs": 3,
+  "lcpBudgetMs": 2500,
+  "playerChunkPattern": "player",
+  "budgets": {
+    "public": { "firstLoadScriptKb": 300 },
+    "learner": { "firstLoadScriptKb": 200 }
+  },
+  "pages": [{ "path": "/", "kind": "public", "app": "frontend-public" }]
+}

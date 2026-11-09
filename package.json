@@ -1,7 +1,7 @@
 {
   "name": "heat-lms",
   "private": true,
-  "packageManager": "pnpm@11.28.11",
+  "packageManager": "pnpm@11.28.11+sha512.740184d10f81f5d5b165be88560ee7ba62406c4134896abc27a580109eec2f47c1e41d91251c944c2cababcb1c22461799ebb72de2ec625af2030b0e36c735a3",
   "engines": {
     "node": "^22.22.0",
     "pnpm": ">=11.28.11 <12"
@@ -16,9 +16,19 @@
     "format": "prettier --write .",
     "format:check": "turbo run format:check //#format:root",
     "format:root": "prettier --check . '!apps/**' '!packages/**'",
+    "e2e": "pnpm --filter @heat/e2e e2e",
+    "e2e:a11y": "pnpm --filter @heat/e2e e2e:a11y",
+    "e2e:visual": "pnpm --filter @heat/e2e e2e:visual",
+    "e2e:visual:update": "pnpm --filter @heat/e2e e2e:visual:update",
+    "e2e:docker:update": "node packages/e2e/bin/docker.mjs update",
+    "e2e:docker:visual": "node packages/e2e/bin/docker.mjs visual",
+    "e2e:docker:a11y": "node packages/e2e/bin/docker.mjs a11y",
     "test:coverage": "turbo run test:coverage",
+    "brand": "node packages/config/bin/brand.mjs",
     "audit:deps": "node packages/config/bin/audit.mjs",
     "github:setup": "node packages/config/bin/github-setup.mjs",
+    "design:contrast": "node packages/config/bin/design-contrast.mjs",
+    "design:check": "node packages/config/bin/design-check.mjs",
     "ticket": "node packages/config/bin/ticket.mjs",
     "verify": "node packages/config/bin/verify.mjs",
     "dev:up": "node infra/scripts/dev.mjs up",

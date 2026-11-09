@@ -1,28 +1,245 @@
+@import "tailwindcss";
+@import "@fontsource-variable/source-serif-4/wght.css";
+@import "@fontsource-variable/public-sans/wght.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-*: initial;
+  --font-display: "Source Serif 4 Variable", Georgia, "Times New Roman", serif;
+  --font-sans: "Public Sans Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --spacing: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.25rem;
+  --radius-full: 9999px;
+  --text-display: 2.5rem;
+  --text-display--line-height: 3rem;
+  --text-display--font-weight: 600;
+  --text-heading-1: 2rem;
+  --text-heading-1--line-height: 2.5rem;
+  --text-heading-1--font-weight: 600;
+  --text-heading-2: 1.5rem;
+  --text-heading-2--line-height: 2rem;
+  --text-heading-2--font-weight: 600;
+  --text-heading-3: 1.25rem;
+  --text-heading-3--line-height: 1.75rem;
+  --text-heading-3--font-weight: 600;
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.75rem;
+  --text-body-lg--font-weight: 400;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  --text-body--font-weight: 400;
+  --text-label: 0.875rem;
+  --text-label--line-height: 1.25rem;
+  --text-label--font-weight: 600;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.25rem;
+  --text-small--font-weight: 400;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-divider: var(--divider);
+  --color-link: var(--link);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-disabled: var(--disabled);
+  --color-disabled-foreground: var(--disabled-foreground);
+  --color-player: var(--player);
+  --color-player-foreground: var(--player-foreground);
+  --color-status-neutral: var(--status-neutral);
+  --color-status-neutral-foreground: var(--status-neutral-foreground);
+  --color-status-neutral-mark: var(--status-neutral-mark);
+  --color-status-info: var(--status-info);
+  --color-status-info-foreground: var(--status-info-foreground);
+  --color-status-info-mark: var(--status-info-mark);
+  --color-status-success: var(--status-success);
+  --color-status-success-foreground: var(--status-success-foreground);
+  --color-status-success-mark: var(--status-success-mark);
+  --color-status-warning: var(--status-warning);
+  --color-status-warning-foreground: var(--status-warning-foreground);
+  --color-status-warning-mark: var(--status-warning-mark);
+  --color-status-danger: var(--status-danger);
+  --color-status-danger-foreground: var(--status-danger-foreground);
+  --color-status-danger-mark: var(--status-danger-mark);
+  --color-status-brand: var(--status-brand);
+  --color-status-brand-foreground: var(--status-brand-foreground);
+  --color-status-brand-mark: var(--status-brand-mark);
+  --shadow-sm: var(--elevation-sm);
+  --shadow-md: var(--elevation-md);
+  --shadow-lg: var(--elevation-lg);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --primary: #1d4ed8;
+  --background: #fbfafe;
+  --foreground: #1b1530;
+  --card: #ffffff;
+  --card-foreground: #1b1530;
+  --popover: #ffffff;
+  --popover-foreground: #1b1530;
+  --primary: #5b2d9a;
   --primary-foreground: #ffffff;
+  --secondary: #eee8f8;
+  --secondary-foreground: #2f1a56;
+  --muted: #f3f0f9;
+  --muted-foreground: #5e5778;
+  --accent: #e6dcf6;
+  --accent-foreground: #2f1a56;
+  --destructive: #b3261e;
+  --destructive-foreground: #ffffff;
+  --border: #857e9e;
+  --input: #857e9e;
+  --ring: #6d3fc0;
+  --divider: #e3ddee;
+  --link: #4b2490;
+  --chart-1: #6d3fc0;
+  --chart-2: #c2570c;
+  --chart-3: #0f766e;
+  --chart-4: #b0307a;
+  --chart-5: #2563c4;
+  --sidebar: #2b1850;
+  --sidebar-foreground: #f4f0fb;
+  --sidebar-primary: #f2b35e;
+  --sidebar-primary-foreground: #2b1850;
+  --sidebar-accent: #432a74;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #4a3a72;
+  --sidebar-ring: #f2b35e;
+  --disabled: #ece9f2;
+  --disabled-foreground: #9a94ad;
+  --player: #140e24;
+  --player-foreground: #ffffff;
+  --status-neutral: #ece9f2;
+  --status-neutral-foreground: #34304a;
+  --status-neutral-mark: #5f5878;
+  --status-info: #deebfb;
+  --status-info-foreground: #11356a;
+  --status-info-mark: #1d5fb8;
+  --status-success: #daf2e3;
+  --status-success-foreground: #0d4727;
+  --status-success-mark: #17703f;
+  --status-warning: #fceacb;
+  --status-warning-foreground: #5a3000;
+  --status-warning-mark: #94500a;
+  --status-danger: #fadfdc;
+  --status-danger-foreground: #6b120e;
+  --status-danger-mark: #b3261e;
+  --status-brand: #e6dcf6;
+  --status-brand-foreground: #2f1a56;
+  --status-brand-mark: #5b2d9a;
+  --elevation-sm: 0px 1px 2px 0px color-mix(in srgb, #1b1530 8%, transparent);
+  --elevation-md: 0px 4px 12px -2px color-mix(in srgb, #1b1530 10%, transparent);
+  --elevation-lg: 0px 12px 32px -8px color-mix(in srgb, #1b1530 14%, transparent);
 }
 
 .dark {
-  --background: #0b1220;
-  --foreground: #e5e7eb;
-  --primary: #93c5fd;
-  --primary-foreground: #0b1220;
+  --background: #0f0b1a;
+  --foreground: #ece8f6;
+  --card: #171127;
+  --card-foreground: #ece8f6;
+  --popover: #1c1530;
+  --popover-foreground: #ece8f6;
+  --primary: #b99cf3;
+  --primary-foreground: #1b0f36;
+  --secondary: #251b3d;
+  --secondary-foreground: #e4dcf5;
+  --muted: #1e1730;
+  --muted-foreground: #a8a0c0;
+  --accent: #2e2250;
+  --accent-foreground: #ede6ff;
+  --destructive: #f2827a;
+  --destructive-foreground: #2a0a07;
+  --border: #70678f;
+  --input: #70678f;
+  --ring: #b99cf3;
+  --divider: #2d2444;
+  --link: #c4adf7;
+  --chart-1: #a98bef;
+  --chart-2: #f0924a;
+  --chart-3: #3cc4b3;
+  --chart-4: #eb6bae;
+  --chart-5: #6ea2f2;
+  --sidebar: #130a26;
+  --sidebar-foreground: #ece8f6;
+  --sidebar-primary: #f2b35e;
+  --sidebar-primary-foreground: #1b0f36;
+  --sidebar-accent: #2a1b4d;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #3a2d5e;
+  --sidebar-ring: #f2b35e;
+  --disabled: #211a33;
+  --disabled-foreground: #6e6688;
+  --player: #0a0714;
+  --player-foreground: #ffffff;
+  --status-neutral: #272238;
+  --status-neutral-foreground: #e0dcec;
+  --status-neutral-mark: #b3acc8;
+  --status-info: #12294a;
+  --status-info-foreground: #cfe2fb;
+  --status-info-mark: #7fb0f2;
+  --status-success: #0f3322;
+  --status-success-foreground: #cdefd9;
+  --status-success-mark: #5ccb8b;
+  --status-warning: #3c2506;
+  --status-warning-foreground: #fbe3b8;
+  --status-warning-mark: #f0b24f;
+  --status-danger: #3f1512;
+  --status-danger-foreground: #fad6d2;
+  --status-danger-mark: #f38e86;
+  --status-brand: #2e2250;
+  --status-brand-foreground: #e8ddfb;
+  --status-brand-mark: #b99cf3;
+  --elevation-sm: 0px 1px 2px 0px color-mix(in srgb, #000000 40%, transparent);
+  --elevation-md: 0px 4px 12px -2px color-mix(in srgb, #000000 45%, transparent);
+  --elevation-lg: 0px 12px 32px -8px color-mix(in srgb, #000000 55%, transparent);
 }
 
-.heat-placeholder {
-  background: var(--background);
-  color: var(--foreground);
-  padding: 1rem;
-}
+@layer base {
+  * {
+    border-color: var(--divider);
+  }
 
-.heat-placeholder button {
-  background: var(--primary);
-  color: var(--primary-foreground);
-  border: 0;
-  border-radius: 0.375rem;
-  padding: 0.5rem 1rem;
-  font: inherit;
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+  }
 }

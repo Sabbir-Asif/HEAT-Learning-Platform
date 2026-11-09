@@ -1,0 +1,630 @@
+{
+  "version": 1,
+  "frames": [
+    {
+      "id": "specimen-colors-laptop-light-en",
+      "area": "specimen",
+      "screen": "colors",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Every colour role with its hex, light theme"
+    },
+    {
+      "id": "specimen-type-laptop-light-en",
+      "area": "specimen",
+      "screen": "type",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Type scale at every style and weight, light theme"
+    },
+    {
+      "id": "specimen-shape-laptop-light-en",
+      "area": "specimen",
+      "screen": "shape",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Radius, spacing and shadow steps, light theme"
+    },
+    {
+      "id": "specimen-status-laptop-light-en",
+      "area": "specimen",
+      "screen": "status",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "One StatusBadge per enrollment, video and course state, light theme"
+    },
+    {
+      "id": "student-awaiting-approval-laptop-light-en",
+      "area": "student",
+      "screen": "awaiting-approval",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-awaiting-approval-phone-light-en",
+      "area": "student",
+      "screen": "awaiting-approval",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-awaiting-approval-rejected-laptop-light-en",
+      "area": "student",
+      "screen": "awaiting-approval-rejected",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-awaiting-approval-rejected-phone-light-en",
+      "area": "student",
+      "screen": "awaiting-approval-rejected",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-profile-laptop-light-en",
+      "area": "student",
+      "screen": "profile",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Account details, enrollment status and the Sign out button (icon and small text)"
+    },
+    {
+      "id": "student-profile-phone-light-en",
+      "area": "student",
+      "screen": "profile",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Account details, enrollment status and the Sign out button (icon and small text)"
+    },
+    {
+      "id": "student-dashboard-empty-laptop-light-en",
+      "area": "student",
+      "screen": "dashboard-empty",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-empty-phone-light-en",
+      "area": "student",
+      "screen": "dashboard-empty",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-error-laptop-light-en",
+      "area": "student",
+      "screen": "dashboard-error",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-error-phone-light-en",
+      "area": "student",
+      "screen": "dashboard-error",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-laptop-light-en",
+      "area": "student",
+      "screen": "dashboard",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-loading-laptop-light-en",
+      "area": "student",
+      "screen": "dashboard-loading",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-loading-phone-light-en",
+      "area": "student",
+      "screen": "dashboard-loading",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-dashboard-phone-light-en",
+      "area": "student",
+      "screen": "dashboard",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-enroll-captcha-laptop-light-en",
+      "area": "student",
+      "screen": "enroll-captcha",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-enroll-captcha-phone-light-en",
+      "area": "student",
+      "screen": "enroll-captcha",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-enroll-details-laptop-light-en",
+      "area": "student",
+      "screen": "enroll-details",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-enroll-details-phone-light-en",
+      "area": "student",
+      "screen": "enroll-details",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-enroll-success-laptop-light-en",
+      "area": "student",
+      "screen": "enroll-success",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-enroll-success-phone-light-en",
+      "area": "student",
+      "screen": "enroll-success",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-landing-laptop-light-en",
+      "area": "student",
+      "screen": "landing",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-landing-phone-light-en",
+      "area": "student",
+      "screen": "landing",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "drawer-quiz-submit-unanswered-laptop-light-en",
+      "area": "drawer",
+      "screen": "quiz-submit-unanswered",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
+    },
+    {
+      "id": "drawer-quiz-submit-unanswered-phone-light-en",
+      "area": "drawer",
+      "screen": "quiz-submit-unanswered",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
+    },
+    {
+      "id": "student-course-laptop-light-en",
+      "area": "student",
+      "screen": "course",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-course-phone-light-en",
+      "area": "student",
+      "screen": "course",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-lesson-laptop-light-en",
+      "area": "student",
+      "screen": "lesson",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-lesson-phone-light-en",
+      "area": "student",
+      "screen": "lesson",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-question-laptop-light-en",
+      "area": "student",
+      "screen": "quiz-question",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-question-phone-light-en",
+      "area": "student",
+      "screen": "quiz-question",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-result-fail-laptop-light-en",
+      "area": "student",
+      "screen": "quiz-result-fail",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-result-fail-phone-light-en",
+      "area": "student",
+      "screen": "quiz-result-fail",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-result-pass-laptop-light-en",
+      "area": "student",
+      "screen": "quiz-result-pass",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-result-pass-phone-light-en",
+      "area": "student",
+      "screen": "quiz-result-pass",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-review-laptop-light-en",
+      "area": "student",
+      "screen": "quiz-review",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "student-quiz-review-phone-light-en",
+      "area": "student",
+      "screen": "quiz-review",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-empty-laptop-light-en",
+      "area": "admin",
+      "screen": "approvals-empty",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-empty-phone-light-en",
+      "area": "admin",
+      "screen": "approvals-empty",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-error-laptop-light-en",
+      "area": "admin",
+      "screen": "approvals-error",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-error-phone-light-en",
+      "area": "admin",
+      "screen": "approvals-error",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-laptop-light-en",
+      "area": "admin",
+      "screen": "approvals",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-loading-laptop-light-en",
+      "area": "admin",
+      "screen": "approvals-loading",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-loading-phone-light-en",
+      "area": "admin",
+      "screen": "approvals-loading",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-approvals-phone-light-en",
+      "area": "admin",
+      "screen": "approvals",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-insights-laptop-light-en",
+      "area": "admin",
+      "screen": "insights",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-insights-phone-light-en",
+      "area": "admin",
+      "screen": "insights",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-module-editor-locked-laptop-light-en",
+      "area": "admin",
+      "screen": "module-editor-locked",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-module-editor-locked-phone-light-en",
+      "area": "admin",
+      "screen": "module-editor-locked",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-module-editor-unlocked-laptop-light-en",
+      "area": "admin",
+      "screen": "module-editor-unlocked",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-module-editor-unlocked-phone-light-en",
+      "area": "admin",
+      "screen": "module-editor-unlocked",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-overview-laptop-light-en",
+      "area": "admin",
+      "screen": "overview",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-overview-phone-light-en",
+      "area": "admin",
+      "screen": "overview",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-students-laptop-light-en",
+      "area": "admin",
+      "screen": "students",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "admin-students-phone-light-en",
+      "area": "admin",
+      "screen": "students",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en"
+    },
+    {
+      "id": "drawer-approvals-approve-bulk-laptop-light-en",
+      "area": "drawer",
+      "screen": "approvals-approve-bulk",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
+    },
+    {
+      "id": "drawer-approvals-approve-bulk-phone-light-en",
+      "area": "drawer",
+      "screen": "approvals-approve-bulk",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
+    },
+    {
+      "id": "drawer-approvals-filters-phone-light-en",
+      "area": "drawer",
+      "screen": "approvals-filters",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
+    },
+    {
+      "id": "drawer-approvals-reject-reason-laptop-light-en",
+      "area": "drawer",
+      "screen": "approvals-reject-reason",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
+    },
+    {
+      "id": "drawer-approvals-reject-reason-phone-light-en",
+      "area": "drawer",
+      "screen": "approvals-reject-reason",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "overlay": "drawer"
+    },
+    {
+      "id": "student-sign-in-laptop-light-en",
+      "area": "student",
+      "screen": "sign-in",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Email and password sign in, forgot password link, link to enroll"
+    },
+    {
+      "id": "student-sign-in-phone-light-en",
+      "area": "student",
+      "screen": "sign-in",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Email and password sign in on a phone"
+    },
+    {
+      "id": "student-certificate-laptop-light-en",
+      "area": "student",
+      "screen": "certificate",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Earned certificate preview, download as PDF, number and verification link"
+    },
+    {
+      "id": "student-certificate-phone-light-en",
+      "area": "student",
+      "screen": "certificate",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Earned certificate on a phone with download and verification link"
+    },
+    {
+      "id": "student-help-laptop-light-en",
+      "area": "student",
+      "screen": "help",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Common questions as an expandable list, support email and a note on confidential help"
+    },
+    {
+      "id": "student-help-phone-light-en",
+      "area": "student",
+      "screen": "help",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Common questions and support contact on a phone"
+    },
+    {
+      "id": "admin-certificates-laptop-light-en",
+      "area": "admin",
+      "screen": "certificates",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Issued certificates table with search, status, icon-only row actions and the pagination bar"
+    },
+    {
+      "id": "admin-certificates-phone-light-en",
+      "area": "admin",
+      "screen": "certificates",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Issued certificates as rows with icon-only actions and the pagination bar"
+    },
+    {
+      "id": "student-forgot-password-laptop-light-en",
+      "area": "student",
+      "screen": "forgot-password",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Reset request with one email field and the send action"
+    },
+    {
+      "id": "student-forgot-password-phone-light-en",
+      "area": "student",
+      "screen": "forgot-password",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Reset request with one email field and the send action"
+    },
+    {
+      "id": "student-forgot-password-sent-laptop-light-en",
+      "area": "student",
+      "screen": "forgot-password-sent",
+      "width": "laptop",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Confirmation that a reset link was sent, with send again and back to sign in"
+    },
+    {
+      "id": "student-forgot-password-sent-phone-light-en",
+      "area": "student",
+      "screen": "forgot-password-sent",
+      "width": "phone",
+      "theme": "light",
+      "lang": "en",
+      "shows": "Confirmation that a reset link was sent, with send again and back to sign in"
+    }
+  ]
+}

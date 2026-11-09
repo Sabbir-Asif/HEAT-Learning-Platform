@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
-import { parseShell } from "../../src/hooks/shell.mjs";
+import { isStraightLine, parseShell } from "../../src/hooks/shell.mjs";
 
 const base = "/work/repo";
 const words = (text) => parseShell(text, base).map((command) => command.words);
@@ -200,5 +200,63 @@ describe("working directory", () => {
 
   test("a stray closing parenthesis does not lose the directory", () => {
     expect(parseShell("cd sub; ) echo a", base).at(-1).cwd).toBe(resolve(base, "sub"));
+  });
+});
+
+describe("straight-line commands", () => {
+  const straight = (text) => isStraightLine(parseShell(text, base), text);
+
+  test.each([
+    "echo hi",
+    "a=x; echo hi > apps/$a/f",
+    "a=x\ncp README.md apps/${a}/f",
+    "for a in x y; do echo hi > apps/$a/f; done",
+    "for a in x y\ndo\n  tee $a\ndone",
+    "cmd 2>&1",
+    "cmd &>/dev/null",
+    "cmd >| out",
+    "cat foo* > /dev/null 2>&1",
+    "wc -l docs/adr/*",
+  ])("%j is straight-line", (text) => {
+    expect(straight(text)).toBe(true);
+  });
+
+  test.each([
+    "a && b",
+    "a || b",
+    "a | b",
+    "a &",
+    "(a)",
+    "{ a; }",
+    "echo `a`",
+    "echo $(a)",
+    "cat <(a)",
+    "f() { a; }",
+    "if a; then b; fi",
+    "while a; do b; done",
+    "until a; do b; done",
+    "case x in x) a;; esac",
+    "select a in b; do c; done",
+    "function f { a; }",
+    "bash -c 'a'",
+    "sh -c a",
+    "/bin/zsh -c a",
+    "eval a",
+    "source x",
+    ". ./x.sh",
+    "trap 'a' DEBUG",
+    "env A=1 cmd",
+    "sudo cmd",
+    "nohup cmd",
+    "xargs cmd",
+    "time cmd",
+    "command cmd",
+    "exec cmd",
+    "$r X",
+    "`r` X",
+    "e''nv A=1 cmd",
+    "! a",
+  ])("%j is not straight-line", (text) => {
+    expect(straight(text)).toBe(false);
   });
 });

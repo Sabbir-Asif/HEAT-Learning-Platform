@@ -1,6 +1,22 @@
 import { expect, test } from "vitest";
-import { packageName } from "../src/index";
+import * as ui from "../src/index";
 
 test("exports its package name", () => {
-  expect(packageName).toBe("@heat/ui");
+  expect(ui.packageName).toBe("@heat/ui");
+});
+
+test.each([
+  "ConfirmDialog",
+  "EmptyState",
+  "ErrorState",
+  "Form",
+  "FormField",
+  "FormMessage",
+  "PageHeader",
+  "PageHeaderAction",
+  "StatCard",
+  "StatusBadge",
+  "resolveStatus",
+])("exports %s", (name) => {
+  expect(ui).toHaveProperty(name);
 });

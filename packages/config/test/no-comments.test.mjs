@@ -24,7 +24,6 @@ const scriptExtensions = new Map([
 ]);
 const hashFiles =
   /(\.(ya?ml|conf|inc|example|nvmrc)|(^|\/)(CODEOWNERS|\.gitignore|\.prettierignore))$/;
-const versionTrailer = /^#\s*v\d+\.\d+\.\d+$/;
 
 const tracked = () =>
   execFileSync("git", ["ls-files", "-z"], { cwd: root, encoding: "utf8" })
@@ -88,7 +87,7 @@ function hashComments(text) {
       } else if ((char === '"' || char === "'") && (i === 0 || /[\s:[{,=(]/.test(line[i - 1]))) {
         quote = char;
       } else if (char === "#" && (i === 0 || /\s/.test(line[i - 1]))) {
-        if (!versionTrailer.test(line.slice(i))) found.push(lineStart + i);
+        found.push(lineStart + i);
         break;
       }
     }
@@ -128,5 +127,5 @@ test("the checker finds comments in every supported file type", () => {
   expect(hashComments("a: 1 # note\n")).toHaveLength(1);
   expect(hashComments("# note\na: 1\n")).toHaveLength(1);
   expect(hashComments('a: "b # not a comment"\nc: Blocked by#12\n')).toHaveLength(0);
-  expect(hashComments("uses: actions/checkout@abc # v1.2.3\n")).toHaveLength(0);
+  expect(hashComments("uses: actions/checkout@abc # v1.2.3\n")).toHaveLength(1);
 });

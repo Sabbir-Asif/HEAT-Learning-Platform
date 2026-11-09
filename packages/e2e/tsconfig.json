@@ -1,0 +1,4 @@
+{
+  "extends": "@heat/config/tsconfig/library.json",
+  "include": ["playwright.config.ts", "test"]
+}
