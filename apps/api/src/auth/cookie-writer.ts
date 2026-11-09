@@ -1,3 +1,4 @@
+import { studentSessionCookies } from "@heat/contracts";
 import { Inject, Injectable } from "@nestjs/common";
 import { APP_CONFIG } from "../core";
 import type { AppConfig } from "../core";
@@ -23,11 +24,7 @@ interface RealmCookies {
 }
 
 export const realmCookies: Record<AuthRealm, RealmCookies> = {
-  student: {
-    access: "__Host-heat_access",
-    refresh: "__Secure-heat_refresh",
-    refreshPath: "/api/auth/refresh",
-  },
+  student: studentSessionCookies,
   admin: {
     access: "__Host-heat_admin_access",
     refresh: "__Secure-heat_admin_refresh",

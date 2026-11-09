@@ -4,6 +4,7 @@ import {
   landingPathFor,
   meResponseSchema,
   signInRequestSchema,
+  studentSessionCookies,
 } from "../src/index";
 
 describe("signInRequestSchema", () => {
@@ -53,7 +54,7 @@ describe("meResponseSchema", () => {
       user: {
         id: "0190b3a2-7c1e-7a55-9a3b-1f2e3d4c5b6a",
         email: "a@b.test",
-                role: "STUDENT",
+        role: "STUDENT",
         emailVerified: true,
         mustChangePassword: false,
       },
@@ -61,5 +62,13 @@ describe("meResponseSchema", () => {
     });
 
     expect(parsed.success).toBe(true);
+  });
+});
+
+describe("student session cookies", () => {
+  test("the refresh cookie is scoped to its endpoint and the access cookie is host-only", () => {
+    expect(studentSessionCookies.access.startsWith("__Host-")).toBe(true);
+    expect(studentSessionCookies.refresh.startsWith("__Secure-")).toBe(true);
+    expect(studentSessionCookies.refreshPath).toBe("/api/auth/refresh");
   });
 });

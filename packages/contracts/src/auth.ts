@@ -64,3 +64,9 @@ export const landingPathFor = (
   enrollments.some((enrollment) => grantsCourseAccess(enrollment.status))
     ? "/dashboard"
     : "/awaiting-approval";
+
+export const studentSessionCookies = {
+  access: "__Host-heat_access",
+  refresh: "__Secure-heat_refresh",
+  refreshPath: "/api/auth/refresh",
+} as const;
