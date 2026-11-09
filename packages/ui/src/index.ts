@@ -23,6 +23,7 @@ export * from "./components/sheet";
 export * from "./components/sidebar";
 export * from "./components/skeleton";
 export * from "./components/sonner";
+export * from "./components/table";
 export * from "./components/tabs";
 export * from "./components/textarea";
 export * from "./components/tooltip";
