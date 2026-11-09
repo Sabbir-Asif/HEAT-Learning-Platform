@@ -1,16 +1,6 @@
-import { PostgreSqlContainer } from "@testcontainers/postgresql";
 import type { TestProject } from "vitest/node";
+import { provideInfrastructure } from "../../src/testing";
 
-declare module "vitest" {
-  export interface ProvidedContext {
-    postgresUrl: string;
-  }
-}
-
-export default async function setup(project: TestProject) {
-  const container = await new PostgreSqlContainer("postgres:17-alpine").start();
-  project.provide("postgresUrl", container.getConnectionUri());
-  return async () => {
-    await container.stop();
-  };
+export default function setup(project: TestProject) {
+  return provideInfrastructure(project);
 }

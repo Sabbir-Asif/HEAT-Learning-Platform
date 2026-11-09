@@ -150,9 +150,24 @@ The schema is in `packages/db/prisma/schema/`, one file per concern, and the gen
 pnpm --filter @heat/db prisma:generate     # regenerate the client after a schema change
 pnpm --filter @heat/db test:integration    # schema tests on Postgres 17 in Testcontainers; needs Docker
 pnpm --filter @heat/db er-diagram          # rewrite docs/data-model.md from the schema
+SUPER_ADMIN_EMAIL=... SUPER_ADMIN_PASSWORD=... DATABASE_URL=... pnpm --filter @heat/db exec prisma db seed
 ```
 
-Each integration test file gets its own database, created from the committed migrations with `prisma migrate deploy`, so the tests prove the migrations and not only the schema. `docs/data-inventory.md` lists the personal data columns; a schema change that adds one updates it in the same pull request.
+The seed creates the super admin (who must change the password at first sign-in), the University of Dhaka and the `frontpage` tag. Add `SEED_SAMPLE_DIRECTORY=true` in development and staging for sample faculties and departments; production leaves it unset. Details are in `packages/db/CLAUDE.md`.
+
+`docs/data-inventory.md` lists the personal data columns; a schema change that adds one updates it in the same pull request.
+
+### Integration tests
+
+Integration tests run on real Postgres 17 and Redis 7 in Testcontainers, with no Docker Compose stack, in `packages/db` and `apps/api` (`pnpm -r --if-present run test:integration`; needs Docker, and set `DOCKER_HOST=unix:///var/run/docker.sock` when the Docker Desktop socket is missing). The harness is `packages/db/src/testing`, exported as `@heat/db/testing`.
+
+- Global setup starts both containers once per run, creates one template database and applies the committed migrations to it with `prisma migrate deploy`, so the tests prove the migrations. Testcontainers stops the containers when the run ends, and its Ryuk reaper removes them if the process dies, so a failed run leaves no orphans.
+- Isolation is a template clone per test: `useTestDatabase()` (and `useTestApp()` in the API) runs `create database ... template ...` before each test and drops it after. A clone costs tens of milliseconds, tests in one file cannot see each other, and nothing needs truncating. Transaction rollback was rejected because the code under test opens its own transactions and connections. Files that share one database in `beforeAll` can call `withDatabase()` and clean up themselves.
+- Redis has no clone, so `useTestRedis()` gives each test a random key prefix and deletes its keys afterwards. Never use `flushall`.
+- `createFactories(prisma)` builds users, admins, universities, faculties, departments, students with profiles, courses with a first revision, enrollments (pinned revision and approval decision when approved) and `approvedStudentInPublishedCourse()`. Values are unique, so tests never collide.
+- `apps/api/test/support/testing-module.ts` builds the real `AppModule` on the containers: `useTestApp({ controllers, providers, imports })` returns the app, base URL, database, factories and Redis URL, provides `TEST_DATABASE` and `TEST_REDIS_URL`, and sets `DATABASE_URL` and `REDIS_URL`.
+- `harness.integration.test.ts` is the self-test: two tests insert the same unique email and both pass.
+- The CI `integration` job builds `@heat/db` and `api` first, because the API tests import the compiled harness, and has a 15 minute limit. The suite takes about 20 seconds locally; the limit leaves room for image pulls and a slower runner.
 
 ### API client
 
@@ -227,6 +242,11 @@ Pull requests and pushes to `main` run these checks in GitHub Actions; each is a
 
 The `storybook` job is separate and not yet a required check: it runs the story tests with axe and builds static Storybook, and uploads it as the `storybook-static` artifact (7 days, also when the tests fail). It runs on every pull request. The owner adds it to `.github/branch-protection.json` and re-applies the protection.
 
+<<<<<<< HEAD
+=======
+The `migrations` job is separate and not yet a required check. On pull requests it fails when a migration directory that exists on the base branch is modified or deleted (`packages/config/bin/migrations.mjs immutable`, naming each file), then applies the migrations to an empty Postgres 17 service with `prisma migrate deploy` and fails when `prisma migrate diff` finds the schema differs. It is a quick pre-check for the drift test in `packages/db/test/integration/migrate.integration.test.ts`, which the required `integration` job also runs. Review rules for migrations are in [docs/runbooks/migration-review.md](docs/runbooks/migration-review.md). The owner adds `migrations` to `.github/branch-protection.json` and re-applies the protection.
+
+>>>>>>> origin/epic/e2-data-model
 The `screenshots` job is not required. See Visual baselines.
 
 The `lighthouse` job is separate and not a required check: it audits the production build against the performance budgets and only warns. See Performance budgets (Lighthouse).

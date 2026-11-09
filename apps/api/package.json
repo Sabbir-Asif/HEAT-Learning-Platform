@@ -18,7 +18,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "openapi": "node dist/openapi/emit.js"
+    "openapi": "node dist/openapi/emit.js",
+    "test:integration": "vitest run --config vitest.integration.config.mjs"
   },
   "dependencies": {
     "@heat/contracts": "workspace:*",

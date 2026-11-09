@@ -8,6 +8,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "default": "./dist/testing/index.js"
     }
   },
   "scripts": {
@@ -24,18 +28,22 @@
   "devDependencies": {
     "@heat/config": "workspace:*",
     "@testcontainers/postgresql": "12.2.1",
+    "@testcontainers/redis": "12.2.1",
     "@types/node": "catalog:",
     "@types/pg": "8.23.1",
     "eslint": "catalog:",
+    "ioredis": "6.0.0",
     "prettier": "catalog:",
     "prisma": "7.10.1",
     "testcontainers": "12.2.1",
+    "tsx": "4.21.0",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
+    "argon2": "0.45.2",
     "pg": "8.23.1"
   }
 }

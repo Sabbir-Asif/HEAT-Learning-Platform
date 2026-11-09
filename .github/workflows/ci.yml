@@ -43,13 +43,49 @@ jobs:
   integration:
     name: integration
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
+      - run: pnpm turbo build --filter=api... --filter=@heat/db...
+        env:
+          TURBO_CACHE_DIR: .turbo
       - run: pnpm -r --if-present run test:integration
+
+  migrations:
+    name: migrations
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: heat
+          POSTGRES_PASSWORD: heat
+          POSTGRES_DB: heat
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U heat"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://heat:heat@localhost:5432/heat
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      - if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+        run: node packages/config/bin/migrations.mjs immutable "$BASE_REF"
+      - run: pnpm --filter @heat/db exec prisma migrate deploy
+      - run: pnpm --filter @heat/db exec prisma migrate diff --from-config-datasource --to-schema prisma/schema --exit-code
 
   storybook:
     name: storybook

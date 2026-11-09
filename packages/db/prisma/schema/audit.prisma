@@ -1,0 +1,16 @@
+model AuditLog {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  actorId    String?  @db.Uuid
+  action     String
+  entity     String
+  entityId   String?
+  before     Json?
+  after      Json?
+  requestId  String?
+  ipAddress  String?
+  occurredAt DateTime @default(now())
+
+  @@index([actorId, occurredAt])
+  @@index([entity, entityId])
+  @@index([occurredAt])
+}
