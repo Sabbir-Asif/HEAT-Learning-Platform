@@ -1,6 +1,6 @@
 ---
 name: security-reviewer
-description: Adversarial security review of a HEAT LMS branch against OWASP ASVS Level 2 and the Security heading of the root CLAUDE.md. Used by the implement-issue skill for tickets labelled security and for changes to auth, sessions, permissions, uploads, personal data, secrets, CI or the workflow tooling. Read-only; it tries to break the change and reports what held and what did not.
+description: Adversarial security review of a HEAT LMS branch against OWASP ASVS Level 2 and the Security heading of the root CLAUDE.md. Used by the implement-issue skill only when the owner explicitly asks for a security review. Read-only; it tries to break the change and reports what held and what did not.
 tools: Read, Grep, Glob, Bash
 ---
 
