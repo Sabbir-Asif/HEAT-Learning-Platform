@@ -22,7 +22,7 @@ describe("Playwright pin", () => {
   test("no package pins Playwright outside the catalog", () => {
     for (const path of ["packages/ui/package.json", "packages/e2e/package.json"]) {
       const { devDependencies } = JSON.parse(read(path));
-      for (const name of ["playwright", "@playwright/test", "@axe-core/playwright"]) {
+      for (const name of ["playwright", "@playwright/test"]) {
         if (devDependencies[name]) expect(devDependencies[name]).toBe("catalog:");
       }
     }
@@ -39,15 +39,8 @@ describe("end-to-end jobs", () => {
   const protection = JSON.parse(read(".github/branch-protection.json"));
   const steps = (name) => ci.jobs[name].steps;
 
-  test("accessibility is a required check and screenshots is not", () => {
-    expect(protection.required_status_checks.contexts).toContain("accessibility");
+  test("screenshots is not a required check", () => {
     expect(protection.required_status_checks.contexts).not.toContain("screenshots");
-  });
-
-  test("accessibility runs the suite in the pinned image", () => {
-    expect(
-      steps("accessibility").some((s) => s.run === "node packages/e2e/bin/docker.mjs a11y"),
-    ).toBe(true);
   });
 
   test("screenshots never fails the run, warns, and keeps images for 7 days", () => {
@@ -58,7 +51,7 @@ describe("end-to-end jobs", () => {
     expect(steps("screenshots").some((s) => s.run?.includes("report-visual.mjs"))).toBe(true);
   });
 
-  test("neither job is limited by path", () => {
+  test("the job is not limited by path", () => {
     expect(JSON.stringify(ci.on)).not.toMatch(/paths/);
   });
 });

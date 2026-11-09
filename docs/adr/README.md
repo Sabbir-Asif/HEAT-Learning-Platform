@@ -2,7 +2,7 @@
 
 One file per decision, numbered in order (`0001-title.md`). Each record states the decision, why, what follows from it and the alternatives considered. Changes to an ADR always go through the owner.
 
-Records 0001 to 0016 are the design decisions D1 to D16 in section 02 of the [project plan](../plan/heat-lms-project-plan.html#decisions). The frontend design spec ([frontend architecture](../superpowers/specs/2026-11-07-frontend-architecture-design.md)) adds detail to D9, D13, D15 and D16. A status is Proposed, Accepted or Superseded by NNNN. An "Open points for the owner" section lists conflicts or gaps in the source documents with a Proposed resolution; none is decided until the owner accepts it. To add a record, copy [0000-template.md](0000-template.md) and take the next free number. The Content Security Policy record is written by its own spike (#39) and takes the next number then.
+Records 0001 to 0016 (0009 was superseded by 0018 and removed) are the design decisions D1 to D16 in section 02 of the [project plan](../plan/heat-lms-project-plan.html#decisions). The frontend design spec ([frontend architecture](../superpowers/specs/2026-11-07-frontend-architecture-design.md)) adds detail to D9, D13, D15 and D16. A status is Proposed, Accepted or Superseded by NNNN. An "Open points for the owner" section lists conflicts or gaps in the source documents with a Proposed resolution; none is decided until the owner accepts it. To add a record, copy [0000-template.md](0000-template.md) and take the next free number. The Content Security Policy record is written by its own spike (#39) and takes the next number then.
 
 | No.  | Decision                                                                                                    | Plan       | Status   |
 | ---- | ----------------------------------------------------------------------------------------------------------- | ---------- | -------- |
@@ -14,7 +14,6 @@ Records 0001 to 0016 are the design decisions D1 to D16 in section 02 of the [pr
 | 0006 | [Watched-interval progress the server can trust](0006-watched-interval-progress.md)                         | D6         | Accepted |
 | 0007 | [Transactional outbox for email and jobs](0007-transactional-outbox.md)                                     | D7         | Accepted |
 | 0008 | [Certificate PDFs from an HTML template](0008-certificate-pdfs-from-html-template.md)                       | D8         | Accepted |
-| 0009 | [Bangla and English interface from day one](0009-bangla-and-english-interface.md)                           | D9         | Superseded by 0018 |
 | 0010 | [Hooks guide, CI and branch protection enforce](0010-hooks-guide-ci-and-branch-protection-enforce.md)       | D10        | Accepted |
 | 0011 | [Enrollment approval lifecycle](0011-enrollment-approval-lifecycle.md)                                      | D11        | Accepted |
 | 0012 | [Pluggable, quota-aware email](0012-pluggable-quota-aware-email.md)                                         | D12        | Accepted |

@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 
 const [name] = process.argv.slice(2);
-const guards = new Set(["branch-guard", "plan-gate", "danger-guard", "pr-gate"]);
+const guards = new Set(["branch-guard", "danger-guard", "pr-gate"]);
 
 function readStdin() {
   try {

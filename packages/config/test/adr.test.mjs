@@ -8,7 +8,9 @@ const read = (path) => readFileSync(join(root, path), "utf8");
 
 const files = readdirSync(adrDir);
 const numbered = files.filter((file) => /^\d{4}-.+\.md$/.test(file));
-const decisions = Array.from({ length: 16 }, (_, index) => String(index + 1).padStart(4, "0"));
+const decisions = Array.from({ length: 16 }, (_, index) =>
+  String(index + 1).padStart(4, "0"),
+).filter((number) => number !== "0009");
 const fileFor = (number) => numbered.filter((file) => file.startsWith(`${number}-`));
 const adrs = [...decisions, "0017"].flatMap(fileFor);
 
@@ -26,7 +28,7 @@ const sectionsOf = (text) =>
 const words = (text) => text.split(/\s+/).filter(Boolean).length;
 const adr = (number) => sectionsOf(read(`docs/adr/${fileFor(number)[0]}`));
 
-test("the template, the index and one ADR per decision D1 to D16 exist", () => {
+test("the template, the index and one ADR per decision D1 to D16 except the removed D9 exist", () => {
   expect({
     template: files.includes("0000-template.md"),
     index: files.includes("README.md"),

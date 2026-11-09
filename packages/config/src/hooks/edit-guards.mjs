@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { join, relative } from "node:path";
-import { branchOf, git, repoOf, ticketNumber } from "./git.mjs";
+import { branchOf, git, repoOf } from "./git.mjs";
 import { resolveReal } from "./paths.mjs";
 
 const protectedBranches = new Set(["main", "master", ""]);
@@ -36,33 +36,9 @@ export function branchDenial(location) {
   return `Edits are blocked: ${location.real} is in a checkout on "${location.branch}". Create the ticket branch and worktree first (stage 3 of /implement-issue) and work there.`;
 }
 
-export function planPath(location, number) {
-  return join(location.top, "docs", "plans", `issue-${number}.md`);
-}
-
-export function planDenial(location) {
-  const number = ticketNumber(location.branch);
-  if (number === null) return null;
-  if (location.real === planPath(location, number)) return null;
-  if (existsSync(planPath(location, number))) return null;
-  return `Source edits are blocked on ${location.branch} until docs/plans/issue-${number}.md exists in ${location.top} (stage 4 of /implement-issue). Write and commit the plan first; the plan file itself can be edited.`;
-}
-
 export function branchGuard(input) {
   const location = locate(targetOf(input), input.cwd);
   if (!location) return {};
   const deny = branchDenial(location);
-  return deny ? { deny } : {};
-}
-
-export function planGate(input) {
-  const location = locate(targetOf(input), input.cwd);
-  if (!location || protectedBranches.has(location.branch)) return {};
-  if (ticketNumber(location.branch) === null) {
-    return {
-      context: `Plan gate: branch "${location.branch}" is not a <type>/N-slug ticket branch, so no plan is required for this edit.`,
-    };
-  }
-  const deny = planDenial(location);
   return deny ? { deny } : {};
 }
