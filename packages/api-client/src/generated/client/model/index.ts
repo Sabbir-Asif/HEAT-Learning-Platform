@@ -7,3 +7,9 @@
 
 export * from './healthResponseDto';
 export * from './healthResponseDtoStatus';
+export * from './meResponseDto';
+export * from './meResponseDtoEnrollmentsItem';
+export * from './meResponseDtoEnrollmentsItemStatus';
+export * from './meResponseDtoUser';
+export * from './meResponseDtoUserRole';
+export * from './signInRequestDto';
