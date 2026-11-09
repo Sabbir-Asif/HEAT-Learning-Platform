@@ -1,3 +1,6 @@
+import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import {
   build,
@@ -9,7 +12,7 @@ import {
   start,
   type RunningServer,
 } from "./harness";
-import { THEME_SCRIPT_HASH, buildPolicy } from "../src/policy";
+import { THEME_SCRIPT_HASH, THEME_STYLE_HASHES, buildPolicy } from "../src/policy";
 
 const header = "content-security-policy-report-only";
 
@@ -27,6 +30,22 @@ describe("policy builder", () => {
 
   test("allows unsafe-eval only in development", () => {
     expect(scriptSrc(buildPolicy({ nonce: "abc", development: true }))).toContain("'unsafe-eval'");
+  });
+});
+
+describe("theme hashes", () => {
+  const uiRequire = createRequire(
+    join(import.meta.dirname, "../../../../../packages/ui/package.json"),
+  );
+
+  test("the transition style hash is the hash of the style next-themes injects", () => {
+    const source = readFileSync(
+      uiRequire.resolve("next-themes").replace(/index\.js$/, "index.mjs"),
+      "utf8",
+    );
+    const css = /createTextNode\("([^"]*transition:none[^"]*)"\)/.exec(source)?.[1];
+    expect(css).toBeTruthy();
+    expect(THEME_STYLE_HASHES).toContain(hashOf(css ?? ""));
   });
 });
 
@@ -136,5 +155,37 @@ describe("fully dynamic build", () => {
     });
     expect(small.status).toBe(204);
     expect(large.status).toBe(413);
+  });
+
+  test("the report endpoint rejects a declared oversized body before reading it", async () => {
+    const response = await fetch(`${server.origin}/csp-report`, {
+      method: "POST",
+      headers: { "content-length": "100000" },
+      body: "{}",
+    }).catch(() => null);
+    expect(response === null || response.status === 413).toBe(true);
+  });
+
+  test("the report endpoint stops reading an unbounded stream at the limit", async () => {
+    const chunk = new TextEncoder().encode("x".repeat(1024));
+    let sent = 0;
+    const stream = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        if (sent >= 64) return controller.close();
+        sent += 1;
+        controller.enqueue(chunk);
+      },
+    });
+    const response = await fetch(`${server.origin}/csp-report`, {
+      method: "POST",
+      body: stream,
+      duplex: "half",
+    } as RequestInit);
+    expect(response.status).toBe(413);
+  });
+
+  test("the report endpoint rejects a body that is not JSON", async () => {
+    const response = await fetch(`${server.origin}/csp-report`, { method: "POST", body: "nope" });
+    expect(response.status).toBe(400);
   });
 });
