@@ -269,3 +269,123 @@ describe("nested relations", () => {
     expect(filtered?.revisions).toHaveLength(0);
   });
 });
+
+describe("soft delete inside a transaction", () => {
+  const rollback = new Error("rollback");
+
+  test("a delete in a rolled back transaction leaves the row active", async () => {
+    const user = await database.prisma.user.create({
+      data: userData(`${unique()}@example.com`),
+    });
+
+    await expect(
+      database.prisma.$transaction(async (tx) => {
+        await tx.user.delete({ where: { id: user.id } });
+        throw rollback;
+      }),
+    ).rejects.toBe(rollback);
+
+    const stored = await database.prisma.user.findUnique({ where: { id: user.id } });
+    expect(stored?.deletedAt).toBeNull();
+  });
+
+  test("deleteMany in a rolled back transaction leaves the rows active", async () => {
+    const tag = unique();
+    await database.prisma.user.create({ data: userData(`${tag}-1@example.com`) });
+    await database.prisma.user.create({ data: userData(`${tag}-2@example.com`) });
+
+    await expect(
+      database.prisma.$transaction(async (tx) => {
+        const result = await tx.user.deleteMany({ where: { email: { startsWith: tag } } });
+        expect(result.count).toBe(2);
+        throw rollback;
+      }),
+    ).rejects.toBe(rollback);
+
+    expect(await database.prisma.user.count({ where: { email: { startsWith: tag } } })).toBe(2);
+  });
+
+  test("a delete in a committed transaction soft-deletes the row", async () => {
+    const user = await database.prisma.user.create({
+      data: userData(`${unique()}@example.com`),
+    });
+
+    await database.prisma.$transaction(async (tx) => {
+      await tx.user.delete({ where: { id: user.id } });
+    });
+
+    expect(await database.prisma.user.findUnique({ where: { id: user.id } })).toBeNull();
+    const rows = await database.query(`select "deletedAt" from "User" where id = $1`, [user.id]);
+    expect(rows.rows[0]!.deletedAt).toBeInstanceOf(Date);
+  });
+
+  test("a delete after an update of the same row in one transaction does not hang", async () => {
+    const user = await database.prisma.user.create({
+      data: userData(`${unique()}@example.com`),
+    });
+
+    await database.prisma.$transaction(
+      async (tx) => {
+        await tx.user.update({ where: { id: user.id }, data: { mustChangePassword: true } });
+        await tx.user.delete({ where: { id: user.id } });
+      },
+      { timeout: 5000 },
+    );
+
+    const stored = await database.prisma
+      .$includingDeleted()
+      .user.findUnique({ where: { id: user.id } });
+    expect(stored?.mustChangePassword).toBe(true);
+    expect(stored?.deletedAt).toBeInstanceOf(Date);
+  });
+
+  test("deleteMany after an updateMany of the same rows in one transaction does not hang", async () => {
+    const tag = unique();
+    await database.prisma.user.create({ data: userData(`${tag}-1@example.com`) });
+
+    await database.prisma.$transaction(
+      async (tx) => {
+        await tx.user.updateMany({
+          where: { email: { startsWith: tag } },
+          data: { mustChangePassword: true },
+        });
+        await tx.user.deleteMany({ where: { email: { startsWith: tag } } });
+      },
+      { timeout: 5000 },
+    );
+
+    expect(await database.prisma.user.count({ where: { email: { startsWith: tag } } })).toBe(0);
+  });
+});
+
+describe("deletedAt in create data", () => {
+  test("create, createMany and createManyAndReturn reject deletedAt", async () => {
+    const data = { ...userData(`${unique()}@example.com`), deletedAt: new Date() };
+
+    await expect(database.prisma.user.create({ data })).rejects.toThrow(/deletedAt/);
+    await expect(database.prisma.user.createMany({ data: [data] })).rejects.toThrow(/deletedAt/);
+    await expect(database.prisma.user.createManyAndReturn({ data: [data] })).rejects.toThrow(
+      /deletedAt/,
+    );
+  });
+
+  test("the include-deleted client can create a deleted row", async () => {
+    const created = await database.prisma.$includingDeleted().user.create({
+      data: { ...userData(`${unique()}@example.com`), deletedAt: new Date() },
+    });
+
+    expect(created.deletedAt).toBeInstanceOf(Date);
+  });
+});
+
+describe("include-deleted client on a transaction client", () => {
+  test("runs outside the transaction, so it cannot see rows the transaction wrote", async () => {
+    await database.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({ data: userData(`${unique()}@example.com`) });
+
+      const outside = await tx.$includingDeleted().user.findUnique({ where: { id: user.id } });
+
+      expect(outside).toBeNull();
+    });
+  });
+});

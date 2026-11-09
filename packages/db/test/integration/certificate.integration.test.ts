@@ -141,3 +141,50 @@ describe("file checksum", () => {
     ).rejects.toThrow(/Certificate_fileSha256_sha256_check/);
   });
 });
+
+describe("issued certificates are immutable", () => {
+  test.each([
+    ["number", { number: "0000000000000000" }],
+    ["recipientName", { recipientName: "Someone Else" }],
+    ["fileKey", { fileKey: "certificates/other.pdf" }],
+    ["fileSha256", { fileSha256: "b".repeat(64) }],
+  ])("%s cannot change", async (_name, change) => {
+    const enrollment = await createEnrollment();
+    const certificate = await database.prisma.certificate.create({
+      data: certificateData(enrollment.id),
+    });
+
+    await expect(
+      database.prisma.certificate.update({ where: { id: certificate.id }, data: change }),
+    ).rejects.toThrow(/issued certificate/);
+
+    const stored = await database.prisma.certificate.findUniqueOrThrow({
+      where: { id: certificate.id },
+    });
+    expect(stored).toMatchObject({
+      number: certificate.number,
+      recipientName: certificate.recipientName,
+      fileKey: certificate.fileKey,
+      fileSha256: certificate.fileSha256,
+    });
+  });
+
+  test("a certificate can still be revoked and the revocation lifted", async () => {
+    const enrollment = await createEnrollment();
+    const certificate = await database.prisma.certificate.create({
+      data: certificateData(enrollment.id),
+    });
+
+    const revoked = await database.prisma.certificate.update({
+      where: { id: certificate.id },
+      data: { revokedAt: new Date() },
+    });
+    const restored = await database.prisma.certificate.update({
+      where: { id: certificate.id },
+      data: { revokedAt: null },
+    });
+
+    expect(revoked.revokedAt).toBeInstanceOf(Date);
+    expect(restored.revokedAt).toBeNull();
+  });
+});

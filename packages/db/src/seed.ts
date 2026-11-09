@@ -26,6 +26,7 @@ export interface SeedOptions {
   superAdminEmail: string | undefined;
   superAdminPassword: string | undefined;
   includeSampleDirectory: boolean;
+  production: boolean;
 }
 
 export interface SeedSummary {
@@ -44,9 +45,15 @@ export const seedOptionsFromEnv = (env: NodeJS.ProcessEnv): SeedOptions => ({
   superAdminEmail: env["SUPER_ADMIN_EMAIL"],
   superAdminPassword: env["SUPER_ADMIN_PASSWORD"],
   includeSampleDirectory: env["SEED_SAMPLE_DIRECTORY"]?.trim().toLowerCase() === "true",
+  production: env["NODE_ENV"] === "production",
 });
 
 const validate = (options: SeedOptions): { email: string; password: string } => {
+  if (options.production && options.includeSampleDirectory) {
+    throw new SeedConfigError(
+      "SEED_SAMPLE_DIRECTORY=true is not allowed when NODE_ENV is production",
+    );
+  }
   const email = options.superAdminEmail?.trim().toLowerCase() ?? "";
   const password = options.superAdminPassword ?? "";
   if (email === "") {

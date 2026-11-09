@@ -310,3 +310,163 @@ describe("attempt grants", () => {
     ).rejects.toThrow(/AttemptGrant_extraAttempts_check/);
   });
 });
+
+describe("attempt integrity", () => {
+  const attemptData = async (extra: Record<string, unknown> = {}) => {
+    const world = await createQuizWorld();
+    return {
+      world,
+      data: {
+        enrollmentId: world.enrollment.id,
+        quizId: world.quiz.id,
+        idempotencyKey: "key-1",
+        passMarkSnapshot: 70,
+        ...extra,
+      },
+    };
+  };
+
+  test("a score without a submission time is rejected", async () => {
+    const { data } = await attemptData({ scorePercent: 80 });
+
+    await expect(database.prisma.quizAttempt.create({ data })).rejects.toThrow(
+      /QuizAttempt_scored_submitted_check/,
+    );
+  });
+
+  test("a result without a score is rejected", async () => {
+    const { data } = await attemptData({ passed: true, submittedAt: new Date() });
+
+    await expect(database.prisma.quizAttempt.create({ data })).rejects.toThrow(
+      /QuizAttempt_passed_scored_check/,
+    );
+  });
+
+  test.each([
+    [69, true],
+    [70, false],
+    [100, false],
+    [0, true],
+  ])("a score of %s with passed %s contradicts a pass mark of 70", async (scorePercent, passed) => {
+    const { data } = await attemptData({ scorePercent, passed, submittedAt: new Date() });
+
+    await expect(database.prisma.quizAttempt.create({ data })).rejects.toThrow(
+      /QuizAttempt_passed_matches_score_check/,
+    );
+  });
+
+  test.each([
+    [69, false],
+    [70, true],
+    [100, true],
+  ])("a score of %s with passed %s is accepted", async (scorePercent, passed) => {
+    const { data } = await attemptData({ scorePercent, passed, submittedAt: new Date() });
+
+    const attempt = await database.prisma.quizAttempt.create({ data });
+
+    expect(attempt.passed).toBe(passed);
+  });
+
+  test("a submitted attempt without a stored result is accepted", async () => {
+    const { data } = await attemptData({ submittedAt: new Date() });
+
+    const attempt = await database.prisma.quizAttempt.create({ data });
+
+    expect(attempt.scorePercent).toBeNull();
+  });
+
+  test("an in-progress attempt can be submitted with its score and result", async () => {
+    const { data } = await attemptData();
+    const attempt = await database.prisma.quizAttempt.create({ data });
+
+    const submitted = await database.prisma.quizAttempt.update({
+      where: { id: attempt.id },
+      data: { scorePercent: 80, passed: true, submittedAt: new Date() },
+    });
+
+    expect(submitted.scorePercent).toBe(80);
+  });
+
+  test("a submitted attempt cannot change its score, result, snapshot, key, enrollment or quiz", async () => {
+    const { world, data } = await attemptData({
+      scorePercent: 80,
+      passed: true,
+      submittedAt: new Date(),
+    });
+    const attempt = await database.prisma.quizAttempt.create({ data });
+    const otherEnrollment = await createQuizWorld();
+
+    const changes = [
+      { scorePercent: 90 },
+      { passed: false },
+      { passMarkSnapshot: 50 },
+      { idempotencyKey: "key-2" },
+      { enrollmentId: otherEnrollment.enrollment.id },
+      { quizId: otherEnrollment.quiz.id },
+      { submittedAt: new Date(0) },
+    ];
+    for (const change of changes) {
+      await expect(
+        database.prisma.quizAttempt.update({ where: { id: attempt.id }, data: change }),
+      ).rejects.toThrow(/submitted attempt/);
+    }
+
+    const stored = await database.prisma.quizAttempt.findUniqueOrThrow({
+      where: { id: attempt.id },
+    });
+    expect(stored).toMatchObject({
+      scorePercent: 80,
+      passed: true,
+      passMarkSnapshot: 70,
+      idempotencyKey: "key-1",
+      enrollmentId: world.enrollment.id,
+      quizId: world.quiz.id,
+    });
+  });
+
+  test("an update that changes nothing on a submitted attempt is accepted", async () => {
+    const { data } = await attemptData({ scorePercent: 80, passed: true, submittedAt: new Date() });
+    const attempt = await database.prisma.quizAttempt.create({ data });
+
+    await database.prisma.quizAttempt.update({
+      where: { id: attempt.id },
+      data: { scorePercent: 80 },
+    });
+  });
+
+  test("answers of an in-progress attempt can change and be removed", async () => {
+    const { world, data } = await attemptData();
+    const { question, right, wrong } = await addQuestion(world.quiz.id);
+    const attempt = await database.prisma.quizAttempt.create({ data });
+    const answer = await database.prisma.answer.create({
+      data: { attemptId: attempt.id, questionId: question.id, optionId: wrong.id },
+    });
+
+    await database.prisma.answer.update({ where: { id: answer.id }, data: { optionId: right.id } });
+    await database.prisma.answer.delete({ where: { id: answer.id } });
+
+    expect(await database.prisma.answer.count({ where: { attemptId: attempt.id } })).toBe(0);
+  });
+
+  test("answers of a submitted attempt cannot be updated or deleted", async () => {
+    const { world, data } = await attemptData();
+    const { question, right, wrong } = await addQuestion(world.quiz.id);
+    const attempt = await database.prisma.quizAttempt.create({ data });
+    const answer = await database.prisma.answer.create({
+      data: { attemptId: attempt.id, questionId: question.id, optionId: wrong.id },
+    });
+    await database.prisma.quizAttempt.update({
+      where: { id: attempt.id },
+      data: { scorePercent: 0, passed: false, submittedAt: new Date() },
+    });
+
+    await expect(
+      database.prisma.answer.update({ where: { id: answer.id }, data: { optionId: right.id } }),
+    ).rejects.toThrow(/submitted attempt/);
+    await expect(database.prisma.answer.delete({ where: { id: answer.id } })).rejects.toThrow(
+      /submitted attempt/,
+    );
+    const stored = await database.prisma.answer.findUniqueOrThrow({ where: { id: answer.id } });
+    expect(stored.optionId).toBe(wrong.id);
+  });
+});

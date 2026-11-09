@@ -4,8 +4,8 @@ import { softDeleteExtension } from "./soft-delete";
 
 export const createClient = (connectionString: string) => {
   const base = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
-  const includingDeleted = base.$extends(softDeleteExtension(base, { includeDeleted: true }));
-  return base.$extends(softDeleteExtension(base, { includeDeleted: false })).$extends({
+  const includingDeleted = base.$extends(softDeleteExtension({ includeDeleted: true }));
+  return base.$extends(softDeleteExtension({ includeDeleted: false })).$extends({
     client: {
       $includingDeleted: () => includingDeleted,
     },

@@ -127,3 +127,53 @@ describe("the application database role", () => {
     );
   });
 });
+
+describe("the table owner", () => {
+  const insertAsOwner = async () => {
+    const result = await database.query(
+      `insert into "AuditLog" ("id", "action", "entity") values (gen_random_uuid(), 'x', 'Course') returning "id"`,
+    );
+    return result.rows[0]!.id as string;
+  };
+
+  test("is the role that migrated the database and is not heat_app", async () => {
+    const owner = await database.query(
+      `select tableowner = current_user as owned from pg_tables where tablename = 'AuditLog'`,
+    );
+
+    expect(owner.rows[0]?.owned).toBe(true);
+  });
+
+  test("cannot UPDATE an entry", async () => {
+    const id = await insertAsOwner();
+
+    await expect(
+      database.query(`update "AuditLog" set "action" = 'tampered' where "id" = $1`, [id]),
+    ).rejects.toThrow(/append-only/);
+  });
+
+  test("cannot DELETE an entry", async () => {
+    const id = await insertAsOwner();
+
+    await expect(database.query('delete from "AuditLog" where "id" = $1', [id])).rejects.toThrow(
+      /append-only/,
+    );
+  });
+
+  test("cannot TRUNCATE the table", async () => {
+    await insertAsOwner();
+
+    await expect(database.query('truncate "AuditLog"')).rejects.toThrow(/append-only/);
+  });
+
+  test("can still insert and read entries, and the entry is unchanged afterwards", async () => {
+    const id = await insertAsOwner();
+    await database
+      .query(`update "AuditLog" set "action" = 'tampered' where "id" = $1`, [id])
+      .catch(() => undefined);
+
+    const result = await database.query('select "action" from "AuditLog" where "id" = $1', [id]);
+
+    expect(result.rows[0]!.action).toBe("x");
+  });
+});

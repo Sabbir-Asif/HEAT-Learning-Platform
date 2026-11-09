@@ -14,6 +14,7 @@ const options = (overrides: Partial<SeedOptions> = {}): SeedOptions => ({
   superAdminEmail: "Root@Example.test",
   superAdminPassword: password,
   includeSampleDirectory: false,
+  production: false,
   ...overrides,
 });
 
@@ -87,6 +88,27 @@ describe("seed", () => {
     await expect(seed(prisma, options(overrides))).rejects.toThrow(SeedConfigError);
 
     expect(Object.values(await counts()).every((count) => count === 0)).toBe(true);
+  });
+
+  test("sample data in production fails with a clear message and writes nothing", async () => {
+    const { prisma } = database();
+
+    const error = await seed(
+      prisma,
+      options({ production: true, includeSampleDirectory: true }),
+    ).catch((caught: unknown) => caught);
+
+    expect(error).toBeInstanceOf(SeedConfigError);
+    expect((error as Error).message).toMatch(/SEED_SAMPLE_DIRECTORY/);
+    expect(Object.values(await counts()).every((count) => count === 0)).toBe(true);
+  });
+
+  test("production without sample data seeds normally", async () => {
+    const { prisma } = database();
+
+    const summary = await seed(prisma, options({ production: true }));
+
+    expect(summary).toEqual({ superAdminCreated: true, sampleDirectory: false });
   });
 
   test("the error never contains the password", async () => {
