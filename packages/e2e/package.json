@@ -16,8 +16,10 @@
     "@heat/config": "workspace:*",
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
+    "chrome-launcher": "^1.2.3",
     "eslint": "catalog:",
     "globals": "^17.14.0",
+    "lighthouse": "^13.6.0",
     "prettier": "catalog:",
     "typescript": "catalog:"
   }
