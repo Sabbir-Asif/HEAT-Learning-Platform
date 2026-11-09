@@ -152,7 +152,19 @@ pnpm --filter @heat/db test:integration    # schema tests on Postgres 17 in Test
 pnpm --filter @heat/db er-diagram          # rewrite docs/data-model.md from the schema
 ```
 
-Each integration test file gets its own database, created from the committed migrations with `prisma migrate deploy`, so the tests prove the migrations and not only the schema. `docs/data-inventory.md` lists the personal data columns; a schema change that adds one updates it in the same pull request.
+`docs/data-inventory.md` lists the personal data columns; a schema change that adds one updates it in the same pull request.
+
+### Integration tests
+
+Integration tests run on real Postgres 17 and Redis 7 in Testcontainers, with no Docker Compose stack, in `packages/db` and `apps/api` (`pnpm -r --if-present run test:integration`; needs Docker, and set `DOCKER_HOST=unix:///var/run/docker.sock` when the Docker Desktop socket is missing). The harness is `packages/db/src/testing`, exported as `@heat/db/testing`.
+
+- Global setup starts both containers once per run, creates one template database and applies the committed migrations to it with `prisma migrate deploy`, so the tests prove the migrations. Testcontainers stops the containers when the run ends, and its Ryuk reaper removes them if the process dies, so a failed run leaves no orphans.
+- Isolation is a template clone per test: `useTestDatabase()` (and `useTestApp()` in the API) runs `create database ... template ...` before each test and drops it after. A clone costs tens of milliseconds, tests in one file cannot see each other, and nothing needs truncating. Transaction rollback was rejected because the code under test opens its own transactions and connections. Files that share one database in `beforeAll` can call `withDatabase()` and clean up themselves.
+- Redis has no clone, so `useTestRedis()` gives each test a random key prefix and deletes its keys afterwards. Never use `flushall`.
+- `createFactories(prisma)` builds users, admins, universities, faculties, departments, students with profiles, courses with a first revision, enrollments (pinned revision and approval decision when approved) and `approvedStudentInPublishedCourse()`. Values are unique, so tests never collide.
+- `apps/api/test/support/testing-module.ts` builds the real `AppModule` on the containers: `useTestApp({ controllers, providers, imports })` returns the app, base URL, database, factories and Redis URL, provides `TEST_DATABASE` and `TEST_REDIS_URL`, and sets `DATABASE_URL` and `REDIS_URL`.
+- `harness.integration.test.ts` is the self-test: two tests insert the same unique email and both pass.
+- The CI `integration` job builds `@heat/db` and `api` first, because the API tests import the compiled harness, and has a 15 minute limit. The suite takes about 20 seconds locally; the limit leaves room for image pulls and a slower runner.
 
 ### API client
 

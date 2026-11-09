@@ -1,59 +1,61 @@
-import { execFile } from "node:child_process";
-import { randomUUID } from "node:crypto";
-import { promisify } from "node:util";
-import { Client, type QueryResult, type QueryResultRow } from "pg";
-import { inject } from "vitest";
-import { createClient } from "../../src/client";
-import type { HeatClient } from "../../src/client";
-import { PrismaClient } from "../../src/generated/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { afterEach, beforeEach, inject } from "vitest";
+import {
+  cloneDatabase,
+  connectRedis,
+  type InfrastructureHandle,
+  type TestDatabase,
+  type TestRedis,
+} from "../../src/testing";
 
-const run = promisify(execFile);
-
-export interface TestDatabase {
-  url: string;
-  prisma: HeatClient;
-  hardDeleting: PrismaClient;
-  query: (sql: string, values?: unknown[]) => Promise<QueryResult<QueryResultRow>>;
-  close: () => Promise<void>;
+declare module "vitest" {
+  export interface ProvidedContext {
+    infrastructure: InfrastructureHandle;
+  }
 }
 
-const withName = (url: string, name: string): string => {
-  const next = new URL(url);
-  next.pathname = `/${name}`;
-  return next.toString();
+export type { TestDatabase };
+
+export const withDatabase = (): Promise<TestDatabase> => {
+  const { postgresUrl, templateName } = inject("infrastructure");
+  return cloneDatabase(postgresUrl, templateName);
 };
 
-export const withDatabase = async (): Promise<TestDatabase> => {
-  const baseUrl = inject("postgresUrl");
-  const name = `test_${randomUUID().replaceAll("-", "")}`;
-
-  const admin = new Client({ connectionString: baseUrl });
-  await admin.connect();
-  await admin.query(`create database ${name}`);
-  await admin.end();
-
-  const url = withName(baseUrl, name);
-  await run("pnpm", ["exec", "prisma", "migrate", "deploy"], {
-    cwd: process.cwd(),
-    env: { ...process.env, DATABASE_URL: url },
+const lifecycle = <T>(
+  open: () => T | Promise<T>,
+  close: (value: T) => Promise<void>,
+  hooks: { before: typeof beforeEach; after: typeof afterEach },
+  name: string,
+): (() => T) => {
+  let current: T | undefined;
+  hooks.before(async () => {
+    current = await open();
   });
-
-  const client = new Client({ connectionString: url });
-  await client.connect();
-
-  const prisma = createClient(url);
-  const hardDeleting = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
-
-  return {
-    url,
-    prisma,
-    hardDeleting,
-    query: (sql, values) => client.query(sql, values),
-    close: async () => {
-      await prisma.$disconnect();
-      await hardDeleting.$disconnect();
-      await client.end();
-    },
+  hooks.after(async () => {
+    if (current !== undefined) {
+      await close(current);
+    }
+    current = undefined;
+  });
+  return () => {
+    if (current === undefined) {
+      throw new Error(`${name} can only be read inside a test or a hook`);
+    }
+    return current;
   };
 };
+
+export const useTestDatabase = () =>
+  lifecycle(
+    withDatabase,
+    (database) => database.close(),
+    { before: beforeEach, after: afterEach },
+    "useTestDatabase",
+  );
+
+export const useTestRedis = () =>
+  lifecycle(
+    (): TestRedis => connectRedis(inject("infrastructure").redisUrl),
+    (redis) => redis.close(),
+    { before: beforeEach, after: afterEach },
+    "useTestRedis",
+  );
