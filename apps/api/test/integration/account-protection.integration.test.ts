@@ -45,6 +45,11 @@ describe("account protections on real Postgres", () => {
     const old = await testApp().factories.user({ email: "new@example.test", verified: false });
     await verifyToken(old.id, "old-link");
     const tokens = await sessions().create(old.id, "student");
+    const { course } = await testApp().factories.course({ slug: "replace-course" });
+    const enrollment = await testApp().factories.enrollment({
+      userId: old.id,
+      courseId: course.id,
+    });
 
     const outcome = await register("NEW@example.test");
 
@@ -59,6 +64,10 @@ describe("account protections on real Postgres", () => {
     expect(link.usedAt).not.toBeNull();
     await expect(sessions().authenticate(tokens.accessToken, "student")).rejects.toBeDefined();
     await expect(sessions().refresh(tokens.refreshToken, "student")).rejects.toBeDefined();
+    const replacedEnrollment = await prisma()
+      .$includingDeleted()
+      .enrollment.findUniqueOrThrow({ where: { id: enrollment.id } });
+    expect(replacedEnrollment.deletedAt).not.toBeNull();
     const active = await prisma().user.findMany({
       where: { email: { equals: "new@example.test", mode: "insensitive" }, deletedAt: null },
     });

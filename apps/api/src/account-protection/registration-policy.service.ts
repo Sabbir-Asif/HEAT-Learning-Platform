@@ -66,6 +66,10 @@ export class RegistrationPolicyService {
       where: { userId, deletedAt: null },
       data: { deletedAt: now },
     });
+    await tx.enrollment.updateMany({
+      where: { userId, deletedAt: null },
+      data: { deletedAt: now },
+    });
     await tx.authToken.updateMany({ where: { userId, usedAt: null }, data: { usedAt: now } });
     await tx.session.updateMany({ where: { userId, revokedAt: null }, data: { revokedAt: now } });
     await this.audit.record(tx, actor, {
