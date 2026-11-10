@@ -3,16 +3,22 @@ import { adminPageSizes } from "./admins";
 
 export const universityNameMaxLength = 200;
 
+const hiddenCharacters = /[\p{Cc}\p{Cf}]/u;
+
 const directoryNameSchema = (label: string) =>
   z
     .string()
     .trim()
-    .transform((value) => value.replace(/\s+/g, " "))
+    .transform((value) => value.normalize("NFC").replace(/\s+/g, " "))
     .pipe(
       z
         .string()
         .min(1, `Enter the ${label} name.`)
-        .max(universityNameMaxLength, `Use at most ${universityNameMaxLength} characters.`),
+        .max(universityNameMaxLength, `Use at most ${universityNameMaxLength} characters.`)
+        .refine(
+          (value) => !hiddenCharacters.test(value),
+          "Remove control, invisible or text direction characters.",
+        ),
     );
 
 export const universityNameSchema = directoryNameSchema("university");
