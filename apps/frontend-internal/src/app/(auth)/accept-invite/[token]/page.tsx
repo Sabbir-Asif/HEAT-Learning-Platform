@@ -1,5 +1,10 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { AcceptInvite } from "@/admins/accept-invite";
 
-export default function Page() {
-  return <PlaceholderPage title="Accept invitation" />;
+interface AcceptInvitePageProps {
+  params: Promise<{ token: string }>;
+}
+
+export default async function Page({ params }: AcceptInvitePageProps) {
+  const { token } = await params;
+  return <AcceptInvite token={token} />;
 }

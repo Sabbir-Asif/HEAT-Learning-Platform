@@ -98,6 +98,14 @@ describe("Providers", () => {
     expect(new Headers(signOut?.[1]?.headers).get("x-csrf-token")).toBe("admin-token");
   });
 
+  test("accepting an invitation is public and skips the admin CSRF token", async () => {
+    await mount();
+    const { adminCsrfOptions } = await import("../src/shell/providers");
+
+    expect(adminCsrfOptions.skipPaths).toContain("/api/admin/auth/invitations/accept");
+    expect(adminCsrfOptions.skipPaths).toContain("/api/admin/auth/invitations/lookup");
+  });
+
   test("the captcha request is sent without fetching an admin CSRF token", async () => {
     fetchMock.mockImplementation(async () => new Response(null, { status: 204 }));
     await mount();

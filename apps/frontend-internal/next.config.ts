@@ -7,7 +7,13 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname, "../.."),
   transpilePackages: ["@heat/ui", "@heat/api-client", "@heat/contracts"],
   async headers() {
-    return [{ source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex" }] }];
+    return [
+      { source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex" }] },
+      {
+        source: "/accept-invite/:token*",
+        headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
+      },
+    ];
   },
 };
 

@@ -2,6 +2,7 @@
 
 import { installCsrf, installSessionRefresh } from "@heat/api-client";
 import { adminCsrf, adminSessionCookies } from "@heat/contracts";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import type { ReactNode } from "react";
@@ -15,7 +16,13 @@ export const adminSessionRefreshOptions = {
 export const adminCsrfOptions = {
   cookieName: adminCsrf.cookie,
   tokenPath: adminCsrf.tokenPath,
-  skipPaths: ["/api/admin/auth/sign-in", adminSessionCookies.refreshPath, "/api/captcha"],
+  skipPaths: [
+    "/api/admin/auth/sign-in",
+    "/api/admin/auth/invitations/accept",
+    "/api/admin/auth/invitations/lookup",
+    adminSessionCookies.refreshPath,
+    "/api/captcha",
+  ],
 };
 
 function createBrowserQueryClient(): QueryClient {
@@ -35,5 +42,9 @@ function createBrowserQueryClient(): QueryClient {
 
 export function Providers({ children }: { children: ReactNode }) {
   const [client] = useState(createBrowserQueryClient);
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={client}>
+      <NuqsAdapter>{children}</NuqsAdapter>
+    </QueryClientProvider>
+  );
 }

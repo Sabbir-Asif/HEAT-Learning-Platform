@@ -26,9 +26,17 @@ import { adminName, heatLogo } from "./brand";
 import { buildBreadcrumbs } from "./breadcrumbs";
 import { adminNavigation } from "./navigation";
 
-export function AdminShell({ children, email }: { children: ReactNode; email?: string }) {
+export function AdminShell({
+  children,
+  email,
+  isSuperAdmin = false,
+}: {
+  children: ReactNode;
+  email?: string;
+  isSuperAdmin?: boolean;
+}) {
   const pathname = usePathname();
-  const groups = useMemo(() => adminNavigation(), []);
+  const groups = useMemo(() => adminNavigation(isSuperAdmin), [isSuperAdmin]);
   const crumbs = buildBreadcrumbs(pathname, groups);
   return (
     <SidebarProvider>
