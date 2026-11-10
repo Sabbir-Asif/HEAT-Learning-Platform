@@ -5,6 +5,7 @@ import type { HeatClient } from "@heat/db";
 import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
 import { PasswordService, SessionService } from "../auth";
+import { SignInLockout } from "../rate-limit";
 import type { SessionMetadata, SessionTokens } from "../auth";
 
 export interface SignedInAdmin {
@@ -21,6 +22,7 @@ export class AdminSignInService implements OnModuleInit {
     @Inject(DATABASE) private readonly database: HeatClient,
     private readonly passwords: PasswordService,
     private readonly sessions: SessionService,
+    private readonly lockout: SignInLockout,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -28,6 +30,7 @@ export class AdminSignInService implements OnModuleInit {
   }
 
   async signIn(email: string, password: string, metadata: SessionMetadata): Promise<SignedInAdmin> {
+    await this.lockout.assertOpen("admin", email);
     const user = await this.database.user.findFirst({
       where: {
         email: { equals: email, mode: "insensitive" },
@@ -40,7 +43,11 @@ export class AdminSignInService implements OnModuleInit {
       select: { id: true, passwordHash: true },
     });
     const matches = await this.passwords.verify(user?.passwordHash ?? this.decoyDigest, password);
-    if (user === null || !matches) throw new ApiException(401, "INVALID_CREDENTIALS");
+    if (user === null || !matches) {
+      await this.lockout.recordFailure("admin", email);
+      throw new ApiException(401, "INVALID_CREDENTIALS");
+    }
+    await this.lockout.recordSuccess("admin", email);
     await this.upgradeDigest(user.id, user.passwordHash, password);
     const tokens = await this.sessions.create(user.id, "admin", metadata);
     return { userId: user.id, tokens };

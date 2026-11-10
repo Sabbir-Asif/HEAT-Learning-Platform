@@ -10,6 +10,7 @@ import {
   realmCookies,
 } from "../auth";
 import type { AuthenticatedRequest, AuthenticatedSession, CookieResponse } from "../auth";
+import { RateLimit } from "../rate-limit";
 import { MeResponseDto } from "../me/me.dto";
 import { MeService } from "../me/me.service";
 import { SignInRequestDto } from "./student-auth.dto";
@@ -28,6 +29,7 @@ export class StudentAuthController {
   ) {}
 
   @Public()
+  @RateLimit("signIn")
   @Post("sign-in")
   @HttpCode(200)
   @ApiOkResponse({ type: MeResponseDto })
@@ -45,6 +47,7 @@ export class StudentAuthController {
   }
 
   @Public()
+  @RateLimit("sessionRefresh")
   @Post("refresh")
   @HttpCode(204)
   @ApiNoContentResponse()

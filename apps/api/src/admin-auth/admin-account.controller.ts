@@ -2,6 +2,7 @@ import { Body, Controller, HttpCode, Post } from "@nestjs/common";
 import { ApiNoContentResponse, ApiTags } from "@nestjs/swagger";
 import { AllowWhilePasswordChangeRequired, Audience, Roles } from "../access";
 import { CurrentSession } from "../auth";
+import { RateLimit } from "../rate-limit";
 import type { AuthenticatedSession } from "../auth";
 import { AdminAccountService } from "./admin-account.service";
 import { ChangePasswordRequestDto } from "./admin-auth.dto";
@@ -14,6 +15,7 @@ export class AdminAccountController {
   constructor(private readonly account: AdminAccountService) {}
 
   @AllowWhilePasswordChangeRequired()
+  @RateLimit("passwordChange")
   @Post("change-password")
   @HttpCode(204)
   @ApiNoContentResponse()
