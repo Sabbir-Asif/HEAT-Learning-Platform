@@ -2,9 +2,11 @@ import { Inject, Injectable } from "@nestjs/common";
 import type { AuditLogListQuery, AuditLogListResponse } from "@heat/contracts";
 import type { HeatClient, Prisma } from "@heat/db";
 import { DATABASE } from "../core";
+import { ApiException } from "../http/api-exception";
 
 const dhakaOffset = "+06:00";
 const dayMs = 86_400_000;
+const actorMatchLimit = 500;
 
 const startOfDay = (date: string): Date => new Date(`${date}T00:00:00.000${dhakaOffset}`);
 
@@ -67,8 +69,11 @@ export class AuditLogService {
       const matches = await this.database.user.findMany({
         where: { email: { contains: query.actor, mode: "insensitive" } },
         select: { id: true },
-        take: 500,
+        take: actorMatchLimit + 1,
       });
+      if (matches.length > actorMatchLimit) {
+        throw new ApiException(400, "AUDIT_ACTOR_FILTER_TOO_BROAD");
+      }
       where.actorId = { in: matches.map((match) => match.id) };
     }
     if (query.action !== undefined) {
