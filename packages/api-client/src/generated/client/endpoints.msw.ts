@@ -19,20 +19,26 @@ import type {
 } from 'msw';
 
 import type {
+  AdminCsrfTokenResponseDto,
   AdminMeResponseDto,
   AdminSignInRequestDto,
   CaptchaRequestDto,
   CaptchaResponseDto,
   ChangePasswordRequestDto,
+  CsrfTokenResponseDto,
   HealthResponseDto,
   MeResponseDto,
   SignInRequestDto
 } from './model';
 
 
+export const getAdminAuthCsrfTokenResponseMock = (overrideResponse: Partial<Extract<AdminCsrfTokenResponseDto, object>> = {}): AdminCsrfTokenResponseDto => ({token: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
+
 export const getAdminAuthSignInResponseMock = (overrideResponse: Partial<Extract<AdminMeResponseDto, object>> = {}): AdminMeResponseDto => ({user: {email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
 
 export const getAdminMeDescribeResponseMock = (overrideResponse: Partial<Extract<AdminMeResponseDto, object>> = {}): AdminMeResponseDto => ({user: {email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
+
+export const getStudentAuthCsrfTokenResponseMock = (overrideResponse: Partial<Extract<CsrfTokenResponseDto, object>> = {}): CsrfTokenResponseDto => ({token: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
 export const getStudentAuthSignInResponseMock = (overrideResponse: Partial<Extract<MeResponseDto, object>> = {}): MeResponseDto => ({enrollments: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), reason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const)})), user: {email: faker.string.alpha({length: {min: 10, max: 20}}), emailVerified: faker.datatype.boolean(), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
 
@@ -49,6 +55,18 @@ export const getAdminAccountChangePasswordMockHandler = (overrideResponse?: void
 
     return new HttpResponse(null,
       { status: 204
+      })
+  }, options)
+}
+
+export const getAdminAuthCsrfTokenMockHandler = (overrideResponse?: AdminCsrfTokenResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<AdminCsrfTokenResponseDto> | AdminCsrfTokenResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/auth/csrf', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminAuthCsrfTokenResponseMock(),
+      { status: 200
       })
   }, options)
 }
@@ -92,6 +110,18 @@ export const getAdminMeDescribeMockHandler = (overrideResponse?: AdminMeResponse
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getAdminMeDescribeResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getStudentAuthCsrfTokenMockHandler = (overrideResponse?: CsrfTokenResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<CsrfTokenResponseDto> | CsrfTokenResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/auth/csrf', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getStudentAuthCsrfTokenResponseMock(),
       { status: 200
       })
   }, options)
@@ -166,10 +196,12 @@ export const getMeDescribeMockHandler = (overrideResponse?: MeResponseDto | ((in
 }
 export const getHeatLmsApiMock = () => [
   getAdminAccountChangePasswordMockHandler(),
+  getAdminAuthCsrfTokenMockHandler(),
   getAdminAuthRefreshMockHandler(),
   getAdminAuthSignInMockHandler(),
   getAdminAuthSignOutMockHandler(),
   getAdminMeDescribeMockHandler(),
+  getStudentAuthCsrfTokenMockHandler(),
   getStudentAuthRefreshMockHandler(),
   getStudentAuthSignInMockHandler(),
   getStudentAuthSignOutMockHandler(),

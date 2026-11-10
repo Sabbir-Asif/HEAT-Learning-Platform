@@ -24,11 +24,13 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdminCsrfTokenResponseDto,
   AdminMeResponseDto,
   AdminSignInRequestDto,
   CaptchaRequestDto,
   CaptchaResponseDto,
   ChangePasswordRequestDto,
+  CsrfTokenResponseDto,
   HealthResponseDto,
   MeResponseDto,
   SignInRequestDto
@@ -138,6 +140,101 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAdminAccountChangePasswordMutationOptions(options), queryClient);
     }
+
+export const getAdminAuthCsrfTokenUrl = () => {
+
+
+
+
+  return `/api/admin/auth/csrf`
+}
+
+export const adminAuthCsrfToken = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdminCsrfTokenResponseDto> => {
+
+  return customFetch<AdminCsrfTokenResponseDto>(getAdminAuthCsrfTokenUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminAuthCsrfTokenQueryKey = () => {
+    return [
+    `/api/admin/auth/csrf`
+    ] as const;
+    }
+
+
+export const getAdminAuthCsrfTokenQueryOptions = <TData = Awaited<ReturnType<typeof adminAuthCsrfToken>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminAuthCsrfToken>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminAuthCsrfTokenQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminAuthCsrfToken>>> = ({ signal }) => adminAuthCsrfToken({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminAuthCsrfToken>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdminAuthCsrfTokenQueryResult = NonNullable<Awaited<ReturnType<typeof adminAuthCsrfToken>>>
+export type AdminAuthCsrfTokenQueryError = ErrorType<unknown>
+
+
+export function useAdminAuthCsrfToken<TData = Awaited<ReturnType<typeof adminAuthCsrfToken>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminAuthCsrfToken>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminAuthCsrfToken>>,
+          TError,
+          Awaited<ReturnType<typeof adminAuthCsrfToken>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminAuthCsrfToken<TData = Awaited<ReturnType<typeof adminAuthCsrfToken>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminAuthCsrfToken>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminAuthCsrfToken>>,
+          TError,
+          Awaited<ReturnType<typeof adminAuthCsrfToken>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminAuthCsrfToken<TData = Awaited<ReturnType<typeof adminAuthCsrfToken>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminAuthCsrfToken>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useAdminAuthCsrfToken<TData = Awaited<ReturnType<typeof adminAuthCsrfToken>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminAuthCsrfToken>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdminAuthCsrfTokenQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getAdminAuthRefreshUrl = () => {
 
@@ -440,6 +537,101 @@ export function useAdminMeDescribe<TData = Awaited<ReturnType<typeof adminMeDesc
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getAdminMeDescribeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getStudentAuthCsrfTokenUrl = () => {
+
+
+
+
+  return `/api/auth/csrf`
+}
+
+export const studentAuthCsrfToken = async ( options?: Parameters<typeof customFetch>[1]): Promise<CsrfTokenResponseDto> => {
+
+  return customFetch<CsrfTokenResponseDto>(getStudentAuthCsrfTokenUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getStudentAuthCsrfTokenQueryKey = () => {
+    return [
+    `/api/auth/csrf`
+    ] as const;
+    }
+
+
+export const getStudentAuthCsrfTokenQueryOptions = <TData = Awaited<ReturnType<typeof studentAuthCsrfToken>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentAuthCsrfToken>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getStudentAuthCsrfTokenQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentAuthCsrfToken>>> = ({ signal }) => studentAuthCsrfToken({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof studentAuthCsrfToken>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type StudentAuthCsrfTokenQueryResult = NonNullable<Awaited<ReturnType<typeof studentAuthCsrfToken>>>
+export type StudentAuthCsrfTokenQueryError = ErrorType<unknown>
+
+
+export function useStudentAuthCsrfToken<TData = Awaited<ReturnType<typeof studentAuthCsrfToken>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentAuthCsrfToken>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof studentAuthCsrfToken>>,
+          TError,
+          Awaited<ReturnType<typeof studentAuthCsrfToken>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStudentAuthCsrfToken<TData = Awaited<ReturnType<typeof studentAuthCsrfToken>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentAuthCsrfToken>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof studentAuthCsrfToken>>,
+          TError,
+          Awaited<ReturnType<typeof studentAuthCsrfToken>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStudentAuthCsrfToken<TData = Awaited<ReturnType<typeof studentAuthCsrfToken>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentAuthCsrfToken>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useStudentAuthCsrfToken<TData = Awaited<ReturnType<typeof studentAuthCsrfToken>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentAuthCsrfToken>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getStudentAuthCsrfTokenQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

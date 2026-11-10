@@ -1,4 +1,13 @@
-import { Body, Controller, HttpCode, Post, Req, Res, UnauthorizedException } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { ApiNoContentResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { Audience } from "../access";
 import {
@@ -13,7 +22,7 @@ import type { AuthenticatedRequest, AuthenticatedSession, CookieResponse } from 
 import { RateLimit } from "../rate-limit";
 import { MeResponseDto } from "../me/me.dto";
 import { MeService } from "../me/me.service";
-import { SignInRequestDto } from "./student-auth.dto";
+import { CsrfTokenResponseDto, SignInRequestDto } from "./student-auth.dto";
 import { StudentSignInService } from "./student-sign-in.service";
 
 const userAgentLimit = 255;
@@ -75,5 +84,15 @@ export class StudentAuthController {
   ): Promise<void> {
     await this.sessions.revoke(session.familyId);
     this.cookies.clear(response, "student");
+  }
+
+  @Audience("student")
+  @Get("csrf")
+  @ApiOkResponse({ type: CsrfTokenResponseDto })
+  csrfToken(
+    @CurrentSession() session: AuthenticatedSession,
+    @Res({ passthrough: true }) response: CookieResponse,
+  ): CsrfTokenResponseDto {
+    return { token: this.cookies.writeCsrf(response, "student", session.familyId) };
   }
 }

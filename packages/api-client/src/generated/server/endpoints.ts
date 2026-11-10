@@ -5,6 +5,10 @@
  * OpenAPI spec version: 1.0.0
  */
 import { serverFetch } from '../../server/server-fetch';
+export interface AdminCsrfTokenResponseDto {
+  token: string;
+}
+
 export type AdminMeResponseDtoUserRole = typeof AdminMeResponseDtoUserRole[keyof typeof AdminMeResponseDtoUserRole];
 
 
@@ -62,6 +66,10 @@ export interface ChangePasswordRequestDto {
      * @maxLength 256
      */
   newPassword: string;
+}
+
+export interface CsrfTokenResponseDto {
+  token: string;
 }
 
 export type HealthResponseDtoStatus = typeof HealthResponseDtoStatus[keyof typeof HealthResponseDtoStatus];
@@ -165,6 +173,27 @@ return serverFetch<void>(getAdminAccountChangePasswordUrl(),
 
 
 
+export const getAdminAuthCsrfTokenUrl = () => {
+
+
+
+
+  return `/api/admin/auth/csrf`
+}
+
+export const adminAuthCsrfToken = async ( options?: Parameters<typeof serverFetch>[1]): Promise<AdminCsrfTokenResponseDto> => {
+
+  return serverFetch<AdminCsrfTokenResponseDto>(getAdminAuthCsrfTokenUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export const getAdminAuthRefreshUrl = () => {
 
 
@@ -253,6 +282,27 @@ export const getAdminMeDescribeUrl = () => {
 export const adminMeDescribe = async ( options?: Parameters<typeof serverFetch>[1]): Promise<AdminMeResponseDto> => {
 
   return serverFetch<AdminMeResponseDto>(getAdminMeDescribeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getStudentAuthCsrfTokenUrl = () => {
+
+
+
+
+  return `/api/auth/csrf`
+}
+
+export const studentAuthCsrfToken = async ( options?: Parameters<typeof serverFetch>[1]): Promise<CsrfTokenResponseDto> => {
+
+  return serverFetch<CsrfTokenResponseDto>(getStudentAuthCsrfTokenUrl(),
   {
     ...options,
     method: 'GET'

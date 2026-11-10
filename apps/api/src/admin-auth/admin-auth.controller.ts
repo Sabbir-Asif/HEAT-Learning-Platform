@@ -1,4 +1,13 @@
-import { Body, Controller, HttpCode, Post, Req, Res, UnauthorizedException } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { ApiNoContentResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { AllowWhilePasswordChangeRequired, Audience, Roles } from "../access";
 import {
@@ -12,7 +21,11 @@ import {
 import type { AuthenticatedRequest, AuthenticatedSession, CookieResponse } from "../auth";
 import { RateLimit } from "../rate-limit";
 import { AdminAccountService } from "./admin-account.service";
-import { AdminMeResponseDto, AdminSignInRequestDto } from "./admin-auth.dto";
+import {
+  AdminCsrfTokenResponseDto,
+  AdminMeResponseDto,
+  AdminSignInRequestDto,
+} from "./admin-auth.dto";
 import { AdminSignInService } from "./admin-sign-in.service";
 
 const userAgentLimit = 255;
@@ -77,5 +90,17 @@ export class AdminAuthController {
   ): Promise<void> {
     await this.sessions.revoke(session.familyId);
     this.cookies.clear(response, "admin");
+  }
+
+  @Audience("admin")
+  @Roles("ADMIN", "SUPER_ADMIN")
+  @AllowWhilePasswordChangeRequired()
+  @Get("csrf")
+  @ApiOkResponse({ type: AdminCsrfTokenResponseDto })
+  csrfToken(
+    @CurrentSession() session: AuthenticatedSession,
+    @Res({ passthrough: true }) response: CookieResponse,
+  ): AdminCsrfTokenResponseDto {
+    return { token: this.cookies.writeCsrf(response, "admin", session.familyId) };
   }
 }
