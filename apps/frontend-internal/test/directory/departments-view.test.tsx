@@ -271,6 +271,17 @@ describe("DepartmentsView filters", () => {
   });
 });
 
+describe("DepartmentsView orphan faculty link", () => {
+  test("a faculty in the URL without a university is not sent to the API", async () => {
+    route();
+
+    await mount(`?faculty=${arts.id}`);
+
+    await vi.waitFor(() => expect(listCalls().length).toBeGreaterThan(0));
+    expect(listCalls().every((url) => !url.includes("facultyId"))).toBe(true);
+  });
+});
+
 describe("DepartmentsView cascade", () => {
   test("changing the university clears the faculty filter", async () => {
     route();
@@ -453,6 +464,19 @@ describe("DepartmentsView form", () => {
     const view = await mount();
     await openCreate(view);
     await vi.waitFor(() => expect(document.body.textContent).toContain("could not be loaded"));
+  });
+
+  test("says when more universities exist than the select lists", async () => {
+    route({
+      universities: () => json({ items: [], total: 51, page: 1, pageSize: 50 }),
+    });
+    const view = await mount();
+
+    await openCreate(view);
+
+    await vi.waitFor(() =>
+      expect(document.body.textContent).toContain("Only the first 50 names are listed"),
+    );
   });
 
   test("closing a form with unsaved changes asks before discarding", async () => {

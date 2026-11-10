@@ -62,7 +62,7 @@ export function DepartmentsView() {
       : {}),
     ...(url.query ? { q: url.query } : {}),
     ...(university ? { universityId: university } : {}),
-    ...(faculty ? { facultyId: faculty } : {}),
+    ...(university && faculty ? { facultyId: faculty } : {}),
   };
   const list = useDepartmentsList(params);
   const remove = useDepartmentsRemove();

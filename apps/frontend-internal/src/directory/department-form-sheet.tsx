@@ -217,6 +217,12 @@ export function DepartmentFormSheet({ target, onClose, onSaved }: DepartmentForm
           {universities.isSuccess && universityItems.length === 0 ? (
             <FieldDescription>No universities yet. Add a university first.</FieldDescription>
           ) : null}
+          {(universities.data?.total ?? 0) > optionLimit ||
+          (faculties.data?.total ?? 0) > optionLimit ? (
+            <FieldDescription>
+              Only the first {optionLimit} names are listed. Search is not available here yet.
+            </FieldDescription>
+          ) : null}
           {faculties.isSuccess && universityId !== "" && facultyItems.length === 0 ? (
             <FieldDescription>
               This university offers no faculty yet. Assign one on the Faculties screen.
