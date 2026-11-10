@@ -133,6 +133,81 @@ describe("archive and restore of directory records over HTTP", () => {
     });
   });
 
+  describe("a warmed, non-empty lookup changes after archive and after restore", () => {
+    const seedWithSiblings = async () => {
+      const { factories, database } = testApp();
+      const { university, faculty, department } = await seed();
+      const otherUniversity = await factories.university("BUET");
+      const otherFaculty = await factories.faculty("Faculty of Science");
+      await database.prisma.universityFaculty.create({
+        data: { universityId: university.id, facultyId: otherFaculty.id },
+      });
+      await factories.department({
+        name: "History",
+        universityId: university.id,
+        facultyId: faculty.id,
+      });
+      return { university, faculty, department, otherUniversity, otherFaculty };
+    };
+
+    test("department", async () => {
+      const cookie = await signedInAdmin();
+      const { university, faculty, department } = await seedWithSiblings();
+      expect(await departmentOptions(university.id, faculty.id)).toEqual(["Bengali", "History"]);
+
+      await call("POST", `${admin}/departments/${department.id}/archive`, { cookie });
+      expect(await departmentOptions(university.id, faculty.id)).toEqual(["History"]);
+
+      await call("POST", `${admin}/departments/${department.id}/restore`, { cookie });
+      expect(await departmentOptions(university.id, faculty.id)).toEqual(["Bengali", "History"]);
+    });
+
+    test("faculty", async () => {
+      const cookie = await signedInAdmin();
+      const { university, faculty } = await seedWithSiblings();
+      expect(await facultyOptions(university.id)).toEqual([
+        "Faculty of Arts",
+        "Faculty of Science",
+      ]);
+      expect(await departmentOptions(university.id, faculty.id)).toEqual(["Bengali", "History"]);
+
+      await call("POST", `${admin}/faculties/${faculty.id}/archive`, { cookie });
+      expect(await facultyOptions(university.id)).toEqual(["Faculty of Science"]);
+      expect(await departmentOptions(university.id, faculty.id)).toEqual([]);
+
+      await call("POST", `${admin}/faculties/${faculty.id}/restore`, { cookie });
+      expect(await facultyOptions(university.id)).toEqual([
+        "Faculty of Arts",
+        "Faculty of Science",
+      ]);
+      expect(await departmentOptions(university.id, faculty.id)).toEqual(["Bengali", "History"]);
+    });
+
+    test("university", async () => {
+      const cookie = await signedInAdmin();
+      const { university, faculty } = await seedWithSiblings();
+      expect(await universityOptions()).toEqual(["BUET", "University of Dhaka"]);
+      expect(await facultyOptions(university.id)).toEqual([
+        "Faculty of Arts",
+        "Faculty of Science",
+      ]);
+      expect(await departmentOptions(university.id, faculty.id)).toEqual(["Bengali", "History"]);
+
+      await call("POST", `${admin}/universities/${university.id}/archive`, { cookie });
+      expect(await universityOptions()).toEqual(["BUET"]);
+      expect(await facultyOptions(university.id)).toEqual([]);
+      expect(await departmentOptions(university.id, faculty.id)).toEqual([]);
+
+      await call("POST", `${admin}/universities/${university.id}/restore`, { cookie });
+      expect(await universityOptions()).toEqual(["BUET", "University of Dhaka"]);
+      expect(await facultyOptions(university.id)).toEqual([
+        "Faculty of Arts",
+        "Faculty of Science",
+      ]);
+      expect(await departmentOptions(university.id, faculty.id)).toEqual(["Bengali", "History"]);
+    });
+  });
+
   test("archiving is idempotent and an unknown id is NOT_FOUND", async () => {
     const cookie = await signedInAdmin();
     const { department } = await seed();
