@@ -1,7 +1,7 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { meDescribe, setUnauthorizedHandler } from "@heat/api-client";
+import { meDescribe, setUnauthorizedHandler, studentAuthSignOut } from "@heat/api-client";
 import { Providers } from "../src/shell/providers";
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
@@ -45,5 +45,22 @@ describe("Providers", () => {
 
     expect(assign).toHaveBeenCalledWith("/sign-in?next=%2Flearn%2Fa%3Fx%3D1");
     expect(container.textContent).toBe("content");
+  });
+
+  test("a mutation carries the student CSRF token fetched from the token endpoint", async () => {
+    fetchMock.mockImplementation(async (input) =>
+      String(input) === "/api/auth/csrf"
+        ? new Response(JSON.stringify({ token: "student-token" }), { status: 200 })
+        : new Response(null, { status: 204 }),
+    );
+    container = document.createElement("div");
+    document.body.append(container);
+    root = createRoot(container);
+    await act(async () => root?.render(<Providers>content</Providers>));
+
+    await studentAuthSignOut();
+
+    const signOut = fetchMock.mock.calls.find(([url]) => url === "/api/auth/sign-out");
+    expect(new Headers(signOut?.[1]?.headers).get("x-csrf-token")).toBe("student-token");
   });
 });

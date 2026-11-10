@@ -1,7 +1,7 @@
 "use client";
 
-import { installSessionRefresh } from "@heat/api-client";
-import { adminSessionCookies } from "@heat/contracts";
+import { installCsrf, installSessionRefresh } from "@heat/api-client";
+import { adminCsrf, adminSessionCookies } from "@heat/contracts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import type { ReactNode } from "react";
@@ -12,8 +12,15 @@ export const adminSessionRefreshOptions = {
   skipPaths: ["/api/admin/auth/sign-in", adminSessionCookies.refreshPath],
 };
 
+export const adminCsrfOptions = {
+  cookieName: adminCsrf.cookie,
+  tokenPath: adminCsrf.tokenPath,
+  skipPaths: ["/api/admin/auth/sign-in", adminSessionCookies.refreshPath],
+};
+
 function createBrowserQueryClient(): QueryClient {
   if (typeof window !== "undefined") {
+    installCsrf(adminCsrfOptions);
     installSessionRefresh({
       ...adminSessionRefreshOptions,
       onExpired: () => {
