@@ -1,6 +1,9 @@
 import { describe, expect, test } from "vitest";
 import {
+  createFacultyRequestSchema,
   createUniversityRequestSchema,
+  facultyListQuerySchema,
+  facultyUniversityParamsSchema,
   universityListQuerySchema,
   updateUniversityRequestSchema,
 } from "../src/index";
@@ -45,5 +48,44 @@ describe("universityListQuerySchema", () => {
   test("rejects an unknown sort field and a page size that is not offered", () => {
     expect(universityListQuerySchema.safeParse({ sort: "id" }).success).toBe(false);
     expect(universityListQuerySchema.safeParse({ pageSize: 7 }).success).toBe(false);
+  });
+});
+
+describe("createFacultyRequestSchema", () => {
+  test("trims the name, collapses inner whitespace and asks for a faculty name", () => {
+    expect(createFacultyRequestSchema.parse({ name: "  Faculty   of  Arts " }).name).toBe(
+      "Faculty of Arts",
+    );
+    const empty = createFacultyRequestSchema.safeParse({ name: "  " });
+    expect(empty.success ? "" : empty.error.issues[0]?.message).toBe("Enter the faculty name.");
+  });
+
+  test("rejects a name longer than 200 characters", () => {
+    expect(createFacultyRequestSchema.safeParse({ name: "a".repeat(201) }).success).toBe(false);
+    expect(createFacultyRequestSchema.safeParse({ name: "a".repeat(200) }).success).toBe(true);
+  });
+});
+
+describe("facultyListQuerySchema", () => {
+  const universityId = "0198f1a0-0000-7000-8000-000000000001";
+
+  test("shares the university list parameters and adds a university filter", () => {
+    expect(facultyListQuerySchema.parse({})).toEqual({ page: 1, pageSize: 25 });
+    expect(facultyListQuerySchema.parse({ universityId, sort: "-name" })).toMatchObject({
+      universityId,
+      sort: "-name",
+    });
+  });
+
+  test("rejects a university filter that is not an id", () => {
+    expect(facultyListQuerySchema.safeParse({ universityId: "dhaka" }).success).toBe(false);
+  });
+});
+
+describe("facultyUniversityParamsSchema", () => {
+  test("needs both ids", () => {
+    const id = "0198f1a0-0000-7000-8000-000000000001";
+    expect(facultyUniversityParamsSchema.safeParse({ id, universityId: id }).success).toBe(true);
+    expect(facultyUniversityParamsSchema.safeParse({ id }).success).toBe(false);
   });
 });
