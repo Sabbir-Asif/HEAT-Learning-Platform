@@ -98,6 +98,7 @@ interface Classified {
   status: number;
   code: ErrorCode;
   fields?: FieldError[];
+  retryAfterSeconds?: number;
 }
 
 function classify(exception: unknown): Classified {
@@ -105,7 +106,11 @@ function classify(exception: unknown): Classified {
     return { status: 400, code: "VALIDATION_FAILED", fields: fieldErrors(exception.getZodError()) };
   }
   if (exception instanceof ApiException) {
-    return { status: exception.getStatus(), code: exception.code };
+    return {
+      status: exception.getStatus(),
+      code: exception.code,
+      retryAfterSeconds: exception.retryAfterSeconds,
+    };
   }
   const status =
     exception instanceof HttpException ? exception.getStatus() : middlewareStatus(exception);
@@ -122,7 +127,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const request = http.getRequest<RequestLike>();
     const response = http.getResponse<ResponseLike>();
     const requestId = resolveRequestId(request.headers["x-request-id"]);
-    const { status, code, fields } = classify(exception);
+    const { status, code, fields, retryAfterSeconds } = classify(exception);
 
     const name = exception instanceof Error ? exception.name : typeof exception;
 
@@ -140,6 +145,9 @@ export class ApiExceptionFilter implements ExceptionFilter {
       error: { code, message: messages[code], requestId, ...(fields ? { fields } : {}) },
     };
     response.setHeader("x-request-id", requestId);
+    if (retryAfterSeconds !== undefined) {
+      response.setHeader("retry-after", String(retryAfterSeconds));
+    }
     response.status(status).json(body);
   }
 }
