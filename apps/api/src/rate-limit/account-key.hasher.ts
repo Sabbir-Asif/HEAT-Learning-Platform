@@ -3,9 +3,15 @@ import { Inject, Injectable } from "@nestjs/common";
 import { APP_CONFIG } from "../core";
 import type { AppConfig } from "../core";
 
+const keyPurpose = "heat:rate-limit:account-key:v1";
+
 @Injectable()
 export class AccountKeyHasher {
-  constructor(@Inject(APP_CONFIG) private readonly config: AppConfig) {}
+  private readonly subkey: Buffer;
+
+  constructor(@Inject(APP_CONFIG) config: AppConfig) {
+    this.subkey = createHmac("sha256", config.auth.accessSecret).update(keyPurpose).digest();
+  }
 
   forEmail(email: string): string {
     return this.digest(`email:${email.trim().toLowerCase()}`);
@@ -16,6 +22,6 @@ export class AccountKeyHasher {
   }
 
   private digest(value: string): string {
-    return createHmac("sha256", this.config.auth.accessSecret).update(value).digest("hex");
+    return createHmac("sha256", this.subkey).update(value).digest("hex");
   }
 }
