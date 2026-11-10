@@ -1,7 +1,7 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { adminMeDescribe, setUnauthorizedHandler } from "@heat/api-client";
+import { adminAuthSignOut, adminMeDescribe, setUnauthorizedHandler } from "@heat/api-client";
 import { Providers } from "../src/shell/providers";
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
@@ -82,5 +82,31 @@ describe("Providers", () => {
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  test("a mutation carries the admin CSRF token fetched from the admin token endpoint", async () => {
+    fetchMock.mockImplementation(async (input) =>
+      String(input) === "/api/admin/auth/csrf"
+        ? new Response(JSON.stringify({ token: "admin-token" }), { status: 200 })
+        : new Response(null, { status: 204 }),
+    );
+    await mount();
+
+    await adminAuthSignOut();
+
+    const signOut = fetchMock.mock.calls.find(([url]) => url === "/api/admin/auth/sign-out");
+    expect(new Headers(signOut?.[1]?.headers).get("x-csrf-token")).toBe("admin-token");
+  });
+
+  test("the captcha request is sent without fetching an admin CSRF token", async () => {
+    fetchMock.mockImplementation(async () => new Response(null, { status: 204 }));
+    await mount();
+    const { adminCsrfOptions } = await import("../src/shell/providers");
+
+    expect(adminCsrfOptions.skipPaths).toContain("/api/captcha");
+    const { captchaIssue } = await import("@heat/api-client");
+    await captchaIssue({});
+
+    expect(fetchMock.mock.calls.map(([url]) => String(url))).toEqual(["/api/captcha"]);
   });
 });

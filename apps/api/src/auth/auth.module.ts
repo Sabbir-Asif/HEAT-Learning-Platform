@@ -4,6 +4,7 @@ import { AccessTokenService } from "./access-token.service";
 import { BreachedPasswordProvider } from "./breached-password.provider";
 import { CLAIM_POLLING, defaultClaimPolling } from "./claim-polling";
 import { CookieWriter } from "./cookie-writer";
+import { CsrfTokenService } from "./csrf-token.service";
 import { HibpBreachedPasswordProvider } from "./hibp-breached-password.provider";
 import { PasswordService } from "./password.service";
 import { PrismaSessionStore } from "./prisma-session.store";
@@ -17,6 +18,7 @@ import { SessionStore } from "./session.store";
   providers: [
     AccessTokenService,
     CookieWriter,
+    CsrfTokenService,
     PasswordService,
     SessionService,
     { provide: CLAIM_POLLING, useValue: defaultClaimPolling },
@@ -24,6 +26,6 @@ import { SessionStore } from "./session.store";
     { provide: SessionStore, useClass: PrismaSessionStore },
     { provide: RotationClaimStore, useClass: RedisRotationClaimStore },
   ],
-  exports: [AccessTokenService, CookieWriter, PasswordService, SessionService],
+  exports: [AccessTokenService, CookieWriter, CsrfTokenService, PasswordService, SessionService],
 })
 export class AuthModule {}

@@ -3,6 +3,7 @@ import { describe, expect, test, vi } from "vitest";
 import { PasswordService, SessionService, realmCookies } from "../../src/auth";
 import { BreachedPasswordProvider } from "../../src/auth/breached-password.provider";
 import { AccessProbeController } from "../support/access-probe.controller";
+import { csrfHeaders } from "../support/csrf";
 import { useTestApp } from "../support/testing-module";
 
 const password = "correct horse battery staple";
@@ -41,6 +42,7 @@ describe("admin sign-in, refresh, sign-out, /admin/me and change-password", () =
       method,
       headers: {
         ...(options.cookie ? { cookie: options.cookie } : {}),
+        ...csrfHeaders(options.cookie),
         ...(options.body === undefined ? {} : { "content-type": "application/json" }),
       },
       body: options.body === undefined ? undefined : JSON.stringify(options.body),

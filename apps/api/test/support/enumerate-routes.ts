@@ -78,3 +78,32 @@ export const enumerateRouteRateLimits = (
   }
   return limits;
 };
+
+export type CsrfMode = "token" | "origin-only";
+
+const safeMethods: ReadonlySet<string> = new Set(["GET", "HEAD", "OPTIONS"]);
+
+export const enumerateCsrfModes = (
+  discovery: DiscoveryService,
+  scanner: MetadataScanner,
+  prefix = "api",
+): Record<string, CsrfMode> => {
+  const reflector = new Reflector();
+  const modes: Record<string, CsrfMode> = {};
+  for (const wrapper of discovery.getControllers()) {
+    const { instance, metatype } = wrapper;
+    if (!instance || typeof metatype !== "function") continue;
+    const controllerPath: unknown = Reflect.getMetadata(PATH_METADATA, metatype);
+    const prototype = Object.getPrototypeOf(instance) as object;
+    for (const name of scanner.getAllMethodNames(prototype)) {
+      const handler = Reflect.get(prototype, name) as () => void;
+      const method: unknown = Reflect.getMetadata(METHOD_METADATA, handler);
+      if (typeof method !== "number" || safeMethods.has(RequestMethod[method] ?? "")) continue;
+      const path: unknown = Reflect.getMetadata(PATH_METADATA, handler);
+      const policy = resolveAccessPolicy(reflector, [handler, metatype as Type]);
+      modes[`${RequestMethod[method]} ${joinPath(prefix, controllerPath, path)}`] =
+        policy.kind === "protected" ? "token" : "origin-only";
+    }
+  }
+  return modes;
+};

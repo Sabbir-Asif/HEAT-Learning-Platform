@@ -1,6 +1,7 @@
 import { hash as argonHash, argon2id } from "argon2";
 import { describe, expect, test, vi } from "vitest";
 import { PasswordService, SessionService, realmCookies } from "../../src/auth";
+import { csrfHeaders } from "../support/csrf";
 import { useTestApp } from "../support/testing-module";
 
 const password = "correct horse battery staple";
@@ -35,6 +36,7 @@ describe("student sign-in, refresh, sign-out and /me", () => {
       method,
       headers: {
         ...(options.cookie ? { cookie: options.cookie } : {}),
+        ...csrfHeaders(options.cookie),
         ...(options.body === undefined ? {} : { "content-type": "application/json" }),
       },
       body: options.body === undefined ? undefined : JSON.stringify(options.body),

@@ -9,20 +9,48 @@ const encryptionKey = z
   .transform((value) => Buffer.from(value, "base64"))
   .refine((key) => key.length === 32, "AUTH_ENCRYPTION_KEY must be 32 bytes, base64 encoded");
 
-const envSchema = z.object({
-  DATABASE_URL: z.string().min(1),
-  REDIS_URL: z.string().min(1),
-  AUTH_ACCESS_SECRET: z.string().min(32),
-  AUTH_ENCRYPTION_KEY: encryptionKey,
-  ARGON2_MEMORY_COST: positiveInt.default(19456),
-  ARGON2_TIME_COST: positiveInt.default(2),
-  ARGON2_PARALLELISM: positiveInt.default(1),
-  ACCESS_TOKEN_TTL_SECONDS: positiveInt.default(600),
-  REFRESH_TOKEN_TTL_DAYS: positiveInt.default(30),
-  ADMIN_IDLE_MINUTES: positiveInt.default(30),
-  REFRESH_GRACE_SECONDS: positiveInt.default(20),
-  BREACHED_PASSWORD_RANGE_URL: z.url().default("https://api.pwnedpasswords.com/range/"),
-});
+const envSchema = z
+  .object({
+    DATABASE_URL: z.string().min(1),
+    REDIS_URL: z.string().min(1),
+    AUTH_ACCESS_SECRET: z.string().min(32),
+    AUTH_ENCRYPTION_KEY: encryptionKey,
+    ARGON2_MEMORY_COST: positiveInt.default(19456),
+    ARGON2_TIME_COST: positiveInt.default(2),
+    ARGON2_PARALLELISM: positiveInt.default(1),
+    ACCESS_TOKEN_TTL_SECONDS: positiveInt.default(600),
+    REFRESH_TOKEN_TTL_DAYS: positiveInt.default(30),
+    ADMIN_IDLE_MINUTES: positiveInt.default(30),
+    REFRESH_GRACE_SECONDS: positiveInt.default(20),
+    CSRF_SECRET: z.string().min(32),
+    NODE_ENV: z.string().optional(),
+    TRUSTED_ORIGINS: z
+      .string()
+      .optional()
+      .transform((value) =>
+        (value ?? "")
+          .split(",")
+          .map((origin) => origin.trim())
+          .filter((origin) => origin !== ""),
+      )
+      .refine(
+        (origins) =>
+          origins.every((origin) => URL.canParse(origin) && new URL(origin).origin === origin),
+        "TRUSTED_ORIGINS must be a comma separated list of origins without a path",
+      ),
+    BREACHED_PASSWORD_RANGE_URL: z.url().default("https://api.pwnedpasswords.com/range/"),
+  })
+  .superRefine((env, context) => {
+    if (env.NODE_ENV === "production" && env.TRUSTED_ORIGINS.length === 0) {
+      context.addIssue({
+        code: "custom",
+        path: ["TRUSTED_ORIGINS"],
+        message: "TRUSTED_ORIGINS is required in production",
+      });
+    }
+  });
+
+const localTrustedOrigins = ["http://localhost:3000", "http://localhost:3001"];
 
 export interface AppConfig {
   databaseUrl: string;
@@ -35,6 +63,7 @@ export interface AppConfig {
     adminIdleMinutes: number;
     refreshGraceSeconds: number;
   };
+  csrf: { secret: string; trustedOrigins: readonly string[] };
   argon2: { memoryCost: number; timeCost: number; parallelism: number };
   breachedPasswordRangeUrl: string;
   rateLimit: RateLimitConfig;
@@ -60,6 +89,11 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
       refreshTokenTtlDays: values.REFRESH_TOKEN_TTL_DAYS,
       adminIdleMinutes: values.ADMIN_IDLE_MINUTES,
       refreshGraceSeconds: values.REFRESH_GRACE_SECONDS,
+    },
+    csrf: {
+      secret: values.CSRF_SECRET,
+      trustedOrigins:
+        values.TRUSTED_ORIGINS.length > 0 ? values.TRUSTED_ORIGINS : localTrustedOrigins,
     },
     argon2: {
       memoryCost: values.ARGON2_MEMORY_COST,

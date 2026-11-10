@@ -4,6 +4,7 @@ import { PasswordService } from "../../src/auth";
 import { BreachedPasswordProvider } from "../../src/auth/breached-password.provider";
 import { RATE_LIMIT_REDIS } from "../../src/rate-limit/rate-limit-redis";
 import { applyEnvironment } from "../support/auth-env";
+import { csrfHeaders } from "../support/csrf";
 import { useTestApp } from "../support/testing-module";
 
 const password = "correct horse battery staple";
@@ -282,7 +283,7 @@ describe("admin change-password limit", () => {
     const change = async () =>
       fetch(`${testApp().baseUrl}/api/admin/account/change-password`, {
         method: "POST",
-        headers: { "content-type": "application/json", cookie },
+        headers: { "content-type": "application/json", cookie, ...csrfHeaders(cookie) },
         body: JSON.stringify({
           currentPassword: "wrong",
           newPassword: "a different long passphrase",

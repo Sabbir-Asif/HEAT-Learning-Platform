@@ -119,7 +119,9 @@ for (const width of widthNames as WidthName[]) {
       baseURL,
     }) => {
       await grantAccess(context, baseURL);
+      const csrfHeaders: Array<string | undefined> = [];
       await context.route("**/api/auth/sign-out", async (route) => {
+        csrfHeaders.push(route.request().headers()["x-csrf-token"]);
         await context.clearCookies();
         await route.fulfill({ status: 204 });
       });
@@ -131,6 +133,7 @@ for (const width of widthNames as WidthName[]) {
 
       await expect(page).toHaveURL(/\/sign-in$/);
       expect(signOuts).toEqual(["POST"]);
+      expect(csrfHeaders).toEqual(["e2e-csrf-token"]);
       await page.goto("/dashboard");
       await expect(page).toHaveURL(/\/sign-in\?next=%2Fdashboard$/);
     });

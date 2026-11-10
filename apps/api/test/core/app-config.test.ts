@@ -10,6 +10,7 @@ const valid = {
   REDIS_URL: "redis://localhost:6379",
   AUTH_ACCESS_SECRET: "x".repeat(32),
   AUTH_ENCRYPTION_KEY: randomBytes(32).toString("base64"),
+  CSRF_SECRET: "c".repeat(32),
 };
 
 describe("loadConfig", () => {
@@ -32,6 +33,54 @@ describe("loadConfig", () => {
   test("refuses a short access secret without echoing its value", () => {
     expect(() => loadConfig({ ...valid, AUTH_ACCESS_SECRET: "short" })).toThrow(
       "Invalid environment configuration: AUTH_ACCESS_SECRET",
+    );
+  });
+
+  test("refuses a short CSRF secret without echoing its value", () => {
+    expect(() => loadConfig({ ...valid, CSRF_SECRET: "short" })).toThrow(
+      "Invalid environment configuration: CSRF_SECRET",
+    );
+  });
+
+  test("reads trusted origins as a list and defaults to the local apps", () => {
+    expect(loadConfig(valid).csrf.trustedOrigins).toEqual([
+      "http://localhost:3000",
+      "http://localhost:3001",
+    ]);
+    expect(
+      loadConfig({
+        ...valid,
+        TRUSTED_ORIGINS: "https://learn.example.test, https://admin.example.test",
+      }).csrf.trustedOrigins,
+    ).toEqual(["https://learn.example.test", "https://admin.example.test"]);
+  });
+
+  test("requires trusted origins in production instead of defaulting to local apps", () => {
+    expect(() => loadConfig({ ...valid, NODE_ENV: "production" })).toThrow(/TRUSTED_ORIGINS/);
+    expect(() => loadConfig({ ...valid, NODE_ENV: "production", TRUSTED_ORIGINS: " , " })).toThrow(
+      /TRUSTED_ORIGINS/,
+    );
+    expect(
+      loadConfig({
+        ...valid,
+        NODE_ENV: "production",
+        TRUSTED_ORIGINS: "https://learn.example.test",
+      }).csrf.trustedOrigins,
+    ).toEqual(["https://learn.example.test"]);
+  });
+
+  test("keeps the local defaults in development and test", () => {
+    for (const NODE_ENV of ["development", "test"]) {
+      expect(loadConfig({ ...valid, NODE_ENV }).csrf.trustedOrigins).toEqual([
+        "http://localhost:3000",
+        "http://localhost:3001",
+      ]);
+    }
+  });
+
+  test("refuses a trusted origin that carries a path", () => {
+    expect(() => loadConfig({ ...valid, TRUSTED_ORIGINS: "https://a.test/x" })).toThrow(
+      /TRUSTED_ORIGINS/,
     );
   });
 
@@ -86,5 +135,7 @@ describe("loadConfig rate limits", () => {
       }
     }
     expect(example).toContain("LOCKOUT_THRESHOLD=");
+    expect(example).toContain("CSRF_SECRET=");
+    expect(example).toContain("TRUSTED_ORIGINS=");
   });
 });

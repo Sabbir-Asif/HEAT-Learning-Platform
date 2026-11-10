@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+export * from './adminCsrfTokenResponseDto';
 export * from './adminMeResponseDto';
 export * from './adminMeResponseDtoUser';
 export * from './adminMeResponseDtoUserRole';
@@ -12,6 +13,7 @@ export * from './adminSignInRequestDto';
 export * from './captchaRequestDto';
 export * from './captchaResponseDto';
 export * from './changePasswordRequestDto';
+export * from './csrfTokenResponseDto';
 export * from './healthResponseDto';
 export * from './healthResponseDtoStatus';
 export * from './meResponseDto';

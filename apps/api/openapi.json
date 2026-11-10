@@ -1,6 +1,17 @@
 {
   "components": {
     "schemas": {
+      "AdminCsrfTokenResponseDto": {
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
       "AdminMeResponseDto": {
         "properties": {
           "user": {
@@ -106,6 +117,17 @@
         "required": [
           "currentPassword",
           "newPassword"
+        ],
+        "type": "object"
+      },
+      "CsrfTokenResponseDto": {
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
         ],
         "type": "object"
       },
@@ -260,6 +282,27 @@
         ]
       }
     },
+    "/api/admin/auth/csrf": {
+      "get": {
+        "operationId": "adminAuthCsrfToken",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCsrfTokenResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-auth"
+        ]
+      }
+    },
     "/api/admin/auth/refresh": {
       "post": {
         "operationId": "adminAuthRefresh",
@@ -337,6 +380,27 @@
         },
         "tags": [
           "admin-me"
+        ]
+      }
+    },
+    "/api/auth/csrf": {
+      "get": {
+        "operationId": "studentAuthCsrfToken",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsrfTokenResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
         ]
       }
     },

@@ -21,6 +21,11 @@ export const AdminAccountChangePasswordBody = zod.object({
 export const AdminAccountChangePasswordResponse = zod.void()
 
 
+export const AdminAuthCsrfTokenResponse = zod.object({
+  "token": zod.string()
+})
+
+
 export const AdminAuthRefreshResponse = zod.void()
 
 
@@ -59,6 +64,11 @@ export const AdminMeDescribeResponse = zod.object({
   "mustChangePassword": zod.boolean(),
   "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT'])
 })
+})
+
+
+export const StudentAuthCsrfTokenResponse = zod.object({
+  "token": zod.string()
 })
 
 
