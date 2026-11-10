@@ -1,5 +1,12 @@
 import {
+  createFacultyRequestSchema,
   createUniversityRequestSchema,
+  facultyIdParamsSchema,
+  facultyListQuerySchema,
+  facultyListResponseSchema,
+  facultySummarySchema,
+  facultyUniversityParamsSchema,
+  updateFacultyRequestSchema,
   universityIdParamsSchema,
   universityListQuerySchema,
   universityListResponseSchema,
@@ -19,3 +26,17 @@ export class UniversityListResponseDto extends createZodDto(universityListRespon
 export class UniversitySummaryDto extends createZodDto(universitySummarySchema) {}
 
 export class UniversityIdParamsDto extends createZodDto(universityIdParamsSchema) {}
+
+export class CreateFacultyRequestDto extends createZodDto(createFacultyRequestSchema) {}
+
+export class UpdateFacultyRequestDto extends createZodDto(updateFacultyRequestSchema) {}
+
+export class FacultyListQueryDto extends createZodDto(facultyListQuerySchema) {}
+
+export class FacultyListResponseDto extends createZodDto(facultyListResponseSchema) {}
+
+export class FacultySummaryDto extends createZodDto(facultySummarySchema) {}
+
+export class FacultyIdParamsDto extends createZodDto(facultyIdParamsSchema) {}
+
+export class FacultyUniversityParamsDto extends createZodDto(facultyUniversityParamsSchema) {}
