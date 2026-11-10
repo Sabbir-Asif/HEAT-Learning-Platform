@@ -46,6 +46,20 @@ function CaptchaField({
   const id = idProp ?? generatedId;
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
+  const [tracked, setTracked] = React.useState({
+    status,
+    announcement: status === "loading" ? "Loading security check" : "",
+  });
+  if (tracked.status !== status) {
+    const announcement =
+      status === "loading"
+        ? "Loading security check"
+        : status === "ready" && tracked.announcement !== ""
+          ? "New security check loaded"
+          : "";
+    setTracked({ status, announcement });
+  }
+  const announcement = tracked.announcement;
   const invalid = error !== undefined && error !== "";
 
   return (
@@ -59,25 +73,21 @@ function CaptchaField({
           {status === "ready" && svg !== undefined ? (
             <img
               src={captchaImageSource(svg)}
-              alt={`${label} image with letters and digits. If you cannot read it, contact ${supportContact}.`}
+              alt={`${label} image with letters and digits`}
               className="size-full object-contain"
               draggable={false}
             />
           ) : null}
-          {status === "loading" ? (
-            <>
-              <Skeleton className="size-full rounded-none" />
-              <span role="status" className="sr-only">
-                Loading security check
-              </span>
-            </>
-          ) : null}
+          {status === "loading" ? <Skeleton className="size-full rounded-none" /> : null}
           {status === "error" ? (
             <p role="alert" className="text-destructive px-2 text-center text-sm">
               The security check could not be loaded. Get a new image.
             </p>
           ) : null}
         </div>
+        <span role="status" aria-live="polite" className="sr-only">
+          {announcement}
+        </span>
         <Button
           type="button"
           variant="outline"

@@ -21,12 +21,11 @@ const renderField = (props: Partial<React.ComponentProps<typeof CaptchaField>> =
   );
 
 describe("CaptchaField", () => {
-  test("shows the image with an accessible name that names the purpose and the support contact", () => {
+  test("the image has a short name and the support contact lives only in the linked hint", () => {
     renderField();
 
     const image = screen.getByRole("img");
-    expect(image.getAttribute("alt")).toContain("Security check");
-    expect(image.getAttribute("alt")).toContain("support@heat.example");
+    expect(image.getAttribute("alt")).toBe("Security check image with letters and digits");
     expect(image.getAttribute("src")).toBe(captchaImageSource(svg));
   });
 
@@ -92,5 +91,33 @@ describe("CaptchaField", () => {
     const describedBy = input.getAttribute("aria-describedby") ?? "";
     expect(describedBy).not.toBe("");
     expect(screen.getByRole("alert").textContent).toBe("The characters do not match.");
+  });
+
+  test("a persistent polite status announces the loading message and the completed refresh", () => {
+    const view = renderField({ status: "loading", svg: undefined });
+    const region = screen.getByRole("status");
+    expect(region.getAttribute("aria-live")).toBe("polite");
+    expect(region.className).toContain("sr-only");
+    expect(region.textContent).toBe("Loading security check");
+
+    view.rerender(
+      <CaptchaField
+        status="ready"
+        svg={svg}
+        value=""
+        onChange={() => undefined}
+        onRefresh={() => undefined}
+        supportContact="support@heat.example"
+      />,
+    );
+
+    expect(screen.getByRole("status")).toBe(region);
+    expect(region.textContent).toBe("New security check loaded");
+  });
+
+  test("the status is present and quiet when the image is ready on first render", () => {
+    renderField();
+
+    expect(screen.getByRole("status").textContent).toBe("");
   });
 });
