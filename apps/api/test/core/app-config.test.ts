@@ -8,9 +8,9 @@ import { rateLimitEnvName } from "../../src/core/config/rate-limit-config";
 const valid = {
   DATABASE_URL: "postgresql://u:p@localhost:5432/db",
   REDIS_URL: "redis://localhost:6379",
-  AUTH_ACCESS_SECRET: "x".repeat(32),
+  AUTH_ACCESS_SECRET: "access-secret-0123456789-abcdefghijklmnop",
   AUTH_ENCRYPTION_KEY: randomBytes(32).toString("base64"),
-  CSRF_SECRET: "c".repeat(32),
+  CSRF_SECRET: "csrf-secret-0123456789-abcdefghijklmnopqrs",
 };
 
 describe("loadConfig", () => {
@@ -80,6 +80,23 @@ describe("loadConfig", () => {
       "Invalid environment configuration: CSRF_SECRET",
     );
   });
+
+  test.each(["AUTH_ACCESS_SECRET", "CSRF_SECRET"])(
+    "%s must be 32 characters or more and not low entropy",
+    (name) => {
+      const reject = (value: string) =>
+        expect(() => loadConfig({ ...valid, [name]: value })).toThrow(
+          `Invalid environment configuration: ${name}`,
+        );
+      reject("a".repeat(31));
+      reject("a".repeat(64));
+      reject("ab".repeat(20));
+      reject("abcdefgh".repeat(6));
+      expect(() =>
+        loadConfig({ ...valid, [name]: "Zq7mP2vK9wL4xR8tN3bH6cD1fG5jS0yE" }),
+      ).not.toThrow();
+    },
+  );
 
   test("reads trusted origins as a list and defaults to the local apps", () => {
     expect(loadConfig(valid).csrf.trustedOrigins).toEqual([

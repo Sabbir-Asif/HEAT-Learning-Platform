@@ -28,7 +28,9 @@ describe("CsrfTokenService", () => {
   });
 
   test("refuses a token made with another secret", () => {
-    const other = new CsrfTokenService(testConfig({ CSRF_SECRET: "z".repeat(40) }));
+    const other = new CsrfTokenService(
+      testConfig({ CSRF_SECRET: "other-csrf-secret-0123456789-abcdefghijklmno" }),
+    );
 
     expect(service.verify("student", familyA, other.issue("student", familyA))).toBe(false);
   });

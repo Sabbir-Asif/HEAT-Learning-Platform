@@ -4,6 +4,16 @@ import type { RateLimitConfig } from "./rate-limit-config";
 
 const positiveInt = z.coerce.number().int().positive();
 
+const minimumDistinctSecretCharacters = 10;
+
+const secret = z
+  .string()
+  .min(32)
+  .refine(
+    (value) => new Set(value).size >= minimumDistinctSecretCharacters,
+    "secret has too little entropy",
+  );
+
 const encryptionKey = z
   .string()
   .transform((value) => Buffer.from(value, "base64"))
@@ -13,7 +23,7 @@ const envSchema = z
   .object({
     DATABASE_URL: z.string().min(1),
     REDIS_URL: z.string().min(1),
-    AUTH_ACCESS_SECRET: z.string().min(32),
+    AUTH_ACCESS_SECRET: secret,
     AUTH_ENCRYPTION_KEY: encryptionKey,
     ARGON2_MEMORY_COST: positiveInt.default(19456),
     ARGON2_TIME_COST: positiveInt.default(2),
@@ -24,7 +34,7 @@ const envSchema = z
     ADMIN_SESSION_ABSOLUTE_HOURS: positiveInt.default(12),
     STUDENT_SESSION_ABSOLUTE_DAYS: positiveInt.default(30),
     REFRESH_GRACE_SECONDS: positiveInt.default(20),
-    CSRF_SECRET: z.string().min(32),
+    CSRF_SECRET: secret,
     NODE_ENV: z.string().optional(),
     TRUSTED_ORIGINS: z
       .string()
