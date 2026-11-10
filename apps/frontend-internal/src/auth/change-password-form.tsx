@@ -12,6 +12,7 @@ import {
   Input,
   applyServerError,
   formErrorCopy,
+  rateLimitedMessage,
 } from "@heat/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { KeyRoundIcon } from "lucide-react";
@@ -54,6 +55,13 @@ export function ChangePasswordForm({ forced }: ChangePasswordFormProps) {
       }
       if (isApiError(error) && error.code === "PASSWORD_BREACHED") {
         form.setError("newPassword", { type: "server", message: breachedPasswordMessage });
+        return;
+      }
+      if (isApiError(error) && error.code === "RATE_LIMITED") {
+        form.setError("root.server", {
+          type: "server",
+          message: rateLimitedMessage(error.retryAfterSeconds),
+        });
         return;
       }
       if (isApiError(error)) {

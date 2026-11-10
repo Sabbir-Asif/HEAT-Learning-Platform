@@ -107,6 +107,24 @@ describe("ChangePasswordForm", () => {
     expect(refresh).toHaveBeenCalled();
   });
 
+  test("a rate limited change shows the wait time", async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ error: { code: "RATE_LIMITED", message: "x", requestId: "r" } }),
+        { status: 429, headers: { "retry-after": "45" } },
+      ),
+    );
+    const view = await mount(false);
+
+    await fill(view, "old password value", "a brand new passphrase");
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=alert]")?.textContent).toBe(
+        "Too many attempts. Try again in 45 seconds.",
+      ),
+    );
+  });
+
   test("a wrong current password is shown on that field", async () => {
     fetchMock.mockResolvedValueOnce(errorReply("INVALID_CREDENTIALS", 400));
     const view = await mount(true);
