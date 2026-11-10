@@ -31,9 +31,9 @@ export function branchDenial(location) {
   if (!protectedBranches.has(location.branch)) return null;
   if (location.branch === "") {
     if (rebaseInProgress(location.top)) return null;
-    return `Edits are blocked: ${location.real} is in a checkout with a detached HEAD, not on a branch. Check out the ticket branch (git switch <branch>) or create it in its own worktree (stage 3 of /implement-issue).`;
+    return `Edits are blocked: ${location.real} is in a checkout with a detached HEAD, not on a branch. Check out the ticket branch (git switch <branch>) or create it (stage 3 of /implement-issue).`;
   }
-  return `Edits are blocked: ${location.real} is in a checkout on "${location.branch}". Create the ticket branch and worktree first (stage 3 of /implement-issue) and work there.`;
+  return `Edits are blocked: ${location.real} is in a checkout on "${location.branch}". Create the ticket branch first (stage 3 of /implement-issue) and work there.`;
 }
 
 export function branchGuard(input) {

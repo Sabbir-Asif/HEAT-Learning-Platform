@@ -40,7 +40,7 @@ Every ticket goes through eight stages, started with `/implement-issue <number>`
 
 1. Pull ticket: fetch the issue, its epic, linked issues and collaborators' comments. Refuse if it is blocked or its card is not Ready or Refining; a blocker counts as done once its closing pull request is merged into an epic branch.
 2. Refine: check the ticket against the code and ADRs, then append a `Refined` section. Never rewrite the owner's original text.
-3. Branch: create `<type>/N-slug` (`feat`, `fix`, `chore`, `docs` or `spike`, from the type label) in its own worktree before writing anything, cut from the epic's `epic/*` branch when it has one, otherwise from `main`; the pull request targets the same base. Move the card to In progress.
+3. Branch: create `<type>/N-slug` (`feat`, `fix`, `chore`, `docs` or `spike`, from the type label) before writing anything, cut from the epic's `epic/*` branch when it has one, otherwise from `main`; the pull request targets the same base. Move the card to In progress.
 4. Brainstorm and plan: choose an approach, write a step-by-step plan with tests first, keep it in the working session only.
 5. Implement (TDD): failing test, code, refactor, in small conventional commits that reference the issue.
 6. Verify: lint, typecheck, unit, integration and affected Playwright tests. Check UI tickets in a real browser.

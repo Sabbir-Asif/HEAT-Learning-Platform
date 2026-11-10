@@ -145,6 +145,12 @@ describe("permissions.deny for environment files", () => {
     }
   });
 
+  test.each(["Read", "Edit"])("%s denies key and credential files", (tool) => {
+    for (const path of ["server.pem", "deploy/credentials.json", "infra/secrets.yml"]) {
+      expect(pathDenied(tool, path), path).toBe(true);
+    }
+  });
+
   test("the local settings file cannot be edited", () => {
     expect(pathRules("Edit")).toContain("**/.claude/settings.local.json");
   });
@@ -210,7 +216,14 @@ describe("permissions.deny for Bash", () => {
   });
 });
 
-test("the settings carry only hooks and permissions", () => {
-  expect(Object.keys(settings).sort()).toEqual(["hooks", "permissions"]);
+test("the settings carry only hooks, permissions, sandbox and the skill shell switch", () => {
+  expect(Object.keys(settings).sort()).toEqual([
+    "disableSkillShellExecution",
+    "hooks",
+    "permissions",
+    "sandbox",
+  ]);
+  expect(settings.disableSkillShellExecution).toBe(true);
+  expect(settings.sandbox.enabled).toBe(true);
   expect(Object.keys(settings.permissions)).toEqual(["deny"]);
 });
