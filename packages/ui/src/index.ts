@@ -27,6 +27,7 @@ export * from "./components/table";
 export * from "./components/tabs";
 export * from "./components/textarea";
 export * from "./components/tooltip";
+export * from "./composites/captcha-field";
 export * from "./composites/confirm-dialog";
 export * from "./composites/empty-state";
 export * from "./composites/error-state";

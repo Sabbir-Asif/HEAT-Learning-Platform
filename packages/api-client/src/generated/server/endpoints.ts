@@ -26,6 +26,31 @@ export interface AdminMeResponseDto {
   user: AdminMeResponseDtoUser;
 }
 
+export interface AdminSignInRequestDto {
+  email: string;
+  /**
+     * @minLength 1
+     * @maxLength 256
+     */
+  password: string;
+}
+
+export interface CaptchaRequestDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  replaces?: string;
+}
+
+export interface CaptchaResponseDto {
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  expiresInSeconds: number;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  svg: string;
+}
+
 export interface ChangePasswordRequestDto {
   /**
      * @minLength 1
@@ -169,7 +194,7 @@ export const getAdminAuthSignInUrl = () => {
   return `/api/admin/auth/sign-in`
 }
 
-export const adminAuthSignIn = async (signInRequestDto: SignInRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminMeResponseDto> => {
+export const adminAuthSignIn = async (adminSignInRequestDto: AdminSignInRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminMeResponseDto> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -190,7 +215,7 @@ return serverFetch<AdminMeResponseDto>(getAdminAuthSignInUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(signInRequestDto)
+    body: JSON.stringify(adminSignInRequestDto)
   }
 );}
 
@@ -310,6 +335,41 @@ export const studentAuthSignOut = async ( options?: Parameters<typeof serverFetc
     method: 'POST'
 
 
+  }
+);}
+
+
+
+export const getCaptchaIssueUrl = () => {
+
+
+
+
+  return `/api/captcha`
+}
+
+export const captchaIssue = async (captchaRequestDto: CaptchaRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<CaptchaResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<CaptchaResponseDto>(getCaptchaIssueUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(captchaRequestDto)
   }
 );}
 

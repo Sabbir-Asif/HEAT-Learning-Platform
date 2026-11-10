@@ -20,6 +20,8 @@ interface ResponseLike {
 
 const messages: Record<ErrorCode, string> = {
   BAD_REQUEST: "The request could not be processed.",
+  CAPTCHA_EXPIRED: "This security check can no longer be used. Request a new one.",
+  CAPTCHA_INVALID: "The characters do not match. Try again.",
   ENROLLMENT_NOT_ACTIVE: "Your enrollment in this course is not active.",
   FORBIDDEN: "You are not allowed to do this.",
   INTERNAL: "Something went wrong on the server.",
