@@ -220,7 +220,9 @@ describe("DepartmentsView list", () => {
     expect(rowOf(view, "Bengali")?.textContent).toContain("Faculty of Arts");
     expect(rowOf(view, "Bengali")?.textContent).toContain("3");
     expect(rowOf(view, "Physics")?.textContent).toContain("Faculty of Engineering");
-    expect(listCalls()[0]).toBe("/api/admin/directory/departments?page=1&pageSize=25");
+    expect(listCalls()[0]).toBe(
+      "/api/admin/directory/departments?status=active&page=1&pageSize=25",
+    );
   });
 
   test("sends the search text, sort and filters from the URL", async () => {
@@ -260,7 +262,7 @@ describe("DepartmentsView filters", () => {
 
     await vi.waitFor(() =>
       expect(fetchMock.mock.calls.map(([input]) => String(input))).toContain(
-        `/api/admin/directory/faculties?page=1&pageSize=50&sort=name&universityId=${buet.id}`,
+        `/api/admin/directory/faculties?page=1&pageSize=50&sort=name&status=all&universityId=${buet.id}`,
       ),
     );
     await vi.waitFor(() =>
@@ -404,6 +406,35 @@ describe("DepartmentsView form", () => {
       expect(document.querySelector("[data-slot=form-message]")?.textContent).toBeTruthy(),
     );
     expect(document.querySelector("[data-slot=form]")).not.toBeNull();
+  });
+
+  test("editing keeps showing an archived university and faculty the pickers no longer offer", async () => {
+    const retiredUniversity = {
+      id: "0198f1a0-0000-7000-8000-0000000000a9",
+      name: "Retired University",
+    };
+    const retiredFaculty = { id: "0198f1a0-0000-7000-8000-0000000000b9", name: "Retired Faculty" };
+    route({
+      departments: [
+        row({
+          id: physics,
+          name: "Physics",
+          university: retiredUniversity,
+          faculty: retiredFaculty,
+        }),
+      ],
+    });
+    const view = await mount();
+    await vi.waitFor(() => expect(view.textContent).toContain("Physics"));
+    await act(async () => buttonNamed("Edit", rowOf(view, "Physics") ?? view)?.click());
+    const form = document.querySelector("[data-slot=form]") as HTMLElement;
+
+    await vi.waitFor(() =>
+      expect(trigger(form, "University").textContent).toContain("Retired University"),
+    );
+    await vi.waitFor(() =>
+      expect(trigger(form, "Faculty").textContent).toContain("Retired Faculty"),
+    );
   });
 
   test("editing starts from the department's values and saves them", async () => {
@@ -561,6 +592,112 @@ describe("DepartmentsView delete", () => {
 
     await vi.waitFor(() =>
       expect(dialog.querySelector("[role=alert]")?.textContent).toContain("3 students"),
+    );
+  });
+});
+
+describe("DepartmentsView archive and restore", () => {
+  const archivedAt = "2026-11-02T04:00:00.000Z";
+  const archivedRow = row({
+    id: "0198f1a0-0000-7000-8000-0000000000d9",
+    name: "Retired Department",
+    archivedAt,
+  });
+  const both = {
+    departments: [
+      row({ id: "0198f1a0-0000-7000-8000-0000000000d1", name: "Bengali" }),
+      archivedRow,
+    ],
+  };
+
+  test("shows a status badge and the archive and restore actions by state", async () => {
+    route(both);
+    const view = await mount("?status=all");
+
+    await vi.waitFor(() => expect(view.textContent).toContain("Retired Department"));
+    expect(rowOf(view, "Retired Department")?.textContent).toContain("Archived");
+    expect(buttonNamed("Restore", rowOf(view, "Retired Department") ?? view)).toBeDefined();
+    expect(buttonNamed("Archive", rowOf(view, "Retired Department") ?? view)).toBeUndefined();
+    expect(rowOf(view, "Bengali")?.textContent).toContain("Active");
+    expect(buttonNamed("Archive", rowOf(view, "Bengali") ?? view)).toBeDefined();
+  });
+
+  test("the status filter is read from the URL and sent to the API", async () => {
+    route({ departments: [] });
+
+    await mount("?status=archived");
+
+    await vi.waitFor(() =>
+      expect(listCalls().some((url) => url.includes("status=archived"))).toBe(true),
+    );
+  });
+
+  test("archiving asks for confirmation, calls the API and confirms", async () => {
+    route({
+      ...both,
+      mutation: (_url, method) =>
+        method === "POST"
+          ? json(row({ id: "0198f1a0-0000-7000-8000-0000000000d1", archivedAt }))
+          : undefined,
+    });
+    const view = await mount();
+    await vi.waitFor(() => expect(view.textContent).toContain("Bengali"));
+
+    await act(async () => buttonNamed("Archive", rowOf(view, "Bengali") ?? view)?.click());
+    const dialog = document.querySelector("[data-slot=confirm-dialog]") as HTMLElement;
+    expect(dialog.textContent).toContain("Bengali");
+    expect(callsTo("POST")).toHaveLength(0);
+    await act(async () => buttonNamed("Archive department", dialog)?.click());
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=status]")?.textContent).toContain("Bengali was archived"),
+    );
+    expect(urlsOf("POST")[0]).toBe(
+      "/api/admin/directory/departments/0198f1a0-0000-7000-8000-0000000000d1/archive",
+    );
+  });
+
+  test("restoring calls the API without a confirmation and confirms", async () => {
+    route({
+      ...both,
+      mutation: (_url, method) =>
+        method === "POST"
+          ? json(row({ id: "0198f1a0-0000-7000-8000-0000000000d9", name: "Retired Department" }))
+          : undefined,
+    });
+    const view = await mount("?status=archived");
+    await vi.waitFor(() => expect(view.textContent).toContain("Retired Department"));
+
+    await act(async () =>
+      buttonNamed("Restore", rowOf(view, "Retired Department") ?? view)?.click(),
+    );
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=status]")?.textContent).toContain(
+        "Retired Department was restored",
+      ),
+    );
+    expect(urlsOf("POST")[0]).toBe(
+      "/api/admin/directory/departments/0198f1a0-0000-7000-8000-0000000000d9/restore",
+    );
+  });
+
+  test("a failed restore is reported as a problem", async () => {
+    route({
+      ...both,
+      mutation: (_url, method) => (method === "POST" ? errorReply("INTERNAL", 500) : undefined),
+    });
+    const view = await mount("?status=archived");
+    await vi.waitFor(() => expect(view.textContent).toContain("Retired Department"));
+
+    await act(async () =>
+      buttonNamed("Restore", rowOf(view, "Retired Department") ?? view)?.click(),
+    );
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=alert]")?.textContent).toContain(
+        "Retired Department could not be restored",
+      ),
     );
   });
 });

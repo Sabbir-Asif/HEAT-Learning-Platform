@@ -70,14 +70,24 @@ export function DepartmentFormSheet({ target, onClose, onSaved }: DepartmentForm
     { query: { enabled: target !== null && universityId !== "" } },
   );
 
-  const universityItems = (universities.data?.items ?? []).map((item) => ({
-    value: item.id,
-    label: item.name,
-  }));
+  const withCurrent = (
+    items: ReadonlyArray<{ value: string; label: string }>,
+    current: { id: string; name: string } | undefined,
+  ) =>
+    current === undefined || items.some((item) => item.value === current.id)
+      ? items
+      : [...items, { value: current.id, label: current.name }];
+  const universityItems = withCurrent(
+    (universities.data?.items ?? []).map((item) => ({ value: item.id, label: item.name })),
+    editing?.university,
+  );
   const facultyItems =
     universityId === ""
       ? []
-      : (faculties.data?.items ?? []).map((item) => ({ value: item.id, label: item.name }));
+      : withCurrent(
+          (faculties.data?.items ?? []).map((item) => ({ value: item.id, label: item.name })),
+          editing !== null && editing.university.id === universityId ? editing.faculty : undefined,
+        );
 
   const { reset } = form;
   const { isDirty } = form.formState;
@@ -113,6 +123,10 @@ export function DepartmentFormSheet({ target, onClose, onSaved }: DepartmentForm
     } catch (error) {
       if (isApiError(error) && error.code === "DIRECTORY_NAME_TAKEN") {
         form.setError("name", { type: "server", message: departmentNameTakenMessage });
+        return;
+      }
+      if (isApiError(error) && error.code === "DIRECTORY_ARCHIVED") {
+        form.setError("root.server", { type: "server", message: formErrorCopy.DIRECTORY_ARCHIVED });
         return;
       }
       if (isApiError(error) && error.code === "DIRECTORY_IN_USE") {
