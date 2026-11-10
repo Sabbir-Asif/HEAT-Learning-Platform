@@ -12,8 +12,7 @@ const build = () => {
   };
   const cache = {
     remember: vi.fn(
-      async (_name: string, load: () => Promise<unknown>, _store?: (value: never) => boolean) =>
-        load(),
+      async (...args: [string, () => Promise<unknown>, ((value: never) => boolean)?]) => args[1](),
     ),
   };
   return {
