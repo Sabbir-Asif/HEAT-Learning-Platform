@@ -27,6 +27,11 @@ describe("admin navigation", () => {
     expect(flat(false).some((item) => item.href === "/admins")).toBe(false);
   });
 
+  test("the audit log is hidden for anyone but a super admin", () => {
+    expect(flat(true).some((item) => item.href === "/audit-log")).toBe(true);
+    expect(flat(false).some((item) => item.href === "/audit-log")).toBe(false);
+  });
+
   test("nested routes keep the parent item active", () => {
     const items = flat();
     expect(findActiveHref(items, "/courses/7/modules/2")).toBe("/courses");
