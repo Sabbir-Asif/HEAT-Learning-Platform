@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 import { AdminInvitationService } from "../../src/admin-management/admin-invitation.service";
+import { AuditService } from "../../src/audit";
 import { hashOpaqueToken } from "../../src/auth";
 import type { PasswordService } from "../../src/auth";
 import type { Clock } from "../../src/core";
@@ -38,6 +39,7 @@ const build = (userUpdateCount: number) => {
     database as never,
     clock,
     passwords as unknown as PasswordService,
+    new AuditService({} as never),
   );
   return { service, tx, database };
 };

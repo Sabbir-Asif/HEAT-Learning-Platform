@@ -1,11 +1,11 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type { AcceptInviteRequest, InvitationLookupResponse } from "@heat/contracts";
 import type { HeatClient } from "@heat/db";
+import { AuditService } from "../audit";
 import { PasswordService, hashOpaqueToken } from "../auth";
 import { CLOCK, DATABASE } from "../core";
 import type { Clock } from "../core";
 import { ApiException } from "../http/api-exception";
-import { auditData } from "./admin-audit";
 
 @Injectable()
 export class AdminInvitationService {
@@ -13,6 +13,7 @@ export class AdminInvitationService {
     @Inject(DATABASE) private readonly database: HeatClient,
     @Inject(CLOCK) private readonly clock: Clock,
     private readonly passwords: PasswordService,
+    private readonly audit: AuditService,
   ) {}
 
   async lookup(token: string): Promise<InvitationLookupResponse> {
@@ -42,17 +43,17 @@ export class AdminInvitationService {
         data: { passwordHash, emailVerifiedAt: now, mustChangePassword: false },
       });
       if (activated.count !== 1) throw new ApiException(400, "INVITATION_INVALID");
-      await tx.auditLog.create({
-        data: auditData(
-          { actorId: invitation.userId, ...metadata },
-          {
-            action: "admin.invite.accept",
-            entityId: invitation.userId,
-            before: { status: "INVITED" },
-            after: { status: "ACTIVE" },
-          },
-        ),
-      });
+      await this.audit.record(
+        tx,
+        { actorId: invitation.userId, ...metadata },
+        {
+          action: "admin.invite.accept",
+          entity: "User",
+          entityId: invitation.userId,
+          before: { status: "INVITED" },
+          after: { status: "ACTIVE" },
+        },
+      );
     });
   }
 

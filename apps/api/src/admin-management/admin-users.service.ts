@@ -7,12 +7,12 @@ import type {
   InviteAdminRequest,
 } from "@heat/contracts";
 import type { HeatClient } from "@heat/db";
+import { AuditService } from "../audit";
+import type { AuditActor } from "../audit";
 import { PasswordService, SessionService, generateOpaqueToken, hashOpaqueToken } from "../auth";
 import { APP_CONFIG, CLOCK, DATABASE, SecretBox } from "../core";
 import type { AppConfig, Clock } from "../core";
 import { ApiException } from "../http/api-exception";
-import { auditData } from "./admin-audit";
-import type { AdminAuditContext } from "./admin-audit";
 import { adminRowSelect, statusOf, toSummary } from "./admin-summary";
 
 const adminRealmWhere = {
@@ -48,6 +48,7 @@ export class AdminUsersService {
     private readonly passwords: PasswordService,
     private readonly sessions: SessionService,
     private readonly secretBox: SecretBox,
+    private readonly audit: AuditService,
   ) {}
 
   async list(query: AdminListQuery): Promise<AdminListResponse> {
@@ -70,7 +71,7 @@ export class AdminUsersService {
     };
   }
 
-  async invite(request: InviteAdminRequest, context: AdminAuditContext): Promise<AdminSummary> {
+  async invite(request: InviteAdminRequest, context: AuditActor): Promise<AdminSummary> {
     const existing = await this.database.user.findFirst({
       where: { email: { equals: request.email, mode: "insensitive" } },
       select: { id: true },
@@ -86,12 +87,11 @@ export class AdminUsersService {
           select: { id: true },
         });
         await this.queueInvitation(tx, user.id, token, expiresAt);
-        await tx.auditLog.create({
-          data: auditData(context, {
-            action: "admin.invite",
-            entityId: user.id,
-            after: { status: "INVITED" },
-          }),
+        await this.audit.record(tx, context, {
+          action: "admin.invite",
+          entity: "User",
+          entityId: user.id,
+          after: { status: "INVITED" },
         });
         return user.id;
       });
@@ -102,7 +102,7 @@ export class AdminUsersService {
     }
   }
 
-  async resendInvitation(id: string, context: AdminAuditContext): Promise<AdminSummary> {
+  async resendInvitation(id: string, context: AuditActor): Promise<AdminSummary> {
     const target = await this.manageable(id);
     if (statusOf(target, this.clock.now()) === "ACTIVE" || target.deactivatedAt !== null) {
       throw new ApiException(409, "INVITATION_NOT_PENDING");
@@ -113,32 +113,30 @@ export class AdminUsersService {
     await this.database.$transaction(async (tx) => {
       await tx.authToken.deleteMany({ where: { userId: id, purpose: "INVITE", usedAt: null } });
       await this.queueInvitation(tx, id, token, expiresAt);
-      await tx.auditLog.create({
-        data: auditData(context, {
-          action: "admin.invite.resend",
-          entityId: id,
-          before: { status: before },
-          after: { status: "INVITED" },
-        }),
+      await this.audit.record(tx, context, {
+        action: "admin.invite.resend",
+        entity: "User",
+        entityId: id,
+        before: { status: before },
+        after: { status: "INVITED" },
       });
     });
     return this.describe(id);
   }
 
-  async deactivate(id: string, context: AdminAuditContext): Promise<AdminSummary> {
+  async deactivate(id: string, context: AuditActor): Promise<AdminSummary> {
     if (id === context.actorId) throw new ApiException(409, "CANNOT_DEACTIVATE_SELF");
     const target = await this.manageable(id);
     if (target.deactivatedAt === null) {
       const before = statusOf(target, this.clock.now());
       await this.database.$transaction(async (tx) => {
         await tx.user.update({ where: { id }, data: { deactivatedAt: this.clock.now() } });
-        await tx.auditLog.create({
-          data: auditData(context, {
-            action: "admin.deactivate",
-            entityId: id,
-            before: { status: before },
-            after: { status: "DEACTIVATED" },
-          }),
+        await this.audit.record(tx, context, {
+          action: "admin.deactivate",
+          entity: "User",
+          entityId: id,
+          before: { status: before },
+          after: { status: "DEACTIVATED" },
         });
       });
     }
@@ -151,18 +149,17 @@ export class AdminUsersService {
     return this.describe(id);
   }
 
-  async reactivate(id: string, context: AdminAuditContext): Promise<AdminSummary> {
+  async reactivate(id: string, context: AuditActor): Promise<AdminSummary> {
     const target = await this.manageable(id);
     if (target.deactivatedAt !== null) {
       await this.database.$transaction(async (tx) => {
         await tx.user.update({ where: { id }, data: { deactivatedAt: null } });
-        await tx.auditLog.create({
-          data: auditData(context, {
-            action: "admin.reactivate",
-            entityId: id,
-            before: { status: "DEACTIVATED" },
-            after: { status: "ACTIVE" },
-          }),
+        await this.audit.record(tx, context, {
+          action: "admin.reactivate",
+          entity: "User",
+          entityId: id,
+          before: { status: "DEACTIVATED" },
+          after: { status: "ACTIVE" },
         });
       });
     }

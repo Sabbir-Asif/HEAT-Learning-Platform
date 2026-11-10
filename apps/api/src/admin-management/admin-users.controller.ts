@@ -1,10 +1,11 @@
 import { Body, Controller, Get, HttpCode, Param, Post, Query, Req } from "@nestjs/common";
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { Audience, Roles } from "../access";
+import { actorOf } from "../audit";
+import type { AuditableRequest } from "../audit";
 import { CurrentSession } from "../auth";
-import type { AuthenticatedRequest, AuthenticatedSession } from "../auth";
+import type { AuthenticatedSession } from "../auth";
 import { RateLimit } from "../rate-limit";
-import type { AdminAuditContext } from "./admin-audit";
 import {
   AdminIdParamsDto,
   AdminListQueryDto,
@@ -13,21 +14,6 @@ import {
   InviteAdminRequestDto,
 } from "./admin-management.dto";
 import { AdminUsersService } from "./admin-users.service";
-
-const requestIdPattern = /^[A-Za-z0-9._-]{1,64}$/;
-
-interface AuditedRequest extends AuthenticatedRequest {
-  headers: AuthenticatedRequest["headers"] & { "x-request-id"?: string | string[] };
-}
-
-const contextOf = (session: AuthenticatedSession, request: AuditedRequest): AdminAuditContext => {
-  const header = request.headers["x-request-id"];
-  return {
-    actorId: session.userId,
-    ipAddress: request.ip,
-    requestId: typeof header === "string" && requestIdPattern.test(header) ? header : undefined,
-  };
-};
 
 @ApiTags("admin-users")
 @Controller("admin/admins")
@@ -48,9 +34,9 @@ export class AdminUsersController {
   invite(
     @Body() body: InviteAdminRequestDto,
     @CurrentSession() session: AuthenticatedSession,
-    @Req() request: AuditedRequest,
+    @Req() request: AuditableRequest,
   ): Promise<AdminSummaryDto> {
-    return this.admins.invite(body, contextOf(session, request));
+    return this.admins.invite(body, actorOf(request, session.userId));
   }
 
   @RateLimit("verify")
@@ -60,9 +46,9 @@ export class AdminUsersController {
   resendInvitation(
     @Param() params: AdminIdParamsDto,
     @CurrentSession() session: AuthenticatedSession,
-    @Req() request: AuditedRequest,
+    @Req() request: AuditableRequest,
   ): Promise<AdminSummaryDto> {
-    return this.admins.resendInvitation(params.id, contextOf(session, request));
+    return this.admins.resendInvitation(params.id, actorOf(request, session.userId));
   }
 
   @Post(":id/deactivate")
@@ -71,9 +57,9 @@ export class AdminUsersController {
   deactivate(
     @Param() params: AdminIdParamsDto,
     @CurrentSession() session: AuthenticatedSession,
-    @Req() request: AuditedRequest,
+    @Req() request: AuditableRequest,
   ): Promise<AdminSummaryDto> {
-    return this.admins.deactivate(params.id, contextOf(session, request));
+    return this.admins.deactivate(params.id, actorOf(request, session.userId));
   }
 
   @Post(":id/reactivate")
@@ -82,8 +68,8 @@ export class AdminUsersController {
   reactivate(
     @Param() params: AdminIdParamsDto,
     @CurrentSession() session: AuthenticatedSession,
-    @Req() request: AuditedRequest,
+    @Req() request: AuditableRequest,
   ): Promise<AdminSummaryDto> {
-    return this.admins.reactivate(params.id, contextOf(session, request));
+    return this.admins.reactivate(params.id, actorOf(request, session.userId));
   }
 }

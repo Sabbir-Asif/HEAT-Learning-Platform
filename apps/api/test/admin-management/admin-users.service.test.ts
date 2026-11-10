@@ -1,6 +1,7 @@
 import { Logger } from "@nestjs/common";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { AdminUsersService } from "../../src/admin-management/admin-users.service";
+import { AuditService } from "../../src/audit";
 import type { PasswordService, SessionService } from "../../src/auth";
 import type { AppConfig, Clock, SecretBox } from "../../src/core";
 
@@ -34,6 +35,7 @@ const build = (revokeAll: () => Promise<void>, deactivatedAt: Date | null = null
     {} as PasswordService,
     sessions as unknown as SessionService,
     {} as SecretBox,
+    new AuditService({} as never),
   );
   return { service, tx, sessions };
 };
