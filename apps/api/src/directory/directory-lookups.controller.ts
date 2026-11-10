@@ -1,7 +1,9 @@
-import { Controller, Get, Header, Param } from "@nestjs/common";
+import { Controller, Get, Header, Param, Req, Res } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import type { DirectoryOptionListResponse } from "@heat/contracts";
 import { Public } from "../auth";
 import { RateLimit } from "../rate-limit";
+import { matchesIfNoneMatch, strongEtagOf } from "./conditional-response";
 import {
   DirectoryDepartmentLookupParamsDto,
   DirectoryFacultyLookupParamsDto,
@@ -9,7 +11,28 @@ import {
 } from "./directory.dto";
 import { DirectoryLookupsService } from "./directory-lookups.service";
 
-const browserCache = "public, max-age=30";
+export const lookupCacheControl = "no-cache";
+
+interface ConditionalRequest {
+  headers: { "if-none-match"?: string };
+}
+
+interface ConditionalResponse {
+  setHeader(name: string, value: string): unknown;
+  status(code: number): unknown;
+}
+
+const revalidated = (
+  request: ConditionalRequest,
+  response: ConditionalResponse,
+  body: DirectoryOptionListResponse,
+): DirectoryOptionListResponse | undefined => {
+  const etag = strongEtagOf(body);
+  response.setHeader("ETag", etag);
+  if (!matchesIfNoneMatch(request.headers["if-none-match"], etag)) return body;
+  response.status(304);
+  return undefined;
+};
 
 @ApiTags("directory")
 @Controller("directory")
@@ -19,27 +42,38 @@ export class DirectoryLookupsController {
   constructor(private readonly lookups: DirectoryLookupsService) {}
 
   @Get("universities")
-  @Header("Cache-Control", browserCache)
+  @Header("Cache-Control", lookupCacheControl)
   @ApiOkResponse({ type: DirectoryOptionListResponseDto })
-  listUniversities(): Promise<DirectoryOptionListResponseDto> {
-    return this.lookups.universities();
+  async listUniversities(
+    @Req() request: ConditionalRequest,
+    @Res({ passthrough: true }) response: ConditionalResponse,
+  ): Promise<DirectoryOptionListResponseDto | undefined> {
+    return revalidated(request, response, await this.lookups.universities());
   }
 
   @Get("universities/:universityId/faculties")
-  @Header("Cache-Control", browserCache)
+  @Header("Cache-Control", lookupCacheControl)
   @ApiOkResponse({ type: DirectoryOptionListResponseDto })
-  listFaculties(
+  async listFaculties(
     @Param() params: DirectoryFacultyLookupParamsDto,
-  ): Promise<DirectoryOptionListResponseDto> {
-    return this.lookups.faculties(params.universityId);
+    @Req() request: ConditionalRequest,
+    @Res({ passthrough: true }) response: ConditionalResponse,
+  ): Promise<DirectoryOptionListResponseDto | undefined> {
+    return revalidated(request, response, await this.lookups.faculties(params.universityId));
   }
 
   @Get("universities/:universityId/faculties/:facultyId/departments")
-  @Header("Cache-Control", browserCache)
+  @Header("Cache-Control", lookupCacheControl)
   @ApiOkResponse({ type: DirectoryOptionListResponseDto })
-  listDepartments(
+  async listDepartments(
     @Param() params: DirectoryDepartmentLookupParamsDto,
-  ): Promise<DirectoryOptionListResponseDto> {
-    return this.lookups.departments(params.universityId, params.facultyId);
+    @Req() request: ConditionalRequest,
+    @Res({ passthrough: true }) response: ConditionalResponse,
+  ): Promise<DirectoryOptionListResponseDto | undefined> {
+    return revalidated(
+      request,
+      response,
+      await this.lookups.departments(params.universityId, params.facultyId),
+    );
   }
 }

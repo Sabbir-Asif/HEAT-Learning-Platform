@@ -117,7 +117,7 @@ describe("public directory lookups over HTTP", () => {
     return { dhaka, buet, archivedUniversity, science, arts, archivedFaculty, physics };
   };
 
-  test("lists only active universities sorted by name, exposing id and name only, with a short browser cache", async () => {
+  test("lists only active universities sorted by name, exposing id and name only, with a strong ETag that revalidates to 304", async () => {
     const { dhaka, buet } = await seed();
 
     const reply = await call("GET", "/directory/universities");
@@ -129,7 +129,13 @@ describe("public directory lookups over HTTP", () => {
         { id: dhaka.id, name: "University of Dhaka" },
       ],
     });
-    expect(reply.headers.get("cache-control")).toBe("public, max-age=30");
+    expect(reply.headers.get("cache-control")).toBe("no-cache");
+    expect(reply.headers.get("etag")).toMatch(/^"/);
+
+    const revalidated = await fetch(`${testApp().baseUrl}/api/directory/universities`, {
+      headers: { "if-none-match": reply.headers.get("etag") ?? "" },
+    });
+    expect(revalidated.status).toBe(304);
   });
 
   test("lists only active faculties linked to the university, sorted by name", async () => {
