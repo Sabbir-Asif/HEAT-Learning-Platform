@@ -16,6 +16,8 @@ export type FormErrorCopyKey =
   | "CAPTCHA_EXPIRED"
   | "CAPTCHA_INVALID"
   | "CSRF_TOKEN_INVALID"
+  | "DIRECTORY_IN_USE"
+  | "DIRECTORY_NAME_TAKEN"
   | "EMAIL_IN_USE"
   | "ENROLLMENT_NOT_ACTIVE"
   | "FORBIDDEN"
@@ -58,6 +60,8 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   CAPTCHA_EXPIRED: "This security check can no longer be used. Request a new one.",
   CAPTCHA_INVALID: "The characters do not match. Try again.",
   CSRF_TOKEN_INVALID: "Your session check failed. Reload the page and try again.",
+  DIRECTORY_IN_USE: "This record is still in use, so it cannot be deleted.",
+  DIRECTORY_NAME_TAKEN: "A record with this name already exists.",
   EMAIL_IN_USE: "An account with this email address already exists.",
   ENROLLMENT_NOT_ACTIVE: "Your enrollment in this course is not active.",
   FORBIDDEN: "You do not have permission to do this.",

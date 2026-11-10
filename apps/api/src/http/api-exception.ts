@@ -6,6 +6,7 @@ export class ApiException extends HttpException {
     status: number,
     readonly code: ErrorCode,
     readonly retryAfterSeconds?: number,
+    readonly detail?: string,
   ) {
     super(code, status);
   }
