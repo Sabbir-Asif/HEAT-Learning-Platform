@@ -181,12 +181,12 @@ export class FacultiesService {
       .catch((error: unknown) => {
         throw errorCodeOf(error) === "P2003" ? new ApiException(404, "NOT_FOUND") : error;
       });
-    this.invalidateAfterCommit();
-    this.audit.capture(
-      created.count > 0
-        ? { entityId: id, after: link }
-        : { entityId: id, before: link, after: link },
-    );
+    if (created.count === 0) {
+      this.audit.skip();
+    } else {
+      this.invalidateAfterCommit();
+      this.audit.capture({ entityId: id, after: link });
+    }
     return this.summaryOf(id, client);
   }
 
@@ -246,7 +246,9 @@ export class FacultiesService {
       data: { archivedAt: archive ? new Date() : null },
     });
     const row = await this.existing(id, client);
-    if (count > 0) {
+    if (count === 0) {
+      this.audit.skip();
+    } else {
       this.invalidateAfterCommit();
       this.audit.capture(archiveChange(row, archive));
     }

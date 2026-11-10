@@ -230,7 +230,9 @@ export class DepartmentsService {
       data: { archivedAt: archive ? new Date() : null },
     });
     const row = await this.existing(id, client);
-    if (count > 0) {
+    if (count === 0) {
+      this.audit.skip();
+    } else {
       this.invalidateAfterCommit();
       this.audit.capture({
         entityId: id,

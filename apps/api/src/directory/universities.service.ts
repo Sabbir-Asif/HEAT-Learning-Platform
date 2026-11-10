@@ -162,7 +162,9 @@ export class UniversitiesService {
     });
     const row = await client.university.findUnique({ where: { id } });
     if (row === null) throw new ApiException(404, "NOT_FOUND");
-    if (count > 0) {
+    if (count === 0) {
+      this.audit.skip();
+    } else {
       this.invalidateAfterCommit();
       this.audit.capture(archiveChange(row, archive));
     }

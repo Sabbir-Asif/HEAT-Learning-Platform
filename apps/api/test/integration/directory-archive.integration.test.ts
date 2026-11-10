@@ -155,6 +155,35 @@ describe("archive and restore of directory records over HTTP", () => {
     expect(errorCode(missing)).toBe("NOT_FOUND");
   });
 
+  test("a no-op archive, restore or assign writes no audit row at all", async () => {
+    const cookie = await signedInAdmin();
+    const { university, faculty, department } = await seed();
+    const rows = (entityId: string) =>
+      testApp().database.prisma.auditLog.count({ where: { entityId } });
+
+    await call("POST", `${admin}/departments/${department.id}/restore`, { cookie });
+    await call("POST", `${admin}/universities/${university.id}/restore`, { cookie });
+    await call("POST", `${admin}/faculties/${faculty.id}/restore`, { cookie });
+    const reassign = await call(
+      "PUT",
+      `${admin}/faculties/${faculty.id}/universities/${university.id}`,
+      { cookie },
+    );
+
+    expect(reassign.status).toBe(200);
+    expect(await rows(department.id)).toBe(0);
+    expect(await rows(university.id)).toBe(0);
+    expect(await rows(faculty.id)).toBe(0);
+
+    await call("POST", `${admin}/departments/${department.id}/archive`, { cookie });
+    await call("POST", `${admin}/departments/${department.id}/archive`, { cookie });
+    await call("POST", `${admin}/universities/${university.id}/archive`, { cookie });
+    await call("POST", `${admin}/universities/${university.id}/archive`, { cookie });
+
+    expect(await rows(department.id)).toBe(1);
+    expect(await rows(university.id)).toBe(1);
+  });
+
   test("archiving a university hides it and everything under it from lookups without touching the departments' own flags, and restoring brings it all back", async () => {
     const cookie = await signedInAdmin();
     const { university, faculty, department } = await seed();

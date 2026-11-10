@@ -101,9 +101,9 @@ const build = (
   );
   const afterCommit: Array<() => Promise<void>> = [];
   const changes: AuditChange[] = [];
-  const inAuditScope = <T>(run: () => Promise<T>): Promise<T> =>
-    auditScopeStorage.run({ tx: database as never, changes, afterCommit }, run);
-  return { service, database, includingDeleted, changes, inAuditScope, cache, afterCommit };
+  const scope = { tx: database as never, changes, afterCommit, skipped: false };
+  const inAuditScope = <T>(run: () => Promise<T>): Promise<T> => auditScopeStorage.run(scope, run);
+  return { service, database, includingDeleted, changes, inAuditScope, cache, afterCommit, scope };
 };
 
 const failureOf = (promise: Promise<unknown>): Promise<unknown> =>
@@ -667,7 +667,9 @@ describe("DepartmentsService archive and restore", () => {
   });
 
   test("archiving a record that is already archived writes no audit entry and queues no invalidation", async () => {
-    const { service, database, changes, inAuditScope, afterCommit } = build({ movedCount: 0 });
+    const { service, database, changes, inAuditScope, afterCommit, scope } = build({
+      movedCount: 0,
+    });
     database.department.findUnique.mockReset().mockResolvedValue(row({ archivedAt: at }));
 
     const result = await inAuditScope(() => service.archive(id));
@@ -675,6 +677,7 @@ describe("DepartmentsService archive and restore", () => {
     expect(result.archivedAt).toBe(at.toISOString());
     expect(changes).toEqual([]);
     expect(afterCommit).toEqual([]);
+    expect(scope.skipped).toBe(true);
   });
 
   test("an unknown id is NOT_FOUND", async () => {

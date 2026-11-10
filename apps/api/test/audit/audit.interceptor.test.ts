@@ -1,5 +1,5 @@
 import { Reflector } from "@nestjs/core";
-import { firstValueFrom, of } from "rxjs";
+import { defer, firstValueFrom, of } from "rxjs";
 import { describe, expect, test, vi } from "vitest";
 import { AuditInterceptor } from "../../src/audit/audit.interceptor";
 import type { AuditedMetadata } from "../../src/audit/audit.types";
@@ -37,6 +37,41 @@ const build = (declared: AuditedMetadata | undefined) => {
   };
   return { interceptor, database, audit, context: context as never };
 };
+
+describe("AuditInterceptor with a skipped scope", () => {
+  const skipping = () =>
+    defer(() => {
+      const scope = auditScopeStorage.getStore();
+      if (scope !== undefined) scope.skipped = true;
+      return of("unchanged");
+    });
+
+  test("writes no audit row when the handler skipped and captured nothing", async () => {
+    const { interceptor, audit, context } = build(metadata);
+
+    const result = await firstValueFrom(interceptor.intercept(context, { handle: skipping }));
+
+    expect(result).toBe("unchanged");
+    expect(audit.record).not.toHaveBeenCalled();
+  });
+
+  test("a captured change is still recorded even if the scope was also marked skipped", async () => {
+    const { interceptor, audit, context } = build(metadata);
+    const handle = () =>
+      defer(() => {
+        const scope = auditScopeStorage.getStore();
+        if (scope !== undefined) {
+          scope.skipped = true;
+          scope.changes.push({ entityId: "x" });
+        }
+        return of("changed");
+      });
+
+    await firstValueFrom(interceptor.intercept(context, { handle }));
+
+    expect(audit.record).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe("AuditInterceptor", () => {
   test("passes undeclared handlers straight through", async () => {

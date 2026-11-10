@@ -45,6 +45,14 @@ export class AuditService {
     scope.changes.push(change);
   }
 
+  skip(): void {
+    const scope = auditScopeStorage.getStore();
+    if (scope === undefined) {
+      throw new Error("skip was called outside an @Audited request");
+    }
+    scope.skipped = true;
+  }
+
   afterCommit(task: AfterCommitTask): void {
     const scope = auditScopeStorage.getStore();
     if (scope === undefined) {
