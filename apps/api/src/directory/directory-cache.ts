@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import type { Redis } from "ioredis";
 import { DIRECTORY_CACHE_REDIS } from "./directory-cache.redis";
@@ -30,21 +31,31 @@ export class DirectoryCache {
   }
 
   async invalidate(): Promise<void> {
-    try {
-      await this.redis.incr(generationKey);
-    } catch {
-      this.logger.warn("Directory cache invalidation failed, entries expire on their own");
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        await this.redis.set(generationKey, randomUUID());
+        return;
+      } catch {
+        continue;
+      }
     }
+    this.logger.warn("Directory cache invalidation failed, entries expire on their own");
   }
 
   private async currentKey(name: string): Promise<string | undefined> {
     try {
-      const generation = await this.redis.get(generationKey);
-      return keyFor(generation ?? "0", name);
+      return keyFor(await this.generation(), name);
     } catch {
       this.logger.warn("Directory cache unavailable, reading from the database");
       return undefined;
     }
+  }
+
+  private async generation(): Promise<string> {
+    const existing = await this.redis.get(generationKey);
+    if (existing !== null) return existing;
+    await this.redis.set(generationKey, randomUUID(), "NX");
+    return (await this.redis.get(generationKey)) ?? randomUUID();
   }
 
   private async read<T>(key: string): Promise<T | undefined> {

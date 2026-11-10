@@ -6,14 +6,10 @@ const fakeRedis = (overrides: Record<string, unknown> = {}) => {
   return {
     entries,
     get: vi.fn(async (key: string) => entries.get(key) ?? null),
-    set: vi.fn(async (key: string, value: string) => {
+    set: vi.fn(async (key: string, value: string, ...flags: unknown[]) => {
+      if (flags.includes("NX") && entries.has(key)) return null;
       entries.set(key, value);
       return "OK";
-    }),
-    incr: vi.fn(async (key: string) => {
-      const next = Number(entries.get(key) ?? "0") + 1;
-      entries.set(key, String(next));
-      return next;
     }),
     ...overrides,
   };
@@ -36,7 +32,7 @@ describe("DirectoryCache.remember", () => {
     expect(second).toEqual(first);
     expect(load).toHaveBeenCalledOnce();
     expect(redis.set).toHaveBeenCalledWith(
-      "directory:lookup:g0:universities",
+      `directory:lookup:g${redis.entries.get("directory:lookup:generation")}:universities`,
       JSON.stringify(first),
       "EX",
       directoryCacheTtlSeconds,
@@ -64,7 +60,12 @@ describe("DirectoryCache.remember", () => {
       (value) => value.length > 0,
     );
 
-    expect(redis.set).not.toHaveBeenCalled();
+    expect(redis.set).not.toHaveBeenCalledWith(
+      expect.stringContaining(":universities"),
+      expect.anything(),
+      "EX",
+      expect.anything(),
+    );
   });
 
   test("reads from the loader when the cache is unreachable", async () => {
@@ -89,24 +90,74 @@ describe("DirectoryCache.remember", () => {
 
   test("a corrupt entry is treated as a miss", async () => {
     const { cache, redis } = build();
-    redis.entries.set("directory:lookup:g0:universities", "{not json");
+    await cache.remember("universities", async () => "seed");
+    const key = [...redis.entries.keys()].find((name) => name.endsWith(":universities")) ?? "";
+    redis.entries.set(key, "{not json");
 
     await expect(cache.remember("universities", async () => "fresh")).resolves.toBe("fresh");
   });
 });
 
-describe("DirectoryCache.invalidate", () => {
-  test("bumps the generation once", async () => {
+describe("DirectoryCache generation", () => {
+  test("a missing generation gets a fresh unique epoch, never a fixed starting value", async () => {
+    const first = build();
+    const second = build();
+
+    await first.cache.remember("universities", async () => "a");
+    await second.cache.remember("universities", async () => "b");
+
+    const epoch = (redis: ReturnType<typeof fakeRedis>) =>
+      redis.entries.get("directory:lookup:generation");
+    expect(epoch(first.redis)).toBeTruthy();
+    expect(epoch(first.redis)).not.toBe("0");
+    expect(epoch(first.redis)).not.toBe(epoch(second.redis));
+  });
+
+  test("a flushed Redis does not bring back entries written under an earlier generation", async () => {
     const { cache, redis } = build();
+    await cache.remember("universities", async () => "old");
+    redis.entries.delete("directory:lookup:generation");
+
+    const after = await cache.remember("universities", async () => "new");
+
+    expect(after).toBe("new");
+  });
+
+  test("an existing generation is reused and not overwritten", async () => {
+    const { cache, redis } = build();
+    redis.entries.set("directory:lookup:generation", "epoch-1");
+
+    await cache.remember("universities", async () => "x");
+
+    expect(redis.entries.get("directory:lookup:generation")).toBe("epoch-1");
+    expect(redis.entries.has("directory:lookup:gepoch-1:universities")).toBe(true);
+  });
+});
+
+describe("DirectoryCache.invalidate", () => {
+  test("replaces the generation with a new epoch", async () => {
+    const { cache, redis } = build();
+    redis.entries.set("directory:lookup:generation", "epoch-1");
 
     await cache.invalidate();
 
-    expect(redis.incr).toHaveBeenCalledWith("directory:lookup:generation");
+    expect(redis.entries.get("directory:lookup:generation")).not.toBe("epoch-1");
   });
 
-  test("never throws when the cache is unreachable", async () => {
-    const { cache } = build({ incr: vi.fn().mockRejectedValue(new Error("down")) });
+  test("retries once when the first attempt fails", async () => {
+    const set = vi.fn().mockRejectedValueOnce(new Error("blip")).mockResolvedValueOnce("OK");
+    const { cache } = build({ set });
+
+    await cache.invalidate();
+
+    expect(set).toHaveBeenCalledTimes(2);
+  });
+
+  test("gives up after the retry and never throws", async () => {
+    const set = vi.fn().mockRejectedValue(new Error("down"));
+    const { cache } = build({ set });
 
     await expect(cache.invalidate()).resolves.toBeUndefined();
+    expect(set).toHaveBeenCalledTimes(2);
   });
 });
