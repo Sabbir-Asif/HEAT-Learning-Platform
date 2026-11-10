@@ -133,7 +133,7 @@ describe("ChangePasswordForm", () => {
     await fill(view, "old password value", "a brand new passphrase");
 
     await vi.waitFor(() =>
-      expect(view.querySelector("[role=alert]")?.textContent).toContain("went wrong"),
+      expect(view.querySelector("[role=alert]")?.textContent).toContain("connection failed"),
     );
   });
 });
