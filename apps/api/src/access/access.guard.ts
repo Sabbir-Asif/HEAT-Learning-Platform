@@ -44,6 +44,13 @@ export class AccessGuard implements CanActivate {
         throw new ApiException(403, "ENROLLMENT_NOT_ACTIVE");
       }
     }
+    if (
+      policy.audience === "admin" &&
+      session.mustChangePassword &&
+      !policy.allowWhilePasswordChangeRequired
+    ) {
+      throw new ApiException(403, "PASSWORD_CHANGE_REQUIRED");
+    }
     request.authSession = session;
     return true;
   }

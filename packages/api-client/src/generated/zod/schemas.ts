@@ -6,6 +6,62 @@
  */
 import * as zod from 'zod';
 
+export const adminAccountChangePasswordBodyCurrentPasswordMax = 256;
+
+export const adminAccountChangePasswordBodyNewPasswordMin = 12;
+export const adminAccountChangePasswordBodyNewPasswordMax = 256;
+
+
+
+export const AdminAccountChangePasswordBody = zod.object({
+  "currentPassword": zod.string().min(1).max(adminAccountChangePasswordBodyCurrentPasswordMax),
+  "newPassword": zod.string().min(adminAccountChangePasswordBodyNewPasswordMin).max(adminAccountChangePasswordBodyNewPasswordMax)
+})
+
+export const AdminAccountChangePasswordResponse = zod.void()
+
+
+export const AdminAuthRefreshResponse = zod.void()
+
+
+export const adminAuthSignInBodyPasswordMax = 256;
+
+
+
+export const AdminAuthSignInBody = zod.object({
+  "email": zod.string(),
+  "password": zod.string().min(1).max(adminAuthSignInBodyPasswordMax)
+})
+
+export const adminAuthSignInResponseUserIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminAuthSignInResponse = zod.object({
+  "user": zod.object({
+  "email": zod.string(),
+  "id": zod.uuid().regex(adminAuthSignInResponseUserIdRegExp),
+  "mustChangePassword": zod.boolean(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT'])
+})
+})
+
+
+export const AdminAuthSignOutResponse = zod.void()
+
+
+export const adminMeDescribeResponseUserIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminMeDescribeResponse = zod.object({
+  "user": zod.object({
+  "email": zod.string(),
+  "id": zod.uuid().regex(adminMeDescribeResponseUserIdRegExp),
+  "mustChangePassword": zod.boolean(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT'])
+})
+})
+
+
 export const StudentAuthRefreshResponse = zod.void()
 
 

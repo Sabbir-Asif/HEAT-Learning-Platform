@@ -1,6 +1,7 @@
 import type { BrowserContext, Page, Route } from "@playwright/test";
 
 export const accessCookieName = "__Host-heat_access";
+export const adminAccessCookieName = "__Host-heat_admin_access";
 
 export const accessToken = (expiresInSeconds: number): string => {
   const exp = Math.floor(Date.now() / 1000) + expiresInSeconds;
@@ -12,10 +13,11 @@ export const grantAccess = (
   context: BrowserContext,
   baseURL: string | undefined,
   expiresInSeconds = 600,
+  cookieName: string = accessCookieName,
 ) =>
   context.addCookies([
     {
-      name: accessCookieName,
+      name: cookieName,
       value: accessToken(expiresInSeconds),
       domain: new URL(baseURL ?? "http://localhost:3000").hostname,
       path: "/",

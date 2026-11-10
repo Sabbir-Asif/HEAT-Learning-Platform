@@ -5,6 +5,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
+export * from './adminMeResponseDto';
+export * from './adminMeResponseDtoUser';
+export * from './adminMeResponseDtoUserRole';
+export * from './changePasswordRequestDto';
 export * from './healthResponseDto';
 export * from './healthResponseDtoStatus';
 export * from './meResponseDto';

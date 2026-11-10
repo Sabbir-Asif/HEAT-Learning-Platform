@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { AccessModule } from "./access";
+import { AdminAuthModule } from "./admin-auth/admin-auth.module";
 import { AuthModule } from "./auth";
 import { CoreModule } from "./core";
 import { HealthController } from "./health/health.controller";
@@ -8,7 +9,15 @@ import { MeModule } from "./me/me.module";
 import { StudentAuthModule } from "./student-auth/student-auth.module";
 
 @Module({
-  imports: [CoreModule, AuthModule, AccessModule, HttpApiModule, MeModule, StudentAuthModule],
+  imports: [
+    CoreModule,
+    AuthModule,
+    AccessModule,
+    HttpApiModule,
+    MeModule,
+    StudentAuthModule,
+    AdminAuthModule,
+  ],
   controllers: [HealthController],
 })
 export class AppModule {}

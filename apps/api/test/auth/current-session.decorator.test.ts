@@ -10,6 +10,7 @@ const session: AuthenticatedSession = {
   familyId: "f",
   realm: "student",
   role: "STUDENT",
+  mustChangePassword: false,
 };
 
 class Probe {

@@ -351,6 +351,17 @@ describe("authenticate", () => {
       familyId: tokens.familyId,
       realm: "student",
       role: "STUDENT",
+      mustChangePassword: false,
+    });
+  });
+
+  test("reports a pending password change", async () => {
+    const { service, store } = setup();
+    const admin = store.addUser({ realm: "ADMIN", role: "ADMIN", mustChangePassword: true });
+    const tokens = await service.create(admin.id, "admin");
+
+    await expect(service.authenticate(tokens.accessToken, "admin")).resolves.toMatchObject({
+      mustChangePassword: true,
     });
   });
 

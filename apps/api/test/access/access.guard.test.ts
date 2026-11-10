@@ -3,7 +3,12 @@ import type { ExecutionContext } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { describe, expect, test, vi } from "vitest";
 import { AccessGuard } from "../../src/access/access.guard";
-import { Audience, RequireCourseAccess, Roles } from "../../src/access/access.decorators";
+import {
+  AllowWhilePasswordChangeRequired,
+  Audience,
+  RequireCourseAccess,
+  Roles,
+} from "../../src/access/access.decorators";
 import type { EnrollmentAccessService } from "../../src/access/enrollment-access.service";
 import type { AuthenticatedSession, AuthRealm, UserRoleName } from "../../src/auth/auth.types";
 import type { AuthenticatedRequest } from "../../src/auth/authenticated-request";
@@ -43,6 +48,13 @@ class AdminBothRoute {
   handler(): void {}
 }
 
+class AdminAllowedRoute {
+  @Audience("admin")
+  @Roles("ADMIN", "SUPER_ADMIN")
+  @AllowWhilePasswordChangeRequired()
+  handler(): void {}
+}
+
 const cookies: Record<AuthRealm, string> = {
   student: "__Host-heat_access=student-token",
   admin: "__Host-heat_admin_access=admin-token",
@@ -53,6 +65,7 @@ const sessionFor = (realm: AuthRealm, role: UserRoleName): AuthenticatedSession 
   familyId: "family-1",
   realm,
   role,
+  mustChangePassword: false,
 });
 
 type Request = AuthenticatedRequest & { params?: Record<string, string> };
@@ -152,6 +165,57 @@ describe("AccessGuard", () => {
         }
       },
     );
+  });
+
+  describe("password change required", () => {
+    const pending = (role: UserRoleName): AuthenticatedSession => ({
+      ...sessionFor("admin", role),
+      mustChangePassword: true,
+    });
+
+    test.each(["ADMIN", "SUPER_ADMIN"] as const)(
+      "an admin route is refused for a %s with PASSWORD_CHANGE_REQUIRED",
+      async (role) => {
+        const { guard } = build({ admin: pending(role) });
+        const request: Request = { headers: { cookie: cookies.admin } };
+
+        const error: unknown = await guard
+          .canActivate(contextFor(AdminBothRoute, request))
+          .catch((caught: unknown) => caught);
+
+        expect(error).toBeInstanceOf(ApiException);
+        expect(error).toMatchObject({ code: "PASSWORD_CHANGE_REQUIRED" });
+        expect((error as ApiException).getStatus()).toBe(403);
+        expect(request.authSession).toBeUndefined();
+      },
+    );
+
+    test("a route that opts out is allowed", async () => {
+      const { guard } = build({ admin: pending("SUPER_ADMIN") });
+      const request: Request = { headers: { cookie: cookies.admin } };
+
+      await expect(guard.canActivate(contextFor(AdminAllowedRoute, request))).resolves.toBe(true);
+      expect(request.authSession?.mustChangePassword).toBe(true);
+    });
+
+    test("a route that opts out still refuses the wrong role and a missing session", async () => {
+      const { guard } = build({ student: sessionFor("student", "STUDENT") });
+
+      await expect(
+        guard.canActivate(contextFor(AdminAllowedRoute, { headers: { cookie: cookies.student } })),
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        guard.canActivate(contextFor(AdminAllowedRoute, { headers: {} })),
+      ).rejects.toBeInstanceOf(UnauthorizedException);
+    });
+
+    test("an admin without the flag reaches every route", async () => {
+      const { guard } = build({ admin: sessionFor("admin", "ADMIN") });
+
+      await expect(
+        guard.canActivate(contextFor(AdminBothRoute, { headers: { cookie: cookies.admin } })),
+      ).resolves.toBe(true);
+    });
   });
 
   test("a missing cookie is 401", async () => {

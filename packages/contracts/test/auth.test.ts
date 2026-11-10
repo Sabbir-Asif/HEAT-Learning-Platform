@@ -1,5 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
+  adminSessionCookies,
+  changePasswordRequestSchema,
   grantsCourseAccess,
   landingPathFor,
   meResponseSchema,
@@ -70,5 +72,43 @@ describe("student session cookies", () => {
     expect(studentSessionCookies.access.startsWith("__Host-")).toBe(true);
     expect(studentSessionCookies.refresh.startsWith("__Secure-")).toBe(true);
     expect(studentSessionCookies.refreshPath).toBe("/api/auth/refresh");
+  });
+});
+
+describe("admin session cookies", () => {
+  test("the refresh cookie is scoped to the admin endpoint and the access cookie is host-only", () => {
+    expect(adminSessionCookies.access.startsWith("__Host-")).toBe(true);
+    expect(adminSessionCookies.refresh.startsWith("__Secure-")).toBe(true);
+    expect(adminSessionCookies.refreshPath).toBe("/api/admin/auth/refresh");
+  });
+});
+
+describe("changePasswordRequestSchema", () => {
+  const valid = { currentPassword: "old password value", newPassword: "a brand new passphrase" };
+
+  test("accepts a new password of at least twelve characters", () => {
+    expect(changePasswordRequestSchema.safeParse(valid).success).toBe(true);
+    expect(
+      changePasswordRequestSchema.safeParse({ ...valid, newPassword: "twelve chars" }).success,
+    ).toBe(true);
+  });
+
+  test("refuses a short new password and an empty current password", () => {
+    expect(changePasswordRequestSchema.safeParse({ ...valid, newPassword: "short" }).success).toBe(
+      false,
+    );
+    expect(changePasswordRequestSchema.safeParse({ ...valid, currentPassword: "" }).success).toBe(
+      false,
+    );
+  });
+
+  test("refuses a new password equal to the current one", () => {
+    const parsed = changePasswordRequestSchema.safeParse({
+      currentPassword: "same passphrase 1",
+      newPassword: "same passphrase 1",
+    });
+
+    expect(parsed.success).toBe(false);
+    expect(parsed.error?.issues[0]?.path).toEqual(["newPassword"]);
   });
 });

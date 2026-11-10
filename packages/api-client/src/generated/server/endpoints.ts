@@ -5,6 +5,40 @@
  * OpenAPI spec version: 1.0.0
  */
 import { serverFetch } from '../../server/server-fetch';
+export type AdminMeResponseDtoUserRole = typeof AdminMeResponseDtoUserRole[keyof typeof AdminMeResponseDtoUserRole];
+
+
+export const AdminMeResponseDtoUserRole = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  ADMIN: 'ADMIN',
+  STUDENT: 'STUDENT',
+} as const;
+
+export type AdminMeResponseDtoUser = {
+  email: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  mustChangePassword: boolean;
+  role: AdminMeResponseDtoUserRole;
+};
+
+export interface AdminMeResponseDto {
+  user: AdminMeResponseDtoUser;
+}
+
+export interface ChangePasswordRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 256
+     */
+  currentPassword: string;
+  /**
+     * @minLength 12
+     * @maxLength 256
+     */
+  newPassword: string;
+}
+
 export type HealthResponseDtoStatus = typeof HealthResponseDtoStatus[keyof typeof HealthResponseDtoStatus];
 
 
@@ -70,6 +104,139 @@ export interface SignInRequestDto {
      */
   password: string;
 }
+
+export const getAdminAccountChangePasswordUrl = () => {
+
+
+
+
+  return `/api/admin/account/change-password`
+}
+
+export const adminAccountChangePassword = async (changePasswordRequestDto: ChangePasswordRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<void>(getAdminAccountChangePasswordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(changePasswordRequestDto)
+  }
+);}
+
+
+
+export const getAdminAuthRefreshUrl = () => {
+
+
+
+
+  return `/api/admin/auth/refresh`
+}
+
+export const adminAuthRefresh = async ( options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getAdminAuthRefreshUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getAdminAuthSignInUrl = () => {
+
+
+
+
+  return `/api/admin/auth/sign-in`
+}
+
+export const adminAuthSignIn = async (signInRequestDto: SignInRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminMeResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<AdminMeResponseDto>(getAdminAuthSignInUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(signInRequestDto)
+  }
+);}
+
+
+
+export const getAdminAuthSignOutUrl = () => {
+
+
+
+
+  return `/api/admin/auth/sign-out`
+}
+
+export const adminAuthSignOut = async ( options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getAdminAuthSignOutUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getAdminMeDescribeUrl = () => {
+
+
+
+
+  return `/api/admin/me`
+}
+
+export const adminMeDescribe = async ( options?: Parameters<typeof serverFetch>[1]): Promise<AdminMeResponseDto> => {
+
+  return serverFetch<AdminMeResponseDto>(getAdminMeDescribeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
 
 export const getStudentAuthRefreshUrl = () => {
 

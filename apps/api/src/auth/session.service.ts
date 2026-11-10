@@ -88,6 +88,7 @@ export class SessionService {
       familyId: claims.familyId,
       realm: realmByName[user.realm],
       role: user.role,
+      mustChangePassword: user.mustChangePassword,
     };
   }
 
