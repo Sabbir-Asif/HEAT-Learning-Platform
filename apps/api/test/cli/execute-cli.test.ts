@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import { authTestEnvironment } from "../support/auth-env";
 import { executeCli } from "../../src/cli/execute-cli";
 
 const collect = () => {
@@ -61,7 +62,6 @@ describe("executeCli", () => {
 
   test("a bootstrap failure with valid configuration prints a generic message", async () => {
     const { err, output } = collect();
-    const { authTestEnvironment } = await import("../support/auth-env");
 
     const code = await executeCli({
       argv: ["recover-super-admin"],

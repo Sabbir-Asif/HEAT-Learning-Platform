@@ -10,7 +10,7 @@ const harness = (
   const run = (argv: string[]) =>
     runCli(
       argv,
-      { recover },
+      { recover: async () => ({ lockoutCleared: true, ...(await recover()) }) },
       { out: (text) => out.push(text), err: (text) => err.push(text) },
       "box",
     );

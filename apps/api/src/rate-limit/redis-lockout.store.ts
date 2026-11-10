@@ -97,13 +97,7 @@ export class RedisLockoutStore extends LockoutStore {
     const keys = [accountKey];
     let cursor = "0";
     do {
-      const [next, found] = await this.redis.scan(
-        cursor,
-        "MATCH",
-        `${accountKey}:*`,
-        "COUNT",
-        500,
-      );
+      const [next, found] = await this.redis.scan(cursor, "MATCH", `${accountKey}:*`, "COUNT", 500);
       cursor = next;
       keys.push(...found);
     } while (cursor !== "0");
