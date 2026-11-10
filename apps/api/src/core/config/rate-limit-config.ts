@@ -10,6 +10,7 @@ export const rateLimitProfileNames = [
   "reset",
   "verify",
   "resendVerification",
+  "adminInvite",
   "playbackSession",
 ] as const;
 
@@ -47,6 +48,7 @@ const defaults: Record<RateLimitProfileName, RateLimitProfile> = {
   reset: { limit: 5, windowSeconds: 3600, ipLimit: 300 },
   verify: { limit: 10, windowSeconds: 900, ipLimit: 300 },
   resendVerification: { limit: 3, windowSeconds: 3600, ipLimit: 300 },
+  adminInvite: { limit: 60, windowSeconds: 3600, ipLimit: 300 },
   playbackSession: { limit: 30, windowSeconds: 60, ipLimit: 3000 },
 };
 

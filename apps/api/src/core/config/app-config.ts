@@ -81,7 +81,12 @@ const envSchema = z
   });
 
 const localAdminAppUrl = "http://localhost:3001";
-const localTrustedOrigins = ["http://localhost:3000", "http://localhost:3001"];
+const localTrustedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://learn.localhost",
+  "http://admin.localhost",
+];
 
 export interface AppConfig {
   databaseUrl: string;

@@ -102,6 +102,8 @@ describe("loadConfig", () => {
     expect(loadConfig(valid).csrf.trustedOrigins).toEqual([
       "http://localhost:3000",
       "http://localhost:3001",
+      "http://learn.localhost",
+      "http://admin.localhost",
     ]);
     expect(
       loadConfig({
@@ -131,6 +133,8 @@ describe("loadConfig", () => {
       expect(loadConfig({ ...valid, NODE_ENV }).csrf.trustedOrigins).toEqual([
         "http://localhost:3000",
         "http://localhost:3001",
+        "http://learn.localhost",
+        "http://admin.localhost",
       ]);
     }
   });
