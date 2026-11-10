@@ -2,7 +2,7 @@
 
 import { useAuditLogList } from "@heat/api-client";
 import type { AuditLogListParams, AuditLogListResponseDtoItemsItem } from "@heat/api-client";
-import { Field, FieldLabel, Input, PageHeader } from "@heat/ui";
+import { Field, FieldError, FieldLabel, Input, PageHeader } from "@heat/ui";
 import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
 import { ShellContent } from "@heat/ui/shell";
@@ -26,7 +26,8 @@ export function AuditLogView() {
     ...(from ? { from } : {}),
     ...(to ? { to } : {}),
   };
-  const list = useAuditLogList(params);
+  const rangeInvalid = Boolean(from && to && to < from);
+  const list = useAuditLogList(params, { query: { enabled: !rangeInvalid } });
   const total = list.data?.total ?? 0;
   const page = useClampedPage(url.page, url.pageSize, total, url.setPage);
 
@@ -75,9 +76,15 @@ export function AuditLogView() {
       <Input
         id={`audit-${key}`}
         type="date"
+        {...(key === "from" && to ? { max: to } : {})}
+        {...(key === "to" && from ? { min: from } : {})}
+        aria-invalid={key === "to" && rangeInvalid ? true : undefined}
         value={url.filters[key]}
         onChange={(event) => url.setFilter(key, event.target.value)}
       />
+      {key === "to" && rangeInvalid ? (
+        <FieldError>The end date must not be before the start date.</FieldError>
+      ) : null}
     </Field>
   );
 

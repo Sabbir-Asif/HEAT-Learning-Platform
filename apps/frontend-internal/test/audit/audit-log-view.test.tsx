@@ -116,6 +116,26 @@ describe("AuditLogView", () => {
     );
   });
 
+  test("the date inputs bound each other so the end cannot be before the start", async () => {
+    fetchMock.mockResolvedValue(page());
+
+    const view = await mount("?from=2026-11-05&to=2026-11-10");
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalled());
+
+    expect((view.querySelector("#audit-to") as HTMLInputElement).min).toBe("2026-11-05");
+    expect((view.querySelector("#audit-from") as HTMLInputElement).max).toBe("2026-11-10");
+    expect(view.textContent).not.toContain("must not be before");
+  });
+
+  test("an end date before the start date shows the message and sends no request", async () => {
+    fetchMock.mockResolvedValue(page());
+
+    const view = await mount("?from=2026-11-10&to=2026-11-05");
+
+    expect(view.textContent).toContain("The end date must not be before the start date.");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   test("shows an empty state, and an error with retry", async () => {
     fetchMock.mockResolvedValueOnce(page([]));
     const empty = await mount();
