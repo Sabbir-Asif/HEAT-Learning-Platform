@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
-import { PasswordService } from "../../src/auth";
+import { PasswordService, hashOpaqueToken } from "../../src/auth";
+import { SecretBox } from "../../src/core";
 import { BreachedPasswordProvider } from "../../src/auth/breached-password.provider";
 import { csrfHeaders } from "../support/csrf";
 import { useTestApp } from "../support/testing-module";
@@ -11,6 +12,7 @@ interface Reply {
   status: number;
   body: unknown;
   setCookies: string[];
+  headers: { cacheControl: string | null };
 }
 
 interface Summary {
@@ -29,7 +31,12 @@ const cookieHeader = (setCookies: string[]): string =>
 
 const errorCode = (reply: Reply): string => (reply.body as { error: { code: string } }).error.code;
 
-const tokenFrom = (inviteUrl: string): string => inviteUrl.slice(inviteUrl.lastIndexOf("/") + 1);
+interface InvitationPayload {
+  template: string;
+  userId: string;
+  expiresAt: string;
+  encryptedToken: string;
+}
 
 describe("admin invitations, deactivation and reactivation", () => {
   const testApp = useTestApp();
@@ -53,6 +60,7 @@ describe("admin invitations, deactivation and reactivation", () => {
       status: response.status,
       body: text === "" ? undefined : (JSON.parse(text) as unknown),
       setCookies: response.headers.getSetCookie(),
+      headers: { cacheControl: response.headers.get("cache-control") },
     };
   };
 
@@ -80,6 +88,9 @@ describe("admin invitations, deactivation and reactivation", () => {
     return { user, cookie: cookieHeader(reply.setCookies) };
   };
 
+  const lookup = async (token: string) =>
+    call("POST", "/admin/auth/invitations/lookup", { body: { token } });
+
   const invite = async (cookie: string, email: string) =>
     call("POST", "/admin/admins", { cookie, body: { email } });
 
@@ -89,9 +100,14 @@ describe("admin invitations, deactivation and reactivation", () => {
       orderBy: { createdAt: "asc" },
     });
     return rows
-      .map((row) => row.payload as { userId: string; recipient: string; inviteUrl: string })
+      .map((row) => row.payload as unknown as InvitationPayload)
       .filter((payload) => payload.userId === userId);
   };
+
+  const tokenFrom = (payload: InvitationPayload | undefined): string =>
+    testApp()
+      .moduleRef.get(SecretBox)
+      .decrypt(payload?.encryptedToken ?? "");
 
   const invited = async (email = "new.admin@example.test") => {
     stubBreachLookup();
@@ -99,7 +115,7 @@ describe("admin invitations, deactivation and reactivation", () => {
     const reply = await invite(root.cookie, email);
     const summary = reply.body as Summary;
     const [payload] = await outboxFor(summary.id);
-    return { root, summary, token: tokenFrom(payload?.inviteUrl ?? "") };
+    return { root, summary, token: tokenFrom(payload) };
   };
 
   test("only the super admin can list or invite, and a plain ADMIN is refused", async () => {
@@ -125,16 +141,26 @@ describe("admin invitations, deactivation and reactivation", () => {
     });
     expect(JSON.stringify(reply.body)).not.toMatch(/token|passwordHash/i);
     const [payload] = await outboxFor(summary.id);
-    expect(payload?.recipient).toBe("new.admin@example.test");
-    expect(payload?.inviteUrl).toMatch(/^http:\/\/localhost:3001\/accept-invite\/[\w-]{43}$/);
-    const token = tokenFrom(payload?.inviteUrl ?? "");
+    expect(Object.keys(payload ?? {}).sort()).toEqual([
+      "encryptedToken",
+      "expiresAt",
+      "template",
+      "userId",
+    ]);
+    expect(payload?.template).toBe("admin-invitation");
+    const token = tokenFrom(payload);
+    expect(token).toMatch(/^[\w-]{43}$/);
+    const serialised = JSON.stringify(payload);
+    expect(serialised).not.toContain(token);
+    expect(serialised).not.toContain("new.admin@example.test");
+    expect(serialised).not.toContain("accept-invite");
     const stored = await testApp().database.prisma.authToken.findMany({
       where: { userId: summary.id },
     });
     expect(stored).toHaveLength(1);
     expect(stored[0]).toMatchObject({ purpose: "INVITE", usedAt: null });
     expect(stored[0]?.tokenHash).toMatch(/^[0-9a-f]{64}$/);
-    expect(stored[0]?.tokenHash).not.toContain(token);
+    expect(stored[0]?.tokenHash).toBe(hashOpaqueToken(token));
     const audit = await testApp().database.prisma.auditLog.findFirstOrThrow({
       where: { entityId: summary.id },
     });
@@ -162,13 +188,15 @@ describe("admin invitations, deactivation and reactivation", () => {
   test("accepting sets the password without authenticator setup and the token cannot be reused", async () => {
     const { summary, token } = await invited();
 
-    const lookup = await call("GET", `/admin/auth/invitations/${token}`);
-    expect(lookup.body).toEqual({ status: "VALID", email: "new.admin@example.test" });
+    const looked = await lookup(token);
+    expect(looked.headers.cacheControl).toBe("no-store");
+    expect(looked.body).toEqual({ status: "VALID", email: "new.admin@example.test" });
     const accepted = await call("POST", "/admin/auth/invitations/accept", {
       body: { token, password: chosen },
     });
 
     expect(accepted.status).toBe(204);
+    expect(accepted.headers.cacheControl).toBe("no-store");
     const session = await signIn("new.admin@example.test", chosen);
     expect(session.status).toBe(200);
     expect(session.body).toMatchObject({
@@ -179,7 +207,7 @@ describe("admin invitations, deactivation and reactivation", () => {
     });
     expect(reuse.status).toBe(400);
     expect(errorCode(reuse)).toBe("INVITATION_INVALID");
-    expect((await call("GET", `/admin/auth/invitations/${token}`)).body).toEqual({
+    expect((await lookup(token)).body).toEqual({
       status: "INVALID",
     });
     expect((await signIn("new.admin@example.test", "another long passphrase here")).status).toBe(
@@ -226,7 +254,7 @@ describe("admin invitations, deactivation and reactivation", () => {
       body: { token, password: chosen },
     });
     expect(errorCode(breached)).toBe("PASSWORD_BREACHED");
-    expect((await call("GET", `/admin/auth/invitations/${token}`)).body).toMatchObject({
+    expect((await lookup(token)).body).toMatchObject({
       status: "VALID",
     });
   });
@@ -238,7 +266,7 @@ describe("admin invitations, deactivation and reactivation", () => {
       data: { expiresAt: new Date(Date.now() - 1000) },
     });
 
-    expect((await call("GET", `/admin/auth/invitations/${token}`)).body).toEqual({
+    expect((await lookup(token)).body).toEqual({
       status: "EXPIRED",
     });
     const expired = await call("POST", "/admin/auth/invitations/accept", {
@@ -257,9 +285,9 @@ describe("admin invitations, deactivation and reactivation", () => {
     expect((resent.body as Summary).status).toBe("INVITED");
     const payloads = await outboxFor(summary.id);
     expect(payloads).toHaveLength(2);
-    const fresh = tokenFrom(payloads[1]?.inviteUrl ?? "");
+    const fresh = tokenFrom(payloads[1]);
     expect(fresh).not.toBe(token);
-    expect((await call("GET", `/admin/auth/invitations/${token}`)).body).toEqual({
+    expect((await lookup(token)).body).toEqual({
       status: "INVALID",
     });
     expect(
@@ -316,6 +344,13 @@ describe("admin invitations, deactivation and reactivation", () => {
       await testApp().database.prisma.auditLog.findMany({ where: { entityId: target.id } })
     ).map((row) => row.action);
     expect(actions.sort()).toEqual(["admin.deactivate", "admin.reactivate"]);
+    const reactivateAudit = await testApp().database.prisma.auditLog.findFirstOrThrow({
+      where: { entityId: target.id, action: "admin.reactivate" },
+    });
+    expect(reactivateAudit).toMatchObject({
+      before: { status: "DEACTIVATED" },
+      after: { status: "ACTIVE" },
+    });
   });
 
   test("the super admin cannot deactivate themselves or another super admin", async () => {

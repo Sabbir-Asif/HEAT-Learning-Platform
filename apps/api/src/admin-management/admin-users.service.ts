@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import type {
   AdminListQuery,
   AdminListResponse,
@@ -8,7 +8,7 @@ import type {
 } from "@heat/contracts";
 import type { HeatClient } from "@heat/db";
 import { PasswordService, SessionService, generateOpaqueToken, hashOpaqueToken } from "../auth";
-import { APP_CONFIG, CLOCK, DATABASE } from "../core";
+import { APP_CONFIG, CLOCK, DATABASE, SecretBox } from "../core";
 import type { AppConfig, Clock } from "../core";
 import { ApiException } from "../http/api-exception";
 import { auditData } from "./admin-audit";
@@ -39,12 +39,15 @@ const isUniqueViolation = (error: unknown): boolean =>
 
 @Injectable()
 export class AdminUsersService {
+  private readonly logger = new Logger(AdminUsersService.name);
+
   constructor(
     @Inject(DATABASE) private readonly database: HeatClient,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
     @Inject(CLOCK) private readonly clock: Clock,
     private readonly passwords: PasswordService,
     private readonly sessions: SessionService,
+    private readonly secretBox: SecretBox,
   ) {}
 
   async list(query: AdminListQuery): Promise<AdminListResponse> {
@@ -82,7 +85,7 @@ export class AdminUsersService {
           data: { email: request.email, passwordHash, role: "ADMIN", realm: "ADMIN" },
           select: { id: true },
         });
-        await this.queueInvitation(tx, user.id, request.email, token, expiresAt);
+        await this.queueInvitation(tx, user.id, token, expiresAt);
         await tx.auditLog.create({
           data: auditData(context, {
             action: "admin.invite",
@@ -109,7 +112,7 @@ export class AdminUsersService {
     const expiresAt = this.expiry();
     await this.database.$transaction(async (tx) => {
       await tx.authToken.deleteMany({ where: { userId: id, purpose: "INVITE", usedAt: null } });
-      await this.queueInvitation(tx, id, target.email, token, expiresAt);
+      await this.queueInvitation(tx, id, token, expiresAt);
       await tx.auditLog.create({
         data: auditData(context, {
           action: "admin.invite.resend",
@@ -139,7 +142,12 @@ export class AdminUsersService {
         });
       });
     }
-    await this.sessions.revokeAll(id);
+    try {
+      await this.sessions.revokeAll(id);
+    } catch (error) {
+      this.logger.warn("Sessions could not be revoked after an administrator was deactivated");
+      throw error;
+    }
     return this.describe(id);
   }
 
@@ -153,6 +161,7 @@ export class AdminUsersService {
             action: "admin.reactivate",
             entityId: id,
             before: { status: "DEACTIVATED" },
+            after: { status: "ACTIVE" },
           }),
         });
       });
@@ -186,7 +195,6 @@ export class AdminUsersService {
   private async queueInvitation(
     tx: Pick<HeatClient, "authToken" | "outbox">,
     userId: string,
-    email: string,
     token: string,
     expiresAt: Date,
   ): Promise<void> {
@@ -199,9 +207,8 @@ export class AdminUsersService {
         payload: {
           template: "admin-invitation",
           userId,
-          recipient: email,
-          inviteUrl: `${this.config.invitations.adminAppUrl}/accept-invite/${token}`,
           expiresAt: expiresAt.toISOString(),
+          encryptedToken: this.secretBox.encrypt(token),
         },
       },
     });
