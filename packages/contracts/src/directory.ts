@@ -124,3 +124,52 @@ export const facultyUniversityParamsSchema = z.object({
   id: z.uuid(),
   universityId: z.uuid(),
 });
+
+export const departmentNameMaxLength = universityNameMaxLength;
+
+export const departmentNameSchema = directoryNameSchema("department");
+
+export const createDepartmentRequestSchema = z.object({
+  name: departmentNameSchema,
+  universityId: z.uuid("Choose a university."),
+  facultyId: z.uuid("Choose a faculty."),
+});
+
+export type CreateDepartmentRequest = z.infer<typeof createDepartmentRequestSchema>;
+
+export const updateDepartmentRequestSchema = createDepartmentRequestSchema;
+
+export type UpdateDepartmentRequest = CreateDepartmentRequest;
+
+export const departmentSortFields = universitySortFields;
+
+export const departmentListQuerySchema = directoryListQuerySchema.extend({
+  universityId: z.uuid().optional(),
+  facultyId: z.uuid().optional(),
+});
+
+export type DepartmentListQuery = z.infer<typeof departmentListQuerySchema>;
+
+export const departmentSummarySchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  university: facultyUniversitySchema,
+  faculty: z.object({ id: z.uuid(), name: z.string() }),
+  archivedAt: z.iso.datetime().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+  studentCount: z.number().int().min(0),
+});
+
+export type DepartmentSummary = z.infer<typeof departmentSummarySchema>;
+
+export const departmentListResponseSchema = z.object({
+  items: z.array(departmentSummarySchema),
+  total: z.number().int().min(0),
+  page: z.number().int().min(1),
+  pageSize: z.number().int().min(1),
+});
+
+export type DepartmentListResponse = z.infer<typeof departmentListResponseSchema>;
+
+export const departmentIdParamsSchema = z.object({ id: z.uuid() });

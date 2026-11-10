@@ -34,6 +34,7 @@ type TableUrlState = {
   toggleSort: (id: string) => void;
   setQuery: (query: string) => void;
   setFilter: (key: string, value: string | null) => void;
+  setFilters: (values: Record<string, string | null>) => void;
   clearFilters: () => void;
   activeFilterCount: number;
 };
@@ -108,6 +109,14 @@ function useTableUrlState({
       void setState({ sort: serializeSort(nextSort(sort, id)), ...resetPage }, push),
     setQuery: (next) => void setState({ q: next || null, ...resetPage }, { history: "replace" }),
     setFilter: (key, value) => void setState({ [key]: value || null, ...resetPage }, push),
+    setFilters: (values) =>
+      void setState(
+        {
+          ...Object.fromEntries(Object.entries(values).map(([key, value]) => [key, value || null])),
+          ...resetPage,
+        },
+        push,
+      ),
     clearFilters: () =>
       void setState(
         { q: null, ...resetPage, ...Object.fromEntries(filters.map((key) => [key, null])) },

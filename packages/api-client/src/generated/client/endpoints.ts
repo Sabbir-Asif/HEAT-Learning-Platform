@@ -36,9 +36,13 @@ import type {
   CaptchaRequestDto,
   CaptchaResponseDto,
   ChangePasswordRequestDto,
+  CreateDepartmentRequestDto,
   CreateFacultyRequestDto,
   CreateUniversityRequestDto,
   CsrfTokenResponseDto,
+  DepartmentListResponseDto,
+  DepartmentSummaryDto,
+  DepartmentsListParams,
   FacultiesListParams,
   FacultyListResponseDto,
   FacultySummaryDto,
@@ -51,6 +55,7 @@ import type {
   UniversitiesListParams,
   UniversityListResponseDto,
   UniversitySummaryDto,
+  UpdateDepartmentRequestDto,
   UpdateFacultyRequestDto,
   UpdateUniversityRequestDto
 } from './model';
@@ -1125,6 +1130,436 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getAdminAuthSignOutMutationOptions(options), queryClient);
+    }
+
+export const getDepartmentsListUrl = (params?: DepartmentsListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/directory/departments?${stringifiedParams}` : `/api/admin/directory/departments`
+}
+
+export const departmentsList = async (params?: DepartmentsListParams, options?: Parameters<typeof customFetch>[1]): Promise<DepartmentListResponseDto> => {
+
+  return customFetch<DepartmentListResponseDto>(getDepartmentsListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDepartmentsListQueryKey = (params?: DepartmentsListParams,) => {
+    return [
+    `/api/admin/directory/departments`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getDepartmentsListQueryOptions = <TData = Awaited<ReturnType<typeof departmentsList>>, TError = ErrorType<unknown>>(params?: DepartmentsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDepartmentsListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof departmentsList>>> = ({ signal }) => departmentsList(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof departmentsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DepartmentsListQueryResult = NonNullable<Awaited<ReturnType<typeof departmentsList>>>
+export type DepartmentsListQueryError = ErrorType<unknown>
+
+
+export function useDepartmentsList<TData = Awaited<ReturnType<typeof departmentsList>>, TError = ErrorType<unknown>>(
+ params: undefined |  DepartmentsListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentsList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof departmentsList>>,
+          TError,
+          Awaited<ReturnType<typeof departmentsList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDepartmentsList<TData = Awaited<ReturnType<typeof departmentsList>>, TError = ErrorType<unknown>>(
+ params?: DepartmentsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentsList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof departmentsList>>,
+          TError,
+          Awaited<ReturnType<typeof departmentsList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDepartmentsList<TData = Awaited<ReturnType<typeof departmentsList>>, TError = ErrorType<unknown>>(
+ params?: DepartmentsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDepartmentsList<TData = Awaited<ReturnType<typeof departmentsList>>, TError = ErrorType<unknown>>(
+ params?: DepartmentsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDepartmentsListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDepartmentsCreateUrl = () => {
+
+
+
+
+  return `/api/admin/directory/departments`
+}
+
+export const departmentsCreate = async (createDepartmentRequestDto: CreateDepartmentRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<DepartmentSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<DepartmentSummaryDto>(getDepartmentsCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createDepartmentRequestDto)
+  }
+);}
+
+
+
+
+
+export const getDepartmentsCreateMutationKey = () => ['departmentsCreate'] as const;
+
+export const getDepartmentsCreateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof departmentsCreate>>, TError,DepartmentsCreateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof departmentsCreate>>, TError,DepartmentsCreateMutationVariables, TContext> => {
+
+const mutationKey = getDepartmentsCreateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof departmentsCreate>>, DepartmentsCreateMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  departmentsCreate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DepartmentsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof departmentsCreate>>>
+    export type DepartmentsCreateMutationBody = CreateDepartmentRequestDto
+    export type DepartmentsCreateMutationError = ErrorType<unknown>
+    export type DepartmentsCreateMutationVariables = {data: CreateDepartmentRequestDto}
+
+    export const useDepartmentsCreate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof departmentsCreate>>, TError,DepartmentsCreateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof departmentsCreate>>,
+        TError,
+        DepartmentsCreateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDepartmentsCreateMutationOptions(options), queryClient);
+    }
+
+export const getDepartmentsRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/departments/${id}`
+}
+
+export const departmentsRemove = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getDepartmentsRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDepartmentsRemoveMutationKey = () => ['departmentsRemove'] as const;
+
+export const getDepartmentsRemoveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof departmentsRemove>>, TError,DepartmentsRemoveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof departmentsRemove>>, TError,DepartmentsRemoveMutationVariables, TContext> => {
+
+const mutationKey = getDepartmentsRemoveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof departmentsRemove>>, DepartmentsRemoveMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  departmentsRemove(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DepartmentsRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof departmentsRemove>>>
+
+    export type DepartmentsRemoveMutationError = ErrorType<unknown>
+    export type DepartmentsRemoveMutationVariables = {id: string}
+
+    export const useDepartmentsRemove = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof departmentsRemove>>, TError,DepartmentsRemoveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof departmentsRemove>>,
+        TError,
+        DepartmentsRemoveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDepartmentsRemoveMutationOptions(options), queryClient);
+    }
+
+export const getDepartmentsGetUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/departments/${id}`
+}
+
+export const departmentsGet = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<DepartmentSummaryDto> => {
+
+  return customFetch<DepartmentSummaryDto>(getDepartmentsGetUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDepartmentsGetQueryKey = (id: string,) => {
+    return [
+    `/api/admin/directory/departments/${id}`
+    ] as const;
+    }
+
+
+export const getDepartmentsGetQueryOptions = <TData = Awaited<ReturnType<typeof departmentsGet>>, TError = ErrorType<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDepartmentsGetQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof departmentsGet>>> = ({ signal }) => departmentsGet(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof departmentsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DepartmentsGetQueryResult = NonNullable<Awaited<ReturnType<typeof departmentsGet>>>
+export type DepartmentsGetQueryError = ErrorType<unknown>
+
+
+export function useDepartmentsGet<TData = Awaited<ReturnType<typeof departmentsGet>>, TError = ErrorType<unknown>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof departmentsGet>>,
+          TError,
+          Awaited<ReturnType<typeof departmentsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDepartmentsGet<TData = Awaited<ReturnType<typeof departmentsGet>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof departmentsGet>>,
+          TError,
+          Awaited<ReturnType<typeof departmentsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDepartmentsGet<TData = Awaited<ReturnType<typeof departmentsGet>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDepartmentsGet<TData = Awaited<ReturnType<typeof departmentsGet>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDepartmentsGetQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDepartmentsUpdateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/departments/${id}`
+}
+
+export const departmentsUpdate = async (id: string,
+    updateDepartmentRequestDto: UpdateDepartmentRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<DepartmentSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<DepartmentSummaryDto>(getDepartmentsUpdateUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateDepartmentRequestDto)
+  }
+);}
+
+
+
+
+
+export const getDepartmentsUpdateMutationKey = () => ['departmentsUpdate'] as const;
+
+export const getDepartmentsUpdateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof departmentsUpdate>>, TError,DepartmentsUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof departmentsUpdate>>, TError,DepartmentsUpdateMutationVariables, TContext> => {
+
+const mutationKey = getDepartmentsUpdateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof departmentsUpdate>>, DepartmentsUpdateMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  departmentsUpdate(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DepartmentsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof departmentsUpdate>>>
+    export type DepartmentsUpdateMutationBody = UpdateDepartmentRequestDto
+    export type DepartmentsUpdateMutationError = ErrorType<unknown>
+    export type DepartmentsUpdateMutationVariables = {id: string;data: UpdateDepartmentRequestDto}
+
+    export const useDepartmentsUpdate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof departmentsUpdate>>, TError,DepartmentsUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof departmentsUpdate>>,
+        TError,
+        DepartmentsUpdateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDepartmentsUpdateMutationOptions(options), queryClient);
     }
 
 export const getFacultiesListUrl = (params?: FacultiesListParams,) => {

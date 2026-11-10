@@ -29,9 +29,12 @@ import type {
   CaptchaRequestDto,
   CaptchaResponseDto,
   ChangePasswordRequestDto,
+  CreateDepartmentRequestDto,
   CreateFacultyRequestDto,
   CreateUniversityRequestDto,
   CsrfTokenResponseDto,
+  DepartmentListResponseDto,
+  DepartmentSummaryDto,
   FacultyListResponseDto,
   FacultySummaryDto,
   HealthResponseDto,
@@ -42,6 +45,7 @@ import type {
   SignInRequestDto,
   UniversityListResponseDto,
   UniversitySummaryDto,
+  UpdateDepartmentRequestDto,
   UpdateFacultyRequestDto,
   UpdateUniversityRequestDto
 } from './model';
@@ -64,6 +68,14 @@ export const getAdminAuthCsrfTokenResponseMock = (overrideResponse: Partial<Extr
 export const getAdminInvitationLookupResponseMock = (overrideResponse: Partial<Extract<InvitationLookupResponseDto, object>> = {}): InvitationLookupResponseDto => ({email: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), status: faker.helpers.arrayElement(['VALID','EXPIRED','INVALID'] as const), ...overrideResponse})
 
 export const getAdminAuthSignInResponseMock = (overrideResponse: Partial<Extract<AdminMeResponseDto, object>> = {}): AdminMeResponseDto => ({user: {email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
+
+export const getDepartmentsListResponseMock = (overrideResponse: Partial<Extract<DepartmentListResponseDto, object>> = {}): DepartmentListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({archivedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), studentCount: faker.number.int({min: 0, max: 9007199254740991}), university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
+
+export const getDepartmentsCreateResponseMock = (overrideResponse: Partial<Extract<DepartmentSummaryDto, object>> = {}): DepartmentSummaryDto => ({archivedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), studentCount: faker.number.int({min: 0, max: 9007199254740991}), university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getDepartmentsGetResponseMock = (overrideResponse: Partial<Extract<DepartmentSummaryDto, object>> = {}): DepartmentSummaryDto => ({archivedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), studentCount: faker.number.int({min: 0, max: 9007199254740991}), university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getDepartmentsUpdateResponseMock = (overrideResponse: Partial<Extract<DepartmentSummaryDto, object>> = {}): DepartmentSummaryDto => ({archivedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), studentCount: faker.number.int({min: 0, max: 9007199254740991}), university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 export const getFacultiesListResponseMock = (overrideResponse: Partial<Extract<FacultyListResponseDto, object>> = {}): FacultyListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({archivedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', departmentCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), studentCount: faker.number.int({min: 0, max: 9007199254740991}), universities: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})})), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
 
@@ -242,6 +254,64 @@ export const getAdminAuthSignOutMockHandler = (overrideResponse?: void | ((info:
 
     return new HttpResponse(null,
       { status: 204
+      })
+  }, options)
+}
+
+export const getDepartmentsListMockHandler = (overrideResponse?: DepartmentListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<DepartmentListResponseDto> | DepartmentListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/directory/departments', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDepartmentsListResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getDepartmentsCreateMockHandler = (overrideResponse?: DepartmentSummaryDto | ((info: Parameters<HttpResponseResolver<PathParams, CreateDepartmentRequestDto>>[0]) => Promise<DepartmentSummaryDto> | DepartmentSummaryDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, CreateDepartmentRequestDto>('*/api/admin/directory/departments', async (info: Parameters<HttpResponseResolver<PathParams, CreateDepartmentRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDepartmentsCreateResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getDepartmentsRemoveMockHandler = (overrideResponse?: void | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.delete<{ id: string }>('*/api/admin/directory/departments/:id', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
+
+export const getDepartmentsGetMockHandler = (overrideResponse?: DepartmentSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<DepartmentSummaryDto> | DepartmentSummaryDto), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string }>('*/api/admin/directory/departments/:id', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDepartmentsGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getDepartmentsUpdateMockHandler = (overrideResponse?: DepartmentSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string }, UpdateDepartmentRequestDto>>[0]) => Promise<DepartmentSummaryDto> | DepartmentSummaryDto), options?: RequestHandlerOptions) => {
+  return http.patch<{ id: string }, UpdateDepartmentRequestDto>('*/api/admin/directory/departments/:id', async (info: Parameters<HttpResponseResolver<{ id: string }, UpdateDepartmentRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDepartmentsUpdateResponseMock(),
+      { status: 200
       })
   }, options)
 }
@@ -491,6 +561,11 @@ export const getHeatLmsApiMock = () => [
   getAdminAuthRefreshMockHandler(),
   getAdminAuthSignInMockHandler(),
   getAdminAuthSignOutMockHandler(),
+  getDepartmentsListMockHandler(),
+  getDepartmentsCreateMockHandler(),
+  getDepartmentsRemoveMockHandler(),
+  getDepartmentsGetMockHandler(),
+  getDepartmentsUpdateMockHandler(),
   getFacultiesListMockHandler(),
   getFacultiesCreateMockHandler(),
   getFacultiesRemoveMockHandler(),
