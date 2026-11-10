@@ -1,7 +1,8 @@
 export { AuthModule } from "./auth.module";
 export { AccessTokenService } from "./access-token.service";
-export { CookieWriter, realmCookies } from "./cookie-writer";
+export { CookieWriter, realmCookies, realmCsrfCookies } from "./cookie-writer";
 export type { CookieOptions, CookieResponse } from "./cookie-writer";
+export { CsrfTokenService } from "./csrf-token.service";
 export { PasswordService } from "./password.service";
 export { SessionService } from "./session.service";
 export { authRealms } from "./auth.types";

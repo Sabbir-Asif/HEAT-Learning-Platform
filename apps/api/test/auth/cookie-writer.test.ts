@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { CookieWriter, realmCookies } from "../../src/auth/cookie-writer";
 import type { CookieOptions } from "../../src/auth/cookie-writer";
 import type { SessionTokens } from "../../src/auth/auth.types";
+import { CsrfTokenService } from "../../src/auth/csrf-token.service";
 import { testConfig } from "../support/auth-fixtures";
 
 interface Call {
@@ -33,7 +34,9 @@ const tokens: SessionTokens = {
 };
 
 describe("CookieWriter", () => {
-  const writer = new CookieWriter(testConfig());
+  const config = testConfig();
+  const csrf = new CsrfTokenService(config);
+  const writer = new CookieWriter(config, csrf);
 
   test("writes the student access cookie as __Host-, Lax, 10 minutes, Path=/", () => {
     const { calls, response } = recorder();
@@ -66,6 +69,34 @@ describe("CookieWriter", () => {
     expect(calls[1]?.options).not.toHaveProperty("domain");
   });
 
+  test("writes a readable Strict __Host- CSRF cookie bound to the session family", () => {
+    const { calls, response } = recorder();
+    writer.write(response, "student", tokens);
+
+    expect(calls[2]).toEqual({
+      method: "cookie",
+      name: "__Host-heat_csrf",
+      value: csrf.issue("student", "family"),
+      options: {
+        httpOnly: false,
+        secure: true,
+        sameSite: "strict",
+        path: "/",
+        maxAge: 30 * 86_400_000,
+      },
+    });
+  });
+
+  test("writeCsrf returns the token it sets for the session", () => {
+    const { calls, response } = recorder();
+
+    const token = writer.writeCsrf(response, "admin", "family");
+
+    expect(token).toBe(csrf.issue("admin", "family"));
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.value).toBe(token);
+  });
+
   test("uses distinct names and the admin refresh path for the admin realm", () => {
     const { calls, response } = recorder();
     writer.write(response, "admin", tokens);
@@ -73,6 +104,7 @@ describe("CookieWriter", () => {
     expect(calls.map((call) => call.name)).toEqual([
       "__Host-heat_admin_access",
       "__Secure-heat_admin_refresh",
+      "__Host-heat_admin_csrf",
     ]);
     expect(calls[1]?.options.path).toBe("/api/admin/auth/refresh");
     const names = [...Object.values(realmCookies.student), ...Object.values(realmCookies.admin)];
@@ -98,6 +130,11 @@ describe("CookieWriter", () => {
           sameSite: "strict",
           path: "/api/admin/auth/refresh",
         },
+      },
+      {
+        method: "clearCookie",
+        name: "__Host-heat_admin_csrf",
+        options: { httpOnly: false, secure: true, sameSite: "strict", path: "/" },
       },
     ]);
   });
