@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import type { OnModuleInit } from "@nestjs/common";
+import { findUserIdsByEmail } from "@heat/db";
 import type { HeatClient } from "@heat/db";
 import { AuditService } from "../audit";
 import type { AuditActor } from "../audit";
@@ -41,7 +42,7 @@ export class AdminSignInService implements OnModuleInit {
     await this.lockout.reserve("admin", email, metadata.ipAddress);
     const user = await this.database.user.findFirst({
       where: {
-        email: { equals: email, mode: "insensitive" },
+        id: { in: await findUserIdsByEmail(this.database, email) },
         realm: "ADMIN",
         role: { in: ["ADMIN", "SUPER_ADMIN"] },
         deletedAt: null,

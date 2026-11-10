@@ -1,3 +1,4 @@
+import { findUserIdsByEmail } from "@heat/db";
 import { Inject, Injectable } from "@nestjs/common";
 import { AuditService } from "../audit";
 import type { AuditActor } from "../audit";
@@ -31,7 +32,7 @@ export class RegistrationPolicyService {
     await tx.$executeRaw`SELECT set_config('lock_timeout', ${`${REGISTRATION_LOCK_TIMEOUT_MS}ms`}, true)`;
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(lower(${email})))`;
     const existing = await tx.user.findFirst({
-      where: { email: { equals: email, mode: "insensitive" }, deletedAt: null },
+      where: { id: { in: await findUserIdsByEmail(tx, email) }, deletedAt: null },
       select: { id: true, realm: true, emailVerifiedAt: true },
     });
     if (existing === null) return { kind: "PROCEED", replacedUserId: null };

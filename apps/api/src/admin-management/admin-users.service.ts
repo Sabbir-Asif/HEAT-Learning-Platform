@@ -6,6 +6,7 @@ import type {
   AdminSummary,
   InviteAdminRequest,
 } from "@heat/contracts";
+import { findUserIdsByEmail } from "@heat/db";
 import type { HeatClient } from "@heat/db";
 import { AuditService } from "../audit";
 import type { AuditActor } from "../audit";
@@ -73,7 +74,7 @@ export class AdminUsersService {
 
   async invite(request: InviteAdminRequest, context: AuditActor): Promise<AdminSummary> {
     const existing = await this.database.user.findFirst({
-      where: { email: { equals: request.email, mode: "insensitive" } },
+      where: { id: { in: await findUserIdsByEmail(this.database, request.email) } },
       select: { id: true },
     });
     if (existing !== null) throw new ApiException(409, "EMAIL_IN_USE");

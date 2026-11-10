@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { Inject, Injectable } from "@nestjs/common";
+import { findUserIdsByEmail } from "@heat/db";
 import type { HeatClient } from "@heat/db";
 import { AuditService } from "../audit";
 import { PasswordService, SessionService } from "../auth";
@@ -76,7 +77,9 @@ export class RecoverSuperAdminService {
         role: "SUPER_ADMIN",
         realm: "ADMIN",
         deletedAt: null,
-        ...(email === undefined ? {} : { email: { equals: email, mode: "insensitive" } }),
+        ...(email === undefined
+          ? {}
+          : { id: { in: await findUserIdsByEmail(this.database, email) } }),
       },
       select: { id: true, email: true, deactivatedAt: true },
       orderBy: { createdAt: "asc" },

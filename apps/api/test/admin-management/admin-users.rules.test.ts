@@ -50,6 +50,7 @@ const build = (
     auditLog: { create: vi.fn().mockResolvedValue({}) },
   };
   const database = {
+    $queryRaw: vi.fn().mockResolvedValue([{ id: "matched-id" }]),
     user: {
       findFirst: options.inviting
         ? vi

@@ -9,6 +9,7 @@ const actor = { actorId: null, ipAddress: "203.0.113.4" };
 const build = (existing: unknown) => {
   const tx = {
     $executeRaw: vi.fn().mockResolvedValue(1),
+    $queryRaw: vi.fn().mockResolvedValue([{ id: "matched-id" }]),
     user: {
       findFirst: vi.fn().mockResolvedValue(existing),
       update: vi.fn().mockResolvedValue({}),

@@ -16,6 +16,7 @@ const build = (options: Options = {}) => {
   const user =
     options.user === undefined ? { id: "user-id", passwordHash: "digest" } : options.user;
   const database = {
+    $queryRaw: vi.fn().mockResolvedValue([{ id: "matched-id" }]),
     user: {
       findFirst: vi.fn().mockResolvedValue(user),
       update: vi.fn().mockResolvedValue({}),

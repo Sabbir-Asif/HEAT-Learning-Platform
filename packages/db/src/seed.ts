@@ -1,4 +1,5 @@
 import type { HeatClient } from "./client";
+import { findUserIdsByEmail } from "./email-lookup";
 import { hashPassword } from "./password";
 
 export const universityName = "University of Dhaka";
@@ -84,7 +85,7 @@ const seedSuperAdmin = async (
   return prisma.$transaction(async (tx) => {
     await tx.$executeRaw`select pg_advisory_xact_lock(${superAdminLockKey})`;
     const existing = await tx.user.findFirst({
-      where: { email: { equals: email, mode: "insensitive" } },
+      where: { id: { in: await findUserIdsByEmail(tx, email) } },
     });
     if (existing === null && (await tx.user.count({ where: { role: "SUPER_ADMIN" } })) > 0) {
       return false;

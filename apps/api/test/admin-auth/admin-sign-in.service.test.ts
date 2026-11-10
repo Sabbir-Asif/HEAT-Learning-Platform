@@ -5,6 +5,7 @@ const actor = { actorId: null, ipAddress: "127.0.0.1", requestId: "r" };
 
 const build = (recordStandalone: () => Promise<void>) => {
   const database = {
+    $queryRaw: vi.fn().mockResolvedValue([{ id: "matched-id" }]),
     user: {
       findFirst: vi.fn().mockResolvedValue({ id: "admin-id", passwordHash: "digest" }),
       update: vi.fn(),

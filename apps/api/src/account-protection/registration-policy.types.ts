@@ -3,6 +3,7 @@ import type { HeatClient } from "@heat/db";
 export type RegistrationPolicyTransaction = Pick<
   HeatClient,
   | "$executeRaw"
+  | "$queryRaw"
   | "user"
   | "studentProfile"
   | "enrollment"

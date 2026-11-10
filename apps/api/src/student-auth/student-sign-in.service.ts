@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import type { OnModuleInit } from "@nestjs/common";
+import { findUserIdsByEmail } from "@heat/db";
 import type { HeatClient } from "@heat/db";
 import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
@@ -37,7 +38,7 @@ export class StudentSignInService implements OnModuleInit {
     await this.lockout.reserve("student", email, metadata.ipAddress);
     const user = await this.database.user.findFirst({
       where: {
-        email: { equals: email, mode: "insensitive" },
+        id: { in: await findUserIdsByEmail(this.database, email) },
         realm: "STUDENT",
         role: "STUDENT",
         deletedAt: null,
