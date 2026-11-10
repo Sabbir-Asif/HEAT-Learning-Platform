@@ -24,6 +24,18 @@ pnpm turbo build        # builds every package and app
 pnpm turbo build lint typecheck test
 ```
 
+### First run
+
+```sh
+pnpm install
+pnpm dev:up
+pnpm --filter @heat/db exec prisma migrate deploy
+SUPER_ADMIN_EMAIL=you@example.com SUPER_ADMIN_PASSWORD='a-long-password' pnpm --filter @heat/db exec prisma db seed
+pnpm dev
+```
+
+`pnpm dev:up` creates `apps/api/.env` from `apps/api/.env.example` when it is missing; the example holds working development values, including the three secrets. If an older copy of the file has empty secrets, copy the example over it. Sign in to the admin console at <http://localhost:3001> with the seeded email and password; you are asked to change the password at first sign-in. Add `SEED_SAMPLE_DIRECTORY=true` to the seed command for sample faculties and departments.
+
 ### Run each app
 
 | App                 | Dev                                   | Production build                                                                 |
@@ -37,7 +49,7 @@ pnpm turbo build lint typecheck test
 
 ### Local services (Docker)
 
-`pnpm dev:up` starts Postgres 17, Redis, Nginx and Mailpit from `infra/compose/docker-compose.dev.yml` and returns once all four are healthy (it waits up to 60 seconds). On first run it copies each `.env.example` to `.env` (`infra/compose/` and every app, mode 600); edit the copies, they are ignored by git. Only `infra/compose/.env` is read today; the app files list the variables the apps will read once configuration loading lands.
+`pnpm dev:up` starts Postgres 17, Redis, Nginx and Mailpit from `infra/compose/docker-compose.dev.yml` and returns once all four are healthy (it waits up to 60 seconds). On first run it copies each `.env.example` to `.env` (`infra/compose/` and every app, mode 600); edit the copies, they are ignored by git. `infra/compose/.env` configures the containers. `apps/api/.env` is loaded by `pnpm --filter api dev` and by the Prisma commands in `packages/db` (migrate and seed), which read `DATABASE_URL` from it when it is not already set. Real environment variables win over the file.
 
 | Service  | Host address                                                    | Notes                                                                 |
 | -------- | --------------------------------------------------------------- | --------------------------------------------------------------------- |
