@@ -977,6 +977,55 @@ export const CaptchaIssueResponse = zod.object({
 })
 
 
+export const directoryLookupsListUniversitiesResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const DirectoryLookupsListUniversitiesResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.uuid().regex(directoryLookupsListUniversitiesResponseItemsItemIdRegExp),
+  "name": zod.string()
+}))
+})
+
+
+export const directoryLookupsListFacultiesPathUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const DirectoryLookupsListFacultiesParams = zod.object({
+  "universityId": zod.uuid().regex(directoryLookupsListFacultiesPathUniversityIdRegExp)
+})
+
+export const directoryLookupsListFacultiesResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const DirectoryLookupsListFacultiesResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.uuid().regex(directoryLookupsListFacultiesResponseItemsItemIdRegExp),
+  "name": zod.string()
+}))
+})
+
+
+export const directoryLookupsListDepartmentsPathUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const directoryLookupsListDepartmentsPathFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const DirectoryLookupsListDepartmentsParams = zod.object({
+  "universityId": zod.uuid().regex(directoryLookupsListDepartmentsPathUniversityIdRegExp),
+  "facultyId": zod.uuid().regex(directoryLookupsListDepartmentsPathFacultyIdRegExp)
+})
+
+export const directoryLookupsListDepartmentsResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const DirectoryLookupsListDepartmentsResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.uuid().regex(directoryLookupsListDepartmentsResponseItemsItemIdRegExp),
+  "name": zod.string()
+}))
+})
+
+
 export const HealthCheckResponse = zod.object({
   "status": zod.enum(['ok'])
 })

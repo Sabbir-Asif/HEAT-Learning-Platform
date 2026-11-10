@@ -352,6 +352,16 @@ export interface DepartmentSummaryDto {
   updatedAt: string;
 }
 
+export type DirectoryOptionListResponseDtoItemsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export interface DirectoryOptionListResponseDto {
+  items: DirectoryOptionListResponseDtoItemsItem[];
+}
+
 export type FacultyListResponseDtoItemsItemUniversitiesItem = {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
@@ -1746,6 +1756,71 @@ return serverFetch<CaptchaResponseDto>(getCaptchaIssueUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(captchaRequestDto)
+  }
+);}
+
+
+
+export const getDirectoryLookupsListUniversitiesUrl = () => {
+
+
+
+
+  return `/api/directory/universities`
+}
+
+export const directoryLookupsListUniversities = async ( options?: Parameters<typeof serverFetch>[1]): Promise<DirectoryOptionListResponseDto> => {
+
+  return serverFetch<DirectoryOptionListResponseDto>(getDirectoryLookupsListUniversitiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getDirectoryLookupsListFacultiesUrl = (universityId: string,) => {
+
+
+
+
+  return `/api/directory/universities/${universityId}/faculties`
+}
+
+export const directoryLookupsListFaculties = async (universityId: string, options?: Parameters<typeof serverFetch>[1]): Promise<DirectoryOptionListResponseDto> => {
+
+  return serverFetch<DirectoryOptionListResponseDto>(getDirectoryLookupsListFacultiesUrl(universityId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getDirectoryLookupsListDepartmentsUrl = (universityId: string,
+    facultyId: string,) => {
+
+
+
+
+  return `/api/directory/universities/${universityId}/faculties/${facultyId}/departments`
+}
+
+export const directoryLookupsListDepartments = async (universityId: string,
+    facultyId: string, options?: Parameters<typeof serverFetch>[1]): Promise<DirectoryOptionListResponseDto> => {
+
+  return serverFetch<DirectoryOptionListResponseDto>(getDirectoryLookupsListDepartmentsUrl(universityId,facultyId),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 
