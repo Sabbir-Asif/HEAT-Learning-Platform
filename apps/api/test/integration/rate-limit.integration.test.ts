@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { Redis } from "ioredis";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { PasswordService } from "../../src/auth";
@@ -25,11 +26,21 @@ const useEnvironment = (values: Record<string, string>): void => {
   });
 };
 
+const uniqueAddress = (): string => {
+  const [a, b, c] = randomBytes(3);
+  return `10.${a}.${b}.${c}`;
+};
+
 const sleep = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 const useHarness = (environment: Record<string, string> = {}) => {
   useEnvironment(environment);
   const testApp = useTestApp();
+
+  let defaultAddress = uniqueAddress();
+  beforeEach(() => {
+    defaultAddress = uniqueAddress();
+  });
 
   const post = async (
     path: string,
@@ -38,7 +49,11 @@ const useHarness = (environment: Record<string, string> = {}) => {
   ): Promise<Reply> => {
     const response = await fetch(`${testApp().baseUrl}/api${path}`, {
       method: "POST",
-      headers: { "content-type": "application/json", ...headers },
+      headers: {
+        "content-type": "application/json",
+        "x-forwarded-for": defaultAddress,
+        ...headers,
+      },
       body: JSON.stringify(body),
     });
     const retry = response.headers.get("retry-after");
