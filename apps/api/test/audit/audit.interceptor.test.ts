@@ -82,6 +82,55 @@ describe("AuditInterceptor", () => {
     expect(audit.record.mock.calls.map((call) => call[2].entityId)).toEqual(["a", "b"]);
   });
 
+  test("runs post-commit tasks after the transaction resolves and not when it fails", async () => {
+    const { interceptor, database, context } = build(metadata);
+    const order: string[] = [];
+    database.$transaction.mockImplementation(
+      async (run: (client: typeof tx) => Promise<unknown>) => {
+        const result = await run(tx);
+        order.push("committed");
+        return result;
+      },
+    );
+    const handle = () => {
+      auditScopeStorage.getStore()?.afterCommit?.push(async () => {
+        order.push("task");
+      });
+      return of("done");
+    };
+
+    await firstValueFrom(interceptor.intercept(context, { handle }));
+
+    expect(order).toEqual(["committed", "task"]);
+
+    order.length = 0;
+    database.$transaction.mockRejectedValueOnce(new Error("rolled back"));
+    await expect(firstValueFrom(interceptor.intercept(context, { handle }))).rejects.toThrow(
+      "rolled back",
+    );
+    expect(order).toEqual([]);
+  });
+
+  test("a failing post-commit task does not fail the request or skip later tasks", async () => {
+    const { interceptor, context } = build(metadata);
+    const ran: string[] = [];
+    const handle = () => {
+      const tasks = auditScopeStorage.getStore()?.afterCommit;
+      tasks?.push(async () => {
+        throw new Error("redis down");
+      });
+      tasks?.push(async () => {
+        ran.push("second");
+      });
+      return of("done");
+    };
+
+    const result = await firstValueFrom(interceptor.intercept(context, { handle }));
+
+    expect(result).toBe("done");
+    expect(ran).toEqual(["second"]);
+  });
+
   test("refuses a handler that emits more than one value", async () => {
     const { interceptor, audit, context } = build(metadata);
 
