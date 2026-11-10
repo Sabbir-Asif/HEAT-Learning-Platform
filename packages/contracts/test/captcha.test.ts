@@ -39,8 +39,8 @@ describe("captcha contracts", () => {
         captchaAnswer: "a".repeat(captchaAnswerMaxLength + 1),
       }).success,
     ).toBe(false);
-    expect(
-      captchaFieldsSchema.safeParse({ captchaId: "x", captchaAnswer: "AB3K7" }).success,
-    ).toBe(false);
+    expect(captchaFieldsSchema.safeParse({ captchaId: "x", captchaAnswer: "AB3K7" }).success).toBe(
+      false,
+    );
   });
 });

@@ -35,6 +35,22 @@ export interface AdminSignInRequestDto {
   password: string;
 }
 
+export interface CaptchaRequestDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  replaces?: string;
+}
+
+export interface CaptchaResponseDto {
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  expiresInSeconds: number;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  svg: string;
+}
+
 export interface ChangePasswordRequestDto {
   /**
      * @minLength 1
@@ -319,6 +335,41 @@ export const studentAuthSignOut = async ( options?: Parameters<typeof serverFetc
     method: 'POST'
 
 
+  }
+);}
+
+
+
+export const getCaptchaIssueUrl = () => {
+
+
+
+
+  return `/api/captcha`
+}
+
+export const captchaIssue = async (captchaRequestDto: CaptchaRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<CaptchaResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<CaptchaResponseDto>(getCaptchaIssueUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(captchaRequestDto)
   }
 );}
 

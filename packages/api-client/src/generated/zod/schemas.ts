@@ -100,6 +100,26 @@ export const StudentAuthSignInResponse = zod.object({
 export const StudentAuthSignOutResponse = zod.void()
 
 
+export const captchaIssueBodyReplacesRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const CaptchaIssueBody = zod.object({
+  "replaces": zod.uuid().regex(captchaIssueBodyReplacesRegExp).optional()
+})
+
+export const captchaIssueResponseExpiresInSecondsExclusiveMin = 0;
+export const captchaIssueResponseExpiresInSecondsMax = 9007199254740991;
+
+export const captchaIssueResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const CaptchaIssueResponse = zod.object({
+  "expiresInSeconds": zod.int().gt(captchaIssueResponseExpiresInSecondsExclusiveMin).max(captchaIssueResponseExpiresInSecondsMax),
+  "id": zod.uuid().regex(captchaIssueResponseIdRegExp),
+  "svg": zod.string()
+})
+
+
 export const HealthCheckResponse = zod.object({
   "status": zod.enum(['ok'])
 })

@@ -1,5 +1,8 @@
 import { randomUUID } from "node:crypto";
 import type { Clock } from "../../src/core";
+import { CaptchaStore } from "../../src/captcha/captcha.store";
+import type { CaptchaAttempt } from "../../src/captcha/captcha.store";
+import type { CaptchaEntropy } from "../../src/captcha/captcha-entropy";
 import { RotationClaimStore } from "../../src/auth/rotation-claim.store";
 import { SessionStore } from "../../src/auth/session.store";
 import type { NewSession, SessionRow, SessionUserRow } from "../../src/auth/session.store";
@@ -149,5 +152,68 @@ export class InMemorySessionStore extends SessionStore {
       rotatedAt: null,
       revokedAt: null,
     };
+  }
+}
+
+export class InMemoryCaptchaStore extends CaptchaStore {
+  private readonly entries = new Map<
+    string,
+    { answerHash: string; tries: number; expiresAt: number }
+  >();
+
+  constructor(private readonly clock: Clock) {
+    super();
+  }
+
+  save(id: string, answerHash: string, ttlSeconds: number): Promise<void> {
+    this.entries.set(id, {
+      answerHash,
+      tries: 0,
+      expiresAt: this.clock.now().getTime() + ttlSeconds * 1000,
+    });
+    return Promise.resolve();
+  }
+
+  attempt(id: string, answerHash: string, maxTries: number): Promise<CaptchaAttempt> {
+    const entry = this.entries.get(id);
+    if (entry === undefined || entry.expiresAt <= this.clock.now().getTime()) {
+      this.entries.delete(id);
+      return Promise.resolve("gone");
+    }
+    if (entry.answerHash === answerHash) {
+      this.entries.delete(id);
+      return Promise.resolve("passed");
+    }
+    entry.tries += 1;
+    if (entry.tries >= maxTries) {
+      this.entries.delete(id);
+      return Promise.resolve("exhausted");
+    }
+    return Promise.resolve("wrong");
+  }
+
+  remove(id: string): Promise<void> {
+    this.entries.delete(id);
+    return Promise.resolve();
+  }
+
+  hashes(): string[] {
+    return [...this.entries.values()].map((entry) => entry.answerHash);
+  }
+}
+
+export class StubEntropy implements CaptchaEntropy {
+  private cursor = 0;
+
+  constructor(private readonly picks: number[] = [0, 1, 2, 3, 4, 5]) {}
+
+  int(max: number): number {
+    const value = (this.picks[this.cursor % this.picks.length] ?? 0) % max;
+    this.cursor += 1;
+    return value;
+  }
+
+  unit(): number {
+    return 0.5;
   }
 }

@@ -21,6 +21,8 @@ import type {
 import type {
   AdminMeResponseDto,
   AdminSignInRequestDto,
+  CaptchaRequestDto,
+  CaptchaResponseDto,
   ChangePasswordRequestDto,
   HealthResponseDto,
   MeResponseDto,
@@ -33,6 +35,8 @@ export const getAdminAuthSignInResponseMock = (overrideResponse: Partial<Extract
 export const getAdminMeDescribeResponseMock = (overrideResponse: Partial<Extract<AdminMeResponseDto, object>> = {}): AdminMeResponseDto => ({user: {email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
 
 export const getStudentAuthSignInResponseMock = (overrideResponse: Partial<Extract<MeResponseDto, object>> = {}): MeResponseDto => ({enrollments: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), reason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const)})), user: {email: faker.string.alpha({length: {min: 10, max: 20}}), emailVerified: faker.datatype.boolean(), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
+
+export const getCaptchaIssueResponseMock = (overrideResponse: Partial<Extract<CaptchaResponseDto, object>> = {}): CaptchaResponseDto => ({expiresInSeconds: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), svg: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
 export const getHealthCheckResponseMock = (overrideResponse: Partial<Extract<HealthResponseDto, object>> = {}): HealthResponseDto => ({status: faker.helpers.arrayElement(['ok'] as const), ...overrideResponse})
 
@@ -125,6 +129,18 @@ export const getStudentAuthSignOutMockHandler = (overrideResponse?: void | ((inf
   }, options)
 }
 
+export const getCaptchaIssueMockHandler = (overrideResponse?: CaptchaResponseDto | ((info: Parameters<HttpResponseResolver<PathParams, CaptchaRequestDto>>[0]) => Promise<CaptchaResponseDto> | CaptchaResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, CaptchaRequestDto>('*/api/captcha', async (info: Parameters<HttpResponseResolver<PathParams, CaptchaRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCaptchaIssueResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getHealthCheckMockHandler = (overrideResponse?: HealthResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<HealthResponseDto> | HealthResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/health', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -157,6 +173,7 @@ export const getHeatLmsApiMock = () => [
   getStudentAuthRefreshMockHandler(),
   getStudentAuthSignInMockHandler(),
   getStudentAuthSignOutMockHandler(),
+  getCaptchaIssueMockHandler(),
   getHealthCheckMockHandler(),
   getMeDescribeMockHandler()
 ]
