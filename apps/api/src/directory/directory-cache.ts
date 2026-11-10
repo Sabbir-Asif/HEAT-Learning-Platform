@@ -5,6 +5,8 @@ import { DIRECTORY_CACHE_REDIS } from "./directory-cache.redis";
 
 export const directoryCacheTtlSeconds = 300;
 
+export const directoryEmptyCacheTtlSeconds = 30;
+
 const generationKey = "directory:lookup:generation";
 
 const keyFor = (generation: string, name: string): string =>
@@ -19,14 +21,14 @@ export class DirectoryCache {
   async remember<T>(
     name: string,
     load: () => Promise<T>,
-    shouldStore: (value: T) => boolean = () => true,
+    ttlSecondsOf: (value: T) => number = () => directoryCacheTtlSeconds,
   ): Promise<T> {
     const key = await this.currentKey(name);
     if (key === undefined) return load();
     const hit = await this.read<T>(key);
     if (hit !== undefined) return hit;
     const value = await load();
-    if (shouldStore(value)) await this.write(key, value);
+    await this.write(key, value, ttlSecondsOf(value));
     return value;
   }
 
@@ -67,9 +69,9 @@ export class DirectoryCache {
     }
   }
 
-  private async write(key: string, value: unknown): Promise<void> {
+  private async write(key: string, value: unknown, ttlSeconds: number): Promise<void> {
     try {
-      await this.redis.set(key, JSON.stringify(value), "EX", directoryCacheTtlSeconds);
+      await this.redis.set(key, JSON.stringify(value), "EX", ttlSeconds);
     } catch {
       this.logger.warn("Directory cache write failed");
     }

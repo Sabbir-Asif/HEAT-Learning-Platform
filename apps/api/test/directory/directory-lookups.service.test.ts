@@ -1,4 +1,8 @@
 import { describe, expect, test, vi } from "vitest";
+import {
+  directoryCacheTtlSeconds,
+  directoryEmptyCacheTtlSeconds,
+} from "../../src/directory/directory-cache";
 import { DirectoryLookupsService } from "../../src/directory/directory-lookups.service";
 
 const university = "0198F1A0-0000-7000-8000-000000000001";
@@ -12,7 +16,7 @@ const build = () => {
   };
   const cache = {
     remember: vi.fn(
-      async (...args: [string, () => Promise<unknown>, ((value: never) => boolean)?]) => args[1](),
+      async (...args: [string, () => Promise<unknown>, ((value: never) => number)?]) => args[1](),
     ),
   };
   return {
@@ -79,15 +83,14 @@ describe("DirectoryLookupsService", () => {
     });
   });
 
-  test("empty answers are not stored in the cache", async () => {
+  test("empty answers are cached for a short time and non-empty ones for the full time", async () => {
     const { service, cache } = build();
 
     await service.faculties(university);
 
-    const shouldStore = cache.remember.mock.calls[0]?.[2] as (value: {
-      items: unknown[];
-    }) => boolean;
-    expect(shouldStore({ items: [] })).toBe(false);
-    expect(shouldStore({ items: [{}] })).toBe(true);
+    const ttlOf = cache.remember.mock.calls[0]?.[2] as (value: { items: unknown[] }) => number;
+    expect(ttlOf({ items: [] })).toBe(directoryEmptyCacheTtlSeconds);
+    expect(ttlOf({ items: [{}] })).toBe(directoryCacheTtlSeconds);
+    expect(directoryEmptyCacheTtlSeconds).toBeLessThan(directoryCacheTtlSeconds);
   });
 });

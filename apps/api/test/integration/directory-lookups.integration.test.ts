@@ -221,6 +221,23 @@ describe("public directory lookups over HTTP", () => {
     expect(names(second)).not.toContain("Renamed Behind The Cache");
   });
 
+  test("an empty answer is cached briefly, and a write still makes the next lookup fresh", async () => {
+    const cookie = await signedInAdmin();
+    expect(names(await call("GET", "/directory/universities"))).toEqual([]);
+
+    await testApp().factories.university("Behind The Cache");
+    expect(names(await call("GET", "/directory/universities"))).toEqual([]);
+
+    const created = await call("POST", "/admin/directory/universities", {
+      cookie,
+      body: { name: "Fresh University" },
+    });
+    const next = await call("GET", "/directory/universities");
+
+    expect(created.status).toBe(201);
+    expect(names(next)).toEqual(["Behind The Cache", "Fresh University"]);
+  });
+
   test("renaming a university through the admin API shows in the next lookup", async () => {
     const { dhaka } = await seed();
     const cookie = await signedInAdmin();
