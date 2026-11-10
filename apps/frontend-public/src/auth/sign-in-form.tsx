@@ -11,6 +11,7 @@ import {
   Input,
   applyServerError,
   formErrorCopy,
+  rateLimitedMessage,
 } from "@heat/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LogInIcon } from "lucide-react";
@@ -48,6 +49,13 @@ export function SignInForm({ next }: SignInFormProps) {
     } catch (error) {
       if (isApiError(error) && error.code === "INVALID_CREDENTIALS") {
         form.setError("root.server", { type: "server", message: invalidCredentialsMessage });
+        return;
+      }
+      if (isApiError(error) && error.code === "RATE_LIMITED") {
+        form.setError("root.server", {
+          type: "server",
+          message: rateLimitedMessage(error.retryAfterSeconds),
+        });
         return;
       }
       if (isApiError(error)) {

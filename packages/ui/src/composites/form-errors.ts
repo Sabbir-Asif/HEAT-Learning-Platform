@@ -11,9 +11,15 @@ export type FieldErrorCopyKey =
 
 export type FormErrorCopyKey =
   | "BAD_REQUEST"
+  | "CAPTCHA_EXPIRED"
+  | "CAPTCHA_INVALID"
+  | "ENROLLMENT_NOT_ACTIVE"
   | "FORBIDDEN"
   | "INTERNAL"
+  | "INVALID_CREDENTIALS"
   | "NOT_FOUND"
+  | "PASSWORD_BREACHED"
+  | "PASSWORD_CHANGE_REQUIRED"
   | "RATE_LIMITED"
   | "UNAUTHENTICATED"
   | "VALIDATION_FAILED"
@@ -38,9 +44,15 @@ export const genericFormMessage =
 
 export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   BAD_REQUEST: "The request could not be understood. Check the form and try again.",
+  CAPTCHA_EXPIRED: "This security check can no longer be used. Request a new one.",
+  CAPTCHA_INVALID: "The characters do not match. Try again.",
+  ENROLLMENT_NOT_ACTIVE: "Your enrollment in this course is not active.",
   FORBIDDEN: "You do not have permission to do this.",
   INTERNAL: "Something went wrong on our side. Try again in a moment.",
+  INVALID_CREDENTIALS: "The email or password is not correct.",
   NOT_FOUND: "This item could not be found. It may have been removed.",
+  PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
+  PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
   RATE_LIMITED: "Too many attempts. Wait a little and try again.",
   UNAUTHENTICATED: "Your session has ended. Sign in again to continue.",
   VALIDATION_FAILED: genericFormMessage,
@@ -48,6 +60,16 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   REQUEST_ABORTED: "The request was cancelled. Try again.",
   UNEXPECTED_RESPONSE: "The server sent an unexpected reply. Try again in a moment.",
 };
+
+export function rateLimitedMessage(retryAfterSeconds?: number): string {
+  if (retryAfterSeconds === undefined || retryAfterSeconds <= 0) return formErrorCopy.RATE_LIMITED;
+  if (retryAfterSeconds < 60) {
+    const seconds = Math.ceil(retryAfterSeconds);
+    return `Too many attempts. Try again in ${seconds} ${seconds === 1 ? "second" : "seconds"}.`;
+  }
+  const minutes = Math.ceil(retryAfterSeconds / 60);
+  return `Too many attempts. Try again in ${minutes} ${minutes === 1 ? "minute" : "minutes"}.`;
+}
 
 export type FieldMessage = { path: string; message: string };
 

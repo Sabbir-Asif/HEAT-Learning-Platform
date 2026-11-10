@@ -10,6 +10,7 @@ import {
   realmCookies,
 } from "../auth";
 import type { AuthenticatedRequest, AuthenticatedSession, CookieResponse } from "../auth";
+import { RateLimit } from "../rate-limit";
 import { AdminAccountService } from "./admin-account.service";
 import { AdminMeResponseDto, AdminSignInRequestDto } from "./admin-auth.dto";
 import { AdminSignInService } from "./admin-sign-in.service";
@@ -27,6 +28,7 @@ export class AdminAuthController {
   ) {}
 
   @Public()
+  @RateLimit("adminSignIn")
   @Post("sign-in")
   @HttpCode(200)
   @ApiOkResponse({ type: AdminMeResponseDto })
@@ -45,6 +47,7 @@ export class AdminAuthController {
   }
 
   @Public()
+  @RateLimit("sessionRefresh")
   @Post("refresh")
   @HttpCode(204)
   @ApiNoContentResponse()

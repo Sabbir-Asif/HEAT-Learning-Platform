@@ -39,6 +39,10 @@ class FailController {
   limited() {
     throw new HttpException("slow down", 429);
   }
+  @Get("locked")
+  locked() {
+    throw new ApiException(429, "RATE_LIMITED", 42);
+  }
   @Get("conflict")
   conflict() {
     throw new HttpException("conflict", 409);
@@ -153,6 +157,18 @@ describe("HTTP exceptions", () => {
     const { response, body } = await call(path);
     expect(response.status).toBe(status);
     expect(errorResponseSchema.parse(body).error.code).toBe(code);
+  });
+
+  test("a rate limit with a wait sends Retry-After", async () => {
+    const { response, body } = await call("/api/fail/locked");
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("42");
+    expect(errorResponseSchema.parse(body).error.code).toBe("RATE_LIMITED");
+  });
+
+  test("a rate limit without a wait sends no Retry-After", async () => {
+    const { response } = await call("/api/fail/limited");
+    expect(response.headers.get("retry-after")).toBeNull();
   });
 
   test("the message is fixed text, never the exception text", async () => {

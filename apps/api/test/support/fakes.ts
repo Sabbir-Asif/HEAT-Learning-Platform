@@ -3,6 +3,10 @@ import type { Clock } from "../../src/core";
 import { CaptchaStore } from "../../src/captcha/captcha.store";
 import type { CaptchaAttempt } from "../../src/captcha/captcha.store";
 import type { CaptchaEntropy } from "../../src/captcha/captcha-entropy";
+import type { LockoutPolicy } from "../../src/core";
+import { LockoutStore } from "../../src/rate-limit/lockout.store";
+import { RateLimitStore } from "../../src/rate-limit/rate-limit.store";
+import type { RateLimitHit } from "../../src/rate-limit/rate-limit.store";
 import { RotationClaimStore } from "../../src/auth/rotation-claim.store";
 import { SessionStore } from "../../src/auth/session.store";
 import type { NewSession, SessionRow, SessionUserRow } from "../../src/auth/session.store";
@@ -215,5 +219,83 @@ export class StubEntropy implements CaptchaEntropy {
 
   unit(): number {
     return 0.5;
+  }
+}
+
+export class InMemoryRateLimitStore extends RateLimitStore {
+  readonly keys = new Map<string, { count: number; expiresAt: number }>();
+  failing = false;
+
+  constructor(private readonly clock: Clock) {
+    super();
+  }
+
+  hit(key: string, windowSeconds: number): Promise<RateLimitHit> {
+    if (this.failing) return Promise.reject(new Error("redis down"));
+    const now = this.clock.now().getTime();
+    const current = this.keys.get(key);
+    const entry =
+      current !== undefined && current.expiresAt > now
+        ? current
+        : { count: 0, expiresAt: now + windowSeconds * 1000 };
+    entry.count += 1;
+    this.keys.set(key, entry);
+    return Promise.resolve({
+      count: entry.count,
+      ttlSeconds: Math.ceil((entry.expiresAt - now) / 1000),
+    });
+  }
+}
+
+interface LockoutEntry {
+  failures: number;
+  start: number;
+  until: number;
+}
+
+export class InMemoryLockoutStore extends LockoutStore {
+  readonly entries = new Map<string, LockoutEntry>();
+  failing = false;
+
+  reserve(
+    attemptKey: string,
+    accountKey: string,
+    nowMs: number,
+    policy: LockoutPolicy,
+  ): Promise<number> {
+    if (this.failing) return Promise.reject(new Error("redis down"));
+    const windowMs = policy.memorySeconds * 1000;
+    const attempt = this.entries.get(attemptKey);
+    const account = this.entries.get(accountKey);
+    const lockedUntil = Math.max(attempt?.until ?? 0, account?.until ?? 0);
+    if (lockedUntil > nowMs) return Promise.resolve(lockedUntil);
+    const touch = (key: string, existing: LockoutEntry | undefined): LockoutEntry => {
+      const live = existing !== undefined && nowMs < existing.start + windowMs;
+      const entry = live ? existing : { failures: 0, start: nowMs, until: 0 };
+      entry.failures += 1;
+      this.entries.set(key, entry);
+      return entry;
+    };
+    const attemptEntry = touch(attemptKey, attempt);
+    if (attemptEntry.failures >= policy.threshold) {
+      const delay = Math.min(
+        policy.baseSeconds * 2 ** Math.min(attemptEntry.failures - policy.threshold, 30),
+        policy.maxSeconds,
+      );
+      attemptEntry.until = nowMs + delay * 1000;
+    }
+    const accountEntry = touch(accountKey, account);
+    if (accountEntry.failures >= policy.accountThreshold) {
+      accountEntry.until = nowMs + policy.maxSeconds * 1000;
+    }
+    return Promise.resolve(0);
+  }
+
+  release(attemptKey: string, accountKey: string): Promise<void> {
+    if (this.failing) return Promise.reject(new Error("redis down"));
+    this.entries.delete(attemptKey);
+    const account = this.entries.get(accountKey);
+    if (account !== undefined && account.failures > 0) account.failures -= 1;
+    return Promise.resolve();
   }
 }

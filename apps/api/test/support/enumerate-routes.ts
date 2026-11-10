@@ -48,3 +48,33 @@ export const enumerateRouteAccess = (
 
 export const unguardedRoutes = (routes: RouteAccess[]): string[] =>
   routes.filter((entry) => !entry.allowed).map((entry) => `${entry.route}: ${entry.reason}`);
+
+export const enumerateRouteRateLimits = (
+  discovery: DiscoveryService,
+  scanner: MetadataScanner,
+  metadataKey: string,
+  prefix = "api",
+): Record<string, string> => {
+  const reflector = new Reflector();
+  const limits: Record<string, string> = {};
+  for (const wrapper of discovery.getControllers()) {
+    const { instance, metatype } = wrapper;
+    if (!instance || typeof metatype !== "function") continue;
+    const controllerPath: unknown = Reflect.getMetadata(PATH_METADATA, metatype);
+    const prototype = Object.getPrototypeOf(instance) as object;
+    for (const name of scanner.getAllMethodNames(prototype)) {
+      const handler = Reflect.get(prototype, name) as () => void;
+      const method: unknown = Reflect.getMetadata(METHOD_METADATA, handler);
+      if (typeof method !== "number") continue;
+      const path: unknown = Reflect.getMetadata(PATH_METADATA, handler);
+      const profile = reflector.getAllAndOverride<string | undefined>(metadataKey, [
+        handler,
+        metatype as Type,
+      ]);
+      if (profile !== undefined) {
+        limits[`${RequestMethod[method]} ${joinPath(prefix, controllerPath, path)}`] = profile;
+      }
+    }
+  }
+  return limits;
+};

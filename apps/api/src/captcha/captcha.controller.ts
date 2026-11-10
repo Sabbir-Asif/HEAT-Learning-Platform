@@ -1,6 +1,7 @@
 import { Body, Controller, HttpCode, Post } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { Public } from "../auth";
+import { RateLimit } from "../rate-limit";
 import { CaptchaRequestDto, CaptchaResponseDto } from "./captcha.dto";
 import { CaptchaService } from "./captcha.service";
 
@@ -10,6 +11,7 @@ export class CaptchaController {
   constructor(private readonly captcha: CaptchaService) {}
 
   @Public()
+  @RateLimit("captcha")
   @Post()
   @HttpCode(200)
   @ApiOkResponse({ type: CaptchaResponseDto })

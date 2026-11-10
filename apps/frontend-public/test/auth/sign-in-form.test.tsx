@@ -132,6 +132,25 @@ describe("SignInForm", () => {
     await vi.waitFor(() => expect(replace).toHaveBeenCalledWith("/awaiting-approval"));
   });
 
+  test("shows the wait time when the sign-in is rate limited", async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ error: { code: "RATE_LIMITED", message: "x", requestId: "r" } }),
+        { status: 429, headers: { "retry-after": "90" } },
+      ),
+    );
+    const view = await mount();
+
+    await submit(view, "a@b.test", "secret-pass");
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=alert]")?.textContent).toBe(
+        "Too many attempts. Try again in 2 minutes.",
+      ),
+    );
+    expect(replace).not.toHaveBeenCalled();
+  });
+
   test("shows one generic message for wrong credentials and does not navigate", async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(

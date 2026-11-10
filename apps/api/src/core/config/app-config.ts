@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { loadRateLimitConfig } from "./rate-limit-config";
+import type { RateLimitConfig } from "./rate-limit-config";
 
 const positiveInt = z.coerce.number().int().positive();
 
@@ -35,6 +37,7 @@ export interface AppConfig {
   };
   argon2: { memoryCost: number; timeCost: number; parallelism: number };
   breachedPasswordRangeUrl: string;
+  rateLimit: RateLimitConfig;
 }
 
 export const APP_CONFIG = Symbol("APP_CONFIG");
@@ -45,6 +48,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
     const names = [...new Set(parsed.error.issues.map((issue) => String(issue.path[0])))];
     throw new Error(`Invalid environment configuration: ${names.join(", ")}`);
   }
+  const rateLimit = loadRateLimitConfig(env);
   const values = parsed.data;
   return {
     databaseUrl: values.DATABASE_URL,
@@ -63,5 +67,6 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
       parallelism: values.ARGON2_PARALLELISM,
     },
     breachedPasswordRangeUrl: values.BREACHED_PASSWORD_RANGE_URL,
+    rateLimit,
   };
 };

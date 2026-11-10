@@ -4,6 +4,7 @@ import {
   fieldErrorCopy,
   formErrorCopy,
   genericFormMessage,
+  rateLimitedMessage,
   toFormErrors,
 } from "../src/composites/form-errors";
 
@@ -132,5 +133,20 @@ describe("toFormErrors", () => {
   test("treats an unknown field code as invalid", () => {
     const result = toFormErrors(validation([{ path: "email", code: "brand_new" }]), ["email"]);
     expect(result.fields).toEqual([{ path: "email", message: fieldErrorCopy.invalid }]);
+  });
+});
+
+describe("rateLimitedMessage", () => {
+  test("falls back to the generic text without a wait", () => {
+    expect(rateLimitedMessage()).toBe(formErrorCopy.RATE_LIMITED);
+    expect(rateLimitedMessage(0)).toBe(formErrorCopy.RATE_LIMITED);
+  });
+
+  test("names seconds under a minute and minutes from a minute up, rounding up", () => {
+    expect(rateLimitedMessage(1)).toBe("Too many attempts. Try again in 1 second.");
+    expect(rateLimitedMessage(45)).toBe("Too many attempts. Try again in 45 seconds.");
+    expect(rateLimitedMessage(60)).toBe("Too many attempts. Try again in 1 minute.");
+    expect(rateLimitedMessage(61)).toBe("Too many attempts. Try again in 2 minutes.");
+    expect(rateLimitedMessage(900)).toBe("Too many attempts. Try again in 15 minutes.");
   });
 });
