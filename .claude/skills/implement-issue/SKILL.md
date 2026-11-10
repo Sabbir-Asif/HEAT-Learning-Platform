@@ -18,13 +18,13 @@ The stages are run with the superpowers plugin. Invoke each skill with the Skill
 
 | Stage                 | Superpowers skill                                                                                                                                           |
 | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 3 Branch              | `superpowers:using-git-worktrees`                                                                                                                           |
+| 3 Branch              | none: create the branch in the main checkout, as below                                                                                                      |
 | 4 Brainstorm and plan | `superpowers:brainstorming`, then `superpowers:writing-plans`                                                                                               |
 | 5 Implement           | `superpowers:test-driven-development`, `superpowers:executing-plans`, inline in this session; `superpowers:systematic-debugging` on any failing test or bug |
 | 6 Verify              | `superpowers:verification-before-completion`                                                                                                                |
 | 7 Code review         | `superpowers:requesting-code-review`, then `superpowers:receiving-code-review`                                                                              |
 
-This repository's rules win where a superpowers skill's defaults differ: the plan stays in this session and is never committed (no `docs/plans` files, no spec files), the branch and worktree come from stage 3, commits are conventional and reference the issue, code has no comments, and no attribution lines are added. Never run `superpowers:finishing-a-development-branch`; stage 8 and the owner's merge replace it.
+This repository's rules win where a superpowers skill's defaults differ: the plan stays in this session and is never committed (no `docs/plans` files, no spec files), the branch comes from stage 3 and is created in the main checkout, commits are conventional and reference the issue, code has no comments, and no attribution lines are added. Never run `superpowers:finishing-a-development-branch`; stage 8 and the owner's merge replace it.
 
 ## Ground rules
 
@@ -42,7 +42,7 @@ Run stage 1 first every time. When `resuming` is true, or a stage's artifact alr
 | Artifact                                                                      | Stage done     |
 | ----------------------------------------------------------------------------- | -------------- |
 | `## Refined` in the issue body, or a clear ticket with no major conflict      | 2 Refine       |
-| `branch.existsLocal` and a worktree on it (`git worktree list`)               | 3 Branch       |
+| `branch.existsLocal` and it is the checked-out branch                         | 3 Branch       |
 | `planApproved` true and no change of approach since, or `needsApproval` false | 4 approval     |
 | The plan's tasks are committed on the branch                                  | 5 Implement    |
 | A pull request in `pr`                                                        | 8 Pull request |
@@ -84,27 +84,26 @@ Artifact: a `## Refined` section and a refinement log comment, or the one-line d
 
 ## 3. Branch
 
-Before any file is written, following `superpowers:using-git-worktrees` for the isolation. Use `branch.name` and `branch.base` from the ticket JSON; never invent a name. The worktree goes beside the main checkout, named after it with `-N` (for example `../heat-lp-24`).
+Before any file is written. Use `branch.name` and `branch.base` from the ticket JSON; never invent a name. Work in the main checkout; do not create a worktree. Start from a clean tree (`git status --short` prints nothing); if it is not clean, stop and ask the owner.
 
 ```sh
 git fetch origin
 # New branch:
-git worktree add -b "<branch.name>" "../<checkout>-$N" "origin/<branch.base>"
-git -C "../<checkout>-$N" branch --unset-upstream
-# Branch exists locally or only on origin:
-git worktree add "../<checkout>-$N" "<branch.name>"
+git switch -c "<branch.name>" --no-track "origin/<branch.base>"
+# Branch exists locally:
+git switch "<branch.name>"
+# Branch exists only on origin:
+git switch -c "<branch.name>" --no-track "origin/<branch.name>"
 ```
 
-The upstream is cleared so a later push cannot land on the base branch; the first push sets the real one with `git push -u origin "<branch.name>"`. An existing branch is reused as it is, never reset. When the branch exists only on origin and `resuming` is false, show the owner its commits (`git log --format='%an %s' "origin/<branch.base>..origin/<branch.name>"`) and ask before adopting it: someone else's branch is not yours to build on. Then, in the worktree:
+`--no-track` keeps a later push from landing on the base branch; the first push sets the real upstream with `git push -u origin "<branch.name>"`. An existing branch is reused as it is, never reset. When the branch exists only on origin and `resuming` is false, show the owner its commits (`git log --format='%an %s' "origin/<branch.base>..origin/<branch.name>"`) and ask before adopting it: someone else's branch is not yours to build on. Then:
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm ticket move $N start
 ```
 
-From here on, work only in the worktree, with absolute paths.
-
-Artifact: the worktree, the card In progress, the `in-progress` label.
+Artifact: the checked-out branch, the card In progress, the `in-progress` label.
 
 ## 4. Brainstorm and plan
 
@@ -146,7 +145,7 @@ Artifact: commits on the branch. Delete any doc created for the ticket before th
 
 ## 6. Verify
 
-Invoke `superpowers:verification-before-completion`: no result is reported without the command run and its output read. From the worktree root:
+Invoke `superpowers:verification-before-completion`: no result is reported without the command run and its output read. From the repository root:
 
 ```sh
 pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:coverage && pnpm build
@@ -162,7 +161,7 @@ Artifact: the verification log.
 
 ## 7. Code review
 
-Invoke `superpowers:requesting-code-review` and follow it, with one change: the review is done by the `reviewer` agent, which holds this repository's quality bar. Dispatch it as a subagent with the issue number, the ticket JSON path, the worktree path and the base branch. It is the only review this skill runs.
+Invoke `superpowers:requesting-code-review` and follow it, with one change: the review is done by the `reviewer` agent, which holds this repository's quality bar. Dispatch it as a subagent with the issue number, the ticket JSON path, the checkout path and the base branch. It is the only review this skill runs.
 
 A security review is not part of this stage. Run the `security-reviewer` agent only when the owner explicitly asks for it in this session, whatever the labels or the files touched.
 

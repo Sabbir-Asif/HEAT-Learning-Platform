@@ -1114,7 +1114,7 @@ sequenceDiagram
   <ol class="pipeline">
     <li><h4>Pull ticket</h4><p>Fetch the issue, its epic, linked issues and comments with <code>gh</code>. Refuse if it is blocked or not <code>ready</code>.</p><span class="out">→ issue context loaded</span></li>
     <li><h4>Refine</h4><p>Refiner agent checks the ticket against the code and ADRs and appends a “Refined” section with acceptance criteria and edge cases. It never rewrites your original text.</p><span class="out">→ issue updated, comment logged</span></li>
-    <li><h4>Branch</h4><p>Create <code>feat/N-slug</code> in its own worktree before anything is written, and move the card to In progress.</p><span class="out">→ isolated workspace</span></li>
+    <li><h4>Branch</h4><p>Create <code>feat/N-slug</code> before anything is written, and move the card to In progress.</p><span class="out">→ ticket branch</span></li>
     <li class="gate"><h4>Brainstorm and plan</h4><p>Explore approaches, choose one, and write a step-by-step plan with tests first, committed on the branch. Optional human approval for <code>L</code> or <code>security</code> tickets.</p><span class="out">→ docs/plans/issue-N.md, plan comment</span></li>
     <li><h4>Implement (TDD)</h4><p>Failing test, code, refactor, in small conventional commits that reference the issue.</p><span class="out">→ commits on branch</span></li>
     <li><h4>Verify</h4><p>Lint, typecheck, unit, integration and affected Playwright tests. UI tickets are also checked in a real browser through Chrome DevTools.</p><span class="out">→ verification log</span></li>

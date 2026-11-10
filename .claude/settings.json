@@ -16,7 +16,13 @@
       "Bash(git push -f*)",
       "Bash(prisma migrate reset*)",
       "Bash(pnpm exec prisma migrate reset*)",
-      "Bash(npx prisma migrate reset*)"
+      "Bash(npx prisma migrate reset*)",
+      "Read(*.pem)",
+      "Read(credentials*)",
+      "Read(secrets*)",
+      "Edit(*.pem)",
+      "Edit(credentials*)",
+      "Edit(secrets*)"
     ]
   },
   "hooks": {
@@ -113,5 +119,11 @@
         ]
       }
     ]
+  },
+  "disableSkillShellExecution": true,
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "allowUnsandboxedCommands": false
   }
 }

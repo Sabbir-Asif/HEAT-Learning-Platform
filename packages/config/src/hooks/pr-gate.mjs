@@ -40,7 +40,7 @@ function worktreeOf(invocation, anchors) {
     const top = worktreeFor(anchor, branch);
     if (top) return { top };
   }
-  return { top: null, reason: `has no worktree with branch "${branch}" checked out` };
+  return { top: null, reason: `has no checkout with branch "${branch}"` };
 }
 
 export function prGate(input, env = process.env) {
@@ -54,7 +54,7 @@ export function prGate(input, env = process.env) {
     const { top, reason } = worktreeOf(invocation, anchors);
     if (!top) {
       return {
-        deny: `Pull request blocked: the working directory ${reason}, so its verification marker cannot be found. Run the command from the ticket's worktree.`,
+        deny: `Pull request blocked: the working directory ${reason}, so its verification marker cannot be found. Run the command from the ticket's checkout.`,
       };
     }
     const status = markerStatus(top);
