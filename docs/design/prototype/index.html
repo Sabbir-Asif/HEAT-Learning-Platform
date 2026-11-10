@@ -71,7 +71,7 @@ function render(push) {
   stage.className = "stage" + (isPhone ? " phone" : "") + (document.getElementById("hint").getAttribute("aria-pressed") === "true" ? " show" : "");
   stage.replaceChildren();
   const img = document.createElement("img");
-  img.src = "img/" + entry.file;
+  img.src = "../exports/" + entry.file.replace(/\.png$/, "-light-en.png");
   img.alt = TITLES[stem];
   stage.appendChild(img);
   for (const spot of entry.spots) {
