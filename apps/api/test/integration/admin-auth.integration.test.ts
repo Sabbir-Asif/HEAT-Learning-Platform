@@ -266,6 +266,12 @@ describe("admin sign-in, refresh, sign-out, /admin/me and change-password", () =
     });
 
     expect(refreshed.status).toBe(401);
+    expect(
+      refreshed.setCookies.some((line) => line.startsWith(`${realmCookies.admin.refresh}=;`)),
+    ).toBe(true);
+    expect(
+      refreshed.setCookies.some((line) => line.startsWith(`${realmCookies.admin.access}=;`)),
+    ).toBe(true);
     expect((await call("GET", "/admin/me", { cookie })).status).toBe(401);
   });
 
