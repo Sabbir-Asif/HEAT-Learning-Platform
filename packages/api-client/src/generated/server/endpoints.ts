@@ -689,6 +689,7 @@ export type AuditLogListParams = {
 };
 
 export type DepartmentsListParams = {
+  status?: DepartmentsListStatus;
   /**
    * @minimum 1
    * @maximum 9007199254740991
@@ -711,6 +712,15 @@ export type DepartmentsListParams = {
   facultyId?: string;
 };
 
+export type DepartmentsListStatus = typeof DepartmentsListStatus[keyof typeof DepartmentsListStatus];
+
+
+export const DepartmentsListStatus = {
+  active: 'active',
+  archived: 'archived',
+  all: 'all',
+} as const;
+
 export type DepartmentsListSort = typeof DepartmentsListSort[keyof typeof DepartmentsListSort];
 
 
@@ -722,6 +732,7 @@ export const DepartmentsListSort = {
 } as const;
 
 export type FacultiesListParams = {
+  status?: FacultiesListStatus;
   /**
    * @minimum 1
    * @maximum 9007199254740991
@@ -742,6 +753,15 @@ export type FacultiesListParams = {
   universityId?: string;
 };
 
+export type FacultiesListStatus = typeof FacultiesListStatus[keyof typeof FacultiesListStatus];
+
+
+export const FacultiesListStatus = {
+  active: 'active',
+  archived: 'archived',
+  all: 'all',
+} as const;
+
 export type FacultiesListSort = typeof FacultiesListSort[keyof typeof FacultiesListSort];
 
 
@@ -753,6 +773,7 @@ export const FacultiesListSort = {
 } as const;
 
 export type UniversitiesListParams = {
+  status?: UniversitiesListStatus;
   /**
    * @minimum 1
    * @maximum 9007199254740991
@@ -770,6 +791,15 @@ export type UniversitiesListParams = {
    */
   q?: string;
 };
+
+export type UniversitiesListStatus = typeof UniversitiesListStatus[keyof typeof UniversitiesListStatus];
+
+
+export const UniversitiesListStatus = {
+  active: 'active',
+  archived: 'archived',
+  all: 'all',
+} as const;
 
 export type UniversitiesListSort = typeof UniversitiesListSort[keyof typeof UniversitiesListSort];
 
@@ -1279,6 +1309,48 @@ return serverFetch<DepartmentSummaryDto>(getDepartmentsUpdateUrl(id),
 
 
 
+export const getDepartmentsArchiveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/departments/${id}/archive`
+}
+
+export const departmentsArchive = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<DepartmentSummaryDto> => {
+
+  return serverFetch<DepartmentSummaryDto>(getDepartmentsArchiveUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getDepartmentsRestoreUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/departments/${id}/restore`
+}
+
+export const departmentsRestore = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<DepartmentSummaryDto> => {
+
+  return serverFetch<DepartmentSummaryDto>(getDepartmentsRestoreUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
 export const getFacultiesListUrl = (params?: FacultiesListParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -1415,6 +1487,48 @@ return serverFetch<FacultySummaryDto>(getFacultiesUpdateUrl(id),
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(updateFacultyRequestDto)
+  }
+);}
+
+
+
+export const getFacultiesArchiveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/faculties/${id}/archive`
+}
+
+export const facultiesArchive = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<FacultySummaryDto> => {
+
+  return serverFetch<FacultySummaryDto>(getFacultiesArchiveUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getFacultiesRestoreUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/faculties/${id}/restore`
+}
+
+export const facultiesRestore = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<FacultySummaryDto> => {
+
+  return serverFetch<FacultySummaryDto>(getFacultiesRestoreUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
   }
 );}
 
@@ -1602,6 +1716,48 @@ return serverFetch<UniversitySummaryDto>(getUniversitiesUpdateUrl(id),
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(updateUniversityRequestDto)
+  }
+);}
+
+
+
+export const getUniversitiesArchiveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/universities/${id}/archive`
+}
+
+export const universitiesArchive = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<UniversitySummaryDto> => {
+
+  return serverFetch<UniversitySummaryDto>(getUniversitiesArchiveUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getUniversitiesRestoreUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/universities/${id}/restore`
+}
+
+export const universitiesRestore = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<UniversitySummaryDto> => {
+
+  return serverFetch<UniversitySummaryDto>(getUniversitiesRestoreUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
   }
 );}
 

@@ -5,8 +5,10 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { DepartmentsListSort } from './departmentsListSort';
+import type { DepartmentsListStatus } from './departmentsListStatus';
 
 export type DepartmentsListParams = {
+  status?: DepartmentsListStatus;
   /**
    * @minimum 1
    * @maximum 9007199254740991

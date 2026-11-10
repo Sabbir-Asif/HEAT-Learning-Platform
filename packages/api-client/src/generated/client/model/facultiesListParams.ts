@@ -5,8 +5,10 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { FacultiesListSort } from './facultiesListSort';
+import type { FacultiesListStatus } from './facultiesListStatus';
 
 export type FacultiesListParams = {
+  status?: FacultiesListStatus;
   /**
    * @minimum 1
    * @maximum 9007199254740991
