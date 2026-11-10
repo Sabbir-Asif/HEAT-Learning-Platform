@@ -60,6 +60,13 @@ describe("loadConfig", () => {
     expect(loadConfig({ ...valid, ADMIN_IDLE_MINUTES: "5" }).auth.adminIdleMinutes).toBe(5);
   });
 
+  test("defaults the registration response floor to one second and reads an override", () => {
+    expect(loadConfig(valid).accountProtection).toEqual({ responseFloorMs: 1000 });
+    expect(
+      loadConfig({ ...valid, RESPONSE_FLOOR_MS: "1500" }).accountProtection.responseFloorMs,
+    ).toBe(1500);
+  });
+
   test("refuses a short access secret without echoing its value", () => {
     expect(() => loadConfig({ ...valid, AUTH_ACCESS_SECRET: "short" })).toThrow(
       "Invalid environment configuration: AUTH_ACCESS_SECRET",

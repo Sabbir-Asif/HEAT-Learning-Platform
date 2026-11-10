@@ -48,6 +48,7 @@ const envSchema = z
       ),
     AUDIT_TRANSACTION_MAX_WAIT_MS: positiveInt.default(5000),
     AUDIT_TRANSACTION_TIMEOUT_MS: positiveInt.default(15000),
+    RESPONSE_FLOOR_MS: positiveInt.default(1000),
     BREACHED_PASSWORD_RANGE_URL: z.url().default("https://api.pwnedpasswords.com/range/"),
   })
   .superRefine((env, context) => {
@@ -86,6 +87,7 @@ export interface AppConfig {
   breachedPasswordRangeUrl: string;
   invitations: { ttlHours: number; adminAppUrl: string };
   audit: { transactionMaxWaitMs: number; transactionTimeoutMs: number };
+  accountProtection: { responseFloorMs: number };
   rateLimit: RateLimitConfig;
 }
 
@@ -129,6 +131,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
       transactionMaxWaitMs: values.AUDIT_TRANSACTION_MAX_WAIT_MS,
       transactionTimeoutMs: values.AUDIT_TRANSACTION_TIMEOUT_MS,
     },
+    accountProtection: { responseFloorMs: values.RESPONSE_FLOOR_MS },
     rateLimit,
   };
 };
