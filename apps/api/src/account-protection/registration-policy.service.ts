@@ -27,6 +27,7 @@ export class RegistrationPolicyService {
     email: string,
     actor: AuditActor,
   ): Promise<RegistrationOutcome> {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(lower(${email})))`;
     const existing = await tx.user.findFirst({
       where: { email: { equals: email, mode: "insensitive" }, deletedAt: null },
       select: { id: true, realm: true, emailVerifiedAt: true },

@@ -16,3 +16,4 @@ export type {
   RegistrationOutcome,
   RegistrationPolicyTransaction,
 } from "./registration-policy.types";
+export { isActiveEmailConflict } from "./active-email-conflict";

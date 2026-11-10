@@ -20,12 +20,12 @@ describe("account protections on real Postgres", () => {
   const verification = () => testApp().moduleRef.get(VerificationSessionService);
   const sessions = () => testApp().moduleRef.get(SessionService);
 
-  const register = (email: string) =>
+  const register = (email: string, emailVerifiedAt: Date | null = null) =>
     prisma().$transaction(async (tx) => {
       const outcome = await policy().apply(tx, email, actor);
       if (outcome.kind === "PROCEED") {
         await tx.user.create({
-          data: { email, passwordHash: "hash", role: "STUDENT", realm: "STUDENT" },
+          data: { email, passwordHash: "hash", role: "STUDENT", realm: "STUDENT", emailVerifiedAt },
         });
       }
       return outcome;
@@ -64,6 +64,43 @@ describe("account protections on real Postgres", () => {
     });
     expect(active).toHaveLength(1);
     expect(active[0]?.id).not.toBe(old.id);
+    const audit = await prisma().auditLog.findMany({
+      where: { action: "student.registration.replaced", entityId: old.id },
+    });
+    expect(audit).toHaveLength(1);
+  });
+
+  test("parallel registrations of one email serialise: one creates the user, the other gets the duplicate outcome", async () => {
+    const results = await Promise.all([
+      register("race@example.test", new Date()),
+      register("RACE@example.test", new Date()),
+    ]);
+
+    expect(results.map((outcome) => outcome.kind).sort()).toEqual([
+      "ALREADY_REGISTERED",
+      "PROCEED",
+    ]);
+    expect(
+      await prisma().user.count({
+        where: { email: { equals: "race@example.test", mode: "insensitive" }, deletedAt: null },
+      }),
+    ).toBe(1);
+  });
+
+  test("parallel registrations over one unverified account each replace the previous unverified account and leave one active", async () => {
+    const old = await testApp().factories.user({ email: "raceold@example.test", verified: false });
+
+    const results = await Promise.all([
+      register("raceold@example.test"),
+      register("raceold@example.test"),
+    ]);
+
+    expect(results.map((outcome) => outcome.kind)).toEqual(["PROCEED", "PROCEED"]);
+    expect(
+      await prisma().user.count({
+        where: { email: "raceold@example.test", deletedAt: null },
+      }),
+    ).toBe(1);
     const audit = await prisma().auditLog.findMany({
       where: { action: "student.registration.replaced", entityId: old.id },
     });

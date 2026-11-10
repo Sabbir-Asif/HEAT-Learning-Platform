@@ -2,7 +2,7 @@ import type { HeatClient } from "@heat/db";
 
 export type RegistrationPolicyTransaction = Pick<
   HeatClient,
-  "user" | "studentProfile" | "authToken" | "session" | "outbox" | "auditLog"
+  "$executeRaw" | "user" | "studentProfile" | "authToken" | "session" | "outbox" | "auditLog"
 >;
 
 export type RegistrationOutcome =
