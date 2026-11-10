@@ -8,7 +8,12 @@ test("builds a standalone server with the React Compiler", () => {
 
 test("sends X-Robots-Tag noindex on every path, including assets and the API", async () => {
   const rules = (await nextConfig.headers?.()) ?? [];
-  expect(rules).toHaveLength(1);
   expect(rules[0]?.source).toBe("/:path*");
   expect(rules[0]?.headers).toEqual([{ key: "X-Robots-Tag", value: "noindex" }]);
+});
+
+test("keeps the invitation token out of the Referer header", async () => {
+  const rules = (await nextConfig.headers?.()) ?? [];
+  const rule = rules.find((entry) => entry.source === "/accept-invite/:token*");
+  expect(rule?.headers).toEqual([{ key: "Referrer-Policy", value: "no-referrer" }]);
 });
