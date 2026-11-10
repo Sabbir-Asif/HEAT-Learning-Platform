@@ -9,7 +9,7 @@ import {
 } from "@heat/api-client";
 import type { AdminListResponseDtoItemsItem } from "@heat/api-client";
 import { adminSortFields } from "@heat/contracts";
-import { Badge, Button, ConfirmDialog, FieldDescription, PageHeader } from "@heat/ui";
+import { Badge, Button, ConfirmDialog, FieldDescription, FieldError, PageHeader } from "@heat/ui";
 import { DataTable, useClampedPage, useTableUrlState } from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
 import { ShellContent } from "@heat/ui/shell";
@@ -28,6 +28,7 @@ export function AdminsView({ currentUserId }: { currentUserId: string }) {
   const queryClient = useQueryClient();
   const url = useTableUrlState({ sortable });
   const [notice, setNotice] = useState<string | null>(null);
+  const [failure, setFailure] = useState<string | null>(null);
   const sortValue = url.sort ? `${url.sort.desc ? "-" : ""}${url.sort.id}` : undefined;
   const params = {
     page: url.page,
@@ -83,12 +84,13 @@ export function AdminsView({ currentUserId }: { currentUserId: string }) {
 
   async function resendInvitation(row: AdminRow) {
     setNotice(null);
+    setFailure(null);
     try {
       await resend.mutateAsync({ id: row.id });
       await refresh();
       setNotice(`A new invitation was sent to ${row.email}.`);
     } catch {
-      setNotice(`The invitation to ${row.email} could not be sent. Try again.`);
+      setFailure(`The invitation to ${row.email} could not be sent. Try again.`);
     }
   }
 
@@ -102,12 +104,13 @@ export function AdminsView({ currentUserId }: { currentUserId: string }) {
           disabled={reactivate.isPending}
           onClick={async () => {
             setNotice(null);
+            setFailure(null);
             try {
               await reactivate.mutateAsync({ id: row.id });
               await refresh();
               setNotice(`${row.email} can sign in again.`);
             } catch {
-              setNotice(`${row.email} could not be reactivated. Try again.`);
+              setFailure(`${row.email} could not be reactivated. Try again.`);
             }
           }}
         >
@@ -142,7 +145,10 @@ export function AdminsView({ currentUserId }: { currentUserId: string }) {
             description="They are signed out everywhere at once and cannot sign in until you reactivate them."
             confirmLabel="Deactivate"
             destructive
+            errorMessage={`${row.email} could not be deactivated. Try again.`}
             onConfirm={async () => {
+              setNotice(null);
+              setFailure(null);
               await deactivate.mutateAsync({ id: row.id });
               await refresh();
               setNotice(`${row.email} was deactivated and signed out.`);
@@ -163,6 +169,7 @@ export function AdminsView({ currentUserId }: { currentUserId: string }) {
           />
         }
       />
+      {failure !== null ? <FieldError>{failure}</FieldError> : null}
       {notice !== null ? <FieldDescription role="status">{notice}</FieldDescription> : null}
       <DataTable
         label="Admins"

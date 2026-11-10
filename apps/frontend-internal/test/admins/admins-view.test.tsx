@@ -218,7 +218,55 @@ describe("AdminsView", () => {
     await act(async () => buttonNamed("Resend invitation", view)?.click());
 
     await vi.waitFor(() =>
-      expect(view.querySelector("[role=status]")?.textContent).toContain("could not be sent"),
+      expect(view.querySelector("[role=alert]")?.textContent).toContain("could not be sent"),
     );
+    expect(view.querySelector("[role=status]")).toBeNull();
+  });
+
+  test("a failed reactivation is shown as an error", async () => {
+    fetchMock.mockImplementation(async (url) =>
+      String(url).endsWith("/reactivate")
+        ? new Response(
+            JSON.stringify({ error: { code: "INTERNAL", message: "x", requestId: "r" } }),
+            { status: 500 },
+          )
+        : list(),
+    );
+    const view = await mount();
+    await vi.waitFor(() => expect(view.textContent).toContain("off@example.test"));
+
+    await act(async () => buttonNamed("Reactivate", view)?.click());
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=alert]")?.textContent).toContain("could not be reactivated"),
+    );
+    expect(view.querySelector("[role=status]")).toBeNull();
+  });
+
+  test("a failed deactivation keeps the dialog open and shows an error naming the admin", async () => {
+    fetchMock.mockImplementation(async (url) =>
+      String(url).endsWith("/deactivate")
+        ? new Response(
+            JSON.stringify({ error: { code: "INTERNAL", message: "x", requestId: "r" } }),
+            { status: 500 },
+          )
+        : list(),
+    );
+    const view = await mount();
+    await vi.waitFor(() => expect(view.textContent).toContain("active@example.test"));
+    const activeRow = [...view.querySelectorAll("tr")].find((tr) =>
+      tr.textContent?.includes("active@example.test"),
+    );
+    await act(async () => buttonNamed("Deactivate", activeRow ?? view)?.click());
+    const dialog = document.querySelector("[data-slot=confirm-dialog]");
+
+    await act(async () => buttonNamed("Deactivate", dialog ?? document)?.click());
+
+    await vi.waitFor(() =>
+      expect(
+        document.querySelector("[data-slot=confirm-dialog] [role=alert]")?.textContent,
+      ).toContain("active@example.test"),
+    );
+    expect(view.querySelector("[role=status]")).toBeNull();
   });
 });
