@@ -10,6 +10,7 @@ import type { HeatClient } from "@heat/db";
 import { AuditService } from "../audit";
 import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
+import { DirectoryCache } from "./directory-cache";
 import { errorCodeOf, translateDirectoryError } from "./directory-rules";
 import {
   blockingMessage,
@@ -67,6 +68,7 @@ export class FacultiesService {
   constructor(
     @Inject(DATABASE) private readonly database: HeatClient,
     private readonly audit: AuditService,
+    private readonly cache: DirectoryCache,
   ) {}
 
   async list(query: FacultyListQuery): Promise<FacultyListResponse> {
@@ -111,6 +113,7 @@ export class FacultiesService {
       const created = await this.audit
         .client(this.database)
         .faculty.create({ data: { name: request.name }, include: withUniversities });
+      this.invalidateAfterCommit();
       this.audit.capture({ entityId: created.id, after: { name: created.name } });
       return toSummary(created, { students: 0, departments: 0 });
     } catch (error) {
@@ -125,6 +128,7 @@ export class FacultiesService {
       const updated = await this.audit
         .client(this.database)
         .faculty.update({ where: { id }, data: { name: request.name }, include: withUniversities });
+      this.invalidateAfterCommit();
       this.audit.capture({
         entityId: id,
         before: { name: before.name },
@@ -149,6 +153,7 @@ export class FacultiesService {
       }
       throw translateDirectoryError(error);
     }
+    this.invalidateAfterCommit();
     this.audit.capture({ entityId: id, before: { name: before.name } });
   }
 
@@ -166,6 +171,7 @@ export class FacultiesService {
       .catch((error: unknown) => {
         throw errorCodeOf(error) === "P2003" ? new ApiException(404, "NOT_FOUND") : error;
       });
+    this.invalidateAfterCommit();
     this.audit.capture(
       created.count > 0
         ? { entityId: id, after: link }
@@ -210,6 +216,7 @@ export class FacultiesService {
       }
       throw translateDirectoryError(error);
     }
+    this.invalidateAfterCommit();
     this.audit.capture({ entityId: id, before: { universityId, universityName } });
     return this.summaryOf(id, client);
   }
@@ -220,6 +227,10 @@ export class FacultiesService {
   ): Promise<FacultySummary> {
     const row = await this.existing(id, client);
     return toSummary(row, await usageOf(this.database, id));
+  }
+
+  private invalidateAfterCommit(): void {
+    this.audit.afterCommit(() => this.cache.invalidate());
   }
 
   private async existing(id: string, client: Pick<HeatClient, "faculty">): Promise<FacultyRow> {

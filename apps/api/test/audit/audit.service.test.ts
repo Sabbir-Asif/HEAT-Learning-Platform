@@ -84,4 +84,17 @@ describe("AuditService", () => {
       "capture was called outside an @Audited request",
     );
   });
+
+  test("afterCommit queues a task inside a request and refuses outside one", () => {
+    const service = new AuditService({} as never);
+    const scope = { tx: {} as never, changes: [] };
+    const task = async () => undefined;
+
+    auditScopeStorage.run(scope, () => service.afterCommit(task));
+
+    expect((scope as { afterCommit?: unknown[] }).afterCommit).toEqual([task]);
+    expect(() => service.afterCommit(task)).toThrow(
+      "afterCommit was called outside an @Audited request",
+    );
+  });
 });

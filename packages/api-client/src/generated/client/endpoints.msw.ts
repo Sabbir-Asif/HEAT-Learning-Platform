@@ -35,6 +35,7 @@ import type {
   CsrfTokenResponseDto,
   DepartmentListResponseDto,
   DepartmentSummaryDto,
+  DirectoryOptionListResponseDto,
   FacultyListResponseDto,
   FacultySummaryDto,
   HealthResponseDto,
@@ -104,6 +105,12 @@ export const getStudentAuthCsrfTokenResponseMock = (overrideResponse: Partial<Ex
 export const getStudentAuthSignInResponseMock = (overrideResponse: Partial<Extract<MeResponseDto, object>> = {}): MeResponseDto => ({enrollments: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), reason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const)})), user: {email: faker.string.alpha({length: {min: 10, max: 20}}), emailVerified: faker.datatype.boolean(), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
 
 export const getCaptchaIssueResponseMock = (overrideResponse: Partial<Extract<CaptchaResponseDto, object>> = {}): CaptchaResponseDto => ({expiresInSeconds: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), svg: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
+
+export const getDirectoryLookupsListUniversitiesResponseMock = (overrideResponse: Partial<Extract<DirectoryOptionListResponseDto, object>> = {}): DirectoryOptionListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
+
+export const getDirectoryLookupsListFacultiesResponseMock = (overrideResponse: Partial<Extract<DirectoryOptionListResponseDto, object>> = {}): DirectoryOptionListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
+
+export const getDirectoryLookupsListDepartmentsResponseMock = (overrideResponse: Partial<Extract<DirectoryOptionListResponseDto, object>> = {}): DirectoryOptionListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
 export const getHealthCheckResponseMock = (overrideResponse: Partial<Extract<HealthResponseDto, object>> = {}): HealthResponseDto => ({status: faker.helpers.arrayElement(['ok'] as const), ...overrideResponse})
 
@@ -524,6 +531,42 @@ export const getCaptchaIssueMockHandler = (overrideResponse?: CaptchaResponseDto
   }, options)
 }
 
+export const getDirectoryLookupsListUniversitiesMockHandler = (overrideResponse?: DirectoryOptionListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<DirectoryOptionListResponseDto> | DirectoryOptionListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/directory/universities', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDirectoryLookupsListUniversitiesResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getDirectoryLookupsListFacultiesMockHandler = (overrideResponse?: DirectoryOptionListResponseDto | ((info: Parameters<HttpResponseResolver<{ universityId: string }>>[0]) => Promise<DirectoryOptionListResponseDto> | DirectoryOptionListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get<{ universityId: string }>('*/api/directory/universities/:universityId/faculties', async (info: Parameters<HttpResponseResolver<{ universityId: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDirectoryLookupsListFacultiesResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getDirectoryLookupsListDepartmentsMockHandler = (overrideResponse?: DirectoryOptionListResponseDto | ((info: Parameters<HttpResponseResolver<{ universityId: string; facultyId: string }>>[0]) => Promise<DirectoryOptionListResponseDto> | DirectoryOptionListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get<{ universityId: string; facultyId: string }>('*/api/directory/universities/:universityId/faculties/:facultyId/departments', async (info: Parameters<HttpResponseResolver<{ universityId: string; facultyId: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getDirectoryLookupsListDepartmentsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getHealthCheckMockHandler = (overrideResponse?: HealthResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<HealthResponseDto> | HealthResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/health', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -584,6 +627,9 @@ export const getHeatLmsApiMock = () => [
   getStudentAuthSignInMockHandler(),
   getStudentAuthSignOutMockHandler(),
   getCaptchaIssueMockHandler(),
+  getDirectoryLookupsListUniversitiesMockHandler(),
+  getDirectoryLookupsListFacultiesMockHandler(),
+  getDirectoryLookupsListDepartmentsMockHandler(),
   getHealthCheckMockHandler(),
   getMeDescribeMockHandler()
 ]

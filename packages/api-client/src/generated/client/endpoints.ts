@@ -43,6 +43,7 @@ import type {
   DepartmentListResponseDto,
   DepartmentSummaryDto,
   DepartmentsListParams,
+  DirectoryOptionListResponseDto,
   FacultiesListParams,
   FacultyListResponseDto,
   FacultySummaryDto,
@@ -3051,6 +3052,299 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCaptchaIssueMutationOptions(options), queryClient);
     }
+
+export const getDirectoryLookupsListUniversitiesUrl = () => {
+
+
+
+
+  return `/api/directory/universities`
+}
+
+export const directoryLookupsListUniversities = async ( options?: Parameters<typeof customFetch>[1]): Promise<DirectoryOptionListResponseDto> => {
+
+  return customFetch<DirectoryOptionListResponseDto>(getDirectoryLookupsListUniversitiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDirectoryLookupsListUniversitiesQueryKey = () => {
+    return [
+    `/api/directory/universities`
+    ] as const;
+    }
+
+
+export const getDirectoryLookupsListUniversitiesQueryOptions = <TData = Awaited<ReturnType<typeof directoryLookupsListUniversities>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListUniversities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDirectoryLookupsListUniversitiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof directoryLookupsListUniversities>>> = ({ signal }) => directoryLookupsListUniversities({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListUniversities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DirectoryLookupsListUniversitiesQueryResult = NonNullable<Awaited<ReturnType<typeof directoryLookupsListUniversities>>>
+export type DirectoryLookupsListUniversitiesQueryError = ErrorType<unknown>
+
+
+export function useDirectoryLookupsListUniversities<TData = Awaited<ReturnType<typeof directoryLookupsListUniversities>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListUniversities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof directoryLookupsListUniversities>>,
+          TError,
+          Awaited<ReturnType<typeof directoryLookupsListUniversities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDirectoryLookupsListUniversities<TData = Awaited<ReturnType<typeof directoryLookupsListUniversities>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListUniversities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof directoryLookupsListUniversities>>,
+          TError,
+          Awaited<ReturnType<typeof directoryLookupsListUniversities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDirectoryLookupsListUniversities<TData = Awaited<ReturnType<typeof directoryLookupsListUniversities>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListUniversities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDirectoryLookupsListUniversities<TData = Awaited<ReturnType<typeof directoryLookupsListUniversities>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListUniversities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDirectoryLookupsListUniversitiesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDirectoryLookupsListFacultiesUrl = (universityId: string,) => {
+
+
+
+
+  return `/api/directory/universities/${universityId}/faculties`
+}
+
+export const directoryLookupsListFaculties = async (universityId: string, options?: Parameters<typeof customFetch>[1]): Promise<DirectoryOptionListResponseDto> => {
+
+  return customFetch<DirectoryOptionListResponseDto>(getDirectoryLookupsListFacultiesUrl(universityId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDirectoryLookupsListFacultiesQueryKey = (universityId: string,) => {
+    return [
+    `/api/directory/universities/${universityId}/faculties`
+    ] as const;
+    }
+
+
+export const getDirectoryLookupsListFacultiesQueryOptions = <TData = Awaited<ReturnType<typeof directoryLookupsListFaculties>>, TError = ErrorType<unknown>>(universityId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListFaculties>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDirectoryLookupsListFacultiesQueryKey(universityId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof directoryLookupsListFaculties>>> = ({ signal }) => directoryLookupsListFaculties(universityId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: universityId !== null && universityId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListFaculties>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DirectoryLookupsListFacultiesQueryResult = NonNullable<Awaited<ReturnType<typeof directoryLookupsListFaculties>>>
+export type DirectoryLookupsListFacultiesQueryError = ErrorType<unknown>
+
+
+export function useDirectoryLookupsListFaculties<TData = Awaited<ReturnType<typeof directoryLookupsListFaculties>>, TError = ErrorType<unknown>>(
+ universityId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListFaculties>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof directoryLookupsListFaculties>>,
+          TError,
+          Awaited<ReturnType<typeof directoryLookupsListFaculties>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDirectoryLookupsListFaculties<TData = Awaited<ReturnType<typeof directoryLookupsListFaculties>>, TError = ErrorType<unknown>>(
+ universityId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListFaculties>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof directoryLookupsListFaculties>>,
+          TError,
+          Awaited<ReturnType<typeof directoryLookupsListFaculties>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDirectoryLookupsListFaculties<TData = Awaited<ReturnType<typeof directoryLookupsListFaculties>>, TError = ErrorType<unknown>>(
+ universityId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListFaculties>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDirectoryLookupsListFaculties<TData = Awaited<ReturnType<typeof directoryLookupsListFaculties>>, TError = ErrorType<unknown>>(
+ universityId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListFaculties>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDirectoryLookupsListFacultiesQueryOptions(universityId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDirectoryLookupsListDepartmentsUrl = (universityId: string,
+    facultyId: string,) => {
+
+
+
+
+  return `/api/directory/universities/${universityId}/faculties/${facultyId}/departments`
+}
+
+export const directoryLookupsListDepartments = async (universityId: string,
+    facultyId: string, options?: Parameters<typeof customFetch>[1]): Promise<DirectoryOptionListResponseDto> => {
+
+  return customFetch<DirectoryOptionListResponseDto>(getDirectoryLookupsListDepartmentsUrl(universityId,facultyId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDirectoryLookupsListDepartmentsQueryKey = (universityId: string,
+    facultyId: string,) => {
+    return [
+    `/api/directory/universities/${universityId}/faculties/${facultyId}/departments`
+    ] as const;
+    }
+
+
+export const getDirectoryLookupsListDepartmentsQueryOptions = <TData = Awaited<ReturnType<typeof directoryLookupsListDepartments>>, TError = ErrorType<unknown>>(universityId: string,
+    facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListDepartments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDirectoryLookupsListDepartmentsQueryKey(universityId,facultyId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof directoryLookupsListDepartments>>> = ({ signal }) => directoryLookupsListDepartments(universityId,facultyId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: universityId !== null && universityId !== undefined && facultyId !== null && facultyId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListDepartments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DirectoryLookupsListDepartmentsQueryResult = NonNullable<Awaited<ReturnType<typeof directoryLookupsListDepartments>>>
+export type DirectoryLookupsListDepartmentsQueryError = ErrorType<unknown>
+
+
+export function useDirectoryLookupsListDepartments<TData = Awaited<ReturnType<typeof directoryLookupsListDepartments>>, TError = ErrorType<unknown>>(
+ universityId: string,
+    facultyId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListDepartments>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof directoryLookupsListDepartments>>,
+          TError,
+          Awaited<ReturnType<typeof directoryLookupsListDepartments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDirectoryLookupsListDepartments<TData = Awaited<ReturnType<typeof directoryLookupsListDepartments>>, TError = ErrorType<unknown>>(
+ universityId: string,
+    facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListDepartments>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof directoryLookupsListDepartments>>,
+          TError,
+          Awaited<ReturnType<typeof directoryLookupsListDepartments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDirectoryLookupsListDepartments<TData = Awaited<ReturnType<typeof directoryLookupsListDepartments>>, TError = ErrorType<unknown>>(
+ universityId: string,
+    facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListDepartments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDirectoryLookupsListDepartments<TData = Awaited<ReturnType<typeof directoryLookupsListDepartments>>, TError = ErrorType<unknown>>(
+ universityId: string,
+    facultyId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof directoryLookupsListDepartments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDirectoryLookupsListDepartmentsQueryOptions(universityId,facultyId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getHealthCheckUrl = () => {
 

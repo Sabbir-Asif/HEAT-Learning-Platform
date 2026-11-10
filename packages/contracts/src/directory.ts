@@ -173,3 +173,20 @@ export const departmentListResponseSchema = z.object({
 export type DepartmentListResponse = z.infer<typeof departmentListResponseSchema>;
 
 export const departmentIdParamsSchema = z.object({ id: z.uuid() });
+
+export const directoryOptionSchema = z.object({ id: z.uuid(), name: z.string() });
+
+export type DirectoryOption = z.infer<typeof directoryOptionSchema>;
+
+export const directoryOptionListResponseSchema = z.object({
+  items: z.array(directoryOptionSchema),
+});
+
+export type DirectoryOptionListResponse = z.infer<typeof directoryOptionListResponseSchema>;
+
+export const directoryFacultyLookupParamsSchema = z.object({ universityId: z.uuid() });
+
+export const directoryDepartmentLookupParamsSchema = z.object({
+  universityId: z.uuid(),
+  facultyId: z.uuid(),
+});

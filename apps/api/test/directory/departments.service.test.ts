@@ -84,11 +84,17 @@ const build = (
     },
     $includingDeleted: () => includingDeleted,
   };
-  const service = new DepartmentsService(database as never, new AuditService({} as never));
+  const cache = { invalidate: vi.fn().mockResolvedValue(undefined) };
+  const service = new DepartmentsService(
+    database as never,
+    new AuditService({} as never),
+    cache as never,
+  );
+  const afterCommit: Array<() => Promise<void>> = [];
   const changes: AuditChange[] = [];
   const inAuditScope = <T>(run: () => Promise<T>): Promise<T> =>
-    auditScopeStorage.run({ tx: database as never, changes }, run);
-  return { service, database, includingDeleted, changes, inAuditScope };
+    auditScopeStorage.run({ tx: database as never, changes, afterCommit }, run);
+  return { service, database, includingDeleted, changes, inAuditScope, cache, afterCommit };
 };
 
 const failureOf = (promise: Promise<unknown>): Promise<unknown> =>
@@ -551,5 +557,52 @@ describe("DepartmentsService.remove", () => {
     });
 
     expect(await code(inAuditScope(() => service.remove(id)))).toBe("NOT_FOUND");
+  });
+});
+
+const settle = async (tasks: Array<() => Promise<void>>): Promise<void> => {
+  await Promise.all(tasks.map((task) => task()));
+};
+
+describe("DepartmentsService lookup cache invalidation", () => {
+  test("create queues one invalidation that runs only after commit", async () => {
+    const { cache, afterCommit, inAuditScope, service } = build();
+
+    await inAuditScope(() => service.create(input));
+
+    expect(afterCommit).toHaveLength(1);
+    expect(cache.invalidate).not.toHaveBeenCalled();
+    await settle(afterCommit);
+    expect(cache.invalidate).toHaveBeenCalledOnce();
+  });
+
+  test("update queues one invalidation that runs only after commit", async () => {
+    const { cache, afterCommit, inAuditScope, service } = build({ students: 5 });
+
+    await inAuditScope(() => service.update(id, { ...input, name: "History" }));
+
+    expect(afterCommit).toHaveLength(1);
+    expect(cache.invalidate).not.toHaveBeenCalled();
+    await settle(afterCommit);
+    expect(cache.invalidate).toHaveBeenCalledOnce();
+  });
+
+  test("remove queues one invalidation that runs only after commit", async () => {
+    const { cache, afterCommit, inAuditScope, service } = build();
+
+    await inAuditScope(() => service.remove(id));
+
+    expect(afterCommit).toHaveLength(1);
+    expect(cache.invalidate).not.toHaveBeenCalled();
+    await settle(afterCommit);
+    expect(cache.invalidate).toHaveBeenCalledOnce();
+  });
+
+  test("a refused write queues no invalidation", async () => {
+    const { afterCommit, inAuditScope, service } = build({ existing: null });
+
+    await inAuditScope(() => service.remove(id)).catch(() => undefined);
+
+    expect(afterCommit).toHaveLength(0);
   });
 });

@@ -16,6 +16,7 @@ import {
   studentCountOf,
   studentCountsOf,
 } from "./department-usage";
+import { DirectoryCache } from "./directory-cache";
 import { errorCodeOf, translateDirectoryError } from "./directory-rules";
 
 interface DepartmentRow {
@@ -89,6 +90,7 @@ export class DepartmentsService {
   constructor(
     @Inject(DATABASE) private readonly database: HeatClient,
     private readonly audit: AuditService,
+    private readonly cache: DirectoryCache,
   ) {}
 
   async list(query: DepartmentListQuery): Promise<DepartmentListResponse> {
@@ -134,6 +136,7 @@ export class DepartmentsService {
         },
         include: withPair,
       });
+      this.invalidateAfterCommit();
       this.audit.capture({ entityId: created.id, after: snapshot(created) });
       return toSummary(created, 0);
     } catch (error) {
@@ -165,6 +168,7 @@ export class DepartmentsService {
         await client.department.update({ where: { id }, data });
       }
       const updated = await this.existing(id, client);
+      this.invalidateAfterCommit();
       this.audit.capture({
         entityId: id,
         before: snapshot(before),
@@ -189,6 +193,7 @@ export class DepartmentsService {
       }
       throw translateDirectoryError(error);
     }
+    this.invalidateAfterCommit();
     this.audit.capture({ entityId: id, before: snapshot(before) });
   }
 
@@ -201,6 +206,10 @@ export class DepartmentsService {
   private translateUpdateError(error: unknown): unknown {
     if (errorCodeOf(error) === "P2003") return new ApiException(404, "NOT_FOUND");
     return translateDirectoryError(error);
+  }
+
+  private invalidateAfterCommit(): void {
+    this.audit.afterCommit(() => this.cache.invalidate());
   }
 
   private async existing(

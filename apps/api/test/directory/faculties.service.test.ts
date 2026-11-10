@@ -106,11 +106,17 @@ const build = (
     },
     $includingDeleted: () => includingDeleted,
   };
-  const service = new FacultiesService(database as never, new AuditService({} as never));
+  const cache = { invalidate: vi.fn().mockResolvedValue(undefined) };
+  const service = new FacultiesService(
+    database as never,
+    new AuditService({} as never),
+    cache as never,
+  );
+  const afterCommit: Array<() => Promise<void>> = [];
   const changes: AuditChange[] = [];
   const inAuditScope = <T>(run: () => Promise<T>): Promise<T> =>
-    auditScopeStorage.run({ tx: database as never, changes }, run);
-  return { service, database, includingDeleted, changes, inAuditScope };
+    auditScopeStorage.run({ tx: database as never, changes, afterCommit }, run);
+  return { service, database, includingDeleted, changes, inAuditScope, cache, afterCommit };
 };
 
 const code = async (promise: Promise<unknown>): Promise<string | undefined> =>
@@ -561,5 +567,79 @@ describe("FacultiesService.unassign", () => {
       "NOT_FOUND",
     );
     expect(unlinked.database.universityFaculty.delete).not.toHaveBeenCalled();
+  });
+});
+
+const settle = async (tasks: Array<() => Promise<void>>): Promise<void> => {
+  await Promise.all(tasks.map((task) => task()));
+};
+
+describe("FacultiesService lookup cache invalidation", () => {
+  test("create queues one invalidation that runs only after commit", async () => {
+    const { cache, afterCommit, inAuditScope, service } = build();
+
+    await inAuditScope(() => service.create({ name: "Faculty of Arts" }));
+
+    expect(afterCommit).toHaveLength(1);
+    expect(cache.invalidate).not.toHaveBeenCalled();
+    await settle(afterCommit);
+    expect(cache.invalidate).toHaveBeenCalledOnce();
+  });
+
+  test("update queues one invalidation that runs only after commit", async () => {
+    const { cache, afterCommit, inAuditScope, service } = build();
+
+    await inAuditScope(() => service.update(id, { name: "Faculty of Letters" }));
+
+    expect(afterCommit).toHaveLength(1);
+    expect(cache.invalidate).not.toHaveBeenCalled();
+    await settle(afterCommit);
+    expect(cache.invalidate).toHaveBeenCalledOnce();
+  });
+
+  test("remove queues one invalidation that runs only after commit", async () => {
+    const { cache, afterCommit, inAuditScope, service } = build();
+
+    await inAuditScope(() => service.remove(id));
+
+    expect(afterCommit).toHaveLength(1);
+    expect(cache.invalidate).not.toHaveBeenCalled();
+    await settle(afterCommit);
+    expect(cache.invalidate).toHaveBeenCalledOnce();
+  });
+
+  test("assign queues one invalidation that runs only after commit", async () => {
+    const { cache, afterCommit, inAuditScope, service } = build({ linked: false });
+
+    await inAuditScope(() => service.assign(id, buet));
+
+    expect(afterCommit).toHaveLength(1);
+    expect(cache.invalidate).not.toHaveBeenCalled();
+    await settle(afterCommit);
+    expect(cache.invalidate).toHaveBeenCalledOnce();
+  });
+
+  test("unassign queues one invalidation that runs only after commit", async () => {
+    const { cache, afterCommit, inAuditScope, service, database } = build();
+    database.universityFaculty.findUnique.mockResolvedValue({
+      universityId: dhaka,
+      facultyId: id,
+      university: { id: dhaka, name: "University of Dhaka" },
+    });
+
+    await inAuditScope(() => service.unassign(id, dhaka));
+
+    expect(afterCommit).toHaveLength(1);
+    expect(cache.invalidate).not.toHaveBeenCalled();
+    await settle(afterCommit);
+    expect(cache.invalidate).toHaveBeenCalledOnce();
+  });
+
+  test("a refused write queues no invalidation", async () => {
+    const { afterCommit, inAuditScope, service } = build({ linked: false });
+
+    await inAuditScope(() => service.unassign(id, dhaka)).catch(() => undefined);
+
+    expect(afterCommit).toHaveLength(0);
   });
 });

@@ -3,7 +3,7 @@ import type { HeatClient } from "@heat/db";
 import { DATABASE } from "../core";
 import { redact } from "./audit-redaction";
 import { auditScopeStorage } from "./audit-scope";
-import type { AuditTransaction } from "./audit-scope";
+import type { AfterCommitTask, AuditTransaction } from "./audit-scope";
 import type { AuditActor, AuditChange, AuditEntry, AuditWriter } from "./audit.types";
 
 const present = (value: unknown) => (value === undefined ? undefined : redact(value));
@@ -43,5 +43,13 @@ export class AuditService {
       throw new Error("capture was called outside an @Audited request");
     }
     scope.changes.push(change);
+  }
+
+  afterCommit(task: AfterCommitTask): void {
+    const scope = auditScopeStorage.getStore();
+    if (scope === undefined) {
+      throw new Error("afterCommit was called outside an @Audited request");
+    }
+    (scope.afterCommit ??= []).push(task);
   }
 }

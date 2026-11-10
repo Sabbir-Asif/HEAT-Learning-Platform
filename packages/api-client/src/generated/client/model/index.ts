@@ -41,6 +41,8 @@ export * from './departmentsListSort';
 export * from './departmentSummaryDto';
 export * from './departmentSummaryDtoFaculty';
 export * from './departmentSummaryDtoUniversity';
+export * from './directoryOptionListResponseDto';
+export * from './directoryOptionListResponseDtoItemsItem';
 export * from './facultiesListParams';
 export * from './facultiesListSort';
 export * from './facultyListResponseDto';
