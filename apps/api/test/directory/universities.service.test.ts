@@ -97,7 +97,13 @@ describe("UniversitiesService.list", () => {
   test("pages, sorts and searches by name and reports usage counts", async () => {
     const { service, database } = build({ counts: { students: 4, departments: 2, faculties: 1 } });
 
-    const result = await service.list({ status: "all", page: 2, pageSize: 10, sort: "-name", q: "dha" });
+    const result = await service.list({
+      status: "all",
+      page: 2,
+      pageSize: 10,
+      sort: "-name",
+      q: "dha",
+    });
 
     expect(database.university.findMany).toHaveBeenCalledWith({
       where: { name: { contains: "dha", mode: "insensitive" } },

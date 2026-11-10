@@ -17,7 +17,12 @@ import {
   studentCountsOf,
 } from "./department-usage";
 import { DirectoryCache } from "./directory-cache";
-import { archivedError, errorCodeOf, statusWhere, translateDirectoryError } from "./directory-rules";
+import {
+  archivedError,
+  errorCodeOf,
+  statusWhere,
+  translateDirectoryError,
+} from "./directory-rules";
 
 interface DepartmentRow {
   id: string;

@@ -79,18 +79,16 @@ const build = (
         : vi.fn().mockResolvedValue(row()),
     },
     universityFaculty: {
-      findUnique: vi
-        .fn()
-        .mockResolvedValue(
-          options.linked === false
-            ? null
-            : {
-                university: {
-                  archivedAt: options.archivedPair === "university" ? at : null,
-                },
-                faculty: { archivedAt: options.archivedPair === "faculty" ? at : null },
+      findUnique: vi.fn().mockResolvedValue(
+        options.linked === false
+          ? null
+          : {
+              university: {
+                archivedAt: options.archivedPair === "university" ? at : null,
               },
-        ),
+              faculty: { archivedAt: options.archivedPair === "faculty" ? at : null },
+            },
+      ),
     },
     $includingDeleted: () => includingDeleted,
   };

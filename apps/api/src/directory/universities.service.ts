@@ -11,7 +11,12 @@ import { AuditService } from "../audit";
 import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
 import { DirectoryCache } from "./directory-cache";
-import { archiveChange, errorCodeOf, statusWhere, translateDirectoryError } from "./directory-rules";
+import {
+  archiveChange,
+  errorCodeOf,
+  statusWhere,
+  translateDirectoryError,
+} from "./directory-rules";
 import { blockingMessage, departmentUsageOf, usageOf } from "./university-usage";
 import type { UniversityUsage } from "./university-usage";
 

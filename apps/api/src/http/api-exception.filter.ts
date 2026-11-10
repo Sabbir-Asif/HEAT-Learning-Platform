@@ -27,7 +27,8 @@ const messages: Record<ErrorCode, string> = {
   CAPTCHA_INVALID: "The characters do not match. Try again.",
   CSRF_TOKEN_INVALID:
     "The security token for this request is missing or no longer valid. Reload the page and try again.",
-  DIRECTORY_ARCHIVED: "This record is archived, so it cannot be used for new records. Restore it first.",
+  DIRECTORY_ARCHIVED:
+    "This record is archived, so it cannot be used for new records. Restore it first.",
   DIRECTORY_IN_USE: "This record is still in use, so it cannot be deleted.",
   DIRECTORY_NAME_TAKEN: "A record with this name already exists.",
   EMAIL_IN_USE: "An account with this email address already exists.",
