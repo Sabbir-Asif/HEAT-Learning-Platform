@@ -59,3 +59,12 @@ describe("response timing", () => {
     expect(timing.slept).toEqual([90]);
   });
 });
+
+describe("response timing defaults", () => {
+  test("measures with the real clock and sleeps for real when no hooks are given", async () => {
+    const started = performance.now();
+    const result = await new ResponseTiming(config).equalise(async () => "ok", { floorMs: 20 });
+    expect(result).toBe("ok");
+    expect(performance.now() - started).toBeGreaterThanOrEqual(15);
+  });
+});
