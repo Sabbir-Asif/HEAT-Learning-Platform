@@ -18,3 +18,4 @@ export { IS_PUBLIC, Public } from "./public.decorator";
 export { readCookie } from "./cookie-reader";
 export type { CookieHeader } from "./cookie-reader";
 export type { AuthenticatedRequest } from "./authenticated-request";
+export { generateOpaqueToken, hashOpaqueToken } from "./token-hash";

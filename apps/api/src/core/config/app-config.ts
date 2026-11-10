@@ -38,9 +38,21 @@ const envSchema = z
           origins.every((origin) => URL.canParse(origin) && new URL(origin).origin === origin),
         "TRUSTED_ORIGINS must be a comma separated list of origins without a path",
       ),
+    ADMIN_INVITE_TTL_HOURS: positiveInt.default(72),
+    ADMIN_APP_URL: z
+      .url()
+      .optional()
+      .refine((value) => value === undefined || new URL(value).origin === value, "ADMIN_APP_URL must be an origin"),
     BREACHED_PASSWORD_RANGE_URL: z.url().default("https://api.pwnedpasswords.com/range/"),
   })
   .superRefine((env, context) => {
+    if (env.NODE_ENV === "production" && env.ADMIN_APP_URL === undefined) {
+      context.addIssue({
+        code: "custom",
+        path: ["ADMIN_APP_URL"],
+        message: "ADMIN_APP_URL is required in production",
+      });
+    }
     if (env.NODE_ENV === "production" && env.TRUSTED_ORIGINS.length === 0) {
       context.addIssue({
         code: "custom",
@@ -50,6 +62,7 @@ const envSchema = z
     }
   });
 
+const localAdminAppUrl = "http://localhost:3001";
 const localTrustedOrigins = ["http://localhost:3000", "http://localhost:3001"];
 
 export interface AppConfig {
@@ -66,6 +79,7 @@ export interface AppConfig {
   csrf: { secret: string; trustedOrigins: readonly string[] };
   argon2: { memoryCost: number; timeCost: number; parallelism: number };
   breachedPasswordRangeUrl: string;
+  invitations: { ttlHours: number; adminAppUrl: string };
   rateLimit: RateLimitConfig;
 }
 
@@ -101,6 +115,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
       parallelism: values.ARGON2_PARALLELISM,
     },
     breachedPasswordRangeUrl: values.BREACHED_PASSWORD_RANGE_URL,
+    invitations: { ttlHours: values.ADMIN_INVITE_TTL_HOURS, adminAppUrl: values.ADMIN_APP_URL ?? localAdminAppUrl },
     rateLimit,
   };
 };

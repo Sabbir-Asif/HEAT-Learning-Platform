@@ -6,14 +6,7 @@ export const adminStatusSchema = z.enum(adminStatuses);
 export type AdminStatus = z.infer<typeof adminStatusSchema>;
 
 export const adminPageSizes = [10, 25, 50] as const;
-export const adminSortFields = [
-  "email",
-  "-email",
-  "createdAt",
-  "-createdAt",
-  "status",
-  "-status",
-] as const;
+export const adminSortFields = ["email", "-email", "createdAt", "-createdAt"] as const;
 
 export const inviteAdminRequestSchema = z.object({
   email: z
