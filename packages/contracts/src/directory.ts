@@ -27,7 +27,14 @@ export type UpdateUniversityRequest = CreateUniversityRequest;
 
 export const universitySortFields = ["name", "-name", "createdAt", "-createdAt"] as const;
 
+export const directoryStatuses = ["active", "archived", "all"] as const;
+
+export const directoryStatusSchema = z.enum(directoryStatuses);
+
+export type DirectoryStatus = z.infer<typeof directoryStatusSchema>;
+
 const directoryListQuerySchema = z.object({
+  status: directoryStatusSchema.default("active"),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce
     .number()
