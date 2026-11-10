@@ -129,4 +129,55 @@ describe("audit interceptor and audit log viewer", () => {
     await expect(prisma.$executeRawUnsafe(`DELETE FROM "AuditLog"`)).rejects.toThrow();
     expect(await prisma.auditLog.count()).toBe(1);
   });
+
+  test("admin sign-in, sign-out and password change are audited without secrets", async () => {
+    const admin = await signedIn("ADMIN");
+
+    const changed = await call("POST", "/admin/account/change-password", {
+      cookie: admin.cookie,
+      body: { currentPassword: password, newPassword: "an entirely different passphrase" },
+      headers: { "x-request-id": "req-pw" },
+    });
+    const out = await call("POST", "/admin/auth/sign-out", { cookie: admin.cookie });
+
+    expect(changed.status).toBe(204);
+    expect(out.status).toBe(204);
+    const rows = await auditRows("User");
+    expect(rows.map((row) => row.action)).toEqual([
+      "admin.sign-in",
+      "admin.password.change",
+      "admin.sign-out",
+    ]);
+    expect(rows.every((row) => row.actorId === admin.user.id)).toBe(true);
+    expect(rows[1]?.requestId).toBe("req-pw");
+    const serialised = JSON.stringify(rows);
+    expect(serialised).not.toContain("argon2");
+    expect(serialised).not.toContain("passphrase");
+  });
+
+  test("a rejected password change writes no audit row", async () => {
+    const admin = await signedIn("ADMIN");
+
+    const reply = await call("POST", "/admin/account/change-password", {
+      cookie: admin.cookie,
+      body: {
+        currentPassword: "wrong wrong wrong",
+        newPassword: "an entirely different passphrase",
+      },
+    });
+
+    expect(reply.status).toBe(400);
+    expect((await auditRows("User")).map((row) => row.action)).toEqual(["admin.sign-in"]);
+  });
+
+  test("a failed sign-in writes no audit row", async () => {
+    const user = await testApp().factories.user({ role: "ADMIN" });
+
+    const reply = await call("POST", "/admin/auth/sign-in", {
+      body: { email: user.email, password: "wrong wrong wrong" },
+    });
+
+    expect(reply.status).toBe(401);
+    expect(await auditRows()).toHaveLength(0);
+  });
 });

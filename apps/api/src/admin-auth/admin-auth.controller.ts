@@ -9,6 +9,8 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { ApiNoContentResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { actorOf } from "../audit";
+import type { AuditableRequest } from "../audit";
 import { AllowWhilePasswordChangeRequired, Audience, Roles } from "../access";
 import {
   CookieWriter,
@@ -47,13 +49,18 @@ export class AdminAuthController {
   @ApiOkResponse({ type: AdminMeResponseDto })
   async signIn(
     @Body() body: AdminSignInRequestDto,
-    @Req() request: AuthenticatedRequest,
+    @Req() request: AuditableRequest,
     @Res({ passthrough: true }) response: CookieResponse,
   ): Promise<AdminMeResponseDto> {
-    const { userId, tokens } = await this.signInService.signIn(body.email, body.password, {
-      userAgent: request.headers["user-agent"]?.slice(0, userAgentLimit),
-      ipAddress: request.ip,
-    });
+    const { userId, tokens } = await this.signInService.signIn(
+      body.email,
+      body.password,
+      {
+        userAgent: request.headers["user-agent"]?.slice(0, userAgentLimit),
+        ipAddress: request.ip,
+      },
+      actorOf(request),
+    );
     const profile = await this.account.describe(userId);
     this.cookies.write(response, "admin", tokens);
     return profile;
@@ -86,9 +93,11 @@ export class AdminAuthController {
   @ApiNoContentResponse()
   async signOut(
     @CurrentSession() session: AuthenticatedSession,
+    @Req() request: AuditableRequest,
     @Res({ passthrough: true }) response: CookieResponse,
   ): Promise<void> {
     await this.sessions.revoke(session.familyId);
+    await this.account.recordSignOut(actorOf(request, session.userId));
     this.cookies.clear(response, "admin");
   }
 

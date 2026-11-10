@@ -1,6 +1,8 @@
-import { Body, Controller, HttpCode, Post } from "@nestjs/common";
+import { Body, Controller, HttpCode, Post, Req } from "@nestjs/common";
 import { ApiNoContentResponse, ApiTags } from "@nestjs/swagger";
 import { AllowWhilePasswordChangeRequired, Audience, Roles } from "../access";
+import { actorOf } from "../audit";
+import type { AuditableRequest } from "../audit";
 import { CurrentSession } from "../auth";
 import { RateLimit } from "../rate-limit";
 import type { AuthenticatedSession } from "../auth";
@@ -22,12 +24,14 @@ export class AdminAccountController {
   async changePassword(
     @Body() body: ChangePasswordRequestDto,
     @CurrentSession() session: AuthenticatedSession,
+    @Req() request: AuditableRequest,
   ): Promise<void> {
     await this.account.changePassword(
       session.userId,
       session.familyId,
       body.currentPassword,
       body.newPassword,
+      actorOf(request, session.userId),
     );
   }
 }
