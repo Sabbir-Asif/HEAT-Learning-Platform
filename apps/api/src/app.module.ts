@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { AccessModule } from "./access";
+import { AccountProtectionModule } from "./account-protection";
 import { AdminManagementModule } from "./admin-management";
 import { AdminAuthModule } from "./admin-auth/admin-auth.module";
 import { AuditModule } from "./audit";
@@ -17,6 +18,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     AuthModule,
     AccessModule,
     AuditModule,
+    AccountProtectionModule,
     HttpApiModule,
     MeModule,
     StudentAuthModule,
