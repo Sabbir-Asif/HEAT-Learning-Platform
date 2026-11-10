@@ -1,6 +1,10 @@
 import { z } from "zod";
 
 export * from "./academic-session";
+export * from "./admins";
+export * from "./audit";
+export * from "./auth";
+export * from "./captcha";
 export * from "./errors";
 
 export const healthResponseSchema = z.object({

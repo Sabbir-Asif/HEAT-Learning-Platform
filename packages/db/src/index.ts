@@ -1,5 +1,6 @@
 export const packageName = "@heat/db";
 export { createClient, type HeatClient } from "./client";
+export { findUserIdsByEmail, type EmailLookupClient } from "./email-lookup";
 export { Prisma } from "./generated/client";
 export { softDeletedModels } from "./soft-delete";
 export { assertNotInUse, RecordInUseError, type Usage } from "./in-use";

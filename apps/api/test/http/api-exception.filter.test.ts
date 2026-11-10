@@ -16,6 +16,7 @@ import { z } from "zod";
 import { Logger } from "@nestjs/common";
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import { configureApp } from "../../src/app.setup";
+import { ApiException } from "../../src/http/api-exception";
 import { ApiExceptionFilter } from "../../src/http/api-exception.filter";
 import { HttpApiModule } from "../../src/http/http.module";
 import { ItemsController } from "../openapi/fixtures";
@@ -38,6 +39,10 @@ class FailController {
   limited() {
     throw new HttpException("slow down", 429);
   }
+  @Get("locked")
+  locked() {
+    throw new ApiException(429, "RATE_LIMITED", 42);
+  }
   @Get("conflict")
   conflict() {
     throw new HttpException("conflict", 409);
@@ -45,6 +50,10 @@ class FailController {
   @Get("unavailable")
   unavailable() {
     throw new HttpException("maintenance", 503);
+  }
+  @Get("breached")
+  breached() {
+    throw new ApiException(400, "PASSWORD_BREACHED");
   }
   @Get("boom")
   boom() {
@@ -141,12 +150,25 @@ describe("HTTP exceptions", () => {
     ["/api/fail/missing", 404, "NOT_FOUND"],
     ["/api/nowhere", 404, "NOT_FOUND"],
     ["/api/fail/limited", 429, "RATE_LIMITED"],
+    ["/api/fail/breached", 400, "PASSWORD_BREACHED"],
     ["/api/fail/conflict", 409, "BAD_REQUEST"],
     ["/api/fail/unavailable", 503, "INTERNAL"],
   ])("%s gives %i and %s", async (path, status, code) => {
     const { response, body } = await call(path);
     expect(response.status).toBe(status);
     expect(errorResponseSchema.parse(body).error.code).toBe(code);
+  });
+
+  test("a rate limit with a wait sends Retry-After", async () => {
+    const { response, body } = await call("/api/fail/locked");
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("42");
+    expect(errorResponseSchema.parse(body).error.code).toBe("RATE_LIMITED");
+  });
+
+  test("a rate limit without a wait sends no Retry-After", async () => {
+    const { response } = await call("/api/fail/limited");
+    expect(response.headers.get("retry-after")).toBeNull();
   });
 
   test("the message is fixed text, never the exception text", async () => {

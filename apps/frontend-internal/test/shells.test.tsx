@@ -57,7 +57,7 @@ describe("admin shell", () => {
   test("the drawer lists the admin navigation and closes when a link is selected", async () => {
     pathname.value = "/";
     const view = await mount(
-      <AdminShell>
+      <AdminShell isSuperAdmin>
         <p>content</p>
       </AdminShell>,
     );
@@ -70,6 +70,23 @@ describe("admin shell", () => {
     link.addEventListener("click", (event) => event.preventDefault());
     await act(async () => link.click());
     expect(document.querySelector('[role="dialog"][data-open]')).toBeNull();
+  });
+});
+
+describe("admin shell for a plain admin", () => {
+  test("hides the Admins and Audit log pages from the navigation", async () => {
+    pathname.value = "/";
+    const view = await mount(
+      <AdminShell>
+        <p>content</p>
+      </AdminShell>,
+    );
+    await act(async () =>
+      (view.querySelector('[data-sidebar="trigger"]') as HTMLButtonElement).click(),
+    );
+    const nav = document.querySelector('nav[aria-label="Admin"]') as HTMLElement;
+    expect(nav.querySelector('a[href="/audit-log"]')).toBeNull();
+    expect(nav.querySelector('a[href="/admins"]')).toBeNull();
   });
 });
 

@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Catch, HttpException, Logger } from "@nestjs/common";
 import type { ArgumentsHost, ExceptionFilter } from "@nestjs/common";
 import { ZodValidationException } from "nestjs-zod";
+import { ApiException } from "./api-exception";
 import { z } from "zod";
 import { fieldErrorCodes } from "@heat/contracts";
 import type { ErrorCode, ErrorResponse, FieldError, FieldErrorCode } from "@heat/contracts";
@@ -18,10 +19,26 @@ interface ResponseLike {
 }
 
 const messages: Record<ErrorCode, string> = {
+  AUDIT_ACTOR_FILTER_TOO_BROAD:
+    "Too many accounts match this actor filter. Enter more of the email address.",
   BAD_REQUEST: "The request could not be processed.",
+  CANNOT_DEACTIVATE_SELF: "You cannot deactivate your own account.",
+  CAPTCHA_EXPIRED: "This security check can no longer be used. Request a new one.",
+  CAPTCHA_INVALID: "The characters do not match. Try again.",
+  CSRF_TOKEN_INVALID:
+    "The security token for this request is missing or no longer valid. Reload the page and try again.",
+  EMAIL_IN_USE: "An account with this email address already exists.",
+  ENROLLMENT_NOT_ACTIVE: "Your enrollment in this course is not active.",
   FORBIDDEN: "You are not allowed to do this.",
   INTERNAL: "Something went wrong on the server.",
+  INVALID_CREDENTIALS: "The email or password is not correct.",
+  INVITATION_EXPIRED: "This invitation has expired. Ask the super admin to send a new one.",
+  INVITATION_INVALID: "This invitation link is not valid.",
+  INVITATION_NOT_PENDING: "This admin has no pending invitation.",
   NOT_FOUND: "The requested resource was not found.",
+  ORIGIN_NOT_ALLOWED: "This request did not come from an allowed site.",
+  PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
+  PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
   RATE_LIMITED: "Too many requests. Try again later.",
   UNAUTHENTICATED: "Sign in to continue.",
   VALIDATION_FAILED: "Some fields are not valid.",
@@ -91,11 +108,19 @@ interface Classified {
   status: number;
   code: ErrorCode;
   fields?: FieldError[];
+  retryAfterSeconds?: number;
 }
 
 function classify(exception: unknown): Classified {
   if (exception instanceof ZodValidationException) {
     return { status: 400, code: "VALIDATION_FAILED", fields: fieldErrors(exception.getZodError()) };
+  }
+  if (exception instanceof ApiException) {
+    return {
+      status: exception.getStatus(),
+      code: exception.code,
+      retryAfterSeconds: exception.retryAfterSeconds,
+    };
   }
   const status =
     exception instanceof HttpException ? exception.getStatus() : middlewareStatus(exception);
@@ -112,7 +137,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const request = http.getRequest<RequestLike>();
     const response = http.getResponse<ResponseLike>();
     const requestId = resolveRequestId(request.headers["x-request-id"]);
-    const { status, code, fields } = classify(exception);
+    const { status, code, fields, retryAfterSeconds } = classify(exception);
 
     const name = exception instanceof Error ? exception.name : typeof exception;
 
@@ -130,6 +155,9 @@ export class ApiExceptionFilter implements ExceptionFilter {
       error: { code, message: messages[code], requestId, ...(fields ? { fields } : {}) },
     };
     response.setHeader("x-request-id", requestId);
+    if (retryAfterSeconds !== undefined) {
+      response.setHeader("retry-after", String(retryAfterSeconds));
+    }
     response.status(status).json(body);
   }
 }

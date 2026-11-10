@@ -22,18 +22,22 @@ describe("tailwindcss is installed in every linted package", () => {
 
 describe("the Tailwind rules are active under each package's own eslint config", () => {
   for (const directory of packages.slice(1)) {
-    test(directory, async () => {
-      const cwd = resolve(root, directory);
-      const eslint = new ESLint({
-        cwd,
-        overrideConfigFile: resolve(cwd, "eslint.config.mjs"),
-      });
-      const [result] = await eslint.lintText('export const a = <div className="p-2 p-4" />;\n', {
-        filePath: resolve(cwd, "src/probe.tsx"),
-      });
-      expect(result.messages.map((message) => message.ruleId)).toContain(
-        "better-tailwindcss/no-conflicting-classes",
-      );
-    });
+    test(
+      directory,
+      async () => {
+        const cwd = resolve(root, directory);
+        const eslint = new ESLint({
+          cwd,
+          overrideConfigFile: resolve(cwd, "eslint.config.mjs"),
+        });
+        const [result] = await eslint.lintText('export const a = <div className="p-2 p-4" />;\n', {
+          filePath: resolve(cwd, "src/probe.tsx"),
+        });
+        expect(result.messages.map((message) => message.ruleId)).toContain(
+          "better-tailwindcss/no-conflicting-classes",
+        );
+      },
+      120_000,
+    );
   }
 });

@@ -27,6 +27,7 @@ export * from "./components/table";
 export * from "./components/tabs";
 export * from "./components/textarea";
 export * from "./components/tooltip";
+export * from "./composites/captcha-field";
 export * from "./composites/confirm-dialog";
 export * from "./composites/empty-state";
 export * from "./composites/error-state";
@@ -36,6 +37,11 @@ export * from "./composites/stat-card";
 export * from "./composites/status-badge";
 export { applyServerError } from "./composites/apply-server-error";
 export type { ApplyServerErrorOptions, ServerErrorForm } from "./composites/apply-server-error";
-export { fieldErrorCopy, formErrorCopy, genericFormMessage } from "./composites/form-errors";
+export {
+  fieldErrorCopy,
+  formErrorCopy,
+  genericFormMessage,
+  rateLimitedMessage,
+} from "./composites/form-errors";
 export { resolveStatus, statusEntries } from "./composites/status";
 export type { StatusEntry, StatusKey, StatusKind, StatusTone } from "./composites/status";

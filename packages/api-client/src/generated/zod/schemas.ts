@@ -6,6 +6,386 @@
  */
 import * as zod from 'zod';
 
+export const adminAccountChangePasswordBodyCurrentPasswordMax = 256;
+
+export const adminAccountChangePasswordBodyNewPasswordMin = 12;
+export const adminAccountChangePasswordBodyNewPasswordMax = 256;
+
+
+
+export const AdminAccountChangePasswordBody = zod.object({
+  "currentPassword": zod.string().min(1).max(adminAccountChangePasswordBodyCurrentPasswordMax),
+  "newPassword": zod.string().min(adminAccountChangePasswordBodyNewPasswordMin).max(adminAccountChangePasswordBodyNewPasswordMax)
+})
+
+export const AdminAccountChangePasswordResponse = zod.void()
+
+
+export const adminUsersListQueryPageDefault = 1;
+export const adminUsersListQueryPageMax = 9007199254740991;
+
+export const adminUsersListQueryPageSizeDefault = 25;
+export const adminUsersListQueryPageSizeMin = -9007199254740991;
+export const adminUsersListQueryPageSizeMax = 9007199254740991;
+
+
+
+export const AdminUsersListQueryParams = zod.object({
+  "page": zod.int().min(1).max(adminUsersListQueryPageMax).default(adminUsersListQueryPageDefault),
+  "pageSize": zod.int().min(adminUsersListQueryPageSizeMin).max(adminUsersListQueryPageSizeMax).default(adminUsersListQueryPageSizeDefault),
+  "sort": zod.enum(['email', '-email', 'createdAt', '-createdAt']).optional()
+})
+
+export const adminUsersListResponseItemsItemCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminUsersListResponseItemsItemDeactivatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminUsersListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminUsersListResponseItemsItemInviteExpiresAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminUsersListResponsePageMax = 9007199254740991;
+
+export const adminUsersListResponsePageSizeMax = 9007199254740991;
+
+export const adminUsersListResponseTotalMin = 0;
+export const adminUsersListResponseTotalMax = 9007199254740991;
+
+
+
+export const AdminUsersListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "createdAt": zod.iso.datetime({"offset":true}).regex(adminUsersListResponseItemsItemCreatedAtRegExp),
+  "deactivatedAt": zod.iso.datetime({"offset":true}).regex(adminUsersListResponseItemsItemDeactivatedAtRegExp).nullable(),
+  "email": zod.string(),
+  "id": zod.uuid().regex(adminUsersListResponseItemsItemIdRegExp),
+  "inviteExpiresAt": zod.iso.datetime({"offset":true}).regex(adminUsersListResponseItemsItemInviteExpiresAtRegExp).nullable(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT']),
+  "status": zod.enum(['ACTIVE', 'INVITED', 'INVITE_EXPIRED', 'DEACTIVATED'])
+})),
+  "page": zod.int().min(1).max(adminUsersListResponsePageMax),
+  "pageSize": zod.int().min(1).max(adminUsersListResponsePageSizeMax),
+  "total": zod.int().min(adminUsersListResponseTotalMin).max(adminUsersListResponseTotalMax)
+})
+
+
+export const AdminUsersInviteBody = zod.object({
+  "email": zod.string()
+})
+
+export const adminUsersInviteResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminUsersInviteResponseDeactivatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminUsersInviteResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminUsersInviteResponseInviteExpiresAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const AdminUsersInviteResponse = zod.object({
+  "createdAt": zod.iso.datetime({"offset":true}).regex(adminUsersInviteResponseCreatedAtRegExp),
+  "deactivatedAt": zod.iso.datetime({"offset":true}).regex(adminUsersInviteResponseDeactivatedAtRegExp).nullable(),
+  "email": zod.string(),
+  "id": zod.uuid().regex(adminUsersInviteResponseIdRegExp),
+  "inviteExpiresAt": zod.iso.datetime({"offset":true}).regex(adminUsersInviteResponseInviteExpiresAtRegExp).nullable(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT']),
+  "status": zod.enum(['ACTIVE', 'INVITED', 'INVITE_EXPIRED', 'DEACTIVATED'])
+})
+
+
+export const adminUsersDeactivatePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminUsersDeactivateParams = zod.object({
+  "id": zod.uuid().regex(adminUsersDeactivatePathIdRegExp)
+})
+
+export const adminUsersDeactivateResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminUsersDeactivateResponseDeactivatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminUsersDeactivateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminUsersDeactivateResponseInviteExpiresAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const AdminUsersDeactivateResponse = zod.object({
+  "createdAt": zod.iso.datetime({"offset":true}).regex(adminUsersDeactivateResponseCreatedAtRegExp),
+  "deactivatedAt": zod.iso.datetime({"offset":true}).regex(adminUsersDeactivateResponseDeactivatedAtRegExp).nullable(),
+  "email": zod.string(),
+  "id": zod.uuid().regex(adminUsersDeactivateResponseIdRegExp),
+  "inviteExpiresAt": zod.iso.datetime({"offset":true}).regex(adminUsersDeactivateResponseInviteExpiresAtRegExp).nullable(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT']),
+  "status": zod.enum(['ACTIVE', 'INVITED', 'INVITE_EXPIRED', 'DEACTIVATED'])
+})
+
+
+export const adminUsersReactivatePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminUsersReactivateParams = zod.object({
+  "id": zod.uuid().regex(adminUsersReactivatePathIdRegExp)
+})
+
+export const adminUsersReactivateResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminUsersReactivateResponseDeactivatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminUsersReactivateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminUsersReactivateResponseInviteExpiresAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const AdminUsersReactivateResponse = zod.object({
+  "createdAt": zod.iso.datetime({"offset":true}).regex(adminUsersReactivateResponseCreatedAtRegExp),
+  "deactivatedAt": zod.iso.datetime({"offset":true}).regex(adminUsersReactivateResponseDeactivatedAtRegExp).nullable(),
+  "email": zod.string(),
+  "id": zod.uuid().regex(adminUsersReactivateResponseIdRegExp),
+  "inviteExpiresAt": zod.iso.datetime({"offset":true}).regex(adminUsersReactivateResponseInviteExpiresAtRegExp).nullable(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT']),
+  "status": zod.enum(['ACTIVE', 'INVITED', 'INVITE_EXPIRED', 'DEACTIVATED'])
+})
+
+
+export const adminUsersResendInvitationPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminUsersResendInvitationParams = zod.object({
+  "id": zod.uuid().regex(adminUsersResendInvitationPathIdRegExp)
+})
+
+export const adminUsersResendInvitationResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminUsersResendInvitationResponseDeactivatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminUsersResendInvitationResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminUsersResendInvitationResponseInviteExpiresAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const AdminUsersResendInvitationResponse = zod.object({
+  "createdAt": zod.iso.datetime({"offset":true}).regex(adminUsersResendInvitationResponseCreatedAtRegExp),
+  "deactivatedAt": zod.iso.datetime({"offset":true}).regex(adminUsersResendInvitationResponseDeactivatedAtRegExp).nullable(),
+  "email": zod.string(),
+  "id": zod.uuid().regex(adminUsersResendInvitationResponseIdRegExp),
+  "inviteExpiresAt": zod.iso.datetime({"offset":true}).regex(adminUsersResendInvitationResponseInviteExpiresAtRegExp).nullable(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT']),
+  "status": zod.enum(['ACTIVE', 'INVITED', 'INVITE_EXPIRED', 'DEACTIVATED'])
+})
+
+
+export const auditLogListQueryPageDefault = 1;
+export const auditLogListQueryPageMax = 9007199254740991;
+
+export const auditLogListQueryPageSizeDefault = 25;
+export const auditLogListQueryPageSizeMin = -9007199254740991;
+export const auditLogListQueryPageSizeMax = 9007199254740991;
+
+export const auditLogListQueryActorMax = 120;
+
+export const auditLogListQueryActionMax = 120;
+
+export const auditLogListQueryEntityMax = 120;
+
+export const auditLogListQueryFromRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const auditLogListQueryToRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+
+
+export const AuditLogListQueryParams = zod.object({
+  "page": zod.int().min(1).max(auditLogListQueryPageMax).default(auditLogListQueryPageDefault),
+  "pageSize": zod.int().min(auditLogListQueryPageSizeMin).max(auditLogListQueryPageSizeMax).default(auditLogListQueryPageSizeDefault),
+  "actor": zod.string().min(1).max(auditLogListQueryActorMax).optional(),
+  "action": zod.string().min(1).max(auditLogListQueryActionMax).optional(),
+  "entity": zod.string().min(1).max(auditLogListQueryEntityMax).optional(),
+  "from": zod.string().regex(auditLogListQueryFromRegExp).optional(),
+  "to": zod.string().regex(auditLogListQueryToRegExp).optional()
+})
+
+export const auditLogListResponseItemsItemActorEmailMax = 254;
+
+export const auditLogListResponseItemsItemActorIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const auditLogListResponseItemsItemEntityIdMax = 128;
+
+export const auditLogListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const auditLogListResponseItemsItemIpAddressMax = 64;
+
+export const auditLogListResponseItemsItemOccurredAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const auditLogListResponseItemsItemRequestIdMax = 64;
+
+export const auditLogListResponsePageMax = 9007199254740991;
+
+export const auditLogListResponsePageSizeMax = 9007199254740991;
+
+export const auditLogListResponseTotalMin = 0;
+export const auditLogListResponseTotalMax = 9007199254740991;
+
+
+
+export const AuditLogListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "action": zod.string(),
+  "actorEmail": zod.string().max(auditLogListResponseItemsItemActorEmailMax).nullable(),
+  "actorId": zod.uuid().regex(auditLogListResponseItemsItemActorIdRegExp).nullable(),
+  "after": zod.record(zod.string(), zod.unknown()).nullable(),
+  "before": zod.record(zod.string(), zod.unknown()).nullable(),
+  "entity": zod.string(),
+  "entityId": zod.string().max(auditLogListResponseItemsItemEntityIdMax).nullable(),
+  "id": zod.uuid().regex(auditLogListResponseItemsItemIdRegExp),
+  "ipAddress": zod.string().max(auditLogListResponseItemsItemIpAddressMax).nullable(),
+  "occurredAt": zod.iso.datetime({"offset":true}).regex(auditLogListResponseItemsItemOccurredAtRegExp),
+  "requestId": zod.string().max(auditLogListResponseItemsItemRequestIdMax).nullable()
+})),
+  "page": zod.int().min(1).max(auditLogListResponsePageMax),
+  "pageSize": zod.int().min(1).max(auditLogListResponsePageSizeMax),
+  "total": zod.int().min(auditLogListResponseTotalMin).max(auditLogListResponseTotalMax)
+})
+
+
+export const AdminAuthCsrfTokenResponse = zod.object({
+  "token": zod.string()
+})
+
+
+export const adminInvitationAcceptBodyPasswordMin = 12;
+export const adminInvitationAcceptBodyPasswordMax = 256;
+
+export const adminInvitationAcceptBodyTokenMax = 128;
+
+
+
+export const AdminInvitationAcceptBody = zod.object({
+  "password": zod.string().min(adminInvitationAcceptBodyPasswordMin).max(adminInvitationAcceptBodyPasswordMax),
+  "token": zod.string().min(1).max(adminInvitationAcceptBodyTokenMax)
+})
+
+export const AdminInvitationAcceptResponse = zod.void()
+
+
+export const adminInvitationLookupBodyTokenMax = 128;
+
+
+
+export const AdminInvitationLookupBody = zod.object({
+  "token": zod.string().min(1).max(adminInvitationLookupBodyTokenMax)
+})
+
+export const AdminInvitationLookupResponse = zod.object({
+  "email": zod.string().optional(),
+  "status": zod.enum(['VALID', 'EXPIRED', 'INVALID'])
+})
+
+
+export const AdminAuthRefreshResponse = zod.void()
+
+
+export const adminAuthSignInBodyPasswordMax = 256;
+
+
+
+export const AdminAuthSignInBody = zod.object({
+  "email": zod.string(),
+  "password": zod.string().min(1).max(adminAuthSignInBodyPasswordMax)
+})
+
+export const adminAuthSignInResponseUserIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminAuthSignInResponse = zod.object({
+  "user": zod.object({
+  "email": zod.string(),
+  "id": zod.uuid().regex(adminAuthSignInResponseUserIdRegExp),
+  "mustChangePassword": zod.boolean(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT'])
+})
+})
+
+
+export const AdminAuthSignOutResponse = zod.void()
+
+
+export const adminMeDescribeResponseUserIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminMeDescribeResponse = zod.object({
+  "user": zod.object({
+  "email": zod.string(),
+  "id": zod.uuid().regex(adminMeDescribeResponseUserIdRegExp),
+  "mustChangePassword": zod.boolean(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT'])
+})
+})
+
+
+export const StudentAuthCsrfTokenResponse = zod.object({
+  "token": zod.string()
+})
+
+
+export const StudentAuthRefreshResponse = zod.void()
+
+
+export const studentAuthSignInBodyPasswordMax = 256;
+
+
+
+export const StudentAuthSignInBody = zod.object({
+  "email": zod.string(),
+  "password": zod.string().min(1).max(studentAuthSignInBodyPasswordMax)
+})
+
+export const studentAuthSignInResponseEnrollmentsItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentAuthSignInResponseUserIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const StudentAuthSignInResponse = zod.object({
+  "enrollments": zod.array(zod.object({
+  "courseId": zod.uuid().regex(studentAuthSignInResponseEnrollmentsItemCourseIdRegExp),
+  "courseSlug": zod.string(),
+  "courseTitle": zod.string(),
+  "reason": zod.string().optional(),
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED'])
+})),
+  "user": zod.object({
+  "email": zod.string(),
+  "emailVerified": zod.boolean(),
+  "id": zod.uuid().regex(studentAuthSignInResponseUserIdRegExp),
+  "mustChangePassword": zod.boolean(),
+  "name": zod.string().optional(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT'])
+})
+})
+
+
+export const StudentAuthSignOutResponse = zod.void()
+
+
+export const captchaIssueBodyReplacesRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const CaptchaIssueBody = zod.object({
+  "replaces": zod.uuid().regex(captchaIssueBodyReplacesRegExp).optional()
+})
+
+export const captchaIssueResponseExpiresInSecondsExclusiveMin = 0;
+export const captchaIssueResponseExpiresInSecondsMax = 9007199254740991;
+
+export const captchaIssueResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const CaptchaIssueResponse = zod.object({
+  "expiresInSeconds": zod.int().gt(captchaIssueResponseExpiresInSecondsExclusiveMin).max(captchaIssueResponseExpiresInSecondsMax),
+  "id": zod.uuid().regex(captchaIssueResponseIdRegExp),
+  "svg": zod.string()
+})
+
+
 export const HealthCheckResponse = zod.object({
   "status": zod.enum(['ok'])
+})
+
+
+export const meDescribeResponseEnrollmentsItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const meDescribeResponseUserIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const MeDescribeResponse = zod.object({
+  "enrollments": zod.array(zod.object({
+  "courseId": zod.uuid().regex(meDescribeResponseEnrollmentsItemCourseIdRegExp),
+  "courseSlug": zod.string(),
+  "courseTitle": zod.string(),
+  "reason": zod.string().optional(),
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED'])
+})),
+  "user": zod.object({
+  "email": zod.string(),
+  "emailVerified": zod.boolean(),
+  "id": zod.uuid().regex(meDescribeResponseUserIdRegExp),
+  "mustChangePassword": zod.boolean(),
+  "name": zod.string().optional(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT'])
+})
 })

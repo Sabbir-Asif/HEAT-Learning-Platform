@@ -1,0 +1,314 @@
+import { randomUUID } from "node:crypto";
+import type { Clock } from "../../src/core";
+import { CaptchaStore } from "../../src/captcha/captcha.store";
+import type { CaptchaAttempt } from "../../src/captcha/captcha.store";
+import type { CaptchaEntropy } from "../../src/captcha/captcha-entropy";
+import type { LockoutPolicy } from "../../src/core";
+import { LockoutStore } from "../../src/rate-limit/lockout.store";
+import { RateLimitStore } from "../../src/rate-limit/rate-limit.store";
+import type { RateLimitHit } from "../../src/rate-limit/rate-limit.store";
+import { RotationClaimStore } from "../../src/auth/rotation-claim.store";
+import { SessionStore } from "../../src/auth/session.store";
+import type { NewSession, SessionRow, SessionUserRow } from "../../src/auth/session.store";
+
+export class FakeClock implements Clock {
+  private current: number;
+
+  constructor(start: Date = new Date("2026-11-09T04:00:00.000Z")) {
+    this.current = start.getTime();
+  }
+
+  now(): Date {
+    return new Date(this.current);
+  }
+
+  advanceSeconds(seconds: number): void {
+    this.current += seconds * 1000;
+  }
+
+  advanceMinutes(minutes: number): void {
+    this.advanceSeconds(minutes * 60);
+  }
+}
+
+export class InMemoryClaimStore extends RotationClaimStore {
+  private readonly entries = new Map<string, { value: string; expiresAt: number }>();
+
+  constructor(private readonly clock: Clock) {
+    super();
+  }
+
+  claim(key: string, value: string, ttlSeconds: number): Promise<boolean> {
+    if (this.live(key) !== null) return Promise.resolve(false);
+    this.entries.set(key, { value, expiresAt: this.clock.now().getTime() + ttlSeconds * 1000 });
+    return Promise.resolve(true);
+  }
+
+  read(key: string): Promise<string | null> {
+    return Promise.resolve(this.live(key));
+  }
+
+  delete(key: string): Promise<void> {
+    this.entries.delete(key);
+    return Promise.resolve();
+  }
+
+  keys(): string[] {
+    return [...this.entries.keys()];
+  }
+
+  private live(key: string): string | null {
+    const entry = this.entries.get(key);
+    if (entry === undefined) return null;
+    if (entry.expiresAt <= this.clock.now().getTime()) {
+      this.entries.delete(key);
+      return null;
+    }
+    return entry.value;
+  }
+}
+
+export class InMemorySessionStore extends SessionStore {
+  readonly rows: SessionRow[] = [];
+  readonly users = new Map<string, SessionUserRow>();
+  failNextRotation: Error | null = null;
+  rotateResult: boolean | null = null;
+
+  addUser(user: Partial<SessionUserRow> = {}): SessionUserRow {
+    const created: SessionUserRow = {
+      id: randomUUID(),
+      realm: "STUDENT",
+      role: "STUDENT",
+      deactivatedAt: null,
+      deletedAt: null,
+      mustChangePassword: false,
+      ...user,
+    };
+    this.users.set(created.id, created);
+    return created;
+  }
+
+  findByHash(refreshTokenHash: string): Promise<SessionRow | null> {
+    return Promise.resolve(
+      this.rows.find((row) => row.refreshTokenHash === refreshTokenHash) ?? null,
+    );
+  }
+
+  findLatest(familyId: string): Promise<SessionRow | null> {
+    const family = this.rows.filter((row) => row.familyId === familyId);
+    return Promise.resolve(family.at(-1) ?? null);
+  }
+
+  findFamilyStart(familyId: string): Promise<Date | null> {
+    const first = this.rows.find((row) => row.familyId === familyId);
+    return Promise.resolve(first?.createdAt ?? null);
+  }
+
+  findUser(userId: string): Promise<SessionUserRow | null> {
+    return Promise.resolve(this.users.get(userId) ?? null);
+  }
+
+  insert(session: NewSession): Promise<void> {
+    this.rows.push(this.toRow(session));
+    return Promise.resolve();
+  }
+
+  rotate(previousId: string, rotatedAt: Date, next: NewSession): Promise<boolean> {
+    if (this.failNextRotation !== null) {
+      const error = this.failNextRotation;
+      this.failNextRotation = null;
+      return Promise.reject(error);
+    }
+    if (this.rotateResult !== null) return Promise.resolve(this.rotateResult);
+    const previous = this.rows.find((row) => row.id === previousId);
+    if (previous === undefined || previous.rotatedAt !== null || previous.revokedAt !== null) {
+      return Promise.resolve(false);
+    }
+    previous.rotatedAt = rotatedAt;
+    this.rows.push(this.toRow(next));
+    return Promise.resolve(true);
+  }
+
+  revokeFamily(familyId: string, at: Date): Promise<void> {
+    this.revokeWhere((row) => row.familyId === familyId, at);
+    return Promise.resolve();
+  }
+
+  revokeUser(userId: string, at: Date): Promise<void> {
+    this.revokeWhere((row) => row.userId === userId, at);
+    return Promise.resolve();
+  }
+
+  revokeUserExcept(userId: string, keepFamilyId: string, at: Date): Promise<void> {
+    this.revokeWhere((row) => row.userId === userId && row.familyId !== keepFamilyId, at);
+    return Promise.resolve();
+  }
+
+  private revokeWhere(match: (row: SessionRow) => boolean, at: Date): void {
+    for (const row of this.rows) {
+      if (match(row) && row.revokedAt === null) row.revokedAt = at;
+    }
+  }
+
+  private toRow(session: NewSession): SessionRow {
+    return {
+      id: randomUUID(),
+      userId: session.userId,
+      familyId: session.familyId,
+      refreshTokenHash: session.refreshTokenHash,
+      createdAt: session.createdAt,
+      expiresAt: session.expiresAt,
+      rotatedAt: null,
+      revokedAt: null,
+    };
+  }
+}
+
+export class InMemoryCaptchaStore extends CaptchaStore {
+  private readonly entries = new Map<
+    string,
+    { answerHash: string; tries: number; expiresAt: number }
+  >();
+
+  constructor(private readonly clock: Clock) {
+    super();
+  }
+
+  save(id: string, answerHash: string, ttlSeconds: number): Promise<void> {
+    this.entries.set(id, {
+      answerHash,
+      tries: 0,
+      expiresAt: this.clock.now().getTime() + ttlSeconds * 1000,
+    });
+    return Promise.resolve();
+  }
+
+  attempt(id: string, answerHash: string, maxTries: number): Promise<CaptchaAttempt> {
+    const entry = this.entries.get(id);
+    if (entry === undefined || entry.expiresAt <= this.clock.now().getTime()) {
+      this.entries.delete(id);
+      return Promise.resolve("gone");
+    }
+    if (entry.answerHash === answerHash) {
+      this.entries.delete(id);
+      return Promise.resolve("passed");
+    }
+    entry.tries += 1;
+    if (entry.tries >= maxTries) {
+      this.entries.delete(id);
+      return Promise.resolve("exhausted");
+    }
+    return Promise.resolve("wrong");
+  }
+
+  remove(id: string): Promise<void> {
+    this.entries.delete(id);
+    return Promise.resolve();
+  }
+
+  hashes(): string[] {
+    return [...this.entries.values()].map((entry) => entry.answerHash);
+  }
+}
+
+export class StubEntropy implements CaptchaEntropy {
+  private cursor = 0;
+
+  constructor(private readonly picks: number[] = [0, 1, 2, 3, 4, 5]) {}
+
+  int(max: number): number {
+    const value = (this.picks[this.cursor % this.picks.length] ?? 0) % max;
+    this.cursor += 1;
+    return value;
+  }
+
+  unit(): number {
+    return 0.5;
+  }
+}
+
+export class InMemoryRateLimitStore extends RateLimitStore {
+  readonly keys = new Map<string, { count: number; expiresAt: number }>();
+  failing = false;
+
+  constructor(private readonly clock: Clock) {
+    super();
+  }
+
+  hit(key: string, windowSeconds: number): Promise<RateLimitHit> {
+    if (this.failing) return Promise.reject(new Error("redis down"));
+    const now = this.clock.now().getTime();
+    const current = this.keys.get(key);
+    const entry =
+      current !== undefined && current.expiresAt > now
+        ? current
+        : { count: 0, expiresAt: now + windowSeconds * 1000 };
+    entry.count += 1;
+    this.keys.set(key, entry);
+    return Promise.resolve({
+      count: entry.count,
+      ttlSeconds: Math.ceil((entry.expiresAt - now) / 1000),
+    });
+  }
+}
+
+interface LockoutEntry {
+  failures: number;
+  start: number;
+  until: number;
+}
+
+export class InMemoryLockoutStore extends LockoutStore {
+  readonly entries = new Map<string, LockoutEntry>();
+  failing = false;
+
+  reserve(
+    attemptKey: string,
+    accountKey: string,
+    nowMs: number,
+    policy: LockoutPolicy,
+  ): Promise<number> {
+    if (this.failing) return Promise.reject(new Error("redis down"));
+    const windowMs = policy.memorySeconds * 1000;
+    const attempt = this.entries.get(attemptKey);
+    const account = this.entries.get(accountKey);
+    const lockedUntil = Math.max(attempt?.until ?? 0, account?.until ?? 0);
+    if (lockedUntil > nowMs) return Promise.resolve(lockedUntil);
+    const touch = (key: string, existing: LockoutEntry | undefined): LockoutEntry => {
+      const live = existing !== undefined && nowMs < existing.start + windowMs;
+      const entry = live ? existing : { failures: 0, start: nowMs, until: 0 };
+      entry.failures += 1;
+      this.entries.set(key, entry);
+      return entry;
+    };
+    const attemptEntry = touch(attemptKey, attempt);
+    if (attemptEntry.failures >= policy.threshold) {
+      const delay = Math.min(
+        policy.baseSeconds * 2 ** Math.min(attemptEntry.failures - policy.threshold, 30),
+        policy.maxSeconds,
+      );
+      attemptEntry.until = nowMs + delay * 1000;
+    }
+    const accountEntry = touch(accountKey, account);
+    if (accountEntry.failures >= policy.accountThreshold) {
+      accountEntry.until = nowMs + policy.maxSeconds * 1000;
+    }
+    return Promise.resolve(0);
+  }
+
+  release(attemptKey: string, accountKey: string): Promise<void> {
+    if (this.failing) return Promise.reject(new Error("redis down"));
+    this.entries.delete(attemptKey);
+    const account = this.entries.get(accountKey);
+    if (account !== undefined && account.failures > 0) account.failures -= 1;
+    return Promise.resolve();
+  }
+
+  clearAccount(accountKey: string): Promise<void> {
+    if (this.failing) return Promise.reject(new Error("redis down"));
+    for (const key of [...this.entries.keys()]) {
+      if (key === accountKey || key.startsWith(`${accountKey}:`)) this.entries.delete(key);
+    }
+    return Promise.resolve();
+  }
+}

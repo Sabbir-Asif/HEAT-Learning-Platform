@@ -107,6 +107,18 @@ importers:
       '@nestjs/swagger':
         specifier: 12.1.1
         version: 12.1.1(@nestjs/common@12.4.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.4.0)(reflect-metadata@0.2.2)(typescript@5.9.3)
+      argon2:
+        specifier: 0.45.2
+        version: 0.45.2
+      helmet:
+        specifier: ^8.3.0
+        version: 8.3.0
+      ioredis:
+        specifier: 6.0.0
+        version: 6.0.0(supports-color@7.2.0)
+      jose:
+        specifier: ^6.2.15
+        version: 6.2.15
       nestjs-zod:
         specifier: 5.5.0
         version: 5.5.0(@nestjs/common@12.4.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/swagger@12.1.1(@nestjs/common@12.4.0(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@7.2.0))(@nestjs/core@12.4.0)(reflect-metadata@0.2.2)(typescript@5.9.3))(rxjs@7.8.2)(zod@4.6.7)
@@ -156,18 +168,33 @@ importers:
       '@heat/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@hookform/resolvers':
+        specifier: 7.0.3
+        version: 7.0.3(@standard-schema/spec@1.1.0)(ajv@8.20.0)(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.1))(valibot@1.5.0(typescript@5.9.3))(zod@4.6.7)
+      '@tanstack/react-query':
+        specifier: 5.106.1
+        version: 5.106.1(@types/react@19.3.0)(react@19.3.1)
       lucide-react:
         specifier: 1.70.0
         version: 1.70.0(@types/react@19.3.0)(react@19.3.1)
       next:
         specifier: 'catalog:'
         version: 16.4.5(@babel/core@7.29.13(supports-color@7.2.0))(@opentelemetry/api@1.10.0)(@playwright/test@1.65.0)(@types/node@22.20.5)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      nuqs:
+        specifier: 2.10.2
+        version: 2.10.2(next@16.4.5(@babel/core@7.29.13(supports-color@7.2.0))(@opentelemetry/api@1.10.0)(@playwright/test@1.65.0)(@types/node@22.20.5)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
       react:
         specifier: 'catalog:'
         version: 19.3.1
       react-dom:
         specifier: 'catalog:'
         version: 19.3.1(react@19.3.1)
+      react-hook-form:
+        specifier: 7.91.0
+        version: 7.91.0(@types/react@19.3.0)(react@19.3.1)
+      server-only:
+        specifier: 0.0.1
+        version: 0.0.1
     devDependencies:
       '@heat/config':
         specifier: workspace:*
@@ -214,6 +241,12 @@ importers:
       '@heat/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@hookform/resolvers':
+        specifier: 7.0.3
+        version: 7.0.3(@standard-schema/spec@1.1.0)(ajv@8.20.0)(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.1))(valibot@1.5.0(typescript@5.9.3))(zod@4.6.7)
+      '@tanstack/react-query':
+        specifier: 5.106.1
+        version: 5.106.1(@types/react@19.3.0)(react@19.3.1)
       lucide-react:
         specifier: 1.70.0
         version: 1.70.0(@types/react@19.3.0)(react@19.3.1)
@@ -226,6 +259,12 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.3.1(react@19.3.1)
+      react-hook-form:
+        specifier: 7.91.0
+        version: 7.91.0(@types/react@19.3.0)(react@19.3.1)
+      server-only:
+        specifier: 0.0.1
+        version: 0.0.1
     devDependencies:
       '@heat/config':
         specifier: workspace:*
@@ -1269,6 +1308,81 @@ packages:
     resolution: {integrity: sha512-wtF6h+DY6M3YaDBPAmvuuA6jV8Sif9MjtOI5euKFWRgCDl5PeDpPsHR9u2l6St5ceY8AZgoNDww5+HvEsXFsGg==}
     engines: {node: '>=6'}
     hasBin: true
+
+  '@hookform/resolvers@7.0.3':
+    resolution: {integrity: sha512-beGY1JY6K5cyWlswD4BVf7UTb5MxSjKkjljrRyLPT3KIQzsTU0jOibBKqtdcKqIZYQUUyURed7roLWZtSdAtiQ==}
+    peerDependencies:
+      '@standard-schema/spec': ^1.0.0
+      '@vinejs/vine': ^2.0.0 || ^3.0.0 || ^4.0.0
+      ajv: ^8.12.0
+      ajv-errors: ^3.0.0
+      ajv-formats: ^2.1.1
+      arktype: ^2.0.0
+      ata-validator: ^1.23.0
+      class-transformer: '>=0.4.0'
+      class-validator: '>=0.12.0'
+      computed-types: ^1.0.0
+      effect: ^4.0.0
+      fluentvalidation-ts: ^3.0.0
+      fp-ts: ^2.7.0
+      io-ts: ^2.0.0
+      joi: ^17.0.0 || ^18.0.0
+      nope-validator: '>=0.12.0'
+      react-hook-form: ^7.55.0
+      superstruct: '>=0.12.0'
+      typanion: ^3.3.2
+      typebox: ^1.0.0
+      valibot: '>=0.31.0 || ^1.0.0-beta.4 || ^1.0.0-rc'
+      vest: '>=6.0.0'
+      yup: ^1.0.0
+      zod: ^3.25.0 || ^4.0.0
+    peerDependenciesMeta:
+      '@standard-schema/spec':
+        optional: true
+      '@vinejs/vine':
+        optional: true
+      ajv:
+        optional: true
+      ajv-errors:
+        optional: true
+      ajv-formats:
+        optional: true
+      arktype:
+        optional: true
+      ata-validator:
+        optional: true
+      class-transformer:
+        optional: true
+      class-validator:
+        optional: true
+      computed-types:
+        optional: true
+      effect:
+        optional: true
+      fluentvalidation-ts:
+        optional: true
+      fp-ts:
+        optional: true
+      io-ts:
+        optional: true
+      joi:
+        optional: true
+      nope-validator:
+        optional: true
+      superstruct:
+        optional: true
+      typanion:
+        optional: true
+      typebox:
+        optional: true
+      valibot:
+        optional: true
+      vest:
+        optional: true
+      yup:
+        optional: true
+      zod:
+        optional: true
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -4900,6 +5014,10 @@ packages:
   headers-polyfill@5.0.1:
     resolution: {integrity: sha512-1TJ6Fih/b8h5TIcv+1+Hw0PDQWJTKDKzFZzcKOiW1wJza3XoAQlkCuXLbymPYB8+ZQyw8mHvdw560e8zVFIWyA==}
 
+  helmet@8.3.0:
+    resolution: {integrity: sha512-Qgpiaws3Sm30Av8Eah6sjMCZZwjlBu+E68rhpCWBshY1lb09HtLwj5GviX0OyQIn+ulUS0iX0AxN5n3tLZzz1w==}
+    engines: {node: '>=18.0.0'}
+
   hermes-estree@0.25.1:
     resolution: {integrity: sha512-0wUoCcLp+5Ev5pDW2OriHC2MJCbwLwuRx+gAqMTOkGKJJiBCLjtrvy4PWUGn6MIVefecRpzoOZ/UV6iGdOr+Cw==}
 
@@ -5189,6 +5307,9 @@ packages:
   jiti@2.7.0:
     resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
+
+  jose@6.2.15:
+    resolution: {integrity: sha512-qdF6ewcZARtef63fJ9AKKZPgxw+t7USH6HLXYcD4CrdmSvDp79rpJSPFEKc90QBeGS63u1KQtN2MZQHC0yDIzA==}
 
   jpeg-js@0.4.4:
     resolution: {integrity: sha512-WZzeDOEtTOBK4Mdsar0IqEU5sMr3vSV2RqkAIzUEV2BHnUfKGyswWFPFwK5EeDo93K3FohSHbLAjj0s1Wzd+dg==}
@@ -7707,6 +7828,16 @@ snapshots:
       long: 5.3.2
       protobufjs: 7.6.6
       yargs: 17.7.3
+
+  '@hookform/resolvers@7.0.3(@standard-schema/spec@1.1.0)(ajv@8.20.0)(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.1))(valibot@1.5.0(typescript@5.9.3))(zod@4.6.7)':
+    dependencies:
+      '@standard-schema/utils': 0.3.0
+      react-hook-form: 7.91.0(@types/react@19.3.0)(react@19.3.1)
+    optionalDependencies:
+      '@standard-schema/spec': 1.1.0
+      ajv: 8.20.0
+      valibot: 1.5.0(typescript@5.9.3)
+      zod: 4.6.7
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -11340,6 +11471,8 @@ snapshots:
       '@types/set-cookie-parser': 2.4.10
       set-cookie-parser: 3.2.2
 
+  helmet@8.3.0: {}
+
   hermes-estree@0.25.1: {}
 
   hermes-parser@0.25.1:
@@ -11607,6 +11740,8 @@ snapshots:
       '@pkgjs/parseargs': 0.11.0
 
   jiti@2.7.0: {}
+
+  jose@6.2.15: {}
 
   jpeg-js@0.4.4: {}
 

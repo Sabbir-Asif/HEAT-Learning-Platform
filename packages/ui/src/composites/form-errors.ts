@@ -10,10 +10,24 @@ export type FieldErrorCopyKey =
   | "unrecognized_keys";
 
 export type FormErrorCopyKey =
+  | "AUDIT_ACTOR_FILTER_TOO_BROAD"
   | "BAD_REQUEST"
+  | "CANNOT_DEACTIVATE_SELF"
+  | "CAPTCHA_EXPIRED"
+  | "CAPTCHA_INVALID"
+  | "CSRF_TOKEN_INVALID"
+  | "EMAIL_IN_USE"
+  | "ENROLLMENT_NOT_ACTIVE"
   | "FORBIDDEN"
   | "INTERNAL"
+  | "INVALID_CREDENTIALS"
+  | "INVITATION_EXPIRED"
+  | "INVITATION_INVALID"
+  | "INVITATION_NOT_PENDING"
   | "NOT_FOUND"
+  | "ORIGIN_NOT_ALLOWED"
+  | "PASSWORD_BREACHED"
+  | "PASSWORD_CHANGE_REQUIRED"
   | "RATE_LIMITED"
   | "UNAUTHENTICATED"
   | "VALIDATION_FAILED"
@@ -37,10 +51,25 @@ export const genericFormMessage =
   "Something in the form needs another look. Check it and try again.";
 
 export const formErrorCopy: Record<FormErrorCopyKey, string> = {
+  AUDIT_ACTOR_FILTER_TOO_BROAD:
+    "That actor filter matches too many accounts. Type more of the email address.",
   BAD_REQUEST: "The request could not be understood. Check the form and try again.",
+  CANNOT_DEACTIVATE_SELF: "You cannot deactivate your own account.",
+  CAPTCHA_EXPIRED: "This security check can no longer be used. Request a new one.",
+  CAPTCHA_INVALID: "The characters do not match. Try again.",
+  CSRF_TOKEN_INVALID: "Your session check failed. Reload the page and try again.",
+  EMAIL_IN_USE: "An account with this email address already exists.",
+  ENROLLMENT_NOT_ACTIVE: "Your enrollment in this course is not active.",
   FORBIDDEN: "You do not have permission to do this.",
   INTERNAL: "Something went wrong on our side. Try again in a moment.",
+  INVALID_CREDENTIALS: "The email or password is not correct.",
+  INVITATION_EXPIRED: "This invitation has expired. Ask the super admin to send a new one.",
+  INVITATION_INVALID: "This invitation link is not valid.",
+  INVITATION_NOT_PENDING: "This admin has no pending invitation.",
   NOT_FOUND: "This item could not be found. It may have been removed.",
+  ORIGIN_NOT_ALLOWED: "This request did not come from an allowed site.",
+  PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
+  PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
   RATE_LIMITED: "Too many attempts. Wait a little and try again.",
   UNAUTHENTICATED: "Your session has ended. Sign in again to continue.",
   VALIDATION_FAILED: genericFormMessage,
@@ -48,6 +77,16 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   REQUEST_ABORTED: "The request was cancelled. Try again.",
   UNEXPECTED_RESPONSE: "The server sent an unexpected reply. Try again in a moment.",
 };
+
+export function rateLimitedMessage(retryAfterSeconds?: number): string {
+  if (retryAfterSeconds === undefined || retryAfterSeconds <= 0) return formErrorCopy.RATE_LIMITED;
+  if (retryAfterSeconds < 60) {
+    const seconds = Math.ceil(retryAfterSeconds);
+    return `Too many attempts. Try again in ${seconds} ${seconds === 1 ? "second" : "seconds"}.`;
+  }
+  const minutes = Math.ceil(retryAfterSeconds / 60);
+  return `Too many attempts. Try again in ${minutes} ${minutes === 1 ? "minute" : "minutes"}.`;
+}
 
 export type FieldMessage = { path: string; message: string };
 

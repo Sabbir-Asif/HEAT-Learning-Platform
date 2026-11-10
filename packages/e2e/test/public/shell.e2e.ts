@@ -1,5 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { settle, viewportFor } from "../support/matrix";
+import { grantAccess } from "../support/session";
+
+test.beforeEach(async ({ context, baseURL }) => {
+  await grantAccess(context, baseURL);
+});
 
 test.describe("learner bottom bar", () => {
   test.describe("at phone width", () => {

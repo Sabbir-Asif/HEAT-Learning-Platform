@@ -33,8 +33,6 @@ export const routeManifest: ReadonlyArray<RouteEntry> = [
   { pattern: "/audit-log", path: "/audit-log", kind: "admin" },
   { pattern: "/account", path: "/account", kind: "admin" },
   { pattern: "/sign-in", path: "/sign-in", kind: "auth" },
-  { pattern: "/sign-in/verify", path: "/sign-in/verify", kind: "auth" },
-  { pattern: "/setup-2fa", path: "/setup-2fa", kind: "auth" },
   { pattern: "/accept-invite/[token]", path: "/accept-invite/sample-token", kind: "auth" },
   { pattern: "/forgot-password", path: "/forgot-password", kind: "auth" },
   { pattern: "/reset-password/[token]", path: "/reset-password/sample-token", kind: "auth" },

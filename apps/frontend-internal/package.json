@@ -16,10 +16,15 @@
     "@heat/api-client": "workspace:*",
     "@heat/contracts": "workspace:*",
     "@heat/ui": "workspace:*",
+    "@hookform/resolvers": "7.0.3",
+    "@tanstack/react-query": "5.106.1",
     "lucide-react": "1.70.0",
     "next": "catalog:",
+    "nuqs": "2.10.2",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "react-hook-form": "7.91.0",
+    "server-only": "0.0.1"
   },
   "devDependencies": {
     "@heat/config": "workspace:*",

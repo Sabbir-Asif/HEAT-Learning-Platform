@@ -2,14 +2,27 @@ import { defineConfig } from "@playwright/test";
 
 const ports = { public: 3000, internal: 3001 } as const;
 
+const fakeAdminApiPort = 4010;
+
 const server = (app: "public" | "internal") => ({
   command: `node packages/e2e/bin/standalone.mjs frontend-${app} ${ports[app]}`,
   cwd: "../..",
   url: `http://localhost:${ports[app]}`,
   reuseExistingServer: !process.env.CI,
   timeout: 120_000,
-  env: { NEXT_TELEMETRY_DISABLED: "1" },
+  env: {
+    NEXT_TELEMETRY_DISABLED: "1",
+    API_INTERNAL_URL: `http://localhost:${fakeAdminApiPort}`,
+  },
 });
+
+const fakeAdminApi = {
+  command: `node packages/e2e/bin/fake-admin-api.mjs ${fakeAdminApiPort}`,
+  cwd: "../..",
+  url: `http://localhost:${fakeAdminApiPort}/api/admin/me`,
+  reuseExistingServer: !process.env.CI,
+  timeout: 30_000,
+};
 
 export default defineConfig({
   testMatch: "**/*.e2e.ts",
@@ -37,6 +50,11 @@ export default defineConfig({
       testDir: "test/internal",
       use: { baseURL: `http://localhost:${ports.internal}` },
     },
+    {
+      name: "internal-stack",
+      testDir: "test/internal-stack",
+      use: { baseURL: process.env.E2E_ADMIN_URL ?? "http://admin.localhost" },
+    },
   ],
-  webServer: [server("public"), server("internal")],
+  webServer: [fakeAdminApi, server("public"), server("internal")],
 });

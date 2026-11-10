@@ -6,6 +6,7 @@ test("exports its package name", () => {
 });
 
 test.each([
+  "CaptchaField",
   "ConfirmDialog",
   "EmptyState",
   "ErrorState",

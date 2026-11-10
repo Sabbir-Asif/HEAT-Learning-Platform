@@ -1,6 +1,397 @@
 {
   "components": {
     "schemas": {
+      "AcceptInviteRequestDto": {
+        "properties": {
+          "password": {
+            "maxLength": 256,
+            "minLength": 12,
+            "type": "string"
+          },
+          "token": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ],
+        "type": "object"
+      },
+      "AdminCsrfTokenResponseDto": {
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
+      "AdminListResponseDto": {
+        "properties": {
+          "items": {
+            "items": {
+              "properties": {
+                "createdAt": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                  "type": "string"
+                },
+                "deactivatedAt": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "inviteExpiresAt": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                  "type": "string"
+                },
+                "role": {
+                  "enum": [
+                    "SUPER_ADMIN",
+                    "ADMIN",
+                    "STUDENT"
+                  ],
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "ACTIVE",
+                    "INVITED",
+                    "INVITE_EXPIRED",
+                    "DEACTIVATED"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "email",
+                "role",
+                "status",
+                "createdAt",
+                "inviteExpiresAt",
+                "deactivatedAt"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "page": {
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "pageSize": {
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "total": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
+        "type": "object"
+      },
+      "AdminMeResponseDto": {
+        "properties": {
+          "user": {
+            "properties": {
+              "email": {
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "mustChangePassword": {
+                "type": "boolean"
+              },
+              "role": {
+                "enum": [
+                  "SUPER_ADMIN",
+                  "ADMIN",
+                  "STUDENT"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "email",
+              "role",
+              "mustChangePassword"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "user"
+        ],
+        "type": "object"
+      },
+      "AdminSignInRequestDto": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object"
+      },
+      "AdminSummaryDto": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "type": "string"
+          },
+          "deactivatedAt": {
+            "format": "date-time",
+            "nullable": true,
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "inviteExpiresAt": {
+            "format": "date-time",
+            "nullable": true,
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "SUPER_ADMIN",
+              "ADMIN",
+              "STUDENT"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "INVITED",
+              "INVITE_EXPIRED",
+              "DEACTIVATED"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "role",
+          "status",
+          "createdAt",
+          "inviteExpiresAt",
+          "deactivatedAt"
+        ],
+        "type": "object"
+      },
+      "AuditLogListResponseDto": {
+        "properties": {
+          "items": {
+            "items": {
+              "properties": {
+                "action": {
+                  "type": "string"
+                },
+                "actorEmail": {
+                  "maxLength": 254,
+                  "nullable": true,
+                  "type": "string"
+                },
+                "actorId": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "after": {
+                  "additionalProperties": {},
+                  "nullable": true,
+                  "properties": {},
+                  "type": "object"
+                },
+                "before": {
+                  "additionalProperties": {},
+                  "nullable": true,
+                  "properties": {},
+                  "type": "object"
+                },
+                "entity": {
+                  "type": "string"
+                },
+                "entityId": {
+                  "maxLength": 128,
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "ipAddress": {
+                  "maxLength": 64,
+                  "nullable": true,
+                  "type": "string"
+                },
+                "occurredAt": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                  "type": "string"
+                },
+                "requestId": {
+                  "maxLength": 64,
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "occurredAt",
+                "actorId",
+                "actorEmail",
+                "action",
+                "entity",
+                "entityId",
+                "before",
+                "after",
+                "requestId",
+                "ipAddress"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "page": {
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "pageSize": {
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "total": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
+        "type": "object"
+      },
+      "CaptchaRequestDto": {
+        "properties": {
+          "replaces": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "CaptchaResponseDto": {
+        "properties": {
+          "expiresInSeconds": {
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "svg": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "svg",
+          "expiresInSeconds"
+        ],
+        "type": "object"
+      },
+      "ChangePasswordRequestDto": {
+        "properties": {
+          "currentPassword": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+          },
+          "newPassword": {
+            "maxLength": 256,
+            "minLength": 12,
+            "type": "string"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
+        "type": "object"
+      },
+      "CsrfTokenResponseDto": {
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
       "HealthResponseDto": {
         "properties": {
           "status": {
@@ -14,6 +405,152 @@
           "status"
         ],
         "type": "object"
+      },
+      "InvitationLookupRequestDto": {
+        "properties": {
+          "token": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
+      "InvitationLookupResponseDto": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "VALID",
+              "EXPIRED",
+              "INVALID"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object"
+      },
+      "InviteAdminRequestDto": {
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "type": "object"
+      },
+      "MeResponseDto": {
+        "properties": {
+          "enrollments": {
+            "items": {
+              "properties": {
+                "courseId": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "courseSlug": {
+                  "type": "string"
+                },
+                "courseTitle": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "PENDING_VERIFICATION",
+                    "PENDING_APPROVAL",
+                    "APPROVED",
+                    "COMPLETED",
+                    "REJECTED",
+                    "EXPIRED",
+                    "REMOVED"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "courseId",
+                "courseSlug",
+                "courseTitle",
+                "status"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "user": {
+            "properties": {
+              "email": {
+                "type": "string"
+              },
+              "emailVerified": {
+                "type": "boolean"
+              },
+              "id": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "mustChangePassword": {
+                "type": "boolean"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "enum": [
+                  "SUPER_ADMIN",
+                  "ADMIN",
+                  "STUDENT"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "email",
+              "role",
+              "emailVerified",
+              "mustChangePassword"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "user",
+          "enrollments"
+        ],
+        "type": "object"
+      },
+      "SignInRequestDto": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object"
       }
     }
   },
@@ -25,6 +562,572 @@
   },
   "openapi": "3.0.0",
   "paths": {
+    "/api/admin/account/change-password": {
+      "post": {
+        "operationId": "adminAccountChangePassword",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-account"
+        ]
+      }
+    },
+    "/api/admin/admins": {
+      "get": {
+        "operationId": "adminUsersList",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "enum": [
+                "email",
+                "-email",
+                "createdAt",
+                "-createdAt"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminListResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-users"
+        ]
+      },
+      "post": {
+        "operationId": "adminUsersInvite",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteAdminRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSummaryDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-users"
+        ]
+      }
+    },
+    "/api/admin/admins/{id}/deactivate": {
+      "post": {
+        "operationId": "adminUsersDeactivate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSummaryDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-users"
+        ]
+      }
+    },
+    "/api/admin/admins/{id}/reactivate": {
+      "post": {
+        "operationId": "adminUsersReactivate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSummaryDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-users"
+        ]
+      }
+    },
+    "/api/admin/admins/{id}/resend-invitation": {
+      "post": {
+        "operationId": "adminUsersResendInvitation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSummaryDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-users"
+        ]
+      }
+    },
+    "/api/admin/audit-log": {
+      "get": {
+        "operationId": "auditLogList",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 9007199254740991,
+              "minimum": -9007199254740991,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "actor",
+            "required": false,
+            "schema": {
+              "maxLength": 120,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "action",
+            "required": false,
+            "schema": {
+              "maxLength": 120,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "entity",
+            "required": false,
+            "schema": {
+              "maxLength": 120,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogListResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "audit-log"
+        ]
+      }
+    },
+    "/api/admin/auth/csrf": {
+      "get": {
+        "operationId": "adminAuthCsrfToken",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCsrfTokenResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-auth"
+        ]
+      }
+    },
+    "/api/admin/auth/invitations/accept": {
+      "post": {
+        "operationId": "adminInvitationAccept",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInviteRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-invitations"
+        ]
+      }
+    },
+    "/api/admin/auth/invitations/lookup": {
+      "post": {
+        "operationId": "adminInvitationLookup",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationLookupRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationLookupResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-invitations"
+        ]
+      }
+    },
+    "/api/admin/auth/refresh": {
+      "post": {
+        "operationId": "adminAuthRefresh",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-auth"
+        ]
+      }
+    },
+    "/api/admin/auth/sign-in": {
+      "post": {
+        "operationId": "adminAuthSignIn",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminSignInRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMeResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-auth"
+        ]
+      }
+    },
+    "/api/admin/auth/sign-out": {
+      "post": {
+        "operationId": "adminAuthSignOut",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-auth"
+        ]
+      }
+    },
+    "/api/admin/me": {
+      "get": {
+        "operationId": "adminMeDescribe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMeResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "admin-me"
+        ]
+      }
+    },
+    "/api/auth/csrf": {
+      "get": {
+        "operationId": "studentAuthCsrfToken",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsrfTokenResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "operationId": "studentAuthRefresh",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/sign-in": {
+      "post": {
+        "operationId": "studentAuthSignIn",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/sign-out": {
+      "post": {
+        "operationId": "studentAuthSignOut",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/captcha": {
+      "post": {
+        "operationId": "captchaIssue",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaptchaRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptchaResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "captcha"
+        ]
+      }
+    },
     "/api/health": {
       "get": {
         "operationId": "healthCheck",
@@ -43,6 +1146,27 @@
         },
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/api/me": {
+      "get": {
+        "operationId": "meDescribe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "me"
         ]
       }
     }

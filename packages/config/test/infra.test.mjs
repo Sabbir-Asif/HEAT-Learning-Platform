@@ -96,6 +96,25 @@ describe("dev Nginx config", () => {
     expect(nginx).toMatch(/default_server;[\s\S]*?location \/ \{\s*return 404;/);
   });
 
+  test("the student host blocks admin API paths, case-insensitively, before the API proxy", () => {
+    const learn = server("learn.localhost");
+    expect(learn).toMatch(/location \^~ \/api\/admin\/ \{\s*return 404;\s*\}/);
+    expect(learn).toMatch(/location ~\* \^\/api\/admin\(\/\|\$\) \{\s*return 404;\s*\}/);
+    expect(learn).not.toMatch(/location (=|~) ?\/api\/admin/);
+  });
+
+  test("merge_slashes stays on and the admin blocks come before the /api/ proxy", () => {
+    expect(nginx).not.toMatch(/merge_slashes\s+off/);
+    const learn = server("learn.localhost");
+    const proxy = learn.indexOf("location /api/ {");
+    const prefixBlock = learn.indexOf("location ^~ /api/admin/ {");
+    const regexBlock = learn.indexOf("location ~* ^/api/admin(/|$) {");
+    expect(prefixBlock).toBeGreaterThan(-1);
+    expect(regexBlock).toBeGreaterThan(-1);
+    expect(proxy).toBeGreaterThan(prefixBlock);
+    expect(proxy).toBeGreaterThan(regexBlock);
+  });
+
   test("Nginx can reach host.docker.internal on Linux", () => {
     expect(service("nginx")).toContain('- "host.docker.internal:host-gateway"');
   });

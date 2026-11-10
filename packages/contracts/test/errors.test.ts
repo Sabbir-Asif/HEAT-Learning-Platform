@@ -3,9 +3,16 @@ import { clientErrorCodes, errorCodes, errorResponseSchema, fieldErrorCodes } fr
 
 const publishedCodes = [
   "BAD_REQUEST",
+  "CAPTCHA_EXPIRED",
+  "CAPTCHA_INVALID",
+  "CSRF_TOKEN_INVALID",
   "FORBIDDEN",
   "INTERNAL",
+  "INVALID_CREDENTIALS",
   "NOT_FOUND",
+  "ORIGIN_NOT_ALLOWED",
+  "PASSWORD_BREACHED",
+  "PASSWORD_CHANGE_REQUIRED",
   "RATE_LIMITED",
   "UNAUTHENTICATED",
   "VALIDATION_FAILED",
