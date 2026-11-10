@@ -33,6 +33,10 @@ export class SignInLockout {
     await this.guarded(() => this.store.release(attemptKey, accountKey), undefined);
   }
 
+  clearAccount(realm: AuthRealm, email: string): Promise<void> {
+    return this.store.clearAccount(`lockout:${realm}:${this.hasher.forEmail(email)}`);
+  }
+
   private keysFor(
     realm: AuthRealm,
     email: string,

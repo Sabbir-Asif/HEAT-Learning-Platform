@@ -298,4 +298,12 @@ export class InMemoryLockoutStore extends LockoutStore {
     if (account !== undefined && account.failures > 0) account.failures -= 1;
     return Promise.resolve();
   }
+
+  clearAccount(accountKey: string): Promise<void> {
+    if (this.failing) return Promise.reject(new Error("redis down"));
+    for (const key of [...this.entries.keys()]) {
+      if (key === accountKey || key.startsWith(`${accountKey}:`)) this.entries.delete(key);
+    }
+    return Promise.resolve();
+  }
 }

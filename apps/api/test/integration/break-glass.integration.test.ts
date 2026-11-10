@@ -1,13 +1,17 @@
-import { describe, expect, test } from "vitest";
+import { afterAll, describe, expect, test, vi } from "vitest";
 import { PasswordService, SessionService } from "../../src/auth";
 import { CliModule } from "../../src/cli/cli.module";
 import { RecoverSuperAdminService, RecoveryError } from "../../src/cli/recover-super-admin.service";
+import { SignInLockout } from "../../src/rate-limit";
+import { applyEnvironment } from "../support/auth-env";
 import { csrfHeaders } from "../support/csrf";
 import { useTestApp } from "../support/testing-module";
 
 const oldPassword = "correct horse battery staple";
 
 describe("break-glass super admin recovery", () => {
+  const restoreEnvironment = applyEnvironment({ LOCKOUT_THRESHOLD: "3" });
+  afterAll(restoreEnvironment);
   const testApp = useTestApp({ imports: [CliModule] });
 
   const service = () => testApp().moduleRef.get(RecoverSuperAdminService, { strict: false });
@@ -143,5 +147,47 @@ describe("break-glass super admin recovery", () => {
     await expect(service().recover({ hostname: "vps-1", email: admin.email })).rejects.toThrow(
       RecoveryError,
     );
+  });
+
+  test("recovery clears the sign-in lockout so the temporary password works", async () => {
+    const admin = await superAdmin();
+    for (const attempt of ["a", "b", "c"]) await signIn(admin.email, attempt);
+    expect((await signIn(admin.email, oldPassword)).status).toBe(429);
+
+    const result = await service().recover({ hostname: "vps-1" });
+
+    expect(result.lockoutCleared).toBe(true);
+    expect((await signIn(admin.email, result.temporaryPassword)).status).toBe(200);
+  });
+
+  test("a lockout store failure does not undo the recovery", async () => {
+    const admin = await superAdmin();
+    const lockout = testApp().moduleRef.get(SignInLockout, { strict: false });
+    vi.spyOn(lockout, "clearAccount").mockRejectedValueOnce(new Error("redis down"));
+
+    const result = await service().recover({ hostname: "vps-1" });
+
+    expect(result.lockoutCleared).toBe(false);
+    const changed = await testApp().database.prisma.user.findFirstOrThrow({
+      where: { id: admin.id },
+    });
+    expect(changed.passwordHash).not.toBe(admin.passwordHash);
+  });
+
+  test("when revocation fails nothing is committed and no audit row exists", async () => {
+    const admin = await superAdmin();
+    const sessions = testApp().moduleRef.get(SessionService);
+    vi.spyOn(sessions, "revokeAll").mockRejectedValueOnce(new Error("db down"));
+
+    await expect(service().recover({ hostname: "vps-1" })).rejects.toThrow();
+
+    const unchanged = await testApp().database.prisma.user.findFirstOrThrow({
+      where: { id: admin.id },
+    });
+    expect(unchanged.passwordHash).toBe(admin.passwordHash);
+    const rows = await testApp().database.prisma.auditLog.findMany({
+      where: { action: "admin.break-glass.recover" },
+    });
+    expect(rows).toHaveLength(0);
   });
 });

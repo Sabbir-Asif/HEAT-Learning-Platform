@@ -2,7 +2,9 @@ import { describe, expect, test } from "vitest";
 import { runCli } from "../../src/cli/run-cli";
 import { RecoveryError } from "../../src/cli/recover-super-admin.service";
 
-const harness = (recover: () => Promise<{ email: string; temporaryPassword: string }>) => {
+const harness = (
+  recover: () => Promise<{ email: string; temporaryPassword: string; lockoutCleared?: boolean }>,
+) => {
   const out: string[] = [];
   const err: string[] = [];
   const run = (argv: string[]) =>
@@ -55,5 +57,19 @@ describe("runCli", () => {
 
     expect(await run(["nope"])).toBe(2);
     expect(err.join("")).toContain("Usage:");
+  });
+
+  test("warns on stderr when the lockout could not be cleared, and still prints the password", async () => {
+    const { out, err, run } = harness(async () => ({
+      email: "root@example.test",
+      temporaryPassword: "Temp-Secret-123",
+      lockoutCleared: false,
+    }));
+
+    expect(await run(["recover-super-admin"])).toBe(0);
+
+    expect(out.join("")).toContain("Temp-Secret-123");
+    expect(err.join("")).toContain("lockout");
+    expect(err.join("")).not.toContain("Temp-Secret-123");
   });
 });

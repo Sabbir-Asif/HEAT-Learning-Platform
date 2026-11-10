@@ -186,4 +186,25 @@ describe("SignInLockout", () => {
     expect(JSON.stringify(warn.mock.calls)).not.toContain("ada");
     warn.mockRestore();
   });
+
+  test("clearing an account removes its account and address counters in that realm only", async () => {
+    const { store, lockout } = build();
+    await fail(lockout, 3);
+    await fail(lockout, 3, OTHER_IP);
+    await fail(lockout, 3, IP, "other@b.test");
+    await lockout.reserve("admin", "a@b.test", IP);
+
+    await lockout.clearAccount("student", "A@b.test");
+
+    expect(await waitOf(lockout.reserve("student", "a@b.test", IP))).toBeNull();
+    expect(await waitOf(lockout.reserve("student", "a@b.test", OTHER_IP))).toBeNull();
+    expect(await waitOf(lockout.reserve("student", "other@b.test", IP))).toBe(30);
+    expect(store.entries.size).toBeGreaterThan(0);
+  });
+
+  test("clearing an account reports a store failure to the caller", async () => {
+    const { store, lockout } = build();
+    store.failing = true;
+    await expect(lockout.clearAccount("admin", "a@b.test")).rejects.toThrow();
+  });
 });

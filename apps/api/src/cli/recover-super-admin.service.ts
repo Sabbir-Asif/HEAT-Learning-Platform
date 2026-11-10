@@ -4,6 +4,7 @@ import type { HeatClient } from "@heat/db";
 import { AuditService } from "../audit";
 import { PasswordService, SessionService } from "../auth";
 import { CLOCK, DATABASE } from "../core";
+import { SignInLockout } from "../rate-limit";
 import type { Clock } from "../core";
 
 export class RecoveryError extends Error {
@@ -21,6 +22,7 @@ export interface RecoveryOptions {
 export interface RecoveryResult {
   email: string;
   temporaryPassword: string;
+  lockoutCleared: boolean;
 }
 
 @Injectable()
@@ -31,12 +33,14 @@ export class RecoverSuperAdminService {
     private readonly passwords: PasswordService,
     private readonly sessions: SessionService,
     private readonly audit: AuditService,
+    private readonly lockout: SignInLockout,
   ) {}
 
   async recover(options: RecoveryOptions): Promise<RecoveryResult> {
     const target = await this.select(options.email);
     const temporaryPassword = randomBytes(24).toString("base64url");
     const passwordHash = await this.passwords.hash(temporaryPassword);
+    await this.sessions.revokeAll(target.id);
     await this.database.$transaction(async (tx) => {
       await tx.user.update({
         where: { id: target.id },
@@ -59,8 +63,11 @@ export class RecoverSuperAdminService {
         },
       );
     });
-    await this.sessions.revokeAll(target.id);
-    return { email: target.email, temporaryPassword };
+    const lockoutCleared = await this.lockout.clearAccount("admin", target.email).then(
+      () => true,
+      () => false,
+    );
+    return { email: target.email, temporaryPassword, lockoutCleared };
   }
 
   private async select(email: string | undefined): Promise<{ id: string; email: string }> {

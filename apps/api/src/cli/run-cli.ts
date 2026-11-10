@@ -31,6 +31,11 @@ export const runCli = async (
       `Super admin ${result.email} was reset. All its sessions were revoked.\n` +
         `Temporary password (shown once, change it at the next sign-in):\n${result.temporaryPassword}\n`,
     );
+    if (!result.lockoutCleared) {
+      output.err(
+        "Warning: the sign-in lockout could not be cleared. If sign-in answers too many attempts, wait for the lockout to lapse.\n",
+      );
+    }
     return 0;
   } catch (error) {
     output.err(

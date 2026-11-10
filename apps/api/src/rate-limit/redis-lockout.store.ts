@@ -92,4 +92,21 @@ export class RedisLockoutStore extends LockoutStore {
   async release(attemptKey: string, accountKey: string): Promise<void> {
     await this.redis.eval(releaseScript, 2, attemptKey, accountKey);
   }
+
+  async clearAccount(accountKey: string): Promise<void> {
+    const keys = [accountKey];
+    let cursor = "0";
+    do {
+      const [next, found] = await this.redis.scan(
+        cursor,
+        "MATCH",
+        `${accountKey}:*`,
+        "COUNT",
+        500,
+      );
+      cursor = next;
+      keys.push(...found);
+    } while (cursor !== "0");
+    await this.redis.del(...keys);
+  }
 }
