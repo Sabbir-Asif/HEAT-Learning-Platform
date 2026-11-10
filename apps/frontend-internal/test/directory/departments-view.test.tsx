@@ -417,7 +417,9 @@ describe("DepartmentsView form", () => {
       ),
     );
     expect(document.querySelector("[data-slot=form]")).not.toBeNull();
-    expect((document.querySelector("input[name=name]") as HTMLInputElement).value).toBe("Anthropology");
+    expect((document.querySelector("input[name=name]") as HTMLInputElement).value).toBe(
+      "Anthropology",
+    );
   });
 
   test("a server failure is shown in the form and the sheet stays open", async () => {
@@ -470,7 +472,8 @@ describe("DepartmentsView form", () => {
 
   test("editing starts from the department's values and saves them", async () => {
     route({
-      mutation: (_url, method) => (method === "PATCH" ? json(row({ name: "Archaeology" })) : undefined),
+      mutation: (_url, method) =>
+        method === "PATCH" ? json(row({ name: "Archaeology" })) : undefined,
     });
     const view = await mount();
     await vi.waitFor(() => expect(view.textContent).toContain("Physics"));
@@ -681,7 +684,9 @@ describe("DepartmentsView archive and restore", () => {
     await act(async () => buttonNamed("Archive department", dialog)?.click());
 
     await vi.waitFor(() =>
-      expect(view.querySelector("[role=status]")?.textContent).toContain("Anthropology was archived"),
+      expect(view.querySelector("[role=status]")?.textContent).toContain(
+        "Anthropology was archived",
+      ),
     );
     expect(urlsOf("POST")[0]).toBe(
       "/api/admin/directory/departments/0198f1a0-0000-7000-8000-0000000000d1/archive",

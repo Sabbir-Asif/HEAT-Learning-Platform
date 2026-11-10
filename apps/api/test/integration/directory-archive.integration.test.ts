@@ -153,13 +153,19 @@ describe("archive and restore of directory records over HTTP", () => {
     test("department", async () => {
       const cookie = await signedInAdmin();
       const { university, faculty, department } = await seedWithSiblings();
-      expect(await departmentOptions(university.id, faculty.id)).toEqual(["Anthropology", "History"]);
+      expect(await departmentOptions(university.id, faculty.id)).toEqual([
+        "Anthropology",
+        "History",
+      ]);
 
       await call("POST", `${admin}/departments/${department.id}/archive`, { cookie });
       expect(await departmentOptions(university.id, faculty.id)).toEqual(["History"]);
 
       await call("POST", `${admin}/departments/${department.id}/restore`, { cookie });
-      expect(await departmentOptions(university.id, faculty.id)).toEqual(["Anthropology", "History"]);
+      expect(await departmentOptions(university.id, faculty.id)).toEqual([
+        "Anthropology",
+        "History",
+      ]);
     });
 
     test("faculty", async () => {
@@ -169,7 +175,10 @@ describe("archive and restore of directory records over HTTP", () => {
         "Faculty of Arts",
         "Faculty of Science",
       ]);
-      expect(await departmentOptions(university.id, faculty.id)).toEqual(["Anthropology", "History"]);
+      expect(await departmentOptions(university.id, faculty.id)).toEqual([
+        "Anthropology",
+        "History",
+      ]);
 
       await call("POST", `${admin}/faculties/${faculty.id}/archive`, { cookie });
       expect(await facultyOptions(university.id)).toEqual(["Faculty of Science"]);
@@ -180,7 +189,10 @@ describe("archive and restore of directory records over HTTP", () => {
         "Faculty of Arts",
         "Faculty of Science",
       ]);
-      expect(await departmentOptions(university.id, faculty.id)).toEqual(["Anthropology", "History"]);
+      expect(await departmentOptions(university.id, faculty.id)).toEqual([
+        "Anthropology",
+        "History",
+      ]);
     });
 
     test("university", async () => {
@@ -191,7 +203,10 @@ describe("archive and restore of directory records over HTTP", () => {
         "Faculty of Arts",
         "Faculty of Science",
       ]);
-      expect(await departmentOptions(university.id, faculty.id)).toEqual(["Anthropology", "History"]);
+      expect(await departmentOptions(university.id, faculty.id)).toEqual([
+        "Anthropology",
+        "History",
+      ]);
 
       await call("POST", `${admin}/universities/${university.id}/archive`, { cookie });
       expect(await universityOptions()).toEqual(["BUET"]);
@@ -204,7 +219,10 @@ describe("archive and restore of directory records over HTTP", () => {
         "Faculty of Arts",
         "Faculty of Science",
       ]);
-      expect(await departmentOptions(university.id, faculty.id)).toEqual(["Anthropology", "History"]);
+      expect(await departmentOptions(university.id, faculty.id)).toEqual([
+        "Anthropology",
+        "History",
+      ]);
     });
   });
 
