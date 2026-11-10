@@ -187,6 +187,58 @@ describe("UniversitiesView create and edit", () => {
     expect(document.querySelector("[data-slot=form]")).not.toBeNull();
   });
 
+  test("a rate limited save shows the wait time", async () => {
+    fetchMock.mockImplementation(async (_url, init) =>
+      init?.method === "POST"
+        ? new Response(
+            JSON.stringify({ error: { code: "RATE_LIMITED", message: "x", requestId: "r" } }),
+            { status: 429, headers: { "retry-after": "120" } },
+          )
+        : list(),
+    );
+    const view = await mount();
+    await act(async () => buttonNamed("Add university", view)?.click());
+    await type(document.querySelector("input[name=name]"), "Anything");
+    await submitForm();
+
+    await vi.waitFor(() =>
+      expect(document.querySelector("[data-slot=form-message]")?.textContent).toBe(
+        "Too many attempts. Try again in 2 minutes.",
+      ),
+    );
+  });
+
+  test("a server failure on save is shown in the form", async () => {
+    fetchMock.mockImplementation(async (_url, init) =>
+      init?.method === "POST" ? errorReply("INTERNAL", 500) : list(),
+    );
+    const view = await mount();
+    await act(async () => buttonNamed("Add university", view)?.click());
+    await type(document.querySelector("input[name=name]"), "Anything");
+    await submitForm();
+
+    await vi.waitFor(() =>
+      expect(document.querySelector("[data-slot=form-message]")).not.toBeNull(),
+    );
+    expect(document.querySelector("[data-slot=form]")).not.toBeNull();
+  });
+
+  test("keep editing returns to the form and cancel without changes closes at once", async () => {
+    fetchMock.mockResolvedValue(list());
+    const view = await mount();
+    await act(async () => buttonNamed("Add university", view)?.click());
+    await act(async () => buttonNamed("Cancel")?.click());
+    expect(document.querySelector("[data-slot=form]")).toBeNull();
+
+    await act(async () => buttonNamed("Add university", view)?.click());
+    await type(document.querySelector("input[name=name]"), "Half typed");
+    await act(async () => buttonNamed("Cancel")?.click());
+    await act(async () => buttonNamed("Keep editing")?.click());
+
+    expect(document.body.textContent).not.toContain("You have unsaved changes");
+    expect(document.querySelector<HTMLInputElement>("input[name=name]")?.value).toBe("Half typed");
+  });
+
   test("editing pre-fills the name and sends a PATCH to that university", async () => {
     fetchMock.mockImplementation(async (_url, init) =>
       init?.method === "PATCH"
