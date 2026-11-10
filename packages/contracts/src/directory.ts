@@ -163,6 +163,7 @@ export const departmentSummarySchema = z.object({
   university: facultyUniversitySchema,
   faculty: z.object({ id: z.uuid(), name: z.string() }),
   archivedAt: z.iso.datetime().nullable(),
+  parentArchived: z.boolean(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
   studentCount: z.number().int().min(0),

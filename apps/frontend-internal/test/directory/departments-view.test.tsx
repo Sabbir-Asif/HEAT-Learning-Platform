@@ -682,6 +682,37 @@ describe("DepartmentsView archive and restore", () => {
     );
   });
 
+  test("restoring under an archived parent says it stays hidden, and such a row is badged", async () => {
+    route({
+      ...both,
+      mutation: (_url, method) =>
+        method === "POST"
+          ? json(row({ id: "0198f1a0-0000-7000-8000-0000000000d9", parentArchived: true }))
+          : undefined,
+    });
+    const view = await mount("?status=archived");
+    await vi.waitFor(() => expect(view.textContent).toContain("Retired Department"));
+
+    await act(async () =>
+      buttonNamed("Restore", rowOf(view, "Retired Department") ?? view)?.click(),
+    );
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=status]")?.textContent).toContain(
+        "stays hidden from enrollment",
+      ),
+    );
+  });
+
+  test("a department under an archived parent is badged as hidden", async () => {
+    route({ departments: [row({ name: "Bengali", parentArchived: true })] });
+    const view = await mount();
+
+    await vi.waitFor(() =>
+      expect(rowOf(view, "Bengali")?.textContent).toContain("Hidden, parent archived"),
+    );
+  });
+
   test("a failed restore is reported as a problem", async () => {
     route({
       ...both,

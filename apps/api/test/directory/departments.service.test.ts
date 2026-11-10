@@ -19,8 +19,8 @@ const row = (overrides: Record<string, unknown> = {}) => ({
   createdAt: at,
   updatedAt: at,
   universityFaculty: {
-    university: { id: dhaka, name: "University of Dhaka" },
-    faculty: { id: arts, name: "Faculty of Arts" },
+    university: { id: dhaka, name: "University of Dhaka", archivedAt: null },
+    faculty: { id: arts, name: "Faculty of Arts", archivedAt: null },
   },
   ...overrides,
 });
@@ -28,8 +28,8 @@ const row = (overrides: Record<string, unknown> = {}) => ({
 const updatedRow = row({
   name: "History",
   universityFaculty: {
-    university: { id: buet, name: "BUET" },
-    faculty: { id: science, name: "Faculty of Science" },
+    university: { id: buet, name: "BUET", archivedAt: null },
+    faculty: { id: science, name: "Faculty of Science", archivedAt: null },
   },
 });
 
@@ -123,8 +123,8 @@ const input = { name: "Bengali", universityId: dhaka, facultyId: arts };
 const pairInclude = {
   universityFaculty: {
     select: {
-      university: { select: { id: true, name: true } },
-      faculty: { select: { id: true, name: true } },
+      university: { select: { id: true, name: true, archivedAt: true } },
+      faculty: { select: { id: true, name: true, archivedAt: true } },
     },
   },
 };
@@ -164,6 +164,7 @@ describe("DepartmentsService.list", () => {
           university: { id: dhaka, name: "University of Dhaka" },
           faculty: { id: arts, name: "Faculty of Arts" },
           archivedAt: null,
+          parentArchived: false,
           createdAt: at.toISOString(),
           updatedAt: at.toISOString(),
           studentCount: 3,
@@ -712,6 +713,28 @@ describe("DepartmentsService archived parents", () => {
 
     expect(database.department.update).toHaveBeenCalled();
   });
+});
+
+describe("DepartmentsService parentArchived", () => {
+  test.each(["university", "faculty"] as const)(
+    "is true when the %s is archived and the department's own flag is untouched",
+    async (parent) => {
+      const { service, database } = build();
+      const base = row();
+      database.department.findMany.mockResolvedValue([
+        row({
+          universityFaculty: {
+            ...base.universityFaculty,
+            [parent]: { ...base.universityFaculty[parent], archivedAt: at },
+          },
+        }),
+      ]);
+
+      const result = await service.list({ status: "all", page: 1, pageSize: 25 });
+
+      expect(result.items[0]).toMatchObject({ archivedAt: null, parentArchived: true });
+    },
+  );
 });
 
 describe("DepartmentsService parent locks", () => {

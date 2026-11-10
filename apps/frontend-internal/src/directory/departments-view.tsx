@@ -123,10 +123,12 @@ export function DepartmentsView() {
         id: "status",
         header: "Status",
         cell: (row) =>
-          row.archivedAt === null ? (
-            <Badge variant="secondary">Active</Badge>
-          ) : (
+          row.archivedAt !== null ? (
             <Badge variant="outline">Archived</Badge>
+          ) : row.parentArchived ? (
+            <Badge variant="outline">Hidden, parent archived</Badge>
+          ) : (
+            <Badge variant="secondary">Active</Badge>
           ),
       },
       { id: "students", header: "Students", cell: (row) => String(row.studentCount) },
@@ -182,9 +184,14 @@ export function DepartmentsView() {
             onClick={async () => {
               setNotice(null);
               try {
-                await restore.mutateAsync({ id: row.id });
+                const restored = await restore.mutateAsync({ id: row.id });
                 await refresh();
-                setNotice({ text: `${row.name} was restored.`, problem: false });
+                setNotice({
+                  text: restored.parentArchived
+                    ? `${row.name} was restored but stays hidden from enrollment while its university or faculty is archived.`
+                    : `${row.name} was restored.`,
+                  problem: false,
+                });
               } catch {
                 setNotice({ text: restoreFailedMessage(row.name), problem: true });
               }

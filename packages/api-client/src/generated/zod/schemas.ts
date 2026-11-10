@@ -339,6 +339,7 @@ export const DepartmentsListResponse = zod.object({
 }),
   "id": zod.uuid().regex(departmentsListResponseItemsItemIdRegExp),
   "name": zod.string(),
+  "parentArchived": zod.boolean(),
   "studentCount": zod.int().min(departmentsListResponseItemsItemStudentCountMin).max(departmentsListResponseItemsItemStudentCountMax),
   "university": zod.object({
   "id": zod.uuid().regex(departmentsListResponseItemsItemUniversityIdRegExp),
@@ -382,6 +383,7 @@ export const DepartmentsCreateResponse = zod.object({
 }),
   "id": zod.uuid().regex(departmentsCreateResponseIdRegExp),
   "name": zod.string(),
+  "parentArchived": zod.boolean(),
   "studentCount": zod.int().min(departmentsCreateResponseStudentCountMin).max(departmentsCreateResponseStudentCountMax),
   "university": zod.object({
   "id": zod.uuid().regex(departmentsCreateResponseUniversityIdRegExp),
@@ -428,6 +430,7 @@ export const DepartmentsGetResponse = zod.object({
 }),
   "id": zod.uuid().regex(departmentsGetResponseIdRegExp),
   "name": zod.string(),
+  "parentArchived": zod.boolean(),
   "studentCount": zod.int().min(departmentsGetResponseStudentCountMin).max(departmentsGetResponseStudentCountMax),
   "university": zod.object({
   "id": zod.uuid().regex(departmentsGetResponseUniversityIdRegExp),
@@ -474,6 +477,7 @@ export const DepartmentsUpdateResponse = zod.object({
 }),
   "id": zod.uuid().regex(departmentsUpdateResponseIdRegExp),
   "name": zod.string(),
+  "parentArchived": zod.boolean(),
   "studentCount": zod.int().min(departmentsUpdateResponseStudentCountMin).max(departmentsUpdateResponseStudentCountMax),
   "university": zod.object({
   "id": zod.uuid().regex(departmentsUpdateResponseUniversityIdRegExp),
@@ -510,6 +514,7 @@ export const DepartmentsArchiveResponse = zod.object({
 }),
   "id": zod.uuid().regex(departmentsArchiveResponseIdRegExp),
   "name": zod.string(),
+  "parentArchived": zod.boolean(),
   "studentCount": zod.int().min(departmentsArchiveResponseStudentCountMin).max(departmentsArchiveResponseStudentCountMax),
   "university": zod.object({
   "id": zod.uuid().regex(departmentsArchiveResponseUniversityIdRegExp),
@@ -546,6 +551,7 @@ export const DepartmentsRestoreResponse = zod.object({
 }),
   "id": zod.uuid().regex(departmentsRestoreResponseIdRegExp),
   "name": zod.string(),
+  "parentArchived": zod.boolean(),
   "studentCount": zod.int().min(departmentsRestoreResponseStudentCountMin).max(departmentsRestoreResponseStudentCountMax),
   "university": zod.object({
   "id": zod.uuid().regex(departmentsRestoreResponseUniversityIdRegExp),

@@ -32,8 +32,8 @@ interface DepartmentRow {
   createdAt: Date;
   updatedAt: Date;
   universityFaculty: {
-    university: { id: string; name: string };
-    faculty: { id: string; name: string };
+    university: { id: string; name: string; archivedAt: Date | null };
+    faculty: { id: string; name: string; archivedAt: Date | null };
   };
 }
 
@@ -45,8 +45,8 @@ interface Pair {
 const withPair = {
   universityFaculty: {
     select: {
-      university: { select: { id: true, name: true } },
-      faculty: { select: { id: true, name: true } },
+      university: { select: { id: true, name: true, archivedAt: true } },
+      faculty: { select: { id: true, name: true, archivedAt: true } },
     },
   },
 };
@@ -67,9 +67,15 @@ const orderBy = (sort: DepartmentListQuery["sort"]) => {
 const toSummary = (row: DepartmentRow, studentCount: number): DepartmentSummary => ({
   id: row.id,
   name: row.name,
-  university: row.universityFaculty.university,
-  faculty: row.universityFaculty.faculty,
+  university: {
+    id: row.universityFaculty.university.id,
+    name: row.universityFaculty.university.name,
+  },
+  faculty: { id: row.universityFaculty.faculty.id, name: row.universityFaculty.faculty.name },
   archivedAt: row.archivedAt?.toISOString() ?? null,
+  parentArchived:
+    row.universityFaculty.university.archivedAt !== null ||
+    row.universityFaculty.faculty.archivedAt !== null,
   createdAt: row.createdAt.toISOString(),
   updatedAt: row.updatedAt.toISOString(),
   studentCount,

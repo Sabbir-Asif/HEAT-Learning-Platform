@@ -430,6 +430,25 @@ describe("FacultiesView edit", () => {
     expect((checkboxFor("BUET") as HTMLInputElement).checked).toBe(true);
   });
 
+  test("assigning to a university that was archived meanwhile shows the archived message and keeps the sheet open", async () => {
+    route({
+      mutation: (_url, method) =>
+        method === "PUT" ? errorReply("DIRECTORY_ARCHIVED", 409) : undefined,
+    });
+    const view = await mount();
+    await openEdit(view, "Faculty of Science");
+    await toggle("BUET");
+    await submitForm();
+
+    await vi.waitFor(() =>
+      expect(document.querySelector("[data-slot=form-message]")?.textContent).toBe(
+        "Faculty of Science was saved. BUET: This record is archived, so it cannot be used for new records. Restore it first.",
+      ),
+    );
+    expect(document.querySelector("[data-slot=form]")).not.toBeNull();
+    expect((checkboxFor("BUET") as HTMLInputElement).checked).toBe(true);
+  });
+
   test("a link that cannot be saved keeps the sheet open with it ticked, and a retry only repeats that link", async () => {
     let failing = true;
     route({

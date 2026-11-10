@@ -478,6 +478,9 @@
                 "name": {
                   "type": "string"
                 },
+                "parentArchived": {
+                  "type": "boolean"
+                },
                 "studentCount": {
                   "maximum": 9007199254740991,
                   "minimum": 0,
@@ -512,6 +515,7 @@
                 "university",
                 "faculty",
                 "archivedAt",
+                "parentArchived",
                 "createdAt",
                 "updatedAt",
                 "studentCount"
@@ -582,6 +586,9 @@
           "name": {
             "type": "string"
           },
+          "parentArchived": {
+            "type": "boolean"
+          },
           "studentCount": {
             "maximum": 9007199254740991,
             "minimum": 0,
@@ -616,6 +623,7 @@
           "university",
           "faculty",
           "archivedAt",
+          "parentArchived",
           "createdAt",
           "updatedAt",
           "studentCount"
