@@ -68,6 +68,14 @@ const toSummary = (row: DepartmentRow, studentCount: number): DepartmentSummary 
   studentCount,
 });
 
+const notOfferedError = (): ApiException =>
+  new ApiException(
+    400,
+    "VALIDATION_FAILED",
+    undefined,
+    "This faculty is not offered at the chosen university.",
+  );
+
 const snapshot = (row: DepartmentRow) => ({
   name: row.name,
   universityId: row.universityFaculty.university.id,
@@ -129,7 +137,7 @@ export class DepartmentsService {
       this.audit.capture({ entityId: created.id, after: snapshot(created) });
       return toSummary(created, 0);
     } catch (error) {
-      throw this.translateWriteError(error);
+      throw errorCodeOf(error) === "P2003" ? notOfferedError() : translateDirectoryError(error);
     }
   }
 
@@ -138,29 +146,25 @@ export class DepartmentsService {
     const moved =
       before.universityFaculty.university.id !== request.universityId ||
       before.universityFaculty.faculty.id !== request.facultyId;
-    if (moved) {
-      await this.assertPairLinked(request);
-      const students = await studentCountOf(this.database, id);
-      if (students > 0) {
-        throw new ApiException(
-          409,
-          "DIRECTORY_IN_USE",
-          undefined,
-          moveBlockedMessage(before.name, students),
-        );
-      }
-    }
+    if (moved) await this.assertPairLinked(request);
     await this.assertNameFree(request.name, request, id);
     try {
-      const updated = await this.audit.client(this.database).department.update({
-        where: { id },
-        data: {
-          name: request.name,
-          universityId: request.universityId,
-          facultyId: request.facultyId,
-        },
-        include: withPair,
-      });
+      const client = this.audit.client(this.database);
+      const data = {
+        name: request.name,
+        universityId: request.universityId,
+        facultyId: request.facultyId,
+      };
+      if (moved) {
+        const { count } = await client.department.updateMany({
+          where: { id, profiles: { none: {} } },
+          data,
+        });
+        if (count === 0) await this.refuseMove(id, before.name);
+      } else {
+        await client.department.update({ where: { id }, data });
+      }
+      const updated = await this.existing(id, client);
       this.audit.capture({
         entityId: id,
         before: snapshot(before),
@@ -168,7 +172,7 @@ export class DepartmentsService {
       });
       return toSummary(updated, await studentCountOf(this.database, id));
     } catch (error) {
-      throw this.translateWriteError(error);
+      throw this.translateUpdateError(error);
     }
   }
 
@@ -188,7 +192,13 @@ export class DepartmentsService {
     this.audit.capture({ entityId: id, before: snapshot(before) });
   }
 
-  private translateWriteError(error: unknown): unknown {
+  private async refuseMove(id: string, name: string): Promise<never> {
+    const students = await studentCountOf(this.database, id);
+    if (students === 0) throw new ApiException(404, "NOT_FOUND");
+    throw new ApiException(409, "DIRECTORY_IN_USE", undefined, moveBlockedMessage(name, students));
+  }
+
+  private translateUpdateError(error: unknown): unknown {
     if (errorCodeOf(error) === "P2003") return new ApiException(404, "NOT_FOUND");
     return translateDirectoryError(error);
   }
@@ -209,14 +219,7 @@ export class DepartmentsService {
       },
       select: { universityId: true },
     });
-    if (link === null) {
-      throw new ApiException(
-        400,
-        "VALIDATION_FAILED",
-        undefined,
-        "This faculty is not offered at the chosen university.",
-      );
-    }
+    if (link === null) throw notOfferedError();
   }
 
   private async assertNameFree(name: string, pair: Pair, excludeId?: string): Promise<void> {

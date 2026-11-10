@@ -25,6 +25,14 @@ const row = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
+const updatedRow = row({
+  name: "History",
+  universityFaculty: {
+    university: { id: buet, name: "BUET" },
+    faculty: { id: science, name: "Faculty of Science" },
+  },
+});
+
 const uniqueViolation = Object.assign(new Error("unique"), { code: "P2002" });
 const foreignKeyViolation = Object.assign(new Error("fk"), { code: "P2003" });
 
@@ -36,6 +44,7 @@ const build = (
     linked?: boolean;
     createError?: Error;
     updateError?: Error;
+    movedCount?: number;
     deleteError?: Error;
   } = {},
 ) => {
@@ -52,22 +61,18 @@ const build = (
       count: vi.fn().mockResolvedValue(1),
       findUnique: vi
         .fn()
-        .mockResolvedValue(options.existing === undefined ? row() : options.existing),
+        .mockResolvedValueOnce(options.existing === undefined ? row() : options.existing)
+        .mockResolvedValue(updatedRow),
+      updateMany: options.updateError
+        ? vi.fn().mockRejectedValue(options.updateError)
+        : vi.fn().mockResolvedValue({ count: options.movedCount ?? 1 }),
       findFirst: vi.fn().mockResolvedValue(options.taken ?? null),
       create: options.createError
         ? vi.fn().mockRejectedValue(options.createError)
         : vi.fn().mockResolvedValue(row()),
       update: options.updateError
         ? vi.fn().mockRejectedValue(options.updateError)
-        : vi.fn().mockResolvedValue(
-            row({
-              name: "History",
-              universityFaculty: {
-                university: { id: buet, name: "BUET" },
-                faculty: { id: science, name: "Faculty of Science" },
-              },
-            }),
-          ),
+        : vi.fn().mockResolvedValue(updatedRow),
       delete: options.deleteError
         ? vi.fn().mockRejectedValue(options.deleteError)
         : vi.fn().mockResolvedValue(row()),
@@ -286,10 +291,16 @@ describe("DepartmentsService.create", () => {
     expect(await code(inAuditScope(() => service.create(input)))).toBe("DIRECTORY_NAME_TAKEN");
   });
 
-  test("a link removed after the check is NOT_FOUND, not a failed write", async () => {
+  test("a link removed after the check is the same not-offered VALIDATION_FAILED", async () => {
     const { service, inAuditScope } = build({ createError: foreignKeyViolation });
 
-    expect(await code(inAuditScope(() => service.create(input)))).toBe("NOT_FOUND");
+    const failure = await failureOf(inAuditScope(() => service.create(input)));
+
+    expect(failure).toBeInstanceOf(ApiException);
+    expect((failure as ApiException).code).toBe("VALIDATION_FAILED");
+    expect((failure as ApiException).detail).toBe(
+      "This faculty is not offered at the chosen university.",
+    );
   });
 
   test("any other database error is not hidden", async () => {
@@ -310,8 +321,8 @@ describe("DepartmentsService.update", () => {
     expect(database.department.update).toHaveBeenCalledWith({
       where: { id },
       data: { name: "History", universityId: dhaka, facultyId: arts },
-      include: pairInclude,
     });
+    expect(database.department.updateMany).not.toHaveBeenCalled();
     expect(includingDeleted.studentProfile.count).toHaveBeenCalledTimes(1);
     expect(database.universityFaculty.findUnique).not.toHaveBeenCalled();
     expect(changes).toEqual([
@@ -363,11 +374,18 @@ describe("DepartmentsService.update", () => {
       where: { universityId_facultyId: { universityId: buet, facultyId: science } },
       select: { universityId: true },
     });
-    expect(database.department.update).toHaveBeenCalled();
+    expect(database.department.updateMany).toHaveBeenCalledWith({
+      where: { id, profiles: { none: {} } },
+      data: { name: "Bengali", universityId: buet, facultyId: science },
+    });
+    expect(database.department.update).not.toHaveBeenCalled();
   });
 
   test("moving a department that students reference is DIRECTORY_IN_USE with the count, soft-deleted included", async () => {
-    const { service, database, includingDeleted, changes, inAuditScope } = build({ students: 3 });
+    const { service, database, includingDeleted, changes, inAuditScope } = build({
+      students: 3,
+      movedCount: 0,
+    });
 
     const failure = await failureOf(
       inAuditScope(() =>
@@ -383,6 +401,44 @@ describe("DepartmentsService.update", () => {
     });
     expect(database.department.update).not.toHaveBeenCalled();
     expect(changes).toEqual([]);
+  });
+
+  test("the move is one guarded write, so a student added after the first read still blocks it", async () => {
+    const { service, database, inAuditScope } = build({ students: 1, movedCount: 0 });
+
+    expect(
+      await code(
+        inAuditScope(() =>
+          service.update(id, { name: "Bengali", universityId: buet, facultyId: science }),
+        ),
+      ),
+    ).toBe("DIRECTORY_IN_USE");
+    expect(database.department.updateMany).toHaveBeenCalledTimes(1);
+    expect(database.department.update).not.toHaveBeenCalled();
+  });
+
+  test("a guarded move that matched nothing and has no students means the department is gone", async () => {
+    const { service, inAuditScope } = build({ students: 0, movedCount: 0 });
+
+    expect(
+      await code(
+        inAuditScope(() =>
+          service.update(id, { name: "Bengali", universityId: buet, facultyId: science }),
+        ),
+      ),
+    ).toBe("NOT_FOUND");
+  });
+
+  test("a link removed after the check is NOT_FOUND on a move too", async () => {
+    const { service, inAuditScope } = build({ updateError: foreignKeyViolation });
+
+    expect(
+      await code(
+        inAuditScope(() =>
+          service.update(id, { name: "Bengali", universityId: buet, facultyId: science }),
+        ),
+      ),
+    ).toBe("NOT_FOUND");
   });
 
   test("moving to a pair that is not linked is VALIDATION_FAILED", async () => {
