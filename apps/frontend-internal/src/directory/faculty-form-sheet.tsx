@@ -94,7 +94,6 @@ export function FacultyFormSheet({ target, onClose, onSaved }: FacultyFormSheetP
   const { reset } = form;
   const { isDirty } = form.formState;
   useEffect(() => {
-    setSaved(null);
     reset({
       name: targetRow?.name ?? "",
       universityIds: targetRow?.universities.map((university) => university.id) ?? [],
