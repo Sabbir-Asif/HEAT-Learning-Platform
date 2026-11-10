@@ -73,36 +73,42 @@ const validate = (options: SeedOptions): { email: string; password: string } => 
   return { email, password };
 };
 
+const superAdminLockKey = 5700001;
+
 const seedSuperAdmin = async (
   prisma: HeatClient,
   email: string,
   password: string,
 ): Promise<boolean> => {
-  const existing = await prisma.user.findFirst({
-    where: { email: { equals: email, mode: "insensitive" } },
-  });
-  if (existing === null && (await prisma.user.count({ where: { role: "SUPER_ADMIN" } })) > 0) {
-    return false;
-  }
-  if (existing) {
-    if (existing.role !== "SUPER_ADMIN") {
-      throw new SeedConfigError(
-        "SUPER_ADMIN_EMAIL belongs to an existing user who is not a super admin",
-      );
+  const passwordHash = await hashPassword(password);
+  return prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`select pg_advisory_xact_lock(${superAdminLockKey})`;
+    const existing = await tx.user.findFirst({
+      where: { email: { equals: email, mode: "insensitive" } },
+    });
+    if (existing === null && (await tx.user.count({ where: { role: "SUPER_ADMIN" } })) > 0) {
+      return false;
     }
-    return false;
-  }
-  await prisma.user.create({
-    data: {
-      email,
-      passwordHash: await hashPassword(password),
-      role: "SUPER_ADMIN",
-      realm: "ADMIN",
-      emailVerifiedAt: new Date(),
-      mustChangePassword: true,
-    },
+    if (existing) {
+      if (existing.role !== "SUPER_ADMIN") {
+        throw new SeedConfigError(
+          "SUPER_ADMIN_EMAIL belongs to an existing user who is not a super admin",
+        );
+      }
+      return false;
+    }
+    await tx.user.create({
+      data: {
+        email,
+        passwordHash,
+        role: "SUPER_ADMIN",
+        realm: "ADMIN",
+        emailVerifiedAt: new Date(),
+        mustChangePassword: true,
+      },
+    });
+    return true;
   });
-  return true;
 };
 
 const seedUniversity = async (prisma: HeatClient) =>

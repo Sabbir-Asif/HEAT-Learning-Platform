@@ -9,10 +9,11 @@ The super admin can no longer sign in (forgotten password, lost access) and no o
 Run from a shell on the server, in the API container or install, with the API environment loaded (database, Redis and auth secrets):
 
 ```sh
-pnpm --filter api recover-super-admin
 node dist/cli/main.js recover-super-admin
 node dist/cli/main.js recover-super-admin --email root@example.test
 ```
+
+In development only, `pnpm --filter api recover-super-admin` runs the same command from source.
 
 Without `--email` the command needs exactly one super admin. It refuses with a non-zero exit and changes nothing when there is none, when several exist (pass `--email`), or when the account is deactivated.
 
@@ -20,14 +21,15 @@ Without `--email` the command needs exactly one super admin. It refuses with a n
 
 - Generates a one-time temporary password from a CSPRNG and prints it once to the terminal. It is never logged or written to a file.
 - Stores its argon2id hash and sets `mustChangePassword`, in one transaction with an audit entry (`admin.break-glass.recover`) that records the time and the host name.
-- Revokes every session of that account, so old sessions fail to refresh.
+- Revokes every session of that account first, so old sessions fail to refresh. If revocation fails, nothing is changed and the command exits non-zero without printing a password.
+- Clears the admin sign-in lockout for that account, so the temporary password works at once.
 
 ## After
 
 1. Sign in at the admin console with the temporary password and set a new password when asked.
 2. Clear the terminal scrollback and do not paste the password anywhere. Prefix the command with a space or disable history if the shell records commands (the password is printed, not typed, so history holds only the command).
 3. Check the audit log for the `admin.break-glass.recover` entry and confirm it matches your own use. An entry you did not make means shell access was abused: rotate secrets and review the server.
-4. If sign-in answers "too many attempts", the sign-in lockout from earlier failures is still running (it is capped); wait for it to lapse.
+4. If the command prints a warning that the sign-in lockout could not be cleared (Redis was unreachable) and sign-in answers "too many attempts", wait for the lockout to lapse; it is capped.
 
 ## Security notes
 

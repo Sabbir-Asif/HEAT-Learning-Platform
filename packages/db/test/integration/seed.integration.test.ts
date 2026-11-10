@@ -31,6 +31,19 @@ const counts = async () => {
 };
 
 describe("seed", () => {
+  test("concurrent seeds with different emails create one super admin", async () => {
+    const { prisma } = database();
+
+    const results = await Promise.all(
+      ["one", "two", "three", "four"].map((name) =>
+        seed(prisma, options({ superAdminEmail: `${name}@example.test` })),
+      ),
+    );
+
+    expect(results.filter((result) => result.superAdminCreated)).toHaveLength(1);
+    expect(await prisma.user.count({ where: { role: "SUPER_ADMIN" } })).toBe(1);
+  });
+
   test("running twice leaves the same rows", async () => {
     const { prisma } = database();
     await seed(prisma, options({ includeSampleDirectory: true }));
