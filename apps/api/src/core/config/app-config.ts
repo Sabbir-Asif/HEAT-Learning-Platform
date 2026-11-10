@@ -21,6 +21,21 @@ const envSchema = z.object({
   REFRESH_TOKEN_TTL_DAYS: positiveInt.default(30),
   ADMIN_IDLE_MINUTES: positiveInt.default(30),
   REFRESH_GRACE_SECONDS: positiveInt.default(20),
+  CSRF_SECRET: z.string().min(32),
+  TRUSTED_ORIGINS: z
+    .string()
+    .default("http://localhost:3000,http://localhost:3001")
+    .transform((value) =>
+      value
+        .split(",")
+        .map((origin) => origin.trim())
+        .filter((origin) => origin !== ""),
+    )
+    .refine(
+      (origins) =>
+        origins.every((origin) => URL.canParse(origin) && new URL(origin).origin === origin),
+      "TRUSTED_ORIGINS must be a comma separated list of origins without a path",
+    ),
   BREACHED_PASSWORD_RANGE_URL: z.url().default("https://api.pwnedpasswords.com/range/"),
 });
 
@@ -35,6 +50,7 @@ export interface AppConfig {
     adminIdleMinutes: number;
     refreshGraceSeconds: number;
   };
+  csrf: { secret: string; trustedOrigins: readonly string[] };
   argon2: { memoryCost: number; timeCost: number; parallelism: number };
   breachedPasswordRangeUrl: string;
   rateLimit: RateLimitConfig;
@@ -61,6 +77,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
       adminIdleMinutes: values.ADMIN_IDLE_MINUTES,
       refreshGraceSeconds: values.REFRESH_GRACE_SECONDS,
     },
+    csrf: { secret: values.CSRF_SECRET, trustedOrigins: values.TRUSTED_ORIGINS },
     argon2: {
       memoryCost: values.ARGON2_MEMORY_COST,
       timeCost: values.ARGON2_TIME_COST,

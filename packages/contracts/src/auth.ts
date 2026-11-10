@@ -77,6 +77,24 @@ export const adminSessionCookies = {
   refreshPath: "/api/admin/auth/refresh",
 } as const;
 
+export const csrfHeaderName = "x-csrf-token";
+
+export const studentCsrf = {
+  cookie: "__Host-heat_csrf",
+  tokenPath: "/api/auth/csrf",
+} as const;
+
+export const adminCsrf = {
+  cookie: "__Host-heat_admin_csrf",
+  tokenPath: "/api/admin/auth/csrf",
+} as const;
+
+export const csrfTokenResponseSchema = z.object({
+  token: z.string(),
+});
+
+export type CsrfTokenResponse = z.infer<typeof csrfTokenResponseSchema>;
+
 export const passwordMinLength = 12;
 export const passwordMaxLength = 256;
 

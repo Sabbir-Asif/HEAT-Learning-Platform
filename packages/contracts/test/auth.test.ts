@@ -1,11 +1,13 @@
 import { describe, expect, test } from "vitest";
 import {
+  adminCsrf,
   adminSessionCookies,
   changePasswordRequestSchema,
   grantsCourseAccess,
   landingPathFor,
   meResponseSchema,
   signInRequestSchema,
+  studentCsrf,
   studentSessionCookies,
 } from "../src/index";
 
@@ -110,5 +112,15 @@ describe("changePasswordRequestSchema", () => {
 
     expect(parsed.success).toBe(false);
     expect(parsed.error?.issues[0]?.path).toEqual(["newPassword"]);
+  });
+});
+
+describe("csrf contract", () => {
+  test("each realm has a distinct __Host- cookie and its own token path", () => {
+    expect(studentCsrf.cookie).toMatch(/^__Host-/);
+    expect(adminCsrf.cookie).toMatch(/^__Host-/);
+    expect(studentCsrf.cookie).not.toBe(adminCsrf.cookie);
+    expect(studentCsrf.tokenPath).toBe("/api/auth/csrf");
+    expect(adminCsrf.tokenPath).toBe("/api/admin/auth/csrf");
   });
 });
