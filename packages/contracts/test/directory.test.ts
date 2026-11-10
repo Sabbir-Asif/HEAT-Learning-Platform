@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   createFacultyRequestSchema,
   createUniversityRequestSchema,
+  facultyFormSchema,
   facultyListQuerySchema,
   facultyUniversityParamsSchema,
   universityListQuerySchema,
@@ -87,5 +88,17 @@ describe("facultyUniversityParamsSchema", () => {
     const id = "0198f1a0-0000-7000-8000-000000000001";
     expect(facultyUniversityParamsSchema.safeParse({ id, universityId: id }).success).toBe(true);
     expect(facultyUniversityParamsSchema.safeParse({ id }).success).toBe(false);
+  });
+});
+
+describe("facultyFormSchema", () => {
+  test("keeps the name rules and carries the chosen university ids", () => {
+    const id = "0198f1a0-0000-7000-8000-000000000001";
+    expect(facultyFormSchema.parse({ name: " Arts ", universityIds: [id] })).toEqual({
+      name: "Arts",
+      universityIds: [id],
+    });
+    expect(facultyFormSchema.safeParse({ name: "", universityIds: [] }).success).toBe(false);
+    expect(facultyFormSchema.safeParse({ name: "Arts", universityIds: ["x"] }).success).toBe(false);
   });
 });

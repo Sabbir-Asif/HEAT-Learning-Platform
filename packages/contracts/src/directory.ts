@@ -74,6 +74,12 @@ export const createFacultyRequestSchema = z.object({ name: facultyNameSchema });
 
 export type CreateFacultyRequest = z.infer<typeof createFacultyRequestSchema>;
 
+export const facultyFormSchema = createFacultyRequestSchema.extend({
+  universityIds: z.array(z.uuid()),
+});
+
+export type FacultyFormValues = z.infer<typeof facultyFormSchema>;
+
 export const updateFacultyRequestSchema = createFacultyRequestSchema;
 
 export type UpdateFacultyRequest = CreateFacultyRequest;
