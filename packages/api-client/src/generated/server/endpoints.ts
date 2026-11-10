@@ -149,6 +149,73 @@ export interface AdminSummaryDto {
   status: AdminSummaryDtoStatus;
 }
 
+/**
+ * @nullable
+ */
+export type AuditLogListResponseDtoItemsItemAfter = {[key: string]: unknown} | null;
+
+/**
+ * @nullable
+ */
+export type AuditLogListResponseDtoItemsItemBefore = {[key: string]: unknown} | null;
+
+export type AuditLogListResponseDtoItemsItem = {
+  action: string;
+  /**
+     * @maxLength 254
+     * @nullable
+     */
+  actorEmail: string | null;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  actorId: string | null;
+  /** @nullable */
+  after: AuditLogListResponseDtoItemsItemAfter;
+  /** @nullable */
+  before: AuditLogListResponseDtoItemsItemBefore;
+  entity: string;
+  /**
+     * @maxLength 128
+     * @nullable
+     */
+  entityId: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @maxLength 64
+     * @nullable
+     */
+  ipAddress: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  occurredAt: string;
+  /**
+     * @maxLength 64
+     * @nullable
+     */
+  requestId: string | null;
+};
+
+export interface AuditLogListResponseDto {
+  items: AuditLogListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+}
+
 export interface CaptchaRequestDto {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   replaces?: string;
@@ -297,6 +364,38 @@ export const AdminUsersListSort = {
   createdAt: 'createdAt',
   '-createdAt': '-createdAt',
 } as const;
+
+export type AuditLogListParams = {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  pageSize?: number;
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  actor?: string;
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  action?: string;
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  entity?: string;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  from?: string;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  to?: string;
+};
 
 export const getAdminAccountChangePasswordUrl = () => {
 
@@ -452,6 +551,34 @@ export const adminUsersResendInvitation = async (id: string, options?: Parameter
   {
     ...options,
     method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getAuditLogListUrl = (params?: AuditLogListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/audit-log?${stringifiedParams}` : `/api/admin/audit-log`
+}
+
+export const auditLogList = async (params?: AuditLogListParams, options?: Parameters<typeof serverFetch>[1]): Promise<AuditLogListResponseDto> => {
+
+  return serverFetch<AuditLogListResponseDto>(getAuditLogListUrl(params),
+  {
+    ...options,
+    method: 'GET'
 
 
   }

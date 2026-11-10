@@ -36,14 +36,14 @@ export const auditLogEntrySchema = z.object({
   id: z.uuid(),
   occurredAt: z.iso.datetime(),
   actorId: z.uuid().nullable(),
-  actorEmail: z.string().nullable(),
+  actorEmail: z.string().max(254).nullable(),
   action: z.string(),
   entity: z.string(),
-  entityId: z.string().nullable(),
-  before: z.record(z.string(), z.unknown()).nullable(),
-  after: z.record(z.string(), z.unknown()).nullable(),
-  requestId: z.string().nullable(),
-  ipAddress: z.string().nullable(),
+  entityId: z.string().max(128).nullable(),
+  before: z.looseObject({}).nullable(),
+  after: z.looseObject({}).nullable(),
+  requestId: z.string().max(64).nullable(),
+  ipAddress: z.string().max(64).nullable(),
 });
 
 export type AuditLogEntry = z.infer<typeof auditLogEntrySchema>;

@@ -31,6 +31,8 @@ import type {
   AdminSignInRequestDto,
   AdminSummaryDto,
   AdminUsersListParams,
+  AuditLogListParams,
+  AuditLogListResponseDto,
   CaptchaRequestDto,
   CaptchaResponseDto,
   ChangePasswordRequestDto,
@@ -535,6 +537,108 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAdminUsersResendInvitationMutationOptions(options), queryClient);
     }
+
+export const getAuditLogListUrl = (params?: AuditLogListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/audit-log?${stringifiedParams}` : `/api/admin/audit-log`
+}
+
+export const auditLogList = async (params?: AuditLogListParams, options?: Parameters<typeof customFetch>[1]): Promise<AuditLogListResponseDto> => {
+
+  return customFetch<AuditLogListResponseDto>(getAuditLogListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAuditLogListQueryKey = (params?: AuditLogListParams,) => {
+    return [
+    `/api/admin/audit-log`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getAuditLogListQueryOptions = <TData = Awaited<ReturnType<typeof auditLogList>>, TError = ErrorType<unknown>>(params?: AuditLogListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof auditLogList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAuditLogListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof auditLogList>>> = ({ signal }) => auditLogList(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof auditLogList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AuditLogListQueryResult = NonNullable<Awaited<ReturnType<typeof auditLogList>>>
+export type AuditLogListQueryError = ErrorType<unknown>
+
+
+export function useAuditLogList<TData = Awaited<ReturnType<typeof auditLogList>>, TError = ErrorType<unknown>>(
+ params: undefined |  AuditLogListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof auditLogList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof auditLogList>>,
+          TError,
+          Awaited<ReturnType<typeof auditLogList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAuditLogList<TData = Awaited<ReturnType<typeof auditLogList>>, TError = ErrorType<unknown>>(
+ params?: AuditLogListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof auditLogList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof auditLogList>>,
+          TError,
+          Awaited<ReturnType<typeof auditLogList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAuditLogList<TData = Awaited<ReturnType<typeof auditLogList>>, TError = ErrorType<unknown>>(
+ params?: AuditLogListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof auditLogList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useAuditLogList<TData = Awaited<ReturnType<typeof auditLogList>>, TError = ErrorType<unknown>>(
+ params?: AuditLogListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof auditLogList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAuditLogListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getAdminAuthCsrfTokenUrl = () => {
 

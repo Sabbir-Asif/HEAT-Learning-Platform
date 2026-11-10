@@ -158,6 +158,73 @@ export const AdminUsersResendInvitationResponse = zod.object({
 })
 
 
+export const auditLogListQueryPageDefault = 1;
+export const auditLogListQueryPageMax = 9007199254740991;
+
+export const auditLogListQueryPageSizeDefault = 25;
+export const auditLogListQueryPageSizeMin = -9007199254740991;
+export const auditLogListQueryPageSizeMax = 9007199254740991;
+
+export const auditLogListQueryActorMax = 120;
+
+export const auditLogListQueryActionMax = 120;
+
+export const auditLogListQueryEntityMax = 120;
+
+export const auditLogListQueryFromRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const auditLogListQueryToRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+
+
+export const AuditLogListQueryParams = zod.object({
+  "page": zod.int().min(1).max(auditLogListQueryPageMax).default(auditLogListQueryPageDefault),
+  "pageSize": zod.int().min(auditLogListQueryPageSizeMin).max(auditLogListQueryPageSizeMax).default(auditLogListQueryPageSizeDefault),
+  "actor": zod.string().min(1).max(auditLogListQueryActorMax).optional(),
+  "action": zod.string().min(1).max(auditLogListQueryActionMax).optional(),
+  "entity": zod.string().min(1).max(auditLogListQueryEntityMax).optional(),
+  "from": zod.string().regex(auditLogListQueryFromRegExp).optional(),
+  "to": zod.string().regex(auditLogListQueryToRegExp).optional()
+})
+
+export const auditLogListResponseItemsItemActorEmailMax = 254;
+
+export const auditLogListResponseItemsItemActorIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const auditLogListResponseItemsItemEntityIdMax = 128;
+
+export const auditLogListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const auditLogListResponseItemsItemIpAddressMax = 64;
+
+export const auditLogListResponseItemsItemOccurredAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const auditLogListResponseItemsItemRequestIdMax = 64;
+
+export const auditLogListResponsePageMax = 9007199254740991;
+
+export const auditLogListResponsePageSizeMax = 9007199254740991;
+
+export const auditLogListResponseTotalMin = 0;
+export const auditLogListResponseTotalMax = 9007199254740991;
+
+
+
+export const AuditLogListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "action": zod.string(),
+  "actorEmail": zod.string().max(auditLogListResponseItemsItemActorEmailMax).nullable(),
+  "actorId": zod.uuid().regex(auditLogListResponseItemsItemActorIdRegExp).nullable(),
+  "after": zod.record(zod.string(), zod.unknown()).nullable(),
+  "before": zod.record(zod.string(), zod.unknown()).nullable(),
+  "entity": zod.string(),
+  "entityId": zod.string().max(auditLogListResponseItemsItemEntityIdMax).nullable(),
+  "id": zod.uuid().regex(auditLogListResponseItemsItemIdRegExp),
+  "ipAddress": zod.string().max(auditLogListResponseItemsItemIpAddressMax).nullable(),
+  "occurredAt": zod.iso.datetime({"offset":true}).regex(auditLogListResponseItemsItemOccurredAtRegExp),
+  "requestId": zod.string().max(auditLogListResponseItemsItemRequestIdMax).nullable()
+})),
+  "page": zod.int().min(1).max(auditLogListResponsePageMax),
+  "pageSize": zod.int().min(1).max(auditLogListResponsePageSizeMax),
+  "total": zod.int().min(auditLogListResponseTotalMin).max(auditLogListResponseTotalMax)
+})
+
+
 export const AdminAuthCsrfTokenResponse = zod.object({
   "token": zod.string()
 })
