@@ -589,6 +589,27 @@ describe("FacultiesView delete", () => {
   });
 });
 
+describe("FacultiesView university list truncation", () => {
+  test("the sheet says when more universities exist than it lists", async () => {
+    route({ universities: () => json({ items: [], total: 51, page: 1, pageSize: 50 }) });
+    const view = await mount();
+    await act(async () => buttonNamed("Add faculty", view)?.click());
+
+    await vi.waitFor(() =>
+      expect(document.body.textContent).toContain("Only the first 50 names are listed"),
+    );
+  });
+
+  test("no notice while every university fits", async () => {
+    route();
+    const view = await mount();
+    await act(async () => buttonNamed("Add faculty", view)?.click());
+    await vi.waitFor(() => expect(checkboxFor("BUET")).toBeDefined());
+
+    expect(document.body.textContent).not.toContain("Only the first");
+  });
+});
+
 describe("FacultiesView archive and restore", () => {
   const archivedAt = "2026-11-02T04:00:00.000Z";
   const archivedRow = row({
