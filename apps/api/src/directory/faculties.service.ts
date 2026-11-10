@@ -15,6 +15,7 @@ import {
   archiveChange,
   archivedError,
   errorCodeOf,
+  lockParents,
   statusWhere,
   translateDirectoryError,
 } from "./directory-rules";
@@ -166,6 +167,7 @@ export class FacultiesService {
 
   async assign(id: string, universityId: string): Promise<FacultySummary> {
     const client = this.audit.client(this.database);
+    await lockParents(client, universityId, id);
     const faculty = await this.existing(id, client);
     const university = await client.university.findUnique({
       where: { id: universityId },
@@ -179,7 +181,6 @@ export class FacultiesService {
       .catch((error: unknown) => {
         throw errorCodeOf(error) === "P2003" ? new ApiException(404, "NOT_FOUND") : error;
       });
-    await this.assertStillActive(id, universityId, client);
     this.invalidateAfterCommit();
     this.audit.capture(
       created.count > 0
@@ -245,22 +246,11 @@ export class FacultiesService {
       data: { archivedAt: archive ? new Date() : null },
     });
     const row = await this.existing(id, client);
-    this.invalidateAfterCommit();
-    this.audit.capture(archiveChange(row, archive, count > 0));
+    if (count > 0) {
+      this.invalidateAfterCommit();
+      this.audit.capture(archiveChange(row, archive));
+    }
     return toSummary(row, await usageOf(this.database, id));
-  }
-
-  private async assertStillActive(
-    id: string,
-    universityId: string,
-    client: Pick<HeatClient, "faculty" | "university">,
-  ): Promise<void> {
-    const [faculty, university] = await Promise.all([
-      client.faculty.findUnique({ where: { id }, select: { archivedAt: true } }),
-      client.university.findUnique({ where: { id: universityId }, select: { archivedAt: true } }),
-    ]);
-    if (faculty === null || university === null) throw new ApiException(404, "NOT_FOUND");
-    if (faculty.archivedAt !== null || university.archivedAt !== null) throw archivedError();
   }
 
   private async summaryOf(

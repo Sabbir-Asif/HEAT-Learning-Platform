@@ -20,6 +20,7 @@ import { DirectoryCache } from "./directory-cache";
 import {
   archivedError,
   errorCodeOf,
+  lockParents,
   statusWhere,
   translateDirectoryError,
 } from "./directory-rules";
@@ -131,10 +132,11 @@ export class DepartmentsService {
   }
 
   async create(request: CreateDepartmentRequest): Promise<DepartmentSummary> {
-    await this.assertPairLinked(request, this.database);
+    const client = this.audit.client(this.database);
+    await lockParents(client, request.universityId, request.facultyId);
+    await this.assertPairLinked(request, client);
     await this.assertNameFree(request.name, request);
     try {
-      const client = this.audit.client(this.database);
       const created = await client.department.create({
         data: {
           name: request.name,
@@ -143,7 +145,6 @@ export class DepartmentsService {
         },
         include: withPair,
       });
-      await this.assertPairLinked(request, client);
       this.invalidateAfterCommit();
       this.audit.capture({ entityId: created.id, after: snapshot(created) });
       return toSummary(created, 0);
@@ -157,10 +158,13 @@ export class DepartmentsService {
     const moved =
       before.universityFaculty.university.id !== request.universityId ||
       before.universityFaculty.faculty.id !== request.facultyId;
-    if (moved) await this.assertPairLinked(request, this.database);
+    const client = this.audit.client(this.database);
+    if (moved) {
+      await lockParents(client, request.universityId, request.facultyId);
+      await this.assertPairLinked(request, client);
+    }
     await this.assertNameFree(request.name, request, id);
     try {
-      const client = this.audit.client(this.database);
       const data = {
         name: request.name,
         universityId: request.universityId,
@@ -172,7 +176,6 @@ export class DepartmentsService {
           data,
         });
         if (count === 0) await this.refuseMove(id, before.name);
-        await this.assertPairLinked(request, client);
       } else {
         await client.department.update({ where: { id }, data });
       }
@@ -221,12 +224,14 @@ export class DepartmentsService {
       data: { archivedAt: archive ? new Date() : null },
     });
     const row = await this.existing(id, client);
-    this.invalidateAfterCommit();
-    this.audit.capture({
-      entityId: id,
-      before: { ...snapshot(row), archived: count > 0 ? !archive : archive },
-      after: { ...snapshot(row), archived: archive },
-    });
+    if (count > 0) {
+      this.invalidateAfterCommit();
+      this.audit.capture({
+        entityId: id,
+        before: { ...snapshot(row), archived: !archive },
+        after: { ...snapshot(row), archived: archive },
+      });
+    }
     return toSummary(row, await studentCountOf(this.database, id));
   }
 

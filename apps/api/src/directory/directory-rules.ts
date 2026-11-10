@@ -1,4 +1,5 @@
 import type { DirectoryStatus } from "@heat/contracts";
+import type { HeatClient } from "@heat/db";
 import { assertNotInUse, RecordInUseError } from "@heat/db";
 import { ApiException } from "../http/api-exception";
 
@@ -49,12 +50,17 @@ export const archivedError = (): ApiException =>
     "This record is archived, so it cannot be used for new records. Restore it first.",
   );
 
-export const archiveChange = (
-  row: { id: string; name: string },
-  archive: boolean,
-  changed: boolean,
-) => ({
+export const archiveChange = (row: { id: string; name: string }, archive: boolean) => ({
   entityId: row.id,
-  before: { name: row.name, archived: changed ? !archive : archive },
+  before: { name: row.name, archived: !archive },
   after: { name: row.name, archived: archive },
 });
+
+export const lockParents = async (
+  client: Pick<HeatClient, "$queryRaw">,
+  universityId: string,
+  facultyId: string,
+): Promise<void> => {
+  await client.$queryRaw`SELECT id FROM "University" WHERE id = ${universityId}::uuid FOR SHARE`;
+  await client.$queryRaw`SELECT id FROM "Faculty" WHERE id = ${facultyId}::uuid FOR SHARE`;
+};

@@ -108,6 +108,7 @@ const build = (
         .fn()
         .mockResolvedValue((options.linkedDepartments ?? []).map((name) => ({ name }))),
     },
+    $queryRaw: vi.fn().mockResolvedValue([]),
     $includingDeleted: () => includingDeleted,
   };
   const cache = { invalidate: vi.fn().mockResolvedValue(undefined) };
@@ -683,13 +684,17 @@ describe("FacultiesService archive and restore", () => {
     });
   });
 
-  test("repeating an archive changes nothing and records an unchanged state", async () => {
-    const { service, database, changes, inAuditScope } = build({ archivedChanged: false });
-    database.faculty.findUnique.mockResolvedValue(row({ archivedAt: at }));
+  test("archiving a record that is already archived writes no audit entry and queues no invalidation", async () => {
+    const { service, database, changes, inAuditScope, afterCommit } = build({
+      archivedChanged: false,
+    });
+    database.faculty.findUnique.mockReset().mockResolvedValue(row({ archivedAt: at }));
 
-    await inAuditScope(() => service.archive(id));
+    const result = await inAuditScope(() => service.archive(id));
 
-    expect(changes[0]).toMatchObject({ before: { archived: true }, after: { archived: true } });
+    expect(result.archivedAt).toBe(at.toISOString());
+    expect(changes).toEqual([]);
+    expect(afterCommit).toEqual([]);
   });
 
   test("an unknown id is NOT_FOUND", async () => {
@@ -719,13 +724,19 @@ describe("FacultiesService assign to or from archived records", () => {
     expect(database.universityFaculty.createMany).not.toHaveBeenCalled();
   });
 
-  test("an archive that lands between the check and the write is refused and rolls back", async () => {
+  test("both parent rows are locked in the transaction before the archived check, so a concurrent archive serializes with the assign", async () => {
     const { service, database, inAuditScope } = build();
-    database.faculty.findUnique
-      .mockResolvedValueOnce(row())
-      .mockResolvedValue(row({ archivedAt: at }));
 
-    expect(await code(inAuditScope(() => service.assign(id, buet)))).toBe("DIRECTORY_ARCHIVED");
+    await inAuditScope(() => service.assign(id, buet));
+
+    expect(database.$queryRaw).toHaveBeenCalledTimes(2);
+    const lockOrder = database.$queryRaw.mock.invocationCallOrder;
+    expect(Math.max(...lockOrder)).toBeLessThan(
+      database.university.findUnique.mock.invocationCallOrder[0] ?? 0,
+    );
+    expect(Math.max(...lockOrder)).toBeLessThan(
+      database.universityFaculty.createMany.mock.invocationCallOrder[0] ?? 0,
+    );
   });
 });
 

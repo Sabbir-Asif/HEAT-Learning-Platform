@@ -427,13 +427,17 @@ describe("UniversitiesService archive and restore", () => {
     expect(changes[0]).toMatchObject({ before: { archived: true }, after: { archived: false } });
   });
 
-  test("repeating an archive changes nothing and records an unchanged state", async () => {
-    const { service, database, changes, inAuditScope } = build({ archivedChanged: false });
-    database.university.findUnique.mockResolvedValue(row({ archivedAt: at }));
+  test("archiving a record that is already archived writes no audit entry and queues no invalidation", async () => {
+    const { service, database, changes, inAuditScope, afterCommit } = build({
+      archivedChanged: false,
+    });
+    database.university.findUnique.mockReset().mockResolvedValue(row({ archivedAt: at }));
 
-    await inAuditScope(() => service.archive(id));
+    const result = await inAuditScope(() => service.archive(id));
 
-    expect(changes[0]).toMatchObject({ before: { archived: true }, after: { archived: true } });
+    expect(result.archivedAt).toBe(at.toISOString());
+    expect(changes).toEqual([]);
+    expect(afterCommit).toEqual([]);
   });
 
   test("an unknown id is NOT_FOUND", async () => {

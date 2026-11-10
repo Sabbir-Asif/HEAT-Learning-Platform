@@ -90,6 +90,7 @@ const build = (
             },
       ),
     },
+    $queryRaw: vi.fn().mockResolvedValue([]),
     $includingDeleted: () => includingDeleted,
   };
   const cache = { invalidate: vi.fn().mockResolvedValue(undefined) };
@@ -664,14 +665,15 @@ describe("DepartmentsService archive and restore", () => {
     });
   });
 
-  test("archiving an archived department changes nothing and records an unchanged state", async () => {
-    const { service, database, changes, inAuditScope } = build({ movedCount: 0 });
+  test("archiving a record that is already archived writes no audit entry and queues no invalidation", async () => {
+    const { service, database, changes, inAuditScope, afterCommit } = build({ movedCount: 0 });
     database.department.findUnique.mockReset().mockResolvedValue(row({ archivedAt: at }));
 
     const result = await inAuditScope(() => service.archive(id));
 
     expect(result.archivedAt).toBe(at.toISOString());
-    expect(changes[0]).toMatchObject({ before: { archived: true }, after: { archived: true } });
+    expect(changes).toEqual([]);
+    expect(afterCommit).toEqual([]);
   });
 
   test("an unknown id is NOT_FOUND", async () => {
@@ -709,6 +711,37 @@ describe("DepartmentsService archived parents", () => {
     await inAuditScope(() => service.update(id, { ...input, name: "History" }));
 
     expect(database.department.update).toHaveBeenCalled();
+  });
+});
+
+describe("DepartmentsService parent locks", () => {
+  test("create locks both parent rows before it reads the link and writes", async () => {
+    const { service, database, inAuditScope } = build();
+
+    await inAuditScope(() => service.create(input));
+
+    expect(database.$queryRaw).toHaveBeenCalledTimes(2);
+    const lastLock = Math.max(...database.$queryRaw.mock.invocationCallOrder);
+    expect(lastLock).toBeLessThan(
+      database.universityFaculty.findUnique.mock.invocationCallOrder[0] ?? 0,
+    );
+    expect(lastLock).toBeLessThan(database.department.create.mock.invocationCallOrder[0] ?? 0);
+  });
+
+  test("a move locks the target parents before the link check and the write, a rename locks nothing", async () => {
+    const moved = build();
+    await moved.inAuditScope(() => moved.service.update(id, { ...input, facultyId: science }));
+    const lastLock = Math.max(...moved.database.$queryRaw.mock.invocationCallOrder);
+    expect(lastLock).toBeLessThan(
+      moved.database.universityFaculty.findUnique.mock.invocationCallOrder[0] ?? 0,
+    );
+    expect(lastLock).toBeLessThan(
+      moved.database.department.updateMany.mock.invocationCallOrder[0] ?? 0,
+    );
+
+    const renamed = build();
+    await renamed.inAuditScope(() => renamed.service.update(id, { ...input, name: "History" }));
+    expect(renamed.database.$queryRaw).not.toHaveBeenCalled();
   });
 });
 
