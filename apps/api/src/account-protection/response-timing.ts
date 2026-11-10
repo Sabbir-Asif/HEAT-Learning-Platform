@@ -1,6 +1,7 @@
 import { setTimeout as delay } from "node:timers/promises";
-import { Injectable } from "@nestjs/common";
-import { DEFAULT_RESPONSE_FLOOR_MS } from "./account-protection.constants";
+import { Inject, Injectable } from "@nestjs/common";
+import { APP_CONFIG } from "../core";
+import type { AppConfig } from "../core";
 
 export interface TimingOptions {
   floorMs?: number;
@@ -10,8 +11,10 @@ export interface TimingOptions {
 
 @Injectable()
 export class ResponseTiming {
+  constructor(@Inject(APP_CONFIG) private readonly config: AppConfig) {}
+
   async equalise<T>(work: () => Promise<T>, options: TimingOptions = {}): Promise<T> {
-    const floorMs = options.floorMs ?? DEFAULT_RESPONSE_FLOOR_MS;
+    const floorMs = options.floorMs ?? this.config.accountProtection.responseFloorMs;
     const now = options.now ?? (() => performance.now());
     const sleep = options.sleep ?? ((milliseconds: number) => delay(milliseconds));
     const started = now();

@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   ALREADY_REGISTERED_EVENT_TYPE,
   ALREADY_REGISTERED_TEMPLATE_KEY,
+  REGISTRATION_LOCK_TIMEOUT_MS,
   RegistrationPolicyService,
   ResponseTiming,
   VerificationSessionService,
@@ -199,19 +200,70 @@ describe("account protections on real Postgres", () => {
     await expect(sessions().authenticate(early.accessToken, "student")).resolves.toBeDefined();
   });
 
-  test("new and existing email paths take the same time within the tolerance", async () => {
-    await testApp().factories.user({ email: "present@example.test" });
+  test("new, existing and unverified-replace paths take the same time, and the work fits under the floor", async () => {
     const timing = testApp().moduleRef.get(ResponseTiming);
-    const measure = async (email: string): Promise<number> => {
+    const runs = 5;
+    const median = (values: number[]): number =>
+      [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)] ?? 0;
+    const measure = async (email: string) => {
       const started = performance.now();
-      await timing.equalise(() => register(email), { floorMs: timingFloorMs });
-      return performance.now() - started;
+      let workMs = 0;
+      await timing.equalise(
+        async () => {
+          const workStarted = performance.now();
+          try {
+            return await register(email);
+          } finally {
+            workMs = performance.now() - workStarted;
+          }
+        },
+        { floorMs: timingFloorMs },
+      );
+      return { totalMs: performance.now() - started, workMs };
+    };
+    const collect = async (prepare: (email: string, run: number) => Promise<void>) => {
+      const samples = [];
+      for (let run = 0; run < runs; run += 1) {
+        const email = `timing-${prepare.name}-${run}@example.test`;
+        await prepare(email, run);
+        samples.push(await measure(email));
+      }
+      return {
+        total: median(samples.map((sample) => sample.totalMs)),
+        work: median(samples.map((sample) => sample.workMs)),
+      };
     };
 
-    const fresh = await measure("brand-new@example.test");
-    const duplicate = await measure("present@example.test");
+    const fresh = await collect(async function fresh() {});
+    const duplicate = await collect(async function duplicate(email) {
+      await testApp().factories.user({ email });
+    });
+    const replace = await collect(async function replace(email) {
+      await testApp().factories.user({ email, verified: false });
+    });
 
-    expect(Math.abs(fresh - duplicate)).toBeLessThan(timingToleranceMs);
-    expect(Math.min(fresh, duplicate)).toBeGreaterThanOrEqual(timingFloorMs - 5);
+    for (const path of [fresh, duplicate, replace]) {
+      expect(path.work).toBeLessThan(timingFloorMs);
+      expect(path.total).toBeGreaterThanOrEqual(timingFloorMs - 5);
+    }
+    const totals = [fresh.total, duplicate.total, replace.total];
+    expect(Math.max(...totals) - Math.min(...totals)).toBeLessThan(timingToleranceMs);
+  });
+
+  test("a registration waiting on a held same-email lock fails within the lock timeout", async () => {
+    const holder = prisma().$transaction(
+      async (tx) => {
+        await policy().apply(tx, "held@example.test", actor);
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      },
+      { timeout: 10_000 },
+    );
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    const started = performance.now();
+    await expect(register("HELD@example.test")).rejects.toBeDefined();
+
+    expect(performance.now() - started).toBeLessThan(REGISTRATION_LOCK_TIMEOUT_MS + 400);
+    await holder;
   });
 });

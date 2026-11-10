@@ -6,4 +6,4 @@ export const REGISTRATION_REPLACED_AUDIT_ACTION = "student.registration.replaced
 
 export const REGISTRATION_DUPLICATE_AUDIT_ACTION = "student.registration.duplicate";
 
-export const DEFAULT_RESPONSE_FLOOR_MS = 600;
+export const REGISTRATION_LOCK_TIMEOUT_MS = 500;

@@ -7,6 +7,7 @@ import {
   ALREADY_REGISTERED_EVENT_TYPE,
   ALREADY_REGISTERED_TEMPLATE_KEY,
   REGISTRATION_DUPLICATE_AUDIT_ACTION,
+  REGISTRATION_LOCK_TIMEOUT_MS,
   REGISTRATION_REPLACED_AUDIT_ACTION,
 } from "./account-protection.constants";
 import type {
@@ -27,6 +28,7 @@ export class RegistrationPolicyService {
     email: string,
     actor: AuditActor,
   ): Promise<RegistrationOutcome> {
+    await tx.$executeRaw`SELECT set_config('lock_timeout', ${`${REGISTRATION_LOCK_TIMEOUT_MS}ms`}, true)`;
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(lower(${email})))`;
     const existing = await tx.user.findFirst({
       where: { email: { equals: email, mode: "insensitive" }, deletedAt: null },
