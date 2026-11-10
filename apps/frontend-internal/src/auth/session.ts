@@ -4,6 +4,7 @@ import { adminMeDescribe } from "@heat/api-client/server";
 import type { AdminMeResponse } from "@heat/contracts";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { cache } from "react";
 import { safeNextPath } from "./next-path";
 import { pathnameHeader } from "./session-gate";
@@ -14,6 +15,7 @@ async function currentPath(): Promise<string> {
 }
 
 export const verifySession = cache(async (): Promise<AdminMeResponse> => {
+  await connection();
   try {
     return await adminMeDescribe();
   } catch (error) {

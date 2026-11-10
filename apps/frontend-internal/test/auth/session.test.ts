@@ -3,6 +3,10 @@ import type { AdminMeResponse } from "@heat/contracts";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const adminMeDescribe = vi.fn();
+const callOrder: string[] = [];
+const connection = vi.fn(async () => {
+  callOrder.push("connection");
+});
 const headerValues = new Map<string, string>();
 const redirect = vi.fn((location: string): never => {
   throw new Error(`redirect:${location}`);
@@ -13,6 +17,7 @@ vi.mock("@heat/api-client/server", () => ({ adminMeDescribe: () => adminMeDescri
 vi.mock("next/headers", () => ({
   headers: async () => ({ get: (name: string) => headerValues.get(name) ?? null }),
 }));
+vi.mock("next/server", () => ({ connection: () => connection() }));
 vi.mock("next/navigation", () => ({ redirect: (location: string) => redirect(location) }));
 vi.mock("react", async (importOriginal) => ({
   ...(await importOriginal<typeof import("react")>()),
@@ -32,9 +37,23 @@ beforeEach(() => {
   adminMeDescribe.mockReset();
   redirect.mockClear();
   headerValues.clear();
+  callOrder.length = 0;
+  connection.mockClear();
 });
 
 describe("verifySession", () => {
+  test("opts into dynamic rendering before calling the API", async () => {
+    adminMeDescribe.mockImplementation(async () => {
+      callOrder.push("api");
+      return session(false);
+    });
+    const { verifySession } = await import("../../src/auth/session");
+
+    await verifySession();
+
+    expect(callOrder).toEqual(["connection", "api"]);
+  });
+
   test("returns the session from /admin/me", async () => {
     const current = session(false);
     adminMeDescribe.mockResolvedValue(current);
