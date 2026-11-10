@@ -11,7 +11,10 @@ const build = () => {
     department: { findMany: vi.fn().mockResolvedValue([{ id: "d", name: "CSE" }]) },
   };
   const cache = {
-    remember: vi.fn(async (_name: string, load: () => Promise<unknown>) => load()),
+    remember: vi.fn(
+      async (_name: string, load: () => Promise<unknown>, _store?: (value: never) => boolean) =>
+        load(),
+    ),
   };
   return {
     database,
