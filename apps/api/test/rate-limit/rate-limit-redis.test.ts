@@ -37,3 +37,12 @@ describe("createRateLimitRedis", () => {
     client.disconnect();
   });
 });
+
+describe("createRateLimitRedis error handling", () => {
+  test("connection errors are swallowed instead of crashing the process", () => {
+    const client = createRateLimitRedis("redis://127.0.0.1:1", 100);
+
+    expect(() => client.emit("error", new Error("connection refused"))).not.toThrow();
+    client.disconnect();
+  });
+});
