@@ -119,6 +119,6 @@ New code copies the first implementation of its pattern. Each ticket that lands 
 
 | Pattern | Reference                                                                  |
 | ------- | -------------------------------------------------------------------------- |
-| Module  | none yet; the first API module to land is added here                       |
+| Module  | `apps/api/src/directory` (controller, service, DTOs, `@Audited` writes)    |
 | Form    | `packages/ui/src/composites/form.tsx` (`Form`, `FormField`, `FormMessage`) |
 | Job     | none yet; the first worker job to land is added here                       |

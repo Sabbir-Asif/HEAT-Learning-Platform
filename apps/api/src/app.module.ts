@@ -7,6 +7,7 @@ import { AuditModule } from "./audit";
 import { AuthModule } from "./auth";
 import { CaptchaModule } from "./captcha";
 import { CoreModule } from "./core";
+import { DirectoryModule } from "./directory";
 import { HealthController } from "./health/health.controller";
 import { HttpApiModule } from "./http/http.module";
 import { MeModule } from "./me/me.module";
@@ -25,6 +26,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     AdminAuthModule,
     AdminManagementModule,
     CaptchaModule,
+    DirectoryModule,
   ],
   controllers: [HealthController],
 })
