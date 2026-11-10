@@ -1,3 +1,4 @@
+import type { DirectoryStatus } from "@heat/contracts";
 import { assertNotInUse, RecordInUseError } from "@heat/db";
 import { ApiException } from "../http/api-exception";
 
@@ -33,3 +34,27 @@ export const translateDirectoryError = (error: unknown): unknown => {
   if (errorCodeOf(error) === "P2025") return new ApiException(404, "NOT_FOUND");
   return error;
 };
+
+export const statusWhere = (status: DirectoryStatus): { archivedAt?: null | { not: null } } => {
+  if (status === "active") return { archivedAt: null };
+  if (status === "archived") return { archivedAt: { not: null } };
+  return {};
+};
+
+export const archivedError = (): ApiException =>
+  new ApiException(
+    409,
+    "DIRECTORY_ARCHIVED",
+    undefined,
+    "This record is archived, so it cannot be used for new records. Restore it first.",
+  );
+
+export const archiveChange = (
+  row: { id: string; name: string },
+  archive: boolean,
+  changed: boolean,
+) => ({
+  entityId: row.id,
+  before: { name: row.name, archived: changed ? !archive : archive },
+  after: { name: row.name, archived: archive },
+});

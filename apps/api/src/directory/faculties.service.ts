@@ -11,7 +11,13 @@ import { AuditService } from "../audit";
 import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
 import { DirectoryCache } from "./directory-cache";
-import { errorCodeOf, translateDirectoryError } from "./directory-rules";
+import {
+  archiveChange,
+  archivedError,
+  errorCodeOf,
+  statusWhere,
+  translateDirectoryError,
+} from "./directory-rules";
 import {
   blockingMessage,
   departmentUsageOf,
@@ -73,6 +79,7 @@ export class FacultiesService {
 
   async list(query: FacultyListQuery): Promise<FacultyListResponse> {
     const where = {
+      ...statusWhere(query.status),
       ...(query.q === undefined
         ? {}
         : { name: { contains: query.q, mode: "insensitive" as const } }),
@@ -159,18 +166,20 @@ export class FacultiesService {
 
   async assign(id: string, universityId: string): Promise<FacultySummary> {
     const client = this.audit.client(this.database);
-    await this.existing(id, client);
+    const faculty = await this.existing(id, client);
     const university = await client.university.findUnique({
       where: { id: universityId },
-      select: { id: true, name: true },
+      select: { id: true, name: true, archivedAt: true },
     });
     if (university === null) throw new ApiException(404, "NOT_FOUND");
+    if (faculty.archivedAt !== null || university.archivedAt !== null) throw archivedError();
     const link = { universityId, universityName: university.name };
     const created = await client.universityFaculty
       .createMany({ data: [{ universityId, facultyId: id }], skipDuplicates: true })
       .catch((error: unknown) => {
         throw errorCodeOf(error) === "P2003" ? new ApiException(404, "NOT_FOUND") : error;
       });
+    await this.assertStillActive(id, universityId, client);
     this.invalidateAfterCommit();
     this.audit.capture(
       created.count > 0
@@ -219,6 +228,39 @@ export class FacultiesService {
     this.invalidateAfterCommit();
     this.audit.capture({ entityId: id, before: { universityId, universityName } });
     return this.summaryOf(id, client);
+  }
+
+  archive(id: string): Promise<FacultySummary> {
+    return this.setArchived(id, true);
+  }
+
+  restore(id: string): Promise<FacultySummary> {
+    return this.setArchived(id, false);
+  }
+
+  private async setArchived(id: string, archive: boolean): Promise<FacultySummary> {
+    const client = this.audit.client(this.database);
+    const { count } = await client.faculty.updateMany({
+      where: { id, archivedAt: archive ? null : { not: null } },
+      data: { archivedAt: archive ? new Date() : null },
+    });
+    const row = await this.existing(id, client);
+    this.invalidateAfterCommit();
+    this.audit.capture(archiveChange(row, archive, count > 0));
+    return toSummary(row, await usageOf(this.database, id));
+  }
+
+  private async assertStillActive(
+    id: string,
+    universityId: string,
+    client: Pick<HeatClient, "faculty" | "university">,
+  ): Promise<void> {
+    const [faculty, university] = await Promise.all([
+      client.faculty.findUnique({ where: { id }, select: { archivedAt: true } }),
+      client.university.findUnique({ where: { id: universityId }, select: { archivedAt: true } }),
+    ]);
+    if (faculty === null || university === null) throw new ApiException(404, "NOT_FOUND");
+    if (faculty.archivedAt !== null || university.archivedAt !== null) throw archivedError();
   }
 
   private async summaryOf(

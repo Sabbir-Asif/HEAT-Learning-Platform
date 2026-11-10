@@ -36,4 +36,27 @@ describe("ApiExceptionFilter with an exception detail", () => {
       error: expect.objectContaining({ message: "A record with this name already exists." }),
     });
   });
+
+  test("field errors on an ApiException reach the response body", () => {
+    const { json } = reply(
+      new ApiException(400, "VALIDATION_FAILED", undefined, undefined, [
+        { path: "departmentId", code: "invalid_value" },
+      ]),
+    );
+
+    expect(json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        code: "VALIDATION_FAILED",
+        fields: [{ path: "departmentId", code: "invalid_value" }],
+      }),
+    });
+  });
+
+  test("an archived directory record has its own message", () => {
+    const { json } = reply(new ApiException(409, "DIRECTORY_ARCHIVED"));
+
+    expect(json).toHaveBeenCalledWith({
+      error: expect.objectContaining({ code: "DIRECTORY_ARCHIVED" }),
+    });
+  });
 });

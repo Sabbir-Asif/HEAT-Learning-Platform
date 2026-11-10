@@ -13,6 +13,8 @@ describe("FacultiesController access", () => {
     ["create", "faculty.create"],
     ["update", "faculty.update"],
     ["remove", "faculty.delete"],
+    ["archive", "faculty.archive"],
+    ["restore", "faculty.restore"],
     ["assign", "faculty.assign"],
     ["unassign", "faculty.unassign"],
   ] as const)("%s is audited as %s", (handler, action) => {

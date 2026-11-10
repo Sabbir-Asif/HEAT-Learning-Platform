@@ -55,4 +55,20 @@ export class DepartmentsController {
   remove(@Param() params: DepartmentIdParamsDto): Promise<void> {
     return this.departments.remove(params.id);
   }
+
+  @Post(":id/archive")
+  @HttpCode(200)
+  @Audited({ action: "department.archive", entity: "Department" })
+  @ApiOkResponse({ type: DepartmentSummaryDto })
+  archive(@Param() params: DepartmentIdParamsDto): Promise<DepartmentSummaryDto> {
+    return this.departments.archive(params.id);
+  }
+
+  @Post(":id/restore")
+  @HttpCode(200)
+  @Audited({ action: "department.restore", entity: "Department" })
+  @ApiOkResponse({ type: DepartmentSummaryDto })
+  restore(@Param() params: DepartmentIdParamsDto): Promise<DepartmentSummaryDto> {
+    return this.departments.restore(params.id);
+  }
 }

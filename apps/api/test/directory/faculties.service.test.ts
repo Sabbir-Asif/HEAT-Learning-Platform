@@ -36,7 +36,7 @@ const build = (
     existing?: ReturnType<typeof row> | null;
     taken?: { id: string } | null;
     counts?: Counts;
-    university?: { id: string; name: string } | null;
+    university?: { id: string; name: string; archivedAt: Date | null } | null;
     linked?: boolean;
     linkedDepartments?: string[];
     createdLinks?: number;
@@ -45,6 +45,7 @@ const build = (
     deleteError?: Error;
     unassignError?: Error;
     assignError?: Error;
+    archivedChanged?: boolean;
   } = {},
 ) => {
   const counts = options.counts ?? {};
@@ -66,6 +67,7 @@ const build = (
       findUnique: vi
         .fn()
         .mockResolvedValue(options.existing === undefined ? row() : options.existing),
+      updateMany: vi.fn().mockResolvedValue({ count: options.archivedChanged === false ? 0 : 1 }),
       findFirst: vi.fn().mockResolvedValue(options.taken ?? null),
       create: options.createError
         ? vi.fn().mockRejectedValue(options.createError)
@@ -81,7 +83,9 @@ const build = (
       findUnique: vi
         .fn()
         .mockResolvedValue(
-          options.university === undefined ? { id: buet, name: "BUET" } : options.university,
+          options.university === undefined
+            ? { id: buet, name: "BUET", archivedAt: null }
+            : options.university,
         ),
     },
     universityFaculty: {
@@ -133,6 +137,7 @@ describe("FacultiesService.list", () => {
     const { service, database } = build({ counts: { students: 4, departments: 2 } });
 
     const result = await service.list({
+      status: "all",
       page: 2,
       pageSize: 10,
       sort: "-name",
@@ -179,7 +184,7 @@ describe("FacultiesService.list", () => {
   test("sorts by name ascending with no filter when none is given", async () => {
     const { service, database } = build();
 
-    await service.list({ page: 1, pageSize: 25 });
+    await service.list({ status: "all", page: 1, pageSize: 25 });
 
     expect(database.faculty.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: {}, orderBy: [{ name: "asc" }, { id: "asc" }] }),
@@ -192,7 +197,7 @@ describe("FacultiesService.list", () => {
   ] as const)("sorts by %s", async (sort, expected) => {
     const { service, database } = build();
 
-    await service.list({ page: 1, pageSize: 25, sort });
+    await service.list({ status: "all", page: 1, pageSize: 25, sort });
 
     expect(database.faculty.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ orderBy: [expected, { id: "asc" }] }),
@@ -204,7 +209,7 @@ describe("FacultiesService.list", () => {
       counts: { students: 1, departments: 1 },
     });
 
-    await service.list({ page: 1, pageSize: 25 });
+    await service.list({ status: "all", page: 1, pageSize: 25 });
 
     expect(includingDeleted.department.findMany).toHaveBeenCalledTimes(1);
     expect(includingDeleted.department.findMany).toHaveBeenCalledWith({
@@ -219,7 +224,7 @@ describe("FacultiesService.list", () => {
     const { service, database, includingDeleted } = build();
     database.faculty.findMany.mockResolvedValue([]);
 
-    const result = await service.list({ page: 1, pageSize: 25 });
+    const result = await service.list({ status: "all", page: 1, pageSize: 25 });
 
     expect(result.items).toEqual([]);
     expect(includingDeleted.department.findMany).not.toHaveBeenCalled();
@@ -641,5 +646,101 @@ describe("FacultiesService lookup cache invalidation", () => {
     await inAuditScope(() => service.unassign(id, dhaka)).catch(() => undefined);
 
     expect(afterCommit).toHaveLength(0);
+  });
+});
+
+describe("FacultiesService archive and restore", () => {
+  test("archive is one guarded write, audited, and invalidates the cache after commit", async () => {
+    const { service, database, changes, inAuditScope, cache, afterCommit } = build();
+    database.faculty.findUnique.mockResolvedValue(row({ archivedAt: at }));
+
+    const result = await inAuditScope(() => service.archive(id));
+
+    expect(database.faculty.updateMany).toHaveBeenCalledWith({
+      where: { id, archivedAt: null },
+      data: { archivedAt: expect.any(Date) },
+    });
+    expect(result.archivedAt).toBe(at.toISOString());
+    expect(changes).toEqual([
+      {
+        entityId: id,
+        before: { name: "Faculty of Arts", archived: false },
+        after: { name: "Faculty of Arts", archived: true },
+      },
+    ]);
+    await Promise.all(afterCommit.map((task) => task()));
+    expect(cache.invalidate).toHaveBeenCalledTimes(1);
+  });
+
+  test("restore clears the flag on archived rows only", async () => {
+    const { service, database, inAuditScope } = build();
+
+    await inAuditScope(() => service.restore(id));
+
+    expect(database.faculty.updateMany).toHaveBeenCalledWith({
+      where: { id, archivedAt: { not: null } },
+      data: { archivedAt: null },
+    });
+  });
+
+  test("repeating an archive changes nothing and records an unchanged state", async () => {
+    const { service, database, changes, inAuditScope } = build({ archivedChanged: false });
+    database.faculty.findUnique.mockResolvedValue(row({ archivedAt: at }));
+
+    await inAuditScope(() => service.archive(id));
+
+    expect(changes[0]).toMatchObject({ before: { archived: true }, after: { archived: true } });
+  });
+
+  test("an unknown id is NOT_FOUND", async () => {
+    const { service, inAuditScope } = build({ existing: null, archivedChanged: false });
+
+    expect(await code(inAuditScope(() => service.archive(id)))).toBe("NOT_FOUND");
+  });
+});
+
+describe("FacultiesService assign to or from archived records", () => {
+  test("an archived faculty cannot be assigned to a university", async () => {
+    const { service, database, changes, inAuditScope } = build({
+      existing: row({ archivedAt: at }),
+    });
+
+    expect(await code(inAuditScope(() => service.assign(id, buet)))).toBe("DIRECTORY_ARCHIVED");
+    expect(database.universityFaculty.createMany).not.toHaveBeenCalled();
+    expect(changes).toEqual([]);
+  });
+
+  test("a faculty cannot be assigned to an archived university", async () => {
+    const { service, database, inAuditScope } = build({
+      university: { id: buet, name: "BUET", archivedAt: at },
+    });
+
+    expect(await code(inAuditScope(() => service.assign(id, buet)))).toBe("DIRECTORY_ARCHIVED");
+    expect(database.universityFaculty.createMany).not.toHaveBeenCalled();
+  });
+
+  test("an archive that lands between the check and the write is refused and rolls back", async () => {
+    const { service, database, inAuditScope } = build();
+    database.faculty.findUnique
+      .mockResolvedValueOnce(row())
+      .mockResolvedValue(row({ archivedAt: at }));
+
+    expect(await code(inAuditScope(() => service.assign(id, buet)))).toBe("DIRECTORY_ARCHIVED");
+  });
+});
+
+describe("FacultiesService status filter", () => {
+  test.each([
+    ["active", { archivedAt: null }],
+    ["archived", { archivedAt: { not: null } }],
+    ["all", {}],
+  ] as const)("status %s", async (status, expected) => {
+    const { service, database } = build();
+
+    await service.list({ status, page: 1, pageSize: 25 });
+
+    expect(database.faculty.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expected }),
+    );
   });
 });

@@ -42,6 +42,7 @@ const build = (
     taken?: { id: string } | null;
     students?: number;
     linked?: boolean;
+    archivedPair?: "university" | "faculty";
     createError?: Error;
     updateError?: Error;
     movedCount?: number;
@@ -80,7 +81,16 @@ const build = (
     universityFaculty: {
       findUnique: vi
         .fn()
-        .mockResolvedValue(options.linked === false ? null : { universityId: dhaka }),
+        .mockResolvedValue(
+          options.linked === false
+            ? null
+            : {
+                university: {
+                  archivedAt: options.archivedPair === "university" ? at : null,
+                },
+                faculty: { archivedAt: options.archivedPair === "faculty" ? at : null },
+              },
+        ),
     },
     $includingDeleted: () => includingDeleted,
   };
@@ -125,6 +135,7 @@ describe("DepartmentsService.list", () => {
     const { service, database } = build({ students: 3 });
 
     const result = await service.list({
+      status: "all",
       page: 2,
       pageSize: 10,
       sort: "-name",
@@ -168,7 +179,7 @@ describe("DepartmentsService.list", () => {
   test("applies no filter and sorts by name when none is given", async () => {
     const { service, database } = build();
 
-    await service.list({ page: 1, pageSize: 25 });
+    await service.list({ status: "all", page: 1, pageSize: 25 });
 
     expect(database.department.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: {}, orderBy: [{ name: "asc" }, { id: "asc" }] }),
@@ -181,7 +192,7 @@ describe("DepartmentsService.list", () => {
   ] as const)("sorts by %s", async (sort, expected) => {
     const { service, database } = build();
 
-    await service.list({ page: 1, pageSize: 25, sort });
+    await service.list({ status: "all", page: 1, pageSize: 25, sort });
 
     expect(database.department.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ orderBy: [expected, { id: "asc" }] }),
@@ -191,7 +202,7 @@ describe("DepartmentsService.list", () => {
   test("counts the students of the whole page with one query, soft-deleted profiles included", async () => {
     const { service, includingDeleted } = build({ students: 2 });
 
-    await service.list({ page: 1, pageSize: 25 });
+    await service.list({ status: "all", page: 1, pageSize: 25 });
 
     expect(includingDeleted.department.findMany).toHaveBeenCalledTimes(1);
     expect(includingDeleted.department.findMany).toHaveBeenCalledWith({
@@ -205,7 +216,7 @@ describe("DepartmentsService.list", () => {
     const { service, database, includingDeleted } = build();
     database.department.findMany.mockResolvedValue([]);
 
-    const result = await service.list({ page: 1, pageSize: 25 });
+    const result = await service.list({ status: "all", page: 1, pageSize: 25 });
 
     expect(result.items).toEqual([]);
     expect(includingDeleted.department.findMany).not.toHaveBeenCalled();
@@ -239,7 +250,10 @@ describe("DepartmentsService.create", () => {
 
     expect(database.universityFaculty.findUnique).toHaveBeenCalledWith({
       where: { universityId_facultyId: { universityId: dhaka, facultyId: arts } },
-      select: { universityId: true },
+      select: {
+        university: { select: { archivedAt: true } },
+        faculty: { select: { archivedAt: true } },
+      },
     });
     expect(database.department.create).toHaveBeenCalledWith({
       data: { name: "Bengali", universityId: dhaka, facultyId: arts },
@@ -378,7 +392,10 @@ describe("DepartmentsService.update", () => {
 
     expect(database.universityFaculty.findUnique).toHaveBeenCalledWith({
       where: { universityId_facultyId: { universityId: buet, facultyId: science } },
-      select: { universityId: true },
+      select: {
+        university: { select: { archivedAt: true } },
+        faculty: { select: { archivedAt: true } },
+      },
     });
     expect(database.department.updateMany).toHaveBeenCalledWith({
       where: { id, profiles: { none: {} } },
@@ -604,5 +621,111 @@ describe("DepartmentsService lookup cache invalidation", () => {
     await inAuditScope(() => service.remove(id)).catch(() => undefined);
 
     expect(afterCommit).toHaveLength(0);
+  });
+});
+
+describe("DepartmentsService archive and restore", () => {
+  test("archive is one guarded write on active rows, audited with before and after, and invalidates the cache after commit", async () => {
+    const { service, database, changes, inAuditScope, cache, afterCommit } = build({
+      students: 2,
+    });
+    database.department.findUnique.mockReset().mockResolvedValue(row({ archivedAt: at }));
+
+    const result = await inAuditScope(() => service.archive(id));
+
+    expect(database.department.updateMany).toHaveBeenCalledWith({
+      where: { id, archivedAt: null },
+      data: { archivedAt: expect.any(Date) },
+    });
+    expect(result.archivedAt).toBe(at.toISOString());
+    expect(changes).toEqual([
+      {
+        entityId: id,
+        before: expect.objectContaining({ name: "Bengali", archived: false }),
+        after: expect.objectContaining({ name: "Bengali", archived: true }),
+      },
+    ]);
+    expect(cache.invalidate).not.toHaveBeenCalled();
+    await Promise.all(afterCommit.map((task) => task()));
+    expect(cache.invalidate).toHaveBeenCalledTimes(1);
+  });
+
+  test("restore clears the flag on archived rows only", async () => {
+    const { service, database, changes, inAuditScope } = build();
+    database.department.findUnique.mockReset().mockResolvedValue(row());
+
+    await inAuditScope(() => service.restore(id));
+
+    expect(database.department.updateMany).toHaveBeenCalledWith({
+      where: { id, archivedAt: { not: null } },
+      data: { archivedAt: null },
+    });
+    expect(changes[0]).toMatchObject({
+      before: { archived: true },
+      after: { archived: false },
+    });
+  });
+
+  test("archiving an archived department changes nothing and records an unchanged state", async () => {
+    const { service, database, changes, inAuditScope } = build({ movedCount: 0 });
+    database.department.findUnique.mockReset().mockResolvedValue(row({ archivedAt: at }));
+
+    const result = await inAuditScope(() => service.archive(id));
+
+    expect(result.archivedAt).toBe(at.toISOString());
+    expect(changes[0]).toMatchObject({ before: { archived: true }, after: { archived: true } });
+  });
+
+  test("an unknown id is NOT_FOUND", async () => {
+    const { service, database, inAuditScope } = build({ movedCount: 0 });
+    database.department.findUnique.mockReset().mockResolvedValue(null);
+
+    expect(await code(inAuditScope(() => service.archive(id)))).toBe("NOT_FOUND");
+  });
+});
+
+describe("DepartmentsService archived parents", () => {
+  test.each(["university", "faculty"] as const)(
+    "creating under an archived %s is DIRECTORY_ARCHIVED and writes nothing",
+    async (archivedPair) => {
+      const { service, database, changes, inAuditScope } = build({ archivedPair });
+
+      expect(await code(inAuditScope(() => service.create(input)))).toBe("DIRECTORY_ARCHIVED");
+      expect(database.department.create).not.toHaveBeenCalled();
+      expect(changes).toEqual([]);
+    },
+  );
+
+  test("moving to an archived faculty is DIRECTORY_ARCHIVED", async () => {
+    const { service, database, inAuditScope } = build({ archivedPair: "faculty" });
+
+    expect(
+      await code(inAuditScope(() => service.update(id, { ...input, facultyId: science }))),
+    ).toBe("DIRECTORY_ARCHIVED");
+    expect(database.department.updateMany).not.toHaveBeenCalled();
+  });
+
+  test("renaming a department in place is allowed even when its faculty is archived", async () => {
+    const { service, database, inAuditScope } = build({ archivedPair: "faculty" });
+
+    await inAuditScope(() => service.update(id, { ...input, name: "History" }));
+
+    expect(database.department.update).toHaveBeenCalled();
+  });
+});
+
+describe("DepartmentsService status filter", () => {
+  test.each([
+    ["active", { archivedAt: null }],
+    ["archived", { archivedAt: { not: null } }],
+    ["all", {}],
+  ] as const)("status %s", async (status, expected) => {
+    const { service, database } = build();
+
+    await service.list({ status, page: 1, pageSize: 25 });
+
+    expect(database.department.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expected }),
+    );
   });
 });

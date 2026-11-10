@@ -82,4 +82,20 @@ export class FacultiesController {
   unassign(@Param() params: FacultyUniversityParamsDto): Promise<FacultySummaryDto> {
     return this.faculties.unassign(params.id, params.universityId);
   }
+
+  @Post(":id/archive")
+  @HttpCode(200)
+  @Audited({ action: "faculty.archive", entity: "Faculty" })
+  @ApiOkResponse({ type: FacultySummaryDto })
+  archive(@Param() params: FacultyIdParamsDto): Promise<FacultySummaryDto> {
+    return this.faculties.archive(params.id);
+  }
+
+  @Post(":id/restore")
+  @HttpCode(200)
+  @Audited({ action: "faculty.restore", entity: "Faculty" })
+  @ApiOkResponse({ type: FacultySummaryDto })
+  restore(@Param() params: FacultyIdParamsDto): Promise<FacultySummaryDto> {
+    return this.faculties.restore(params.id);
+  }
 }

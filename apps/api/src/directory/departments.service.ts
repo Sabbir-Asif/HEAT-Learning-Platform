@@ -17,7 +17,7 @@ import {
   studentCountsOf,
 } from "./department-usage";
 import { DirectoryCache } from "./directory-cache";
-import { errorCodeOf, translateDirectoryError } from "./directory-rules";
+import { archivedError, errorCodeOf, statusWhere, translateDirectoryError } from "./directory-rules";
 
 interface DepartmentRow {
   id: string;
@@ -95,6 +95,7 @@ export class DepartmentsService {
 
   async list(query: DepartmentListQuery): Promise<DepartmentListResponse> {
     const where = {
+      ...statusWhere(query.status),
       ...(query.q === undefined
         ? {}
         : { name: { contains: query.q, mode: "insensitive" as const } }),
@@ -125,10 +126,11 @@ export class DepartmentsService {
   }
 
   async create(request: CreateDepartmentRequest): Promise<DepartmentSummary> {
-    await this.assertPairLinked(request);
+    await this.assertPairLinked(request, this.database);
     await this.assertNameFree(request.name, request);
     try {
-      const created = await this.audit.client(this.database).department.create({
+      const client = this.audit.client(this.database);
+      const created = await client.department.create({
         data: {
           name: request.name,
           universityId: request.universityId,
@@ -136,6 +138,7 @@ export class DepartmentsService {
         },
         include: withPair,
       });
+      await this.assertPairLinked(request, client);
       this.invalidateAfterCommit();
       this.audit.capture({ entityId: created.id, after: snapshot(created) });
       return toSummary(created, 0);
@@ -149,7 +152,7 @@ export class DepartmentsService {
     const moved =
       before.universityFaculty.university.id !== request.universityId ||
       before.universityFaculty.faculty.id !== request.facultyId;
-    if (moved) await this.assertPairLinked(request);
+    if (moved) await this.assertPairLinked(request, this.database);
     await this.assertNameFree(request.name, request, id);
     try {
       const client = this.audit.client(this.database);
@@ -164,6 +167,7 @@ export class DepartmentsService {
           data,
         });
         if (count === 0) await this.refuseMove(id, before.name);
+        await this.assertPairLinked(request, client);
       } else {
         await client.department.update({ where: { id }, data });
       }
@@ -197,6 +201,30 @@ export class DepartmentsService {
     this.audit.capture({ entityId: id, before: snapshot(before) });
   }
 
+  archive(id: string): Promise<DepartmentSummary> {
+    return this.setArchived(id, true);
+  }
+
+  restore(id: string): Promise<DepartmentSummary> {
+    return this.setArchived(id, false);
+  }
+
+  private async setArchived(id: string, archive: boolean): Promise<DepartmentSummary> {
+    const client = this.audit.client(this.database);
+    const { count } = await client.department.updateMany({
+      where: { id, archivedAt: archive ? null : { not: null } },
+      data: { archivedAt: archive ? new Date() : null },
+    });
+    const row = await this.existing(id, client);
+    this.invalidateAfterCommit();
+    this.audit.capture({
+      entityId: id,
+      before: { ...snapshot(row), archived: count > 0 ? !archive : archive },
+      after: { ...snapshot(row), archived: archive },
+    });
+    return toSummary(row, await studentCountOf(this.database, id));
+  }
+
   private async refuseMove(id: string, name: string): Promise<never> {
     const students = await studentCountOf(this.database, id);
     if (students === 0) throw new ApiException(404, "NOT_FOUND");
@@ -221,14 +249,23 @@ export class DepartmentsService {
     return row;
   }
 
-  private async assertPairLinked(pair: Pair): Promise<void> {
-    const link = await this.database.universityFaculty.findUnique({
+  private async assertPairLinked(
+    pair: Pair,
+    client: Pick<HeatClient, "universityFaculty">,
+  ): Promise<void> {
+    const link = await client.universityFaculty.findUnique({
       where: {
         universityId_facultyId: { universityId: pair.universityId, facultyId: pair.facultyId },
       },
-      select: { universityId: true },
+      select: {
+        university: { select: { archivedAt: true } },
+        faculty: { select: { archivedAt: true } },
+      },
     });
     if (link === null) throw notOfferedError();
+    if (link.university.archivedAt !== null || link.faculty.archivedAt !== null) {
+      throw archivedError();
+    }
   }
 
   private async assertNameFree(name: string, pair: Pair, excludeId?: string): Promise<void> {
