@@ -37,10 +37,10 @@ export class AdminAccountService {
       throw new ApiException(400, "INVALID_CREDENTIALS");
     }
     const passwordHash = await this.passwords.hashChecked(newPassword);
+    await this.sessions.revokeAllExceptCurrent(userId, currentFamilyId);
     await this.database.user.update({
       where: { id: userId },
       data: { passwordHash, mustChangePassword: false },
     });
-    await this.sessions.revokeAllExceptCurrent(userId, currentFamilyId);
   }
 }
