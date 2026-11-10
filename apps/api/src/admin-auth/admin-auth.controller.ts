@@ -96,9 +96,12 @@ export class AdminAuthController {
     @Req() request: AuditableRequest,
     @Res({ passthrough: true }) response: CookieResponse,
   ): Promise<void> {
-    await this.sessions.revoke(session.familyId);
-    await this.account.recordSignOut(actorOf(request, session.userId));
-    this.cookies.clear(response, "admin");
+    try {
+      await this.sessions.revoke(session.familyId);
+      await this.account.recordSignOut(actorOf(request, session.userId));
+    } finally {
+      this.cookies.clear(response, "admin");
+    }
   }
 
   @Audience("admin")

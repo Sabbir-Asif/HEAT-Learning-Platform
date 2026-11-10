@@ -57,10 +57,15 @@ export class AdminSignInService implements OnModuleInit {
     await this.lockout.recordSuccess("admin", email, metadata.ipAddress);
     await this.upgradeDigest(user.id, user.passwordHash, password);
     const tokens = await this.sessions.create(user.id, "admin", metadata);
-    await this.audit.recordStandalone(
-      { ...actor, actorId: user.id },
-      { action: "admin.sign-in", entity: "User", entityId: user.id },
-    );
+    try {
+      await this.audit.recordStandalone(
+        { ...actor, actorId: user.id },
+        { action: "admin.sign-in", entity: "User", entityId: user.id },
+      );
+    } catch (error) {
+      await this.sessions.revoke(tokens.familyId);
+      throw error;
+    }
     return { userId: user.id, tokens };
   }
 
