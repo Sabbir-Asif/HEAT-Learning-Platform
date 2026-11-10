@@ -1,11 +1,14 @@
 import { describe, expect, test } from "vitest";
 import {
+  createDepartmentRequestSchema,
   createFacultyRequestSchema,
   createUniversityRequestSchema,
+  departmentListQuerySchema,
   facultyFormSchema,
   facultyListQuerySchema,
   facultyUniversityParamsSchema,
   universityListQuerySchema,
+  updateDepartmentRequestSchema,
   updateUniversityRequestSchema,
 } from "../src/index";
 
@@ -100,5 +103,50 @@ describe("facultyFormSchema", () => {
     });
     expect(facultyFormSchema.safeParse({ name: "", universityIds: [] }).success).toBe(false);
     expect(facultyFormSchema.safeParse({ name: "Arts", universityIds: ["x"] }).success).toBe(false);
+  });
+});
+
+const pair = {
+  universityId: "0198f1a0-0000-7000-8000-000000000001",
+  facultyId: "0198f1a0-0000-7000-8000-000000000002",
+};
+
+describe("createDepartmentRequestSchema", () => {
+  test("trims the name and carries the university and faculty ids", () => {
+    expect(createDepartmentRequestSchema.parse({ name: "  Computer   Science ", ...pair })).toEqual(
+      {
+        name: "Computer Science",
+        ...pair,
+      },
+    );
+  });
+
+  test("rejects an empty name, a long name and ids that are not ids", () => {
+    expect(createDepartmentRequestSchema.safeParse({ name: " ", ...pair }).success).toBe(false);
+    expect(
+      createDepartmentRequestSchema.safeParse({ name: "a".repeat(201), ...pair }).success,
+    ).toBe(false);
+    expect(
+      createDepartmentRequestSchema.safeParse({ name: "CSE", ...pair, facultyId: "x" }).success,
+    ).toBe(false);
+    expect(createDepartmentRequestSchema.safeParse({ name: "CSE" }).success).toBe(false);
+  });
+
+  test("update uses the same rules", () => {
+    expect(updateDepartmentRequestSchema.parse({ name: " CSE ", ...pair }).name).toBe("CSE");
+  });
+});
+
+describe("departmentListQuerySchema", () => {
+  test("defaults the page and accepts university and faculty filters", () => {
+    expect(departmentListQuerySchema.parse({})).toEqual({ page: 1, pageSize: 25 });
+    expect(departmentListQuerySchema.parse({ ...pair, sort: "-name" })).toMatchObject({
+      ...pair,
+      sort: "-name",
+    });
+  });
+
+  test("rejects filters that are not ids", () => {
+    expect(departmentListQuerySchema.safeParse({ facultyId: "arts" }).success).toBe(false);
   });
 });
