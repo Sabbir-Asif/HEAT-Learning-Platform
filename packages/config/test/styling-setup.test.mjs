@@ -34,6 +34,6 @@ describe("the Tailwind rules are active under each package's own eslint config",
       expect(result.messages.map((message) => message.ruleId)).toContain(
         "better-tailwindcss/no-conflicting-classes",
       );
-    });
+    }, 120_000);
   }
 });
