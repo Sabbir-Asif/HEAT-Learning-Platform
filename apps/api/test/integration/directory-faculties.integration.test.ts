@@ -1,4 +1,7 @@
 import { describe, expect, test } from "vitest";
+import { auditScopeStorage } from "../../src/audit/audit-scope";
+import { FacultiesService } from "../../src/directory/faculties.service";
+import { ApiException } from "../../src/http/api-exception";
 import { PasswordService, SessionService, realmCookies } from "../../src/auth";
 import { csrfHeaders } from "../support/csrf";
 import { useTestApp } from "../support/testing-module";
@@ -235,6 +238,31 @@ describe("faculty directory over HTTP", () => {
         `DELETE FROM "Faculty" WHERE id = '${department.facultyId}'::uuid`,
       ),
     ).rejects.toThrow();
+  });
+
+  test("a department created after the check still gets DIRECTORY_IN_USE naming it, not a failed transaction", async () => {
+    const department = await testApp().factories.department({ name: "Bengali" });
+    const service = testApp().moduleRef.get(FacultiesService);
+    const prisma = testApp().database.prisma;
+
+    const failure = await prisma
+      .$transaction(async (tx) => {
+        const blindToDepartments = new Proxy(tx, {
+          get: (target, property, receiver) =>
+            property === "department"
+              ? { findMany: async () => [] }
+              : Reflect.get(target, property, receiver),
+        });
+        return auditScopeStorage.run({ tx: blindToDepartments as never, changes: [] }, () =>
+          service.unassign(department.facultyId, department.universityId),
+        );
+      })
+      .catch((error: unknown) => error);
+
+    expect(failure).toBeInstanceOf(ApiException);
+    expect((failure as ApiException).code).toBe("DIRECTORY_IN_USE");
+    expect((failure as ApiException).detail).toContain("(Bengali)");
+    expect(await links(department.facultyId)).toHaveLength(1);
   });
 
   test("a name that exists, compared without case, is DIRECTORY_NAME_TAKEN on create and rename, and nothing is written", async () => {

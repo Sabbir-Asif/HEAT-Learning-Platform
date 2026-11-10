@@ -161,10 +161,11 @@ export class FacultiesService {
     });
     if (university === null) throw new ApiException(404, "NOT_FOUND");
     const link = { universityId, universityName: university.name };
-    const created = await client.universityFaculty.createMany({
-      data: [{ universityId, facultyId: id }],
-      skipDuplicates: true,
-    });
+    const created = await client.universityFaculty
+      .createMany({ data: [{ universityId, facultyId: id }], skipDuplicates: true })
+      .catch((error: unknown) => {
+        throw errorCodeOf(error) === "P2003" ? new ApiException(404, "NOT_FOUND") : error;
+      });
     this.audit.capture(
       created.count > 0
         ? { entityId: id, after: link }
@@ -200,7 +201,7 @@ export class FacultiesService {
       await client.universityFaculty.delete({ where: pair });
     } catch (error) {
       if (errorCodeOf(error) === "P2003") {
-        const names = await client.department.findMany({
+        const names = await this.database.department.findMany({
           where: { universityId, facultyId: id },
           select: { name: true },
           orderBy: { name: "asc" },

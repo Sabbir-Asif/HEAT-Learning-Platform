@@ -44,6 +44,7 @@ const build = (
     updateError?: Error;
     deleteError?: Error;
     unassignError?: Error;
+    assignError?: Error;
   } = {},
 ) => {
   const counts = options.counts ?? {};
@@ -90,7 +91,9 @@ const build = (
         .mockResolvedValue(
           options.linked === false ? null : { universityId: dhaka, facultyId: id },
         ),
-      createMany: vi.fn().mockResolvedValue({ count: options.createdLinks ?? 1 }),
+      createMany: options.assignError
+        ? vi.fn().mockRejectedValue(options.assignError)
+        : vi.fn().mockResolvedValue({ count: options.createdLinks ?? 1 }),
       delete: options.unassignError
         ? vi.fn().mockRejectedValue(options.unassignError)
         : vi.fn().mockResolvedValue({}),
@@ -440,6 +443,20 @@ describe("FacultiesService.assign", () => {
   });
 });
 
+describe("FacultiesService.assign races", () => {
+  test("a foreign key violation because the faculty or university vanished is NOT_FOUND", async () => {
+    const { service, inAuditScope } = build({ assignError: foreignKeyViolation });
+
+    expect(await code(inAuditScope(() => service.assign(id, buet)))).toBe("NOT_FOUND");
+  });
+
+  test("any other error while linking is not hidden", async () => {
+    const { service, inAuditScope } = build({ assignError: new Error("down") });
+
+    expect(await code(inAuditScope(() => service.assign(id, buet)))).toBe("OTHER");
+  });
+});
+
 describe("FacultiesService.unassign", () => {
   test("removes the link and captures the university it was removed from", async () => {
     const { service, database, changes, inAuditScope } = build();
@@ -502,13 +519,35 @@ describe("FacultiesService.unassign", () => {
     expect((failure as ApiException).detail).toContain("(A, B, C, D, E and 2 more)");
   });
 
-  test("a foreign key violation that slips past the check is DIRECTORY_IN_USE", async () => {
-    const { service, database, inAuditScope } = build({ unassignError: foreignKeyViolation });
+  test("a foreign key violation that slips past the check names the departments read outside the aborted transaction", async () => {
+    const { service, database } = build({
+      unassignError: foreignKeyViolation,
+      linkedDepartments: ["Bengali"],
+    });
     database.universityFaculty.findUnique.mockResolvedValue({
       university: { id: dhaka, name: "University of Dhaka" },
     });
+    const transaction = {
+      ...database,
+      department: {
+        findMany: vi
+          .fn()
+          .mockResolvedValueOnce([])
+          .mockRejectedValue(new Error("25P02 transaction is aborted")),
+      },
+    };
 
-    expect(await code(inAuditScope(() => service.unassign(id, dhaka)))).toBe("DIRECTORY_IN_USE");
+    const failure = await failureOf(
+      auditScopeStorage.run({ tx: transaction as never, changes: [] }, () =>
+        service.unassign(id, dhaka),
+      ),
+    );
+
+    expect(failure).toBeInstanceOf(ApiException);
+    expect((failure as ApiException).code).toBe("DIRECTORY_IN_USE");
+    expect((failure as ApiException).detail).toContain("(Bengali)");
+    expect(transaction.department.findMany).toHaveBeenCalledTimes(1);
+    expect(database.department.findMany).toHaveBeenCalledTimes(1);
   });
 
   test("a faculty that is not linked to the university, or does not exist, is NOT_FOUND", async () => {
