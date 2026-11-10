@@ -87,10 +87,30 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/admin/auth/refresh": "sessionRefresh",
       "POST /api/admin/account/change-password": "passwordChange",
       "POST /api/captcha": "captcha",
-      "POST /api/admin/admins": "verify",
-      "POST /api/admin/admins/:id/resend-invitation": "verify",
+      "POST /api/admin/admins": "adminInvite",
+      "POST /api/admin/admins/:id/resend-invitation": "adminInvite",
       "POST /api/admin/auth/invitations/lookup": "verify",
       "POST /api/admin/auth/invitations/accept": "verify",
+    });
+  });
+
+  test("every public unsafe route carries its exact rate limit profile", async () => {
+    const limits = await enumerateLimits();
+    const modes = await enumerateModes();
+
+    const publicUnsafe = Object.entries(modes)
+      .filter(([, mode]) => mode === "origin-only")
+      .map(([route]) => route)
+      .sort();
+    const profiles = Object.fromEntries(publicUnsafe.map((route) => [route, limits[route]]));
+    expect(profiles).toEqual({
+      "POST /api/admin/auth/invitations/accept": "verify",
+      "POST /api/admin/auth/invitations/lookup": "verify",
+      "POST /api/admin/auth/refresh": "sessionRefresh",
+      "POST /api/admin/auth/sign-in": "adminSignIn",
+      "POST /api/auth/refresh": "sessionRefresh",
+      "POST /api/auth/sign-in": "signIn",
+      "POST /api/captcha": "captcha",
     });
   });
 

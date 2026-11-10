@@ -28,7 +28,7 @@ export class AdminUsersController {
     return this.admins.list(query);
   }
 
-  @RateLimit("verify")
+  @RateLimit("adminInvite")
   @Post()
   @ApiCreatedResponse({ type: AdminSummaryDto })
   invite(
@@ -39,7 +39,7 @@ export class AdminUsersController {
     return this.admins.invite(body, actorOf(request, session.userId));
   }
 
-  @RateLimit("verify")
+  @RateLimit("adminInvite")
   @Post(":id/resend-invitation")
   @HttpCode(200)
   @ApiOkResponse({ type: AdminSummaryDto })
