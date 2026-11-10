@@ -55,6 +55,29 @@ describe("loadConfig", () => {
     ).toEqual(["https://learn.example.test", "https://admin.example.test"]);
   });
 
+  test("requires trusted origins in production instead of defaulting to local apps", () => {
+    expect(() => loadConfig({ ...valid, NODE_ENV: "production" })).toThrow(/TRUSTED_ORIGINS/);
+    expect(() => loadConfig({ ...valid, NODE_ENV: "production", TRUSTED_ORIGINS: " , " })).toThrow(
+      /TRUSTED_ORIGINS/,
+    );
+    expect(
+      loadConfig({
+        ...valid,
+        NODE_ENV: "production",
+        TRUSTED_ORIGINS: "https://learn.example.test",
+      }).csrf.trustedOrigins,
+    ).toEqual(["https://learn.example.test"]);
+  });
+
+  test("keeps the local defaults in development and test", () => {
+    for (const NODE_ENV of ["development", "test"]) {
+      expect(loadConfig({ ...valid, NODE_ENV }).csrf.trustedOrigins).toEqual([
+        "http://localhost:3000",
+        "http://localhost:3001",
+      ]);
+    }
+  });
+
   test("refuses a trusted origin that carries a path", () => {
     expect(() => loadConfig({ ...valid, TRUSTED_ORIGINS: "https://a.test/x" })).toThrow(
       /TRUSTED_ORIGINS/,
