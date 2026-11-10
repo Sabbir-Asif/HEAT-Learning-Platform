@@ -5,8 +5,79 @@
  * OpenAPI spec version: 1.0.0
  */
 import { serverFetch } from '../../server/server-fetch';
+export interface AcceptInviteRequestDto {
+  /**
+     * @minLength 12
+     * @maxLength 256
+     */
+  password: string;
+  /**
+     * @minLength 1
+     * @maxLength 128
+     */
+  token: string;
+}
+
 export interface AdminCsrfTokenResponseDto {
   token: string;
+}
+
+export type AdminListResponseDtoItemsItemRole = typeof AdminListResponseDtoItemsItemRole[keyof typeof AdminListResponseDtoItemsItemRole];
+
+
+export const AdminListResponseDtoItemsItemRole = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  ADMIN: 'ADMIN',
+  STUDENT: 'STUDENT',
+} as const;
+
+export type AdminListResponseDtoItemsItemStatus = typeof AdminListResponseDtoItemsItemStatus[keyof typeof AdminListResponseDtoItemsItemStatus];
+
+
+export const AdminListResponseDtoItemsItemStatus = {
+  ACTIVE: 'ACTIVE',
+  INVITED: 'INVITED',
+  INVITE_EXPIRED: 'INVITE_EXPIRED',
+  DEACTIVATED: 'DEACTIVATED',
+} as const;
+
+export type AdminListResponseDtoItemsItem = {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  deactivatedAt: string | null;
+  email: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  inviteExpiresAt: string | null;
+  role: AdminListResponseDtoItemsItemRole;
+  status: AdminListResponseDtoItemsItemStatus;
+};
+
+export interface AdminListResponseDto {
+  items: AdminListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
 }
 
 export type AdminMeResponseDtoUserRole = typeof AdminMeResponseDtoUserRole[keyof typeof AdminMeResponseDtoUserRole];
@@ -37,6 +108,45 @@ export interface AdminSignInRequestDto {
      * @maxLength 256
      */
   password: string;
+}
+
+export type AdminSummaryDtoRole = typeof AdminSummaryDtoRole[keyof typeof AdminSummaryDtoRole];
+
+
+export const AdminSummaryDtoRole = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  ADMIN: 'ADMIN',
+  STUDENT: 'STUDENT',
+} as const;
+
+export type AdminSummaryDtoStatus = typeof AdminSummaryDtoStatus[keyof typeof AdminSummaryDtoStatus];
+
+
+export const AdminSummaryDtoStatus = {
+  ACTIVE: 'ACTIVE',
+  INVITED: 'INVITED',
+  INVITE_EXPIRED: 'INVITE_EXPIRED',
+  DEACTIVATED: 'DEACTIVATED',
+} as const;
+
+export interface AdminSummaryDto {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  deactivatedAt: string | null;
+  email: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  inviteExpiresAt: string | null;
+  role: AdminSummaryDtoRole;
+  status: AdminSummaryDtoStatus;
 }
 
 export interface CaptchaRequestDto {
@@ -81,6 +191,24 @@ export const HealthResponseDtoStatus = {
 
 export interface HealthResponseDto {
   status: HealthResponseDtoStatus;
+}
+
+export type InvitationLookupResponseDtoStatus = typeof InvitationLookupResponseDtoStatus[keyof typeof InvitationLookupResponseDtoStatus];
+
+
+export const InvitationLookupResponseDtoStatus = {
+  VALID: 'VALID',
+  EXPIRED: 'EXPIRED',
+  INVALID: 'INVALID',
+} as const;
+
+export interface InvitationLookupResponseDto {
+  email?: string;
+  status: InvitationLookupResponseDtoStatus;
+}
+
+export interface InviteAdminRequestDto {
+  email: string;
 }
 
 export type MeResponseDtoEnrollmentsItemStatus = typeof MeResponseDtoEnrollmentsItemStatus[keyof typeof MeResponseDtoEnrollmentsItemStatus];
@@ -138,6 +266,30 @@ export interface SignInRequestDto {
   password: string;
 }
 
+export type AdminUsersListParams = {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  pageSize?: number;
+  sort?: AdminUsersListSort;
+};
+
+export type AdminUsersListSort = typeof AdminUsersListSort[keyof typeof AdminUsersListSort];
+
+
+export const AdminUsersListSort = {
+  email: 'email',
+  '-email': '-email',
+  createdAt: 'createdAt',
+  '-createdAt': '-createdAt',
+} as const;
+
 export const getAdminAccountChangePasswordUrl = () => {
 
 
@@ -173,6 +325,132 @@ return serverFetch<void>(getAdminAccountChangePasswordUrl(),
 
 
 
+export const getAdminUsersListUrl = (params?: AdminUsersListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/admins?${stringifiedParams}` : `/api/admin/admins`
+}
+
+export const adminUsersList = async (params?: AdminUsersListParams, options?: Parameters<typeof serverFetch>[1]): Promise<AdminListResponseDto> => {
+
+  return serverFetch<AdminListResponseDto>(getAdminUsersListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getAdminUsersInviteUrl = () => {
+
+
+
+
+  return `/api/admin/admins`
+}
+
+export const adminUsersInvite = async (inviteAdminRequestDto: InviteAdminRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<AdminSummaryDto>(getAdminUsersInviteUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(inviteAdminRequestDto)
+  }
+);}
+
+
+
+export const getAdminUsersDeactivateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/admins/${id}/deactivate`
+}
+
+export const adminUsersDeactivate = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<AdminSummaryDto> => {
+
+  return serverFetch<AdminSummaryDto>(getAdminUsersDeactivateUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getAdminUsersReactivateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/admins/${id}/reactivate`
+}
+
+export const adminUsersReactivate = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<AdminSummaryDto> => {
+
+  return serverFetch<AdminSummaryDto>(getAdminUsersReactivateUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getAdminUsersResendInvitationUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/admins/${id}/resend-invitation`
+}
+
+export const adminUsersResendInvitation = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<AdminSummaryDto> => {
+
+  return serverFetch<AdminSummaryDto>(getAdminUsersResendInvitationUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
 export const getAdminAuthCsrfTokenUrl = () => {
 
 
@@ -184,6 +462,62 @@ export const getAdminAuthCsrfTokenUrl = () => {
 export const adminAuthCsrfToken = async ( options?: Parameters<typeof serverFetch>[1]): Promise<AdminCsrfTokenResponseDto> => {
 
   return serverFetch<AdminCsrfTokenResponseDto>(getAdminAuthCsrfTokenUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getAdminInvitationAcceptUrl = () => {
+
+
+
+
+  return `/api/admin/auth/invitations/accept`
+}
+
+export const adminInvitationAccept = async (acceptInviteRequestDto: AcceptInviteRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<void>(getAdminInvitationAcceptUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(acceptInviteRequestDto)
+  }
+);}
+
+
+
+export const getAdminInvitationLookupUrl = (token: string,) => {
+
+
+
+
+  return `/api/admin/auth/invitations/${token}`
+}
+
+export const adminInvitationLookup = async (token: string, options?: Parameters<typeof serverFetch>[1]): Promise<InvitationLookupResponseDto> => {
+
+  return serverFetch<InvitationLookupResponseDto>(getAdminInvitationLookupUrl(token),
   {
     ...options,
     method: 'GET'

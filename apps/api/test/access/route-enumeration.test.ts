@@ -87,6 +87,10 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/admin/auth/refresh": "sessionRefresh",
       "POST /api/admin/account/change-password": "passwordChange",
       "POST /api/captcha": "captcha",
+      "POST /api/admin/admins": "verify",
+      "POST /api/admin/admins/:id/resend-invitation": "verify",
+      "GET /api/admin/auth/invitations/:token": "verify",
+      "POST /api/admin/auth/invitations/accept": "verify",
     });
   });
 
@@ -98,6 +102,7 @@ describe("deny-by-default route enumeration", () => {
       .map(([route]) => route)
       .sort();
     expect(originOnly).toEqual([
+      "POST /api/admin/auth/invitations/accept",
       "POST /api/admin/auth/refresh",
       "POST /api/admin/auth/sign-in",
       "POST /api/auth/refresh",
@@ -108,6 +113,10 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/auth/sign-out": "token",
       "POST /api/admin/auth/sign-out": "token",
       "POST /api/admin/account/change-password": "token",
+      "POST /api/admin/admins": "token",
+      "POST /api/admin/admins/:id/deactivate": "token",
+      "POST /api/admin/admins/:id/reactivate": "token",
+      "POST /api/admin/admins/:id/resend-invitation": "token",
     });
     expect(Object.keys(modes).some((route) => route.startsWith("GET "))).toBe(false);
   });

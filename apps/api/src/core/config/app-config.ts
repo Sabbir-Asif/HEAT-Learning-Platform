@@ -42,7 +42,10 @@ const envSchema = z
     ADMIN_APP_URL: z
       .url()
       .optional()
-      .refine((value) => value === undefined || new URL(value).origin === value, "ADMIN_APP_URL must be an origin"),
+      .refine(
+        (value) => value === undefined || new URL(value).origin === value,
+        "ADMIN_APP_URL must be an origin",
+      ),
     BREACHED_PASSWORD_RANGE_URL: z.url().default("https://api.pwnedpasswords.com/range/"),
   })
   .superRefine((env, context) => {
@@ -115,7 +118,10 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
       parallelism: values.ARGON2_PARALLELISM,
     },
     breachedPasswordRangeUrl: values.BREACHED_PASSWORD_RANGE_URL,
-    invitations: { ttlHours: values.ADMIN_INVITE_TTL_HOURS, adminAppUrl: values.ADMIN_APP_URL ?? localAdminAppUrl },
+    invitations: {
+      ttlHours: values.ADMIN_INVITE_TTL_HOURS,
+      adminAppUrl: values.ADMIN_APP_URL ?? localAdminAppUrl,
+    },
     rateLimit,
   };
 };

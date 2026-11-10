@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { AccessModule } from "./access";
+import { AdminManagementModule } from "./admin-management";
 import { AdminAuthModule } from "./admin-auth/admin-auth.module";
 import { AuthModule } from "./auth";
 import { CaptchaModule } from "./captcha";
@@ -18,6 +19,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     MeModule,
     StudentAuthModule,
     AdminAuthModule,
+    AdminManagementModule,
     CaptchaModule,
   ],
   controllers: [HealthController],

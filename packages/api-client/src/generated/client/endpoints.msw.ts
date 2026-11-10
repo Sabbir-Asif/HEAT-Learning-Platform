@@ -19,20 +19,37 @@ import type {
 } from 'msw';
 
 import type {
+  AcceptInviteRequestDto,
   AdminCsrfTokenResponseDto,
+  AdminListResponseDto,
   AdminMeResponseDto,
   AdminSignInRequestDto,
+  AdminSummaryDto,
   CaptchaRequestDto,
   CaptchaResponseDto,
   ChangePasswordRequestDto,
   CsrfTokenResponseDto,
   HealthResponseDto,
+  InvitationLookupResponseDto,
+  InviteAdminRequestDto,
   MeResponseDto,
   SignInRequestDto
 } from './model';
 
 
+export const getAdminUsersListResponseMock = (overrideResponse: Partial<Extract<AdminListResponseDto, object>> = {}): AdminListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', deactivatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), inviteExpiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const), status: faker.helpers.arrayElement(['ACTIVE','INVITED','INVITE_EXPIRED','DEACTIVATED'] as const)})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
+
+export const getAdminUsersInviteResponseMock = (overrideResponse: Partial<Extract<AdminSummaryDto, object>> = {}): AdminSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', deactivatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), inviteExpiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const), status: faker.helpers.arrayElement(['ACTIVE','INVITED','INVITE_EXPIRED','DEACTIVATED'] as const), ...overrideResponse})
+
+export const getAdminUsersDeactivateResponseMock = (overrideResponse: Partial<Extract<AdminSummaryDto, object>> = {}): AdminSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', deactivatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), inviteExpiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const), status: faker.helpers.arrayElement(['ACTIVE','INVITED','INVITE_EXPIRED','DEACTIVATED'] as const), ...overrideResponse})
+
+export const getAdminUsersReactivateResponseMock = (overrideResponse: Partial<Extract<AdminSummaryDto, object>> = {}): AdminSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', deactivatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), inviteExpiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const), status: faker.helpers.arrayElement(['ACTIVE','INVITED','INVITE_EXPIRED','DEACTIVATED'] as const), ...overrideResponse})
+
+export const getAdminUsersResendInvitationResponseMock = (overrideResponse: Partial<Extract<AdminSummaryDto, object>> = {}): AdminSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', deactivatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), inviteExpiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const), status: faker.helpers.arrayElement(['ACTIVE','INVITED','INVITE_EXPIRED','DEACTIVATED'] as const), ...overrideResponse})
+
 export const getAdminAuthCsrfTokenResponseMock = (overrideResponse: Partial<Extract<AdminCsrfTokenResponseDto, object>> = {}): AdminCsrfTokenResponseDto => ({token: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
+
+export const getAdminInvitationLookupResponseMock = (overrideResponse: Partial<Extract<InvitationLookupResponseDto, object>> = {}): InvitationLookupResponseDto => ({email: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), status: faker.helpers.arrayElement(['VALID','EXPIRED','INVALID'] as const), ...overrideResponse})
 
 export const getAdminAuthSignInResponseMock = (overrideResponse: Partial<Extract<AdminMeResponseDto, object>> = {}): AdminMeResponseDto => ({user: {email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
 
@@ -59,6 +76,66 @@ export const getAdminAccountChangePasswordMockHandler = (overrideResponse?: void
   }, options)
 }
 
+export const getAdminUsersListMockHandler = (overrideResponse?: AdminListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<AdminListResponseDto> | AdminListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/admins', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminUsersListResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getAdminUsersInviteMockHandler = (overrideResponse?: AdminSummaryDto | ((info: Parameters<HttpResponseResolver<PathParams, InviteAdminRequestDto>>[0]) => Promise<AdminSummaryDto> | AdminSummaryDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, InviteAdminRequestDto>('*/api/admin/admins', async (info: Parameters<HttpResponseResolver<PathParams, InviteAdminRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminUsersInviteResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getAdminUsersDeactivateMockHandler = (overrideResponse?: AdminSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<AdminSummaryDto> | AdminSummaryDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string }>('*/api/admin/admins/:id/deactivate', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminUsersDeactivateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getAdminUsersReactivateMockHandler = (overrideResponse?: AdminSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<AdminSummaryDto> | AdminSummaryDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string }>('*/api/admin/admins/:id/reactivate', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminUsersReactivateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getAdminUsersResendInvitationMockHandler = (overrideResponse?: AdminSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<AdminSummaryDto> | AdminSummaryDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string }>('*/api/admin/admins/:id/resend-invitation', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminUsersResendInvitationResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getAdminAuthCsrfTokenMockHandler = (overrideResponse?: AdminCsrfTokenResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<AdminCsrfTokenResponseDto> | AdminCsrfTokenResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/admin/auth/csrf', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -66,6 +143,28 @@ export const getAdminAuthCsrfTokenMockHandler = (overrideResponse?: AdminCsrfTok
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getAdminAuthCsrfTokenResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getAdminInvitationAcceptMockHandler = (overrideResponse?: void | ((info: Parameters<HttpResponseResolver<PathParams, AcceptInviteRequestDto>>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, AcceptInviteRequestDto>('*/api/admin/auth/invitations/accept', async (info: Parameters<HttpResponseResolver<PathParams, AcceptInviteRequestDto>>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
+
+export const getAdminInvitationLookupMockHandler = (overrideResponse?: InvitationLookupResponseDto | ((info: Parameters<HttpResponseResolver<{ token: string }>>[0]) => Promise<InvitationLookupResponseDto> | InvitationLookupResponseDto), options?: RequestHandlerOptions) => {
+  return http.get<{ token: string }>('*/api/admin/auth/invitations/:token', async (info: Parameters<HttpResponseResolver<{ token: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminInvitationLookupResponseMock(),
       { status: 200
       })
   }, options)
@@ -196,7 +295,14 @@ export const getMeDescribeMockHandler = (overrideResponse?: MeResponseDto | ((in
 }
 export const getHeatLmsApiMock = () => [
   getAdminAccountChangePasswordMockHandler(),
+  getAdminUsersListMockHandler(),
+  getAdminUsersInviteMockHandler(),
+  getAdminUsersDeactivateMockHandler(),
+  getAdminUsersReactivateMockHandler(),
+  getAdminUsersResendInvitationMockHandler(),
   getAdminAuthCsrfTokenMockHandler(),
+  getAdminInvitationAcceptMockHandler(),
+  getAdminInvitationLookupMockHandler(),
   getAdminAuthRefreshMockHandler(),
   getAdminAuthSignInMockHandler(),
   getAdminAuthSignOutMockHandler(),
