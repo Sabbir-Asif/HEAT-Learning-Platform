@@ -3,8 +3,6 @@ import { AUDIENCE_KEY, ROLES_KEY } from "../../src/access/access.decorators";
 import { AUDITED_KEY } from "../../src/audit/audited.decorator";
 import { UniversitiesController } from "../../src/directory/universities.controller";
 
-const handlers = ["list", "get", "create", "update", "remove"] as const;
-
 describe("UniversitiesController access", () => {
   test("the whole controller is for the admin audience with an explicit role list", () => {
     expect(Reflect.getMetadata(AUDIENCE_KEY, UniversitiesController)).toBe("admin");
@@ -18,8 +16,8 @@ describe("UniversitiesController access", () => {
     ["create", "university.create"],
     ["update", "university.update"],
     ["remove", "university.delete"],
-  ])("%s is audited as %s", (handler, action) => {
-    const method = UniversitiesController.prototype[handler as (typeof handlers)[number]];
+  ] as const)("%s is audited as %s", (handler, action) => {
+    const method = UniversitiesController.prototype[handler];
     expect(Reflect.getMetadata(AUDITED_KEY, method)).toEqual({ action, entity: "University" });
   });
 

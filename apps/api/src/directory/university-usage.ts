@@ -9,7 +9,9 @@ export interface UniversityUsage {
 
 export const usageOf = async (database: HeatClient, id: string): Promise<UniversityUsage> => {
   const [students, departments, faculties] = await Promise.all([
-    database.$includingDeleted().studentProfile.count({ where: { department: { universityId: id } } }),
+    database
+      .$includingDeleted()
+      .studentProfile.count({ where: { department: { universityId: id } } }),
     database.department.count({ where: { universityId: id } }),
     database.universityFaculty.count({ where: { universityId: id } }),
   ]);
