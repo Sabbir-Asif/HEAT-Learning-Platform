@@ -41,7 +41,6 @@ export class AdminAccountService {
       throw new ApiException(400, "INVALID_CREDENTIALS");
     }
     const passwordHash = await this.passwords.hashChecked(newPassword);
-    await this.sessions.revokeAllExceptCurrent(userId, currentFamilyId);
     await this.database.$transaction(async (tx) => {
       await tx.user.update({
         where: { id: userId },
@@ -54,6 +53,7 @@ export class AdminAccountService {
         after: { passwordChanged: true, mustChangePassword: false },
       });
     });
+    await this.sessions.revokeAllExceptCurrent(userId, currentFamilyId);
   }
 
   async recordSignOut(actor: AuditActor): Promise<void> {
