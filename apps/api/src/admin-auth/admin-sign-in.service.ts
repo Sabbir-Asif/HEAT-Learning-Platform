@@ -30,7 +30,7 @@ export class AdminSignInService implements OnModuleInit {
   }
 
   async signIn(email: string, password: string, metadata: SessionMetadata): Promise<SignedInAdmin> {
-    await this.lockout.assertOpen("admin", email);
+    await this.lockout.reserve("admin", email, metadata.ipAddress);
     const user = await this.database.user.findFirst({
       where: {
         email: { equals: email, mode: "insensitive" },
@@ -44,10 +44,9 @@ export class AdminSignInService implements OnModuleInit {
     });
     const matches = await this.passwords.verify(user?.passwordHash ?? this.decoyDigest, password);
     if (user === null || !matches) {
-      await this.lockout.recordFailure("admin", email);
       throw new ApiException(401, "INVALID_CREDENTIALS");
     }
-    await this.lockout.recordSuccess("admin", email);
+    await this.lockout.recordSuccess("admin", email, metadata.ipAddress);
     await this.upgradeDigest(user.id, user.passwordHash, password);
     const tokens = await this.sessions.create(user.id, "admin", metadata);
     return { userId: user.id, tokens };

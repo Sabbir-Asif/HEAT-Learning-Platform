@@ -2,7 +2,7 @@ import { Redis } from "ioredis";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { PasswordService } from "../../src/auth";
 import { BreachedPasswordProvider } from "../../src/auth/breached-password.provider";
-import { REDIS } from "../../src/core";
+import { RATE_LIMIT_REDIS } from "../../src/rate-limit/rate-limit-redis";
 import { applyEnvironment } from "../support/auth-env";
 import { useTestApp } from "../support/testing-module";
 
@@ -129,6 +129,51 @@ describe("account lockout with backoff", () => {
   });
 });
 
+describe("lockout scope", () => {
+  const { signIn, studentWithPassword } = useHarness({
+    LOCKOUT_THRESHOLD: "3",
+    LOCKOUT_BASE_SECONDS: "30",
+    LOCKOUT_ACCOUNT_THRESHOLD: "8",
+  });
+
+  test("an attacker address locked out does not stop the victim from another address", async () => {
+    const victim = await studentWithPassword();
+    for (const attempt of ["a", "b", "c"]) await signIn(victim, attempt, "198.51.100.1");
+
+    expect((await signIn(victim, password, "198.51.100.1")).status).toBe(429);
+    expect((await signIn(victim, password, "198.51.100.2")).status).toBe(200);
+  });
+
+  test("failures from many addresses reach the account ceiling and lock the account", async () => {
+    const victim = await studentWithPassword();
+    for (let index = 0; index < 8; index++) {
+      expect((await signIn(victim, "wrong", `192.0.2.${index + 1}`)).status).toBe(401);
+    }
+
+    const blocked = await signIn(victim, password, "192.0.2.100");
+    expect(blocked.status).toBe(429);
+    expect(blocked.retryAfter).toBeGreaterThan(0);
+  });
+});
+
+describe("concurrent guesses", () => {
+  const { signIn, studentWithPassword } = useHarness({
+    LOCKOUT_THRESHOLD: "3",
+    LOCKOUT_BASE_SECONDS: "30",
+  });
+
+  test("never lets more wrong guesses through than the threshold", async () => {
+    const email = await studentWithPassword();
+
+    const replies = await Promise.all(
+      Array.from({ length: 12 }, (_, index) => signIn(email, `wrong-${index}`)),
+    );
+
+    expect(replies.filter((reply) => reply.status === 401)).toHaveLength(3);
+    expect(replies.filter((reply) => reply.status === 429)).toHaveLength(9);
+  }, 30_000);
+});
+
 describe("shared campus address", () => {
   const { testApp, signIn, studentWithPassword } = useHarness();
 
@@ -204,7 +249,7 @@ describe("Redis outage", () => {
 
   test("sign-in keeps working and does not enforce limits while Redis is down", async () => {
     const email = await studentWithPassword();
-    testApp().moduleRef.get<Redis>(REDIS).disconnect();
+    testApp().moduleRef.get<Redis>(RATE_LIMIT_REDIS).disconnect();
 
     const wrong = [];
     for (let index = 0; index < 12; index++) wrong.push((await signIn(email, "wrong")).status);

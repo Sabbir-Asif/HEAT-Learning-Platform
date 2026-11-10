@@ -1,42 +1,95 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type { Redis } from "ioredis";
-import { REDIS } from "../core";
+import type { LockoutPolicy } from "../core";
 import { LockoutStore } from "./lockout.store";
+import { RATE_LIMIT_REDIS } from "./rate-limit-redis";
 
-const incrementScript = `
-local failures = redis.call('HINCRBY', KEYS[1], 'failures', 1)
-redis.call('EXPIRE', KEYS[1], ARGV[1])
-return failures
+const reserveScript = `
+local now = tonumber(ARGV[1])
+local threshold = tonumber(ARGV[2])
+local base = tonumber(ARGV[3])
+local cap = tonumber(ARGV[4])
+local windowMs = tonumber(ARGV[5]) * 1000
+local accountThreshold = tonumber(ARGV[6])
+
+local function lockedUntil(key)
+  return tonumber(redis.call('HGET', key, 'until') or '0')
+end
+
+local locked = math.max(lockedUntil(KEYS[1]), lockedUntil(KEYS[2]))
+if locked > now then
+  return locked
+end
+
+local function touch(key)
+  local start = tonumber(redis.call('HGET', key, 'start') or '0')
+  if start == 0 or now >= start + windowMs then
+    redis.call('DEL', key)
+    start = now
+    redis.call('HSET', key, 'start', start)
+  end
+  local failures = redis.call('HINCRBY', key, 'failures', 1)
+  return failures, start
+end
+
+local function expire(key, start)
+  local expiresAt = math.max(start + windowMs, lockedUntil(key))
+  redis.call('PEXPIREAT', key, expiresAt)
+end
+
+local failures, start = touch(KEYS[1])
+if failures >= threshold then
+  local delay = math.min(base * 2 ^ math.min(failures - threshold, 30), cap)
+  redis.call('HSET', KEYS[1], 'until', now + delay * 1000)
+end
+expire(KEYS[1], start)
+
+local accountFailures, accountStart = touch(KEYS[2])
+if accountFailures >= accountThreshold then
+  redis.call('HSET', KEYS[2], 'until', now + cap * 1000)
+end
+expire(KEYS[2], accountStart)
+return 0
 `;
 
-const lockScript = `
-local current = tonumber(redis.call('HGET', KEYS[1], 'until') or '0')
-if tonumber(ARGV[1]) > current then
-  redis.call('HSET', KEYS[1], 'until', ARGV[1])
+const releaseScript = `
+redis.call('DEL', KEYS[1])
+local failures = tonumber(redis.call('HGET', KEYS[2], 'failures') or '0')
+if failures > 0 then
+  redis.call('HINCRBY', KEYS[2], 'failures', -1)
 end
-redis.call('EXPIRE', KEYS[1], ARGV[2])
 return 1
 `;
 
 @Injectable()
 export class RedisLockoutStore extends LockoutStore {
-  constructor(@Inject(REDIS) private readonly redis: Redis) {
+  constructor(@Inject(RATE_LIMIT_REDIS) private readonly redis: Redis) {
     super();
   }
 
-  async increment(key: string, memorySeconds: number): Promise<number> {
-    return Number(await this.redis.eval(incrementScript, 1, key, memorySeconds));
+  async reserve(
+    attemptKey: string,
+    accountKey: string,
+    nowMs: number,
+    policy: LockoutPolicy,
+  ): Promise<number> {
+    return Number(
+      await this.redis.eval(
+        reserveScript,
+        2,
+        attemptKey,
+        accountKey,
+        nowMs,
+        policy.threshold,
+        policy.baseSeconds,
+        policy.maxSeconds,
+        policy.memorySeconds,
+        policy.accountThreshold,
+      ),
+    );
   }
 
-  async lockUntil(key: string, untilMs: number, memorySeconds: number): Promise<void> {
-    await this.redis.eval(lockScript, 1, key, untilMs, memorySeconds);
-  }
-
-  async lockedUntil(key: string): Promise<number> {
-    return Number((await this.redis.hget(key, "until")) ?? 0);
-  }
-
-  async clear(key: string): Promise<void> {
-    await this.redis.del(key);
+  async release(attemptKey: string, accountKey: string): Promise<void> {
+    await this.redis.eval(releaseScript, 2, attemptKey, accountKey);
   }
 }

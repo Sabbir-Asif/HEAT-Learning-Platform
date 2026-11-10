@@ -34,7 +34,7 @@ export class StudentSignInService implements OnModuleInit {
     password: string,
     metadata: SessionMetadata,
   ): Promise<SignedInStudent> {
-    await this.lockout.assertOpen("student", email);
+    await this.lockout.reserve("student", email, metadata.ipAddress);
     const user = await this.database.user.findFirst({
       where: {
         email: { equals: email, mode: "insensitive" },
@@ -48,10 +48,9 @@ export class StudentSignInService implements OnModuleInit {
     });
     const matches = await this.passwords.verify(user?.passwordHash ?? this.decoyDigest, password);
     if (user === null || !matches) {
-      await this.lockout.recordFailure("student", email);
       throw new ApiException(401, "INVALID_CREDENTIALS");
     }
-    await this.lockout.recordSuccess("student", email);
+    await this.lockout.recordSuccess("student", email, metadata.ipAddress);
     await this.upgradeDigest(user.id, user.passwordHash, password);
     const tokens = await this.sessions.create(user.id, "student", metadata);
     return { userId: user.id, tokens };

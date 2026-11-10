@@ -1,6 +1,11 @@
+import type { LockoutPolicy } from "../core";
+
 export abstract class LockoutStore {
-  abstract increment(key: string, memorySeconds: number): Promise<number>;
-  abstract lockUntil(key: string, untilMs: number, memorySeconds: number): Promise<void>;
-  abstract lockedUntil(key: string): Promise<number>;
-  abstract clear(key: string): Promise<void>;
+  abstract reserve(
+    attemptKey: string,
+    accountKey: string,
+    nowMs: number,
+    policy: LockoutPolicy,
+  ): Promise<number>;
+  abstract release(attemptKey: string, accountKey: string): Promise<void>;
 }
