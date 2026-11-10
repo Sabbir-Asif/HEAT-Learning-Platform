@@ -7,6 +7,7 @@ import type { AppConfig } from "../core";
 import { RateLimitModule } from "../rate-limit";
 import { DepartmentsController } from "./departments.controller";
 import { DepartmentsService } from "./departments.service";
+import { DepartmentOfferingService } from "./department-offering.service";
 import { DirectoryCache } from "./directory-cache";
 import { DIRECTORY_CACHE_REDIS, createDirectoryCacheRedis } from "./directory-cache.redis";
 import { DirectoryLookupsController } from "./directory-lookups.controller";
@@ -28,6 +29,7 @@ import { UniversitiesService } from "./universities.service";
     UniversitiesService,
     FacultiesService,
     DepartmentsService,
+    DepartmentOfferingService,
     DirectoryLookupsService,
     DirectoryCache,
     {
@@ -36,7 +38,13 @@ import { UniversitiesService } from "./universities.service";
       useFactory: (config: AppConfig) => createDirectoryCacheRedis(config.redisUrl),
     },
   ],
-  exports: [UniversitiesService, FacultiesService, DepartmentsService, DirectoryCache],
+  exports: [
+    UniversitiesService,
+    FacultiesService,
+    DepartmentsService,
+    DepartmentOfferingService,
+    DirectoryCache,
+  ],
 })
 export class DirectoryModule implements OnApplicationShutdown {
   constructor(@Inject(DIRECTORY_CACHE_REDIS) private readonly redis: Redis) {}

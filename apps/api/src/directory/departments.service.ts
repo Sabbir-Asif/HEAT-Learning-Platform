@@ -17,7 +17,13 @@ import {
   studentCountsOf,
 } from "./department-usage";
 import { DirectoryCache } from "./directory-cache";
-import { errorCodeOf, translateDirectoryError } from "./directory-rules";
+import {
+  archivedError,
+  errorCodeOf,
+  lockParents,
+  statusWhere,
+  translateDirectoryError,
+} from "./directory-rules";
 
 interface DepartmentRow {
   id: string;
@@ -26,8 +32,8 @@ interface DepartmentRow {
   createdAt: Date;
   updatedAt: Date;
   universityFaculty: {
-    university: { id: string; name: string };
-    faculty: { id: string; name: string };
+    university: { id: string; name: string; archivedAt: Date | null };
+    faculty: { id: string; name: string; archivedAt: Date | null };
   };
 }
 
@@ -39,8 +45,8 @@ interface Pair {
 const withPair = {
   universityFaculty: {
     select: {
-      university: { select: { id: true, name: true } },
-      faculty: { select: { id: true, name: true } },
+      university: { select: { id: true, name: true, archivedAt: true } },
+      faculty: { select: { id: true, name: true, archivedAt: true } },
     },
   },
 };
@@ -61,9 +67,15 @@ const orderBy = (sort: DepartmentListQuery["sort"]) => {
 const toSummary = (row: DepartmentRow, studentCount: number): DepartmentSummary => ({
   id: row.id,
   name: row.name,
-  university: row.universityFaculty.university,
-  faculty: row.universityFaculty.faculty,
+  university: {
+    id: row.universityFaculty.university.id,
+    name: row.universityFaculty.university.name,
+  },
+  faculty: { id: row.universityFaculty.faculty.id, name: row.universityFaculty.faculty.name },
   archivedAt: row.archivedAt?.toISOString() ?? null,
+  parentArchived:
+    row.universityFaculty.university.archivedAt !== null ||
+    row.universityFaculty.faculty.archivedAt !== null,
   createdAt: row.createdAt.toISOString(),
   updatedAt: row.updatedAt.toISOString(),
   studentCount,
@@ -95,6 +107,7 @@ export class DepartmentsService {
 
   async list(query: DepartmentListQuery): Promise<DepartmentListResponse> {
     const where = {
+      ...statusWhere(query.status),
       ...(query.q === undefined
         ? {}
         : { name: { contains: query.q, mode: "insensitive" as const } }),
@@ -125,10 +138,12 @@ export class DepartmentsService {
   }
 
   async create(request: CreateDepartmentRequest): Promise<DepartmentSummary> {
-    await this.assertPairLinked(request);
+    const client = this.audit.client(this.database);
+    await lockParents(client, request.universityId, request.facultyId);
+    await this.assertPairLinked(request, client);
     await this.assertNameFree(request.name, request);
     try {
-      const created = await this.audit.client(this.database).department.create({
+      const created = await client.department.create({
         data: {
           name: request.name,
           universityId: request.universityId,
@@ -149,10 +164,13 @@ export class DepartmentsService {
     const moved =
       before.universityFaculty.university.id !== request.universityId ||
       before.universityFaculty.faculty.id !== request.facultyId;
-    if (moved) await this.assertPairLinked(request);
+    const client = this.audit.client(this.database);
+    if (moved) {
+      await lockParents(client, request.universityId, request.facultyId);
+      await this.assertPairLinked(request, client);
+    }
     await this.assertNameFree(request.name, request, id);
     try {
-      const client = this.audit.client(this.database);
       const data = {
         name: request.name,
         universityId: request.universityId,
@@ -197,6 +215,32 @@ export class DepartmentsService {
     this.audit.capture({ entityId: id, before: snapshot(before) });
   }
 
+  archive(id: string): Promise<DepartmentSummary> {
+    return this.setArchived(id, true);
+  }
+
+  restore(id: string): Promise<DepartmentSummary> {
+    return this.setArchived(id, false);
+  }
+
+  private async setArchived(id: string, archive: boolean): Promise<DepartmentSummary> {
+    const client = this.audit.client(this.database);
+    const { count } = await client.department.updateMany({
+      where: { id, archivedAt: archive ? null : { not: null } },
+      data: { archivedAt: archive ? new Date() : null },
+    });
+    const row = await this.existing(id, client);
+    if (count > 0) {
+      this.invalidateAfterCommit();
+      this.audit.capture({
+        entityId: id,
+        before: { ...snapshot(row), archived: !archive },
+        after: { ...snapshot(row), archived: archive },
+      });
+    }
+    return toSummary(row, await studentCountOf(this.database, id));
+  }
+
   private async refuseMove(id: string, name: string): Promise<never> {
     const students = await studentCountOf(this.database, id);
     if (students === 0) throw new ApiException(404, "NOT_FOUND");
@@ -221,14 +265,23 @@ export class DepartmentsService {
     return row;
   }
 
-  private async assertPairLinked(pair: Pair): Promise<void> {
-    const link = await this.database.universityFaculty.findUnique({
+  private async assertPairLinked(
+    pair: Pair,
+    client: Pick<HeatClient, "universityFaculty">,
+  ): Promise<void> {
+    const link = await client.universityFaculty.findUnique({
       where: {
         universityId_facultyId: { universityId: pair.universityId, facultyId: pair.facultyId },
       },
-      select: { universityId: true },
+      select: {
+        university: { select: { archivedAt: true } },
+        faculty: { select: { archivedAt: true } },
+      },
     });
     if (link === null) throw notOfferedError();
+    if (link.university.archivedAt !== null || link.faculty.archivedAt !== null) {
+      throw archivedError();
+    }
   }
 
   private async assertNameFree(name: string, pair: Pair, excludeId?: string): Promise<void> {

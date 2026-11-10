@@ -168,7 +168,7 @@ describe("FacultiesView list", () => {
     expect(rowOf(view, "Faculty of Arts")?.textContent).toContain("3");
     expect(rowOf(view, "Faculty of Science")?.textContent).toContain("None");
     expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
-      "/api/admin/directory/faculties?page=1&pageSize=25",
+      "/api/admin/directory/faculties?status=active&page=1&pageSize=25",
     );
   });
 
@@ -430,6 +430,25 @@ describe("FacultiesView edit", () => {
     expect((checkboxFor("BUET") as HTMLInputElement).checked).toBe(true);
   });
 
+  test("assigning to a university that was archived meanwhile shows the archived message and keeps the sheet open", async () => {
+    route({
+      mutation: (_url, method) =>
+        method === "PUT" ? errorReply("DIRECTORY_ARCHIVED", 409) : undefined,
+    });
+    const view = await mount();
+    await openEdit(view, "Faculty of Science");
+    await toggle("BUET");
+    await submitForm();
+
+    await vi.waitFor(() =>
+      expect(document.querySelector("[data-slot=form-message]")?.textContent).toBe(
+        "Faculty of Science was saved. BUET: This record is archived, so it cannot be used for new records. Restore it first.",
+      ),
+    );
+    expect(document.querySelector("[data-slot=form]")).not.toBeNull();
+    expect((checkboxFor("BUET") as HTMLInputElement).checked).toBe(true);
+  });
+
   test("a link that cannot be saved keeps the sheet open with it ticked, and a retry only repeats that link", async () => {
     let failing = true;
     route({
@@ -565,6 +584,110 @@ describe("FacultiesView delete", () => {
     await vi.waitFor(() =>
       expect(dialog.querySelector("[role=alert]")?.textContent).toContain(
         "3 students, 2 departments",
+      ),
+    );
+  });
+});
+
+describe("FacultiesView archive and restore", () => {
+  const archivedAt = "2026-11-02T04:00:00.000Z";
+  const archivedRow = row({
+    id: "0198f1a0-0000-7000-8000-0000000000f9",
+    name: "Retired Faculty",
+    archivedAt,
+  });
+  const both = {
+    faculties: [
+      row({ id: "0198f1a0-0000-7000-8000-0000000000f1", name: "Faculty of Arts" }),
+      archivedRow,
+    ],
+  };
+
+  test("shows a status badge and the archive and restore actions by state", async () => {
+    route(both);
+    const view = await mount("?status=all");
+
+    await vi.waitFor(() => expect(view.textContent).toContain("Retired Faculty"));
+    expect(rowOf(view, "Retired Faculty")?.textContent).toContain("Archived");
+    expect(buttonNamed("Restore", rowOf(view, "Retired Faculty") ?? view)).toBeDefined();
+    expect(buttonNamed("Archive", rowOf(view, "Retired Faculty") ?? view)).toBeUndefined();
+    expect(rowOf(view, "Faculty of Arts")?.textContent).toContain("Active");
+    expect(buttonNamed("Archive", rowOf(view, "Faculty of Arts") ?? view)).toBeDefined();
+  });
+
+  test("the status filter is read from the URL and sent to the API", async () => {
+    route({ faculties: [] });
+
+    await mount("?status=archived");
+
+    await vi.waitFor(() =>
+      expect(urlsOf("GET").some((url) => url.includes("status=archived"))).toBe(true),
+    );
+  });
+
+  test("archiving asks for confirmation, calls the API and confirms", async () => {
+    route({
+      ...both,
+      mutation: (_url, method) =>
+        method === "POST"
+          ? json(row({ id: "0198f1a0-0000-7000-8000-0000000000f1", archivedAt }))
+          : undefined,
+    });
+    const view = await mount();
+    await vi.waitFor(() => expect(view.textContent).toContain("Faculty of Arts"));
+
+    await act(async () => buttonNamed("Archive", rowOf(view, "Faculty of Arts") ?? view)?.click());
+    const dialog = document.querySelector("[data-slot=confirm-dialog]") as HTMLElement;
+    expect(dialog.textContent).toContain("Faculty of Arts");
+    expect(callsTo("POST")).toHaveLength(0);
+    await act(async () => buttonNamed("Archive faculty", dialog)?.click());
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=status]")?.textContent).toContain(
+        "Faculty of Arts was archived",
+      ),
+    );
+    expect(urlsOf("POST")[0]).toBe(
+      "/api/admin/directory/faculties/0198f1a0-0000-7000-8000-0000000000f1/archive",
+    );
+  });
+
+  test("restoring calls the API without a confirmation and confirms", async () => {
+    route({
+      ...both,
+      mutation: (_url, method) =>
+        method === "POST"
+          ? json(row({ id: "0198f1a0-0000-7000-8000-0000000000f9", name: "Retired Faculty" }))
+          : undefined,
+    });
+    const view = await mount("?status=archived");
+    await vi.waitFor(() => expect(view.textContent).toContain("Retired Faculty"));
+
+    await act(async () => buttonNamed("Restore", rowOf(view, "Retired Faculty") ?? view)?.click());
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=status]")?.textContent).toContain(
+        "Retired Faculty was restored",
+      ),
+    );
+    expect(urlsOf("POST")[0]).toBe(
+      "/api/admin/directory/faculties/0198f1a0-0000-7000-8000-0000000000f9/restore",
+    );
+  });
+
+  test("a failed restore is reported as a problem", async () => {
+    route({
+      ...both,
+      mutation: (_url, method) => (method === "POST" ? errorReply("INTERNAL", 500) : undefined),
+    });
+    const view = await mount("?status=archived");
+    await vi.waitFor(() => expect(view.textContent).toContain("Retired Faculty"));
+
+    await act(async () => buttonNamed("Restore", rowOf(view, "Retired Faculty") ?? view)?.click());
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=alert]")?.textContent).toContain(
+        "Retired Faculty could not be restored",
       ),
     );
   });

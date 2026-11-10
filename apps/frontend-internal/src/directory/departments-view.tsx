@@ -6,14 +6,17 @@ import {
   getFacultiesListQueryKey,
   getUniversitiesListQueryKey,
   isApiError,
+  useDepartmentsArchive,
   useDepartmentsList,
   useDepartmentsRemove,
+  useDepartmentsRestore,
   useFacultiesList,
   useUniversitiesList,
 } from "@heat/api-client";
 import type { DepartmentListResponseDtoItemsItem } from "@heat/api-client";
 import { departmentSortFields } from "@heat/contracts";
 import {
+  Badge,
   Button,
   ConfirmDialog,
   Field,
@@ -31,10 +34,18 @@ import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui
 import type { DataTableColumn } from "@heat/ui/data";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
-import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { ArchiveIcon, ArchiveRestoreIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
 import { deleteBlockedMessage } from "./directory-copy";
+import {
+  archiveFailedMessage,
+  directoryStatusItems,
+  restoreFailedMessage,
+  statusFilterKey,
+  statusFilterOptions,
+  statusFromUrl,
+} from "./directory-status";
 import { DepartmentFormSheet } from "./department-form-sheet";
 import type { DepartmentFormTarget } from "./department-form-sheet";
 
@@ -42,19 +53,25 @@ type DepartmentRow = DepartmentListResponseDtoItemsItem;
 
 const sortable = ["name", "createdAt"] as const;
 const sortValues: readonly string[] = departmentSortFields;
-const filterKeys = ["university", "faculty"] as const;
+const filterKeys = ["university", "faculty", statusFilterKey] as const;
 const optionLimit = 50;
 const all = "all";
 
 export function DepartmentsView() {
   const queryClient = useQueryClient();
-  const url = useTableUrlState({ sortable, filters: filterKeys });
+  const url = useTableUrlState({
+    sortable,
+    filters: filterKeys,
+    filterOptions: statusFilterOptions,
+  });
   const [target, setTarget] = useState<DepartmentFormTarget>(null);
   const [notice, setNotice] = useState<{ text: string; problem: boolean } | null>(null);
   const [blocked, setBlocked] = useState<{ id: string; message: string } | null>(null);
   const { university, faculty } = url.filters;
   const sortValue = url.sort ? `${url.sort.desc ? "-" : ""}${url.sort.id}` : undefined;
+  const status = statusFromUrl(url.filters[statusFilterKey]);
   const params = {
+    status,
     page: url.page,
     pageSize: url.pageSize,
     ...(sortValue !== undefined && sortValues.includes(sortValue)
@@ -66,9 +83,16 @@ export function DepartmentsView() {
   };
   const list = useDepartmentsList(params);
   const remove = useDepartmentsRemove();
-  const universities = useUniversitiesList({ page: 1, pageSize: optionLimit, sort: "name" });
+  const archive = useDepartmentsArchive();
+  const restore = useDepartmentsRestore();
+  const universities = useUniversitiesList({
+    page: 1,
+    pageSize: optionLimit,
+    sort: "name",
+    status: "all",
+  });
   const faculties = useFacultiesList(
-    { page: 1, pageSize: optionLimit, sort: "name", universityId: university },
+    { page: 1, pageSize: optionLimit, sort: "name", status: "all", universityId: university },
     { query: { enabled: Boolean(university) } },
   );
   const total = list.data?.total ?? 0;
@@ -95,6 +119,18 @@ export function DepartmentsView() {
       { id: "name", header: "Name", cell: (row) => row.name, sortable: true },
       { id: "university", header: "University", cell: (row) => row.university.name },
       { id: "faculty", header: "Faculty", cell: (row) => row.faculty.name },
+      {
+        id: "status",
+        header: "Status",
+        cell: (row) =>
+          row.archivedAt !== null ? (
+            <Badge variant="outline">Archived</Badge>
+          ) : row.parentArchived ? (
+            <Badge variant="outline">Hidden, parent archived</Badge>
+          ) : (
+            <Badge variant="secondary">Active</Badge>
+          ),
+      },
       { id: "students", header: "Students", cell: (row) => String(row.studentCount) },
       {
         id: "createdAt",
@@ -120,6 +156,51 @@ export function DepartmentsView() {
           <PencilIcon data-icon="inline-start" />
           Edit
         </Button>
+        {row.archivedAt === null ? (
+          <ConfirmDialog
+            trigger={
+              <Button variant="outline" size="sm">
+                <ArchiveIcon data-icon="inline-start" />
+                Archive
+              </Button>
+            }
+            title="Archive this department?"
+            itemName={row.name}
+            description="It stops being offered to new students. Existing students keep it. You can restore it later."
+            confirmLabel="Archive department"
+            errorMessage={archiveFailedMessage(row.name)}
+            onConfirm={async () => {
+              setNotice(null);
+              await archive.mutateAsync({ id: row.id });
+              await refresh();
+              setNotice({ text: `${row.name} was archived.`, problem: false });
+            }}
+          />
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={restore.isPending}
+            onClick={async () => {
+              setNotice(null);
+              try {
+                const restored = await restore.mutateAsync({ id: row.id });
+                await refresh();
+                setNotice({
+                  text: restored.parentArchived
+                    ? `${row.name} was restored but stays hidden from enrollment while its university or faculty is archived.`
+                    : `${row.name} was restored.`,
+                  problem: false,
+                });
+              } catch {
+                setNotice({ text: restoreFailedMessage(row.name), problem: true });
+              }
+            }}
+          >
+            <ArchiveRestoreIcon data-icon="inline-start" />
+            Restore
+          </Button>
+        )}
         <ConfirmDialog
           trigger={
             <Button variant="outline" size="sm">
@@ -236,6 +317,27 @@ export function DepartmentsView() {
             </SelectTrigger>
             <SelectContent>
               {facultyItems.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field>
+          <FieldLabel id="department-filter-status">Status</FieldLabel>
+          <Select
+            items={directoryStatusItems}
+            value={status}
+            onValueChange={(value) =>
+              url.setFilter(statusFilterKey, value === "active" ? null : value)
+            }
+          >
+            <SelectTrigger aria-labelledby="department-filter-status" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {directoryStatusItems.map((item) => (
                 <SelectItem key={item.value} value={item.value}>
                   {item.label}
                 </SelectItem>

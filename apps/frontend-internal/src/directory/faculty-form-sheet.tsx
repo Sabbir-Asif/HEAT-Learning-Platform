@@ -127,6 +127,7 @@ export function FacultyFormSheet({ target, onClose, onSaved }: FacultyFormSheetP
       options.find((option) => option.id === id)?.name ?? "a university";
     const blocked: string[] = [];
     const failed: string[] = [];
+    const archived: string[] = [];
     const linked = new Set(current);
     for (const id of current) {
       if (wanted.has(id)) continue;
@@ -144,11 +145,13 @@ export function FacultyFormSheet({ target, onClose, onSaved }: FacultyFormSheetP
       try {
         await assign.mutateAsync({ id: facultyId, universityId: id });
         linked.add(id);
-      } catch {
-        failed.push(nameOf(id));
+      } catch (error) {
+        (isApiError(error) && error.code === "DIRECTORY_ARCHIVED" ? archived : failed).push(
+          nameOf(id),
+        );
       }
     }
-    return { blocked, failed, linked };
+    return { blocked, failed, archived, linked };
   }
 
   async function onSubmit(values: FacultyFormValues) {
@@ -175,12 +178,23 @@ export function FacultyFormSheet({ target, onClose, onSaved }: FacultyFormSheetP
       return;
     }
     const problems = await changeLinks(result.id, values);
-    if (problems.blocked.length === 0 && problems.failed.length === 0) {
+    if (
+      problems.blocked.length === 0 &&
+      problems.failed.length === 0 &&
+      problems.archived.length === 0
+    ) {
       onSaved(editing === null ? `${result.name} was added.` : `${result.name} was saved.`, false);
       close();
       return;
     }
-    const message = linkProblemMessage(result.name, problems);
+    const message = [
+      linkProblemMessage(result.name, problems),
+      problems.archived.length > 0
+        ? `${problems.archived.join(", ")}: ${formErrorCopy.DIRECTORY_ARCHIVED}`
+        : null,
+    ]
+      .filter((part): part is string => part !== null)
+      .join(" ");
     const wanted = new Set(values.universityIds);
     const stillTicked = [...new Set([...problems.linked, ...wanted])];
     setSaved({

@@ -107,7 +107,7 @@ describe("UniversitiesView list", () => {
     expect(view.textContent).toContain("Unused University");
     expect(rowOf(view, "University of Dhaka")?.textContent).toContain("3");
     expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
-      "/api/admin/directory/universities?page=1&pageSize=25",
+      "/api/admin/directory/universities?status=active&page=1&pageSize=25",
     );
   });
 
@@ -118,7 +118,7 @@ describe("UniversitiesView list", () => {
 
     await vi.waitFor(() => expect(fetchMock).toHaveBeenCalled());
     expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
-      "/api/admin/directory/universities?page=1&pageSize=25&q=dha",
+      "/api/admin/directory/universities?status=active&page=1&pageSize=25&q=dha",
     );
   });
 
@@ -359,6 +359,127 @@ describe("UniversitiesView delete", () => {
     await vi.waitFor(() =>
       expect(dialog.querySelector("[role=alert]")?.textContent).toContain(
         "3 students, 2 departments and 1 faculty link",
+      ),
+    );
+  });
+});
+
+describe("UniversitiesView archive and restore", () => {
+  test("shows a status badge and the archive and restore actions by state", async () => {
+    fetchMock.mockResolvedValue(
+      list([
+        rows[0],
+        row({
+          id: "0198f1a0-0000-7000-8000-000000000009",
+          name: "Old University",
+          archivedAt: "2026-11-02T04:00:00.000Z",
+        }),
+      ]),
+    );
+    const view = await mount("?status=all");
+
+    await vi.waitFor(() => expect(view.textContent).toContain("Old University"));
+    expect(rowOf(view, "Old University")?.textContent).toContain("Archived");
+    expect(buttonNamed("Restore", rowOf(view, "Old University") ?? view)).toBeDefined();
+    expect(buttonNamed("Archive", rowOf(view, "Old University") ?? view)).toBeUndefined();
+    expect(rowOf(view, "University of Dhaka")?.textContent).toContain("Active");
+    expect(buttonNamed("Archive", rowOf(view, "University of Dhaka") ?? view)).toBeDefined();
+  });
+
+  test("the status filter defaults to active, is read from the URL and sent to the API", async () => {
+    fetchMock.mockResolvedValue(list([]));
+    await mount("?status=archived");
+
+    await vi.waitFor(() =>
+      expect(
+        fetchMock.mock.calls
+          .map(([input]) => String(input))
+          .some((url) => url.includes("status=archived")),
+      ).toBe(true),
+    );
+  });
+
+  test("archiving asks for confirmation, calls the API and confirms", async () => {
+    fetchMock.mockImplementation(async (_url, init) =>
+      init?.method === "POST"
+        ? new Response(JSON.stringify(row({ archivedAt: "2026-11-02T04:00:00.000Z" })), {
+            status: 200,
+          })
+        : list(),
+    );
+    const view = await mount();
+    await vi.waitFor(() => expect(view.textContent).toContain("University of Dhaka"));
+
+    await act(async () =>
+      buttonNamed("Archive", rowOf(view, "University of Dhaka") ?? view)?.click(),
+    );
+    const dialog = document.querySelector("[data-slot=confirm-dialog]") as HTMLElement;
+    expect(dialog.textContent).toContain("University of Dhaka");
+    expect(callsTo("POST")).toHaveLength(0);
+    await act(async () => buttonNamed("Archive university", dialog)?.click());
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=status]")?.textContent).toContain(
+        "University of Dhaka was archived",
+      ),
+    );
+    expect(String(callsTo("POST")[0]?.[0])).toBe(
+      "/api/admin/directory/universities/0198f1a0-0000-7000-8000-000000000001/archive",
+    );
+  });
+
+  test("restoring calls the API without a confirmation and confirms", async () => {
+    fetchMock.mockImplementation(async (_url, init) =>
+      init?.method === "POST"
+        ? new Response(
+            JSON.stringify(
+              row({ id: "0198f1a0-0000-7000-8000-000000000009", name: "Old University" }),
+            ),
+            { status: 200 },
+          )
+        : list([
+            row({
+              id: "0198f1a0-0000-7000-8000-000000000009",
+              name: "Old University",
+              archivedAt: "2026-11-02T04:00:00.000Z",
+            }),
+          ]),
+    );
+    const view = await mount("?status=archived");
+    await vi.waitFor(() => expect(view.textContent).toContain("Old University"));
+
+    await act(async () => buttonNamed("Restore", rowOf(view, "Old University") ?? view)?.click());
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=status]")?.textContent).toContain(
+        "Old University was restored",
+      ),
+    );
+    expect(String(callsTo("POST")[0]?.[0])).toBe(
+      "/api/admin/directory/universities/0198f1a0-0000-7000-8000-000000000009/restore",
+    );
+  });
+
+  test("a failed restore is reported as a problem", async () => {
+    fetchMock.mockImplementation(async (_url, init) =>
+      init?.method === "POST"
+        ? errorReply("INTERNAL", 500)
+        : list([
+            row({
+              id: "0198f1a0-0000-7000-8000-000000000009",
+              name: "Old University",
+              archivedAt: "2026-11-02T04:00:00.000Z",
+            }),
+          ]),
+    );
+    const view = await mount("?status=archived");
+    await vi.waitFor(() => expect(view.textContent).toContain("Old University"));
+
+    await act(async () => buttonNamed("Restore", rowOf(view, "Old University") ?? view)?.click());
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=alert]")?.textContent).toContain(
+        "Old University could not be restored",
       ),
     );
   });

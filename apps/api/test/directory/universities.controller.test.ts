@@ -16,6 +16,8 @@ describe("UniversitiesController access", () => {
     ["create", "university.create"],
     ["update", "university.update"],
     ["remove", "university.delete"],
+    ["archive", "university.archive"],
+    ["restore", "university.restore"],
   ] as const)("%s is audited as %s", (handler, action) => {
     const method = UniversitiesController.prototype[handler];
     expect(Reflect.getMetadata(AUDITED_KEY, method)).toEqual({ action, entity: "University" });

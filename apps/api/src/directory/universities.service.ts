@@ -11,7 +11,12 @@ import { AuditService } from "../audit";
 import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
 import { DirectoryCache } from "./directory-cache";
-import { errorCodeOf, translateDirectoryError } from "./directory-rules";
+import {
+  archiveChange,
+  errorCodeOf,
+  statusWhere,
+  translateDirectoryError,
+} from "./directory-rules";
 import { blockingMessage, departmentUsageOf, usageOf } from "./university-usage";
 import type { UniversityUsage } from "./university-usage";
 
@@ -56,8 +61,12 @@ export class UniversitiesService {
   ) {}
 
   async list(query: UniversityListQuery): Promise<UniversityListResponse> {
-    const where =
-      query.q === undefined ? {} : { name: { contains: query.q, mode: "insensitive" as const } };
+    const where = {
+      ...statusWhere(query.status),
+      ...(query.q === undefined
+        ? {}
+        : { name: { contains: query.q, mode: "insensitive" as const } }),
+    };
     const [rows, total] = await Promise.all([
       this.database.university.findMany({
         where,
@@ -135,6 +144,29 @@ export class UniversitiesService {
     }
     this.invalidateAfterCommit();
     this.audit.capture({ entityId: id, before: { name: before.name } });
+  }
+
+  archive(id: string): Promise<UniversitySummary> {
+    return this.setArchived(id, true);
+  }
+
+  restore(id: string): Promise<UniversitySummary> {
+    return this.setArchived(id, false);
+  }
+
+  private async setArchived(id: string, archive: boolean): Promise<UniversitySummary> {
+    const client = this.audit.client(this.database);
+    const { count } = await client.university.updateMany({
+      where: { id, archivedAt: archive ? null : { not: null } },
+      data: { archivedAt: archive ? new Date() : null },
+    });
+    const row = await client.university.findUnique({ where: { id } });
+    if (row === null) throw new ApiException(404, "NOT_FOUND");
+    if (count > 0) {
+      this.invalidateAfterCommit();
+      this.audit.capture(archiveChange(row, archive));
+    }
+    return toSummary(row, await usageOf(this.database, id));
   }
 
   private invalidateAfterCommit(): void {

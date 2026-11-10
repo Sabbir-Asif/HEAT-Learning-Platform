@@ -1563,6 +1563,142 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getDepartmentsUpdateMutationOptions(options), queryClient);
     }
 
+export const getDepartmentsArchiveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/departments/${id}/archive`
+}
+
+export const departmentsArchive = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<DepartmentSummaryDto> => {
+
+  return customFetch<DepartmentSummaryDto>(getDepartmentsArchiveUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getDepartmentsArchiveMutationKey = () => ['departmentsArchive'] as const;
+
+export const getDepartmentsArchiveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof departmentsArchive>>, TError,DepartmentsArchiveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof departmentsArchive>>, TError,DepartmentsArchiveMutationVariables, TContext> => {
+
+const mutationKey = getDepartmentsArchiveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof departmentsArchive>>, DepartmentsArchiveMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  departmentsArchive(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DepartmentsArchiveMutationResult = NonNullable<Awaited<ReturnType<typeof departmentsArchive>>>
+
+    export type DepartmentsArchiveMutationError = ErrorType<unknown>
+    export type DepartmentsArchiveMutationVariables = {id: string}
+
+    export const useDepartmentsArchive = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof departmentsArchive>>, TError,DepartmentsArchiveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof departmentsArchive>>,
+        TError,
+        DepartmentsArchiveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDepartmentsArchiveMutationOptions(options), queryClient);
+    }
+
+export const getDepartmentsRestoreUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/departments/${id}/restore`
+}
+
+export const departmentsRestore = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<DepartmentSummaryDto> => {
+
+  return customFetch<DepartmentSummaryDto>(getDepartmentsRestoreUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getDepartmentsRestoreMutationKey = () => ['departmentsRestore'] as const;
+
+export const getDepartmentsRestoreMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof departmentsRestore>>, TError,DepartmentsRestoreMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof departmentsRestore>>, TError,DepartmentsRestoreMutationVariables, TContext> => {
+
+const mutationKey = getDepartmentsRestoreMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof departmentsRestore>>, DepartmentsRestoreMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  departmentsRestore(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DepartmentsRestoreMutationResult = NonNullable<Awaited<ReturnType<typeof departmentsRestore>>>
+
+    export type DepartmentsRestoreMutationError = ErrorType<unknown>
+    export type DepartmentsRestoreMutationVariables = {id: string}
+
+    export const useDepartmentsRestore = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof departmentsRestore>>, TError,DepartmentsRestoreMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof departmentsRestore>>,
+        TError,
+        DepartmentsRestoreMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDepartmentsRestoreMutationOptions(options), queryClient);
+    }
+
 export const getFacultiesListUrl = (params?: FacultiesListParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -1991,6 +2127,142 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getFacultiesUpdateMutationOptions(options), queryClient);
+    }
+
+export const getFacultiesArchiveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/faculties/${id}/archive`
+}
+
+export const facultiesArchive = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<FacultySummaryDto> => {
+
+  return customFetch<FacultySummaryDto>(getFacultiesArchiveUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getFacultiesArchiveMutationKey = () => ['facultiesArchive'] as const;
+
+export const getFacultiesArchiveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultiesArchive>>, TError,FacultiesArchiveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof facultiesArchive>>, TError,FacultiesArchiveMutationVariables, TContext> => {
+
+const mutationKey = getFacultiesArchiveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultiesArchive>>, FacultiesArchiveMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  facultiesArchive(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FacultiesArchiveMutationResult = NonNullable<Awaited<ReturnType<typeof facultiesArchive>>>
+
+    export type FacultiesArchiveMutationError = ErrorType<unknown>
+    export type FacultiesArchiveMutationVariables = {id: string}
+
+    export const useFacultiesArchive = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultiesArchive>>, TError,FacultiesArchiveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof facultiesArchive>>,
+        TError,
+        FacultiesArchiveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getFacultiesArchiveMutationOptions(options), queryClient);
+    }
+
+export const getFacultiesRestoreUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/faculties/${id}/restore`
+}
+
+export const facultiesRestore = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<FacultySummaryDto> => {
+
+  return customFetch<FacultySummaryDto>(getFacultiesRestoreUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getFacultiesRestoreMutationKey = () => ['facultiesRestore'] as const;
+
+export const getFacultiesRestoreMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultiesRestore>>, TError,FacultiesRestoreMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof facultiesRestore>>, TError,FacultiesRestoreMutationVariables, TContext> => {
+
+const mutationKey = getFacultiesRestoreMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof facultiesRestore>>, FacultiesRestoreMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  facultiesRestore(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FacultiesRestoreMutationResult = NonNullable<Awaited<ReturnType<typeof facultiesRestore>>>
+
+    export type FacultiesRestoreMutationError = ErrorType<unknown>
+    export type FacultiesRestoreMutationVariables = {id: string}
+
+    export const useFacultiesRestore = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof facultiesRestore>>, TError,FacultiesRestoreMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof facultiesRestore>>,
+        TError,
+        FacultiesRestoreMutationVariables,
+        TContext
+      > => {
+      return useMutation(getFacultiesRestoreMutationOptions(options), queryClient);
     }
 
 export const getFacultiesUnassignUrl = (id: string,
@@ -2561,6 +2833,142 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getUniversitiesUpdateMutationOptions(options), queryClient);
+    }
+
+export const getUniversitiesArchiveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/universities/${id}/archive`
+}
+
+export const universitiesArchive = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<UniversitySummaryDto> => {
+
+  return customFetch<UniversitySummaryDto>(getUniversitiesArchiveUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getUniversitiesArchiveMutationKey = () => ['universitiesArchive'] as const;
+
+export const getUniversitiesArchiveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof universitiesArchive>>, TError,UniversitiesArchiveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof universitiesArchive>>, TError,UniversitiesArchiveMutationVariables, TContext> => {
+
+const mutationKey = getUniversitiesArchiveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof universitiesArchive>>, UniversitiesArchiveMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  universitiesArchive(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UniversitiesArchiveMutationResult = NonNullable<Awaited<ReturnType<typeof universitiesArchive>>>
+
+    export type UniversitiesArchiveMutationError = ErrorType<unknown>
+    export type UniversitiesArchiveMutationVariables = {id: string}
+
+    export const useUniversitiesArchive = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof universitiesArchive>>, TError,UniversitiesArchiveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof universitiesArchive>>,
+        TError,
+        UniversitiesArchiveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUniversitiesArchiveMutationOptions(options), queryClient);
+    }
+
+export const getUniversitiesRestoreUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/universities/${id}/restore`
+}
+
+export const universitiesRestore = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<UniversitySummaryDto> => {
+
+  return customFetch<UniversitySummaryDto>(getUniversitiesRestoreUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getUniversitiesRestoreMutationKey = () => ['universitiesRestore'] as const;
+
+export const getUniversitiesRestoreMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof universitiesRestore>>, TError,UniversitiesRestoreMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof universitiesRestore>>, TError,UniversitiesRestoreMutationVariables, TContext> => {
+
+const mutationKey = getUniversitiesRestoreMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof universitiesRestore>>, UniversitiesRestoreMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  universitiesRestore(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UniversitiesRestoreMutationResult = NonNullable<Awaited<ReturnType<typeof universitiesRestore>>>
+
+    export type UniversitiesRestoreMutationError = ErrorType<unknown>
+    export type UniversitiesRestoreMutationVariables = {id: string}
+
+    export const useUniversitiesRestore = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof universitiesRestore>>, TError,UniversitiesRestoreMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof universitiesRestore>>,
+        TError,
+        UniversitiesRestoreMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUniversitiesRestoreMutationOptions(options), queryClient);
     }
 
 export const getAdminMeDescribeUrl = () => {

@@ -34,6 +34,7 @@ const build = (
     createError?: Error;
     updateError?: Error;
     deleteError?: Error;
+    archivedChanged?: boolean;
   } = {},
 ) => {
   const counts = options.counts ?? {};
@@ -57,6 +58,7 @@ const build = (
       findUnique: vi
         .fn()
         .mockResolvedValue(options.existing === undefined ? row() : options.existing),
+      updateMany: vi.fn().mockResolvedValue({ count: options.archivedChanged === false ? 0 : 1 }),
       findFirst: vi.fn().mockResolvedValue(options.taken ?? null),
       create: options.createError
         ? vi.fn().mockRejectedValue(options.createError)
@@ -95,7 +97,13 @@ describe("UniversitiesService.list", () => {
   test("pages, sorts and searches by name and reports usage counts", async () => {
     const { service, database } = build({ counts: { students: 4, departments: 2, faculties: 1 } });
 
-    const result = await service.list({ page: 2, pageSize: 10, sort: "-name", q: "dha" });
+    const result = await service.list({
+      status: "all",
+      page: 2,
+      pageSize: 10,
+      sort: "-name",
+      q: "dha",
+    });
 
     expect(database.university.findMany).toHaveBeenCalledWith({
       where: { name: { contains: "dha", mode: "insensitive" } },
@@ -129,7 +137,7 @@ describe("UniversitiesService.list", () => {
   test("sorts by name ascending when no sort is given", async () => {
     const { service, database } = build();
 
-    await service.list({ page: 1, pageSize: 25 });
+    await service.list({ status: "all", page: 1, pageSize: 25 });
 
     expect(database.university.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: {}, orderBy: [{ name: "asc" }, { id: "asc" }] }),
@@ -141,7 +149,7 @@ describe("UniversitiesService.list", () => {
       counts: { students: 1, departments: 1 },
     });
 
-    await service.list({ page: 1, pageSize: 25 });
+    await service.list({ status: "all", page: 1, pageSize: 25 });
 
     expect(includingDeleted.department.findMany).toHaveBeenCalledTimes(1);
     expect(includingDeleted.department.findMany).toHaveBeenCalledWith({
@@ -157,7 +165,7 @@ describe("UniversitiesService.list", () => {
     const { service, database, includingDeleted } = build();
     database.university.findMany.mockResolvedValue([]);
 
-    const result = await service.list({ page: 1, pageSize: 25 });
+    const result = await service.list({ status: "all", page: 1, pageSize: 25 });
 
     expect(result.items).toEqual([]);
     expect(includingDeleted.department.findMany).not.toHaveBeenCalled();
@@ -381,5 +389,76 @@ describe("UniversitiesService lookup cache invalidation", () => {
     await inAuditScope(() => service.remove(id)).catch(() => undefined);
 
     expect(afterCommit).toHaveLength(0);
+  });
+});
+
+describe("UniversitiesService archive and restore", () => {
+  test("archive is one guarded write, audited, and invalidates the cache after commit", async () => {
+    const { service, database, changes, inAuditScope, cache, afterCommit } = build();
+    database.university.findUnique.mockResolvedValue(row({ archivedAt: at }));
+
+    const result = await inAuditScope(() => service.archive(id));
+
+    expect(database.university.updateMany).toHaveBeenCalledWith({
+      where: { id, archivedAt: null },
+      data: { archivedAt: expect.any(Date) },
+    });
+    expect(result.archivedAt).toBe(at.toISOString());
+    expect(changes).toEqual([
+      {
+        entityId: id,
+        before: { name: "University of Dhaka", archived: false },
+        after: { name: "University of Dhaka", archived: true },
+      },
+    ]);
+    await Promise.all(afterCommit.map((task) => task()));
+    expect(cache.invalidate).toHaveBeenCalledTimes(1);
+  });
+
+  test("restore clears the flag on archived rows only", async () => {
+    const { service, database, changes, inAuditScope } = build();
+
+    await inAuditScope(() => service.restore(id));
+
+    expect(database.university.updateMany).toHaveBeenCalledWith({
+      where: { id, archivedAt: { not: null } },
+      data: { archivedAt: null },
+    });
+    expect(changes[0]).toMatchObject({ before: { archived: true }, after: { archived: false } });
+  });
+
+  test("archiving a record that is already archived writes no audit entry and queues no invalidation", async () => {
+    const { service, database, changes, inAuditScope, afterCommit } = build({
+      archivedChanged: false,
+    });
+    database.university.findUnique.mockReset().mockResolvedValue(row({ archivedAt: at }));
+
+    const result = await inAuditScope(() => service.archive(id));
+
+    expect(result.archivedAt).toBe(at.toISOString());
+    expect(changes).toEqual([]);
+    expect(afterCommit).toEqual([]);
+  });
+
+  test("an unknown id is NOT_FOUND", async () => {
+    const { service, inAuditScope } = build({ existing: null, archivedChanged: false });
+
+    expect(await code(inAuditScope(() => service.archive(id)))).toBe("NOT_FOUND");
+  });
+});
+
+describe("UniversitiesService status filter", () => {
+  test.each([
+    ["active", { archivedAt: null }],
+    ["archived", { archivedAt: { not: null } }],
+    ["all", {}],
+  ] as const)("status %s", async (status, expected) => {
+    const { service, database } = build();
+
+    await service.list({ status, page: 1, pageSize: 25 });
+
+    expect(database.university.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expected }),
+    );
   });
 });

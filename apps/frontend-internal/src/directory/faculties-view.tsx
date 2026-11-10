@@ -5,20 +5,44 @@ import {
   getFacultiesListQueryKey,
   getUniversitiesListQueryKey,
   isApiError,
+  useFacultiesArchive,
   useFacultiesList,
   useFacultiesRemove,
+  useFacultiesRestore,
 } from "@heat/api-client";
 import type { FacultyListResponseDtoItemsItem } from "@heat/api-client";
 import { facultySortFields } from "@heat/contracts";
-import { Button, ConfirmDialog, FieldDescription, Input, PageHeader } from "@heat/ui";
+import {
+  Badge,
+  Button,
+  ConfirmDialog,
+  Field,
+  FieldDescription,
+  FieldLabel,
+  Input,
+  PageHeader,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@heat/ui";
 import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
-import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { ArchiveIcon, ArchiveRestoreIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
 import { facultyDeleteBlockedMessage } from "./directory-copy";
+import {
+  archiveFailedMessage,
+  directoryStatusItems,
+  restoreFailedMessage,
+  statusFilterKey,
+  statusFilterOptions,
+  statusFromUrl,
+} from "./directory-status";
 import { FacultyFormSheet } from "./faculty-form-sheet";
 import type { FacultyFormTarget } from "./faculty-form-sheet";
 
@@ -29,12 +53,18 @@ const sortValues: readonly string[] = facultySortFields;
 
 export function FacultiesView() {
   const queryClient = useQueryClient();
-  const url = useTableUrlState({ sortable });
+  const url = useTableUrlState({
+    sortable,
+    filters: [statusFilterKey],
+    filterOptions: statusFilterOptions,
+  });
   const [target, setTarget] = useState<FacultyFormTarget>(null);
   const [notice, setNotice] = useState<{ text: string; problem: boolean } | null>(null);
   const [blocked, setBlocked] = useState<{ id: string; message: string } | null>(null);
   const sortValue = url.sort ? `${url.sort.desc ? "-" : ""}${url.sort.id}` : undefined;
+  const status = statusFromUrl(url.filters[statusFilterKey]);
   const params = {
+    status,
     page: url.page,
     pageSize: url.pageSize,
     ...(sortValue !== undefined && sortValues.includes(sortValue)
@@ -44,6 +74,8 @@ export function FacultiesView() {
   };
   const list = useFacultiesList(params);
   const remove = useFacultiesRemove();
+  const archive = useFacultiesArchive();
+  const restore = useFacultiesRestore();
   const total = list.data?.total ?? 0;
   const page = useClampedPage(url.page, url.pageSize, total, url.setPage);
 
@@ -56,6 +88,16 @@ export function FacultiesView() {
   const columns = useMemo<DataTableColumn<FacultyRow>[]>(
     () => [
       { id: "name", header: "Name", cell: (row) => row.name, sortable: true },
+      {
+        id: "status",
+        header: "Status",
+        cell: (row) =>
+          row.archivedAt === null ? (
+            <Badge variant="secondary">Active</Badge>
+          ) : (
+            <Badge variant="outline">Archived</Badge>
+          ),
+      },
       {
         id: "universities",
         header: "Universities",
@@ -90,6 +132,46 @@ export function FacultiesView() {
           <PencilIcon data-icon="inline-start" />
           Edit
         </Button>
+        {row.archivedAt === null ? (
+          <ConfirmDialog
+            trigger={
+              <Button variant="outline" size="sm">
+                <ArchiveIcon data-icon="inline-start" />
+                Archive
+              </Button>
+            }
+            title="Archive this faculty?"
+            itemName={row.name}
+            description="It and every department under it stop being offered to new students, and it cannot be assigned to a university until restored. Existing students keep it."
+            confirmLabel="Archive faculty"
+            errorMessage={archiveFailedMessage(row.name)}
+            onConfirm={async () => {
+              setNotice(null);
+              await archive.mutateAsync({ id: row.id });
+              await refresh();
+              setNotice({ text: `${row.name} was archived.`, problem: false });
+            }}
+          />
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={restore.isPending}
+            onClick={async () => {
+              setNotice(null);
+              try {
+                await restore.mutateAsync({ id: row.id });
+                await refresh();
+                setNotice({ text: `${row.name} was restored.`, problem: false });
+              } catch {
+                setNotice({ text: restoreFailedMessage(row.name), problem: true });
+              }
+            }}
+          >
+            <ArchiveRestoreIcon data-icon="inline-start" />
+            Restore
+          </Button>
+        )}
         <ConfirmDialog
           trigger={
             <Button variant="outline" size="sm">
@@ -172,7 +254,27 @@ export function FacultiesView() {
           />
         }
       >
-        {null}
+        <Field>
+          <FieldLabel id="faculty-filter-status">Status</FieldLabel>
+          <Select
+            items={directoryStatusItems}
+            value={status}
+            onValueChange={(value) =>
+              url.setFilter(statusFilterKey, value === "active" ? null : value)
+            }
+          >
+            <SelectTrigger aria-labelledby="faculty-filter-status" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {directoryStatusItems.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
       </FilterBar>
       <DataTable
         label="Faculties"

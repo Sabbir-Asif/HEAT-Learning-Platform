@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   createDepartmentRequestSchema,
+  directoryStatuses,
   createFacultyRequestSchema,
   createUniversityRequestSchema,
   departmentListQuerySchema,
@@ -42,7 +43,11 @@ describe("updateUniversityRequestSchema", () => {
 
 describe("universityListQuerySchema", () => {
   test("defaults the page and page size", () => {
-    expect(universityListQuerySchema.parse({})).toEqual({ page: 1, pageSize: 25 });
+    expect(universityListQuerySchema.parse({})).toEqual({
+      status: "active",
+      page: 1,
+      pageSize: 25,
+    });
   });
 
   test("accepts a sort field and a search text", () => {
@@ -77,7 +82,11 @@ describe("facultyListQuerySchema", () => {
   const universityId = "0198f1a0-0000-7000-8000-000000000001";
 
   test("shares the university list parameters and adds a university filter", () => {
-    expect(facultyListQuerySchema.parse({})).toEqual({ page: 1, pageSize: 25 });
+    expect(facultyListQuerySchema.parse({})).toEqual({
+      status: "active",
+      page: 1,
+      pageSize: 25,
+    });
     expect(facultyListQuerySchema.parse({ universityId, sort: "-name" })).toMatchObject({
       universityId,
       sort: "-name",
@@ -142,7 +151,11 @@ describe("createDepartmentRequestSchema", () => {
 
 describe("departmentListQuerySchema", () => {
   test("defaults the page and accepts university and faculty filters", () => {
-    expect(departmentListQuerySchema.parse({})).toEqual({ page: 1, pageSize: 25 });
+    expect(departmentListQuerySchema.parse({})).toEqual({
+      status: "active",
+      page: 1,
+      pageSize: 25,
+    });
     expect(departmentListQuerySchema.parse({ ...pair, sort: "-name" })).toMatchObject({
       ...pair,
       sort: "-name",
@@ -170,4 +183,17 @@ describe("public directory lookups", () => {
     ).toBe(false);
     expect(directoryDepartmentLookupParamsSchema.safeParse(pair).success).toBe(true);
   });
+});
+
+describe("directory list status filter", () => {
+  test.each([universityListQuerySchema, facultyListQuerySchema, departmentListQuerySchema])(
+    "defaults to active and accepts only the known statuses",
+    (schema) => {
+      expect(schema.parse({}).status).toBe("active");
+      for (const status of directoryStatuses) {
+        expect(schema.parse({ status }).status).toBe(status);
+      }
+      expect(schema.safeParse({ status: "deleted" }).success).toBe(false);
+    },
+  );
 });

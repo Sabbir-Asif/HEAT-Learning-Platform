@@ -13,6 +13,8 @@ describe("DepartmentsController access", () => {
     ["create", "department.create"],
     ["update", "department.update"],
     ["remove", "department.delete"],
+    ["archive", "department.archive"],
+    ["restore", "department.restore"],
   ] as const)("%s is audited as %s", (handler, action) => {
     const method = DepartmentsController.prototype[handler];
     expect(Reflect.getMetadata(AUDITED_KEY, method)).toEqual({ action, entity: "Department" });

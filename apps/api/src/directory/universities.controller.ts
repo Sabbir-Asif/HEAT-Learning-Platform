@@ -55,4 +55,20 @@ export class UniversitiesController {
   remove(@Param() params: UniversityIdParamsDto): Promise<void> {
     return this.universities.remove(params.id);
   }
+
+  @Post(":id/archive")
+  @HttpCode(200)
+  @Audited({ action: "university.archive", entity: "University" })
+  @ApiOkResponse({ type: UniversitySummaryDto })
+  archive(@Param() params: UniversityIdParamsDto): Promise<UniversitySummaryDto> {
+    return this.universities.archive(params.id);
+  }
+
+  @Post(":id/restore")
+  @HttpCode(200)
+  @Audited({ action: "university.restore", entity: "University" })
+  @ApiOkResponse({ type: UniversitySummaryDto })
+  restore(@Param() params: UniversityIdParamsDto): Promise<UniversitySummaryDto> {
+    return this.universities.restore(params.id);
+  }
 }
