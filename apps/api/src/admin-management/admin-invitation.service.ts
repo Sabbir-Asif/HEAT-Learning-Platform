@@ -37,10 +37,11 @@ export class AdminInvitationService {
         data: { usedAt: now },
       });
       if (consumed.count !== 1) throw new ApiException(400, "INVITATION_INVALID");
-      await tx.user.update({
-        where: { id: invitation.userId },
+      const activated = await tx.user.updateMany({
+        where: { id: invitation.userId, deactivatedAt: null, deletedAt: null },
         data: { passwordHash, emailVerifiedAt: now, mustChangePassword: false },
       });
+      if (activated.count !== 1) throw new ApiException(400, "INVITATION_INVALID");
       await tx.auditLog.create({
         data: auditData(
           { actorId: invitation.userId, ...metadata },
