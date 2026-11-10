@@ -7,10 +7,15 @@ import {
   type Factories,
   type TestDatabase,
 } from "@heat/db/testing";
+import { randomUUID } from "node:crypto";
 import { afterEach, beforeEach, inject } from "vitest";
 import type { InfrastructureHandle } from "@heat/db/testing";
 import { applyEnvironment, authTestEnvironment } from "./auth-env";
 import { AppModule } from "../../src/app.module";
+import {
+  DIRECTORY_CACHE_REDIS,
+  createDirectoryCacheRedis,
+} from "../../src/directory/directory-cache.redis";
 import { configureApp } from "../../src/app.setup";
 import { createHttpAdapter } from "../../src/http/http-adapter";
 
@@ -64,7 +69,10 @@ export const createTestApp = async (options: TestAppOptions = {}): Promise<TestA
       imports: [TestInfrastructureModule, AppModule, ...(options.imports ?? [])],
       providers: options.providers,
       controllers: options.controllers,
-    }).compile();
+    })
+      .overrideProvider(DIRECTORY_CACHE_REDIS)
+      .useValue(createDirectoryCacheRedis(redisUrl, `test:${randomUUID()}:`))
+      .compile();
     const app = moduleRef.createNestApplication(createHttpAdapter());
     configureApp(app);
     await app.listen(0);

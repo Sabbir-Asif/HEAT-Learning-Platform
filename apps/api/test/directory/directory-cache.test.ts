@@ -161,3 +161,16 @@ describe("DirectoryCache.invalidate", () => {
     expect(set).toHaveBeenCalledTimes(2);
   });
 });
+
+describe("createDirectoryCacheRedis", () => {
+  test("applies the key prefix it is given so separate apps never share entries", async () => {
+    const { createDirectoryCacheRedis } = await import("../../src/directory/directory-cache.redis");
+    const first = createDirectoryCacheRedis("redis://localhost:6379", "a:");
+    const second = createDirectoryCacheRedis("redis://localhost:6379");
+
+    expect(first.options.keyPrefix).toBe("a:");
+    expect(second.options.keyPrefix).toBe("");
+    first.disconnect();
+    second.disconnect();
+  });
+});
