@@ -1,9 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import type { CanActivate, ExecutionContext } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import type { RateLimitProfileName } from "../core";
 import type { AuthenticatedRequest } from "../auth";
 import { AccountKeyHasher } from "./account-key.hasher";
+import { ipBucket, unknownIpBucket } from "./ip-bucket";
 import { RateLimiter } from "./rate-limiter.service";
 import type { RateLimitSubject } from "./rate-limiter.service";
 
@@ -13,8 +14,6 @@ interface RateLimitRequest extends AuthenticatedRequest {
   body?: unknown;
 }
 
-const unknownIp = "unknown";
-
 const emailFrom = (body: unknown): string | undefined => {
   if (typeof body !== "object" || body === null) return undefined;
   const email = (body as { email?: unknown }).email;
@@ -23,6 +22,8 @@ const emailFrom = (body: unknown): string | undefined => {
 
 @Injectable()
 export class RateLimitGuard implements CanActivate {
+  private readonly logger = new Logger(RateLimitGuard.name);
+
   constructor(
     private readonly reflector: Reflector,
     private readonly limiter: RateLimiter,
@@ -41,7 +42,8 @@ export class RateLimitGuard implements CanActivate {
   }
 
   private subjectOf(request: RateLimitRequest): RateLimitSubject {
-    const ip = request.ip ?? unknownIp;
+    if (request.ip === undefined) this.logger.warn("Request has no client address");
+    const ip = request.ip === undefined ? unknownIpBucket : ipBucket(request.ip);
     if (request.authSession !== undefined) {
       return { ip, accountKey: this.hasher.forUser(request.authSession.userId) };
     }
