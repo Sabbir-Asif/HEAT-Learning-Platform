@@ -4,6 +4,9 @@ import {
   departmentListQuerySchema,
   departmentListResponseSchema,
   departmentSummarySchema,
+  directoryDepartmentLookupParamsSchema,
+  directoryFacultyLookupParamsSchema,
+  directoryOptionListResponseSchema,
   updateDepartmentRequestSchema,
   createFacultyRequestSchema,
   createUniversityRequestSchema,
@@ -58,3 +61,15 @@ export class DepartmentListResponseDto extends createZodDto(departmentListRespon
 export class DepartmentSummaryDto extends createZodDto(departmentSummarySchema) {}
 
 export class DepartmentIdParamsDto extends createZodDto(departmentIdParamsSchema) {}
+
+export class DirectoryOptionListResponseDto extends createZodDto(
+  directoryOptionListResponseSchema,
+) {}
+
+export class DirectoryFacultyLookupParamsDto extends createZodDto(
+  directoryFacultyLookupParamsSchema,
+) {}
+
+export class DirectoryDepartmentLookupParamsDto extends createZodDto(
+  directoryDepartmentLookupParamsSchema,
+) {}

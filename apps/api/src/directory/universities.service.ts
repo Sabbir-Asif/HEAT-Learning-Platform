@@ -10,6 +10,7 @@ import type { HeatClient } from "@heat/db";
 import { AuditService } from "../audit";
 import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
+import { DirectoryCache } from "./directory-cache";
 import { errorCodeOf, translateDirectoryError } from "./directory-rules";
 import { blockingMessage, departmentUsageOf, usageOf } from "./university-usage";
 import type { UniversityUsage } from "./university-usage";
@@ -51,6 +52,7 @@ export class UniversitiesService {
   constructor(
     @Inject(DATABASE) private readonly database: HeatClient,
     private readonly audit: AuditService,
+    private readonly cache: DirectoryCache,
   ) {}
 
   async list(query: UniversityListQuery): Promise<UniversityListResponse> {
@@ -91,6 +93,7 @@ export class UniversitiesService {
       const created = await this.audit
         .client(this.database)
         .university.create({ data: { name: request.name } });
+      this.invalidateAfterCommit();
       this.audit.capture({ entityId: created.id, after: { name: created.name } });
       return toSummary(created, { students: 0, departments: 0, faculties: 0 });
     } catch (error) {
@@ -105,6 +108,7 @@ export class UniversitiesService {
       const updated = await this.audit
         .client(this.database)
         .university.update({ where: { id }, data: { name: request.name } });
+      this.invalidateAfterCommit();
       this.audit.capture({
         entityId: id,
         before: { name: before.name },
@@ -129,7 +133,12 @@ export class UniversitiesService {
       }
       throw translateDirectoryError(error);
     }
+    this.invalidateAfterCommit();
     this.audit.capture({ entityId: id, before: { name: before.name } });
+  }
+
+  private invalidateAfterCommit(): void {
+    this.audit.afterCommit(() => this.cache.invalidate());
   }
 
   private async existing(id: string): Promise<UniversityRow> {

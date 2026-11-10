@@ -75,6 +75,9 @@ describe("deny-by-default route enumeration", () => {
     expect(names).toContain("GET /api/health (HealthController.check)");
     expect(names).toContain("POST /api/auth/sign-in (StudentAuthController.signIn)");
     expect(names).toContain("GET /api/me (MeController.describe)");
+    expect(names).toContain(
+      "GET /api/directory/universities (DirectoryLookupsController.listUniversities)",
+    );
   });
 
   test("sensitive routes carry the expected rate limit profile", async () => {
@@ -87,6 +90,10 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/admin/auth/refresh": "sessionRefresh",
       "POST /api/admin/account/change-password": "passwordChange",
       "POST /api/captcha": "captcha",
+      "GET /api/directory/universities": "directoryLookup",
+      "GET /api/directory/universities/:universityId/faculties": "directoryLookup",
+      "GET /api/directory/universities/:universityId/faculties/:facultyId/departments":
+        "directoryLookup",
       "POST /api/admin/admins": "adminInvite",
       "POST /api/admin/admins/:id/resend-invitation": "adminInvite",
       "POST /api/admin/auth/invitations/lookup": "verify",
