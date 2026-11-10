@@ -53,6 +53,21 @@ describe("StudentAuthController.signIn", () => {
     expect(result).toBe(profile);
   });
 
+  test("writes no cookies when the profile lookup fails", async () => {
+    const { controller, cookies, me } = build();
+    me.describe.mockRejectedValueOnce(new Error("lookup failed"));
+
+    await expect(
+      controller.signIn(
+        { email: "a@example.test", password: "secret" },
+        { headers: {}, ip: "203.0.113.4" } as never,
+        response as never,
+      ),
+    ).rejects.toThrow("lookup failed");
+
+    expect(cookies.write).not.toHaveBeenCalled();
+  });
+
   test("copes with a missing user agent", async () => {
     const { controller, signInService } = build();
 

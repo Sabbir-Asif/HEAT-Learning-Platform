@@ -51,8 +51,9 @@ export class StudentAuthController {
       userAgent: request.headers["user-agent"]?.slice(0, userAgentLimit),
       ipAddress: request.ip,
     });
+    const profile = await this.me.describe(userId);
     this.cookies.write(response, "student", tokens);
-    return this.me.describe(userId);
+    return profile;
   }
 
   @Public()
