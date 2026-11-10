@@ -491,7 +491,7 @@ describe("FacultiesService.unassign", () => {
 
   test("is refused with DIRECTORY_IN_USE naming the departments while the pair has any", async () => {
     const { service, database, changes, inAuditScope } = build({
-      linkedDepartments: ["Bengali", "History"],
+      linkedDepartments: ["Anthropology", "History"],
     });
     database.universityFaculty.findUnique.mockResolvedValue({
       university: { id: dhaka, name: "University of Dhaka" },
@@ -503,7 +503,7 @@ describe("FacultiesService.unassign", () => {
     expect((failure as ApiException).code).toBe("DIRECTORY_IN_USE");
     expect((failure as ApiException).getStatus()).toBe(409);
     expect((failure as ApiException).detail).toBe(
-      "Faculty of Arts has 2 departments at University of Dhaka (Bengali, History), so it cannot be removed from that university.",
+      "Faculty of Arts has 2 departments at University of Dhaka (Anthropology, History), so it cannot be removed from that university.",
     );
     expect(database.department.findMany).toHaveBeenCalledWith({
       where: { universityId: dhaka, facultyId: id },
@@ -530,7 +530,7 @@ describe("FacultiesService.unassign", () => {
   test("a foreign key violation that slips past the check names the departments read outside the aborted transaction", async () => {
     const { service, database } = build({
       unassignError: foreignKeyViolation,
-      linkedDepartments: ["Bengali"],
+      linkedDepartments: ["Anthropology"],
     });
     database.universityFaculty.findUnique.mockResolvedValue({
       university: { id: dhaka, name: "University of Dhaka" },
@@ -553,7 +553,7 @@ describe("FacultiesService.unassign", () => {
 
     expect(failure).toBeInstanceOf(ApiException);
     expect((failure as ApiException).code).toBe("DIRECTORY_IN_USE");
-    expect((failure as ApiException).detail).toContain("(Bengali)");
+    expect((failure as ApiException).detail).toContain("(Anthropology)");
     expect(transaction.department.findMany).toHaveBeenCalledTimes(1);
     expect(database.department.findMany).toHaveBeenCalledTimes(1);
   });

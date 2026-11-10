@@ -185,7 +185,7 @@ describe("faculty directory over HTTP", () => {
 
   test("unassign is refused with DIRECTORY_IN_USE naming the departments, and the link stays", async () => {
     const admin = await signedInAdmin();
-    const department = await testApp().factories.department({ name: "Bengali" });
+    const department = await testApp().factories.department({ name: "Anthropology" });
     await testApp().factories.department({
       name: "History",
       universityId: department.universityId,
@@ -202,7 +202,7 @@ describe("faculty directory over HTTP", () => {
     expect(reply.status).toBe(409);
     expect(errorOf(reply).code).toBe("DIRECTORY_IN_USE");
     expect(errorOf(reply).message).toContain("2 departments");
-    expect(errorOf(reply).message).toContain("Bengali, History");
+    expect(errorOf(reply).message).toContain("Anthropology, History");
     expect(await links(department.facultyId)).toHaveLength(1);
     expect(await testApp().database.prisma.auditLog.count()).toBe(before);
   });
@@ -241,7 +241,7 @@ describe("faculty directory over HTTP", () => {
   });
 
   test("a department created after the check still gets DIRECTORY_IN_USE naming it, not a failed transaction", async () => {
-    const department = await testApp().factories.department({ name: "Bengali" });
+    const department = await testApp().factories.department({ name: "Anthropology" });
     const service = testApp().moduleRef.get(FacultiesService);
     const prisma = testApp().database.prisma;
 
@@ -261,7 +261,7 @@ describe("faculty directory over HTTP", () => {
 
     expect(failure).toBeInstanceOf(ApiException);
     expect((failure as ApiException).code).toBe("DIRECTORY_IN_USE");
-    expect((failure as ApiException).detail).toContain("(Bengali)");
+    expect((failure as ApiException).detail).toContain("(Anthropology)");
     expect(await links(department.facultyId)).toHaveLength(1);
   });
 

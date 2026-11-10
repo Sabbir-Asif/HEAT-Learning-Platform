@@ -87,13 +87,13 @@ describe("department directory over HTTP", () => {
 
     const reply = await call("POST", base, {
       cookie: admin.cookie,
-      body: { name: "  Bengali  ", universityId: university.id, facultyId: faculty.id },
+      body: { name: "  Anthropology  ", universityId: university.id, facultyId: faculty.id },
     });
 
     const created = reply.body as Department;
     expect(reply.status).toBe(201);
     expect(created).toMatchObject({
-      name: "Bengali",
+      name: "Anthropology",
       university: { id: university.id, name: "University of Dhaka" },
       faculty: { id: faculty.id, name: "Faculty of Arts" },
       studentCount: 0,
@@ -105,7 +105,7 @@ describe("department directory over HTTP", () => {
       actorId: admin.user.id,
       entity: "Department",
       after: {
-        name: "Bengali",
+        name: "Anthropology",
         universityId: university.id,
         universityName: "University of Dhaka",
         facultyId: faculty.id,
@@ -122,7 +122,7 @@ describe("department directory over HTTP", () => {
 
     const reply = await call("POST", base, {
       cookie: admin.cookie,
-      body: { name: "Bengali", universityId: university.id, facultyId: faculty.id },
+      body: { name: "Anthropology", universityId: university.id, facultyId: faculty.id },
     });
 
     expect(reply.status).toBe(400);
@@ -161,18 +161,18 @@ describe("department directory over HTTP", () => {
 
   test("a name is unique per pair without case, and the same name under another pair is allowed", async () => {
     const admin = await signedInAdmin();
-    const first = await testApp().factories.department({ name: "Bengali" });
+    const first = await testApp().factories.department({ name: "Anthropology" });
     const otherFaculty = await testApp().factories.faculty();
     await link(first.universityId, otherFaculty.id);
     const before = await testApp().database.prisma.auditLog.count();
 
     const taken = await call("POST", base, {
       cookie: admin.cookie,
-      body: { name: "bENGALI", universityId: first.universityId, facultyId: first.facultyId },
+      body: { name: "aNTHROPOLOGY", universityId: first.universityId, facultyId: first.facultyId },
     });
     const otherPair = await call("POST", base, {
       cookie: admin.cookie,
-      body: { name: "Bengali", universityId: first.universityId, facultyId: otherFaculty.id },
+      body: { name: "Anthropology", universityId: first.universityId, facultyId: otherFaculty.id },
     });
     const sibling = await testApp().factories.department({
       name: "History",
@@ -181,7 +181,7 @@ describe("department directory over HTTP", () => {
     });
     const rename = await call("PATCH", `${base}/${sibling.id}`, {
       cookie: admin.cookie,
-      body: { name: "BENGALI", universityId: first.universityId, facultyId: first.facultyId },
+      body: { name: "ANTHROPOLOGY", universityId: first.universityId, facultyId: first.facultyId },
     });
 
     expect(taken.status).toBe(409);
@@ -219,18 +219,18 @@ describe("department directory over HTTP", () => {
 
   test("an unreferenced department can move to another linked pair, and not to an unlinked one", async () => {
     const admin = await signedInAdmin();
-    const department = await testApp().factories.department({ name: "Bengali" });
+    const department = await testApp().factories.department({ name: "Anthropology" });
     const buet = await testApp().factories.university("BUET");
     const science = await testApp().factories.faculty("Faculty of Science");
     await link(buet.id, science.id);
 
     const unlinked = await call("PATCH", `${base}/${department.id}`, {
       cookie: admin.cookie,
-      body: { name: "Bengali", universityId: buet.id, facultyId: department.facultyId },
+      body: { name: "Anthropology", universityId: buet.id, facultyId: department.facultyId },
     });
     const moved = await call("PATCH", `${base}/${department.id}`, {
       cookie: admin.cookie,
-      body: { name: "Bengali", universityId: buet.id, facultyId: science.id },
+      body: { name: "Anthropology", universityId: buet.id, facultyId: science.id },
     });
 
     expect(unlinked.status).toBe(400);
@@ -240,7 +240,7 @@ describe("department directory over HTTP", () => {
 
   test("moving a department that students reference, a soft-deleted profile included, is DIRECTORY_IN_USE", async () => {
     const admin = await signedInAdmin();
-    const department = await testApp().factories.department({ name: "Bengali" });
+    const department = await testApp().factories.department({ name: "Anthropology" });
     const { profile } = await testApp().factories.student({ departmentId: department.id });
     await testApp().database.prisma.studentProfile.update({
       where: { id: profile.id },
@@ -251,7 +251,7 @@ describe("department directory over HTTP", () => {
 
     const reply = await call("PATCH", `${base}/${department.id}`, {
       cookie: admin.cookie,
-      body: { name: "Bengali", universityId: buet.id, facultyId: department.facultyId },
+      body: { name: "Anthropology", universityId: buet.id, facultyId: department.facultyId },
     });
 
     expect(reply.status).toBe(409);
@@ -266,20 +266,20 @@ describe("department directory over HTTP", () => {
 
   test("renaming a department that students reference is allowed", async () => {
     const admin = await signedInAdmin();
-    const department = await testApp().factories.department({ name: "Bengali" });
+    const department = await testApp().factories.department({ name: "Anthropology" });
     await testApp().factories.student({ departmentId: department.id });
 
     const reply = await call("PATCH", `${base}/${department.id}`, {
       cookie: admin.cookie,
       body: {
-        name: "Bangla",
+        name: "Archaeology",
         universityId: department.universityId,
         facultyId: department.facultyId,
       },
     });
 
     expect(reply.status).toBe(200);
-    expect(reply.body).toMatchObject({ name: "Bangla", studentCount: 1 });
+    expect(reply.body).toMatchObject({ name: "Archaeology", studentCount: 1 });
   });
 
   test("delete is refused with DIRECTORY_IN_USE counting a soft-deleted student, and nothing changes", async () => {
@@ -337,7 +337,7 @@ describe("department directory over HTTP", () => {
 
   test("the list filters by university and faculty and reports student counts with soft-deleted profiles", async () => {
     const admin = await signedInAdmin();
-    const arts = await testApp().factories.department({ name: "Bengali" });
+    const arts = await testApp().factories.department({ name: "Anthropology" });
     const science = await testApp().factories.department({ name: "Physics" });
     const { profile } = await testApp().factories.student({ departmentId: arts.id });
     await testApp().factories.student({ departmentId: arts.id });

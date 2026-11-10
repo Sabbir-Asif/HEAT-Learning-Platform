@@ -15,13 +15,13 @@ const dhaka = { id: "0198f1a0-0000-7000-8000-0000000000a1", name: "University of
 const buet = { id: "0198f1a0-0000-7000-8000-0000000000a2", name: "BUET" };
 const arts = { id: "0198f1a0-0000-7000-8000-0000000000f1", name: "Faculty of Arts" };
 const engineering = { id: "0198f1a0-0000-7000-8000-0000000000f2", name: "Faculty of Engineering" };
-const bengali = "0198f1a0-0000-7000-8000-0000000000d1";
+const anthropology = "0198f1a0-0000-7000-8000-0000000000d1";
 const physics = "0198f1a0-0000-7000-8000-0000000000d2";
 const stamp = "2026-11-01T04:00:00.000Z";
 
 const row = (overrides: Record<string, unknown> = {}) => ({
-  id: bengali,
-  name: "Bengali",
+  id: anthropology,
+  name: "Anthropology",
   university: dhaka,
   faculty: arts,
   archivedAt: null,
@@ -214,11 +214,11 @@ describe("DepartmentsView list", () => {
     route();
 
     const view = await mount();
-    await vi.waitFor(() => expect(view.textContent).toContain("Bengali"));
+    await vi.waitFor(() => expect(view.textContent).toContain("Anthropology"));
 
-    expect(rowOf(view, "Bengali")?.textContent).toContain("University of Dhaka");
-    expect(rowOf(view, "Bengali")?.textContent).toContain("Faculty of Arts");
-    expect(rowOf(view, "Bengali")?.textContent).toContain("3");
+    expect(rowOf(view, "Anthropology")?.textContent).toContain("University of Dhaka");
+    expect(rowOf(view, "Anthropology")?.textContent).toContain("Faculty of Arts");
+    expect(rowOf(view, "Anthropology")?.textContent).toContain("3");
     expect(rowOf(view, "Physics")?.textContent).toContain("Faculty of Engineering");
     expect(listCalls()[0]).toBe(
       "/api/admin/directory/departments?status=active&page=1&pageSize=25",
@@ -255,7 +255,7 @@ describe("DepartmentsView filters", () => {
   test("the faculty filter is off until a university is chosen, then offers only that university's faculties", async () => {
     route();
     const view = await mount();
-    await vi.waitFor(() => expect(view.textContent).toContain("Bengali"));
+    await vi.waitFor(() => expect(view.textContent).toContain("Anthropology"));
     expect(disabled(trigger(view, "Faculty"))).toBe(true);
 
     await pick(view, "University", "BUET");
@@ -298,7 +298,7 @@ describe("DepartmentsView filter truncation", () => {
     route();
 
     const view = await mount(`?university=${dhaka.id}`);
-    await vi.waitFor(() => expect(view.textContent).toContain("Bengali"));
+    await vi.waitFor(() => expect(view.textContent).toContain("Anthropology"));
 
     expect(view.textContent).not.toContain("Only the first");
   });
@@ -405,7 +405,7 @@ describe("DepartmentsView form", () => {
     const view = await mount();
     const form = await openCreate(view);
 
-    await type(document.querySelector("input[name=name]"), "Bengali");
+    await type(document.querySelector("input[name=name]"), "Anthropology");
     await pick(form, "University", "University of Dhaka");
     await vi.waitFor(() => expect(disabled(trigger(form, "Faculty"))).toBe(false));
     await pick(form, "Faculty", "Faculty of Arts");
@@ -417,7 +417,7 @@ describe("DepartmentsView form", () => {
       ),
     );
     expect(document.querySelector("[data-slot=form]")).not.toBeNull();
-    expect((document.querySelector("input[name=name]") as HTMLInputElement).value).toBe("Bengali");
+    expect((document.querySelector("input[name=name]") as HTMLInputElement).value).toBe("Anthropology");
   });
 
   test("a server failure is shown in the form and the sheet stays open", async () => {
@@ -470,7 +470,7 @@ describe("DepartmentsView form", () => {
 
   test("editing starts from the department's values and saves them", async () => {
     route({
-      mutation: (_url, method) => (method === "PATCH" ? json(row({ name: "Bangla" })) : undefined),
+      mutation: (_url, method) => (method === "PATCH" ? json(row({ name: "Archaeology" })) : undefined),
     });
     const view = await mount();
     await vi.waitFor(() => expect(view.textContent).toContain("Physics"));
@@ -494,8 +494,8 @@ describe("DepartmentsView form", () => {
   test("a department with students cannot change its university or faculty", async () => {
     route();
     const view = await mount();
-    await vi.waitFor(() => expect(view.textContent).toContain("Bengali"));
-    await act(async () => buttonNamed("Edit", rowOf(view, "Bengali") ?? view)?.click());
+    await vi.waitFor(() => expect(view.textContent).toContain("Anthropology"));
+    await act(async () => buttonNamed("Edit", rowOf(view, "Anthropology") ?? view)?.click());
 
     const form = document.querySelector("[data-slot=form]") as HTMLElement;
     expect(disabled(trigger(form, "University"))).toBe(true);
@@ -598,9 +598,9 @@ describe("DepartmentsView delete", () => {
       one: () => json(row({ studentCount: 5 })),
     });
     const view = await mount();
-    const dialog = await openDelete(view, "Bengali");
+    const dialog = await openDelete(view, "Anthropology");
 
-    await type(dialog.querySelector("input"), "Bengali");
+    await type(dialog.querySelector("input"), "Anthropology");
     await act(async () => buttonNamed("Delete department", dialog)?.click());
 
     await vi.waitFor(() => expect(dialog.querySelector("[role=alert]")).not.toBeNull());
@@ -616,9 +616,9 @@ describe("DepartmentsView delete", () => {
       one: () => errorReply("INTERNAL", 500),
     });
     const view = await mount();
-    const dialog = await openDelete(view, "Bengali");
+    const dialog = await openDelete(view, "Anthropology");
 
-    await type(dialog.querySelector("input"), "Bengali");
+    await type(dialog.querySelector("input"), "Anthropology");
     await act(async () => buttonNamed("Delete department", dialog)?.click());
 
     await vi.waitFor(() =>
@@ -636,7 +636,7 @@ describe("DepartmentsView archive and restore", () => {
   });
   const both = {
     departments: [
-      row({ id: "0198f1a0-0000-7000-8000-0000000000d1", name: "Bengali" }),
+      row({ id: "0198f1a0-0000-7000-8000-0000000000d1", name: "Anthropology" }),
       archivedRow,
     ],
   };
@@ -649,8 +649,8 @@ describe("DepartmentsView archive and restore", () => {
     expect(rowOf(view, "Retired Department")?.textContent).toContain("Archived");
     expect(buttonNamed("Restore", rowOf(view, "Retired Department") ?? view)).toBeDefined();
     expect(buttonNamed("Archive", rowOf(view, "Retired Department") ?? view)).toBeUndefined();
-    expect(rowOf(view, "Bengali")?.textContent).toContain("Active");
-    expect(buttonNamed("Archive", rowOf(view, "Bengali") ?? view)).toBeDefined();
+    expect(rowOf(view, "Anthropology")?.textContent).toContain("Active");
+    expect(buttonNamed("Archive", rowOf(view, "Anthropology") ?? view)).toBeDefined();
   });
 
   test("the status filter is read from the URL and sent to the API", async () => {
@@ -672,16 +672,16 @@ describe("DepartmentsView archive and restore", () => {
           : undefined,
     });
     const view = await mount();
-    await vi.waitFor(() => expect(view.textContent).toContain("Bengali"));
+    await vi.waitFor(() => expect(view.textContent).toContain("Anthropology"));
 
-    await act(async () => buttonNamed("Archive", rowOf(view, "Bengali") ?? view)?.click());
+    await act(async () => buttonNamed("Archive", rowOf(view, "Anthropology") ?? view)?.click());
     const dialog = document.querySelector("[data-slot=confirm-dialog]") as HTMLElement;
-    expect(dialog.textContent).toContain("Bengali");
+    expect(dialog.textContent).toContain("Anthropology");
     expect(callsTo("POST")).toHaveLength(0);
     await act(async () => buttonNamed("Archive department", dialog)?.click());
 
     await vi.waitFor(() =>
-      expect(view.querySelector("[role=status]")?.textContent).toContain("Bengali was archived"),
+      expect(view.querySelector("[role=status]")?.textContent).toContain("Anthropology was archived"),
     );
     expect(urlsOf("POST")[0]).toBe(
       "/api/admin/directory/departments/0198f1a0-0000-7000-8000-0000000000d1/archive",
@@ -736,11 +736,11 @@ describe("DepartmentsView archive and restore", () => {
   });
 
   test("a department under an archived parent is badged as hidden", async () => {
-    route({ departments: [row({ name: "Bengali", parentArchived: true })] });
+    route({ departments: [row({ name: "Anthropology", parentArchived: true })] });
     const view = await mount();
 
     await vi.waitFor(() =>
-      expect(rowOf(view, "Bengali")?.textContent).toContain("Hidden, parent archived"),
+      expect(rowOf(view, "Anthropology")?.textContent).toContain("Hidden, parent archived"),
     );
   });
 

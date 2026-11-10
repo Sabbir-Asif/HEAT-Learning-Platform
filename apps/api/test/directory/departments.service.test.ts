@@ -14,7 +14,7 @@ const at = new Date("2026-11-10T06:00:00.000Z");
 
 const row = (overrides: Record<string, unknown> = {}) => ({
   id,
-  name: "Bengali",
+  name: "Anthropology",
   archivedAt: null,
   createdAt: at,
   updatedAt: at,
@@ -118,7 +118,7 @@ const code = async (promise: Promise<unknown>): Promise<string | undefined> => {
   return error instanceof ApiException ? error.code : "OTHER";
 };
 
-const input = { name: "Bengali", universityId: dhaka, facultyId: arts };
+const input = { name: "Anthropology", universityId: dhaka, facultyId: arts };
 
 const pairInclude = {
   universityFaculty: {
@@ -160,7 +160,7 @@ describe("DepartmentsService.list", () => {
       items: [
         {
           id,
-          name: "Bengali",
+          name: "Anthropology",
           university: { id: dhaka, name: "University of Dhaka" },
           faculty: { id: arts, name: "Faculty of Arts" },
           archivedAt: null,
@@ -256,7 +256,7 @@ describe("DepartmentsService.create", () => {
       },
     });
     expect(database.department.create).toHaveBeenCalledWith({
-      data: { name: "Bengali", universityId: dhaka, facultyId: arts },
+      data: { name: "Anthropology", universityId: dhaka, facultyId: arts },
       include: pairInclude,
     });
     expect(created).toMatchObject({ id, studentCount: 0 });
@@ -264,7 +264,7 @@ describe("DepartmentsService.create", () => {
       {
         entityId: id,
         after: {
-          name: "Bengali",
+          name: "Anthropology",
           universityId: dhaka,
           universityName: "University of Dhaka",
           facultyId: arts,
@@ -289,7 +289,7 @@ describe("DepartmentsService.create", () => {
   test("a name held under the same pair, compared without case, is DIRECTORY_NAME_TAKEN", async () => {
     const { service, database, changes, inAuditScope } = build({ taken: { id: "other" } });
 
-    expect(await code(inAuditScope(() => service.create({ ...input, name: "bengali" })))).toBe(
+    expect(await code(inAuditScope(() => service.create({ ...input, name: "anthropology" })))).toBe(
       "DIRECTORY_NAME_TAKEN",
     );
 
@@ -297,7 +297,7 @@ describe("DepartmentsService.create", () => {
       where: {
         universityId: dhaka,
         facultyId: arts,
-        name: { equals: "bengali", mode: "insensitive" },
+        name: { equals: "anthropology", mode: "insensitive" },
       },
       select: { id: true },
     });
@@ -349,7 +349,7 @@ describe("DepartmentsService.update", () => {
       {
         entityId: id,
         before: {
-          name: "Bengali",
+          name: "Anthropology",
           universityId: dhaka,
           universityName: "University of Dhaka",
           facultyId: arts,
@@ -376,7 +376,7 @@ describe("DepartmentsService.update", () => {
         id: { not: id },
         universityId: dhaka,
         facultyId: arts,
-        name: { equals: "Bengali", mode: "insensitive" },
+        name: { equals: "Anthropology", mode: "insensitive" },
       },
       select: { id: true },
     });
@@ -387,7 +387,7 @@ describe("DepartmentsService.update", () => {
     const { service, database, inAuditScope } = build({ students: 0 });
 
     await inAuditScope(() =>
-      service.update(id, { name: "Bengali", universityId: buet, facultyId: science }),
+      service.update(id, { name: "Anthropology", universityId: buet, facultyId: science }),
     );
 
     expect(database.universityFaculty.findUnique).toHaveBeenCalledWith({
@@ -399,7 +399,7 @@ describe("DepartmentsService.update", () => {
     });
     expect(database.department.updateMany).toHaveBeenCalledWith({
       where: { id, profiles: { none: {} } },
-      data: { name: "Bengali", universityId: buet, facultyId: science },
+      data: { name: "Anthropology", universityId: buet, facultyId: science },
     });
     expect(database.department.update).not.toHaveBeenCalled();
   });
@@ -412,7 +412,7 @@ describe("DepartmentsService.update", () => {
 
     const failure = await failureOf(
       inAuditScope(() =>
-        service.update(id, { name: "Bengali", universityId: buet, facultyId: science }),
+        service.update(id, { name: "Anthropology", universityId: buet, facultyId: science }),
       ),
     );
 
@@ -432,7 +432,7 @@ describe("DepartmentsService.update", () => {
     expect(
       await code(
         inAuditScope(() =>
-          service.update(id, { name: "Bengali", universityId: buet, facultyId: science }),
+          service.update(id, { name: "Anthropology", universityId: buet, facultyId: science }),
         ),
       ),
     ).toBe("DIRECTORY_IN_USE");
@@ -446,7 +446,7 @@ describe("DepartmentsService.update", () => {
     expect(
       await code(
         inAuditScope(() =>
-          service.update(id, { name: "Bengali", universityId: buet, facultyId: science }),
+          service.update(id, { name: "Anthropology", universityId: buet, facultyId: science }),
         ),
       ),
     ).toBe("NOT_FOUND");
@@ -458,7 +458,7 @@ describe("DepartmentsService.update", () => {
     expect(
       await code(
         inAuditScope(() =>
-          service.update(id, { name: "Bengali", universityId: buet, facultyId: science }),
+          service.update(id, { name: "Anthropology", universityId: buet, facultyId: science }),
         ),
       ),
     ).toBe("NOT_FOUND");
@@ -470,7 +470,7 @@ describe("DepartmentsService.update", () => {
     expect(
       await code(
         inAuditScope(() =>
-          service.update(id, { name: "Bengali", universityId: buet, facultyId: arts }),
+          service.update(id, { name: "Anthropology", universityId: buet, facultyId: arts }),
         ),
       ),
     ).toBe("VALIDATION_FAILED");
@@ -515,7 +515,7 @@ describe("DepartmentsService.remove", () => {
       {
         entityId: id,
         before: {
-          name: "Bengali",
+          name: "Anthropology",
           universityId: dhaka,
           universityName: "University of Dhaka",
           facultyId: arts,
@@ -641,8 +641,8 @@ describe("DepartmentsService archive and restore", () => {
     expect(changes).toEqual([
       {
         entityId: id,
-        before: expect.objectContaining({ name: "Bengali", archived: false }),
-        after: expect.objectContaining({ name: "Bengali", archived: true }),
+        before: expect.objectContaining({ name: "Anthropology", archived: false }),
+        after: expect.objectContaining({ name: "Anthropology", archived: true }),
       },
     ]);
     expect(cache.invalidate).not.toHaveBeenCalled();
@@ -807,7 +807,7 @@ describe("DepartmentsService parent locks", () => {
     expect(database.department.update).not.toHaveBeenCalled();
     expect(database.department.updateMany).toHaveBeenCalledWith({
       where: { id, profiles: { none: {} } },
-      data: { name: "Bengali", universityId: dhaka, facultyId: arts },
+      data: { name: "Anthropology", universityId: dhaka, facultyId: arts },
     });
   });
 
