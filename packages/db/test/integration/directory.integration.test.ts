@@ -101,3 +101,58 @@ describe("archiving", () => {
     expect(await database.prisma.university.count({ where: { id: university.id } })).toBe(1);
   });
 });
+
+describe("directory names are unique regardless of letter case", () => {
+  test("rejects a university whose name differs only by case", async () => {
+    const name = `Case U ${unique()}`;
+    await database.prisma.university.create({ data: { name } });
+
+    await expect(
+      database.prisma.university.create({ data: { name: name.toUpperCase() } }),
+    ).rejects.toMatchObject({ code: "P2002" });
+  });
+
+  test("rejects a faculty whose name differs only by case", async () => {
+    const name = `Case F ${unique()}`;
+    await database.prisma.faculty.create({ data: { name } });
+
+    await expect(
+      database.prisma.faculty.create({ data: { name: name.toLowerCase() } }),
+    ).rejects.toMatchObject({ code: "P2002" });
+  });
+
+  test("rejects a department whose name differs only by case under the same pair", async () => {
+    const { university, faculty } = await seedUniversity();
+    const pair = { universityId: university.id, facultyId: faculty.id };
+    await database.prisma.department.create({ data: { name: "Statistics", ...pair } });
+
+    await expect(
+      database.prisma.department.create({ data: { name: "STATISTICS", ...pair } }),
+    ).rejects.toMatchObject({ code: "P2002" });
+  });
+
+  test("rejects a rename onto a case variant of an existing name", async () => {
+    const { university, faculty } = await seedUniversity();
+    const pair = { universityId: university.id, facultyId: faculty.id };
+    await database.prisma.department.create({ data: { name: "Geology", ...pair } });
+    const other = await database.prisma.department.create({ data: { name: "Botany", ...pair } });
+
+    await expect(
+      database.prisma.department.update({ where: { id: other.id }, data: { name: "geology" } }),
+    ).rejects.toMatchObject({ code: "P2002" });
+  });
+
+  test("allows the same department name under another pair", async () => {
+    const first = await seedUniversity();
+    const second = await seedUniversity();
+    await database.prisma.department.create({
+      data: { name: "Zoology", universityId: first.university.id, facultyId: first.faculty.id },
+    });
+
+    const department = await database.prisma.department.create({
+      data: { name: "ZOOLOGY", universityId: second.university.id, facultyId: second.faculty.id },
+    });
+
+    expect(department.name).toBe("ZOOLOGY");
+  });
+});

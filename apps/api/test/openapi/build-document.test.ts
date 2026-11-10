@@ -39,6 +39,33 @@ describe("buildOpenApiDocument", () => {
     expect(healthResponseSchema.safeParse({ status: "down" }).success).toBe(false);
   });
 
+  test("describes the three public directory lookups with id and name only", async () => {
+    const document = await buildOpenApiDocument();
+    const lookups: Array<[string, string]> = [
+      ["/api/directory/universities", "directoryLookupsListUniversities"],
+      ["/api/directory/universities/{universityId}/faculties", "directoryLookupsListFaculties"],
+      [
+        "/api/directory/universities/{universityId}/faculties/{facultyId}/departments",
+        "directoryLookupsListDepartments",
+      ],
+    ];
+
+    for (const [path, operationId] of lookups) {
+      const operation = asRecord(asRecord(document.paths[path])["get"]);
+      expect(operation["operationId"]).toBe(operationId);
+      const ok = asRecord(asRecord(operation["responses"])["200"]);
+      const content = asRecord(asRecord(ok["content"])["application/json"]);
+      expect(content["schema"]).toEqual({
+        $ref: "#/components/schemas/DirectoryOptionListResponseDto",
+      });
+    }
+    const schema = asRecord(
+      asRecord(document.components?.schemas)["DirectoryOptionListResponseDto"],
+    );
+    const item = asRecord(asRecord(asRecord(schema["properties"])["items"])["items"]);
+    expect(Object.keys(asRecord(item["properties"])).sort()).toEqual(["id", "name"]);
+  });
+
   test("names the operation so generated hooks get readable names", async () => {
     const document = await buildOpenApiDocument();
     const operation = asRecord(asRecord(document.paths["/api/health"])["get"]);

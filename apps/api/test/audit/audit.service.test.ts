@@ -84,4 +84,30 @@ describe("AuditService", () => {
       "capture was called outside an @Audited request",
     );
   });
+
+  test("afterCommit queues a task inside a request and refuses outside one", () => {
+    const service = new AuditService({} as never);
+    const scope = { tx: {} as never, changes: [] };
+    const task = async () => undefined;
+
+    auditScopeStorage.run(scope, () => service.afterCommit(task));
+
+    expect((scope as { afterCommit?: unknown[] }).afterCommit).toEqual([task]);
+    expect(() => service.afterCommit(task)).toThrow(
+      "afterCommit was called outside an @Audited request",
+    );
+  });
+
+  test("skip marks the request scope so a handler that changed nothing writes no audit row", () => {
+    const service = new AuditService({} as never);
+    const scope: { tx: never; changes: never[]; skipped?: boolean } = {
+      tx: {} as never,
+      changes: [],
+    };
+
+    auditScopeStorage.run(scope, () => service.skip());
+
+    expect(scope.skipped).toBe(true);
+    expect(() => service.skip()).toThrow("skip was called outside an @Audited request");
+  });
 });

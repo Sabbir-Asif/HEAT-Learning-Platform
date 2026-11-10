@@ -5,6 +5,7 @@ export * from "./admins";
 export * from "./audit";
 export * from "./auth";
 export * from "./captcha";
+export * from "./directory";
 export * from "./errors";
 
 export const healthResponseSchema = z.object({

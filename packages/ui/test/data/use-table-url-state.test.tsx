@@ -103,6 +103,25 @@ describe("writing the URL", () => {
     expect(last()?.options.history).toBe("push");
   });
 
+  test("several filters change in one history entry and reset the page", async () => {
+    const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>();
+    const { result } = renderHook(
+      () => useTableUrlState({ sortable: ["name"], filters: ["status", "team"] }),
+      {
+        wrapper: withNuqsTestingAdapter({
+          searchParams: "?page=3&status=pending&team=a",
+          hasMemory: true,
+          onUrlUpdate,
+        }),
+      },
+    );
+    act(() => result.current.setFilters({ status: "approved", team: null }));
+    await waitFor(() => expect(onUrlUpdate).toHaveBeenCalled());
+    const last = onUrlUpdate.mock.calls.at(-1)?.[0];
+    expect(last?.queryString).toBe("?status=approved");
+    expect(last?.options.history).toBe("push");
+  });
+
   test("clearing removes the search and every filter but keeps sort and size", async () => {
     const { result, last } = setup("?page=2&pageSize=10&sort=name&q=ana&status=pending");
     act(() => result.current.clearFilters());

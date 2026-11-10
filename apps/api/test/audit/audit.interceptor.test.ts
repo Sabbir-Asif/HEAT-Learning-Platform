@@ -1,5 +1,5 @@
 import { Reflector } from "@nestjs/core";
-import { firstValueFrom, of } from "rxjs";
+import { defer, firstValueFrom, of } from "rxjs";
 import { describe, expect, test, vi } from "vitest";
 import { AuditInterceptor } from "../../src/audit/audit.interceptor";
 import type { AuditedMetadata } from "../../src/audit/audit.types";
@@ -37,6 +37,41 @@ const build = (declared: AuditedMetadata | undefined) => {
   };
   return { interceptor, database, audit, context: context as never };
 };
+
+describe("AuditInterceptor with a skipped scope", () => {
+  const skipping = () =>
+    defer(() => {
+      const scope = auditScopeStorage.getStore();
+      if (scope !== undefined) scope.skipped = true;
+      return of("unchanged");
+    });
+
+  test("writes no audit row when the handler skipped and captured nothing", async () => {
+    const { interceptor, audit, context } = build(metadata);
+
+    const result = await firstValueFrom(interceptor.intercept(context, { handle: skipping }));
+
+    expect(result).toBe("unchanged");
+    expect(audit.record).not.toHaveBeenCalled();
+  });
+
+  test("a captured change is still recorded even if the scope was also marked skipped", async () => {
+    const { interceptor, audit, context } = build(metadata);
+    const handle = () =>
+      defer(() => {
+        const scope = auditScopeStorage.getStore();
+        if (scope !== undefined) {
+          scope.skipped = true;
+          scope.changes.push({ entityId: "x" });
+        }
+        return of("changed");
+      });
+
+    await firstValueFrom(interceptor.intercept(context, { handle }));
+
+    expect(audit.record).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe("AuditInterceptor", () => {
   test("passes undeclared handlers straight through", async () => {
@@ -80,6 +115,55 @@ describe("AuditInterceptor", () => {
 
     expect(audit.record).toHaveBeenCalledTimes(2);
     expect(audit.record.mock.calls.map((call) => call[2].entityId)).toEqual(["a", "b"]);
+  });
+
+  test("runs post-commit tasks after the transaction resolves and not when it fails", async () => {
+    const { interceptor, database, context } = build(metadata);
+    const order: string[] = [];
+    database.$transaction.mockImplementation(
+      async (run: (client: typeof tx) => Promise<unknown>) => {
+        const result = await run(tx);
+        order.push("committed");
+        return result;
+      },
+    );
+    const handle = () => {
+      auditScopeStorage.getStore()?.afterCommit?.push(async () => {
+        order.push("task");
+      });
+      return of("done");
+    };
+
+    await firstValueFrom(interceptor.intercept(context, { handle }));
+
+    expect(order).toEqual(["committed", "task"]);
+
+    order.length = 0;
+    database.$transaction.mockRejectedValueOnce(new Error("rolled back"));
+    await expect(firstValueFrom(interceptor.intercept(context, { handle }))).rejects.toThrow(
+      "rolled back",
+    );
+    expect(order).toEqual([]);
+  });
+
+  test("a failing post-commit task does not fail the request or skip later tasks", async () => {
+    const { interceptor, context } = build(metadata);
+    const ran: string[] = [];
+    const handle = () => {
+      const tasks = auditScopeStorage.getStore()?.afterCommit;
+      tasks?.push(async () => {
+        throw new Error("redis down");
+      });
+      tasks?.push(async () => {
+        ran.push("second");
+      });
+      return of("done");
+    };
+
+    const result = await firstValueFrom(interceptor.intercept(context, { handle }));
+
+    expect(result).toBe("done");
+    expect(ran).toEqual(["second"]);
   });
 
   test("refuses a handler that emits more than one value", async () => {

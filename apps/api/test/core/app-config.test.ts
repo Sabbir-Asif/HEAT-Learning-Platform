@@ -182,6 +182,17 @@ describe("loadConfig rate limits", () => {
     expect(rateLimit.lockout.threshold).toBe(3);
   });
 
+  test("the directory lookup profile is per IP only, so only its IP ceiling is read", () => {
+    const { rateLimit } = loadConfig({
+      ...valid,
+      RATE_LIMIT_DIRECTORY_LOOKUP_LIMIT: "abc",
+      RATE_LIMIT_DIRECTORY_LOOKUP_WINDOW_SECONDS: "0",
+      RATE_LIMIT_DIRECTORY_LOOKUP_IP_LIMIT: "4000",
+    });
+    expect(rateLimit.profiles.directoryLookup.ipLimit).toBe(4000);
+    expect(rateLimit.profiles.directoryLookup.limit).toBe(600);
+  });
+
   test("names every invalid variable without echoing values", () => {
     expect(() =>
       loadConfig({ ...valid, LOCKOUT_BASE_SECONDS: "abc", RATE_LIMIT_CAPTCHA_LIMIT: "0" }),
@@ -192,7 +203,10 @@ describe("loadConfig rate limits", () => {
     const example = readFileSync(join(__dirname, "../../.env.example"), "utf8");
     for (const profile of rateLimitProfileNames) {
       for (const field of ["LIMIT", "WINDOW_SECONDS", "IP_LIMIT"]) {
-        expect(example).toContain(`${rateLimitEnvName(profile, field)}=`);
+        const ipOnly = profile === "directoryLookup" && field !== "IP_LIMIT";
+        const name = `${rateLimitEnvName(profile, field)}=`;
+        if (ipOnly) expect(example).not.toContain(name);
+        else expect(example).toContain(name);
       }
     }
     expect(example).toContain("LOCKOUT_THRESHOLD=");

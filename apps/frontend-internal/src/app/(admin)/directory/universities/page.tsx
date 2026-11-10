@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { UniversitiesView } from "@/directory/universities-view";
 
 export default function Page() {
-  return <PlaceholderPage title="Universities" />;
+  return <UniversitiesView />;
 }

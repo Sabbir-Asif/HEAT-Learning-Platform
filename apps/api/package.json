@@ -10,7 +10,7 @@
     }
   },
   "scripts": {
-    "dev": "nest start --watch",
+    "dev": "nest start --watch --env-file .env",
     "build": "nest build",
     "start": "node dist/main.js",
     "recover-super-admin": "node dist/cli/main.js recover-super-admin",

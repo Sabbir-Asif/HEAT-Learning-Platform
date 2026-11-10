@@ -4,7 +4,7 @@
   "private": true,
   "main": "./dist/main.js",
   "scripts": {
-    "dev": "nest start --watch",
+    "dev": "nest start --watch --env-file ../api/.env",
     "build": "nest build",
     "start": "node dist/main.js",
     "lint": "eslint .",

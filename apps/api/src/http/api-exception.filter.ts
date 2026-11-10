@@ -27,6 +27,10 @@ const messages: Record<ErrorCode, string> = {
   CAPTCHA_INVALID: "The characters do not match. Try again.",
   CSRF_TOKEN_INVALID:
     "The security token for this request is missing or no longer valid. Reload the page and try again.",
+  DIRECTORY_ARCHIVED:
+    "This record is archived, so it cannot be used for new records. Restore it first.",
+  DIRECTORY_IN_USE: "This record is still in use, so it cannot be deleted.",
+  DIRECTORY_NAME_TAKEN: "A record with this name already exists.",
   EMAIL_IN_USE: "An account with this email address already exists.",
   ENROLLMENT_NOT_ACTIVE: "Your enrollment in this course is not active.",
   FORBIDDEN: "You are not allowed to do this.",
@@ -109,6 +113,7 @@ interface Classified {
   code: ErrorCode;
   fields?: FieldError[];
   retryAfterSeconds?: number;
+  detail?: string;
 }
 
 function classify(exception: unknown): Classified {
@@ -120,6 +125,8 @@ function classify(exception: unknown): Classified {
       status: exception.getStatus(),
       code: exception.code,
       retryAfterSeconds: exception.retryAfterSeconds,
+      detail: exception.detail,
+      fields: exception.fields,
     };
   }
   const status =
@@ -137,7 +144,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const request = http.getRequest<RequestLike>();
     const response = http.getResponse<ResponseLike>();
     const requestId = resolveRequestId(request.headers["x-request-id"]);
-    const { status, code, fields, retryAfterSeconds } = classify(exception);
+    const { status, code, fields, retryAfterSeconds, detail } = classify(exception);
 
     const name = exception instanceof Error ? exception.name : typeof exception;
 
@@ -152,7 +159,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     }
 
     const body: ErrorResponse = {
-      error: { code, message: messages[code], requestId, ...(fields ? { fields } : {}) },
+      error: { code, message: detail ?? messages[code], requestId, ...(fields ? { fields } : {}) },
     };
     response.setHeader("x-request-id", requestId);
     if (retryAfterSeconds !== undefined) {
