@@ -97,4 +97,17 @@ describe("AuditService", () => {
       "afterCommit was called outside an @Audited request",
     );
   });
+
+  test("skip marks the request scope so a handler that changed nothing writes no audit row", () => {
+    const service = new AuditService({} as never);
+    const scope: { tx: never; changes: never[]; skipped?: boolean } = {
+      tx: {} as never,
+      changes: [],
+    };
+
+    auditScopeStorage.run(scope, () => service.skip());
+
+    expect(scope.skipped).toBe(true);
+    expect(() => service.skip()).toThrow("skip was called outside an @Audited request");
+  });
 });

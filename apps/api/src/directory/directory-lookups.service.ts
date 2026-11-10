@@ -2,13 +2,18 @@ import { Inject, Injectable } from "@nestjs/common";
 import type { DirectoryOptionListResponse } from "@heat/contracts";
 import type { HeatClient } from "@heat/db";
 import { DATABASE } from "../core";
-import { DirectoryCache } from "./directory-cache";
+import {
+  DirectoryCache,
+  directoryCacheTtlSeconds,
+  directoryEmptyCacheTtlSeconds,
+} from "./directory-cache";
 
 const option = { id: true, name: true } as const;
 
 const byName = [{ name: "asc" as const }, { id: "asc" as const }];
 
-const hasItems = (response: DirectoryOptionListResponse): boolean => response.items.length > 0;
+const ttlOf = (response: DirectoryOptionListResponse): number =>
+  response.items.length > 0 ? directoryCacheTtlSeconds : directoryEmptyCacheTtlSeconds;
 
 @Injectable()
 export class DirectoryLookupsService {
@@ -27,7 +32,7 @@ export class DirectoryLookupsService {
           orderBy: byName,
         }),
       }),
-      hasItems,
+      ttlOf,
     );
   }
 
@@ -44,7 +49,7 @@ export class DirectoryLookupsService {
           orderBy: byName,
         }),
       }),
-      hasItems,
+      ttlOf,
     );
   }
 
@@ -63,7 +68,7 @@ export class DirectoryLookupsService {
           orderBy: byName,
         }),
       }),
-      hasItems,
+      ttlOf,
     );
   }
 }

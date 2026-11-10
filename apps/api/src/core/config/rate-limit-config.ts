@@ -39,6 +39,8 @@ export interface RateLimitConfig {
 
 export const ipWindowSeconds = 60;
 
+const ipOnlyProfiles: readonly RateLimitProfileName[] = ["directoryLookup"];
+
 const defaults: Record<RateLimitProfileName, RateLimitProfile> = {
   signIn: { limit: 10, windowSeconds: 900, ipLimit: 1000 },
   adminSignIn: { limit: 5, windowSeconds: 900, ipLimit: 120 },
@@ -91,16 +93,21 @@ export const loadRateLimitConfig = (env: NodeJS.ProcessEnv): RateLimitConfig => 
   const profiles = Object.fromEntries(
     rateLimitProfileNames.map((name) => {
       const base = defaults[name];
+      const ipOnly = ipOnlyProfiles.includes(name);
       return [
         name,
         {
-          limit: readPositive(env, rateLimitEnvName(name, "LIMIT"), base.limit, invalid),
-          windowSeconds: readPositive(
-            env,
-            rateLimitEnvName(name, "WINDOW_SECONDS"),
-            base.windowSeconds,
-            invalid,
-          ),
+          limit: ipOnly
+            ? base.limit
+            : readPositive(env, rateLimitEnvName(name, "LIMIT"), base.limit, invalid),
+          windowSeconds: ipOnly
+            ? base.windowSeconds
+            : readPositive(
+                env,
+                rateLimitEnvName(name, "WINDOW_SECONDS"),
+                base.windowSeconds,
+                invalid,
+              ),
           ipLimit: readPositive(env, rateLimitEnvName(name, "IP_LIMIT"), base.ipLimit, invalid),
         },
       ];

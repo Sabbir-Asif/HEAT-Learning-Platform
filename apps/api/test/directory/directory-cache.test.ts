@@ -1,5 +1,10 @@
 import { describe, expect, test, vi } from "vitest";
-import { DirectoryCache, directoryCacheTtlSeconds } from "../../src/directory/directory-cache";
+import { createDirectoryCacheRedis } from "../../src/directory/directory-cache.redis";
+import {
+  DirectoryCache,
+  directoryCacheTtlSeconds,
+  directoryEmptyCacheTtlSeconds,
+} from "../../src/directory/directory-cache";
 
 const fakeRedis = (overrides: Record<string, unknown> = {}) => {
   const entries = new Map<string, string>();
@@ -51,20 +56,21 @@ describe("DirectoryCache.remember", () => {
     expect(load).toHaveBeenCalledTimes(2);
   });
 
-  test("does not store a value the caller declines", async () => {
+  test("stores a value under the ttl the caller picks for it, and serves it from the cache", async () => {
     const { cache, redis } = build();
+    const load = vi.fn().mockResolvedValue([]);
 
-    await cache.remember(
-      "universities",
-      async () => [],
-      (value) => value.length > 0,
+    await cache.remember("universities", load, (value: unknown[]) =>
+      value.length > 0 ? directoryCacheTtlSeconds : directoryEmptyCacheTtlSeconds,
     );
+    await cache.remember("universities", load);
 
-    expect(redis.set).not.toHaveBeenCalledWith(
+    expect(load).toHaveBeenCalledOnce();
+    expect(redis.set).toHaveBeenCalledWith(
       expect.stringContaining(":universities"),
-      expect.anything(),
+      "[]",
       "EX",
-      expect.anything(),
+      directoryEmptyCacheTtlSeconds,
     );
   });
 
@@ -159,5 +165,17 @@ describe("DirectoryCache.invalidate", () => {
 
     await expect(cache.invalidate()).resolves.toBeUndefined();
     expect(set).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("createDirectoryCacheRedis", () => {
+  test("applies the key prefix it is given so separate apps never share entries", async () => {
+    const first = createDirectoryCacheRedis("redis://localhost:6379", "a:");
+    const second = createDirectoryCacheRedis("redis://localhost:6379");
+
+    expect(first.options.keyPrefix).toBe("a:");
+    expect(second.options.keyPrefix).toBe("");
+    first.disconnect();
+    second.disconnect();
   });
 });

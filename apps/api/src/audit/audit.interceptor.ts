@@ -54,7 +54,11 @@ export class AuditInterceptor implements NestInterceptor {
         }
         const result = emissions[0];
         const changes: AuditChange[] =
-          scope.changes.length > 0 ? scope.changes : [{ entityId: request.params?.id ?? null }];
+          scope.changes.length > 0
+            ? scope.changes
+            : scope.skipped === true
+              ? []
+              : [{ entityId: request.params?.id ?? null }];
         for (const change of changes) {
           await this.audit.record(tx, actor, { ...metadata, ...change });
         }

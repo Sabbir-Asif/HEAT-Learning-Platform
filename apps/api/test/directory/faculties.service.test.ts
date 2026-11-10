@@ -119,9 +119,9 @@ const build = (
   );
   const afterCommit: Array<() => Promise<void>> = [];
   const changes: AuditChange[] = [];
-  const inAuditScope = <T>(run: () => Promise<T>): Promise<T> =>
-    auditScopeStorage.run({ tx: database as never, changes, afterCommit }, run);
-  return { service, database, includingDeleted, changes, inAuditScope, cache, afterCommit };
+  const scope = { tx: database as never, changes, afterCommit, skipped: false };
+  const inAuditScope = <T>(run: () => Promise<T>): Promise<T> => auditScopeStorage.run(scope, run);
+  return { service, database, includingDeleted, changes, inAuditScope, cache, afterCommit, scope };
 };
 
 const code = async (promise: Promise<unknown>): Promise<string | undefined> =>
@@ -425,19 +425,15 @@ describe("FacultiesService.assign", () => {
     ]);
   });
 
-  test("assigning a pair that is already linked creates nothing and records an unchanged link", async () => {
-    const { service, changes, inAuditScope } = build({ createdLinks: 0 });
+  test("assigning a pair that is already linked creates nothing, captures nothing and skips the audit row", async () => {
+    const { service, changes, inAuditScope, afterCommit, scope } = build({ createdLinks: 0 });
 
     const result = await inAuditScope(() => service.assign(id, buet));
 
     expect(result.id).toBe(id);
-    expect(changes).toEqual([
-      {
-        entityId: id,
-        before: { universityId: buet, universityName: "BUET" },
-        after: { universityId: buet, universityName: "BUET" },
-      },
-    ]);
+    expect(changes).toEqual([]);
+    expect(afterCommit).toEqual([]);
+    expect(scope.skipped).toBe(true);
   });
 
   test("an unknown faculty or university is NOT_FOUND and nothing is written", async () => {
@@ -685,7 +681,7 @@ describe("FacultiesService archive and restore", () => {
   });
 
   test("archiving a record that is already archived writes no audit entry and queues no invalidation", async () => {
-    const { service, database, changes, inAuditScope, afterCommit } = build({
+    const { service, database, changes, inAuditScope, afterCommit, scope } = build({
       archivedChanged: false,
     });
     database.faculty.findUnique.mockReset().mockResolvedValue(row({ archivedAt: at }));
@@ -695,6 +691,7 @@ describe("FacultiesService archive and restore", () => {
     expect(result.archivedAt).toBe(at.toISOString());
     expect(changes).toEqual([]);
     expect(afterCommit).toEqual([]);
+    expect(scope.skipped).toBe(true);
   });
 
   test("an unknown id is NOT_FOUND", async () => {

@@ -37,7 +37,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ArchiveIcon, ArchiveRestoreIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
-import { deleteBlockedMessage } from "./directory-copy";
+import { deleteBlockedMessage, optionsTruncatedMessage } from "./directory-copy";
 import {
   archiveFailedMessage,
   directoryStatusItems,
@@ -303,6 +303,9 @@ export function DepartmentsView() {
               ))}
             </SelectContent>
           </Select>
+          {(universities.data?.total ?? 0) > optionLimit ? (
+            <FieldDescription>{optionsTruncatedMessage(optionLimit)}</FieldDescription>
+          ) : null}
         </Field>
         <Field>
           <FieldLabel id="department-filter-faculty">Faculty</FieldLabel>
@@ -323,6 +326,9 @@ export function DepartmentsView() {
               ))}
             </SelectContent>
           </Select>
+          {(faculties.data?.total ?? 0) > optionLimit ? (
+            <FieldDescription>{optionsTruncatedMessage(optionLimit)}</FieldDescription>
+          ) : null}
         </Field>
         <Field>
           <FieldLabel id="department-filter-status">Status</FieldLabel>

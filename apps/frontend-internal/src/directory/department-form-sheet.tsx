@@ -37,6 +37,7 @@ import { useForm, useWatch } from "react-hook-form";
 import {
   departmentMoveBlockedMessage,
   departmentNameTakenMessage,
+  optionsTruncatedMessage,
   unsavedChangesMessage,
 } from "./directory-copy";
 
@@ -233,9 +234,7 @@ export function DepartmentFormSheet({ target, onClose, onSaved }: DepartmentForm
           ) : null}
           {(universities.data?.total ?? 0) > optionLimit ||
           (faculties.data?.total ?? 0) > optionLimit ? (
-            <FieldDescription>
-              Only the first {optionLimit} names are listed. Search is not available here yet.
-            </FieldDescription>
+            <FieldDescription>{optionsTruncatedMessage(optionLimit)}</FieldDescription>
           ) : null}
           {faculties.isSuccess && universityId !== "" && facultyItems.length === 0 ? (
             <FieldDescription>

@@ -273,6 +273,37 @@ describe("DepartmentsView filters", () => {
   });
 });
 
+describe("DepartmentsView filter truncation", () => {
+  test("the university filter says when more universities exist than it lists", async () => {
+    route({ universities: () => json({ items: [], total: 51, page: 1, pageSize: 50 }) });
+
+    const view = await mount();
+
+    await vi.waitFor(() =>
+      expect(view.textContent).toContain("Only the first 50 names are listed"),
+    );
+  });
+
+  test("the faculty filter says when more faculties exist than it lists", async () => {
+    route({ faculties: () => json({ items: [], total: 51, page: 1, pageSize: 50 }) });
+
+    const view = await mount(`?university=${dhaka.id}`);
+
+    await vi.waitFor(() =>
+      expect(view.textContent).toContain("Only the first 50 names are listed"),
+    );
+  });
+
+  test("no notice while every name fits", async () => {
+    route();
+
+    const view = await mount(`?university=${dhaka.id}`);
+    await vi.waitFor(() => expect(view.textContent).toContain("Bengali"));
+
+    expect(view.textContent).not.toContain("Only the first");
+  });
+});
+
 describe("DepartmentsView orphan faculty link", () => {
   test("a faculty in the URL without a university is not sent to the API", async () => {
     route();

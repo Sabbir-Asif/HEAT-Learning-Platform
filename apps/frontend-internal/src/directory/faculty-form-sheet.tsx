@@ -36,6 +36,7 @@ import { useForm } from "react-hook-form";
 import {
   facultyNameTakenMessage,
   linkProblemMessage,
+  optionsTruncatedMessage,
   unsavedChangesMessage,
 } from "./directory-copy";
 
@@ -250,6 +251,11 @@ export function FacultyFormSheet({ target, onClose, onSaved }: FacultyFormSheetP
                 ) : null}
                 {universities.isSuccess && options.length === 0 ? (
                   <FieldDescription>No universities yet. Add a university first.</FieldDescription>
+                ) : null}
+                {(universities.data?.total ?? 0) > universityOptionLimit ? (
+                  <FieldDescription>
+                    {optionsTruncatedMessage(universityOptionLimit)}
+                  </FieldDescription>
                 ) : null}
                 {options.map((option) => {
                   const boxId = `${controlProps.id}-${option.id}`;

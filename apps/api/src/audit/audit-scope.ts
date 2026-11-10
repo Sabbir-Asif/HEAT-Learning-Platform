@@ -10,6 +10,7 @@ export interface AuditScope {
   tx: AuditTransaction;
   changes: AuditChange[];
   afterCommit?: AfterCommitTask[];
+  skipped?: boolean;
 }
 
 export const auditScopeStorage = new AsyncLocalStorage<AuditScope>();

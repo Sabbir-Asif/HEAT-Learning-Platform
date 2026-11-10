@@ -79,3 +79,6 @@ export const linkProblemMessage = (
   ]
     .filter((part): part is string => part !== null)
     .join(" ");
+
+export const optionsTruncatedMessage = (limit: number): string =>
+  `Only the first ${limit} names are listed. Search is not available here yet.`;

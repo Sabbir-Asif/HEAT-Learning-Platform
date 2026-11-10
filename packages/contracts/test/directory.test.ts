@@ -34,6 +34,36 @@ describe("createUniversityRequestSchema", () => {
   });
 });
 
+describe("directory names", () => {
+  const schemas = [
+    createUniversityRequestSchema,
+    createFacultyRequestSchema,
+    updateDepartmentRequestSchema.pick({ name: true }),
+  ];
+
+  test.each(schemas)(
+    "normalises to NFC so composed and decomposed forms are one name",
+    (schema) => {
+      const decomposed = "Cafe\u0301 Studies";
+      expect(schema.parse({ name: decomposed }).name).toBe("Caf\u00e9 Studies");
+    },
+  );
+
+  test.each(schemas)("rejects control, zero-width and bidirectional characters", (schema) => {
+    for (const hidden of ["\u0000", "\u0007", "\u200b", "\u200d", "\u202e", "\u2066"]) {
+      expect(schema.safeParse({ name: `Dhaka${hidden}University` }).success).toBe(false);
+    }
+  });
+
+  test.each(schemas)("still treats tabs and newlines as ordinary spacing", (schema) => {
+    expect(schema.parse({ name: "Dhaka\t\nUniversity" }).name).toBe("Dhaka University");
+  });
+
+  test.each(schemas)("a name made only of an invisible character is rejected", (schema) => {
+    expect(schema.safeParse({ name: "\u200b" }).success).toBe(false);
+  });
+});
+
 describe("updateUniversityRequestSchema", () => {
   test("uses the same rules as create", () => {
     expect(updateUniversityRequestSchema.parse({ name: " Dhaka " }).name).toBe("Dhaka");
