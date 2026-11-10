@@ -402,7 +402,7 @@ describe("FacultiesView edit", () => {
     ]);
   });
 
-  test("an unassign the API refuses is reported as an alert and the other changes still apply", async () => {
+  test("an unassign the API refuses keeps the sheet open with that university still ticked and the other changes applied", async () => {
     route({
       mutation: (_url, method) =>
         method === "DELETE"
@@ -418,29 +418,78 @@ describe("FacultiesView edit", () => {
     await toggle("BUET");
     await submitForm();
 
-    await vi.waitFor(() => expect(view.querySelector("[role=alert]")).not.toBeNull());
-    expect(view.querySelector("[role=alert]")?.textContent).toBe(
-      "Faculty of Arts was saved. It still has departments at University of Dhaka, so it was not removed from there.",
+    const message =
+      "Faculty of Arts was saved. It still has departments at University of Dhaka, so it was not removed from there.";
+    await vi.waitFor(() =>
+      expect(document.querySelector("[data-slot=form-message]")?.textContent).toBe(message),
     );
+    expect(view.querySelector("[role=alert]")?.textContent).toBe(message);
     expect(callsTo("PUT")).toHaveLength(1);
-    expect(document.querySelector("[data-slot=form]")).toBeNull();
+    expect(document.querySelector("[data-slot=form]")).not.toBeNull();
+    expect((checkboxFor("University of Dhaka") as HTMLInputElement).checked).toBe(true);
+    expect((checkboxFor("BUET") as HTMLInputElement).checked).toBe(true);
   });
 
-  test("a link that cannot be saved is reported as an alert", async () => {
+  test("a link that cannot be saved keeps the sheet open with it ticked, and a retry only repeats that link", async () => {
+    let failing = true;
     route({
-      mutation: (_url, method) => (method === "PUT" ? errorReply("INTERNAL", 500) : undefined),
+      mutation: (_url, method) =>
+        method === "PUT" ? (failing ? errorReply("INTERNAL", 500) : json(row())) : undefined,
     });
     const view = await mount();
     await openEdit(view, "Faculty of Science");
-
     await toggle("BUET");
     await submitForm();
 
     await vi.waitFor(() =>
-      expect(view.querySelector("[role=alert]")?.textContent).toBe(
+      expect(document.querySelector("[data-slot=form-message]")?.textContent).toBe(
         "Faculty of Science was saved. Its link with BUET could not be saved. Try again.",
       ),
     );
+    expect((checkboxFor("BUET") as HTMLInputElement).checked).toBe(true);
+
+    failing = false;
+    await submitForm();
+
+    await vi.waitFor(() =>
+      expect(view.querySelector("[role=status]")?.textContent).toContain(
+        "Faculty of Science was saved",
+      ),
+    );
+    expect(callsTo("PUT")).toHaveLength(2);
+    expect(callsTo("PATCH")).toHaveLength(0);
+    expect(document.querySelector("[data-slot=form]")).toBeNull();
+  });
+
+  test("when a new faculty is created but a link fails, retrying does not create it again", async () => {
+    let failing = true;
+    route({
+      mutation: (_url, method) =>
+        method === "POST"
+          ? json(row({ name: "Faculty of Law" }), 201)
+          : method === "PUT"
+            ? failing
+              ? errorReply("INTERNAL", 500)
+              : json(row())
+            : undefined,
+    });
+    const view = await mount();
+    await act(async () => buttonNamed("Add faculty", view)?.click());
+    await type(document.querySelector("input[name=name]"), "Faculty of Law");
+    await toggle("BUET");
+    await submitForm();
+    await vi.waitFor(() =>
+      expect(document.querySelector("[data-slot=form-message]")?.textContent).toContain(
+        "could not be saved",
+      ),
+    );
+
+    failing = false;
+    await submitForm();
+
+    await vi.waitFor(() => expect(document.querySelector("[data-slot=form]")).toBeNull());
+    expect(callsTo("POST")).toHaveLength(1);
+    expect(callsTo("PUT")).toHaveLength(2);
   });
 });
 

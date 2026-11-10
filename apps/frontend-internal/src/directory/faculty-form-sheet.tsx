@@ -47,6 +47,12 @@ type FacultyFormSheetProps = {
   onSaved: (message: string, problem: boolean) => void;
 };
 
+type SavedFaculty = {
+  id: string;
+  name: string;
+  universities: ReadonlyArray<{ id: string; name: string }>;
+};
+
 const universityOptionLimit = 50;
 
 export function FacultyFormSheet({ target, onClose, onSaved }: FacultyFormSheetProps) {
@@ -59,7 +65,17 @@ export function FacultyFormSheet({ target, onClose, onSaved }: FacultyFormSheetP
     { query: { enabled: target !== null } },
   );
   const [discarding, setDiscarding] = useState(false);
-  const editing = target !== null && target !== "create" ? target : null;
+  const targetRow = target !== null && target !== "create" ? target : null;
+  const [saved, setSaved] = useState<SavedFaculty | null>(null);
+  const editing: SavedFaculty | null =
+    saved ??
+    (targetRow === null
+      ? null
+      : {
+          id: targetRow.id,
+          name: targetRow.name,
+          universities: targetRow.universities,
+        });
   const form = useForm<FacultyFormValues>({
     resolver: zodResolver(facultyFormSchema),
     defaultValues: { name: "", universityIds: [] },
@@ -78,14 +94,16 @@ export function FacultyFormSheet({ target, onClose, onSaved }: FacultyFormSheetP
   const { reset } = form;
   const { isDirty } = form.formState;
   useEffect(() => {
+    setSaved(null);
     reset({
-      name: editing?.name ?? "",
-      universityIds: editing?.universities.map((university) => university.id) ?? [],
+      name: targetRow?.name ?? "",
+      universityIds: targetRow?.universities.map((university) => university.id) ?? [],
     });
-  }, [reset, editing]);
+  }, [reset, targetRow]);
 
   function close() {
     setDiscarding(false);
+    setSaved(null);
     onClose();
   }
 
@@ -110,10 +128,12 @@ export function FacultyFormSheet({ target, onClose, onSaved }: FacultyFormSheetP
       options.find((option) => option.id === id)?.name ?? "a university";
     const blocked: string[] = [];
     const failed: string[] = [];
+    const linked = new Set(current);
     for (const id of current) {
       if (wanted.has(id)) continue;
       try {
         await unassign.mutateAsync({ id: facultyId, universityId: id });
+        linked.delete(id);
       } catch (error) {
         (isApiError(error) && error.code === "DIRECTORY_IN_USE" ? blocked : failed).push(
           nameOf(id),
@@ -124,17 +144,18 @@ export function FacultyFormSheet({ target, onClose, onSaved }: FacultyFormSheetP
       if (current.has(id)) continue;
       try {
         await assign.mutateAsync({ id: facultyId, universityId: id });
+        linked.add(id);
       } catch {
         failed.push(nameOf(id));
       }
     }
-    return { blocked, failed };
+    return { blocked, failed, linked };
   }
 
   async function onSubmit(values: FacultyFormValues) {
-    let saved: { id: string; name: string };
+    let result: { id: string; name: string };
     try {
-      saved = await saveName(values);
+      result = await saveName(values);
     } catch (error) {
       if (isApiError(error) && error.code === "DIRECTORY_NAME_TAKEN") {
         form.setError("name", { type: "server", message: facultyNameTakenMessage });
@@ -154,13 +175,26 @@ export function FacultyFormSheet({ target, onClose, onSaved }: FacultyFormSheetP
       form.setError("root.server", { type: "server", message: formErrorCopy.INTERNAL });
       return;
     }
-    const problems = await changeLinks(saved.id, values);
-    if (problems.blocked.length > 0 || problems.failed.length > 0) {
-      onSaved(linkProblemMessage(saved.name, problems), true);
-    } else {
-      onSaved(editing === null ? `${saved.name} was added.` : `${saved.name} was saved.`, false);
+    const problems = await changeLinks(result.id, values);
+    if (problems.blocked.length === 0 && problems.failed.length === 0) {
+      onSaved(editing === null ? `${result.name} was added.` : `${result.name} was saved.`, false);
+      close();
+      return;
     }
-    close();
+    const message = linkProblemMessage(result.name, problems);
+    const wanted = new Set(values.universityIds);
+    const stillTicked = [...new Set([...problems.linked, ...wanted])];
+    setSaved({
+      id: result.id,
+      name: result.name,
+      universities: [...problems.linked].map((id) => ({
+        id,
+        name: options.find((option) => option.id === id)?.name ?? "",
+      })),
+    });
+    form.reset({ name: result.name, universityIds: stillTicked });
+    form.setError("root.server", { type: "server", message });
+    onSaved(message, true);
   }
 
   return (

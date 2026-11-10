@@ -95,7 +95,7 @@ test.describe("faculty directory", () => {
     await page.getByRole("button", { name: "Save" }).click();
 
     await expect(
-      page.getByRole("alert").filter({ hasText: "still has departments at" }),
+      page.getByRole("alert").filter({ hasText: "still has departments at" }).first(),
     ).toBeVisible();
   });
 
