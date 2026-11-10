@@ -103,7 +103,47 @@ describe("EnrollWizard step one", () => {
     expect(view.textContent).toContain(
       "Use the format 2020-21, where the second part is the next year.",
     );
+    expect(view.textContent).toContain("Select your university.");
+    expect(view.textContent).toContain("Select your faculty.");
+    expect(view.textContent).toContain("Select your department.");
+    expect(view.textContent).not.toContain("Invalid");
     expect(view.textContent).not.toContain("Create your account");
+    expect(document.activeElement).toBe(view.querySelector("input"));
+  });
+
+  test("focuses the first empty select when the name is valid", async () => {
+    sessionStorage.setItem(stepOneStorageKey, JSON.stringify({ ...stored, universityId: "" }));
+    const view = await mount();
+    await vi.waitFor(() => expect(view.textContent).not.toContain("Loading universities"));
+
+    await submit(view);
+
+    expect(document.activeElement).toBe(triggers(view)[0]);
+  });
+
+  test("keeps the values after a reload without pressing Next", async () => {
+    const view = await mount();
+    const name = view.querySelector<HTMLInputElement>("input") as HTMLInputElement;
+    await act(async () => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set?.call(name, "Anne");
+      name.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    expect(readStepOne().name).toBe("Anne");
+  });
+
+  test("shows one heading that follows the step", async () => {
+    sessionStorage.setItem(stepOneStorageKey, JSON.stringify(stored));
+    const view = await mount();
+    expect(view.querySelectorAll("h1").length).toBe(1);
+    expect(view.textContent).toContain("Step 1 of 2");
+    await vi.waitFor(() => expect(view.textContent).toContain("Department of History"));
+
+    await submit(view);
+
+    expect(view.querySelectorAll("h1").length).toBe(1);
+    expect(view.textContent).not.toContain("Step 1 of 2");
+    expect(view.textContent).toContain("Create your account");
   });
 
   test("rejects a name with non-English characters", async () => {

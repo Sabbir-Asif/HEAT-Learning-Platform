@@ -18,11 +18,15 @@ export const englishNameSchema = z
       .regex(englishNamePattern, { error: englishNameMessage }),
   );
 
+export const universityRequiredMessage = "Select your university.";
+export const facultyRequiredMessage = "Select your faculty.";
+export const departmentRequiredMessage = "Select your department.";
+
 export const enrollmentStepOneSchema = z.object({
   name: englishNameSchema,
-  universityId: z.uuid(),
-  facultyId: z.uuid(),
-  departmentId: z.uuid(),
+  universityId: z.uuid({ error: universityRequiredMessage }),
+  facultyId: z.uuid({ error: facultyRequiredMessage }),
+  departmentId: z.uuid({ error: departmentRequiredMessage }),
   session: academicSessionSchema,
 });
 

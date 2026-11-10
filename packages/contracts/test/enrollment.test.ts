@@ -5,6 +5,9 @@ import {
   englishNameMessage,
   englishNameSchema,
   enrollmentStepOneSchema,
+  departmentRequiredMessage,
+  facultyRequiredMessage,
+  universityRequiredMessage,
 } from "../src/index";
 
 const ids = {
@@ -72,5 +75,14 @@ describe("enrollmentStepOneSchema", () => {
 
   test("rejects a bad session", () => {
     expect(enrollmentStepOneSchema.safeParse({ ...valid, session: "2020-23" }).success).toBe(false);
+  });
+
+  test.each([
+    ["universityId", universityRequiredMessage],
+    ["facultyId", facultyRequiredMessage],
+    ["departmentId", departmentRequiredMessage],
+  ] as const)("asks to select when %s is empty", (key, message) => {
+    const result = enrollmentStepOneSchema.safeParse({ ...valid, [key]: "" });
+    expect(result.error?.issues.map((issue) => issue.message)).toEqual([message]);
   });
 });

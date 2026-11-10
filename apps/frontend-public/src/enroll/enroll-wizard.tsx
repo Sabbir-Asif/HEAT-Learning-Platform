@@ -10,6 +10,7 @@ import {
   Button,
   EmptyState,
   ErrorState,
+  FieldDescription,
   Form,
   FormField,
   Input,
@@ -23,7 +24,7 @@ import {
 import type { FormControlProps } from "@heat/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, ArrowRightIcon, BuildingIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Ref } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { chooseFaculty, chooseUniversity, dropStaleSelections } from "./cascade";
@@ -100,6 +101,7 @@ function LookupState({ failed, empty, emptyTitle, onRetry }: LookupStateProps) {
 
 export function EnrollWizard() {
   const [step, setStep] = useState<1 | 2>(1);
+  const hydrated = useRef(false);
   const form = useForm<StepOneValues>({
     resolver: zodResolver(enrollmentStepOneSchema),
     defaultValues: emptyStepOne,
@@ -123,7 +125,12 @@ export function EnrollWizard() {
 
   useEffect(() => {
     form.reset(readStepOne());
+    hydrated.current = true;
   }, [form]);
+
+  useEffect(() => {
+    if (hydrated.current) writeStepOne(form.getValues());
+  }, [form, values]);
 
   useEffect(() => {
     const current = form.getValues();
@@ -179,106 +186,110 @@ export function EnrollWizard() {
   }
 
   return (
-    <Form form={form} onSubmit={onSubmit}>
-      <FormField
-        name="name"
-        label="Full name in English"
-        description="This is printed on your certificate."
-        render={({ field, controlProps }) => (
-          <Input autoComplete="name" placeholder="Anne Smith" {...field} {...controlProps} />
-        )}
-      />
-      <FormField
-        name="universityId"
-        label="University"
-        render={({ field, controlProps }) => (
-          <>
-            <LookupSelect
-              label="University"
-              placeholder={
-                universities.isPending ? "Loading universities" : "Select your university"
-              }
-              options={universityOptions}
-              disabled={universities.isPending || universityFailed}
-              value={field.value}
-              triggerProps={{ ...controlProps, ref: field.ref, onBlur: field.onBlur }}
-              onChange={(id) => pick(chooseUniversity(form.getValues(), id))}
-            />
-            <LookupState
-              failed={universityFailed}
-              empty={universityEmpty}
-              emptyTitle="No universities are available"
-              onRetry={() => void universities.refetch()}
-            />
-          </>
-        )}
-      />
-      <FormField
-        name="facultyId"
-        label="Faculty"
-        render={({ field, controlProps }) => (
-          <>
-            <LookupSelect
-              label="Faculty"
-              placeholder={
-                universityId && faculties.isPending ? "Loading faculties" : "Select your faculty"
-              }
-              options={facultyOptions}
-              disabled={!universityId || faculties.isPending || facultyFailed}
-              value={field.value}
-              triggerProps={{ ...controlProps, ref: field.ref, onBlur: field.onBlur }}
-              onChange={(id) => pick(chooseFaculty(form.getValues(), id))}
-            />
-            <LookupState
-              failed={facultyFailed}
-              empty={facultyEmpty}
-              emptyTitle="This university has no faculties yet"
-              onRetry={() => void faculties.refetch()}
-            />
-          </>
-        )}
-      />
-      <FormField
-        name="departmentId"
-        label="Department"
-        render={({ field, controlProps }) => (
-          <>
-            <LookupSelect
-              label="Department"
-              placeholder={
-                facultyId && departments.isPending
-                  ? "Loading departments"
-                  : "Select your department"
-              }
-              options={departmentOptions}
-              disabled={!facultyId || departments.isPending || departmentFailed}
-              value={field.value}
-              triggerProps={{ ...controlProps, ref: field.ref, onBlur: field.onBlur }}
-              onChange={(id) =>
-                form.setValue("departmentId", id, { shouldValidate: form.formState.isSubmitted })
-              }
-            />
-            <LookupState
-              failed={departmentFailed}
-              empty={departmentEmpty}
-              emptyTitle="This faculty has no departments yet"
-              onRetry={() => void departments.refetch()}
-            />
-          </>
-        )}
-      />
-      <FormField
-        name="session"
-        label="Session"
-        description="For example 2020-21."
-        render={({ field, controlProps }) => (
-          <Input inputMode="numeric" placeholder="2020-21" {...field} {...controlProps} />
-        )}
-      />
-      <Button type="submit" size="lg" disabled={blocked}>
-        Next
-        <ArrowRightIcon data-icon="inline-end" />
-      </Button>
-    </Form>
+    <>
+      <PageHeader title="Enroll" />
+      <FieldDescription>Step 1 of 2: your academic details.</FieldDescription>
+      <Form form={form} onSubmit={onSubmit}>
+        <FormField
+          name="name"
+          label="Full name in English"
+          description="This is printed on your certificate."
+          render={({ field, controlProps }) => (
+            <Input autoComplete="name" placeholder="Anne Smith" {...field} {...controlProps} />
+          )}
+        />
+        <FormField
+          name="universityId"
+          label="University"
+          render={({ field, controlProps }) => (
+            <>
+              <LookupSelect
+                label="University"
+                placeholder={
+                  universities.isPending ? "Loading universities" : "Select your university"
+                }
+                options={universityOptions}
+                disabled={universities.isPending || universityFailed}
+                value={field.value}
+                triggerProps={{ ...controlProps, ref: field.ref, onBlur: field.onBlur }}
+                onChange={(id) => pick(chooseUniversity(form.getValues(), id))}
+              />
+              <LookupState
+                failed={universityFailed}
+                empty={universityEmpty}
+                emptyTitle="No universities are available"
+                onRetry={() => void universities.refetch()}
+              />
+            </>
+          )}
+        />
+        <FormField
+          name="facultyId"
+          label="Faculty"
+          render={({ field, controlProps }) => (
+            <>
+              <LookupSelect
+                label="Faculty"
+                placeholder={
+                  universityId && faculties.isPending ? "Loading faculties" : "Select your faculty"
+                }
+                options={facultyOptions}
+                disabled={!universityId || faculties.isPending || facultyFailed}
+                value={field.value}
+                triggerProps={{ ...controlProps, ref: field.ref, onBlur: field.onBlur }}
+                onChange={(id) => pick(chooseFaculty(form.getValues(), id))}
+              />
+              <LookupState
+                failed={facultyFailed}
+                empty={facultyEmpty}
+                emptyTitle="This university has no faculties yet"
+                onRetry={() => void faculties.refetch()}
+              />
+            </>
+          )}
+        />
+        <FormField
+          name="departmentId"
+          label="Department"
+          render={({ field, controlProps }) => (
+            <>
+              <LookupSelect
+                label="Department"
+                placeholder={
+                  facultyId && departments.isPending
+                    ? "Loading departments"
+                    : "Select your department"
+                }
+                options={departmentOptions}
+                disabled={!facultyId || departments.isPending || departmentFailed}
+                value={field.value}
+                triggerProps={{ ...controlProps, ref: field.ref, onBlur: field.onBlur }}
+                onChange={(id) =>
+                  form.setValue("departmentId", id, { shouldValidate: form.formState.isSubmitted })
+                }
+              />
+              <LookupState
+                failed={departmentFailed}
+                empty={departmentEmpty}
+                emptyTitle="This faculty has no departments yet"
+                onRetry={() => void departments.refetch()}
+              />
+            </>
+          )}
+        />
+        <FormField
+          name="session"
+          label="Session"
+          description="For example 2020-21."
+          render={({ field, controlProps }) => (
+            <Input inputMode="numeric" placeholder="2020-21" {...field} {...controlProps} />
+          )}
+        />
+        <Button type="submit" size="lg" disabled={blocked}>
+          Next
+          <ArrowRightIcon data-icon="inline-end" />
+        </Button>
+      </Form>
+    </>
   );
 }
