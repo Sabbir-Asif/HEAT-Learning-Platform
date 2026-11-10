@@ -13,6 +13,7 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "start": "node dist/main.js",
+    "recover-super-admin": "node dist/cli/main.js recover-super-admin",
     "lint": "eslint .",
     "format:check": "prettier --check . --ignore-path ../../.gitignore --ignore-path .prettierignore",
     "typecheck": "tsc --noEmit",
