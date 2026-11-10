@@ -160,30 +160,30 @@ export class DepartmentsService {
   }
 
   async update(id: string, request: UpdateDepartmentRequest): Promise<DepartmentSummary> {
-    const before = await this.existing(id, this.database);
+    const client = this.audit.client(this.database);
+    await this.lockDepartment(id, client);
+    const before = await this.existing(id, client);
     const moved =
       before.universityFaculty.university.id !== request.universityId ||
       before.universityFaculty.faculty.id !== request.facultyId;
-    const client = this.audit.client(this.database);
     if (moved) {
       await lockParents(client, request.universityId, request.facultyId);
       await this.assertPairLinked(request, client);
     }
     await this.assertNameFree(request.name, request, id);
     try {
-      const data = {
-        name: request.name,
-        universityId: request.universityId,
-        facultyId: request.facultyId,
-      };
       if (moved) {
         const { count } = await client.department.updateMany({
           where: { id, profiles: { none: {} } },
-          data,
+          data: {
+            name: request.name,
+            universityId: request.universityId,
+            facultyId: request.facultyId,
+          },
         });
         if (count === 0) await this.refuseMove(id, before.name);
       } else {
-        await client.department.update({ where: { id }, data });
+        await client.department.update({ where: { id }, data: { name: request.name } });
       }
       const updated = await this.existing(id, client);
       this.invalidateAfterCommit();
@@ -241,6 +241,12 @@ export class DepartmentsService {
       });
     }
     return toSummary(row, await studentCountOf(this.database, id));
+  }
+
+  private async lockDepartment(id: string, client: Pick<HeatClient, "$queryRaw">): Promise<void> {
+    const locked = await client.$queryRaw<Array<{ id: string }>>`
+      SELECT id FROM "Department" WHERE id = ${id}::uuid FOR UPDATE`;
+    if (locked.length === 0) throw new ApiException(404, "NOT_FOUND");
   }
 
   private async refuseMove(id: string, name: string): Promise<never> {

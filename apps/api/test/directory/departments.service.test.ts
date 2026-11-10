@@ -90,7 +90,7 @@ const build = (
             },
       ),
     },
-    $queryRaw: vi.fn().mockResolvedValue([]),
+    $queryRaw: vi.fn().mockResolvedValue([{ id }]),
     $includingDeleted: () => includingDeleted,
   };
   const cache = { invalidate: vi.fn().mockResolvedValue(undefined) };
@@ -340,7 +340,7 @@ describe("DepartmentsService.update", () => {
 
     expect(database.department.update).toHaveBeenCalledWith({
       where: { id },
-      data: { name: "History", universityId: dhaka, facultyId: arts },
+      data: { name: "History" },
     });
     expect(database.department.updateMany).not.toHaveBeenCalled();
     expect(includingDeleted.studentProfile.count).toHaveBeenCalledTimes(1);
@@ -754,20 +754,69 @@ describe("DepartmentsService parent locks", () => {
     expect(lastLock).toBeLessThan(database.department.create.mock.invocationCallOrder[0] ?? 0);
   });
 
-  test("a move locks the target parents before the link check and the write, a rename locks nothing", async () => {
-    const moved = build();
-    await moved.inAuditScope(() => moved.service.update(id, { ...input, facultyId: science }));
-    const lastLock = Math.max(...moved.database.$queryRaw.mock.invocationCallOrder);
-    expect(lastLock).toBeLessThan(
-      moved.database.universityFaculty.findUnique.mock.invocationCallOrder[0] ?? 0,
-    );
-    expect(lastLock).toBeLessThan(
-      moved.database.department.updateMany.mock.invocationCallOrder[0] ?? 0,
-    );
+  test("update locks the department row before it reads it, then the target parents before the link check and the guarded move", async () => {
+    const { service, database, inAuditScope } = build();
 
-    const renamed = build();
-    await renamed.inAuditScope(() => renamed.service.update(id, { ...input, name: "History" }));
-    expect(renamed.database.$queryRaw).not.toHaveBeenCalled();
+    await inAuditScope(() => service.update(id, { ...input, facultyId: science }));
+
+    expect(database.$queryRaw).toHaveBeenCalledTimes(3);
+    const [departmentLock, firstParentLock, secondParentLock] =
+      database.$queryRaw.mock.invocationCallOrder;
+    expect(departmentLock).toBeLessThan(
+      database.department.findUnique.mock.invocationCallOrder[0] ?? 0,
+    );
+    expect(secondParentLock).toBeLessThan(
+      database.universityFaculty.findUnique.mock.invocationCallOrder[0] ?? 0,
+    );
+    expect(firstParentLock).toBeLessThan(secondParentLock ?? 0);
+    expect(secondParentLock).toBeLessThan(
+      database.department.updateMany.mock.invocationCallOrder[0] ?? 0,
+    );
+  });
+
+  test("a rename locks only the department row and writes only the name", async () => {
+    const { service, database, inAuditScope } = build();
+
+    await inAuditScope(() => service.update(id, { ...input, name: "History" }));
+
+    expect(database.$queryRaw).toHaveBeenCalledTimes(1);
+    expect(database.$queryRaw.mock.invocationCallOrder[0]).toBeLessThan(
+      database.department.findUnique.mock.invocationCallOrder[0] ?? 0,
+    );
+    expect(database.department.update).toHaveBeenCalledWith({
+      where: { id },
+      data: { name: "History" },
+    });
+  });
+
+  test("a request carrying a stale pair is judged against the locked row, so it is a guarded move and not a blind write", async () => {
+    const { service, database, inAuditScope } = build({
+      existing: row({
+        universityFaculty: {
+          university: { id: buet, name: "BUET", archivedAt: null },
+          faculty: { id: science, name: "Faculty of Science", archivedAt: null },
+        },
+      }),
+      students: 2,
+      movedCount: 0,
+    });
+
+    const failure = await failureOf(inAuditScope(() => service.update(id, input)));
+
+    expect(failure).toMatchObject({ code: "DIRECTORY_IN_USE" });
+    expect(database.department.update).not.toHaveBeenCalled();
+    expect(database.department.updateMany).toHaveBeenCalledWith({
+      where: { id, profiles: { none: {} } },
+      data: { name: "Bengali", universityId: dhaka, facultyId: arts },
+    });
+  });
+
+  test("a department row that is gone when the lock is taken is NOT_FOUND before anything else runs", async () => {
+    const { service, database, inAuditScope } = build();
+    database.$queryRaw.mockResolvedValue([]);
+
+    expect(await code(inAuditScope(() => service.update(id, input)))).toBe("NOT_FOUND");
+    expect(database.department.findUnique).not.toHaveBeenCalled();
   });
 });
 
