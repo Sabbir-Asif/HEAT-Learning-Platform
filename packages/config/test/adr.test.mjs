@@ -96,7 +96,7 @@ test("D3 states its values in the Decision section", () => {
     "`SameSite=Strict`",
     "20-second grace window",
     "argon2id",
-    "Admin TOTP is required",
+    "Admin sign-in is by email and password only",
   ].filter((phrase) => !decision.includes(phrase));
   expect(missing).toEqual([]);
 });

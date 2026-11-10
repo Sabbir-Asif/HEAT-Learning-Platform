@@ -19,21 +19,21 @@ Students and admins sign in on separate hosts (for example `learn.` and `admin.`
 - The access and refresh cookies are `HttpOnly` (frontend design spec section 10), so scripts cannot read the session or refresh tokens. The CSRF token is the one value the browser reads, because the client must send it back.
 - Passwords use argon2id.
 - Student and admin tokens carry different audiences, and the admin app has its own cookie name. Admin API routes reject student tokens even when the session is valid.
-- Admin TOTP is required: every admin, including the super admin, must enter an authenticator-app code (TOTP) at sign-in, and gets recovery codes.
-- Deactivating an admin revokes their sessions immediately. A break-glass command on the server restores super-admin access if the authenticator is lost.
+- Admin sign-in is by email and password only, with no second factor. The seeded super admin and every invited admin must change the password at first sign-in.
+- Deactivating an admin revokes their sessions immediately. A break-glass command on the server restores super-admin access if the password is lost.
 
 ## Consequences
 
 - Both apps share one cookie scheme behind one API.
 - A removed student keeps video access for at most one cookie lifetime (10 minutes), enforced by the playback cookie in [0005](0005-signed-hls-delivered-by-nginx.md), see [0011](0011-enrollment-approval-lifecycle.md).
 - The frontends refresh sessions in `proxy.ts` and in the generated client, see [0015](0015-one-data-path-per-kind-of-page.md).
-- Admin sign-in has more steps, and losing the authenticator needs server access to recover.
+- Admin sign-in rests on the password alone, so admin passwords are protected by the breached-password check, lockout and rate limits, and losing the super-admin password needs server access to recover.
 
 ## Alternatives considered
 
 - Unprefixed cookies with a double-submit CSRF token that is not bound to the session. Named in the plan's review: a sibling subdomain could plant the CSRF cookie. Replaced by `__Host-` cookies and session-bound HMAC tokens. Double-submit stays, as in plan section 08.
 - `SameSite=Strict` for the access cookie. Named in the plan's review: it broke links from emails. Replaced by a Lax access cookie and a Strict refresh cookie.
-- Optional admin two-factor. Derived, not named in the plan: the plan requires an authenticator-app code for every admin.
+- Required admin two-factor (authenticator-app code with recovery codes). Named in the plan and dropped by the owner: ticket #49 was closed as not planned, and admin sign-in stays password only.
 
 ## Open points for the owner
 
