@@ -151,7 +151,7 @@ describe("session service on real Postgres and Redis", () => {
   });
 
   test("an admin family past the absolute cap is revoked on refresh even when it is still active", async () => {
-    const admin = await testApp().factories.user({ role: "ADMIN", realm: "ADMIN" });
+    const admin = await testApp().factories.user({ role: "ADMIN" });
     const first = await sessions().create(admin.id, "admin");
     const second = await sessions().refresh(first.refreshToken, "admin");
     await testApp().database.prisma.session.update({
