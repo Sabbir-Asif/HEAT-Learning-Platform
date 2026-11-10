@@ -10,7 +10,7 @@ import type { HeatClient } from "@heat/db";
 import { AuditService } from "../audit";
 import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
-import { blockingMessage, usageOf } from "./university-usage";
+import { blockingMessage, departmentUsageOf, usageOf } from "./university-usage";
 import type { UniversityUsage } from "./university-usage";
 
 interface UniversityRow {
@@ -64,11 +64,20 @@ export class UniversitiesService {
         orderBy: [orderBy(query.sort), { id: "asc" }],
         skip: (query.page - 1) * query.pageSize,
         take: query.pageSize,
+        include: { _count: { select: { faculties: true } } },
       }),
       this.database.university.count({ where }),
     ]);
-    const items = await Promise.all(
-      rows.map(async (row) => toSummary(row, await usageOf(this.database, row.id))),
+    const usage = await departmentUsageOf(
+      this.database,
+      rows.map((row) => row.id),
+    );
+    const items = rows.map((row) =>
+      toSummary(row, {
+        students: usage.get(row.id)?.students ?? 0,
+        departments: usage.get(row.id)?.departments ?? 0,
+        faculties: row._count.faculties,
+      }),
     );
     return { items, total, page: query.page, pageSize: query.pageSize };
   }

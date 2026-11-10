@@ -41,3 +41,23 @@ export const blockingMessage = (usage: UniversityUsage): string | null => {
     throw error;
   }
 };
+
+export const departmentUsageOf = async (
+  database: HeatClient,
+  ids: readonly string[],
+): Promise<Map<string, { departments: number; students: number }>> => {
+  const usage = new Map<string, { departments: number; students: number }>();
+  if (ids.length === 0) return usage;
+  const departments = await database.$includingDeleted().department.findMany({
+    where: { universityId: { in: [...ids] } },
+    select: { universityId: true, _count: { select: { profiles: true } } },
+  });
+  for (const department of departments) {
+    const current = usage.get(department.universityId) ?? { departments: 0, students: 0 };
+    usage.set(department.universityId, {
+      departments: current.departments + 1,
+      students: current.students + department._count.profiles,
+    });
+  }
+  return usage;
+};

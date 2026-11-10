@@ -39,10 +39,20 @@ const build = (
   const counts = options.counts ?? {};
   const includingDeleted = {
     studentProfile: { count: vi.fn().mockResolvedValue(counts.students ?? 0) },
+    department: {
+      findMany: vi.fn().mockResolvedValue(
+        Array.from({ length: counts.departments ?? 0 }, (_, index) => ({
+          universityId: id,
+          _count: { profiles: index === 0 ? (counts.students ?? 0) : 0 },
+        })),
+      ),
+    },
   };
   const database = {
     university: {
-      findMany: vi.fn().mockResolvedValue([row()]),
+      findMany: vi
+        .fn()
+        .mockResolvedValue([{ ...row(), _count: { faculties: counts.faculties ?? 0 } }]),
       count: vi.fn().mockResolvedValue(1),
       findUnique: vi
         .fn()
@@ -86,6 +96,7 @@ describe("UniversitiesService.list", () => {
       orderBy: [{ name: "desc" }, { id: "asc" }],
       skip: 10,
       take: 10,
+      include: { _count: { select: { faculties: true } } },
     });
     expect(database.university.count).toHaveBeenCalledWith({
       where: { name: { contains: "dha", mode: "insensitive" } },
@@ -119,14 +130,31 @@ describe("UniversitiesService.list", () => {
     );
   });
 
-  test("counts students through the client that includes soft-deleted profiles", async () => {
-    const { service, includingDeleted } = build({ counts: { students: 1 } });
+  test("reads the usage of the whole page with one query per relation, soft-deleted profiles included", async () => {
+    const { service, database, includingDeleted } = build({
+      counts: { students: 1, departments: 1 },
+    });
 
     await service.list({ page: 1, pageSize: 25 });
 
-    expect(includingDeleted.studentProfile.count).toHaveBeenCalledWith({
-      where: { department: { universityId: id } },
+    expect(includingDeleted.department.findMany).toHaveBeenCalledTimes(1);
+    expect(includingDeleted.department.findMany).toHaveBeenCalledWith({
+      where: { universityId: { in: [id] } },
+      select: { universityId: true, _count: { select: { profiles: true } } },
     });
+    expect(includingDeleted.studentProfile.count).not.toHaveBeenCalled();
+    expect(database.department.count).not.toHaveBeenCalled();
+    expect(database.universityFaculty.count).not.toHaveBeenCalled();
+  });
+
+  test("an empty page makes no usage query", async () => {
+    const { service, database, includingDeleted } = build();
+    database.university.findMany.mockResolvedValue([]);
+
+    const result = await service.list({ page: 1, pageSize: 25 });
+
+    expect(result.items).toEqual([]);
+    expect(includingDeleted.department.findMany).not.toHaveBeenCalled();
   });
 });
 
