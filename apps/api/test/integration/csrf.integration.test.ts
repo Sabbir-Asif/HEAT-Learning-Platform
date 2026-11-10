@@ -221,7 +221,10 @@ describe("CSRF protection", () => {
     expect(refreshed.status).toBe(204);
     expect(valueOf(refreshed.setCookies, studentCsrf.cookie)).toBe(token);
     const cookie = pairs(refreshed.setCookies).join("; ");
-    expect((await call("POST", "/auth/sign-out", { cookie, csrf: token })).status).toBe(204);
+    const refreshedToken = valueOf(refreshed.setCookies, studentCsrf.cookie);
+    expect((await call("POST", "/auth/sign-out", { cookie, csrf: refreshedToken })).status).toBe(
+      204,
+    );
   });
 
   test("sign-out clears the CSRF cookie", async () => {
