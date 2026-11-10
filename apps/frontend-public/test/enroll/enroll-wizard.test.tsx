@@ -207,4 +207,78 @@ describe("EnrollWizard step one", () => {
       expect(init?.body).toBeUndefined();
     }
   });
+
+  test("goes back from step two to the saved values", async () => {
+    sessionStorage.setItem(stepOneStorageKey, JSON.stringify(stored));
+    const view = await mount();
+    await vi.waitFor(() => expect(view.textContent).toContain("Department of History"));
+    await submit(view);
+
+    const back = Array.from(view.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("Back"),
+    );
+    await act(async () => back?.click());
+
+    expect(view.textContent).toContain("Full name in English");
+  });
+
+  test.each([
+    [
+      "faculties",
+      `/api/directory/universities/${universityId}/faculties`,
+      { facultyId: "", departmentId: "" },
+    ],
+    [
+      "departments",
+      `/api/directory/universities/${universityId}/faculties/${facultyId}/departments`,
+      { departmentId: "" },
+    ],
+  ])("retries the %s lookup after a failure", async (_name, url, cleared) => {
+    sessionStorage.setItem(stepOneStorageKey, JSON.stringify({ ...stored, ...cleared }));
+    respondWith({ [url]: "fail" });
+    const view = await mount();
+
+    await vi.waitFor(() => expect(view.querySelector("[data-slot=error-state]")).not.toBeNull());
+    respondWith();
+    const retry = Array.from(view.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("Retry"),
+    );
+    await act(async () => retry?.click());
+
+    await vi.waitFor(() => expect(view.querySelector("[data-slot=error-state]")).toBeNull());
+  });
+
+  test("shows an empty state when the faculty has no departments", async () => {
+    sessionStorage.setItem(stepOneStorageKey, JSON.stringify({ ...stored, departmentId: "" }));
+    respondWith({
+      [`/api/directory/universities/${universityId}/faculties/${facultyId}/departments`]: [],
+    });
+    const view = await mount();
+
+    await vi.waitFor(() => expect(view.querySelector("[data-slot=empty-state]")).not.toBeNull());
+  });
+
+  test("choosing another university clears the faculty and department", async () => {
+    sessionStorage.setItem(stepOneStorageKey, JSON.stringify(stored));
+    const otherId = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+    respondWith({
+      "/api/directory/universities": [
+        { id: universityId, name: "University of Dhaka" },
+        { id: otherId, name: "Jahangirnagar University" },
+      ],
+      [`/api/directory/universities/${otherId}/faculties`]: [],
+    });
+    const view = await mount();
+    await vi.waitFor(() => expect(view.textContent).toContain("Department of History"));
+
+    await act(async () => triggers(view)[0]?.click());
+    await vi.waitFor(() => expect(document.body.textContent).toContain("Jahangirnagar University"));
+    const option = Array.from(document.querySelectorAll<HTMLElement>("[role=option]")).find(
+      (item) => item.textContent?.includes("Jahangirnagar"),
+    );
+    await act(async () => option?.click());
+
+    await vi.waitFor(() => expect(triggers(view)[1]?.textContent).toContain("Select your faculty"));
+    expect(triggers(view)[2]?.textContent).toContain("Select your department");
+  });
 });
