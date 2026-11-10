@@ -15,6 +15,10 @@ export class VerificationSessionService {
     private readonly sessions: SessionService,
   ) {}
 
+  verificationTimestamp(): Date {
+    return this.clock.now();
+  }
+
   async revokeSessionsBeforeVerification(
     userId: string,
     emailVerifiedAt: Date,
@@ -32,7 +36,7 @@ export class VerificationSessionService {
     });
   }
 
-  issueFreshSession(userId: string, metadata: SessionMetadata = {}): Promise<SessionTokens> {
+  issueSessionAfterCommit(userId: string, metadata: SessionMetadata = {}): Promise<SessionTokens> {
     return this.sessions.create(userId, "student", metadata);
   }
 }

@@ -169,11 +169,11 @@ describe("account protections on real Postgres", () => {
     const other = await sessions().create(user.id, "student");
     const rotated = await sessions().refresh(other.refreshToken, "student");
     await new Promise((resolve) => setTimeout(resolve, 20));
-    const verifiedAt = new Date();
+    const verifiedAt = verification().verificationTimestamp();
     await prisma().user.update({ where: { id: user.id }, data: { emailVerifiedAt: verifiedAt } });
 
     await verification().revokeSessionsBeforeVerification(user.id, verifiedAt);
-    const fresh = await verification().issueFreshSession(user.id);
+    const fresh = await verification().issueSessionAfterCommit(user.id);
 
     await expect(sessions().authenticate(early.accessToken, "student")).rejects.toBeDefined();
     await expect(sessions().refresh(early.refreshToken, "student")).rejects.toBeDefined();
