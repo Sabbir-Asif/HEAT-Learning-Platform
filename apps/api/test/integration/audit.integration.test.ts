@@ -40,6 +40,7 @@ describe("audit interceptor and audit log viewer", () => {
       status: response.status,
       body: text === "" ? undefined : (JSON.parse(text) as unknown),
       setCookies: response.headers.getSetCookie(),
+      headers: response.headers,
     };
   };
 
@@ -78,8 +79,10 @@ describe("audit interceptor and audit log viewer", () => {
     expect(row).toMatchObject({
       actorId: admin.user.id,
       entityId: target.id,
-      requestId: "req-123",
     });
+    expect(row?.requestId).toMatch(/^[0-9a-f-]{36}$/);
+    expect(row?.requestId).not.toBe("req-123");
+    expect(reply.headers.get("x-request-id")).toBe(row?.requestId);
     expect(row?.ipAddress).toBeTruthy();
     expect(row?.before).toMatchObject({ mustChangePassword: false, passwordHash: "[REDACTED]" });
     expect(row?.after).toMatchObject({ mustChangePassword: true, passwordHash: "[REDACTED]" });
@@ -149,7 +152,7 @@ describe("audit interceptor and audit log viewer", () => {
       "admin.sign-out",
     ]);
     expect(rows.every((row) => row.actorId === admin.user.id)).toBe(true);
-    expect(rows[1]?.requestId).toBe("req-pw");
+    expect(rows[1]?.requestId).toMatch(/^[0-9a-f-]{36}$/);
     const serialised = JSON.stringify(rows);
     expect(serialised).not.toContain("argon2");
     expect(serialised).not.toContain("passphrase");
