@@ -5,8 +5,26 @@ import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { AppModule } from "../../src/app.module";
 import { Audience, Roles } from "../../src/access";
 import { Public } from "../../src/auth";
+import { RATE_LIMIT_PROFILE_KEY } from "../../src/rate-limit/rate-limit.guard";
 import { applyEnvironment, authTestEnvironment } from "../support/auth-env";
-import { enumerateRouteAccess, unguardedRoutes } from "../support/enumerate-routes";
+import {
+  enumerateRouteAccess,
+  enumerateRouteRateLimits,
+  unguardedRoutes,
+} from "../support/enumerate-routes";
+
+const enumerateLimits = async () => {
+  const moduleRef = await Test.createTestingModule({
+    imports: [DiscoveryModule, AppModule],
+  }).compile();
+  const limits = enumerateRouteRateLimits(
+    moduleRef.get(DiscoveryService),
+    new MetadataScanner(),
+    RATE_LIMIT_PROFILE_KEY,
+  );
+  await moduleRef.close();
+  return limits;
+};
 
 const enumerate = async (imports: unknown[], controllers: Array<new () => object> = []) => {
   const moduleRef = await Test.createTestingModule({
@@ -47,6 +65,19 @@ describe("deny-by-default route enumeration", () => {
     expect(names).toContain("GET /api/health (HealthController.check)");
     expect(names).toContain("POST /api/auth/sign-in (StudentAuthController.signIn)");
     expect(names).toContain("GET /api/me (MeController.describe)");
+  });
+
+  test("sensitive routes carry the expected rate limit profile", async () => {
+    const limits = await enumerateLimits();
+
+    expect(limits).toMatchObject({
+      "POST /api/auth/sign-in": "signIn",
+      "POST /api/auth/refresh": "sessionRefresh",
+      "POST /api/admin/auth/sign-in": "adminSignIn",
+      "POST /api/admin/auth/refresh": "sessionRefresh",
+      "POST /api/admin/account/change-password": "passwordChange",
+      "POST /api/captcha": "captcha",
+    });
   });
 
   test("a controller method with no access decorator fails the check and is named", async () => {
