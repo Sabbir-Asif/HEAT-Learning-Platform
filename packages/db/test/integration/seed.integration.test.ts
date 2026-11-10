@@ -135,6 +135,38 @@ describe("seed", () => {
     expect(after.mustChangePassword).toBe(false);
   });
 
+  test("running twice in production leaves the password hash, flag and sessions untouched", async () => {
+    const { prisma } = database();
+    await seed(prisma, options({ production: true }));
+    const created = await prisma.user.findFirstOrThrow();
+    await prisma.user.update({ where: { id: created.id }, data: { mustChangePassword: false } });
+    const session = await prisma.session.create({
+      data: {
+        userId: created.id,
+        refreshTokenHash: "a".repeat(64),
+        familyId: created.id,
+        expiresAt: new Date(Date.now() + 3_600_000),
+      },
+    });
+    const before = await prisma.user.findFirstOrThrow();
+
+    const second = await seed(prisma, options({ production: true }));
+
+    expect(second.superAdminCreated).toBe(false);
+    expect(await prisma.user.findFirstOrThrow()).toEqual(before);
+    expect(await prisma.session.findFirstOrThrow()).toEqual(session);
+  });
+
+  test("a different configured email does not create a second super admin", async () => {
+    const { prisma } = database();
+    await seed(prisma, options());
+
+    const second = await seed(prisma, options({ superAdminEmail: "other@example.test" }));
+
+    expect(second.superAdminCreated).toBe(false);
+    expect(await prisma.user.count({ where: { role: "SUPER_ADMIN" } })).toBe(1);
+  });
+
   test("refuses an email that belongs to a non-admin user", async () => {
     const { prisma } = database();
     await prisma.user.create({

@@ -81,6 +81,9 @@ const seedSuperAdmin = async (
   const existing = await prisma.user.findFirst({
     where: { email: { equals: email, mode: "insensitive" } },
   });
+  if (existing === null && (await prisma.user.count({ where: { role: "SUPER_ADMIN" } })) > 0) {
+    return false;
+  }
   if (existing) {
     if (existing.role !== "SUPER_ADMIN") {
       throw new SeedConfigError(
