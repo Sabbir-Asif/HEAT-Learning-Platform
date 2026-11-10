@@ -20,6 +20,7 @@ import type {
 
 import type {
   AdminMeResponseDto,
+  AdminSignInRequestDto,
   ChangePasswordRequestDto,
   HealthResponseDto,
   MeResponseDto,
@@ -58,8 +59,8 @@ export const getAdminAuthRefreshMockHandler = (overrideResponse?: void | ((info:
   }, options)
 }
 
-export const getAdminAuthSignInMockHandler = (overrideResponse?: AdminMeResponseDto | ((info: Parameters<HttpResponseResolver<PathParams, SignInRequestDto>>[0]) => Promise<AdminMeResponseDto> | AdminMeResponseDto), options?: RequestHandlerOptions) => {
-  return http.post<PathParams, SignInRequestDto>('*/api/admin/auth/sign-in', async (info: Parameters<HttpResponseResolver<PathParams, SignInRequestDto>>[0]) => {
+export const getAdminAuthSignInMockHandler = (overrideResponse?: AdminMeResponseDto | ((info: Parameters<HttpResponseResolver<PathParams, AdminSignInRequestDto>>[0]) => Promise<AdminMeResponseDto> | AdminMeResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, AdminSignInRequestDto>('*/api/admin/auth/sign-in', async (info: Parameters<HttpResponseResolver<PathParams, AdminSignInRequestDto>>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined

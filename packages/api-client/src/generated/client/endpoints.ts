@@ -25,6 +25,7 @@ import type {
 
 import type {
   AdminMeResponseDto,
+  AdminSignInRequestDto,
   ChangePasswordRequestDto,
   HealthResponseDto,
   MeResponseDto,
@@ -212,7 +213,7 @@ export const getAdminAuthSignInUrl = () => {
   return `/api/admin/auth/sign-in`
 }
 
-export const adminAuthSignIn = async (signInRequestDto: SignInRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<AdminMeResponseDto> => {
+export const adminAuthSignIn = async (adminSignInRequestDto: AdminSignInRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<AdminMeResponseDto> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -233,7 +234,7 @@ return customFetch<AdminMeResponseDto>(getAdminAuthSignInUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(signInRequestDto)
+    body: JSON.stringify(adminSignInRequestDto)
   }
 );}
 
@@ -271,9 +272,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type AdminAuthSignInMutationResult = NonNullable<Awaited<ReturnType<typeof adminAuthSignIn>>>
-    export type AdminAuthSignInMutationBody = SignInRequestDto
+    export type AdminAuthSignInMutationBody = AdminSignInRequestDto
     export type AdminAuthSignInMutationError = ErrorType<unknown>
-    export type AdminAuthSignInMutationVariables = {data: SignInRequestDto}
+    export type AdminAuthSignInMutationVariables = {data: AdminSignInRequestDto}
 
     export const useAdminAuthSignIn = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminAuthSignIn>>, TError,AdminAuthSignInMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}

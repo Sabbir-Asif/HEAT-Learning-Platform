@@ -2,6 +2,8 @@ import { z } from "zod";
 
 export const errorCodes = [
   "BAD_REQUEST",
+  "CAPTCHA_EXPIRED",
+  "CAPTCHA_INVALID",
   "ENROLLMENT_NOT_ACTIVE",
   "FORBIDDEN",
   "INTERNAL",

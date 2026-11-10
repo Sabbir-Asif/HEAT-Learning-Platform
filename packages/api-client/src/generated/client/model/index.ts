@@ -8,6 +8,7 @@
 export * from './adminMeResponseDto';
 export * from './adminMeResponseDtoUser';
 export * from './adminMeResponseDtoUserRole';
+export * from './adminSignInRequestDto';
 export * from './changePasswordRequestDto';
 export * from './healthResponseDto';
 export * from './healthResponseDtoStatus';

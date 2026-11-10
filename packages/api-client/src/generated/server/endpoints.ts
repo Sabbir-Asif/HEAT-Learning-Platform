@@ -26,6 +26,15 @@ export interface AdminMeResponseDto {
   user: AdminMeResponseDtoUser;
 }
 
+export interface AdminSignInRequestDto {
+  email: string;
+  /**
+     * @minLength 1
+     * @maxLength 256
+     */
+  password: string;
+}
+
 export interface ChangePasswordRequestDto {
   /**
      * @minLength 1
@@ -169,7 +178,7 @@ export const getAdminAuthSignInUrl = () => {
   return `/api/admin/auth/sign-in`
 }
 
-export const adminAuthSignIn = async (signInRequestDto: SignInRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminMeResponseDto> => {
+export const adminAuthSignIn = async (adminSignInRequestDto: AdminSignInRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminMeResponseDto> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -190,7 +199,7 @@ return serverFetch<AdminMeResponseDto>(getAdminAuthSignInUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(signInRequestDto)
+    body: JSON.stringify(adminSignInRequestDto)
   }
 );}
 
