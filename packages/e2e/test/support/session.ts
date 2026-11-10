@@ -3,6 +3,9 @@ import type { BrowserContext, Page, Route } from "@playwright/test";
 export const accessCookieName = "__Host-heat_access";
 export const adminAccessCookieName = "__Host-heat_admin_access";
 
+export const csrfCookieName = "__Host-heat_csrf";
+export const adminCsrfCookieName = "__Host-heat_admin_csrf";
+
 export const accessToken = (expiresInSeconds: number): string => {
   const exp = Math.floor(Date.now() / 1000) + expiresInSeconds;
   const payload = Buffer.from(JSON.stringify({ exp })).toString("base64url");
@@ -15,15 +18,20 @@ export const grantAccess = (
   expiresInSeconds = 600,
   cookieName: string = accessCookieName,
 ) =>
-  context.addCookies([
-    {
-      name: cookieName,
-      value: accessToken(expiresInSeconds),
+  context.addCookies(
+    [
+      { name: cookieName, value: accessToken(expiresInSeconds) },
+      {
+        name: cookieName === adminAccessCookieName ? adminCsrfCookieName : csrfCookieName,
+        value: "e2e-csrf-token",
+      },
+    ].map((cookie) => ({
+      ...cookie,
       domain: new URL(baseURL ?? "http://localhost:3000").hostname,
       path: "/",
       secure: true,
-    },
-  ]);
+    })),
+  );
 
 export const dropAccess = (context: BrowserContext) => context.clearCookies();
 
