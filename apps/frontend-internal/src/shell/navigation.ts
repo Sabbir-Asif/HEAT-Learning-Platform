@@ -57,7 +57,7 @@ export function adminNavigation(isSuperAdmin = true): NavGroup[] {
       label: "Administration",
       items: [
         { href: "/admins", label: "Admins", icon: ShieldIcon, hidden: !isSuperAdmin },
-        { href: "/audit-log", label: "Audit log", icon: ScrollTextIcon },
+        { href: "/audit-log", label: "Audit log", icon: ScrollTextIcon, hidden: !isSuperAdmin },
         { href: "/account", label: "Account", icon: UserCogIcon },
       ],
     },

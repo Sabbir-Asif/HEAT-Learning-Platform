@@ -215,7 +215,9 @@ describe("admin invitations, deactivation and reactivation", () => {
     );
     const actions = (
       await testApp().database.prisma.auditLog.findMany({ where: { entityId: summary.id } })
-    ).map((row) => row.action);
+    )
+      .map((row) => row.action)
+      .filter((action) => !action.startsWith("admin.sign-"));
     expect(actions.sort()).toEqual(["admin.invite", "admin.invite.accept"]);
   });
 
@@ -342,7 +344,9 @@ describe("admin invitations, deactivation and reactivation", () => {
     expect((await call("GET", "/admin/me", { cookie: first })).status).toBe(401);
     const actions = (
       await testApp().database.prisma.auditLog.findMany({ where: { entityId: target.id } })
-    ).map((row) => row.action);
+    )
+      .map((row) => row.action)
+      .filter((action) => !action.startsWith("admin.sign-"));
     expect(actions.sort()).toEqual(["admin.deactivate", "admin.reactivate"]);
     const reactivateAudit = await testApp().database.prisma.auditLog.findFirstOrThrow({
       where: { entityId: target.id, action: "admin.reactivate" },

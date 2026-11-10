@@ -74,7 +74,7 @@ describe("admin shell", () => {
 });
 
 describe("admin shell for a plain admin", () => {
-  test("hides the Admins page from the navigation", async () => {
+  test("hides the Admins and Audit log pages from the navigation", async () => {
     pathname.value = "/";
     const view = await mount(
       <AdminShell>
@@ -85,7 +85,7 @@ describe("admin shell for a plain admin", () => {
       (view.querySelector('[data-sidebar="trigger"]') as HTMLButtonElement).click(),
     );
     const nav = document.querySelector('nav[aria-label="Admin"]') as HTMLElement;
-    expect(nav.querySelector('a[href="/audit-log"]')).not.toBeNull();
+    expect(nav.querySelector('a[href="/audit-log"]')).toBeNull();
     expect(nav.querySelector('a[href="/admins"]')).toBeNull();
   });
 });

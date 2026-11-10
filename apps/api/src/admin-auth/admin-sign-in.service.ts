@@ -2,6 +2,8 @@ import { randomBytes } from "node:crypto";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import type { OnModuleInit } from "@nestjs/common";
 import type { HeatClient } from "@heat/db";
+import { AuditService } from "../audit";
+import type { AuditActor } from "../audit";
 import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
 import { PasswordService, SessionService } from "../auth";
@@ -23,13 +25,19 @@ export class AdminSignInService implements OnModuleInit {
     private readonly passwords: PasswordService,
     private readonly sessions: SessionService,
     private readonly lockout: SignInLockout,
+    private readonly audit: AuditService,
   ) {}
 
   async onModuleInit(): Promise<void> {
     this.decoyDigest = await this.passwords.hash(randomBytes(24).toString("base64"));
   }
 
-  async signIn(email: string, password: string, metadata: SessionMetadata): Promise<SignedInAdmin> {
+  async signIn(
+    email: string,
+    password: string,
+    metadata: SessionMetadata,
+    actor: AuditActor,
+  ): Promise<SignedInAdmin> {
     await this.lockout.reserve("admin", email, metadata.ipAddress);
     const user = await this.database.user.findFirst({
       where: {
@@ -49,6 +57,15 @@ export class AdminSignInService implements OnModuleInit {
     await this.lockout.recordSuccess("admin", email, metadata.ipAddress);
     await this.upgradeDigest(user.id, user.passwordHash, password);
     const tokens = await this.sessions.create(user.id, "admin", metadata);
+    try {
+      await this.audit.recordStandalone(
+        { ...actor, actorId: user.id },
+        { action: "admin.sign-in", entity: "User", entityId: user.id },
+      );
+    } catch (error) {
+      await this.sessions.revoke(tokens.familyId);
+      throw error;
+    }
     return { userId: user.id, tokens };
   }
 

@@ -19,6 +19,8 @@ interface ResponseLike {
 }
 
 const messages: Record<ErrorCode, string> = {
+  AUDIT_ACTOR_FILTER_TOO_BROAD:
+    "Too many accounts match this actor filter. Enter more of the email address.",
   BAD_REQUEST: "The request could not be processed.",
   CANNOT_DEACTIVATE_SELF: "You cannot deactivate your own account.",
   CAPTCHA_EXPIRED: "This security check can no longer be used. Request a new one.",

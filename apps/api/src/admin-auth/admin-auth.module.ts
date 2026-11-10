@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { AuditModule } from "../audit";
 import { AuthModule } from "../auth";
 import { CoreModule } from "../core";
 import { RateLimitModule } from "../rate-limit";
@@ -9,7 +10,7 @@ import { AdminMeController } from "./admin-me.controller";
 import { AdminSignInService } from "./admin-sign-in.service";
 
 @Module({
-  imports: [CoreModule, AuthModule, RateLimitModule],
+  imports: [CoreModule, AuditModule, AuthModule, RateLimitModule],
   controllers: [AdminAuthController, AdminMeController, AdminAccountController],
   providers: [AdminSignInService, AdminAccountService],
 })

@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { AccessModule } from "./access";
 import { AdminManagementModule } from "./admin-management";
 import { AdminAuthModule } from "./admin-auth/admin-auth.module";
+import { AuditModule } from "./audit";
 import { AuthModule } from "./auth";
 import { CaptchaModule } from "./captcha";
 import { CoreModule } from "./core";
@@ -15,6 +16,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     CoreModule,
     AuthModule,
     AccessModule,
+    AuditModule,
     HttpApiModule,
     MeModule,
     StudentAuthModule,

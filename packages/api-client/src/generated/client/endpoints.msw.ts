@@ -25,6 +25,7 @@ import type {
   AdminMeResponseDto,
   AdminSignInRequestDto,
   AdminSummaryDto,
+  AuditLogListResponseDto,
   CaptchaRequestDto,
   CaptchaResponseDto,
   ChangePasswordRequestDto,
@@ -47,6 +48,8 @@ export const getAdminUsersDeactivateResponseMock = (overrideResponse: Partial<Ex
 export const getAdminUsersReactivateResponseMock = (overrideResponse: Partial<Extract<AdminSummaryDto, object>> = {}): AdminSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', deactivatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), inviteExpiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const), status: faker.helpers.arrayElement(['ACTIVE','INVITED','INVITE_EXPIRED','DEACTIVATED'] as const), ...overrideResponse})
 
 export const getAdminUsersResendInvitationResponseMock = (overrideResponse: Partial<Extract<AdminSummaryDto, object>> = {}): AdminSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', deactivatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), inviteExpiresAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const), status: faker.helpers.arrayElement(['ACTIVE','INVITED','INVITE_EXPIRED','DEACTIVATED'] as const), ...overrideResponse})
+
+export const getAuditLogListResponseMock = (overrideResponse: Partial<Extract<AuditLogListResponseDto, object>> = {}): AuditLogListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({action: faker.string.alpha({length: {min: 10, max: 20}}), actorEmail: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 254}}), null]), actorId: faker.helpers.arrayElement([faker.string.uuid(), null]), after: faker.helpers.arrayElement([null,]), before: faker.helpers.arrayElement([null,]), entity: faker.string.alpha({length: {min: 10, max: 20}}), entityId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 128}}), null]), id: faker.string.uuid(), ipAddress: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 64}}), null]), occurredAt: faker.date.past().toISOString().slice(0, 19) + 'Z', requestId: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 64}}), null])})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
 
 export const getAdminAuthCsrfTokenResponseMock = (overrideResponse: Partial<Extract<AdminCsrfTokenResponseDto, object>> = {}): AdminCsrfTokenResponseDto => ({token: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
@@ -132,6 +135,18 @@ export const getAdminUsersResendInvitationMockHandler = (overrideResponse?: Admi
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getAdminUsersResendInvitationResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getAuditLogListMockHandler = (overrideResponse?: AuditLogListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<AuditLogListResponseDto> | AuditLogListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/audit-log', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAuditLogListResponseMock(),
       { status: 200
       })
   }, options)
@@ -301,6 +316,7 @@ export const getHeatLmsApiMock = () => [
   getAdminUsersDeactivateMockHandler(),
   getAdminUsersReactivateMockHandler(),
   getAdminUsersResendInvitationMockHandler(),
+  getAuditLogListMockHandler(),
   getAdminAuthCsrfTokenMockHandler(),
   getAdminInvitationAcceptMockHandler(),
   getAdminInvitationLookupMockHandler(),

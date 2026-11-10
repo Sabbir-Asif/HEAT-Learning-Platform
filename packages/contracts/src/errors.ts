@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const errorCodes = [
+  "AUDIT_ACTOR_FILTER_TOO_BROAD",
   "BAD_REQUEST",
   "CANNOT_DEACTIVATE_SELF",
   "CAPTCHA_EXPIRED",
