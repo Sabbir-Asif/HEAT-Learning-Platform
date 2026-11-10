@@ -3,6 +3,9 @@ import type { Clock } from "../../src/core";
 import { CaptchaStore } from "../../src/captcha/captcha.store";
 import type { CaptchaAttempt } from "../../src/captcha/captcha.store";
 import type { CaptchaEntropy } from "../../src/captcha/captcha-entropy";
+import { LockoutStore } from "../../src/rate-limit/lockout.store";
+import { RateLimitStore } from "../../src/rate-limit/rate-limit.store";
+import type { RateLimitHit } from "../../src/rate-limit/rate-limit.store";
 import { RotationClaimStore } from "../../src/auth/rotation-claim.store";
 import { SessionStore } from "../../src/auth/session.store";
 import type { NewSession, SessionRow, SessionUserRow } from "../../src/auth/session.store";
@@ -215,5 +218,66 @@ export class StubEntropy implements CaptchaEntropy {
 
   unit(): number {
     return 0.5;
+  }
+}
+
+export class InMemoryRateLimitStore extends RateLimitStore {
+  readonly keys = new Map<string, { count: number; expiresAt: number }>();
+  failing = false;
+
+  constructor(private readonly clock: Clock) {
+    super();
+  }
+
+  hit(key: string, windowSeconds: number): Promise<RateLimitHit> {
+    if (this.failing) return Promise.reject(new Error("redis down"));
+    const now = this.clock.now().getTime();
+    const current = this.keys.get(key);
+    const entry =
+      current !== undefined && current.expiresAt > now
+        ? current
+        : { count: 0, expiresAt: now + windowSeconds * 1000 };
+    entry.count += 1;
+    this.keys.set(key, entry);
+    return Promise.resolve({
+      count: entry.count,
+      ttlSeconds: Math.ceil((entry.expiresAt - now) / 1000),
+    });
+  }
+}
+
+export class InMemoryLockoutStore extends LockoutStore {
+  readonly entries = new Map<string, { failures: number; until: number }>();
+  failing = false;
+
+  private guard(): void {
+    if (this.failing) throw new Error("redis down");
+  }
+
+  increment(key: string): Promise<number> {
+    this.guard();
+    const entry = this.entries.get(key) ?? { failures: 0, until: 0 };
+    entry.failures += 1;
+    this.entries.set(key, entry);
+    return Promise.resolve(entry.failures);
+  }
+
+  lockUntil(key: string, untilMs: number): Promise<void> {
+    this.guard();
+    const entry = this.entries.get(key) ?? { failures: 0, until: 0 };
+    entry.until = Math.max(entry.until, untilMs);
+    this.entries.set(key, entry);
+    return Promise.resolve();
+  }
+
+  lockedUntil(key: string): Promise<number> {
+    this.guard();
+    return Promise.resolve(this.entries.get(key)?.until ?? 0);
+  }
+
+  clear(key: string): Promise<void> {
+    this.guard();
+    this.entries.delete(key);
+    return Promise.resolve();
   }
 }
