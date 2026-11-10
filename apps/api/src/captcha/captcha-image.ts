@@ -4,7 +4,7 @@ import type { Point } from "./captcha-glyphs";
 
 const canvasWidth = 190;
 const canvasHeight = 64;
-const scale = 5.2;
+const scale = 4.4;
 const slot = canvasWidth / 6.4;
 const background = "#f4f1ea";
 const ink = "#1d2733";
@@ -36,7 +36,7 @@ const pathData = (points: readonly Point[]): string =>
 
 const glyphPaths = (character: string, index: number, entropy: CaptchaEntropy): string[] => {
   const strokes = glyphs[character] ?? [];
-  const originX = slot * (index + 0.85) + spread(entropy, 3);
+  const originX = slot * (index + 0.8) + spread(entropy, 3);
   const originY = canvasHeight / 2 + spread(entropy, 4);
   const angle = spread(entropy, 0.3);
   const shear = spread(entropy, 0.25);
