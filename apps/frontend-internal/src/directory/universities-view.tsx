@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  getUniversitiesGetQueryOptions,
   getUniversitiesListQueryKey,
   isApiError,
   useUniversitiesList,
@@ -103,7 +104,11 @@ export function UniversitiesView() {
               await remove.mutateAsync({ id: row.id });
             } catch (error) {
               if (isApiError(error) && error.code === "DIRECTORY_IN_USE") {
-                setBlocked({ id: row.id, message: deleteBlockedMessage(row.name, row) });
+                const current = await queryClient
+                  .fetchQuery({ ...getUniversitiesGetQueryOptions(row.id), staleTime: 0 })
+                  .catch(() => row);
+                setBlocked({ id: row.id, message: deleteBlockedMessage(row.name, current) });
+                void refresh();
               }
               throw error;
             }

@@ -318,10 +318,17 @@ describe("UniversitiesView delete", () => {
     );
   });
 
-  test("a refused delete explains what references the university and suggests archiving", async () => {
-    fetchMock.mockImplementation(async (_url, init) =>
-      init?.method === "DELETE" ? errorReply("DIRECTORY_IN_USE", 409) : list(),
-    );
+  test("a refused delete explains the current references and suggests archiving", async () => {
+    fetchMock.mockImplementation(async (url, init) => {
+      if (init?.method === "DELETE") return errorReply("DIRECTORY_IN_USE", 409);
+      if (String(url).endsWith("0198f1a0-0000-7000-8000-000000000001")) {
+        return new Response(
+          JSON.stringify(row({ studentCount: 5, departmentCount: 2, facultyCount: 0 })),
+          { status: 200 },
+        );
+      }
+      return list();
+    });
     const view = await mount();
     const dialog = await openDelete(view, "University of Dhaka");
 
@@ -330,7 +337,29 @@ describe("UniversitiesView delete", () => {
 
     await vi.waitFor(() => expect(dialog.querySelector("[role=alert]")).not.toBeNull());
     const message = dialog.querySelector("[role=alert]")?.textContent;
-    expect(message).toContain("3 students, 2 departments and 1 faculty link");
+    expect(message).toContain("5 students and 2 departments");
+    expect(message).not.toContain("faculty link");
     expect(message).toContain("Archive it instead");
+  });
+
+  test("when the current counts cannot be read the listed counts are used", async () => {
+    fetchMock.mockImplementation(async (url, init) => {
+      if (init?.method === "DELETE") return errorReply("DIRECTORY_IN_USE", 409);
+      if (String(url).endsWith("0198f1a0-0000-7000-8000-000000000001")) {
+        return errorReply("INTERNAL", 500);
+      }
+      return list();
+    });
+    const view = await mount();
+    const dialog = await openDelete(view, "University of Dhaka");
+
+    await type(dialog.querySelector("input"), "University of Dhaka");
+    await act(async () => buttonNamed("Delete university", dialog)?.click());
+
+    await vi.waitFor(() =>
+      expect(dialog.querySelector("[role=alert]")?.textContent).toContain(
+        "3 students, 2 departments and 1 faculty link",
+      ),
+    );
   });
 });

@@ -232,6 +232,26 @@ describe("university directory over HTTP", () => {
     expect((await call("GET", base)).status).toBe(401);
   });
 
+  test("the list reports student, department and faculty counts, soft-deleted profiles included", async () => {
+    const admin = await signedInAdmin();
+    const department = await testApp().factories.department();
+    const { profile } = await testApp().factories.student({ departmentId: department.id });
+    await testApp().factories.student({ departmentId: department.id });
+    await testApp().database.prisma.studentProfile.update({
+      where: { id: profile.id },
+      data: { deletedAt: new Date() },
+    });
+
+    const reply = await call("GET", `${base}/${department.universityId}`, { cookie: admin.cookie });
+    const list = await call("GET", base, { cookie: admin.cookie });
+
+    const expected = { studentCount: 2, departmentCount: 1, facultyCount: 1 };
+    expect(reply.body).toMatchObject(expected);
+    expect(
+      (list.body as Page).items.find((item) => item.id === department.universityId),
+    ).toMatchObject(expected);
+  });
+
   test("the list is paged and sorted by name", async () => {
     const admin = await signedInAdmin();
     for (const name of ["Charlie", "Alpha", "Bravo"]) {
