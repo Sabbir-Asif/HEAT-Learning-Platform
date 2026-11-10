@@ -131,8 +131,8 @@ export const departmentNameSchema = directoryNameSchema("department");
 
 export const createDepartmentRequestSchema = z.object({
   name: departmentNameSchema,
-  universityId: z.uuid(),
-  facultyId: z.uuid(),
+  universityId: z.uuid("Choose a university."),
+  facultyId: z.uuid("Choose a faculty."),
 });
 
 export type CreateDepartmentRequest = z.infer<typeof createDepartmentRequestSchema>;

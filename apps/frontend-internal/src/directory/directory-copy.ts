@@ -1,5 +1,11 @@
 export const facultyNameTakenMessage = "A faculty with this name already exists.";
 
+export const departmentNameTakenMessage =
+  "A department with this name already exists for this university and faculty.";
+
+export const departmentMoveBlockedMessage =
+  "This department has students, so it cannot be moved to another university or faculty.";
+
 export const universityNameTakenMessage = "A university with this name already exists.";
 
 export const unsavedChangesMessage = "You have unsaved changes. Discard them?";
