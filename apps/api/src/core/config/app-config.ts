@@ -21,6 +21,8 @@ const envSchema = z
     ACCESS_TOKEN_TTL_SECONDS: positiveInt.default(600),
     REFRESH_TOKEN_TTL_DAYS: positiveInt.default(30),
     ADMIN_IDLE_MINUTES: positiveInt.default(30),
+    ADMIN_SESSION_ABSOLUTE_HOURS: positiveInt.default(12),
+    STUDENT_SESSION_ABSOLUTE_DAYS: positiveInt.default(30),
     REFRESH_GRACE_SECONDS: positiveInt.default(20),
     CSRF_SECRET: z.string().min(32),
     NODE_ENV: z.string().optional(),
@@ -80,6 +82,8 @@ export interface AppConfig {
     accessTokenTtlSeconds: number;
     refreshTokenTtlDays: number;
     adminIdleMinutes: number;
+    adminSessionAbsoluteHours: number;
+    studentSessionAbsoluteDays: number;
     refreshGraceSeconds: number;
   };
   csrf: { secret: string; trustedOrigins: readonly string[] };
@@ -110,6 +114,8 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
       accessTokenTtlSeconds: values.ACCESS_TOKEN_TTL_SECONDS,
       refreshTokenTtlDays: values.REFRESH_TOKEN_TTL_DAYS,
       adminIdleMinutes: values.ADMIN_IDLE_MINUTES,
+      adminSessionAbsoluteHours: values.ADMIN_SESSION_ABSOLUTE_HOURS,
+      studentSessionAbsoluteDays: values.STUDENT_SESSION_ABSOLUTE_DAYS,
       refreshGraceSeconds: values.REFRESH_GRACE_SECONDS,
     },
     csrf: {

@@ -45,6 +45,20 @@ describe("PrismaSessionStore", () => {
     );
   });
 
+  test("reads the family start from its oldest row", async () => {
+    const { session, store } = build();
+    session.findFirst.mockResolvedValueOnce({ createdAt: new Date("2026-01-01T00:00:00.000Z") });
+
+    await expect(store.findFamilyStart("f")).resolves.toEqual(new Date("2026-01-01T00:00:00.000Z"));
+    await expect(store.findFamilyStart("g")).resolves.toBeNull();
+    expect(session.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { familyId: "f" },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      }),
+    );
+  });
+
   test("loads the user with the fields that gate a session", async () => {
     const { user, store } = build();
     await store.findUser("u");

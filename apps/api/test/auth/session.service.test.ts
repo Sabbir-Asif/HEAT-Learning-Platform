@@ -341,6 +341,69 @@ describe("admin idle timeout", () => {
   });
 });
 
+describe("absolute session lifetime", () => {
+  const adminCap = { ADMIN_IDLE_MINUTES: "10000", ADMIN_SESSION_ABSOLUTE_HOURS: "2" };
+
+  test("refuses an admin refresh past the cap even when refreshed regularly, and revokes the family", async () => {
+    const { service, clock, admin, store } = setup(adminCap);
+    let tokens = await service.create(admin.id, "admin");
+    for (let step = 0; step < 5; step += 1) {
+      clock.advanceMinutes(20);
+      tokens = await service.refresh(tokens.refreshToken, "admin");
+    }
+    clock.advanceMinutes(21);
+
+    await expect(service.refresh(tokens.refreshToken, "admin")).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
+    expect(store.rows.every((row) => row.revokedAt !== null)).toBe(true);
+    await expect(service.authenticate(tokens.accessToken, "admin")).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
+  });
+
+  test("keeps the family start across rotations and clamps the refresh expiry to the cap", async () => {
+    const { service, clock, admin } = setup(adminCap);
+    const first = await service.create(admin.id, "admin");
+    const start = clock.now().getTime();
+    clock.advanceMinutes(90);
+
+    const second = await service.refresh(first.refreshToken, "admin");
+
+    expect(second.refreshExpiresAt.getTime()).toBe(start + 2 * 3_600_000);
+  });
+
+  test("defaults to 12 hours for admins", async () => {
+    const { service, clock, admin } = setup({ ADMIN_IDLE_MINUTES: "10000" });
+    const first = await service.create(admin.id, "admin");
+    clock.advanceMinutes(11 * 60);
+    const second = await service.refresh(first.refreshToken, "admin");
+    clock.advanceMinutes(61);
+
+    await expect(service.refresh(second.refreshToken, "admin")).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
+  });
+
+  test("caps student sessions by the configured number of days", async () => {
+    const { service, clock, student, store } = setup({
+      REFRESH_TOKEN_TTL_DAYS: "30",
+      STUDENT_SESSION_ABSOLUTE_DAYS: "3",
+    });
+    let tokens = await service.create(student.id, "student");
+    for (let step = 0; step < 2; step += 1) {
+      clock.advanceMinutes(24 * 60);
+      tokens = await service.refresh(tokens.refreshToken, "student");
+    }
+    clock.advanceMinutes(24 * 60 + 1);
+
+    await expect(service.refresh(tokens.refreshToken, "student")).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
+    expect(store.rows.every((row) => row.revokedAt !== null)).toBe(true);
+  });
+});
+
 describe("authenticate", () => {
   test("accepts a live access token for its realm", async () => {
     const { service, student } = setup();

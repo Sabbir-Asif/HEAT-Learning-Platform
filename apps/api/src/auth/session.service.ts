@@ -55,7 +55,8 @@ export class SessionService {
     const user = await this.store.findUser(userId);
     if (!isUsable(user, realm)) throw rejected();
     const refreshToken = generateRefreshToken();
-    const session = this.newSession(userId, randomUUID(), refreshToken, metadata);
+    const endsAt = this.clock.now().getTime() + this.absoluteMilliseconds(realm);
+    const session = this.newSession(userId, randomUUID(), refreshToken, metadata, endsAt);
     await this.store.insert(session);
     return this.issue(userId, realm, refreshToken, session);
   }
@@ -126,13 +127,19 @@ export class SessionService {
 
   private async rotate(row: SessionRow, hash: string, realm: AuthRealm): Promise<SessionTokens> {
     const now = this.clock.now();
+    const startedAt = (await this.store.findFamilyStart(row.familyId)) ?? row.createdAt;
+    const endsAt = startedAt.getTime() + this.absoluteMilliseconds(realm);
+    if (now.getTime() >= endsAt) {
+      await this.store.revokeFamily(row.familyId, now);
+      throw rejected();
+    }
     if (row.expiresAt <= now) throw rejected();
     if (realm === "admin" && now.getTime() - row.createdAt.getTime() > this.idleMilliseconds()) {
       await this.store.revokeFamily(row.familyId, now);
       throw rejected();
     }
     const refreshToken = generateRefreshToken();
-    const next = this.newSession(row.userId, row.familyId, refreshToken);
+    const next = this.newSession(row.userId, row.familyId, refreshToken, {}, endsAt);
     const tokens = await this.issue(row.userId, realm, refreshToken, next);
     if (!(await this.store.rotate(row.id, now, next))) {
       const current = await this.store.findByHash(hash);
@@ -167,11 +174,19 @@ export class SessionService {
     return this.config.auth.adminIdleMinutes * 60_000;
   }
 
+  private absoluteMilliseconds(realm: AuthRealm): number {
+    const { adminSessionAbsoluteHours, studentSessionAbsoluteDays } = this.config.auth;
+    return realm === "admin"
+      ? adminSessionAbsoluteHours * 3_600_000
+      : studentSessionAbsoluteDays * 86_400_000;
+  }
+
   private newSession(
     userId: string,
     familyId: string,
     refreshToken: string,
     metadata: SessionMetadata = {},
+    endsAt: number = Number.POSITIVE_INFINITY,
   ): NewSession {
     const createdAt = this.clock.now();
     const lifetime = this.config.auth.refreshTokenTtlDays * 86_400_000;
@@ -180,7 +195,7 @@ export class SessionService {
       familyId,
       refreshTokenHash: hashRefreshToken(refreshToken),
       createdAt,
-      expiresAt: new Date(createdAt.getTime() + lifetime),
+      expiresAt: new Date(Math.min(createdAt.getTime() + lifetime, endsAt)),
       ...metadata,
     };
   }

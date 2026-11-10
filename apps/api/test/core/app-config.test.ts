@@ -21,6 +21,8 @@ describe("loadConfig", () => {
       refreshTokenTtlDays: 30,
       adminIdleMinutes: 30,
       refreshGraceSeconds: 20,
+      adminSessionAbsoluteHours: 12,
+      studentSessionAbsoluteDays: 30,
     });
     expect(config.argon2).toEqual({ memoryCost: 19456, timeCost: 2, parallelism: 1 });
     expect(config.auth.encryptionKey).toHaveLength(32);

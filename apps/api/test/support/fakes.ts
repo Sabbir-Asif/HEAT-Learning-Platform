@@ -99,6 +99,11 @@ export class InMemorySessionStore extends SessionStore {
     return Promise.resolve(family.at(-1) ?? null);
   }
 
+  findFamilyStart(familyId: string): Promise<Date | null> {
+    const first = this.rows.find((row) => row.familyId === familyId);
+    return Promise.resolve(first?.createdAt ?? null);
+  }
+
   findUser(userId: string): Promise<SessionUserRow | null> {
     return Promise.resolve(this.users.get(userId) ?? null);
   }

@@ -149,4 +149,31 @@ describe("session service on real Postgres and Redis", () => {
       status: 401,
     });
   });
+
+  test("an admin family past the absolute cap is revoked on refresh even when it is still active", async () => {
+    const admin = await testApp().factories.user({ role: "ADMIN", realm: "ADMIN" });
+    const first = await sessions().create(admin.id, "admin");
+    const second = await sessions().refresh(first.refreshToken, "admin");
+    await testApp().database.prisma.session.update({
+      where: { refreshTokenHash: hashRefreshToken(first.refreshToken) },
+      data: { createdAt: new Date(Date.now() - 13 * 3_600_000) },
+    });
+
+    await expect(sessions().refresh(second.refreshToken, "admin")).rejects.toBeDefined();
+
+    const rows = await testApp().database.prisma.session.findMany({
+      where: { familyId: first.familyId },
+    });
+    expect(rows.every((row) => row.revokedAt !== null)).toBe(true);
+  });
+
+  test("a student family within the cap keeps refreshing", async () => {
+    const first = await sessions().create(await student(), "student");
+    await testApp().database.prisma.session.update({
+      where: { refreshTokenHash: hashRefreshToken(first.refreshToken) },
+      data: { createdAt: new Date(Date.now() - 29 * 86_400_000) },
+    });
+
+    await expect(sessions().refresh(first.refreshToken, "student")).resolves.toBeDefined();
+  });
 });

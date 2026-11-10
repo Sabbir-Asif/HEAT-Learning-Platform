@@ -46,6 +46,15 @@ export class PrismaSessionStore extends SessionStore {
     });
   }
 
+  async findFamilyStart(familyId: string): Promise<Date | null> {
+    const first = await this.database.session.findFirst({
+      where: { familyId },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      select: { createdAt: true },
+    });
+    return first?.createdAt ?? null;
+  }
+
   findUser(userId: string): Promise<SessionUserRow | null> {
     return this.database.user.findUnique({
       where: { id: userId },

@@ -33,6 +33,7 @@ export interface NewSession {
 export abstract class SessionStore {
   abstract findByHash(refreshTokenHash: string): Promise<SessionRow | null>;
   abstract findLatest(familyId: string): Promise<SessionRow | null>;
+  abstract findFamilyStart(familyId: string): Promise<Date | null>;
   abstract findUser(userId: string): Promise<SessionUserRow | null>;
   abstract insert(session: NewSession): Promise<void>;
   abstract rotate(previousId: string, rotatedAt: Date, next: NewSession): Promise<boolean>;
