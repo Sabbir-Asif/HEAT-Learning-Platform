@@ -8,6 +8,7 @@ import { Public } from "../../src/auth";
 import { RATE_LIMIT_PROFILE_KEY } from "../../src/rate-limit/rate-limit.guard";
 import { applyEnvironment, authTestEnvironment } from "../support/auth-env";
 import {
+  enumerateCsrfModes,
   enumerateRouteAccess,
   enumerateRouteRateLimits,
   unguardedRoutes,
@@ -24,6 +25,15 @@ const enumerateLimits = async () => {
   );
   await moduleRef.close();
   return limits;
+};
+
+const enumerateModes = async () => {
+  const moduleRef = await Test.createTestingModule({
+    imports: [DiscoveryModule, AppModule],
+  }).compile();
+  const modes = enumerateCsrfModes(moduleRef.get(DiscoveryService), new MetadataScanner());
+  await moduleRef.close();
+  return modes;
 };
 
 const enumerate = async (imports: unknown[], controllers: Array<new () => object> = []) => {
@@ -78,6 +88,28 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/admin/account/change-password": "passwordChange",
       "POST /api/captcha": "captcha",
     });
+  });
+
+  test("every unsafe route needs the CSRF token unless it is a reviewed public route", async () => {
+    const modes = await enumerateModes();
+
+    const originOnly = Object.entries(modes)
+      .filter(([, mode]) => mode === "origin-only")
+      .map(([route]) => route)
+      .sort();
+    expect(originOnly).toEqual([
+      "POST /api/admin/auth/refresh",
+      "POST /api/admin/auth/sign-in",
+      "POST /api/auth/refresh",
+      "POST /api/auth/sign-in",
+      "POST /api/captcha",
+    ]);
+    expect(modes).toMatchObject({
+      "POST /api/auth/sign-out": "token",
+      "POST /api/admin/auth/sign-out": "token",
+      "POST /api/admin/account/change-password": "token",
+    });
+    expect(Object.keys(modes).some((route) => route.startsWith("GET "))).toBe(false);
   });
 
   test("a controller method with no access decorator fails the check and is named", async () => {
