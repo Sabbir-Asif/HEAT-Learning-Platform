@@ -2,15 +2,52 @@ export type AuditJson =
   null | string | number | boolean | AuditJson[] | { [key: string]: AuditJson };
 
 export const redactedMarker = "[REDACTED]";
+export const truncatedMarker = "[TRUNCATED]";
 
 const maxDepth = 8;
 
-const sensitiveKey =
-  /password|passwd|secret|token|cookie|authorization|credential|apikey|privatekey|recovery|otp|hash|digest|signature/i;
+const sensitiveWords = new Set([
+  "password",
+  "passwd",
+  "secret",
+  "token",
+  "cookie",
+  "authorization",
+  "credential",
+  "recovery",
+  "otp",
+  "hash",
+  "digest",
+  "signature",
+  "salt",
+  "pin",
+  "session",
+  "accesskey",
+  "apikey",
+  "privatekey",
+  "pepper",
+]);
 
-const normalise = (key: string): string => key.replace(/[^A-Za-z0-9]/g, "");
+const tokensOf = (key: string): string[] =>
+  key
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((word) => word !== "");
 
-const isSensitive = (key: string): boolean => sensitiveKey.test(normalise(key));
+const singular = (word: string): string => word.replace(/(es|s)$/, "");
+
+const isSensitiveWord = (word: string): boolean =>
+  sensitiveWords.has(word) || sensitiveWords.has(singular(word));
+
+const isSensitive = (key: string): boolean => {
+  const words = tokensOf(key);
+  return (
+    words.some(isSensitiveWord) ||
+    words.slice(1).some((word, index) => isSensitiveWord(`${words[index]}${word}`))
+  );
+};
 
 const walk = (value: unknown, depth: number): AuditJson | undefined => {
   if (value === undefined || typeof value === "function" || typeof value === "symbol") {
@@ -24,7 +61,7 @@ const walk = (value: unknown, depth: number): AuditJson | undefined => {
       ? null
       : (value as string | number | boolean);
   }
-  if (depth >= maxDepth) return redactedMarker;
+  if (depth >= maxDepth) return truncatedMarker;
   if (Array.isArray(value)) {
     return value.map((item) => walk(item, depth + 1) ?? null);
   }

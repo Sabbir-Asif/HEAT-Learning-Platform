@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { redact, redactedMarker } from "../../src/audit/audit-redaction";
+import { redact, redactedMarker, truncatedMarker } from "../../src/audit/audit-redaction";
 
 describe("redact", () => {
   test("replaces password hashes, tokens, secrets, encrypted tokens and cookies", () => {
@@ -66,7 +66,8 @@ describe("redact", () => {
     const result = redact(cyclic) as Record<string, unknown>;
 
     expect(result.id).toBe(1);
-    expect(JSON.stringify(result)).toContain(redactedMarker);
+    expect(JSON.stringify(result)).toContain(truncatedMarker);
+    expect(JSON.stringify(result)).not.toContain(redactedMarker);
   });
 
   test("keeps flags and nulls on sensitive-looking keys so changes stay readable", () => {
@@ -75,5 +76,34 @@ describe("redact", () => {
       passwordHash: null,
       status: "ACTIVE",
     });
+  });
+
+  test("redacts salts, pins, sessions, access keys, peppers, otps and similar names", () => {
+    const names = [
+      "salt",
+      "pin",
+      "sessionId",
+      "accessKey",
+      "access_key",
+      "apiKey",
+      "pepper",
+      "otpCode",
+      "fileDigest",
+      "webhookSignature",
+      "credentials",
+      "passwordHashes",
+      "SESSION_COOKIE",
+    ];
+    const input = Object.fromEntries(names.map((name) => [name, "value"]));
+
+    const result = redact(input) as Record<string, unknown>;
+
+    for (const name of names) expect(result[name]).toBe(redactedMarker);
+  });
+
+  test("does not redact keys that only contain a sensitive word as a substring", () => {
+    const input = { footprint: "a", bootPath: "b", hashtag: "c", pinnacle: "d", dispatch: "e" };
+
+    expect(redact(input)).toEqual(input);
   });
 });
