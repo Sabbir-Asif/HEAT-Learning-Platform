@@ -19,6 +19,7 @@ export const adminCsrfOptions = {
   skipPaths: [
     "/api/admin/auth/sign-in",
     "/api/admin/auth/invitations/accept",
+    "/api/admin/auth/invitations/lookup",
     adminSessionCookies.refreshPath,
     "/api/captcha",
   ],

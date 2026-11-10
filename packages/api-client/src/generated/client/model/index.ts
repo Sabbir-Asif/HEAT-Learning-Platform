@@ -26,6 +26,7 @@ export * from './changePasswordRequestDto';
 export * from './csrfTokenResponseDto';
 export * from './healthResponseDto';
 export * from './healthResponseDtoStatus';
+export * from './invitationLookupRequestDto';
 export * from './invitationLookupResponseDto';
 export * from './invitationLookupResponseDtoStatus';
 export * from './inviteAdminRequestDto';

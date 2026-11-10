@@ -3,15 +3,20 @@
 import { useAdminInvitationLookup } from "@heat/api-client";
 import { EmptyState, ErrorState, PageHeader, Skeleton } from "@heat/ui";
 import { MailXIcon, TimerOffIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AcceptInviteForm } from "./accept-invite-form";
 import { invitationExpiredMessage, invitationInvalidMessage } from "./admin-copy";
 
 export function AcceptInvite({ token }: { token: string }) {
-  const lookup = useAdminInvitationLookup(token);
+  const lookup = useAdminInvitationLookup();
+  const { mutate } = lookup;
   const [unusable, setUnusable] = useState<"expired" | "invalid" | null>(null);
 
-  if (lookup.isPending) {
+  useEffect(() => {
+    mutate({ data: { token } });
+  }, [mutate, token]);
+
+  if (lookup.isIdle || lookup.isPending) {
     return (
       <div role="status" aria-busy="true" className="flex flex-col gap-3">
         <span className="sr-only">Checking your invitation</span>
@@ -20,7 +25,7 @@ export function AcceptInvite({ token }: { token: string }) {
       </div>
     );
   }
-  if (lookup.isError) return <ErrorState onRetry={() => void lookup.refetch()} />;
+  if (lookup.isError) return <ErrorState onRetry={() => lookup.mutate({ data: { token } })} />;
 
   const state =
     unusable ??

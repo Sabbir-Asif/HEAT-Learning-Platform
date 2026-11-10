@@ -178,12 +178,12 @@ export const AdminInvitationAcceptBody = zod.object({
 export const AdminInvitationAcceptResponse = zod.void()
 
 
-export const adminInvitationLookupPathTokenMax = 128;
+export const adminInvitationLookupBodyTokenMax = 128;
 
 
 
-export const AdminInvitationLookupParams = zod.object({
-  "token": zod.string().min(1).max(adminInvitationLookupPathTokenMax)
+export const AdminInvitationLookupBody = zod.object({
+  "token": zod.string().min(1).max(adminInvitationLookupBodyTokenMax)
 })
 
 export const AdminInvitationLookupResponse = zod.object({

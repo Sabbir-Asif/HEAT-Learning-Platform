@@ -30,6 +30,7 @@ import type {
   ChangePasswordRequestDto,
   CsrfTokenResponseDto,
   HealthResponseDto,
+  InvitationLookupRequestDto,
   InvitationLookupResponseDto,
   InviteAdminRequestDto,
   MeResponseDto,
@@ -158,8 +159,8 @@ export const getAdminInvitationAcceptMockHandler = (overrideResponse?: void | ((
   }, options)
 }
 
-export const getAdminInvitationLookupMockHandler = (overrideResponse?: InvitationLookupResponseDto | ((info: Parameters<HttpResponseResolver<{ token: string }>>[0]) => Promise<InvitationLookupResponseDto> | InvitationLookupResponseDto), options?: RequestHandlerOptions) => {
-  return http.get<{ token: string }>('*/api/admin/auth/invitations/:token', async (info: Parameters<HttpResponseResolver<{ token: string }>>[0]) => {
+export const getAdminInvitationLookupMockHandler = (overrideResponse?: InvitationLookupResponseDto | ((info: Parameters<HttpResponseResolver<PathParams, InvitationLookupRequestDto>>[0]) => Promise<InvitationLookupResponseDto> | InvitationLookupResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, InvitationLookupRequestDto>('*/api/admin/auth/invitations/lookup', async (info: Parameters<HttpResponseResolver<PathParams, InvitationLookupRequestDto>>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined

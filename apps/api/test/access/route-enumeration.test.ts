@@ -89,7 +89,7 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/captcha": "captcha",
       "POST /api/admin/admins": "verify",
       "POST /api/admin/admins/:id/resend-invitation": "verify",
-      "GET /api/admin/auth/invitations/:token": "verify",
+      "POST /api/admin/auth/invitations/lookup": "verify",
       "POST /api/admin/auth/invitations/accept": "verify",
     });
   });
@@ -103,6 +103,7 @@ describe("deny-by-default route enumeration", () => {
       .sort();
     expect(originOnly).toEqual([
       "POST /api/admin/auth/invitations/accept",
+      "POST /api/admin/auth/invitations/lookup",
       "POST /api/admin/auth/refresh",
       "POST /api/admin/auth/sign-in",
       "POST /api/auth/refresh",

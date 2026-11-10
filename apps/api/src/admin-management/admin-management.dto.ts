@@ -5,7 +5,7 @@ import {
   adminListResponseSchema,
   adminSummarySchema,
   invitationLookupResponseSchema,
-  invitationTokenParamsSchema,
+  invitationLookupRequestSchema,
   inviteAdminRequestSchema,
 } from "@heat/contracts";
 import { createZodDto } from "nestjs-zod";
@@ -22,6 +22,6 @@ export class AdminIdParamsDto extends createZodDto(adminIdParamsSchema) {}
 
 export class InvitationLookupResponseDto extends createZodDto(invitationLookupResponseSchema) {}
 
-export class InvitationTokenParamsDto extends createZodDto(invitationTokenParamsSchema) {}
+export class InvitationLookupRequestDto extends createZodDto(invitationLookupRequestSchema) {}
 
 export class AcceptInviteRequestDto extends createZodDto(acceptInviteRequestSchema) {}

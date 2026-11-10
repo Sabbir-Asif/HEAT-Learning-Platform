@@ -193,6 +193,14 @@ export interface HealthResponseDto {
   status: HealthResponseDtoStatus;
 }
 
+export interface InvitationLookupRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 128
+     */
+  token: string;
+}
+
 export type InvitationLookupResponseDtoStatus = typeof InvitationLookupResponseDtoStatus[keyof typeof InvitationLookupResponseDtoStatus];
 
 
@@ -507,22 +515,36 @@ return serverFetch<void>(getAdminInvitationAcceptUrl(),
 
 
 
-export const getAdminInvitationLookupUrl = (token: string,) => {
+export const getAdminInvitationLookupUrl = () => {
 
 
 
 
-  return `/api/admin/auth/invitations/${token}`
+  return `/api/admin/auth/invitations/lookup`
 }
 
-export const adminInvitationLookup = async (token: string, options?: Parameters<typeof serverFetch>[1]): Promise<InvitationLookupResponseDto> => {
+export const adminInvitationLookup = async (invitationLookupRequestDto: InvitationLookupRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<InvitationLookupResponseDto> => {
 
-  return serverFetch<InvitationLookupResponseDto>(getAdminInvitationLookupUrl(token),
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<InvitationLookupResponseDto>(getAdminInvitationLookupUrl(),
   {
     ...options,
-    method: 'GET'
-
-
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(invitationLookupRequestDto)
   }
 );}
 

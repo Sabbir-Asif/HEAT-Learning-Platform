@@ -77,6 +77,10 @@ describe("AcceptInvite", () => {
       expect(view.querySelector("[role=status]")?.textContent).toContain("set"),
     );
     expect(view.querySelector("a")?.getAttribute("href")).toBe("/sign-in");
+    const [lookupUrl, lookupInit] = fetchMock.mock.calls[0] ?? [];
+    expect(lookupUrl).toBe("/api/admin/auth/invitations/lookup");
+    expect(lookupInit?.method).toBe("POST");
+    expect(JSON.parse(String(lookupInit?.body))).toEqual({ token: "the-token" });
     const [url, init] = fetchMock.mock.calls[1] ?? [];
     expect(url).toBe("/api/admin/auth/invitations/accept");
     expect(JSON.parse(String(init?.body))).toEqual({

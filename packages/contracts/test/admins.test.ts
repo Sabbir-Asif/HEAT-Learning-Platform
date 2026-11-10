@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   acceptInviteRequestSchema,
   adminListQuerySchema,
+  invitationLookupRequestSchema,
   inviteAdminRequestSchema,
   passwordMinLength,
 } from "../src/index";
@@ -49,5 +50,13 @@ describe("adminListQuerySchema", () => {
   test("rejects an unknown page size or sort", () => {
     expect(adminListQuerySchema.safeParse({ pageSize: "7" }).success).toBe(false);
     expect(adminListQuerySchema.safeParse({ sort: "passwordHash" }).success).toBe(false);
+  });
+});
+
+describe("invitationLookupRequestSchema", () => {
+  test("needs a bounded non-empty token", () => {
+    expect(invitationLookupRequestSchema.parse({ token: "abc" })).toEqual({ token: "abc" });
+    expect(invitationLookupRequestSchema.safeParse({ token: "" }).success).toBe(false);
+    expect(invitationLookupRequestSchema.safeParse({ token: "x".repeat(129) }).success).toBe(false);
   });
 });

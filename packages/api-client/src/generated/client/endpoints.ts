@@ -36,6 +36,7 @@ import type {
   ChangePasswordRequestDto,
   CsrfTokenResponseDto,
   HealthResponseDto,
+  InvitationLookupRequestDto,
   InvitationLookupResponseDto,
   InviteAdminRequestDto,
   MeResponseDto,
@@ -712,22 +713,36 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getAdminInvitationAcceptMutationOptions(options), queryClient);
     }
 
-export const getAdminInvitationLookupUrl = (token: string,) => {
+export const getAdminInvitationLookupUrl = () => {
 
 
 
 
-  return `/api/admin/auth/invitations/${token}`
+  return `/api/admin/auth/invitations/lookup`
 }
 
-export const adminInvitationLookup = async (token: string, options?: Parameters<typeof customFetch>[1]): Promise<InvitationLookupResponseDto> => {
+export const adminInvitationLookup = async (invitationLookupRequestDto: InvitationLookupRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<InvitationLookupResponseDto> => {
 
-  return customFetch<InvitationLookupResponseDto>(getAdminInvitationLookupUrl(token),
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<InvitationLookupResponseDto>(getAdminInvitationLookupUrl(),
   {
     ...options,
-    method: 'GET'
-
-
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(invitationLookupRequestDto)
   }
 );}
 
@@ -735,77 +750,50 @@ export const adminInvitationLookup = async (token: string, options?: Parameters<
 
 
 
-export const getAdminInvitationLookupQueryKey = (token: string,) => {
-    return [
-    `/api/admin/auth/invitations/${token}`
-    ] as const;
+export const getAdminInvitationLookupMutationKey = () => ['adminInvitationLookup'] as const;
+
+export const getAdminInvitationLookupMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminInvitationLookup>>, TError,AdminInvitationLookupMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminInvitationLookup>>, TError,AdminInvitationLookupMutationVariables, TContext> => {
+
+const mutationKey = getAdminInvitationLookupMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminInvitationLookup>>, AdminInvitationLookupMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminInvitationLookup(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminInvitationLookupMutationResult = NonNullable<Awaited<ReturnType<typeof adminInvitationLookup>>>
+    export type AdminInvitationLookupMutationBody = InvitationLookupRequestDto
+    export type AdminInvitationLookupMutationError = ErrorType<unknown>
+    export type AdminInvitationLookupMutationVariables = {data: InvitationLookupRequestDto}
+
+    export const useAdminInvitationLookup = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminInvitationLookup>>, TError,AdminInvitationLookupMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminInvitationLookup>>,
+        TError,
+        AdminInvitationLookupMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAdminInvitationLookupMutationOptions(options), queryClient);
     }
-
-
-export const getAdminInvitationLookupQueryOptions = <TData = Awaited<ReturnType<typeof adminInvitationLookup>>, TError = ErrorType<unknown>>(token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminInvitationLookup>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getAdminInvitationLookupQueryKey(token);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminInvitationLookup>>> = ({ signal }) => adminInvitationLookup(token, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: token !== null && token !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminInvitationLookup>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AdminInvitationLookupQueryResult = NonNullable<Awaited<ReturnType<typeof adminInvitationLookup>>>
-export type AdminInvitationLookupQueryError = ErrorType<unknown>
-
-
-export function useAdminInvitationLookup<TData = Awaited<ReturnType<typeof adminInvitationLookup>>, TError = ErrorType<unknown>>(
- token: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminInvitationLookup>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof adminInvitationLookup>>,
-          TError,
-          Awaited<ReturnType<typeof adminInvitationLookup>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAdminInvitationLookup<TData = Awaited<ReturnType<typeof adminInvitationLookup>>, TError = ErrorType<unknown>>(
- token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminInvitationLookup>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof adminInvitationLookup>>,
-          TError,
-          Awaited<ReturnType<typeof adminInvitationLookup>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAdminInvitationLookup<TData = Awaited<ReturnType<typeof adminInvitationLookup>>, TError = ErrorType<unknown>>(
- token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminInvitationLookup>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useAdminInvitationLookup<TData = Awaited<ReturnType<typeof adminInvitationLookup>>, TError = ErrorType<unknown>>(
- token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminInvitationLookup>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getAdminInvitationLookupQueryOptions(token,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export const getAdminAuthRefreshUrl = () => {
 

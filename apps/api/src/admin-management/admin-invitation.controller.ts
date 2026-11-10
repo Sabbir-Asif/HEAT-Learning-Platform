@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Req } from "@nestjs/common";
+import { Body, Controller, Header, HttpCode, Post, Req } from "@nestjs/common";
 import { ApiNoContentResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { Public } from "../auth";
 import type { AuthenticatedRequest } from "../auth";
@@ -7,7 +7,7 @@ import { AdminInvitationService } from "./admin-invitation.service";
 import {
   AcceptInviteRequestDto,
   InvitationLookupResponseDto,
-  InvitationTokenParamsDto,
+  InvitationLookupRequestDto,
 } from "./admin-management.dto";
 
 @ApiTags("admin-invitations")
@@ -17,16 +17,19 @@ export class AdminInvitationController {
 
   @Public()
   @RateLimit("verify")
-  @Get(":token")
+  @Post("lookup")
+  @HttpCode(200)
+  @Header("Cache-Control", "no-store")
   @ApiOkResponse({ type: InvitationLookupResponseDto })
-  lookup(@Param() params: InvitationTokenParamsDto): Promise<InvitationLookupResponseDto> {
-    return this.invitations.lookup(params.token);
+  lookup(@Body() body: InvitationLookupRequestDto): Promise<InvitationLookupResponseDto> {
+    return this.invitations.lookup(body.token);
   }
 
   @Public()
   @RateLimit("verify")
   @Post("accept")
   @HttpCode(204)
+  @Header("Cache-Control", "no-store")
   @ApiNoContentResponse()
   async accept(
     @Body() body: AcceptInviteRequestDto,

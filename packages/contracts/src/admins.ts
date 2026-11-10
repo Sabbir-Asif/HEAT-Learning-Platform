@@ -62,9 +62,11 @@ export const invitationLookupResponseSchema = z.object({
 
 export type InvitationLookupResponse = z.infer<typeof invitationLookupResponseSchema>;
 
-export const invitationTokenParamsSchema = z.object({
+export const invitationLookupRequestSchema = z.object({
   token: z.string().min(1).max(128),
 });
+
+export type InvitationLookupRequest = z.infer<typeof invitationLookupRequestSchema>;
 
 export const acceptInviteRequestSchema = z.object({
   token: z.string().min(1, "This invitation link is not valid.").max(128),

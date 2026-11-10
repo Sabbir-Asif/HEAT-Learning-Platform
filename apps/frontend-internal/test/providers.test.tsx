@@ -103,6 +103,7 @@ describe("Providers", () => {
     const { adminCsrfOptions } = await import("../src/shell/providers");
 
     expect(adminCsrfOptions.skipPaths).toContain("/api/admin/auth/invitations/accept");
+    expect(adminCsrfOptions.skipPaths).toContain("/api/admin/auth/invitations/lookup");
   });
 
   test("the captcha request is sent without fetching an admin CSRF token", async () => {
