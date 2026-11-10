@@ -245,12 +245,99 @@ export interface ChangePasswordRequestDto {
   newPassword: string;
 }
 
+export interface CreateFacultyRequestDto {
+  name: string;
+}
+
 export interface CreateUniversityRequestDto {
   name: string;
 }
 
 export interface CsrfTokenResponseDto {
   token: string;
+}
+
+export type FacultyListResponseDtoItemsItemUniversitiesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type FacultyListResponseDtoItemsItem = {
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  archivedAt: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  departmentCount: number;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  studentCount: number;
+  universities: FacultyListResponseDtoItemsItemUniversitiesItem[];
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+};
+
+export interface FacultyListResponseDto {
+  items: FacultyListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+}
+
+export type FacultySummaryDtoUniversitiesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export interface FacultySummaryDto {
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  archivedAt: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  departmentCount: number;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  studentCount: number;
+  universities: FacultySummaryDtoUniversitiesItem[];
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
 }
 
 export type HealthResponseDtoStatus = typeof HealthResponseDtoStatus[keyof typeof HealthResponseDtoStatus];
@@ -424,6 +511,10 @@ export interface UniversitySummaryDto {
   updatedAt: string;
 }
 
+export interface UpdateFacultyRequestDto {
+  name: string;
+}
+
 export interface UpdateUniversityRequestDto {
   name: string;
 }
@@ -483,6 +574,37 @@ export type AuditLogListParams = {
   /** @pattern ^\d{4}-\d{2}-\d{2}$ */
   to?: string;
 };
+
+export type FacultiesListParams = {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  pageSize?: number;
+  sort?: FacultiesListSort;
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  q?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId?: string;
+};
+
+export type FacultiesListSort = typeof FacultiesListSort[keyof typeof FacultiesListSort];
+
+
+export const FacultiesListSort = {
+  name: 'name',
+  '-name': '-name',
+  createdAt: 'createdAt',
+  '-createdAt': '-createdAt',
+} as const;
 
 export type UniversitiesListParams = {
   /**
@@ -863,6 +985,193 @@ export const adminAuthSignOut = async ( options?: Parameters<typeof serverFetch>
   {
     ...options,
     method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getFacultiesListUrl = (params?: FacultiesListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/directory/faculties?${stringifiedParams}` : `/api/admin/directory/faculties`
+}
+
+export const facultiesList = async (params?: FacultiesListParams, options?: Parameters<typeof serverFetch>[1]): Promise<FacultyListResponseDto> => {
+
+  return serverFetch<FacultyListResponseDto>(getFacultiesListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getFacultiesCreateUrl = () => {
+
+
+
+
+  return `/api/admin/directory/faculties`
+}
+
+export const facultiesCreate = async (createFacultyRequestDto: CreateFacultyRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<FacultySummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<FacultySummaryDto>(getFacultiesCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createFacultyRequestDto)
+  }
+);}
+
+
+
+export const getFacultiesRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/faculties/${id}`
+}
+
+export const facultiesRemove = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getFacultiesRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getFacultiesGetUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/faculties/${id}`
+}
+
+export const facultiesGet = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<FacultySummaryDto> => {
+
+  return serverFetch<FacultySummaryDto>(getFacultiesGetUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getFacultiesUpdateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/directory/faculties/${id}`
+}
+
+export const facultiesUpdate = async (id: string,
+    updateFacultyRequestDto: UpdateFacultyRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<FacultySummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<FacultySummaryDto>(getFacultiesUpdateUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateFacultyRequestDto)
+  }
+);}
+
+
+
+export const getFacultiesUnassignUrl = (id: string,
+    universityId: string,) => {
+
+
+
+
+  return `/api/admin/directory/faculties/${id}/universities/${universityId}`
+}
+
+export const facultiesUnassign = async (id: string,
+    universityId: string, options?: Parameters<typeof serverFetch>[1]): Promise<FacultySummaryDto> => {
+
+  return serverFetch<FacultySummaryDto>(getFacultiesUnassignUrl(id,universityId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getFacultiesAssignUrl = (id: string,
+    universityId: string,) => {
+
+
+
+
+  return `/api/admin/directory/faculties/${id}/universities/${universityId}`
+}
+
+export const facultiesAssign = async (id: string,
+    universityId: string, options?: Parameters<typeof serverFetch>[1]): Promise<FacultySummaryDto> => {
+
+  return serverFetch<FacultySummaryDto>(getFacultiesAssignUrl(id,universityId),
+  {
+    ...options,
+    method: 'PUT'
 
 
   }

@@ -10,6 +10,7 @@ import type { HeatClient } from "@heat/db";
 import { AuditService } from "../audit";
 import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
+import { errorCodeOf, translateDirectoryError } from "./directory-rules";
 import { blockingMessage, departmentUsageOf, usageOf } from "./university-usage";
 import type { UniversityUsage } from "./university-usage";
 
@@ -33,9 +34,6 @@ const orderBy = (sort: UniversityListQuery["sort"]) => {
       return { name: "asc" as const };
   }
 };
-
-const errorCodeOf = (error: unknown): unknown =>
-  typeof error === "object" && error !== null ? (error as { code?: unknown }).code : undefined;
 
 const toSummary = (row: UniversityRow, usage: UniversityUsage): UniversitySummary => ({
   id: row.id,
@@ -96,7 +94,7 @@ export class UniversitiesService {
       this.audit.capture({ entityId: created.id, after: { name: created.name } });
       return toSummary(created, { students: 0, departments: 0, faculties: 0 });
     } catch (error) {
-      throw this.translate(error);
+      throw translateDirectoryError(error);
     }
   }
 
@@ -114,7 +112,7 @@ export class UniversitiesService {
       });
       return toSummary(updated, await usageOf(this.database, id));
     } catch (error) {
-      throw this.translate(error);
+      throw translateDirectoryError(error);
     }
   }
 
@@ -129,7 +127,7 @@ export class UniversitiesService {
         const message = blockingMessage(await usageOf(this.database, id));
         throw new ApiException(409, "DIRECTORY_IN_USE", undefined, message ?? undefined);
       }
-      throw this.translate(error);
+      throw translateDirectoryError(error);
     }
     this.audit.capture({ entityId: id, before: { name: before.name } });
   }
@@ -149,12 +147,5 @@ export class UniversitiesService {
       select: { id: true },
     });
     if (taken !== null) throw new ApiException(409, "DIRECTORY_NAME_TAKEN");
-  }
-
-  private translate(error: unknown): unknown {
-    if (error instanceof ApiException) return error;
-    if (errorCodeOf(error) === "P2002") return new ApiException(409, "DIRECTORY_NAME_TAKEN");
-    if (errorCodeOf(error) === "P2025") return new ApiException(404, "NOT_FOUND");
-    return error;
   }
 }
