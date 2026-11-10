@@ -8,4 +8,5 @@ export abstract class LockoutStore {
     policy: LockoutPolicy,
   ): Promise<number>;
   abstract release(attemptKey: string, accountKey: string): Promise<void>;
+  abstract clearAccount(accountKey: string): Promise<void>;
 }
