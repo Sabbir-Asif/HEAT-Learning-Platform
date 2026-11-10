@@ -26,11 +26,13 @@ export interface LockoutPolicy {
   baseSeconds: number;
   maxSeconds: number;
   memorySeconds: number;
+  accountThreshold: number;
 }
 
 export interface RateLimitConfig {
   profiles: Record<RateLimitProfileName, RateLimitProfile>;
   lockout: LockoutPolicy;
+  redisTimeoutMs: number;
 }
 
 export const ipWindowSeconds = 60;
@@ -53,7 +55,10 @@ const lockoutDefaults: LockoutPolicy = {
   baseSeconds: 30,
   maxSeconds: 900,
   memorySeconds: 3600,
+  accountThreshold: 50,
 };
+
+const redisTimeoutDefaultMs = 200;
 
 const positiveInt = z.coerce.number().int().positive();
 
@@ -107,9 +112,21 @@ export const loadRateLimitConfig = (env: NodeJS.ProcessEnv): RateLimitConfig => 
       lockoutDefaults.memorySeconds,
       invalid,
     ),
+    accountThreshold: readPositive(
+      env,
+      "LOCKOUT_ACCOUNT_THRESHOLD",
+      lockoutDefaults.accountThreshold,
+      invalid,
+    ),
   };
+  const redisTimeoutMs = readPositive(
+    env,
+    "RATE_LIMIT_REDIS_TIMEOUT_MS",
+    redisTimeoutDefaultMs,
+    invalid,
+  );
   if (invalid.length > 0) {
     throw new Error(`Invalid environment configuration: ${invalid.join(", ")}`);
   }
-  return { profiles, lockout };
+  return { profiles, lockout, redisTimeoutMs };
 };

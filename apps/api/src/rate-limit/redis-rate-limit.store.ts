@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type { Redis } from "ioredis";
-import { REDIS } from "../core";
+import { RATE_LIMIT_REDIS } from "./rate-limit-redis";
 import { RateLimitStore } from "./rate-limit.store";
 import type { RateLimitHit } from "./rate-limit.store";
 
@@ -16,7 +16,7 @@ return {count, ttl}
 
 @Injectable()
 export class RedisRateLimitStore extends RateLimitStore {
-  constructor(@Inject(REDIS) private readonly redis: Redis) {
+  constructor(@Inject(RATE_LIMIT_REDIS) private readonly redis: Redis) {
     super();
   }
 

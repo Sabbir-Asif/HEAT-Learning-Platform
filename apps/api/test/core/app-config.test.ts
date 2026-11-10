@@ -55,7 +55,9 @@ describe("loadConfig rate limits", () => {
       baseSeconds: 30,
       maxSeconds: 900,
       memorySeconds: 3600,
+      accountThreshold: 50,
     });
+    expect(rateLimit.redisTimeoutMs).toBe(200);
   });
 
   test("reads profile overrides from derived variable names", () => {
