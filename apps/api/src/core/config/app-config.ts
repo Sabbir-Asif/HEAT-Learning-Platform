@@ -46,6 +46,8 @@ const envSchema = z
         (value) => value === undefined || new URL(value).origin === value,
         "ADMIN_APP_URL must be an origin",
       ),
+    AUDIT_TRANSACTION_MAX_WAIT_MS: positiveInt.default(5000),
+    AUDIT_TRANSACTION_TIMEOUT_MS: positiveInt.default(15000),
     BREACHED_PASSWORD_RANGE_URL: z.url().default("https://api.pwnedpasswords.com/range/"),
   })
   .superRefine((env, context) => {
@@ -83,6 +85,7 @@ export interface AppConfig {
   argon2: { memoryCost: number; timeCost: number; parallelism: number };
   breachedPasswordRangeUrl: string;
   invitations: { ttlHours: number; adminAppUrl: string };
+  audit: { transactionMaxWaitMs: number; transactionTimeoutMs: number };
   rateLimit: RateLimitConfig;
 }
 
@@ -121,6 +124,10 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
     invitations: {
       ttlHours: values.ADMIN_INVITE_TTL_HOURS,
       adminAppUrl: values.ADMIN_APP_URL ?? localAdminAppUrl,
+    },
+    audit: {
+      transactionMaxWaitMs: values.AUDIT_TRANSACTION_MAX_WAIT_MS,
+      transactionTimeoutMs: values.AUDIT_TRANSACTION_TIMEOUT_MS,
     },
     rateLimit,
   };

@@ -108,6 +108,39 @@ describe("audit interceptor and audit log viewer", () => {
     expect(stored.mustChangePassword).toBe(false);
   });
 
+  test("a write made outside audit.client is not rolled back when the handler fails", async () => {
+    const admin = await signedIn("ADMIN");
+    const target = await testApp().factories.user({ role: "STUDENT" });
+
+    const reply = await call("POST", `/probe/audited/${target.id}`, {
+      cookie: admin.cookie,
+      body: { outside: true, fail: true, silent: true },
+    });
+
+    expect(reply.status).toBe(500);
+    const stored = await testApp().database.prisma.user.findUniqueOrThrow({
+      where: { id: target.id },
+    });
+    expect(stored.mustChangePassword).toBe(true);
+    expect((await auditRows("User")).filter((row) => row.action === "probe.update")).toHaveLength(
+      0,
+    );
+  });
+
+  test("an audited handler that emits more than once fails loudly and writes no row", async () => {
+    const admin = await signedIn("ADMIN");
+
+    const reply = await call("POST", "/probe/audited/stream/many", {
+      cookie: admin.cookie,
+      body: {},
+    });
+
+    expect(reply.status).toBe(500);
+    expect((await auditRows("User")).filter((row) => row.action === "probe.stream")).toHaveLength(
+      0,
+    );
+  });
+
   test("a handler that captures nothing still gets a row for the route entity", async () => {
     const admin = await signedIn("ADMIN");
     const target = await testApp().factories.user({ role: "STUDENT" });

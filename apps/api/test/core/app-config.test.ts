@@ -50,6 +50,13 @@ describe("loadConfig", () => {
   });
 
   test("reads overrides as numbers", () => {
+    expect(loadConfig(valid).audit).toEqual({
+      transactionMaxWaitMs: 5000,
+      transactionTimeoutMs: 15000,
+    });
+    expect(
+      loadConfig({ ...valid, AUDIT_TRANSACTION_TIMEOUT_MS: "20000" }).audit.transactionTimeoutMs,
+    ).toBe(20000);
     expect(loadConfig({ ...valid, ADMIN_IDLE_MINUTES: "5" }).auth.adminIdleMinutes).toBe(5);
   });
 
