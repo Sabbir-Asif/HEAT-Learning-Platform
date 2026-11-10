@@ -10,9 +10,8 @@ import {
   realmCookies,
 } from "../auth";
 import type { AuthenticatedRequest, AuthenticatedSession, CookieResponse } from "../auth";
-import { SignInRequestDto } from "../student-auth/student-auth.dto";
 import { AdminAccountService } from "./admin-account.service";
-import { AdminMeResponseDto } from "./admin-auth.dto";
+import { AdminMeResponseDto, AdminSignInRequestDto } from "./admin-auth.dto";
 import { AdminSignInService } from "./admin-sign-in.service";
 
 const userAgentLimit = 255;
@@ -32,7 +31,7 @@ export class AdminAuthController {
   @HttpCode(200)
   @ApiOkResponse({ type: AdminMeResponseDto })
   async signIn(
-    @Body() body: SignInRequestDto,
+    @Body() body: AdminSignInRequestDto,
     @Req() request: AuthenticatedRequest,
     @Res({ passthrough: true }) response: CookieResponse,
   ): Promise<AdminMeResponseDto> {
@@ -40,8 +39,9 @@ export class AdminAuthController {
       userAgent: request.headers["user-agent"]?.slice(0, userAgentLimit),
       ipAddress: request.ip,
     });
+    const profile = await this.account.describe(userId);
     this.cookies.write(response, "admin", tokens);
-    return this.account.describe(userId);
+    return profile;
   }
 
   @Public()
