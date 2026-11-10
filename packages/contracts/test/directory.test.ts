@@ -4,6 +4,9 @@ import {
   createFacultyRequestSchema,
   createUniversityRequestSchema,
   departmentListQuerySchema,
+  directoryDepartmentLookupParamsSchema,
+  directoryFacultyLookupParamsSchema,
+  directoryOptionListResponseSchema,
   facultyFormSchema,
   facultyListQuerySchema,
   facultyUniversityParamsSchema,
@@ -148,5 +151,23 @@ describe("departmentListQuerySchema", () => {
 
   test("rejects filters that are not ids", () => {
     expect(departmentListQuerySchema.safeParse({ facultyId: "arts" }).success).toBe(false);
+  });
+});
+
+describe("public directory lookups", () => {
+  test("an option exposes only an id and a name", () => {
+    const parsed = directoryOptionListResponseSchema.parse({
+      items: [{ id: pair.universityId, name: "Dhaka", archivedAt: null, studentCount: 4 }],
+    });
+
+    expect(parsed).toEqual({ items: [{ id: pair.universityId, name: "Dhaka" }] });
+  });
+
+  test("lookup parameters must be ids", () => {
+    expect(directoryFacultyLookupParamsSchema.safeParse({ universityId: "x" }).success).toBe(false);
+    expect(
+      directoryDepartmentLookupParamsSchema.safeParse({ ...pair, facultyId: "arts" }).success,
+    ).toBe(false);
+    expect(directoryDepartmentLookupParamsSchema.safeParse(pair).success).toBe(true);
   });
 });

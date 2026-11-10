@@ -12,6 +12,7 @@ export const rateLimitProfileNames = [
   "resendVerification",
   "adminInvite",
   "playbackSession",
+  "directoryLookup",
 ] as const;
 
 export type RateLimitProfileName = (typeof rateLimitProfileNames)[number];
@@ -50,6 +51,7 @@ const defaults: Record<RateLimitProfileName, RateLimitProfile> = {
   resendVerification: { limit: 3, windowSeconds: 3600, ipLimit: 300 },
   adminInvite: { limit: 60, windowSeconds: 3600, ipLimit: 300 },
   playbackSession: { limit: 30, windowSeconds: 60, ipLimit: 3000 },
+  directoryLookup: { limit: 600, windowSeconds: 60, ipLimit: 3000 },
 };
 
 const lockoutDefaults: LockoutPolicy = {
