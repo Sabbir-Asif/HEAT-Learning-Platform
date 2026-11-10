@@ -15,7 +15,7 @@ export const adminSessionRefreshOptions = {
 export const adminCsrfOptions = {
   cookieName: adminCsrf.cookie,
   tokenPath: adminCsrf.tokenPath,
-  skipPaths: ["/api/admin/auth/sign-in", adminSessionCookies.refreshPath],
+  skipPaths: ["/api/admin/auth/sign-in", adminSessionCookies.refreshPath, "/api/captcha"],
 };
 
 function createBrowserQueryClient(): QueryClient {

@@ -113,6 +113,30 @@ describe("CSRF interceptor", () => {
     expect(headerOf(1)).toBeNull();
   });
 
+  test("does not retry the token fetch for a few seconds after it failed", async () => {
+    vi.useFakeTimers();
+    try {
+      fetchMock.mockImplementation(async (input) =>
+        String(input) === studentCsrf.tokenPath
+          ? new Response(null, { status: 401 })
+          : new Response(null, { status: 204 }),
+      );
+      uninstall = installCsrf({ readCookie: cookies({}) });
+
+      await customFetch("/api/a", { method: "POST" });
+      await customFetch("/api/b", { method: "POST" });
+      const tokenFetches = () =>
+        fetchMock.mock.calls.filter(([url]) => String(url) === studentCsrf.tokenPath).length;
+      expect(tokenFetches()).toBe(1);
+
+      await vi.advanceTimersByTimeAsync(10_000);
+      await customFetch("/api/c", { method: "POST" });
+      expect(tokenFetches()).toBe(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   test("uses the admin cookie and token path when configured", async () => {
     uninstall = installCsrf({
       cookieName: adminCsrf.cookie,

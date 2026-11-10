@@ -11,6 +11,7 @@ export interface CsrfOptions {
 }
 
 const defaultSkipPaths = ["/api/auth/sign-in", "/api/auth/refresh", "/api/captcha"];
+const failedFetchBackoffMs = 5000;
 const safeMethods: ReadonlySet<string> = new Set(["GET", "HEAD", "OPTIONS"]);
 
 const pathOf = (url: string): string => url.split("?")[0] ?? url;
@@ -37,6 +38,7 @@ export function createCsrfInterceptor(options: CsrfOptions = {}): RequestInterce
   const skipPaths = options.skipPaths ?? defaultSkipPaths;
   const readCookie = options.readCookie ?? readDocumentCookie;
   let inFlight: Promise<string | undefined> | undefined;
+  let retryAfter = 0;
 
   const fetchToken = async (): Promise<string | undefined> => {
     try {
@@ -48,10 +50,17 @@ export function createCsrfInterceptor(options: CsrfOptions = {}): RequestInterce
     }
   };
 
+  const fetchTokenWithBackoff = async (): Promise<string | undefined> => {
+    const token = await fetchToken();
+    if (token === undefined) retryAfter = Date.now() + failedFetchBackoffMs;
+    return token;
+  };
+
   const currentToken = async (): Promise<string | undefined> => {
     const fromCookie = readCookie(cookieName);
     if (fromCookie !== undefined) return fromCookie;
-    inFlight ??= fetchToken().finally(() => {
+    if (inFlight === undefined && Date.now() < retryAfter) return undefined;
+    inFlight ??= fetchTokenWithBackoff().finally(() => {
       inFlight = undefined;
     });
     return inFlight;

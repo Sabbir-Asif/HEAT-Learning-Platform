@@ -97,4 +97,16 @@ describe("Providers", () => {
     const signOut = fetchMock.mock.calls.find(([url]) => url === "/api/admin/auth/sign-out");
     expect(new Headers(signOut?.[1]?.headers).get("x-csrf-token")).toBe("admin-token");
   });
+
+  test("the captcha request is sent without fetching an admin CSRF token", async () => {
+    fetchMock.mockImplementation(async () => new Response(null, { status: 204 }));
+    await mount();
+    const { adminCsrfOptions } = await import("../src/shell/providers");
+
+    expect(adminCsrfOptions.skipPaths).toContain("/api/captcha");
+    const { captchaIssue } = await import("@heat/api-client");
+    await captchaIssue({});
+
+    expect(fetchMock.mock.calls.map(([url]) => String(url))).toEqual(["/api/captcha"]);
+  });
 });
