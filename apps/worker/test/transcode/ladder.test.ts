@@ -5,6 +5,7 @@ import {
   buildMasterPlaylist,
   buildRenditionArgs,
   gopFrames,
+  renditionsForSource,
   selectRenditions,
 } from "../../src/transcode/ladder";
 
@@ -154,5 +155,53 @@ describe("buildMasterPlaylist", () => {
 
   test("rejects an empty ladder", () => {
     expect(() => buildMasterPlaylist([])).toThrow();
+  });
+});
+
+describe("buildMasterPlaylist without audio", () => {
+  test("declares only the video codec and bandwidth", () => {
+    const text = buildMasterPlaylist(selectRenditions(360), { audio: false });
+    expect(text).toContain("BANDWIDTH=400000");
+    expect(text).toContain('CODECS="avc1.640028"');
+    expect(text).not.toContain("mp4a");
+  });
+
+  test("keeps the audio codec and bandwidth by default", () => {
+    const text = buildMasterPlaylist(selectRenditions(360));
+    expect(text).toContain("BANDWIDTH=496000");
+    expect(text).toContain("mp4a.40.2");
+  });
+});
+
+describe("renditionsForSource", () => {
+  test("keeps 16:9 widths for a 16:9 source", () => {
+    expect(
+      renditionsForSource({ width: 1920, height: 1080 }).map((r) => [r.name, r.width]),
+    ).toEqual([
+      ["360p", 640],
+      ["480p", 854],
+      ["720p", 1280],
+      ["1080p", 1920],
+    ]);
+  });
+
+  test("computes an even width from the real aspect ratio", () => {
+    expect(
+      renditionsForSource({ width: 1280, height: 960 }).map((r) => [r.name, r.width]),
+    ).toEqual([
+      ["360p", 480],
+      ["480p", 640],
+      ["720p", 960],
+    ]);
+  });
+
+  test("never upscales a small source", () => {
+    const [only, ...rest] = renditionsForSource({ width: 320, height: 240 });
+    expect(rest).toEqual([]);
+    expect(only).toMatchObject({ height: 240, width: 320 });
+  });
+
+  test("rejects a size that is not positive", () => {
+    expect(() => renditionsForSource({ width: 0, height: 720 })).toThrow("positive");
   });
 });
