@@ -186,13 +186,13 @@ describe("renditionsForSource", () => {
   });
 
   test("computes an even width from the real aspect ratio", () => {
-    expect(
-      renditionsForSource({ width: 1280, height: 960 }).map((r) => [r.name, r.width]),
-    ).toEqual([
-      ["360p", 480],
-      ["480p", 640],
-      ["720p", 960],
-    ]);
+    expect(renditionsForSource({ width: 1280, height: 960 }).map((r) => [r.name, r.width])).toEqual(
+      [
+        ["360p", 480],
+        ["480p", 640],
+        ["720p", 960],
+      ],
+    );
   });
 
   test("never upscales a small source", () => {
