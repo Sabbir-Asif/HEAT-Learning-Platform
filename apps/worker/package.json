@@ -23,6 +23,7 @@
     "api": "workspace:*",
     "bullmq": "^6.7.3",
     "ioredis": "6.0.0",
+    "qrcode": "1.5.4",
     "react": "catalog:",
     "react-dom": "catalog:",
     "reflect-metadata": "^0.2.2",
@@ -33,8 +34,10 @@
     "@heat/config": "workspace:*",
     "@nestjs/cli": "^12.0.12",
     "@types/node": "catalog:",
+    "@types/qrcode": "1.5.6",
     "@types/react": "catalog:",
     "eslint": "catalog:",
+    "jsqr": "1.4.0",
     "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
