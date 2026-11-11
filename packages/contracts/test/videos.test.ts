@@ -4,6 +4,8 @@ import {
   updateVideoSlotRequestSchema,
   videoSlotListResponseSchema,
   videoSlotStatusSchema,
+  videoQueuedEventType,
+  videoRejectionReasonSchema,
   videoUploadLimits,
   videoUploadParamsSchema,
   videoUploadedPayloadSchema,
@@ -52,6 +54,7 @@ describe("video slot responses", () => {
           required: true,
           status: "NOT_UPLOADED",
           assetKey: null,
+          rejectionReason: null,
         },
       ],
       locked: false,
@@ -86,5 +89,14 @@ describe("video upload contracts", () => {
 
   test("the size cap is two gibibytes", () => {
     expect(videoUploadLimits.maxBytes).toBe(2147483648);
+  });
+});
+
+describe("video probe contracts", () => {
+  test("lists the allowed containers and codecs and the rejection reasons", () => {
+    expect(videoUploadLimits.containers).toContain("mp4");
+    expect(videoUploadLimits.videoCodecs).toContain("h264");
+    expect(videoRejectionReasonSchema.options).toContain("UNSUPPORTED_CODEC");
+    expect(videoQueuedEventType).toBe("video.queued");
   });
 });
