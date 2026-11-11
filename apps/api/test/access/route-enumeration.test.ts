@@ -107,6 +107,7 @@ describe("deny-by-default route enumeration", () => {
       "GET /api/courses/:courseId/learning-structure": "learningRead",
       "GET /api/courses/:courseId/modules/:moduleId/lesson": "learningRead",
       "GET /api/courses/:courseId/modules/:moduleId/quiz-access": "learningRead",
+      "GET /api/courses/:courseId/modules/:moduleId/quiz": "learningRead",
     });
   });
 
