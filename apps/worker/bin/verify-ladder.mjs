@@ -16,7 +16,9 @@ if (!outputArg) {
 const outputDir = resolve(outputArg);
 
 const probe = (args) => {
-  const run = spawnSync("ffprobe", ["-v", "error", ...args], { encoding: "utf8" });
+  const run = spawnSync("ffprobe", ["-protocol_whitelist", "file", "-v", "error", ...args], {
+    encoding: "utf8",
+  });
   if (run.status !== 0) throw new Error(run.stderr);
   return run.stdout;
 };
@@ -40,6 +42,7 @@ for (const playlist of playlists) {
       "frame=pts_time",
       "-of",
       "csv=p=0",
+      "-i",
       path,
     ]),
   );
@@ -51,7 +54,7 @@ for (const playlist of playlists) {
   if (!segmentsAboutSixSeconds(durations))
     failures.push(`${name}: segments are not about 6 seconds`);
 
-  const codecs = probe(["-show_entries", "stream=codec_name", "-of", "csv=p=0", path])
+  const codecs = probe(["-show_entries", "stream=codec_name", "-of", "csv=p=0", "-i", path])
     .split("\n")
     .filter(Boolean)
     .sort()

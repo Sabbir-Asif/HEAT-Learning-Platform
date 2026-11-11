@@ -114,6 +114,18 @@ describe("buildRenditionArgs", () => {
     }
   });
 
+  test("restricts FFmpeg to the file protocol before the input", () => {
+    const args = argsFor("720p");
+    expect(args.slice(0, 2)).toEqual(["-protocol_whitelist", "file"]);
+    expect(args.indexOf("-protocol_whitelist")).toBeLessThan(args.indexOf("-i"));
+  });
+
+  test("rejects an output directory containing a percent sign", () => {
+    expect(() =>
+      buildRenditionArgs(rendition("360p"), { ...options, outputDir: "/work/100%/out" }),
+    ).toThrow();
+  });
+
   test("rejects a frame rate that is not positive", () => {
     expect(() => buildRenditionArgs(rendition("360p"), { ...options, fps: 0 })).toThrow();
   });

@@ -53,9 +53,12 @@ export interface EncodeOptions {
 
 export function buildRenditionArgs(rendition: Rendition, options: EncodeOptions): string[] {
   if (!(options.fps > 0)) throw new Error("Frame rate must be positive");
+  if (options.outputDir.includes("%")) throw new Error("Output directory must not contain %");
   const gop = String(gopFrames(options.fps));
   const folder = `${options.outputDir}/${rendition.name}`;
   return [
+    "-protocol_whitelist",
+    "file",
     "-nostdin",
     "-y",
     "-i",

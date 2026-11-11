@@ -18,6 +18,8 @@ const outputDir = resolve(outputArg);
 const probe = spawnSync(
   "ffprobe",
   [
+    "-protocol_whitelist",
+    "file",
     "-v",
     "error",
     "-select_streams",
@@ -26,6 +28,7 @@ const probe = spawnSync(
     "stream=height,r_frame_rate",
     "-of",
     "json",
+    "-i",
     input,
   ],
   { encoding: "utf8" },
