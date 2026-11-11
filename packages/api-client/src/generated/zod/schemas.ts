@@ -738,6 +738,385 @@ export const ModulesUpdateResponse = zod.object({
 })
 
 
+export const quizGetPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizGetPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const QuizGetParams = zod.object({
+  "id": zod.uuid().regex(quizGetPathIdRegExp),
+  "moduleId": zod.uuid().regex(quizGetPathModuleIdRegExp)
+})
+
+export const quizGetResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizGetResponseQuestionsItemExplanationMax = 2000;
+
+export const quizGetResponseQuestionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizGetResponseQuestionsItemOptionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizGetResponseQuestionsItemOptionsItemOrderMax = 9007199254740991;
+
+export const quizGetResponseQuestionsItemOrderMax = 9007199254740991;
+
+export const quizGetResponseRulesAttemptLimitMax = 9007199254740991;
+
+export const quizGetResponseRulesPassMarkPercentMax = 100;
+
+export const quizGetResponseRulesWaitMinutesMin = 0;
+export const quizGetResponseRulesWaitMinutesMax = 10080;
+
+
+
+export const QuizGetResponse = zod.object({
+  "id": zod.uuid().regex(quizGetResponseIdRegExp).nullable(),
+  "locked": zod.boolean(),
+  "questions": zod.array(zod.object({
+  "explanation": zod.string().max(quizGetResponseQuestionsItemExplanationMax).nullable(),
+  "id": zod.uuid().regex(quizGetResponseQuestionsItemIdRegExp),
+  "options": zod.array(zod.object({
+  "id": zod.uuid().regex(quizGetResponseQuestionsItemOptionsItemIdRegExp),
+  "isCorrect": zod.boolean(),
+  "order": zod.int().min(1).max(quizGetResponseQuestionsItemOptionsItemOrderMax),
+  "text": zod.string()
+})),
+  "order": zod.int().min(1).max(quizGetResponseQuestionsItemOrderMax),
+  "text": zod.string(),
+  "type": zod.enum(['SINGLE_CHOICE'])
+})),
+  "rules": zod.object({
+  "attemptLimit": zod.int().min(1).max(quizGetResponseRulesAttemptLimitMax).nullable(),
+  "passMarkPercent": zod.int().min(1).max(quizGetResponseRulesPassMarkPercentMax),
+  "waitMinutes": zod.int().min(quizGetResponseRulesWaitMinutesMin).max(quizGetResponseRulesWaitMinutesMax)
+})
+})
+
+
+export const quizCreateQuestionPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizCreateQuestionPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const QuizCreateQuestionParams = zod.object({
+  "id": zod.uuid().regex(quizCreateQuestionPathIdRegExp),
+  "moduleId": zod.uuid().regex(quizCreateQuestionPathModuleIdRegExp)
+})
+
+export const quizCreateQuestionBodyExplanationMax = 2000;
+
+export const quizCreateQuestionBodyOptionsItemTextMax = 300;
+
+export const quizCreateQuestionBodyOptionsMin = 2;
+export const quizCreateQuestionBodyOptionsMax = 6;
+
+export const quizCreateQuestionBodyTextMax = 1000;
+
+export const quizCreateQuestionBodyTypeDefault = `SINGLE_CHOICE`;
+
+export const QuizCreateQuestionBody = zod.object({
+  "explanation": zod.string().max(quizCreateQuestionBodyExplanationMax).nullish(),
+  "options": zod.array(zod.object({
+  "isCorrect": zod.boolean(),
+  "text": zod.string().min(1).max(quizCreateQuestionBodyOptionsItemTextMax)
+})).min(quizCreateQuestionBodyOptionsMin).max(quizCreateQuestionBodyOptionsMax),
+  "text": zod.string().min(1).max(quizCreateQuestionBodyTextMax),
+  "type": zod.enum(['SINGLE_CHOICE']).default(quizCreateQuestionBodyTypeDefault)
+})
+
+export const quizCreateQuestionResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizCreateQuestionResponseQuestionsItemExplanationMax = 2000;
+
+export const quizCreateQuestionResponseQuestionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizCreateQuestionResponseQuestionsItemOptionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizCreateQuestionResponseQuestionsItemOptionsItemOrderMax = 9007199254740991;
+
+export const quizCreateQuestionResponseQuestionsItemOrderMax = 9007199254740991;
+
+export const quizCreateQuestionResponseRulesAttemptLimitMax = 9007199254740991;
+
+export const quizCreateQuestionResponseRulesPassMarkPercentMax = 100;
+
+export const quizCreateQuestionResponseRulesWaitMinutesMin = 0;
+export const quizCreateQuestionResponseRulesWaitMinutesMax = 10080;
+
+
+
+export const QuizCreateQuestionResponse = zod.object({
+  "id": zod.uuid().regex(quizCreateQuestionResponseIdRegExp).nullable(),
+  "locked": zod.boolean(),
+  "questions": zod.array(zod.object({
+  "explanation": zod.string().max(quizCreateQuestionResponseQuestionsItemExplanationMax).nullable(),
+  "id": zod.uuid().regex(quizCreateQuestionResponseQuestionsItemIdRegExp),
+  "options": zod.array(zod.object({
+  "id": zod.uuid().regex(quizCreateQuestionResponseQuestionsItemOptionsItemIdRegExp),
+  "isCorrect": zod.boolean(),
+  "order": zod.int().min(1).max(quizCreateQuestionResponseQuestionsItemOptionsItemOrderMax),
+  "text": zod.string()
+})),
+  "order": zod.int().min(1).max(quizCreateQuestionResponseQuestionsItemOrderMax),
+  "text": zod.string(),
+  "type": zod.enum(['SINGLE_CHOICE'])
+})),
+  "rules": zod.object({
+  "attemptLimit": zod.int().min(1).max(quizCreateQuestionResponseRulesAttemptLimitMax).nullable(),
+  "passMarkPercent": zod.int().min(1).max(quizCreateQuestionResponseRulesPassMarkPercentMax),
+  "waitMinutes": zod.int().min(quizCreateQuestionResponseRulesWaitMinutesMin).max(quizCreateQuestionResponseRulesWaitMinutesMax)
+})
+})
+
+
+export const quizReorderQuestionsPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizReorderQuestionsPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const QuizReorderQuestionsParams = zod.object({
+  "id": zod.uuid().regex(quizReorderQuestionsPathIdRegExp),
+  "moduleId": zod.uuid().regex(quizReorderQuestionsPathModuleIdRegExp)
+})
+
+export const quizReorderQuestionsBodyOrderedIdsItemRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizReorderQuestionsBodyOrderedIdsMax = 500;
+
+export const quizReorderQuestionsBodyPreviousIdsItemRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizReorderQuestionsBodyPreviousIdsMax = 500;
+
+
+
+export const QuizReorderQuestionsBody = zod.object({
+  "orderedIds": zod.array(zod.uuid().regex(quizReorderQuestionsBodyOrderedIdsItemRegExp)).max(quizReorderQuestionsBodyOrderedIdsMax),
+  "previousIds": zod.array(zod.uuid().regex(quizReorderQuestionsBodyPreviousIdsItemRegExp)).max(quizReorderQuestionsBodyPreviousIdsMax)
+})
+
+export const quizReorderQuestionsResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizReorderQuestionsResponseQuestionsItemExplanationMax = 2000;
+
+export const quizReorderQuestionsResponseQuestionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizReorderQuestionsResponseQuestionsItemOptionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizReorderQuestionsResponseQuestionsItemOptionsItemOrderMax = 9007199254740991;
+
+export const quizReorderQuestionsResponseQuestionsItemOrderMax = 9007199254740991;
+
+export const quizReorderQuestionsResponseRulesAttemptLimitMax = 9007199254740991;
+
+export const quizReorderQuestionsResponseRulesPassMarkPercentMax = 100;
+
+export const quizReorderQuestionsResponseRulesWaitMinutesMin = 0;
+export const quizReorderQuestionsResponseRulesWaitMinutesMax = 10080;
+
+
+
+export const QuizReorderQuestionsResponse = zod.object({
+  "id": zod.uuid().regex(quizReorderQuestionsResponseIdRegExp).nullable(),
+  "locked": zod.boolean(),
+  "questions": zod.array(zod.object({
+  "explanation": zod.string().max(quizReorderQuestionsResponseQuestionsItemExplanationMax).nullable(),
+  "id": zod.uuid().regex(quizReorderQuestionsResponseQuestionsItemIdRegExp),
+  "options": zod.array(zod.object({
+  "id": zod.uuid().regex(quizReorderQuestionsResponseQuestionsItemOptionsItemIdRegExp),
+  "isCorrect": zod.boolean(),
+  "order": zod.int().min(1).max(quizReorderQuestionsResponseQuestionsItemOptionsItemOrderMax),
+  "text": zod.string()
+})),
+  "order": zod.int().min(1).max(quizReorderQuestionsResponseQuestionsItemOrderMax),
+  "text": zod.string(),
+  "type": zod.enum(['SINGLE_CHOICE'])
+})),
+  "rules": zod.object({
+  "attemptLimit": zod.int().min(1).max(quizReorderQuestionsResponseRulesAttemptLimitMax).nullable(),
+  "passMarkPercent": zod.int().min(1).max(quizReorderQuestionsResponseRulesPassMarkPercentMax),
+  "waitMinutes": zod.int().min(quizReorderQuestionsResponseRulesWaitMinutesMin).max(quizReorderQuestionsResponseRulesWaitMinutesMax)
+})
+})
+
+
+export const quizRemoveQuestionPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizRemoveQuestionPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizRemoveQuestionPathQuestionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const QuizRemoveQuestionParams = zod.object({
+  "id": zod.uuid().regex(quizRemoveQuestionPathIdRegExp),
+  "moduleId": zod.uuid().regex(quizRemoveQuestionPathModuleIdRegExp),
+  "questionId": zod.uuid().regex(quizRemoveQuestionPathQuestionIdRegExp)
+})
+
+export const quizRemoveQuestionResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizRemoveQuestionResponseQuestionsItemExplanationMax = 2000;
+
+export const quizRemoveQuestionResponseQuestionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizRemoveQuestionResponseQuestionsItemOptionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizRemoveQuestionResponseQuestionsItemOptionsItemOrderMax = 9007199254740991;
+
+export const quizRemoveQuestionResponseQuestionsItemOrderMax = 9007199254740991;
+
+export const quizRemoveQuestionResponseRulesAttemptLimitMax = 9007199254740991;
+
+export const quizRemoveQuestionResponseRulesPassMarkPercentMax = 100;
+
+export const quizRemoveQuestionResponseRulesWaitMinutesMin = 0;
+export const quizRemoveQuestionResponseRulesWaitMinutesMax = 10080;
+
+
+
+export const QuizRemoveQuestionResponse = zod.object({
+  "id": zod.uuid().regex(quizRemoveQuestionResponseIdRegExp).nullable(),
+  "locked": zod.boolean(),
+  "questions": zod.array(zod.object({
+  "explanation": zod.string().max(quizRemoveQuestionResponseQuestionsItemExplanationMax).nullable(),
+  "id": zod.uuid().regex(quizRemoveQuestionResponseQuestionsItemIdRegExp),
+  "options": zod.array(zod.object({
+  "id": zod.uuid().regex(quizRemoveQuestionResponseQuestionsItemOptionsItemIdRegExp),
+  "isCorrect": zod.boolean(),
+  "order": zod.int().min(1).max(quizRemoveQuestionResponseQuestionsItemOptionsItemOrderMax),
+  "text": zod.string()
+})),
+  "order": zod.int().min(1).max(quizRemoveQuestionResponseQuestionsItemOrderMax),
+  "text": zod.string(),
+  "type": zod.enum(['SINGLE_CHOICE'])
+})),
+  "rules": zod.object({
+  "attemptLimit": zod.int().min(1).max(quizRemoveQuestionResponseRulesAttemptLimitMax).nullable(),
+  "passMarkPercent": zod.int().min(1).max(quizRemoveQuestionResponseRulesPassMarkPercentMax),
+  "waitMinutes": zod.int().min(quizRemoveQuestionResponseRulesWaitMinutesMin).max(quizRemoveQuestionResponseRulesWaitMinutesMax)
+})
+})
+
+
+export const quizUpdateQuestionPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizUpdateQuestionPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizUpdateQuestionPathQuestionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const QuizUpdateQuestionParams = zod.object({
+  "id": zod.uuid().regex(quizUpdateQuestionPathIdRegExp),
+  "moduleId": zod.uuid().regex(quizUpdateQuestionPathModuleIdRegExp),
+  "questionId": zod.uuid().regex(quizUpdateQuestionPathQuestionIdRegExp)
+})
+
+export const quizUpdateQuestionBodyExplanationMax = 2000;
+
+export const quizUpdateQuestionBodyOptionsItemTextMax = 300;
+
+export const quizUpdateQuestionBodyOptionsMin = 2;
+export const quizUpdateQuestionBodyOptionsMax = 6;
+
+export const quizUpdateQuestionBodyTextMax = 1000;
+
+
+
+export const QuizUpdateQuestionBody = zod.object({
+  "explanation": zod.string().max(quizUpdateQuestionBodyExplanationMax).nullish(),
+  "options": zod.array(zod.object({
+  "isCorrect": zod.boolean(),
+  "text": zod.string().min(1).max(quizUpdateQuestionBodyOptionsItemTextMax)
+})).min(quizUpdateQuestionBodyOptionsMin).max(quizUpdateQuestionBodyOptionsMax),
+  "text": zod.string().min(1).max(quizUpdateQuestionBodyTextMax)
+})
+
+export const quizUpdateQuestionResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizUpdateQuestionResponseQuestionsItemExplanationMax = 2000;
+
+export const quizUpdateQuestionResponseQuestionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizUpdateQuestionResponseQuestionsItemOptionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizUpdateQuestionResponseQuestionsItemOptionsItemOrderMax = 9007199254740991;
+
+export const quizUpdateQuestionResponseQuestionsItemOrderMax = 9007199254740991;
+
+export const quizUpdateQuestionResponseRulesAttemptLimitMax = 9007199254740991;
+
+export const quizUpdateQuestionResponseRulesPassMarkPercentMax = 100;
+
+export const quizUpdateQuestionResponseRulesWaitMinutesMin = 0;
+export const quizUpdateQuestionResponseRulesWaitMinutesMax = 10080;
+
+
+
+export const QuizUpdateQuestionResponse = zod.object({
+  "id": zod.uuid().regex(quizUpdateQuestionResponseIdRegExp).nullable(),
+  "locked": zod.boolean(),
+  "questions": zod.array(zod.object({
+  "explanation": zod.string().max(quizUpdateQuestionResponseQuestionsItemExplanationMax).nullable(),
+  "id": zod.uuid().regex(quizUpdateQuestionResponseQuestionsItemIdRegExp),
+  "options": zod.array(zod.object({
+  "id": zod.uuid().regex(quizUpdateQuestionResponseQuestionsItemOptionsItemIdRegExp),
+  "isCorrect": zod.boolean(),
+  "order": zod.int().min(1).max(quizUpdateQuestionResponseQuestionsItemOptionsItemOrderMax),
+  "text": zod.string()
+})),
+  "order": zod.int().min(1).max(quizUpdateQuestionResponseQuestionsItemOrderMax),
+  "text": zod.string(),
+  "type": zod.enum(['SINGLE_CHOICE'])
+})),
+  "rules": zod.object({
+  "attemptLimit": zod.int().min(1).max(quizUpdateQuestionResponseRulesAttemptLimitMax).nullable(),
+  "passMarkPercent": zod.int().min(1).max(quizUpdateQuestionResponseRulesPassMarkPercentMax),
+  "waitMinutes": zod.int().min(quizUpdateQuestionResponseRulesWaitMinutesMin).max(quizUpdateQuestionResponseRulesWaitMinutesMax)
+})
+})
+
+
+export const quizUpdateRulesPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizUpdateRulesPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const QuizUpdateRulesParams = zod.object({
+  "id": zod.uuid().regex(quizUpdateRulesPathIdRegExp),
+  "moduleId": zod.uuid().regex(quizUpdateRulesPathModuleIdRegExp)
+})
+
+export const quizUpdateRulesBodyAttemptLimitMax = 9007199254740991;
+
+export const quizUpdateRulesBodyPassMarkPercentMax = 100;
+
+export const quizUpdateRulesBodyWaitMinutesMin = 0;
+export const quizUpdateRulesBodyWaitMinutesMax = 10080;
+
+
+
+export const QuizUpdateRulesBody = zod.object({
+  "attemptLimit": zod.int().min(1).max(quizUpdateRulesBodyAttemptLimitMax).nullable(),
+  "passMarkPercent": zod.int().min(1).max(quizUpdateRulesBodyPassMarkPercentMax),
+  "waitMinutes": zod.int().min(quizUpdateRulesBodyWaitMinutesMin).max(quizUpdateRulesBodyWaitMinutesMax)
+})
+
+export const quizUpdateRulesResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizUpdateRulesResponseQuestionsItemExplanationMax = 2000;
+
+export const quizUpdateRulesResponseQuestionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizUpdateRulesResponseQuestionsItemOptionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizUpdateRulesResponseQuestionsItemOptionsItemOrderMax = 9007199254740991;
+
+export const quizUpdateRulesResponseQuestionsItemOrderMax = 9007199254740991;
+
+export const quizUpdateRulesResponseRulesAttemptLimitMax = 9007199254740991;
+
+export const quizUpdateRulesResponseRulesPassMarkPercentMax = 100;
+
+export const quizUpdateRulesResponseRulesWaitMinutesMin = 0;
+export const quizUpdateRulesResponseRulesWaitMinutesMax = 10080;
+
+
+
+export const QuizUpdateRulesResponse = zod.object({
+  "id": zod.uuid().regex(quizUpdateRulesResponseIdRegExp).nullable(),
+  "locked": zod.boolean(),
+  "questions": zod.array(zod.object({
+  "explanation": zod.string().max(quizUpdateRulesResponseQuestionsItemExplanationMax).nullable(),
+  "id": zod.uuid().regex(quizUpdateRulesResponseQuestionsItemIdRegExp),
+  "options": zod.array(zod.object({
+  "id": zod.uuid().regex(quizUpdateRulesResponseQuestionsItemOptionsItemIdRegExp),
+  "isCorrect": zod.boolean(),
+  "order": zod.int().min(1).max(quizUpdateRulesResponseQuestionsItemOptionsItemOrderMax),
+  "text": zod.string()
+})),
+  "order": zod.int().min(1).max(quizUpdateRulesResponseQuestionsItemOrderMax),
+  "text": zod.string(),
+  "type": zod.enum(['SINGLE_CHOICE'])
+})),
+  "rules": zod.object({
+  "attemptLimit": zod.int().min(1).max(quizUpdateRulesResponseRulesAttemptLimitMax).nullable(),
+  "passMarkPercent": zod.int().min(1).max(quizUpdateRulesResponseRulesPassMarkPercentMax),
+  "waitMinutes": zod.int().min(quizUpdateRulesResponseRulesWaitMinutesMin).max(quizUpdateRulesResponseRulesWaitMinutesMax)
+})
+})
+
+
 export const lessonSectionsCreatePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const lessonSectionsCreatePathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 

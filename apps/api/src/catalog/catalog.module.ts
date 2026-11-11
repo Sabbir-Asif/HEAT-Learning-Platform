@@ -9,6 +9,8 @@ import { LessonSectionsController } from "./lesson-sections.controller";
 import { LessonSectionsService } from "./lesson-sections.service";
 import { ModulesController } from "./modules.controller";
 import { ModulesService } from "./modules.service";
+import { QuizController } from "./quiz.controller";
+import { QuizService } from "./quiz.service";
 import { VideoSlotsController } from "./video-slots.controller";
 import { VideoSlotsService } from "./video-slots.service";
 import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
@@ -20,6 +22,7 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     ModulesController,
     LessonSectionsController,
     VideoSlotsController,
+    QuizController,
   ],
   providers: [
     CoursesService,
@@ -28,6 +31,7 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     ModulesService,
     LessonSectionsService,
     VideoSlotsService,
+    QuizService,
     { provide: COURSE_PUBLISH_CHECKS, useValue: [] },
   ],
   exports: [CoursesService, CourseLookupService, ContentLockService, COURSE_PUBLISH_CHECKS],

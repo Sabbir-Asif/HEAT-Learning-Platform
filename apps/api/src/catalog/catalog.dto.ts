@@ -11,9 +11,14 @@ import {
   moduleListResponseSchema,
   moduleParamsSchema,
   moduleSummarySchema,
+  quizQuestionParamsSchema,
+  quizQuestionRequestSchema,
+  quizRulesRequestSchema,
+  quizSummarySchema,
   reorderRequestSchema,
   updateCourseRequestSchema,
   updateModuleRequestSchema,
+  updateQuizQuestionRequestSchema,
   updateVideoSlotRequestSchema,
   videoSlotListResponseSchema,
   videoSlotParamsSchema,
@@ -55,3 +60,13 @@ export class UpdateVideoSlotRequestDto extends createZodDto(updateVideoSlotReque
 export class VideoSlotListResponseDto extends createZodDto(videoSlotListResponseSchema) {}
 
 export class VideoSlotParamsDto extends createZodDto(videoSlotParamsSchema) {}
+
+export class QuizSummaryDto extends createZodDto(quizSummarySchema) {}
+
+export class QuizRulesRequestDto extends createZodDto(quizRulesRequestSchema) {}
+
+export class QuizQuestionRequestDto extends createZodDto(quizQuestionRequestSchema) {}
+
+export class UpdateQuizQuestionRequestDto extends createZodDto(updateQuizQuestionRequestSchema) {}
+
+export class QuizQuestionParamsDto extends createZodDto(quizQuestionParamsSchema) {}

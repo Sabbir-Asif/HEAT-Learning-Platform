@@ -986,6 +986,127 @@ export interface ModuleSummaryDto {
   updatedAt: string;
 }
 
+export type QuizQuestionRequestDtoOptionsItem = {
+  isCorrect: boolean;
+  /**
+     * @minLength 1
+     * @maxLength 300
+     */
+  text: string;
+};
+
+export type QuizQuestionRequestDtoType = typeof QuizQuestionRequestDtoType[keyof typeof QuizQuestionRequestDtoType];
+
+
+export const QuizQuestionRequestDtoType = {
+  SINGLE_CHOICE: 'SINGLE_CHOICE',
+} as const;
+
+export interface QuizQuestionRequestDto {
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  explanation?: string | null;
+  /**
+     * @minItems 2
+     * @maxItems 6
+     */
+  options: QuizQuestionRequestDtoOptionsItem[];
+  /**
+     * @minLength 1
+     * @maxLength 1000
+     */
+  text: string;
+  type?: QuizQuestionRequestDtoType;
+}
+
+export interface QuizRulesRequestDto {
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attemptLimit: number | null;
+  /**
+     * @minimum 1
+     * @maximum 100
+     */
+  passMarkPercent: number;
+  /**
+     * @minimum 0
+     * @maximum 10080
+     */
+  waitMinutes: number;
+}
+
+export type QuizSummaryDtoQuestionsItemOptionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  isCorrect: boolean;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  text: string;
+};
+
+export type QuizSummaryDtoQuestionsItemType = typeof QuizSummaryDtoQuestionsItemType[keyof typeof QuizSummaryDtoQuestionsItemType];
+
+
+export const QuizSummaryDtoQuestionsItemType = {
+  SINGLE_CHOICE: 'SINGLE_CHOICE',
+} as const;
+
+export type QuizSummaryDtoQuestionsItem = {
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  explanation: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  options: QuizSummaryDtoQuestionsItemOptionsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  text: string;
+  type: QuizSummaryDtoQuestionsItemType;
+};
+
+export type QuizSummaryDtoRules = {
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attemptLimit: number | null;
+  /**
+     * @minimum 1
+     * @maximum 100
+     */
+  passMarkPercent: number;
+  /**
+     * @minimum 0
+     * @maximum 10080
+     */
+  waitMinutes: number;
+};
+
+export interface QuizSummaryDto {
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  id: string | null;
+  locked: boolean;
+  questions: QuizSummaryDtoQuestionsItem[];
+  rules: QuizSummaryDtoRules;
+}
+
 export interface ReorderRequestDto {
   /**
      * @maxItems 500
@@ -1123,6 +1244,33 @@ export interface UpdateModuleRequestDto {
   /** @maxItems 10 */
   objectives?: string[];
   title: string;
+}
+
+export type UpdateQuizQuestionRequestDtoOptionsItem = {
+  isCorrect: boolean;
+  /**
+     * @minLength 1
+     * @maxLength 300
+     */
+  text: string;
+};
+
+export interface UpdateQuizQuestionRequestDto {
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  explanation?: string | null;
+  /**
+     * @minItems 2
+     * @maxItems 6
+     */
+  options: UpdateQuizQuestionRequestDtoOptionsItem[];
+  /**
+     * @minLength 1
+     * @maxLength 1000
+     */
+  text: string;
 }
 
 export interface UpdateUniversityRequestDto {
@@ -2120,6 +2268,208 @@ return serverFetch<ModuleSummaryDto>(getModulesUpdateUrl(id,moduleId),
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(updateModuleRequestDto)
+  }
+);}
+
+
+
+export const getQuizGetUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz`
+}
+
+export const quizGet = async (id: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSummaryDto> => {
+
+  return serverFetch<QuizSummaryDto>(getQuizGetUrl(id,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getQuizCreateQuestionUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/questions`
+}
+
+export const quizCreateQuestion = async (id: string,
+    moduleId: string,
+    quizQuestionRequestDto: QuizQuestionRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<QuizSummaryDto>(getQuizCreateQuestionUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quizQuestionRequestDto)
+  }
+);}
+
+
+
+export const getQuizReorderQuestionsUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/questions/reorder`
+}
+
+export const quizReorderQuestions = async (id: string,
+    moduleId: string,
+    reorderRequestDto: ReorderRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<QuizSummaryDto>(getQuizReorderQuestionsUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reorderRequestDto)
+  }
+);}
+
+
+
+export const getQuizRemoveQuestionUrl = (id: string,
+    moduleId: string,
+    questionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/questions/${questionId}`
+}
+
+export const quizRemoveQuestion = async (id: string,
+    moduleId: string,
+    questionId: string, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSummaryDto> => {
+
+  return serverFetch<QuizSummaryDto>(getQuizRemoveQuestionUrl(id,moduleId,questionId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getQuizUpdateQuestionUrl = (id: string,
+    moduleId: string,
+    questionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/questions/${questionId}`
+}
+
+export const quizUpdateQuestion = async (id: string,
+    moduleId: string,
+    questionId: string,
+    updateQuizQuestionRequestDto: UpdateQuizQuestionRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<QuizSummaryDto>(getQuizUpdateQuestionUrl(id,moduleId,questionId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateQuizQuestionRequestDto)
+  }
+);}
+
+
+
+export const getQuizUpdateRulesUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/rules`
+}
+
+export const quizUpdateRules = async (id: string,
+    moduleId: string,
+    quizRulesRequestDto: QuizRulesRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<QuizSummaryDto>(getQuizUpdateRulesUrl(id,moduleId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quizRulesRequestDto)
   }
 );}
 

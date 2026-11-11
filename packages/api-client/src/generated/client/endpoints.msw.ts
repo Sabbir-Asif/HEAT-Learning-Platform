@@ -58,6 +58,9 @@ import type {
   MeResponseDto,
   ModuleListResponseDto,
   ModuleSummaryDto,
+  QuizQuestionRequestDto,
+  QuizRulesRequestDto,
+  QuizSummaryDto,
   ReorderRequestDto,
   SignInRequestDto,
   UniversityListResponseDto,
@@ -66,6 +69,7 @@ import type {
   UpdateDepartmentRequestDto,
   UpdateFacultyRequestDto,
   UpdateModuleRequestDto,
+  UpdateQuizQuestionRequestDto,
   UpdateUniversityRequestDto,
   UpdateVideoSlotRequestDto,
   VerificationAcceptedResponseDto,
@@ -110,6 +114,18 @@ export const getModulesReorderResponseMock = (overrideResponse: Partial<Extract<
 export const getModulesGetResponseMock = (overrideResponse: Partial<Extract<ModuleSummaryDto, object>> = {}): ModuleSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 export const getModulesUpdateResponseMock = (overrideResponse: Partial<Extract<ModuleSummaryDto, object>> = {}): ModuleSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getQuizGetResponseMock = (overrideResponse: Partial<Extract<QuizSummaryDto, object>> = {}): QuizSummaryDto => ({id: faker.helpers.arrayElement([faker.string.uuid(), null]), locked: faker.datatype.boolean(), questions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({explanation: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 2000}}), null]), id: faker.string.uuid(), options: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), isCorrect: faker.datatype.boolean(), order: faker.number.int({min: 1, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}})})), order: faker.number.int({min: 1, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}}), type: faker.helpers.arrayElement(['SINGLE_CHOICE'] as const)})), rules: {attemptLimit: faker.helpers.arrayElement([faker.number.int({min: 1, max: 9007199254740991}), null]), passMarkPercent: faker.number.int({min: 1, max: 100}), waitMinutes: faker.number.int({min: 0, max: 10080})}, ...overrideResponse})
+
+export const getQuizCreateQuestionResponseMock = (overrideResponse: Partial<Extract<QuizSummaryDto, object>> = {}): QuizSummaryDto => ({id: faker.helpers.arrayElement([faker.string.uuid(), null]), locked: faker.datatype.boolean(), questions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({explanation: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 2000}}), null]), id: faker.string.uuid(), options: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), isCorrect: faker.datatype.boolean(), order: faker.number.int({min: 1, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}})})), order: faker.number.int({min: 1, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}}), type: faker.helpers.arrayElement(['SINGLE_CHOICE'] as const)})), rules: {attemptLimit: faker.helpers.arrayElement([faker.number.int({min: 1, max: 9007199254740991}), null]), passMarkPercent: faker.number.int({min: 1, max: 100}), waitMinutes: faker.number.int({min: 0, max: 10080})}, ...overrideResponse})
+
+export const getQuizReorderQuestionsResponseMock = (overrideResponse: Partial<Extract<QuizSummaryDto, object>> = {}): QuizSummaryDto => ({id: faker.helpers.arrayElement([faker.string.uuid(), null]), locked: faker.datatype.boolean(), questions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({explanation: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 2000}}), null]), id: faker.string.uuid(), options: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), isCorrect: faker.datatype.boolean(), order: faker.number.int({min: 1, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}})})), order: faker.number.int({min: 1, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}}), type: faker.helpers.arrayElement(['SINGLE_CHOICE'] as const)})), rules: {attemptLimit: faker.helpers.arrayElement([faker.number.int({min: 1, max: 9007199254740991}), null]), passMarkPercent: faker.number.int({min: 1, max: 100}), waitMinutes: faker.number.int({min: 0, max: 10080})}, ...overrideResponse})
+
+export const getQuizRemoveQuestionResponseMock = (overrideResponse: Partial<Extract<QuizSummaryDto, object>> = {}): QuizSummaryDto => ({id: faker.helpers.arrayElement([faker.string.uuid(), null]), locked: faker.datatype.boolean(), questions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({explanation: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 2000}}), null]), id: faker.string.uuid(), options: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), isCorrect: faker.datatype.boolean(), order: faker.number.int({min: 1, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}})})), order: faker.number.int({min: 1, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}}), type: faker.helpers.arrayElement(['SINGLE_CHOICE'] as const)})), rules: {attemptLimit: faker.helpers.arrayElement([faker.number.int({min: 1, max: 9007199254740991}), null]), passMarkPercent: faker.number.int({min: 1, max: 100}), waitMinutes: faker.number.int({min: 0, max: 10080})}, ...overrideResponse})
+
+export const getQuizUpdateQuestionResponseMock = (overrideResponse: Partial<Extract<QuizSummaryDto, object>> = {}): QuizSummaryDto => ({id: faker.helpers.arrayElement([faker.string.uuid(), null]), locked: faker.datatype.boolean(), questions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({explanation: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 2000}}), null]), id: faker.string.uuid(), options: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), isCorrect: faker.datatype.boolean(), order: faker.number.int({min: 1, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}})})), order: faker.number.int({min: 1, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}}), type: faker.helpers.arrayElement(['SINGLE_CHOICE'] as const)})), rules: {attemptLimit: faker.helpers.arrayElement([faker.number.int({min: 1, max: 9007199254740991}), null]), passMarkPercent: faker.number.int({min: 1, max: 100}), waitMinutes: faker.number.int({min: 0, max: 10080})}, ...overrideResponse})
+
+export const getQuizUpdateRulesResponseMock = (overrideResponse: Partial<Extract<QuizSummaryDto, object>> = {}): QuizSummaryDto => ({id: faker.helpers.arrayElement([faker.string.uuid(), null]), locked: faker.datatype.boolean(), questions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({explanation: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 2000}}), null]), id: faker.string.uuid(), options: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), isCorrect: faker.datatype.boolean(), order: faker.number.int({min: 1, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}})})), order: faker.number.int({min: 1, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}}), type: faker.helpers.arrayElement(['SINGLE_CHOICE'] as const)})), rules: {attemptLimit: faker.helpers.arrayElement([faker.number.int({min: 1, max: 9007199254740991}), null]), passMarkPercent: faker.number.int({min: 1, max: 100}), waitMinutes: faker.number.int({min: 0, max: 10080})}, ...overrideResponse})
 
 export const getLessonSectionsCreateResponseMock = (overrideResponse: Partial<Extract<ModuleSummaryDto, object>> = {}): ModuleSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
@@ -473,6 +489,78 @@ export const getModulesUpdateMockHandler = (overrideResponse?: ModuleSummaryDto 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getModulesUpdateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getQuizGetMockHandler = (overrideResponse?: QuizSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }>>[0]) => Promise<QuizSummaryDto> | QuizSummaryDto), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string; moduleId: string }>('*/api/admin/courses/:id/modules/:moduleId/quiz', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getQuizGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getQuizCreateQuestionMockHandler = (overrideResponse?: QuizSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, QuizQuestionRequestDto>>[0]) => Promise<QuizSummaryDto> | QuizSummaryDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string; moduleId: string }, QuizQuestionRequestDto>('*/api/admin/courses/:id/modules/:moduleId/quiz/questions', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, QuizQuestionRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getQuizCreateQuestionResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getQuizReorderQuestionsMockHandler = (overrideResponse?: QuizSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, ReorderRequestDto>>[0]) => Promise<QuizSummaryDto> | QuizSummaryDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string; moduleId: string }, ReorderRequestDto>('*/api/admin/courses/:id/modules/:moduleId/quiz/questions/reorder', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, ReorderRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getQuizReorderQuestionsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getQuizRemoveQuestionMockHandler = (overrideResponse?: QuizSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string; questionId: string }>>[0]) => Promise<QuizSummaryDto> | QuizSummaryDto), options?: RequestHandlerOptions) => {
+  return http.delete<{ id: string; moduleId: string; questionId: string }>('*/api/admin/courses/:id/modules/:moduleId/quiz/questions/:questionId', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string; questionId: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getQuizRemoveQuestionResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getQuizUpdateQuestionMockHandler = (overrideResponse?: QuizSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string; questionId: string }, UpdateQuizQuestionRequestDto>>[0]) => Promise<QuizSummaryDto> | QuizSummaryDto), options?: RequestHandlerOptions) => {
+  return http.patch<{ id: string; moduleId: string; questionId: string }, UpdateQuizQuestionRequestDto>('*/api/admin/courses/:id/modules/:moduleId/quiz/questions/:questionId', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string; questionId: string }, UpdateQuizQuestionRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getQuizUpdateQuestionResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getQuizUpdateRulesMockHandler = (overrideResponse?: QuizSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, QuizRulesRequestDto>>[0]) => Promise<QuizSummaryDto> | QuizSummaryDto), options?: RequestHandlerOptions) => {
+  return http.put<{ id: string; moduleId: string }, QuizRulesRequestDto>('*/api/admin/courses/:id/modules/:moduleId/quiz/rules', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, QuizRulesRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getQuizUpdateRulesResponseMock(),
       { status: 200
       })
   }, options)
@@ -1092,6 +1180,12 @@ export const getHeatLmsApiMock = () => [
   getModulesRemoveMockHandler(),
   getModulesGetMockHandler(),
   getModulesUpdateMockHandler(),
+  getQuizGetMockHandler(),
+  getQuizCreateQuestionMockHandler(),
+  getQuizReorderQuestionsMockHandler(),
+  getQuizRemoveQuestionMockHandler(),
+  getQuizUpdateQuestionMockHandler(),
+  getQuizUpdateRulesMockHandler(),
   getLessonSectionsCreateMockHandler(),
   getLessonSectionsReorderMockHandler(),
   getLessonSectionsRemoveMockHandler(),
