@@ -25,6 +25,11 @@ const messages: Record<ErrorCode, string> = {
   CANNOT_DEACTIVATE_SELF: "You cannot deactivate your own account.",
   CAPTCHA_EXPIRED: "This security check can no longer be used. Request a new one.",
   CAPTCHA_INVALID: "The characters do not match. Try again.",
+  COURSE_HAS_ENROLLMENTS: "This course has enrollments, so it cannot be deleted.",
+  COURSE_LOCKED: "This course is locked. Only the description and thumbnail can be changed.",
+  COURSE_NOT_DRAFT: "This action is only available for a draft course.",
+  COURSE_PUBLISH_CHECKS_FAILED: "The course is not ready to publish.",
+  COURSE_SLUG_TAKEN: "A course with this slug already exists.",
   CSRF_TOKEN_INVALID:
     "The security token for this request is missing or no longer valid. Reload the page and try again.",
   DIRECTORY_ARCHIVED:
@@ -114,6 +119,7 @@ interface Classified {
   fields?: FieldError[];
   retryAfterSeconds?: number;
   detail?: string;
+  failures?: string[];
 }
 
 function classify(exception: unknown): Classified {
@@ -127,6 +133,7 @@ function classify(exception: unknown): Classified {
       retryAfterSeconds: exception.retryAfterSeconds,
       detail: exception.detail,
       fields: exception.fields,
+      failures: exception.failures,
     };
   }
   const status =
@@ -144,7 +151,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const request = http.getRequest<RequestLike>();
     const response = http.getResponse<ResponseLike>();
     const requestId = resolveRequestId(request.headers["x-request-id"]);
-    const { status, code, fields, retryAfterSeconds, detail } = classify(exception);
+    const { status, code, fields, failures, retryAfterSeconds, detail } = classify(exception);
 
     const name = exception instanceof Error ? exception.name : typeof exception;
 
@@ -159,7 +166,13 @@ export class ApiExceptionFilter implements ExceptionFilter {
     }
 
     const body: ErrorResponse = {
-      error: { code, message: detail ?? messages[code], requestId, ...(fields ? { fields } : {}) },
+      error: {
+        code,
+        message: detail ?? messages[code],
+        requestId,
+        ...(fields ? { fields } : {}),
+        ...(failures ? { failures } : {}),
+      },
     };
     response.setHeader("x-request-id", requestId);
     if (retryAfterSeconds !== undefined) {

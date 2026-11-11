@@ -5,6 +5,7 @@ export * from "./admins";
 export * from "./audit";
 export * from "./auth";
 export * from "./captcha";
+export * from "./courses";
 export * from "./directory";
 export * from "./enrollment";
 export * from "./errors";

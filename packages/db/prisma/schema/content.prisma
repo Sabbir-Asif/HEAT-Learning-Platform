@@ -35,6 +35,7 @@ model MediaAsset {
 
   uploader  User       @relation(fields: [uploaderId], references: [id], onDelete: Restrict)
   resources Resource[]
+  courses   Course[]
 
   @@index([uploaderId])
   @@index([linkedEntity, linkedId])

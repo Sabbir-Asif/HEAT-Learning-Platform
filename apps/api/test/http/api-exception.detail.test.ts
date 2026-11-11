@@ -59,4 +59,16 @@ describe("ApiExceptionFilter with an exception detail", () => {
       error: expect.objectContaining({ code: "DIRECTORY_ARCHIVED" }),
     });
   });
+
+  test("failures on an ApiException reach the response body", () => {
+    const { json } = reply(
+      new ApiException(422, "COURSE_PUBLISH_CHECKS_FAILED", undefined, undefined, undefined, [
+        "Module 1 has no ready video.",
+      ]),
+    );
+
+    expect(json).toHaveBeenCalledWith({
+      error: expect.objectContaining({ failures: ["Module 1 has no ready video."] }),
+    });
+  });
 });

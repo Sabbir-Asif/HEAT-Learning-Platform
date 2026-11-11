@@ -7,6 +7,7 @@ export interface ApiErrorInit {
   status: number;
   code: ApiErrorCode;
   fields?: readonly FieldError[];
+  failures?: readonly string[];
   requestId?: string;
   retryAfterSeconds?: number;
 }
@@ -15,6 +16,7 @@ export class ApiError extends Error {
   readonly status: number;
   readonly code: ApiErrorCode;
   readonly fields: readonly FieldError[];
+  readonly failures: readonly string[];
   readonly requestId?: string;
   readonly retryAfterSeconds?: number;
 
@@ -24,6 +26,7 @@ export class ApiError extends Error {
     this.status = init.status;
     this.code = init.code;
     this.fields = init.fields ?? [];
+    this.failures = init.failures ?? [];
     this.requestId = init.requestId;
     this.retryAfterSeconds = init.retryAfterSeconds;
   }
@@ -62,11 +65,12 @@ export async function parseErrorResponse(response: Response): Promise<ApiError> 
   }
   const envelope = errorResponseSchema.safeParse(json);
   if (!envelope.success) return unexpectedResponseError(response.status);
-  const { code, fields, requestId } = envelope.data.error;
+  const { code, fields, failures, requestId } = envelope.data.error;
   return new ApiError({
     status: response.status,
     code,
     fields,
+    failures,
     requestId,
     retryAfterSeconds: retryAfterSeconds(response.headers.get("retry-after")),
   });

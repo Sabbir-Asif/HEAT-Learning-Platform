@@ -8,6 +8,7 @@ export class ApiException extends HttpException {
     readonly retryAfterSeconds?: number,
     readonly detail?: string,
     readonly fields?: FieldError[],
+    readonly failures?: string[],
   ) {
     super(code, status);
   }

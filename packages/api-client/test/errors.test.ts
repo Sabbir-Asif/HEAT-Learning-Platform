@@ -28,6 +28,14 @@ describe("parseErrorResponse", () => {
     });
   });
 
+  test("keeps the failure messages of a rejected action", async () => {
+    const response = new Response(
+      envelope("COURSE_PUBLISH_CHECKS_FAILED", { failures: ["Module 1 has no ready video."] }),
+      { status: 422 },
+    );
+    expect((await parseErrorResponse(response)).failures).toEqual(["Module 1 has no ready video."]);
+  });
+
   test("never uses the server message as the error message", async () => {
     const error = await parseErrorResponse(new Response(envelope("FORBIDDEN"), { status: 403 }));
     expect(error.message).toBe("FORBIDDEN");

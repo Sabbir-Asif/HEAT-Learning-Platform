@@ -15,6 +15,11 @@ export type FormErrorCopyKey =
   | "CANNOT_DEACTIVATE_SELF"
   | "CAPTCHA_EXPIRED"
   | "CAPTCHA_INVALID"
+  | "COURSE_HAS_ENROLLMENTS"
+  | "COURSE_LOCKED"
+  | "COURSE_NOT_DRAFT"
+  | "COURSE_PUBLISH_CHECKS_FAILED"
+  | "COURSE_SLUG_TAKEN"
   | "CSRF_TOKEN_INVALID"
   | "DIRECTORY_ARCHIVED"
   | "DIRECTORY_IN_USE"
@@ -60,6 +65,11 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   CANNOT_DEACTIVATE_SELF: "You cannot deactivate your own account.",
   CAPTCHA_EXPIRED: "This security check can no longer be used. Request a new one.",
   CAPTCHA_INVALID: "The characters do not match. Try again.",
+  COURSE_HAS_ENROLLMENTS: "This course has enrollments, so it cannot be deleted.",
+  COURSE_LOCKED: "This course is locked. Only the description and thumbnail can be changed.",
+  COURSE_NOT_DRAFT: "This action is only available for a draft course.",
+  COURSE_PUBLISH_CHECKS_FAILED: "The course is not ready to publish.",
+  COURSE_SLUG_TAKEN: "A course with this slug already exists.",
   CSRF_TOKEN_INVALID: "Your session check failed. Reload the page and try again.",
   DIRECTORY_ARCHIVED:
     "This record is archived, so it cannot be used for new records. Restore it first.",
