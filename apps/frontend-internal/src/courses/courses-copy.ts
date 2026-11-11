@@ -1,0 +1,17 @@
+export const courseSlugTakenMessage = "A course with this slug already exists.";
+
+export const courseLockedMessage =
+  "This course is locked because students are enrolled. The title and slug cannot change; the description can.";
+
+export const unsavedChangesMessage = "You have unsaved changes. Discard them?";
+
+export const courseDeleteBlockedMessage = (title: string, enrollmentCount: number): string =>
+  `${title} has ${enrollmentCount} ${enrollmentCount === 1 ? "enrollment" : "enrollments"}, so it cannot be deleted.`;
+
+export const courseDeleteFailedMessage = (title: string): string =>
+  `${title} could not be deleted. Try again.`;
+
+export const publishFailedMessage = (title: string, failures: readonly string[]): string =>
+  failures.length === 0
+    ? `${title} could not be published. Try again.`
+    : `${title} is not ready to publish. ${failures.join(" ")}`;
