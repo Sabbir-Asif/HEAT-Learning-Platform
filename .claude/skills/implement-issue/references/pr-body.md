@@ -18,16 +18,20 @@ Closes #N (part of <epic code>, #<epic number>). Targets <base branch>.
 - `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test:coverage`, `pnpm build`: <result>
 - New and changed tests: <file: what they prove>
 - Acceptance criteria: <each criterion, and the test or the manual check that shows it>
-- Test plan from the issue: <each item and its result>
+- Test plan from the issue: <each item and its result, or "deferred to #<Polish ticket>">
 
 ## Screenshots
 
-Phone and laptop width, light and dark. Or "Not a UI change".
+Phone and laptop width, light theme. Or "Not a UI change".
 
 ## Reviews
 
 - Code review: <findings by severity, and for each: fixed in <commit> or answered with the reason>
 - Security review: <same, or "Not run: not requested">
+
+## Deferred
+
+What the epic's Polish ticket must still prove or harden: integration and Playwright tests from the test plan, hardening found in review. Or "None".
 
 ## Security notes
 

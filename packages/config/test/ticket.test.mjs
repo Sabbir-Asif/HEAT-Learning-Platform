@@ -208,7 +208,8 @@ describe("loadTicket on a ready ticket", () => {
 
   test.each([
     [{ size: "L" }, true],
-    [{ labels: ["type:chore", "security"] }, true],
+    [{ labels: ["type:chore", "needs-approval"] }, true],
+    [{ labels: ["type:chore", "security"] }, false],
     [{ size: "S" }, false],
   ])("needsApproval for %j is %s", (overrides, expected) => {
     expect(load({ fixture: issue(overrides) }).needsApproval).toBe(expected);

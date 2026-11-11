@@ -1,6 +1,7 @@
 import { jsdomPreset } from "@heat/config/vitest";
 
 export default jsdomPreset({
+  threshold: 0,
   coverageExclude: [
     "**/*.stories.tsx",
     "**/index.ts",
