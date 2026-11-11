@@ -66,12 +66,19 @@ export class ProgressService {
     if (duration <= 0) throw new ApiException(409, "VIDEO_NOT_READY");
     const rewatch = enrollment.status === "COMPLETED";
     return this.database.$transaction(async (tx) => {
+      await tx.$queryRaw`
+        SELECT id FROM "Enrollment" WHERE id = ${enrollment.id}::uuid FOR NO KEY UPDATE`;
       const locked = await tx.$queryRaw<Array<{ id: string }>>`
         SELECT id FROM "PlaybackSession" WHERE id = ${batch.sessionId}::uuid FOR UPDATE`;
       if (locked.length === 0) throw new NotFoundException();
       const counters = await tx.playbackSession.findUniqueOrThrow({
         where: { id: batch.sessionId },
         select: { acceptedSeconds: true, lastSequence: true },
+      });
+      const spent = await tx.playbackSession.aggregate({
+        where: { enrollmentId: enrollment.id, videoId },
+        _min: { startedAt: true },
+        _sum: { acceptedSeconds: true },
       });
       const progress = await tx.videoProgress.findUnique({
         where: { enrollmentId_videoId: { enrollmentId: enrollment.id, videoId } },
@@ -88,10 +95,10 @@ export class ProgressService {
         incoming: batch.intervals,
         durationSeconds: duration,
         budgetSeconds: remainingBudgetSeconds({
-          startedAt: session.startedAt,
+          startedAt: spent._min.startedAt ?? session.startedAt,
           now,
           maxRate: maxPlaybackRate,
-          acceptedSeconds: counters.acceptedSeconds,
+          acceptedSeconds: spent._sum.acceptedSeconds ?? counters.acceptedSeconds,
         }),
       });
       const sequence = decideSequence(batch.sequence, counters.lastSequence);

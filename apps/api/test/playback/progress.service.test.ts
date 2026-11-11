@@ -21,6 +21,7 @@ interface Options {
   locked?: boolean;
   requiredVideos?: string[];
   otherProgress?: object[];
+  spent?: { earliest: Date | null; accepted: number | null };
 }
 
 const build = (options: Options = {}) => {
@@ -52,6 +53,19 @@ const build = (options: Options = {}) => {
         .fn()
         .mockResolvedValue(options.counters ?? { acceptedSeconds: 0, lastSequence: 0 }),
       update: vi.fn().mockResolvedValue({}),
+      aggregate: vi.fn().mockResolvedValue(
+        options.spent === undefined
+          ? {
+              _min: { startedAt: started },
+              _sum: {
+                acceptedSeconds: (options.counters ?? { acceptedSeconds: 0 }).acceptedSeconds,
+              },
+            }
+          : {
+              _min: { startedAt: options.spent.earliest },
+              _sum: { acceptedSeconds: options.spent.accepted },
+            },
+      ),
     },
     videoProgress: {
       findUnique: vi.fn().mockResolvedValue(options.progress ?? null),
@@ -154,6 +168,51 @@ describe("ProgressService.record", () => {
     );
     expect(savedProgress(tx).watchedIntervals).toEqual([{ start: 0, end: 15 }]);
     expect(tx.playbackSession.update.mock.calls[0]?.[0].data.acceptedSeconds).toBe(15);
+  });
+
+  test("a second session cannot claim budget the first session already spent", async () => {
+    const { service, tx } = build({
+      now: after(10),
+      duration: 600,
+      session: undefined,
+      counters: { acceptedSeconds: 0, lastSequence: 0 },
+      spent: { earliest: started, accepted: 15 },
+      progress: {
+        watchedIntervals: [{ start: 0, end: 15 }],
+        resumePositionSeconds: 15,
+        firstWatchedAt: started,
+        completedAt: null,
+      },
+    });
+    await service.record("u1", videoId, batch({ intervals: [{ start: 0, end: 600 }] }));
+    expect(savedProgress(tx).watchedIntervals).toEqual([{ start: 0, end: 15 }]);
+    expect(tx.playbackSession.update.mock.calls[0]?.[0].data.acceptedSeconds).toBe(0);
+  });
+
+  test("a later session is bounded by the earliest session window for the video", async () => {
+    const { service, tx } = build({
+      now: after(20),
+      duration: 600,
+      counters: { acceptedSeconds: 0, lastSequence: 0 },
+      spent: { earliest: started, accepted: 20 },
+      progress: {
+        watchedIntervals: [{ start: 0, end: 20 }],
+        resumePositionSeconds: 20,
+        firstWatchedAt: started,
+        completedAt: null,
+      },
+    });
+    await service.record("u1", videoId, batch({ intervals: [{ start: 0, end: 600 }] }));
+    expect(savedProgress(tx).watchedIntervals).toEqual([{ start: 0, end: 30 }]);
+    expect(tx.playbackSession.update.mock.calls[0]?.[0].data.acceptedSeconds).toBe(10);
+  });
+
+  test("locks the enrollment before the session row", async () => {
+    const { service, tx } = build();
+    await service.record("u1", videoId, batch());
+    expect(tx.$queryRaw).toHaveBeenCalledTimes(2);
+    expect(tx.$queryRaw.mock.calls[0]?.[0].join("")).toContain('"Enrollment"');
+    expect(tx.$queryRaw.mock.calls[1]?.[0].join("")).toContain('"PlaybackSession"');
   });
 
   test("a duplicate batch is idempotent", async () => {
