@@ -1,4 +1,4 @@
-import type { ModuleFormValues } from "@heat/contracts";
+import type { ModuleFormValues, VideoRejectionReason } from "@heat/contracts";
 
 export const moduleLockedMessage =
   "This course is locked. Modules and sections cannot be added, removed or reordered. Wording changes to titles and objectives are logged.";
@@ -30,6 +30,18 @@ export const videoUploadFailedMessage = (code: string | undefined): string => {
     return "The connection dropped. Retry to continue from where it stopped.";
   }
   return "The upload failed. Try again.";
+};
+
+export const videoRejectionMessage = (reason: VideoRejectionReason): string => {
+  if (reason === "NOT_A_VIDEO") return "The file was rejected: it is not a video.";
+  if (reason === "UNSUPPORTED_CONTAINER") {
+    return "The file was rejected: its format is not supported. Use MP4, MOV, WebM or MKV.";
+  }
+  if (reason === "UNSUPPORTED_CODEC") {
+    return "The file was rejected: its video codec is not supported. Use H.264, H.265, VP8, VP9 or AV1.";
+  }
+  if (reason === "TOO_LARGE") return "The file was rejected: it is over the size limit.";
+  return "The file was rejected: it is incomplete or has no duration.";
 };
 
 export const reorderFailedMessage = (code: string | undefined): string => {

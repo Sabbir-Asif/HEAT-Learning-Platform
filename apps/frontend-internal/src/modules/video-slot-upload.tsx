@@ -2,10 +2,12 @@
 
 import { fetchResponse } from "@heat/api-client";
 import { videoUploadLimits } from "@heat/contracts";
+import type { VideoRejectionReason } from "@heat/contracts";
+import { FieldDescription } from "@heat/ui";
 import { VideoUpload } from "@heat/ui/upload";
 import type { VideoUploadState } from "@heat/ui/upload";
 import { useEffect, useRef, useState } from "react";
-import { videoUploadFailedMessage } from "./modules-copy";
+import { videoRejectionMessage, videoUploadFailedMessage } from "./modules-copy";
 import { createTusUpload } from "./tus-upload";
 import type { TusUpload } from "./tus-upload";
 
@@ -16,6 +18,7 @@ type VideoSlotUploadProps = {
   title: string;
   hasVideo: boolean;
   disabled: boolean;
+  rejectionReason: VideoRejectionReason | null;
   onFinished: () => void;
 };
 
@@ -33,6 +36,7 @@ export function VideoSlotUpload({
   title,
   hasVideo,
   disabled,
+  rejectionReason,
   onFinished,
 }: VideoSlotUploadProps) {
   const [state, setState] = useState<VideoUploadState>({ status: "idle" });
@@ -73,7 +77,11 @@ export function VideoSlotUpload({
       url: `/admin/courses/${courseId}/modules/${moduleId}/videos/${videoId}/upload`,
       send: fetchResponse,
       onProgress: (offset, total) =>
-        setState({ status: "uploading", fileName: file.name, progress: percentOf(offset, total) }),
+        setState((current) =>
+          current.status === "uploading"
+            ? { status: "uploading", fileName: file.name, progress: percentOf(offset, total) }
+            : current,
+        ),
       onStateChange: (next) =>
         setState((current) =>
           current.status === "uploading" || current.status === "paused"
@@ -99,17 +107,22 @@ export function VideoSlotUpload({
   }
 
   return (
-    <VideoUpload
-      label={`Upload for ${title}`}
-      state={state}
-      maxBytes={videoUploadLimits.maxBytes}
-      hasVideo={hasVideo}
-      disabled={disabled}
-      onSelect={begin}
-      onPause={() => uploadRef.current?.pause()}
-      onResume={() => uploadRef.current?.resume()}
-      onCancel={() => uploadRef.current?.cancel()}
-      onRetry={retry}
-    />
+    <div className="flex flex-col gap-2">
+      {rejectionReason !== null && state.status === "idle" ? (
+        <FieldDescription role="alert">{videoRejectionMessage(rejectionReason)}</FieldDescription>
+      ) : null}
+      <VideoUpload
+        label={`Upload for ${title}`}
+        state={state}
+        maxBytes={videoUploadLimits.maxBytes}
+        hasVideo={hasVideo}
+        disabled={disabled}
+        onSelect={begin}
+        onPause={() => uploadRef.current?.pause()}
+        onResume={() => uploadRef.current?.resume()}
+        onCancel={() => uploadRef.current?.cancel()}
+        onRetry={retry}
+      />
+    </div>
   );
 }

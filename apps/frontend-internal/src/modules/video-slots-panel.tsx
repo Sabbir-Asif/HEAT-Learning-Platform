@@ -158,6 +158,7 @@ export function VideoSlotsPanel({ courseId, moduleId, courseLocked }: VideoSlots
                     title={slot.title}
                     hasVideo={slot.status !== "NOT_UPLOADED"}
                     disabled={locked}
+                    rejectionReason={slot.rejectionReason}
                     onFinished={() => void queryClient.invalidateQueries({ queryKey: listKey })}
                   />
                 </div>

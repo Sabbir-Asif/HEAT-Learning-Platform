@@ -1,3 +1,4 @@
+import type { VideoRejectionReason } from "@heat/contracts";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -25,7 +26,11 @@ afterEach(async () => {
   container?.remove();
 });
 
-async function mount(onFinished = vi.fn(), disabled = false) {
+async function mount(
+  onFinished = vi.fn(),
+  disabled = false,
+  rejectionReason: VideoRejectionReason | null = null,
+) {
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
@@ -38,6 +43,7 @@ async function mount(onFinished = vi.fn(), disabled = false) {
         title="Welcome"
         hasVideo={false}
         disabled={disabled}
+        rejectionReason={rejectionReason}
         onFinished={onFinished}
       />,
     );
@@ -96,5 +102,38 @@ describe("VideoSlotUpload", () => {
       item.textContent?.includes("Upload video"),
     );
     expect(button?.disabled).toBe(true);
+  });
+
+  test("a late progress report never flips a paused upload back to uploading", async () => {
+    let answer: (response: Response) => void = () => undefined;
+    sendMock.mockResolvedValueOnce(
+      new Response(null, { status: 201, headers: { Location: location } }),
+    );
+    sendMock.mockImplementationOnce(
+      () =>
+        new Promise<Response>((resolve) => {
+          answer = resolve;
+        }),
+    );
+    await mount();
+    await choose(mp4());
+    await vi.waitFor(() => expect(sendMock).toHaveBeenCalledTimes(2));
+    const pause = Array.from(container?.querySelectorAll("button") ?? []).find(
+      (item) => item.textContent === "Pause",
+    );
+    await act(async () => pause?.click());
+    await act(async () => {
+      answer(new Response(null, { status: 204, headers: { "Upload-Offset": "50" } }));
+    });
+    const labels = Array.from(container?.querySelectorAll("button") ?? []).map(
+      (item) => item.textContent,
+    );
+    expect(labels).toContain("Resume");
+    expect(labels).not.toContain("Pause");
+  });
+
+  test("shows why a rejected video was refused", async () => {
+    await mount(vi.fn(), false, "UNSUPPORTED_CODEC");
+    expect(container?.textContent).toContain("video codec is not supported");
   });
 });
