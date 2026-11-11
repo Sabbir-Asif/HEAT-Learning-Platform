@@ -25,7 +25,7 @@ export class QuizDeliveryService {
       select: { id: true },
     });
     const quiz = await this.database.quiz.findFirst({
-      where: { moduleId },
+      where: { moduleId, deletedAt: null },
       select: {
         id: true,
         passMarkPercent: true,

@@ -81,6 +81,14 @@ describe("QuizDeliveryService.get", () => {
     expect(database.quizAttempt.create).not.toHaveBeenCalled();
   });
 
+  test("loads only a quiz that is not deleted", async () => {
+    const { service, database } = build();
+    await service.get("u1", "c1", "m1");
+    expect(database.quiz.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { moduleId: "m1", deletedAt: null } }),
+    );
+  });
+
   test("never selects correct flags or explanations from the database", async () => {
     const { service, database } = build();
     await service.get("u1", "c1", "m1");
