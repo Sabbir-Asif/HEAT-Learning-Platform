@@ -103,6 +103,7 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/admin/playback-sessions/:videoId": "playbackSession",
       "POST /api/videos/:id/playback-session": "playbackSession",
       "POST /api/videos/:id/playback-session/refresh": "playbackSession",
+      "GET /api/courses/:courseId/learning-structure": "learningRead",
     });
   });
 
