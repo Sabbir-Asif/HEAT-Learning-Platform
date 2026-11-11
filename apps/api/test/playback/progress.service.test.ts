@@ -19,6 +19,8 @@ interface Options {
   counters?: { acceptedSeconds: number; lastSequence: number };
   progress?: object | null;
   locked?: boolean;
+  requiredVideos?: string[];
+  otherProgress?: object[];
 }
 
 const build = (options: Options = {}) => {
@@ -54,6 +56,12 @@ const build = (options: Options = {}) => {
     videoProgress: {
       findUnique: vi.fn().mockResolvedValue(options.progress ?? null),
       upsert: vi.fn().mockResolvedValue({}),
+      findMany: vi.fn().mockResolvedValue(options.otherProgress ?? []),
+    },
+    video: {
+      findMany: vi
+        .fn()
+        .mockResolvedValue((options.requiredVideos ?? [videoId]).map((id) => ({ id }))),
     },
     moduleProgress: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
   };
@@ -280,8 +288,84 @@ describe("ProgressService.record", () => {
     });
   });
 
+  test("moves an unlocked module to in progress while a required video is under 80 percent", async () => {
+    const { service, tx } = build({ moduleStatus: "UNLOCKED" });
+    await service.record("u1", videoId, batch({ intervals: [{ start: 0, end: 79 }] }));
+    expect(tx.moduleProgress.updateMany).toHaveBeenCalledTimes(1);
+    expect(tx.moduleProgress.updateMany.mock.calls[0]?.[0].data.status).toBe("IN_PROGRESS");
+  });
+
+  test("moves an in progress module to quiz ready on the heartbeat that crosses 80 percent", async () => {
+    const { service, tx } = build({
+      moduleStatus: "IN_PROGRESS",
+      progress: {
+        watchedIntervals: [{ start: 0, end: 70 }],
+        resumePositionSeconds: 70,
+        firstWatchedAt: started,
+        completedAt: null,
+      },
+      counters: { acceptedSeconds: 70, lastSequence: 1 },
+      otherProgress: [{ videoId, coverage: 0.8, completedAt: after(60) }],
+    });
+    await service.record(
+      "u1",
+      videoId,
+      batch({ sequence: 2, intervals: [{ start: 70, end: 80 }] }),
+    );
+    expect(tx.moduleProgress.updateMany).toHaveBeenCalledWith({
+      where: { enrollmentId: "e1", moduleId: "m1", status: "IN_PROGRESS" },
+      data: { status: "QUIZ_READY", quizReadyAt: after(60) },
+    });
+  });
+
+  test("does not unlock the quiz at 79 percent", async () => {
+    const { service, tx } = build({
+      moduleStatus: "IN_PROGRESS",
+      otherProgress: [{ videoId, coverage: 0.79, completedAt: null }],
+    });
+    await service.record("u1", videoId, batch({ intervals: [{ start: 0, end: 79 }] }));
+    expect(tx.moduleProgress.updateMany).not.toHaveBeenCalled();
+  });
+
+  test("keeps the module in progress while another required video is under 80 percent", async () => {
+    const other = "0198f1a0-0000-7000-8000-0000000000a2";
+    const { service, tx } = build({
+      moduleStatus: "IN_PROGRESS",
+      requiredVideos: [videoId, other],
+      otherProgress: [
+        { videoId, coverage: 1, completedAt: after(60) },
+        { videoId: other, coverage: 0.5, completedAt: null },
+      ],
+    });
+    await service.record("u1", videoId, batch());
+    expect(tx.moduleProgress.updateMany).not.toHaveBeenCalled();
+  });
+
+  test("unlocks the quiz when every required video is watched", async () => {
+    const other = "0198f1a0-0000-7000-8000-0000000000a2";
+    const { service, tx } = build({
+      moduleStatus: "IN_PROGRESS",
+      requiredVideos: [videoId, other],
+      otherProgress: [
+        { videoId, coverage: 1, completedAt: after(60) },
+        { videoId: other, coverage: 0.8, completedAt: null },
+      ],
+    });
+    await service.record("u1", videoId, batch());
+    expect(tx.moduleProgress.updateMany.mock.calls[0]?.[0].data.status).toBe("QUIZ_READY");
+  });
+
+  test("a module whose videos are all optional reaches quiz ready on the first heartbeat", async () => {
+    const { service, tx } = build({ moduleStatus: "UNLOCKED", requiredVideos: [] });
+    await service.record("u1", videoId, batch());
+    expect(tx.moduleProgress.updateMany).toHaveBeenCalledWith({
+      where: { enrollmentId: "e1", moduleId: "m1", status: "UNLOCKED" },
+      data: { status: "QUIZ_READY", startedAt: after(60), quizReadyAt: after(60) },
+    });
+  });
+
   test("leaves a module that is already further along alone", async () => {
-    for (const status of ["IN_PROGRESS", "QUIZ_READY", "COMPLETED"]) {
+    for (const status of ["QUIZ_READY", "COMPLETED"]) {
       const { service, tx } = build({ moduleStatus: status });
       await service.record("u1", videoId, batch());
       expect(tx.moduleProgress.updateMany).not.toHaveBeenCalled();
@@ -289,7 +373,11 @@ describe("ProgressService.record", () => {
   });
 
   test("rewatching a completed enrollment does not touch module progress", async () => {
-    const { service, tx } = build({ enrollmentStatus: "COMPLETED", moduleStatus: "UNLOCKED" });
+    const { service, tx } = build({
+      enrollmentStatus: "COMPLETED",
+      moduleStatus: "IN_PROGRESS",
+      otherProgress: [{ videoId, coverage: 1, completedAt: after(60) }],
+    });
     await service.record("u1", videoId, batch());
     expect(tx.moduleProgress.updateMany).not.toHaveBeenCalled();
   });

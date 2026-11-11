@@ -5,6 +5,7 @@ import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { CLOCK, DATABASE } from "../core";
 import type { Clock } from "../core";
 import { ApiException } from "../http/api-exception";
+import { requiredVideosWatched } from "../learning";
 import { playbackRefusal } from "./playback-rules";
 import {
   decideSequence,
@@ -119,15 +120,44 @@ export class ProgressService {
           lastSeenAt: now,
         },
       });
-      if (!rewatch && moduleProgress?.status === "UNLOCKED") {
-        await tx.moduleProgress.updateMany({
+      const status = moduleProgress?.status;
+      if (!rewatch && (status === "UNLOCKED" || status === "IN_PROGRESS")) {
+        const required = await tx.video.findMany({
+          where: { moduleId: video.moduleId, deletedAt: null, required: true },
+          select: { id: true },
+        });
+        const watched = await tx.videoProgress.findMany({
           where: {
             enrollmentId: enrollment.id,
-            moduleId: video.moduleId,
-            status: "UNLOCKED",
+            videoId: { in: required.map((entry) => entry.id) },
           },
-          data: { status: "IN_PROGRESS", startedAt: now },
+          select: { videoId: true, coverage: true, completedAt: true },
         });
+        const watchedById = new Map(watched.map((entry) => [entry.videoId, entry]));
+        const unlocked = requiredVideosWatched(
+          required.map((entry) => ({
+            required: true,
+            coverage: watchedById.get(entry.id)?.coverage ?? 0,
+            completedAt: watchedById.get(entry.id)?.completedAt ?? null,
+          })),
+        );
+        const target = {
+          where: { enrollmentId: enrollment.id, moduleId: video.moduleId, status },
+        };
+        if (unlocked) {
+          await tx.moduleProgress.updateMany({
+            ...target,
+            data:
+              status === "UNLOCKED"
+                ? { status: "QUIZ_READY", startedAt: now, quizReadyAt: now }
+                : { status: "QUIZ_READY", quizReadyAt: now },
+          });
+        } else if (status === "UNLOCKED") {
+          await tx.moduleProgress.updateMany({
+            ...target,
+            data: { status: "IN_PROGRESS", startedAt: now },
+          });
+        }
       }
       return {
         coveragePercent: Math.min(100, Math.round(merge.coverage * 100)),
