@@ -8,6 +8,7 @@
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "!.next/dev/**"]
     },
     "dev": {
+      "dependsOn": ["^build", "prisma:generate"],
       "cache": false,
       "persistent": true
     },
