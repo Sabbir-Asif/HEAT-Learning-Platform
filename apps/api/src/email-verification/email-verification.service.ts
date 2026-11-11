@@ -10,6 +10,7 @@ import { CaptchaService } from "../captcha";
 import { CLOCK, DATABASE } from "../core";
 import type { Clock } from "../core";
 import { ApiException } from "../http/api-exception";
+import { CERTIFICATE_REQUESTED_EVENT_TYPE } from "../learning/module-completion.service";
 import { VerificationTokenService } from "./verification-token.service";
 import {
   EMAIL_VERIFIED_AUDIT_ACTION,
@@ -74,6 +75,22 @@ export class EmailVerificationService {
         where: { userId: row.userId, status: "PENDING_VERIFICATION", deletedAt: null },
         data: { status: "PENDING_APPROVAL", verifiedAt: at },
       });
+      const held = await tx.enrollment.findMany({
+        where: { userId: row.userId, status: "COMPLETED", deletedAt: null, certificate: null },
+        select: { id: true, courseId: true },
+      });
+      for (const enrollment of held) {
+        await tx.outbox.create({
+          data: {
+            eventType: CERTIFICATE_REQUESTED_EVENT_TYPE,
+            payload: {
+              enrollmentId: enrollment.id,
+              userId: row.userId,
+              courseId: enrollment.courseId,
+            },
+          },
+        });
+      }
       await this.sessions.revokeSessionsBeforeVerification(row.userId, at, tx);
       await this.audit.record(
         tx,
