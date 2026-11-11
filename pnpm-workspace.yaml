@@ -11,6 +11,7 @@ allowBuilds:
   protobufjs: false
   ssh2: false
   argon2: false
+  msgpackr-extract: false
 
 catalog:
   react: 19.3.1
