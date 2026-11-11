@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { loadMailConfig } from "../mail/mail-config";
+import type { MailConfig } from "../mail/mail-config";
 import { loadRateLimitConfig } from "./rate-limit-config";
 import type { RateLimitConfig } from "./rate-limit-config";
 
@@ -108,6 +110,7 @@ export interface AppConfig {
   audit: { transactionMaxWaitMs: number; transactionTimeoutMs: number };
   accountProtection: { responseFloorMs: number };
   rateLimit: RateLimitConfig;
+  mail: MailConfig;
 }
 
 export const APP_CONFIG = Symbol("APP_CONFIG");
@@ -154,5 +157,6 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
     },
     accountProtection: { responseFloorMs: values.RESPONSE_FLOOR_MS },
     rateLimit,
+    mail: loadMailConfig(env),
   };
 };

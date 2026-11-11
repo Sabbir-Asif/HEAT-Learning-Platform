@@ -5,6 +5,15 @@ import { describe, expect, test } from "vitest";
 import { loadConfig, rateLimitProfileNames } from "../../src/core/config";
 import { rateLimitEnvName } from "../../src/core/config/rate-limit-config";
 
+const productionMail = {
+  SMTP_HOST: "smtp.gmail.com",
+  SMTP_PORT: "587",
+  SMTP_TLS: "starttls",
+  SMTP_FROM_ADDRESS: "sender@example.test",
+  SMTP_USER: "sender@example.test",
+  SMTP_PASSWORD: "app-password-value",
+};
+
 const valid = {
   DATABASE_URL: "postgresql://u:p@localhost:5432/db",
   REDIS_URL: "redis://localhost:6379",
@@ -114,18 +123,23 @@ describe("loadConfig", () => {
   });
 
   test("requires trusted origins in production instead of defaulting to local apps", () => {
-    expect(() => loadConfig({ ...valid, NODE_ENV: "production" })).toThrow(/TRUSTED_ORIGINS/);
-    expect(() => loadConfig({ ...valid, NODE_ENV: "production", TRUSTED_ORIGINS: " , " })).toThrow(
-      /TRUSTED_ORIGINS/,
-    );
+    const production = { ...valid, ...productionMail, NODE_ENV: "production" };
+    expect(() => loadConfig(production)).toThrow(/TRUSTED_ORIGINS/);
+    expect(() => loadConfig({ ...production, TRUSTED_ORIGINS: " , " })).toThrow(/TRUSTED_ORIGINS/);
     expect(
       loadConfig({
         ...valid,
+        ...productionMail,
         NODE_ENV: "production",
         TRUSTED_ORIGINS: "https://learn.example.test",
         ADMIN_APP_URL: "https://admin.example.test",
       }).csrf.trustedOrigins,
     ).toEqual(["https://learn.example.test"]);
+  });
+
+  test("exposes the mail configuration and defaults it to the local Mailpit", () => {
+    expect(loadConfig(valid).mail).toMatchObject({ host: "localhost", port: 1035, auth: null });
+    expect(() => loadConfig({ ...valid, SMTP_TLS: "ssl" })).toThrow(/SMTP_TLS/);
   });
 
   test("keeps the local defaults in development and test", () => {

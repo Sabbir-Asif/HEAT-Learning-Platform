@@ -25,6 +25,13 @@ const messages: Record<ErrorCode, string> = {
   CANNOT_DEACTIVATE_SELF: "You cannot deactivate your own account.",
   CAPTCHA_EXPIRED: "This security check can no longer be used. Request a new one.",
   CAPTCHA_INVALID: "The characters do not match. Try again.",
+  CONTENT_LOCKED:
+    "This course is locked. Its modules and sections cannot be added, removed or reordered.",
+  COURSE_HAS_ENROLLMENTS: "This course has enrollments, so it cannot be deleted.",
+  COURSE_LOCKED: "This course is locked. Only the description and thumbnail can be changed.",
+  COURSE_NOT_DRAFT: "This action is only available for a draft course.",
+  COURSE_PUBLISH_CHECKS_FAILED: "The course is not ready to publish.",
+  COURSE_SLUG_TAKEN: "A course with this slug already exists.",
   CSRF_TOKEN_INVALID:
     "The security token for this request is missing or no longer valid. Reload the page and try again.",
   DIRECTORY_ARCHIVED:
@@ -40,6 +47,7 @@ const messages: Record<ErrorCode, string> = {
   INVITATION_INVALID: "This invitation link is not valid.",
   INVITATION_NOT_PENDING: "This admin has no pending invitation.",
   NOT_FOUND: "The requested resource was not found.",
+  ORDER_CONFLICT: "The order was changed by someone else. Reload and try again.",
   ORIGIN_NOT_ALLOWED: "This request did not come from an allowed site.",
   PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
   PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
@@ -114,6 +122,7 @@ interface Classified {
   fields?: FieldError[];
   retryAfterSeconds?: number;
   detail?: string;
+  failures?: string[];
 }
 
 function classify(exception: unknown): Classified {
@@ -127,6 +136,7 @@ function classify(exception: unknown): Classified {
       retryAfterSeconds: exception.retryAfterSeconds,
       detail: exception.detail,
       fields: exception.fields,
+      failures: exception.failures,
     };
   }
   const status =
@@ -144,7 +154,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const request = http.getRequest<RequestLike>();
     const response = http.getResponse<ResponseLike>();
     const requestId = resolveRequestId(request.headers["x-request-id"]);
-    const { status, code, fields, retryAfterSeconds, detail } = classify(exception);
+    const { status, code, fields, failures, retryAfterSeconds, detail } = classify(exception);
 
     const name = exception instanceof Error ? exception.name : typeof exception;
 
@@ -159,7 +169,13 @@ export class ApiExceptionFilter implements ExceptionFilter {
     }
 
     const body: ErrorResponse = {
-      error: { code, message: detail ?? messages[code], requestId, ...(fields ? { fields } : {}) },
+      error: {
+        code,
+        message: detail ?? messages[code],
+        requestId,
+        ...(fields ? { fields } : {}),
+        ...(failures ? { failures } : {}),
+      },
     };
     response.setHeader("x-request-id", requestId);
     if (retryAfterSeconds !== undefined) {

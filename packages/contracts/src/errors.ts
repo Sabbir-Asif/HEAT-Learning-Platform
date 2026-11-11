@@ -6,6 +6,12 @@ export const errorCodes = [
   "CANNOT_DEACTIVATE_SELF",
   "CAPTCHA_EXPIRED",
   "CAPTCHA_INVALID",
+  "CONTENT_LOCKED",
+  "COURSE_HAS_ENROLLMENTS",
+  "COURSE_LOCKED",
+  "COURSE_NOT_DRAFT",
+  "COURSE_PUBLISH_CHECKS_FAILED",
+  "COURSE_SLUG_TAKEN",
   "CSRF_TOKEN_INVALID",
   "DIRECTORY_ARCHIVED",
   "DIRECTORY_IN_USE",
@@ -19,6 +25,7 @@ export const errorCodes = [
   "INVITATION_INVALID",
   "INVITATION_NOT_PENDING",
   "NOT_FOUND",
+  "ORDER_CONFLICT",
   "ORIGIN_NOT_ALLOWED",
   "PASSWORD_BREACHED",
   "PASSWORD_CHANGE_REQUIRED",
@@ -63,6 +70,7 @@ export const errorResponseSchema = z.object({
     message: z.string(),
     requestId: z.string(),
     fields: z.array(fieldErrorSchema).optional(),
+    failures: z.array(z.string()).optional(),
   }),
 });
 

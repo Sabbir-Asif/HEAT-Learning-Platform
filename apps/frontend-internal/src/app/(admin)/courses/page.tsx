@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { CoursesView } from "@/courses/courses-view";
 
 export default function Page() {
-  return <PlaceholderPage title="Courses" />;
+  return <CoursesView />;
 }

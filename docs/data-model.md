@@ -80,6 +80,7 @@ erDiagram
     String slug
     String title
     String description
+    String thumbnailAssetId FK
     CourseStatus status
     DateTime lockedAt
     DateTime publishedAt
@@ -101,6 +102,7 @@ erDiagram
     String revisionId FK
     Int order
     String title
+    String[] objectives
     DateTime deletedAt
     DateTime createdAt
     DateTime updatedAt
@@ -109,6 +111,7 @@ erDiagram
     String id PK
     String moduleId FK
     Int order
+    String title
     Json body
     Int schemaVersion
     String[] objectives
@@ -443,6 +446,7 @@ erDiagram
   Enrollment ||--o{ AttemptGrant : enrollment
   Quiz ||--o{ AttemptGrant : quiz
   User ||--o{ AttemptGrant : admin
+  MediaAsset |o--o{ Course : thumbnail
   Course ||--o{ CourseRevision : course
   CourseRevision ||--o{ Module : revision
   Module ||--o{ LessonSection : module

@@ -29,25 +29,37 @@ import type {
   CaptchaRequestDto,
   CaptchaResponseDto,
   ChangePasswordRequestDto,
+  CourseListResponseDto,
+  CourseSummaryDto,
+  CreateCourseRequestDto,
   CreateDepartmentRequestDto,
   CreateFacultyRequestDto,
+  CreateModuleRequestDto,
   CreateUniversityRequestDto,
   CsrfTokenResponseDto,
   DepartmentListResponseDto,
   DepartmentSummaryDto,
   DirectoryOptionListResponseDto,
+  EnrollmentAcceptedResponseDto,
+  EnrollmentRequestDto,
   FacultyListResponseDto,
   FacultySummaryDto,
   HealthResponseDto,
   InvitationLookupRequestDto,
   InvitationLookupResponseDto,
   InviteAdminRequestDto,
+  LessonSectionRequestDto,
   MeResponseDto,
+  ModuleListResponseDto,
+  ModuleSummaryDto,
+  ReorderRequestDto,
   SignInRequestDto,
   UniversityListResponseDto,
   UniversitySummaryDto,
+  UpdateCourseRequestDto,
   UpdateDepartmentRequestDto,
   UpdateFacultyRequestDto,
+  UpdateModuleRequestDto,
   UpdateUniversityRequestDto
 } from './model';
 
@@ -69,6 +81,34 @@ export const getAdminAuthCsrfTokenResponseMock = (overrideResponse: Partial<Extr
 export const getAdminInvitationLookupResponseMock = (overrideResponse: Partial<Extract<InvitationLookupResponseDto, object>> = {}): InvitationLookupResponseDto => ({email: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), status: faker.helpers.arrayElement(['VALID','EXPIRED','INVALID'] as const), ...overrideResponse})
 
 export const getAdminAuthSignInResponseMock = (overrideResponse: Partial<Extract<AdminMeResponseDto, object>> = {}): AdminMeResponseDto => ({user: {email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
+
+export const getCoursesListResponseMock = (overrideResponse: Partial<Extract<CourseListResponseDto, object>> = {}): CourseListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', currentRevision: faker.helpers.arrayElement([{id: faker.string.uuid(), number: faker.number.int({min: 1, max: 9007199254740991}), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])},null,]), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 5000}}), null]), enrollmentCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), lockedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), slug: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['DRAFT','PUBLISHED'] as const), thumbnailAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
+
+export const getCoursesCreateResponseMock = (overrideResponse: Partial<Extract<CourseSummaryDto, object>> = {}): CourseSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', currentRevision: faker.helpers.arrayElement([{id: faker.string.uuid(), number: faker.number.int({min: 1, max: 9007199254740991}), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])},null,]), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 5000}}), null]), enrollmentCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), lockedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), slug: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['DRAFT','PUBLISHED'] as const), thumbnailAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getCoursesGetResponseMock = (overrideResponse: Partial<Extract<CourseSummaryDto, object>> = {}): CourseSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', currentRevision: faker.helpers.arrayElement([{id: faker.string.uuid(), number: faker.number.int({min: 1, max: 9007199254740991}), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])},null,]), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 5000}}), null]), enrollmentCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), lockedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), slug: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['DRAFT','PUBLISHED'] as const), thumbnailAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getCoursesUpdateResponseMock = (overrideResponse: Partial<Extract<CourseSummaryDto, object>> = {}): CourseSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', currentRevision: faker.helpers.arrayElement([{id: faker.string.uuid(), number: faker.number.int({min: 1, max: 9007199254740991}), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])},null,]), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 5000}}), null]), enrollmentCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), lockedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), slug: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['DRAFT','PUBLISHED'] as const), thumbnailAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getModulesListResponseMock = (overrideResponse: Partial<Extract<ModuleListResponseDto, object>> = {}): ModuleListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), locked: faker.datatype.boolean(), ...overrideResponse})
+
+export const getModulesCreateResponseMock = (overrideResponse: Partial<Extract<ModuleSummaryDto, object>> = {}): ModuleSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getModulesReorderResponseMock = (overrideResponse: Partial<Extract<ModuleListResponseDto, object>> = {}): ModuleListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), locked: faker.datatype.boolean(), ...overrideResponse})
+
+export const getModulesGetResponseMock = (overrideResponse: Partial<Extract<ModuleSummaryDto, object>> = {}): ModuleSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getModulesUpdateResponseMock = (overrideResponse: Partial<Extract<ModuleSummaryDto, object>> = {}): ModuleSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getLessonSectionsCreateResponseMock = (overrideResponse: Partial<Extract<ModuleSummaryDto, object>> = {}): ModuleSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getLessonSectionsReorderResponseMock = (overrideResponse: Partial<Extract<ModuleSummaryDto, object>> = {}): ModuleSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getLessonSectionsRemoveResponseMock = (overrideResponse: Partial<Extract<ModuleSummaryDto, object>> = {}): ModuleSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getLessonSectionsUpdateResponseMock = (overrideResponse: Partial<Extract<ModuleSummaryDto, object>> = {}): ModuleSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getCoursesPublishResponseMock = (overrideResponse: Partial<Extract<CourseSummaryDto, object>> = {}): CourseSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', currentRevision: faker.helpers.arrayElement([{id: faker.string.uuid(), number: faker.number.int({min: 1, max: 9007199254740991}), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])},null,]), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 5000}}), null]), enrollmentCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), lockedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), slug: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['DRAFT','PUBLISHED'] as const), thumbnailAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 export const getDepartmentsListResponseMock = (overrideResponse: Partial<Extract<DepartmentListResponseDto, object>> = {}): DepartmentListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({archivedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), parentArchived: faker.datatype.boolean(), studentCount: faker.number.int({min: 0, max: 9007199254740991}), university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
 
@@ -123,6 +163,8 @@ export const getDirectoryLookupsListUniversitiesResponseMock = (overrideResponse
 export const getDirectoryLookupsListFacultiesResponseMock = (overrideResponse: Partial<Extract<DirectoryOptionListResponseDto, object>> = {}): DirectoryOptionListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
 export const getDirectoryLookupsListDepartmentsResponseMock = (overrideResponse: Partial<Extract<DirectoryOptionListResponseDto, object>> = {}): DirectoryOptionListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
+
+export const getEnrollmentSubmitResponseMock = (overrideResponse: Partial<Extract<EnrollmentAcceptedResponseDto, object>> = {}): EnrollmentAcceptedResponseDto => ({accepted: faker.helpers.arrayElement([true] as const), ...overrideResponse})
 
 export const getHealthCheckResponseMock = (overrideResponse: Partial<Extract<HealthResponseDto, object>> = {}): HealthResponseDto => ({status: faker.helpers.arrayElement(['ok'] as const), ...overrideResponse})
 
@@ -273,6 +315,194 @@ export const getAdminAuthSignOutMockHandler = (overrideResponse?: void | ((info:
 
     return new HttpResponse(null,
       { status: 204
+      })
+  }, options)
+}
+
+export const getCoursesListMockHandler = (overrideResponse?: CourseListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<CourseListResponseDto> | CourseListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/courses', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCoursesListResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getCoursesCreateMockHandler = (overrideResponse?: CourseSummaryDto | ((info: Parameters<HttpResponseResolver<PathParams, CreateCourseRequestDto>>[0]) => Promise<CourseSummaryDto> | CourseSummaryDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, CreateCourseRequestDto>('*/api/admin/courses', async (info: Parameters<HttpResponseResolver<PathParams, CreateCourseRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCoursesCreateResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getCoursesRemoveMockHandler = (overrideResponse?: void | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.delete<{ id: string }>('*/api/admin/courses/:id', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
+
+export const getCoursesGetMockHandler = (overrideResponse?: CourseSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<CourseSummaryDto> | CourseSummaryDto), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string }>('*/api/admin/courses/:id', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCoursesGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getCoursesUpdateMockHandler = (overrideResponse?: CourseSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string }, UpdateCourseRequestDto>>[0]) => Promise<CourseSummaryDto> | CourseSummaryDto), options?: RequestHandlerOptions) => {
+  return http.patch<{ id: string }, UpdateCourseRequestDto>('*/api/admin/courses/:id', async (info: Parameters<HttpResponseResolver<{ id: string }, UpdateCourseRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCoursesUpdateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getModulesListMockHandler = (overrideResponse?: ModuleListResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<ModuleListResponseDto> | ModuleListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string }>('*/api/admin/courses/:id/modules', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getModulesListResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getModulesCreateMockHandler = (overrideResponse?: ModuleSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string }, CreateModuleRequestDto>>[0]) => Promise<ModuleSummaryDto> | ModuleSummaryDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string }, CreateModuleRequestDto>('*/api/admin/courses/:id/modules', async (info: Parameters<HttpResponseResolver<{ id: string }, CreateModuleRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getModulesCreateResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getModulesReorderMockHandler = (overrideResponse?: ModuleListResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string }, ReorderRequestDto>>[0]) => Promise<ModuleListResponseDto> | ModuleListResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string }, ReorderRequestDto>('*/api/admin/courses/:id/modules/reorder', async (info: Parameters<HttpResponseResolver<{ id: string }, ReorderRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getModulesReorderResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getModulesRemoveMockHandler = (overrideResponse?: void | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }>>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.delete<{ id: string; moduleId: string }>('*/api/admin/courses/:id/modules/:moduleId', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }>>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
+
+export const getModulesGetMockHandler = (overrideResponse?: ModuleSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }>>[0]) => Promise<ModuleSummaryDto> | ModuleSummaryDto), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string; moduleId: string }>('*/api/admin/courses/:id/modules/:moduleId', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getModulesGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getModulesUpdateMockHandler = (overrideResponse?: ModuleSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, UpdateModuleRequestDto>>[0]) => Promise<ModuleSummaryDto> | ModuleSummaryDto), options?: RequestHandlerOptions) => {
+  return http.patch<{ id: string; moduleId: string }, UpdateModuleRequestDto>('*/api/admin/courses/:id/modules/:moduleId', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, UpdateModuleRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getModulesUpdateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getLessonSectionsCreateMockHandler = (overrideResponse?: ModuleSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, LessonSectionRequestDto>>[0]) => Promise<ModuleSummaryDto> | ModuleSummaryDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string; moduleId: string }, LessonSectionRequestDto>('*/api/admin/courses/:id/modules/:moduleId/sections', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, LessonSectionRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getLessonSectionsCreateResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getLessonSectionsReorderMockHandler = (overrideResponse?: ModuleSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, ReorderRequestDto>>[0]) => Promise<ModuleSummaryDto> | ModuleSummaryDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string; moduleId: string }, ReorderRequestDto>('*/api/admin/courses/:id/modules/:moduleId/sections/reorder', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, ReorderRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getLessonSectionsReorderResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getLessonSectionsRemoveMockHandler = (overrideResponse?: ModuleSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string; sectionId: string }>>[0]) => Promise<ModuleSummaryDto> | ModuleSummaryDto), options?: RequestHandlerOptions) => {
+  return http.delete<{ id: string; moduleId: string; sectionId: string }>('*/api/admin/courses/:id/modules/:moduleId/sections/:sectionId', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string; sectionId: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getLessonSectionsRemoveResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getLessonSectionsUpdateMockHandler = (overrideResponse?: ModuleSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string; sectionId: string }, LessonSectionRequestDto>>[0]) => Promise<ModuleSummaryDto> | ModuleSummaryDto), options?: RequestHandlerOptions) => {
+  return http.patch<{ id: string; moduleId: string; sectionId: string }, LessonSectionRequestDto>('*/api/admin/courses/:id/modules/:moduleId/sections/:sectionId', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string; sectionId: string }, LessonSectionRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getLessonSectionsUpdateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getCoursesPublishMockHandler = (overrideResponse?: CourseSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<CourseSummaryDto> | CourseSummaryDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string }>('*/api/admin/courses/:id/publish', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCoursesPublishResponseMock(),
+      { status: 200
       })
   }, options)
 }
@@ -651,6 +881,18 @@ export const getDirectoryLookupsListDepartmentsMockHandler = (overrideResponse?:
   }, options)
 }
 
+export const getEnrollmentSubmitMockHandler = (overrideResponse?: EnrollmentAcceptedResponseDto | ((info: Parameters<HttpResponseResolver<PathParams, EnrollmentRequestDto>>[0]) => Promise<EnrollmentAcceptedResponseDto> | EnrollmentAcceptedResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, EnrollmentRequestDto>('*/api/enrollment', async (info: Parameters<HttpResponseResolver<PathParams, EnrollmentRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getEnrollmentSubmitResponseMock(),
+      { status: 202
+      })
+  }, options)
+}
+
 export const getHealthCheckMockHandler = (overrideResponse?: HealthResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<HealthResponseDto> | HealthResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/health', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -688,6 +930,22 @@ export const getHeatLmsApiMock = () => [
   getAdminAuthRefreshMockHandler(),
   getAdminAuthSignInMockHandler(),
   getAdminAuthSignOutMockHandler(),
+  getCoursesListMockHandler(),
+  getCoursesCreateMockHandler(),
+  getCoursesRemoveMockHandler(),
+  getCoursesGetMockHandler(),
+  getCoursesUpdateMockHandler(),
+  getModulesListMockHandler(),
+  getModulesCreateMockHandler(),
+  getModulesReorderMockHandler(),
+  getModulesRemoveMockHandler(),
+  getModulesGetMockHandler(),
+  getModulesUpdateMockHandler(),
+  getLessonSectionsCreateMockHandler(),
+  getLessonSectionsReorderMockHandler(),
+  getLessonSectionsRemoveMockHandler(),
+  getLessonSectionsUpdateMockHandler(),
+  getCoursesPublishMockHandler(),
   getDepartmentsListMockHandler(),
   getDepartmentsCreateMockHandler(),
   getDepartmentsRemoveMockHandler(),
@@ -720,6 +978,7 @@ export const getHeatLmsApiMock = () => [
   getDirectoryLookupsListUniversitiesMockHandler(),
   getDirectoryLookupsListFacultiesMockHandler(),
   getDirectoryLookupsListDepartmentsMockHandler(),
+  getEnrollmentSubmitMockHandler(),
   getHealthCheckMockHandler(),
   getMeDescribeMockHandler()
 ]

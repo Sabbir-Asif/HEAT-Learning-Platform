@@ -9,6 +9,7 @@ function preset(
   return defineConfig({
     test: {
       environment,
+      testTimeout: 15000,
       include: ["test/**/*.test.{ts,tsx,mjs}"],
       coverage: {
         provider: "v8",

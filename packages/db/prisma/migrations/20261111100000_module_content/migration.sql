@@ -1,0 +1,2 @@
+ALTER TABLE "Module" ADD COLUMN "objectives" TEXT[] DEFAULT ARRAY[]::TEXT[];
+ALTER TABLE "LessonSection" ADD COLUMN "title" TEXT NOT NULL DEFAULT '';

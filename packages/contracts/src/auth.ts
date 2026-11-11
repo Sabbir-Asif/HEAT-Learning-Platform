@@ -23,12 +23,14 @@ export const courseAccessStatuses = ["APPROVED", "COMPLETED"] as const satisfies
 export const grantsCourseAccess = (status: EnrollmentStatusName): boolean =>
   (courseAccessStatuses as ReadonlyArray<string>).includes(status);
 
+export const emailAddressSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .pipe(z.email("Enter a valid email address.").max(254, "Enter a valid email address."));
+
 export const signInRequestSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .pipe(z.email("Enter a valid email address.").max(254, "Enter a valid email address.")),
+  email: emailAddressSchema,
   password: z.string().min(1, "Enter your password.").max(256, "Enter your password."),
 });
 
