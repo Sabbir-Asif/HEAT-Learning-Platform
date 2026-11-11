@@ -57,6 +57,11 @@ const messages: Record<ErrorCode, string> = {
   PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
   RATE_LIMITED: "Too many requests. Try again later.",
   UNAUTHENTICATED: "Sign in to continue.",
+  UPLOAD_EXPIRED: "This upload expired before it finished. Start it again.",
+  UPLOAD_OFFSET_MISMATCH:
+    "The upload offset does not match the server. Resume from the server offset.",
+  UPLOAD_TOO_LARGE: "This file is larger than the upload limit.",
+  UPLOAD_TYPE_NOT_ALLOWED: "This file is not a supported video.",
   VALIDATION_FAILED: "Some fields are not valid.",
   VERIFICATION_LINK_EXPIRED: "This verification link has expired. Request a new one.",
   VERIFICATION_LINK_INVALID: "This verification link is not valid.",

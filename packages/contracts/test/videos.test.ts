@@ -4,6 +4,9 @@ import {
   updateVideoSlotRequestSchema,
   videoSlotListResponseSchema,
   videoSlotStatusSchema,
+  videoUploadLimits,
+  videoUploadParamsSchema,
+  videoUploadedPayloadSchema,
 } from "../src";
 
 describe("video slot requests", () => {
@@ -54,5 +57,34 @@ describe("video slot responses", () => {
       locked: false,
     });
     expect(parsed.items[0]?.assetKey).toBeNull();
+  });
+});
+
+describe("video upload contracts", () => {
+  const ids = {
+    id: "0198f1a0-0000-7000-8000-0000000000c1",
+    moduleId: "0198f1a0-0000-7000-8000-0000000000c2",
+    videoId: "0198f1a0-0000-7000-8000-0000000000c3",
+  };
+
+  test("the upload route accepts only a 32 character url safe asset key", () => {
+    expect(videoUploadParamsSchema.safeParse({ ...ids, assetKey: "a".repeat(32) }).success).toBe(
+      true,
+    );
+    expect(videoUploadParamsSchema.safeParse({ ...ids, assetKey: "../etc/passwd" }).success).toBe(
+      false,
+    );
+    expect(videoUploadParamsSchema.safeParse({ ...ids, assetKey: "a".repeat(31) }).success).toBe(
+      false,
+    );
+  });
+
+  test("the uploaded event carries the asset id only", () => {
+    expect(videoUploadedPayloadSchema.safeParse({ assetId: ids.id }).success).toBe(true);
+    expect(videoUploadedPayloadSchema.safeParse({ assetId: "x" }).success).toBe(false);
+  });
+
+  test("the size cap is two gibibytes", () => {
+    expect(videoUploadLimits.maxBytes).toBe(2147483648);
   });
 });
