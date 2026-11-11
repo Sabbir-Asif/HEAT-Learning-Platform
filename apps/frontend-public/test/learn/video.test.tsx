@@ -14,7 +14,10 @@ describe("VideoSlot", () => {
     const [video] = makeModule(1).videos;
     const view = await mount(
       withClient(
-        <VideoSlot videos={[{ ...video!, status: "IN_PROGRESS", coveragePercent: 40 }]} />,
+        <VideoSlot
+          courseId="c1"
+          videos={[{ ...video!, status: "IN_PROGRESS", coveragePercent: 40 }]}
+        />,
       ),
     );
 
@@ -26,7 +29,7 @@ describe("VideoSlot", () => {
   test("says when a video is not available yet", async () => {
     const [video] = makeModule(1).videos;
     const view = await mount(
-      withClient(<VideoSlot videos={[{ ...video!, status: "UNAVAILABLE" }]} />),
+      withClient(<VideoSlot courseId="c1" videos={[{ ...video!, status: "UNAVAILABLE" }]} />),
     );
 
     expect(view.textContent).toContain("This video is not available yet.");
@@ -36,7 +39,7 @@ describe("VideoSlot", () => {
 describe("VideoSlot playback start", () => {
   test("offers a play button and no player until the student asks for one", async () => {
     const [video] = makeModule(1).videos;
-    const view = await mount(withClient(<VideoSlot videos={[video!]} />));
+    const view = await mount(withClient(<VideoSlot courseId="c1" videos={[video!]} />));
 
     expect(view.textContent).toContain("Play video");
     expect(view.querySelector('[data-slot="video-player"]')).toBeNull();
@@ -45,7 +48,7 @@ describe("VideoSlot playback start", () => {
   test("does not offer playback for an unavailable video", async () => {
     const [video] = makeModule(1).videos;
     const view = await mount(
-      withClient(<VideoSlot videos={[{ ...video!, status: "UNAVAILABLE" }]} />),
+      withClient(<VideoSlot courseId="c1" videos={[{ ...video!, status: "UNAVAILABLE" }]} />),
     );
 
     expect(view.textContent).not.toContain("Play video");

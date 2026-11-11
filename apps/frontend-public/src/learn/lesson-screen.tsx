@@ -58,6 +58,7 @@ export function LessonScreen({ courseId, moduleId }: LessonScreenProps) {
       : { status: "ready", content: lesson.data };
   return (
     <LessonPage
+      courseId={courseId}
       courseSlug={view.courseSlug}
       courseTitle={view.courseTitle}
       module={view.module}

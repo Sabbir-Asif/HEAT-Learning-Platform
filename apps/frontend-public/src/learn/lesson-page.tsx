@@ -38,6 +38,7 @@ export type LessonContentState =
   | { status: "ready"; content: LessonContentResponse };
 
 export interface LessonPageProps {
+  courseId: string;
   courseSlug: string;
   courseTitle: string;
   module: LearningModule;
@@ -114,7 +115,14 @@ function Sections({ lesson }: { lesson: LessonContentState }) {
   );
 }
 
-export function LessonPage({ courseSlug, courseTitle, module, modules, lesson }: LessonPageProps) {
+export function LessonPage({
+  courseId,
+  courseSlug,
+  courseTitle,
+  module,
+  modules,
+  lesson,
+}: LessonPageProps) {
   const text = (
     <>
       <Sections lesson={lesson} />
@@ -146,7 +154,9 @@ export function LessonPage({ courseSlug, courseTitle, module, modules, lesson }:
       />
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="flex min-w-0 flex-col gap-6 lg:col-span-2">
-          {module.videos.length === 0 ? null : <VideoArea videos={module.videos} />}
+          {module.videos.length === 0 ? null : (
+            <VideoArea courseId={courseId} videos={module.videos} />
+          )}
           <div className="flex flex-col gap-6 max-lg:hidden" data-layout="laptop-text">
             {text}
           </div>
