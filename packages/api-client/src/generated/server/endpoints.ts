@@ -426,6 +426,12 @@ export interface CreateFacultyRequestDto {
   name: string;
 }
 
+export interface CreateModuleRequestDto {
+  /** @maxItems 10 */
+  objectives?: string[];
+  title: string;
+}
+
 export interface CreateUniversityRequestDto {
   name: string;
 }
@@ -684,6 +690,10 @@ export interface InviteAdminRequestDto {
   email: string;
 }
 
+export interface LessonSectionRequestDto {
+  title: string;
+}
+
 export type MeResponseDtoEnrollmentsItemStatus = typeof MeResponseDtoEnrollmentsItemStatus[keyof typeof MeResponseDtoEnrollmentsItemStatus];
 
 
@@ -728,6 +738,80 @@ export type MeResponseDtoUser = {
 export interface MeResponseDto {
   enrollments: MeResponseDtoEnrollmentsItem[];
   user: MeResponseDtoUser;
+}
+
+export type ModuleListResponseDtoItemsItemSectionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  title: string;
+};
+
+export type ModuleListResponseDtoItemsItem = {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  objectives: string[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  sections: ModuleListResponseDtoItemsItemSectionsItem[];
+  title: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+};
+
+export interface ModuleListResponseDto {
+  items: ModuleListResponseDtoItemsItem[];
+  locked: boolean;
+}
+
+export type ModuleSummaryDtoSectionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  title: string;
+};
+
+export interface ModuleSummaryDto {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  objectives: string[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  sections: ModuleSummaryDtoSectionsItem[];
+  title: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+}
+
+export interface ReorderRequestDto {
+  /**
+     * @maxItems 500
+     * @items.pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  orderedIds: string[];
+  /**
+     * @maxItems 500
+     * @items.pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  previousIds: string[];
 }
 
 export interface SignInRequestDto {
@@ -848,6 +932,12 @@ export interface UpdateDepartmentRequestDto {
 
 export interface UpdateFacultyRequestDto {
   name: string;
+}
+
+export interface UpdateModuleRequestDto {
+  /** @maxItems 10 */
+  objectives?: string[];
+  title: string;
 }
 
 export interface UpdateUniversityRequestDto {
@@ -1567,6 +1657,324 @@ return serverFetch<CourseSummaryDto>(getCoursesUpdateUrl(id),
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(updateCourseRequestDto)
+  }
+);}
+
+
+
+export const getModulesListUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules`
+}
+
+export const modulesList = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<ModuleListResponseDto> => {
+
+  return serverFetch<ModuleListResponseDto>(getModulesListUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getModulesCreateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules`
+}
+
+export const modulesCreate = async (id: string,
+    createModuleRequestDto: CreateModuleRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ModuleSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ModuleSummaryDto>(getModulesCreateUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createModuleRequestDto)
+  }
+);}
+
+
+
+export const getModulesReorderUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/reorder`
+}
+
+export const modulesReorder = async (id: string,
+    reorderRequestDto: ReorderRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ModuleListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ModuleListResponseDto>(getModulesReorderUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reorderRequestDto)
+  }
+);}
+
+
+
+export const getModulesRemoveUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}`
+}
+
+export const modulesRemove = async (id: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getModulesRemoveUrl(id,moduleId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getModulesGetUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}`
+}
+
+export const modulesGet = async (id: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<ModuleSummaryDto> => {
+
+  return serverFetch<ModuleSummaryDto>(getModulesGetUrl(id,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getModulesUpdateUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}`
+}
+
+export const modulesUpdate = async (id: string,
+    moduleId: string,
+    updateModuleRequestDto: UpdateModuleRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ModuleSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ModuleSummaryDto>(getModulesUpdateUrl(id,moduleId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateModuleRequestDto)
+  }
+);}
+
+
+
+export const getLessonSectionsCreateUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/sections`
+}
+
+export const lessonSectionsCreate = async (id: string,
+    moduleId: string,
+    lessonSectionRequestDto: LessonSectionRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ModuleSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ModuleSummaryDto>(getLessonSectionsCreateUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(lessonSectionRequestDto)
+  }
+);}
+
+
+
+export const getLessonSectionsReorderUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/sections/reorder`
+}
+
+export const lessonSectionsReorder = async (id: string,
+    moduleId: string,
+    reorderRequestDto: ReorderRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ModuleSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ModuleSummaryDto>(getLessonSectionsReorderUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reorderRequestDto)
+  }
+);}
+
+
+
+export const getLessonSectionsRemoveUrl = (id: string,
+    moduleId: string,
+    sectionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/sections/${sectionId}`
+}
+
+export const lessonSectionsRemove = async (id: string,
+    moduleId: string,
+    sectionId: string, options?: Parameters<typeof serverFetch>[1]): Promise<ModuleSummaryDto> => {
+
+  return serverFetch<ModuleSummaryDto>(getLessonSectionsRemoveUrl(id,moduleId,sectionId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getLessonSectionsUpdateUrl = (id: string,
+    moduleId: string,
+    sectionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/sections/${sectionId}`
+}
+
+export const lessonSectionsUpdate = async (id: string,
+    moduleId: string,
+    sectionId: string,
+    lessonSectionRequestDto: LessonSectionRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ModuleSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ModuleSummaryDto>(getLessonSectionsUpdateUrl(id,moduleId,sectionId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(lessonSectionRequestDto)
   }
 );}
 
