@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { approvalReasonMaxLength } from "./approvals";
 
 export const videoCompletionThreshold = 0.8;
 
@@ -100,7 +101,7 @@ export const learningStructureResponseSchema = z.object({
   course: z.object({ id: z.uuid(), slug: z.string(), title: z.string() }),
   enrollment: z.object({
     status: learningEnrollmentStatusSchema,
-    reason: z.string().nullable(),
+    reason: z.string().max(approvalReasonMaxLength).nullable(),
   }),
   learning: learningContentSchema.nullable(),
 });
