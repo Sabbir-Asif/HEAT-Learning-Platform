@@ -4,6 +4,7 @@ import { AUDITED_KEY } from "../../src/audit/audited.decorator";
 import { LessonSectionsController } from "../../src/catalog/lesson-sections.controller";
 import { ModulesController } from "../../src/catalog/modules.controller";
 import { QuizController } from "../../src/catalog/quiz.controller";
+import { RATE_LIMIT_PROFILE_KEY } from "../../src/rate-limit/rate-limit.guard";
 import { VideoSlotsController } from "../../src/catalog/video-slots.controller";
 
 describe.each([
@@ -61,6 +62,7 @@ describe("video slot writes are audited", () => {
     ["reorder", "video-slot.reorder", "Module"],
     ["update", "video-slot.update", "Video"],
     ["remove", "video-slot.delete", "Video"],
+    ["retryTranscode", "video-transcode.retry", "VideoAsset"],
   ] as const)("%s is audited as %s", (handler, action, entity) => {
     expect(Reflect.getMetadata(AUDITED_KEY, VideoSlotsController.prototype[handler])).toEqual({
       action,
@@ -70,6 +72,14 @@ describe("video slot writes are audited", () => {
 
   test("list is a read and is not audited", () => {
     expect(Reflect.getMetadata(AUDITED_KEY, VideoSlotsController.prototype.list)).toBeUndefined();
+  });
+});
+
+describe("video transcode retry", () => {
+  test("is rate limited under its own profile", () => {
+    expect(
+      Reflect.getMetadata(RATE_LIMIT_PROFILE_KEY, VideoSlotsController.prototype.retryTranscode),
+    ).toBe("videoTranscodeRetry");
   });
 });
 

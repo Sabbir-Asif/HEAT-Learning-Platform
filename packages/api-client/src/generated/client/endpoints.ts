@@ -3390,6 +3390,78 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getVideoSlotsUpdateMutationOptions(options), queryClient);
     }
 
+export const getVideoSlotsRetryTranscodeUrl = (id: string,
+    moduleId: string,
+    videoId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/${videoId}/transcode/retry`
+}
+
+export const videoSlotsRetryTranscode = async (id: string,
+    moduleId: string,
+    videoId: string, options?: Parameters<typeof customFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+  return customFetch<VideoSlotListResponseDto>(getVideoSlotsRetryTranscodeUrl(id,moduleId,videoId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getVideoSlotsRetryTranscodeMutationKey = () => ['videoSlotsRetryTranscode'] as const;
+
+export const getVideoSlotsRetryTranscodeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof videoSlotsRetryTranscode>>, TError,VideoSlotsRetryTranscodeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof videoSlotsRetryTranscode>>, TError,VideoSlotsRetryTranscodeMutationVariables, TContext> => {
+
+const mutationKey = getVideoSlotsRetryTranscodeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof videoSlotsRetryTranscode>>, VideoSlotsRetryTranscodeMutationVariables> = (props) => {
+          const {id,moduleId,videoId} = props ?? {};
+
+          return  videoSlotsRetryTranscode(id,moduleId,videoId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VideoSlotsRetryTranscodeMutationResult = NonNullable<Awaited<ReturnType<typeof videoSlotsRetryTranscode>>>
+
+    export type VideoSlotsRetryTranscodeMutationError = ErrorType<unknown>
+    export type VideoSlotsRetryTranscodeMutationVariables = {id: string;moduleId: string;videoId: string}
+
+    export const useVideoSlotsRetryTranscode = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof videoSlotsRetryTranscode>>, TError,VideoSlotsRetryTranscodeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof videoSlotsRetryTranscode>>,
+        TError,
+        VideoSlotsRetryTranscodeMutationVariables,
+        TContext
+      > => {
+      return useMutation(getVideoSlotsRetryTranscodeMutationOptions(options), queryClient);
+    }
+
 export const getCoursesPublishUrl = (id: string,) => {
 
 

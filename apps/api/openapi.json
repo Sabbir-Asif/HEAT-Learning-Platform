@@ -586,7 +586,8 @@
                     "VERIFICATION_LINK_EXPIRED",
                     "VERIFICATION_LINK_INVALID",
                     "VERIFICATION_LINK_USED",
-                    "VERIFICATION_RESEND_LIMIT"
+                    "VERIFICATION_RESEND_LIMIT",
+                    "VIDEO_NOT_FAILED"
                   ],
                   "type": "string"
                 },
@@ -2412,6 +2413,18 @@
                   "nullable": true,
                   "type": "string"
                 },
+                "failureReason": {
+                  "enum": [
+                    "SOURCE_UNREADABLE",
+                    "ENCODE_FAILED",
+                    "TIMED_OUT",
+                    "VALIDATION_FAILED",
+                    "PUBLISH_FAILED",
+                    null
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
                 "id": {
                   "format": "uuid",
                   "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
@@ -2461,7 +2474,8 @@
                 "required",
                 "status",
                 "assetKey",
-                "rejectionReason"
+                "rejectionReason",
+                "failureReason"
               ],
               "type": "object"
             },
@@ -4133,6 +4147,58 @@
           },
           "required": true
         },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoSlotListResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "video-slots"
+        ]
+      }
+    },
+    "/api/admin/courses/{id}/modules/{moduleId}/videos/{videoId}/transcode/retry": {
+      "post": {
+        "operationId": "videoSlotsRetryTranscode",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "moduleId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "videoId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {

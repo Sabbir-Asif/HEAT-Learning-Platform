@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from "@ne
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { Audience, Roles } from "../access";
 import { Audited } from "../audit";
+import { RateLimit } from "../rate-limit";
 import {
   CreateVideoSlotRequestDto,
   ModuleParamsDto,
@@ -44,6 +45,15 @@ export class VideoSlotsController {
     @Body() body: ReorderRequestDto,
   ): Promise<VideoSlotListResponseDto> {
     return this.slots.reorder(params.id, params.moduleId, body);
+  }
+
+  @Post(":videoId/transcode/retry")
+  @HttpCode(200)
+  @RateLimit("videoTranscodeRetry")
+  @Audited({ action: "video-transcode.retry", entity: "VideoAsset" })
+  @ApiOkResponse({ type: VideoSlotListResponseDto })
+  retryTranscode(@Param() params: VideoSlotParamsDto): Promise<VideoSlotListResponseDto> {
+    return this.slots.retryTranscode(params.id, params.moduleId, params.videoId);
   }
 
   @Patch(":videoId")

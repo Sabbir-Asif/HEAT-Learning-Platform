@@ -1,5 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { videoFailureReasonSchema, videoRejectionReasonSchema } from "@heat/contracts";
+import {
+  videoFailureReasonSchema,
+  videoQueuedEventType,
+  videoRejectionReasonSchema,
+} from "@heat/contracts";
 import type {
   CreateVideoSlotRequest,
   VideoFailureReason,
@@ -86,6 +90,32 @@ export class VideoSlotsService {
     const scope = await readScope(this.database, courseId);
     await this.assertModule(this.database, scope.revisionId, moduleId);
     return this.listOf(this.database, moduleId, scope.lockedAt !== null);
+  }
+
+  async retryTranscode(
+    courseId: string,
+    moduleId: string,
+    videoId: string,
+  ): Promise<VideoSlotListResponse> {
+    const client = this.audit.client(this.database);
+    const scope = await readScope(client, courseId);
+    await this.assertModule(client, scope.revisionId, moduleId);
+    const slot = await this.existing(client, moduleId, videoId);
+    if (slot.assetId === null) throw new ApiException(409, "VIDEO_NOT_FAILED");
+    const flipped = await client.videoAsset.updateMany({
+      where: { id: slot.assetId, status: "FAILED" },
+      data: { status: "QUEUED", failureReason: null },
+    });
+    if (flipped.count === 0) throw new ApiException(409, "VIDEO_NOT_FAILED");
+    await client.outbox.create({
+      data: { eventType: videoQueuedEventType, payload: { assetId: slot.assetId } },
+    });
+    this.audit.capture({
+      entityId: slot.assetId,
+      before: { status: "FAILED", failureReason: slot.asset?.failureReason ?? null },
+      after: { status: "QUEUED", videoId, moduleId },
+    });
+    return this.listOf(client, moduleId, scope.lockedAt !== null);
   }
 
   async create(
