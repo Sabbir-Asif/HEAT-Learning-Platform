@@ -38,9 +38,9 @@ describe("playback contracts", () => {
       captions: [{ language: "en" }],
     };
     expect(playbackSessionResponseSchema.safeParse(session).success).toBe(true);
-    expect(
-      playbackSessionResponseSchema.safeParse({ ...session, expiresAt: "soon" }).success,
-    ).toBe(false);
+    expect(playbackSessionResponseSchema.safeParse({ ...session, expiresAt: "soon" }).success).toBe(
+      false,
+    );
     expect(
       playbackSessionResponseSchema.safeParse({ ...session, resumePositionSeconds: -1 }).success,
     ).toBe(false);

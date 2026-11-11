@@ -24,4 +24,5 @@ export type PlaybackSessionResponse = z.infer<typeof playbackSessionResponseSche
 
 export const hlsCookiePath = (videoId: string): string => `/hls/${videoId}/`;
 
-export const hlsManifestPath = (assetKey: string): string => `${hlsCookiePath(assetKey)}master.m3u8`;
+export const hlsManifestPath = (assetKey: string): string =>
+  `${hlsCookiePath(assetKey)}master.m3u8`;
