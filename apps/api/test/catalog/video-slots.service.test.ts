@@ -13,7 +13,12 @@ interface SlotFixture {
   title: string;
   required: boolean;
   assetId: string | null;
-  asset: { status: string; assetKey: string; rejectionReason?: string | null } | null;
+  asset: {
+    status: string;
+    assetKey: string;
+    rejectionReason?: string | null;
+    failureReason?: string | null;
+  } | null;
 }
 
 const slot = (id: string, order: number, overrides: Partial<SlotFixture> = {}): SlotFixture => ({
@@ -73,6 +78,7 @@ const build = (options: { lockedAt?: Date | null; slots?: SlotFixture[] } = {}) 
         ),
       delete: vi.fn().mockResolvedValue({}),
     },
+    outbox: { create: vi.fn().mockResolvedValue({}) },
     videoAsset: {
       updateMany: vi.fn().mockResolvedValue({ count: 1 }),
       delete: vi.fn(),
@@ -109,6 +115,26 @@ describe("VideoSlotsService.list rejection reason", () => {
       null,
       null,
     ]);
+  });
+});
+
+describe("VideoSlotsService.list failure reason", () => {
+  test("shows why processing failed, and null for unknown or missing reasons", async () => {
+    const { service } = build({
+      slots: [
+        slot("a", 1, {
+          assetId: "x",
+          asset: { status: "FAILED", assetKey: "k1", failureReason: "TIMED_OUT" },
+        }),
+        slot("b", 2, {
+          assetId: "y",
+          asset: { status: "FAILED", assetKey: "k2", failureReason: "legacy" },
+        }),
+        slot("c", 3, { assetId: "z", asset: { status: "READY", assetKey: "k3" } }),
+      ],
+    });
+    const result = await service.list(courseId, "m");
+    expect(result.items.map((item) => item.failureReason)).toEqual(["TIMED_OUT", null, null]);
   });
 });
 
@@ -286,5 +312,71 @@ describe("VideoSlotsService.reorder", () => {
         ),
       ),
     ).toMatchObject({ code: "CONTENT_LOCKED" });
+  });
+});
+
+describe("VideoSlotsService.retryTranscode", () => {
+  const failed = slot("a", 1, {
+    assetId: "asset-1",
+    asset: { status: "FAILED", assetKey: "k1", failureReason: "TIMED_OUT" },
+  });
+
+  test("moves a failed asset back to queued and writes the queued event with an audit entry", async () => {
+    const { service, database, changes, inAuditScope } = build({ slots: [failed] });
+    await inAuditScope(() => service.retryTranscode(courseId, "m", "a"));
+    expect(database.videoAsset.updateMany).toHaveBeenCalledWith({
+      where: { id: "asset-1", status: "FAILED" },
+      data: { status: "QUEUED", failureReason: null },
+    });
+    expect(database.outbox.create).toHaveBeenCalledWith({
+      data: { eventType: "video.queued", payload: { assetId: "asset-1" } },
+    });
+    expect(changes).toEqual([
+      {
+        entityId: "asset-1",
+        before: { status: "FAILED", failureReason: "TIMED_OUT" },
+        after: { status: "QUEUED", videoId: "a", moduleId: "m" },
+      },
+    ]);
+  });
+
+  test("refuses an asset that is not failed and enqueues nothing", async () => {
+    const { service, database, inAuditScope } = build({ slots: [failed] });
+    database.videoAsset.updateMany.mockResolvedValueOnce({ count: 0 });
+    expect(
+      await failureOf(inAuditScope(() => service.retryTranscode(courseId, "m", "a"))),
+    ).toMatchObject({
+      code: "VIDEO_NOT_FAILED",
+    });
+    expect(database.outbox.create).not.toHaveBeenCalled();
+  });
+
+  test("refuses a slot without an upload", async () => {
+    const { service, inAuditScope } = build({ slots: [slot("a", 1)] });
+    expect(
+      await failureOf(inAuditScope(() => service.retryTranscode(courseId, "m", "a"))),
+    ).toMatchObject({
+      code: "VIDEO_NOT_FAILED",
+    });
+  });
+
+  test("answers 404 for an unknown slot or module", async () => {
+    const { service, inAuditScope } = build({ slots: [failed] });
+    expect(
+      await failureOf(inAuditScope(() => service.retryTranscode(courseId, "m", "zz"))),
+    ).toMatchObject({
+      code: "NOT_FOUND",
+    });
+    expect(
+      await failureOf(inAuditScope(() => service.retryTranscode(courseId, "x", "a"))),
+    ).toMatchObject({
+      code: "NOT_FOUND",
+    });
+  });
+
+  test("works on a locked course because content does not change", async () => {
+    const { service, inAuditScope } = build({ slots: [failed], lockedAt: at });
+    const result = await inAuditScope(() => service.retryTranscode(courseId, "m", "a"));
+    expect(result.locked).toBe(true);
   });
 });

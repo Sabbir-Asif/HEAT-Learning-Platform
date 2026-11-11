@@ -7,5 +7,6 @@ export default nodePreset({
     "src/email/prisma-email-delivery-store.ts",
     "src/outbox/outbox-relay.runner.ts",
     "src/outbox/prisma-outbox-store.ts",
+    "src/transcode/transcode-consumer.ts",
   ],
 });

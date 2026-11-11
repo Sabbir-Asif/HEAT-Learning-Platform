@@ -361,6 +361,7 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   VERIFICATION_LINK_INVALID: 'VERIFICATION_LINK_INVALID',
   VERIFICATION_LINK_USED: 'VERIFICATION_LINK_USED',
   VERIFICATION_RESEND_LIMIT: 'VERIFICATION_RESEND_LIMIT',
+  VIDEO_NOT_FAILED: 'VIDEO_NOT_FAILED',
 } as const;
 
 export type BulkApprovalResponseDtoFailedItem = {
@@ -1317,6 +1318,20 @@ export interface VerifyEmailRequestDto {
 /**
  * @nullable
  */
+export type VideoSlotListResponseDtoItemsItemFailureReason = typeof VideoSlotListResponseDtoItemsItemFailureReason[keyof typeof VideoSlotListResponseDtoItemsItemFailureReason] | null;
+
+
+export const VideoSlotListResponseDtoItemsItemFailureReason = {
+  SOURCE_UNREADABLE: 'SOURCE_UNREADABLE',
+  ENCODE_FAILED: 'ENCODE_FAILED',
+  TIMED_OUT: 'TIMED_OUT',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+  PUBLISH_FAILED: 'PUBLISH_FAILED',
+} as const;
+
+/**
+ * @nullable
+ */
 export type VideoSlotListResponseDtoItemsItemRejectionReason = typeof VideoSlotListResponseDtoItemsItemRejectionReason[keyof typeof VideoSlotListResponseDtoItemsItemRejectionReason] | null;
 
 
@@ -1348,6 +1363,8 @@ export type VideoSlotListResponseDtoItemsItem = {
      * @nullable
      */
   assetKey: string | null;
+  /** @nullable */
+  failureReason: VideoSlotListResponseDtoItemsItemFailureReason;
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
   /**
@@ -2800,6 +2817,31 @@ return serverFetch<VideoSlotListResponseDto>(getVideoSlotsUpdateUrl(id,moduleId,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(updateVideoSlotRequestDto)
+  }
+);}
+
+
+
+export const getVideoSlotsRetryTranscodeUrl = (id: string,
+    moduleId: string,
+    videoId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/${videoId}/transcode/retry`
+}
+
+export const videoSlotsRetryTranscode = async (id: string,
+    moduleId: string,
+    videoId: string, options?: Parameters<typeof serverFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+  return serverFetch<VideoSlotListResponseDto>(getVideoSlotsRetryTranscodeUrl(id,moduleId,videoId),
+  {
+    ...options,
+    method: 'POST'
+
+
   }
 );}
 

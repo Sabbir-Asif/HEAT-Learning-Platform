@@ -52,6 +52,7 @@ export type FormErrorCopyKey =
   | "VERIFICATION_LINK_INVALID"
   | "VERIFICATION_LINK_USED"
   | "VERIFICATION_RESEND_LIMIT"
+  | "VIDEO_NOT_FAILED"
   | "NETWORK_ERROR"
   | "REQUEST_ABORTED"
   | "UNEXPECTED_RESPONSE";
@@ -119,6 +120,7 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   VERIFICATION_LINK_USED: "This verification link has already been used or replaced.",
   VERIFICATION_RESEND_LIMIT:
     "Too many verification emails were requested. Contact support if you still need help.",
+  VIDEO_NOT_FAILED: "Only a video whose processing failed can be retried.",
   NETWORK_ERROR: "The connection failed. Check your network and try again.",
   REQUEST_ABORTED: "The request was cancelled. Try again.",
   UNEXPECTED_RESPONSE: "The server sent an unexpected reply. Try again in a moment.",

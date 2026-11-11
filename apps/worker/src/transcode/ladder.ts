@@ -4,7 +4,8 @@ const AUDIO_KBPS = 96;
 const LOWEST_VIDEO_KBPS = 400;
 const MAXRATE_FACTOR = 1.07;
 const BUFSIZE_FACTOR = 2;
-const CODECS = "avc1.640028,mp4a.40.2";
+const VIDEO_CODEC = "avc1.640028";
+const AUDIO_CODEC = "mp4a.40.2";
 
 export interface Rendition {
   readonly name: string;
@@ -39,6 +40,21 @@ export function selectRenditions(sourceHeight: number): Rendition[] {
   if (fitting.length > 0) return fitting;
   const height = Math.max(2, sourceHeight - (sourceHeight % 2));
   return [{ ...rung(height, evenWidthFor(height), LOWEST_VIDEO_KBPS) }];
+}
+
+export interface SourceSize {
+  readonly width: number;
+  readonly height: number;
+}
+
+export function renditionsForSource(source: SourceSize): Rendition[] {
+  if (!(source.width > 0) || !(source.height > 0)) {
+    throw new Error("Source size must be positive");
+  }
+  return selectRenditions(source.height).map((r) => ({
+    ...r,
+    width: Math.max(2, Math.round((r.height * source.width) / source.height / 2) * 2),
+  }));
 }
 
 export function gopFrames(fps: number): number {
@@ -119,10 +135,19 @@ export function buildRenditionArgs(rendition: Rendition, options: EncodeOptions)
   ];
 }
 
-export function buildMasterPlaylist(renditions: readonly Rendition[]): string {
+export interface MasterOptions {
+  readonly audio?: boolean;
+}
+
+export function buildMasterPlaylist(
+  renditions: readonly Rendition[],
+  options: MasterOptions = {},
+): string {
   if (renditions.length === 0) throw new Error("A master playlist needs at least one rendition");
+  const audio = options.audio ?? true;
+  const codecs = audio ? `${VIDEO_CODEC},${AUDIO_CODEC}` : VIDEO_CODEC;
   const entries = renditions.flatMap((r) => [
-    `#EXT-X-STREAM-INF:BANDWIDTH=${(r.videoKbps + r.audioKbps) * 1000},RESOLUTION=${r.width}x${r.height},CODECS="${CODECS}"`,
+    `#EXT-X-STREAM-INF:BANDWIDTH=${(r.videoKbps + (audio ? r.audioKbps : 0)) * 1000},RESOLUTION=${r.width}x${r.height},CODECS="${codecs}"`,
     `${r.name}/index.m3u8`,
   ]);
   return ["#EXTM3U", "#EXT-X-VERSION:3", "#EXT-X-INDEPENDENT-SEGMENTS", ...entries, ""].join("\n");

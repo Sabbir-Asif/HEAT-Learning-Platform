@@ -14,6 +14,7 @@ export const rateLimitProfileNames = [
   "playbackSession",
   "videoUploadStart",
   "videoUploadChunk",
+  "videoTranscodeRetry",
   "directoryLookup",
 ] as const;
 
@@ -57,6 +58,7 @@ const defaults: Record<RateLimitProfileName, RateLimitProfile> = {
   playbackSession: { limit: 30, windowSeconds: 60, ipLimit: 3000 },
   videoUploadStart: { limit: 30, windowSeconds: 60, ipLimit: 3000 },
   videoUploadChunk: { limit: 6000, windowSeconds: 60, ipLimit: 30000 },
+  videoTranscodeRetry: { limit: 10, windowSeconds: 60, ipLimit: 1000 },
   directoryLookup: { limit: 600, windowSeconds: 60, ipLimit: 3000 },
 };
 

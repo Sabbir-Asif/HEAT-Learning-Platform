@@ -24,6 +24,16 @@ export const videoRejectionReasonSchema = z.enum([
 
 export type VideoRejectionReason = z.infer<typeof videoRejectionReasonSchema>;
 
+export const videoFailureReasonSchema = z.enum([
+  "SOURCE_UNREADABLE",
+  "ENCODE_FAILED",
+  "TIMED_OUT",
+  "VALIDATION_FAILED",
+  "PUBLISH_FAILED",
+]);
+
+export type VideoFailureReason = z.infer<typeof videoFailureReasonSchema>;
+
 export const createVideoSlotRequestSchema = z.object({
   title: courseTitleSchema,
   required: z.boolean().default(true),
@@ -46,6 +56,7 @@ export const videoSlotSummarySchema = z.object({
   status: videoSlotStatusSchema,
   assetKey: z.string().max(128).nullable(),
   rejectionReason: videoRejectionReasonSchema.nullable(),
+  failureReason: videoFailureReasonSchema.nullable(),
 });
 
 export type VideoSlotSummary = z.infer<typeof videoSlotSummarySchema>;

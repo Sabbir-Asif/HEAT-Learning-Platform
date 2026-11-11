@@ -43,6 +43,7 @@ export const errorCodes = [
   "VERIFICATION_LINK_INVALID",
   "VERIFICATION_LINK_USED",
   "VERIFICATION_RESEND_LIMIT",
+  "VIDEO_NOT_FAILED",
 ] as const;
 
 export const clientErrorCodes = [

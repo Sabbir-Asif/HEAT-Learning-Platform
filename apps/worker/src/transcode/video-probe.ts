@@ -11,6 +11,7 @@ export interface ExecOptions {
   timeout: number;
   maxBuffer: number;
   shell: false;
+  env?: Record<string, string>;
 }
 
 export type ExecFile = (
@@ -39,7 +40,7 @@ export const ffprobeArguments = (path: string): string[] => [
 export const nodeExecFile: ExecFile = (file, args, options) =>
   promisify(execFile)(file, args, { ...options, encoding: "utf8" });
 
-const exitedWithStatus = (error: unknown): boolean =>
+export const exitedWithStatus = (error: unknown): boolean =>
   typeof error === "object" &&
   error !== null &&
   "code" in error &&

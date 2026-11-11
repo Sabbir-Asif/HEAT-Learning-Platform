@@ -96,6 +96,8 @@ describe("deny-by-default route enumeration", () => {
         "directoryLookup",
       "POST /api/admin/admins": "adminInvite",
       "POST /api/admin/admins/:id/resend-invitation": "adminInvite",
+      "POST /api/admin/courses/:id/modules/:moduleId/videos/:videoId/transcode/retry":
+        "videoTranscodeRetry",
       "POST /api/admin/auth/invitations/lookup": "verify",
       "POST /api/admin/auth/invitations/accept": "verify",
     });

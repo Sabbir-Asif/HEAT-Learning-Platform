@@ -67,6 +67,7 @@ const messages: Record<ErrorCode, string> = {
   VERIFICATION_LINK_INVALID: "This verification link is not valid.",
   VERIFICATION_LINK_USED: "This verification link has already been used or replaced.",
   VERIFICATION_RESEND_LIMIT: "Too many verification emails were requested for this registration.",
+  VIDEO_NOT_FAILED: "Only a video whose processing failed can be retried.",
 };
 
 const issuesSchema = z.object({

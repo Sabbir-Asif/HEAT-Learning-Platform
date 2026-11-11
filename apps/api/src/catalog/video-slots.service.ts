@@ -1,7 +1,12 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { videoRejectionReasonSchema } from "@heat/contracts";
+import {
+  videoFailureReasonSchema,
+  videoQueuedEventType,
+  videoRejectionReasonSchema,
+} from "@heat/contracts";
 import type {
   CreateVideoSlotRequest,
+  VideoFailureReason,
   VideoRejectionReason,
   ReorderRequest,
   UpdateVideoSlotRequest,
@@ -26,7 +31,9 @@ const slotSelect = {
   title: true,
   required: true,
   assetId: true,
-  asset: { select: { status: true, assetKey: true, rejectionReason: true } },
+  asset: {
+    select: { status: true, assetKey: true, rejectionReason: true, failureReason: true },
+  },
 };
 
 interface SlotRow {
@@ -39,11 +46,17 @@ interface SlotRow {
     status: VideoSlotStatus;
     assetKey: string;
     rejectionReason: string | null;
+    failureReason: string | null;
   } | null;
 }
 
 const reasonOf = (value: string | null): VideoRejectionReason | null => {
   const parsed = videoRejectionReasonSchema.safeParse(value);
+  return parsed.success ? parsed.data : null;
+};
+
+const failureOf = (value: string | null): VideoFailureReason | null => {
+  const parsed = videoFailureReasonSchema.safeParse(value);
   return parsed.success ? parsed.data : null;
 };
 
@@ -55,6 +68,7 @@ const toSlotSummary = (row: SlotRow): VideoSlotSummary => ({
   status: slotStatusOf(row.asset),
   assetKey: row.asset?.assetKey ?? null,
   rejectionReason: reasonOf(row.asset?.rejectionReason ?? null),
+  failureReason: failureOf(row.asset?.failureReason ?? null),
 });
 
 const auditedFields = (moduleId: string, row: SlotRow) => ({
@@ -76,6 +90,32 @@ export class VideoSlotsService {
     const scope = await readScope(this.database, courseId);
     await this.assertModule(this.database, scope.revisionId, moduleId);
     return this.listOf(this.database, moduleId, scope.lockedAt !== null);
+  }
+
+  async retryTranscode(
+    courseId: string,
+    moduleId: string,
+    videoId: string,
+  ): Promise<VideoSlotListResponse> {
+    const client = this.audit.client(this.database);
+    const scope = await readScope(client, courseId);
+    await this.assertModule(client, scope.revisionId, moduleId);
+    const slot = await this.existing(client, moduleId, videoId);
+    if (slot.assetId === null) throw new ApiException(409, "VIDEO_NOT_FAILED");
+    const flipped = await client.videoAsset.updateMany({
+      where: { id: slot.assetId, status: "FAILED" },
+      data: { status: "QUEUED", failureReason: null },
+    });
+    if (flipped.count === 0) throw new ApiException(409, "VIDEO_NOT_FAILED");
+    await client.outbox.create({
+      data: { eventType: videoQueuedEventType, payload: { assetId: slot.assetId } },
+    });
+    this.audit.capture({
+      entityId: slot.assetId,
+      before: { status: "FAILED", failureReason: slot.asset?.failureReason ?? null },
+      after: { status: "QUEUED", videoId, moduleId },
+    });
+    return this.listOf(client, moduleId, scope.lockedAt !== null);
   }
 
   async create(

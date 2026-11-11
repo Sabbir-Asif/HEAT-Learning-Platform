@@ -126,6 +126,7 @@ erDiagram
     Int referenceCount
     Int durationSeconds
     String rejectionReason
+    String failureReason
     DateTime createdAt
     DateTime updatedAt
   }

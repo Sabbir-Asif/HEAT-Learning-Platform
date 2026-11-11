@@ -21,3 +21,4 @@ playwright-report
 lighthouse-results
 packages/db/src/generated
 .data/
+videos/
