@@ -32,6 +32,7 @@ export * from "./composites/confirm-dialog";
 export * from "./composites/empty-state";
 export * from "./composites/error-state";
 export * from "./composites/form";
+export * from "./composites/lesson-text";
 export * from "./composites/page-header";
 export * from "./composites/sortable-list";
 export * from "./composites/stat-card";

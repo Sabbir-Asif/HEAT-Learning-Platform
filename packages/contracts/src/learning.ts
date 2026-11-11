@@ -108,3 +108,21 @@ export const learningStructureResponseSchema = z.object({
 
 export type LearningContent = z.infer<typeof learningContentSchema>;
 export type LearningStructureResponse = z.infer<typeof learningStructureResponseSchema>;
+
+export const lessonContentParamsSchema = z.object({ courseId: z.uuid(), moduleId: z.uuid() });
+
+export const lessonContentSectionSchema = z.object({
+  id: z.uuid(),
+  order: z.number().int(),
+  title: z.string(),
+  schemaVersion: z.number().int(),
+  body: z.record(z.string(), z.unknown()),
+});
+
+export const lessonContentResponseSchema = z.object({
+  module: z.object({ id: z.uuid(), title: z.string(), objectives: z.array(z.string()) }),
+  sections: z.array(lessonContentSectionSchema),
+});
+
+export type LessonContentSection = z.infer<typeof lessonContentSectionSchema>;
+export type LessonContentResponse = z.infer<typeof lessonContentResponseSchema>;

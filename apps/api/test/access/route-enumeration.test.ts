@@ -104,6 +104,7 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/videos/:id/playback-session": "playbackSession",
       "POST /api/videos/:id/playback-session/refresh": "playbackSession",
       "GET /api/courses/:courseId/learning-structure": "learningRead",
+      "GET /api/courses/:courseId/modules/:moduleId/lesson": "learningRead",
     });
   });
 
