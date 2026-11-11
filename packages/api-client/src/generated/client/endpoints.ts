@@ -49,6 +49,7 @@ import type {
   CreateFacultyRequestDto,
   CreateModuleRequestDto,
   CreateUniversityRequestDto,
+  CreateVideoSlotRequestDto,
   CsrfTokenResponseDto,
   DepartmentListResponseDto,
   DepartmentSummaryDto,
@@ -78,9 +79,11 @@ import type {
   UpdateFacultyRequestDto,
   UpdateModuleRequestDto,
   UpdateUniversityRequestDto,
+  UpdateVideoSlotRequestDto,
   VerificationAcceptedResponseDto,
   VerificationResendRequestDto,
-  VerifyEmailRequestDto
+  VerifyEmailRequestDto,
+  VideoSlotListResponseDto
 } from './model';
 
 import { customFetch } from '../../mutator/custom-fetch';
@@ -2431,6 +2434,438 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getLessonSectionsUpdateMutationOptions(options), queryClient);
+    }
+
+export const getVideoSlotsListUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos`
+}
+
+export const videoSlotsList = async (id: string,
+    moduleId: string, options?: Parameters<typeof customFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+  return customFetch<VideoSlotListResponseDto>(getVideoSlotsListUrl(id,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getVideoSlotsListQueryKey = (id: string,
+    moduleId: string,) => {
+    return [
+    `/api/admin/courses/${id}/modules/${moduleId}/videos`
+    ] as const;
+    }
+
+
+export const getVideoSlotsListQueryOptions = <TData = Awaited<ReturnType<typeof videoSlotsList>>, TError = ErrorType<unknown>>(id: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof videoSlotsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getVideoSlotsListQueryKey(id,moduleId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof videoSlotsList>>> = ({ signal }) => videoSlotsList(id,moduleId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined && moduleId !== null && moduleId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof videoSlotsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type VideoSlotsListQueryResult = NonNullable<Awaited<ReturnType<typeof videoSlotsList>>>
+export type VideoSlotsListQueryError = ErrorType<unknown>
+
+
+export function useVideoSlotsList<TData = Awaited<ReturnType<typeof videoSlotsList>>, TError = ErrorType<unknown>>(
+ id: string,
+    moduleId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof videoSlotsList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof videoSlotsList>>,
+          TError,
+          Awaited<ReturnType<typeof videoSlotsList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useVideoSlotsList<TData = Awaited<ReturnType<typeof videoSlotsList>>, TError = ErrorType<unknown>>(
+ id: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof videoSlotsList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof videoSlotsList>>,
+          TError,
+          Awaited<ReturnType<typeof videoSlotsList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useVideoSlotsList<TData = Awaited<ReturnType<typeof videoSlotsList>>, TError = ErrorType<unknown>>(
+ id: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof videoSlotsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useVideoSlotsList<TData = Awaited<ReturnType<typeof videoSlotsList>>, TError = ErrorType<unknown>>(
+ id: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof videoSlotsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getVideoSlotsListQueryOptions(id,moduleId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getVideoSlotsCreateUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos`
+}
+
+export const videoSlotsCreate = async (id: string,
+    moduleId: string,
+    createVideoSlotRequestDto: CreateVideoSlotRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<VideoSlotListResponseDto>(getVideoSlotsCreateUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createVideoSlotRequestDto)
+  }
+);}
+
+
+
+
+
+export const getVideoSlotsCreateMutationKey = () => ['videoSlotsCreate'] as const;
+
+export const getVideoSlotsCreateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof videoSlotsCreate>>, TError,VideoSlotsCreateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof videoSlotsCreate>>, TError,VideoSlotsCreateMutationVariables, TContext> => {
+
+const mutationKey = getVideoSlotsCreateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof videoSlotsCreate>>, VideoSlotsCreateMutationVariables> = (props) => {
+          const {id,moduleId,data} = props ?? {};
+
+          return  videoSlotsCreate(id,moduleId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VideoSlotsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof videoSlotsCreate>>>
+    export type VideoSlotsCreateMutationBody = CreateVideoSlotRequestDto
+    export type VideoSlotsCreateMutationError = ErrorType<unknown>
+    export type VideoSlotsCreateMutationVariables = {id: string;moduleId: string;data: CreateVideoSlotRequestDto}
+
+    export const useVideoSlotsCreate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof videoSlotsCreate>>, TError,VideoSlotsCreateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof videoSlotsCreate>>,
+        TError,
+        VideoSlotsCreateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getVideoSlotsCreateMutationOptions(options), queryClient);
+    }
+
+export const getVideoSlotsReorderUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/reorder`
+}
+
+export const videoSlotsReorder = async (id: string,
+    moduleId: string,
+    reorderRequestDto: ReorderRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<VideoSlotListResponseDto>(getVideoSlotsReorderUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reorderRequestDto)
+  }
+);}
+
+
+
+
+
+export const getVideoSlotsReorderMutationKey = () => ['videoSlotsReorder'] as const;
+
+export const getVideoSlotsReorderMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof videoSlotsReorder>>, TError,VideoSlotsReorderMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof videoSlotsReorder>>, TError,VideoSlotsReorderMutationVariables, TContext> => {
+
+const mutationKey = getVideoSlotsReorderMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof videoSlotsReorder>>, VideoSlotsReorderMutationVariables> = (props) => {
+          const {id,moduleId,data} = props ?? {};
+
+          return  videoSlotsReorder(id,moduleId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VideoSlotsReorderMutationResult = NonNullable<Awaited<ReturnType<typeof videoSlotsReorder>>>
+    export type VideoSlotsReorderMutationBody = ReorderRequestDto
+    export type VideoSlotsReorderMutationError = ErrorType<unknown>
+    export type VideoSlotsReorderMutationVariables = {id: string;moduleId: string;data: ReorderRequestDto}
+
+    export const useVideoSlotsReorder = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof videoSlotsReorder>>, TError,VideoSlotsReorderMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof videoSlotsReorder>>,
+        TError,
+        VideoSlotsReorderMutationVariables,
+        TContext
+      > => {
+      return useMutation(getVideoSlotsReorderMutationOptions(options), queryClient);
+    }
+
+export const getVideoSlotsRemoveUrl = (id: string,
+    moduleId: string,
+    videoId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/${videoId}`
+}
+
+export const videoSlotsRemove = async (id: string,
+    moduleId: string,
+    videoId: string, options?: Parameters<typeof customFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+  return customFetch<VideoSlotListResponseDto>(getVideoSlotsRemoveUrl(id,moduleId,videoId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getVideoSlotsRemoveMutationKey = () => ['videoSlotsRemove'] as const;
+
+export const getVideoSlotsRemoveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof videoSlotsRemove>>, TError,VideoSlotsRemoveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof videoSlotsRemove>>, TError,VideoSlotsRemoveMutationVariables, TContext> => {
+
+const mutationKey = getVideoSlotsRemoveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof videoSlotsRemove>>, VideoSlotsRemoveMutationVariables> = (props) => {
+          const {id,moduleId,videoId} = props ?? {};
+
+          return  videoSlotsRemove(id,moduleId,videoId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VideoSlotsRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof videoSlotsRemove>>>
+
+    export type VideoSlotsRemoveMutationError = ErrorType<unknown>
+    export type VideoSlotsRemoveMutationVariables = {id: string;moduleId: string;videoId: string}
+
+    export const useVideoSlotsRemove = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof videoSlotsRemove>>, TError,VideoSlotsRemoveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof videoSlotsRemove>>,
+        TError,
+        VideoSlotsRemoveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getVideoSlotsRemoveMutationOptions(options), queryClient);
+    }
+
+export const getVideoSlotsUpdateUrl = (id: string,
+    moduleId: string,
+    videoId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/${videoId}`
+}
+
+export const videoSlotsUpdate = async (id: string,
+    moduleId: string,
+    videoId: string,
+    updateVideoSlotRequestDto: UpdateVideoSlotRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<VideoSlotListResponseDto>(getVideoSlotsUpdateUrl(id,moduleId,videoId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateVideoSlotRequestDto)
+  }
+);}
+
+
+
+
+
+export const getVideoSlotsUpdateMutationKey = () => ['videoSlotsUpdate'] as const;
+
+export const getVideoSlotsUpdateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof videoSlotsUpdate>>, TError,VideoSlotsUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof videoSlotsUpdate>>, TError,VideoSlotsUpdateMutationVariables, TContext> => {
+
+const mutationKey = getVideoSlotsUpdateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof videoSlotsUpdate>>, VideoSlotsUpdateMutationVariables> = (props) => {
+          const {id,moduleId,videoId,data} = props ?? {};
+
+          return  videoSlotsUpdate(id,moduleId,videoId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VideoSlotsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof videoSlotsUpdate>>>
+    export type VideoSlotsUpdateMutationBody = UpdateVideoSlotRequestDto
+    export type VideoSlotsUpdateMutationError = ErrorType<unknown>
+    export type VideoSlotsUpdateMutationVariables = {id: string;moduleId: string;videoId: string;data: UpdateVideoSlotRequestDto}
+
+    export const useVideoSlotsUpdate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof videoSlotsUpdate>>, TError,VideoSlotsUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof videoSlotsUpdate>>,
+        TError,
+        VideoSlotsUpdateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getVideoSlotsUpdateMutationOptions(options), queryClient);
     }
 
 export const getCoursesPublishUrl = (id: string,) => {

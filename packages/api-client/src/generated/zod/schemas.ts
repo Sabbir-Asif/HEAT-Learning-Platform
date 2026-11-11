@@ -899,6 +899,180 @@ export const LessonSectionsUpdateResponse = zod.object({
 })
 
 
+export const videoSlotsListPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsListPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const VideoSlotsListParams = zod.object({
+  "id": zod.uuid().regex(videoSlotsListPathIdRegExp),
+  "moduleId": zod.uuid().regex(videoSlotsListPathModuleIdRegExp)
+})
+
+export const videoSlotsListResponseItemsItemAssetKeyMax = 128;
+
+export const videoSlotsListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsListResponseItemsItemOrderMax = 9007199254740991;
+
+
+
+export const VideoSlotsListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "assetKey": zod.string().max(videoSlotsListResponseItemsItemAssetKeyMax).nullable(),
+  "id": zod.uuid().regex(videoSlotsListResponseItemsItemIdRegExp),
+  "order": zod.int().min(1).max(videoSlotsListResponseItemsItemOrderMax),
+  "required": zod.boolean(),
+  "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
+  "title": zod.string()
+})),
+  "locked": zod.boolean()
+})
+
+
+export const videoSlotsCreatePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsCreatePathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const VideoSlotsCreateParams = zod.object({
+  "id": zod.uuid().regex(videoSlotsCreatePathIdRegExp),
+  "moduleId": zod.uuid().regex(videoSlotsCreatePathModuleIdRegExp)
+})
+
+export const videoSlotsCreateBodyRequiredDefault = true;
+
+export const VideoSlotsCreateBody = zod.object({
+  "required": zod.boolean().default(videoSlotsCreateBodyRequiredDefault),
+  "title": zod.string()
+})
+
+export const videoSlotsCreateResponseItemsItemAssetKeyMax = 128;
+
+export const videoSlotsCreateResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsCreateResponseItemsItemOrderMax = 9007199254740991;
+
+
+
+export const VideoSlotsCreateResponse = zod.object({
+  "items": zod.array(zod.object({
+  "assetKey": zod.string().max(videoSlotsCreateResponseItemsItemAssetKeyMax).nullable(),
+  "id": zod.uuid().regex(videoSlotsCreateResponseItemsItemIdRegExp),
+  "order": zod.int().min(1).max(videoSlotsCreateResponseItemsItemOrderMax),
+  "required": zod.boolean(),
+  "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
+  "title": zod.string()
+})),
+  "locked": zod.boolean()
+})
+
+
+export const videoSlotsReorderPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsReorderPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const VideoSlotsReorderParams = zod.object({
+  "id": zod.uuid().regex(videoSlotsReorderPathIdRegExp),
+  "moduleId": zod.uuid().regex(videoSlotsReorderPathModuleIdRegExp)
+})
+
+export const videoSlotsReorderBodyOrderedIdsItemRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsReorderBodyOrderedIdsMax = 500;
+
+export const videoSlotsReorderBodyPreviousIdsItemRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsReorderBodyPreviousIdsMax = 500;
+
+
+
+export const VideoSlotsReorderBody = zod.object({
+  "orderedIds": zod.array(zod.uuid().regex(videoSlotsReorderBodyOrderedIdsItemRegExp)).max(videoSlotsReorderBodyOrderedIdsMax),
+  "previousIds": zod.array(zod.uuid().regex(videoSlotsReorderBodyPreviousIdsItemRegExp)).max(videoSlotsReorderBodyPreviousIdsMax)
+})
+
+export const videoSlotsReorderResponseItemsItemAssetKeyMax = 128;
+
+export const videoSlotsReorderResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsReorderResponseItemsItemOrderMax = 9007199254740991;
+
+
+
+export const VideoSlotsReorderResponse = zod.object({
+  "items": zod.array(zod.object({
+  "assetKey": zod.string().max(videoSlotsReorderResponseItemsItemAssetKeyMax).nullable(),
+  "id": zod.uuid().regex(videoSlotsReorderResponseItemsItemIdRegExp),
+  "order": zod.int().min(1).max(videoSlotsReorderResponseItemsItemOrderMax),
+  "required": zod.boolean(),
+  "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
+  "title": zod.string()
+})),
+  "locked": zod.boolean()
+})
+
+
+export const videoSlotsRemovePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsRemovePathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsRemovePathVideoIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const VideoSlotsRemoveParams = zod.object({
+  "id": zod.uuid().regex(videoSlotsRemovePathIdRegExp),
+  "moduleId": zod.uuid().regex(videoSlotsRemovePathModuleIdRegExp),
+  "videoId": zod.uuid().regex(videoSlotsRemovePathVideoIdRegExp)
+})
+
+export const videoSlotsRemoveResponseItemsItemAssetKeyMax = 128;
+
+export const videoSlotsRemoveResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsRemoveResponseItemsItemOrderMax = 9007199254740991;
+
+
+
+export const VideoSlotsRemoveResponse = zod.object({
+  "items": zod.array(zod.object({
+  "assetKey": zod.string().max(videoSlotsRemoveResponseItemsItemAssetKeyMax).nullable(),
+  "id": zod.uuid().regex(videoSlotsRemoveResponseItemsItemIdRegExp),
+  "order": zod.int().min(1).max(videoSlotsRemoveResponseItemsItemOrderMax),
+  "required": zod.boolean(),
+  "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
+  "title": zod.string()
+})),
+  "locked": zod.boolean()
+})
+
+
+export const videoSlotsUpdatePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsUpdatePathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsUpdatePathVideoIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const VideoSlotsUpdateParams = zod.object({
+  "id": zod.uuid().regex(videoSlotsUpdatePathIdRegExp),
+  "moduleId": zod.uuid().regex(videoSlotsUpdatePathModuleIdRegExp),
+  "videoId": zod.uuid().regex(videoSlotsUpdatePathVideoIdRegExp)
+})
+
+export const VideoSlotsUpdateBody = zod.object({
+  "required": zod.boolean(),
+  "title": zod.string()
+})
+
+export const videoSlotsUpdateResponseItemsItemAssetKeyMax = 128;
+
+export const videoSlotsUpdateResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoSlotsUpdateResponseItemsItemOrderMax = 9007199254740991;
+
+
+
+export const VideoSlotsUpdateResponse = zod.object({
+  "items": zod.array(zod.object({
+  "assetKey": zod.string().max(videoSlotsUpdateResponseItemsItemAssetKeyMax).nullable(),
+  "id": zod.uuid().regex(videoSlotsUpdateResponseItemsItemIdRegExp),
+  "order": zod.int().min(1).max(videoSlotsUpdateResponseItemsItemOrderMax),
+  "required": zod.boolean(),
+  "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
+  "title": zod.string()
+})),
+  "locked": zod.boolean()
+})
+
+
 export const coursesPublishPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 

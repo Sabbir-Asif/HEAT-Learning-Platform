@@ -4,6 +4,8 @@ import {
   moduleFormValuesOf,
   moduleRequestOf,
   reorderFailedMessage,
+  videoSlotDeleteFailedMessage,
+  videoSlotLockedMessage,
 } from "../../src/modules/modules-copy";
 
 describe("moduleFormValuesOf", () => {
@@ -38,5 +40,18 @@ describe("reorderFailedMessage", () => {
 describe("moduleDeleteFailedMessage", () => {
   test("names the module", () => {
     expect(moduleDeleteFailedMessage("Consent")).toBe("Consent could not be deleted. Try again.");
+  });
+});
+
+describe("video slot copy", () => {
+  test("names the slot that could not be removed", () => {
+    expect(videoSlotDeleteFailedMessage("Welcome")).toBe(
+      "Welcome could not be removed. Try again.",
+    );
+  });
+
+  test("explains what a locked course refuses", () => {
+    expect(videoSlotLockedMessage).toContain("locked");
+    expect(videoSlotLockedMessage).toContain("required");
   });
 });

@@ -133,6 +133,7 @@ erDiagram
     String moduleId FK
     Int order
     String title
+    Boolean required
     String assetId FK
     DateTime deletedAt
     DateTime createdAt
@@ -451,7 +452,7 @@ erDiagram
   CourseRevision ||--o{ Module : revision
   Module ||--o{ LessonSection : module
   Module ||--o{ Video : module
-  VideoAsset ||--o{ Video : asset
+  VideoAsset |o--o{ Video : asset
   VideoAsset ||--o{ VideoRendition : asset
   VideoAsset ||--o{ VideoCaption : asset
   Course ||--o{ CourseTag : course

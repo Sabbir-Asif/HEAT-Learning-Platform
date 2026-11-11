@@ -12,6 +12,7 @@ export * from "./enrollment";
 export * from "./errors";
 export * from "./modules";
 export * from "./verification";
+export * from "./videos";
 
 export const healthResponseSchema = z.object({
   status: z.literal("ok"),

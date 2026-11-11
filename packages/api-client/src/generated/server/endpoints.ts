@@ -591,6 +591,11 @@ export interface CreateUniversityRequestDto {
   name: string;
 }
 
+export interface CreateVideoSlotRequestDto {
+  required?: boolean;
+  title: string;
+}
+
 export interface CsrfTokenResponseDto {
   token: string;
 }
@@ -1124,6 +1129,11 @@ export interface UpdateUniversityRequestDto {
   name: string;
 }
 
+export interface UpdateVideoSlotRequestDto {
+  required: boolean;
+  title: string;
+}
+
 export interface VerificationAcceptedResponseDto {
   accepted: true;
 }
@@ -1145,6 +1155,43 @@ export interface VerifyEmailRequestDto {
      * @maxLength 512
      */
   token: string;
+}
+
+export type VideoSlotListResponseDtoItemsItemStatus = typeof VideoSlotListResponseDtoItemsItemStatus[keyof typeof VideoSlotListResponseDtoItemsItemStatus];
+
+
+export const VideoSlotListResponseDtoItemsItemStatus = {
+  NOT_UPLOADED: 'NOT_UPLOADED',
+  UPLOADING: 'UPLOADING',
+  UPLOADED: 'UPLOADED',
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  READY: 'READY',
+  FAILED: 'FAILED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type VideoSlotListResponseDtoItemsItem = {
+  /**
+     * @maxLength 128
+     * @nullable
+     */
+  assetKey: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  required: boolean;
+  status: VideoSlotListResponseDtoItemsItemStatus;
+  title: string;
+};
+
+export interface VideoSlotListResponseDto {
+  items: VideoSlotListResponseDtoItemsItem[];
+  locked: boolean;
 }
 
 export type AdminUsersListParams = {
@@ -2214,6 +2261,170 @@ return serverFetch<ModuleSummaryDto>(getLessonSectionsUpdateUrl(id,moduleId,sect
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(lessonSectionRequestDto)
+  }
+);}
+
+
+
+export const getVideoSlotsListUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos`
+}
+
+export const videoSlotsList = async (id: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+  return serverFetch<VideoSlotListResponseDto>(getVideoSlotsListUrl(id,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getVideoSlotsCreateUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos`
+}
+
+export const videoSlotsCreate = async (id: string,
+    moduleId: string,
+    createVideoSlotRequestDto: CreateVideoSlotRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<VideoSlotListResponseDto>(getVideoSlotsCreateUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createVideoSlotRequestDto)
+  }
+);}
+
+
+
+export const getVideoSlotsReorderUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/reorder`
+}
+
+export const videoSlotsReorder = async (id: string,
+    moduleId: string,
+    reorderRequestDto: ReorderRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<VideoSlotListResponseDto>(getVideoSlotsReorderUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reorderRequestDto)
+  }
+);}
+
+
+
+export const getVideoSlotsRemoveUrl = (id: string,
+    moduleId: string,
+    videoId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/${videoId}`
+}
+
+export const videoSlotsRemove = async (id: string,
+    moduleId: string,
+    videoId: string, options?: Parameters<typeof serverFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+  return serverFetch<VideoSlotListResponseDto>(getVideoSlotsRemoveUrl(id,moduleId,videoId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getVideoSlotsUpdateUrl = (id: string,
+    moduleId: string,
+    videoId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/${videoId}`
+}
+
+export const videoSlotsUpdate = async (id: string,
+    moduleId: string,
+    videoId: string,
+    updateVideoSlotRequestDto: UpdateVideoSlotRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<VideoSlotListResponseDto>(getVideoSlotsUpdateUrl(id,moduleId,videoId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateVideoSlotRequestDto)
   }
 );}
 

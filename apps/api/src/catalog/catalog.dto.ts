@@ -5,6 +5,7 @@ import {
   courseSummarySchema,
   createCourseRequestSchema,
   createModuleRequestSchema,
+  createVideoSlotRequestSchema,
   lessonSectionParamsSchema,
   lessonSectionRequestSchema,
   moduleListResponseSchema,
@@ -13,6 +14,9 @@ import {
   reorderRequestSchema,
   updateCourseRequestSchema,
   updateModuleRequestSchema,
+  updateVideoSlotRequestSchema,
+  videoSlotListResponseSchema,
+  videoSlotParamsSchema,
 } from "@heat/contracts";
 import { createZodDto } from "nestjs-zod";
 
@@ -43,3 +47,11 @@ export class ReorderRequestDto extends createZodDto(reorderRequestSchema) {}
 export class LessonSectionRequestDto extends createZodDto(lessonSectionRequestSchema) {}
 
 export class LessonSectionParamsDto extends createZodDto(lessonSectionParamsSchema) {}
+
+export class CreateVideoSlotRequestDto extends createZodDto(createVideoSlotRequestSchema) {}
+
+export class UpdateVideoSlotRequestDto extends createZodDto(updateVideoSlotRequestSchema) {}
+
+export class VideoSlotListResponseDto extends createZodDto(videoSlotListResponseSchema) {}
+
+export class VideoSlotParamsDto extends createZodDto(videoSlotParamsSchema) {}
