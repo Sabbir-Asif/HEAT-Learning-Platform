@@ -41,6 +41,11 @@ const productionRequired = [
   "SMTP_PASSWORD",
 ] as const;
 
+const productionExplicit = ["SMTP_PORT", "SMTP_TLS"] as const;
+
+const isSet = (env: NodeJS.ProcessEnv, name: string): boolean =>
+  env[name] !== undefined && env[name] !== "";
+
 export const loadMailConfig = (env: NodeJS.ProcessEnv): MailConfig => {
   const parsed = schema.safeParse(env);
   const invalid = new Set<string>();
@@ -55,7 +60,11 @@ export const loadMailConfig = (env: NodeJS.ProcessEnv): MailConfig => {
       for (const name of productionRequired) {
         if (values[name] === undefined) invalid.add(name);
       }
+      for (const name of productionExplicit) {
+        if (!isSet(env, name)) invalid.add(name);
+      }
     }
+    if (values.SMTP_USER !== undefined && values.SMTP_TLS === "none") invalid.add("SMTP_TLS");
   }
   if (!parsed.success || invalid.size > 0) {
     throw new Error(`Invalid environment configuration: ${[...invalid].join(", ")}`);

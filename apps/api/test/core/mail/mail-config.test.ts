@@ -59,16 +59,68 @@ describe("loadMailConfig", () => {
 
   test("requires host, sender and credentials in production", () => {
     expect(() => loadMailConfig({ NODE_ENV: "production" })).toThrow(
-      "Invalid environment configuration: SMTP_HOST, SMTP_FROM_ADDRESS, SMTP_USER, SMTP_PASSWORD",
+      "Invalid environment configuration: SMTP_HOST, SMTP_FROM_ADDRESS, SMTP_USER, SMTP_PASSWORD, SMTP_PORT, SMTP_TLS",
     );
-    expect(
-      loadMailConfig({
-        NODE_ENV: "production",
-        SMTP_HOST: "smtp.gmail.com",
-        SMTP_FROM_ADDRESS: "sender@example.test",
-        SMTP_USER: "sender@example.test",
-        SMTP_PASSWORD: "app-password-value",
-      }).host,
-    ).toBe("smtp.gmail.com");
+  });
+
+  describe("plaintext credentials", () => {
+    const production = {
+      NODE_ENV: "production",
+      SMTP_HOST: "smtp.gmail.com",
+      SMTP_FROM_ADDRESS: "sender@example.test",
+      SMTP_USER: "sender@example.test",
+      SMTP_PASSWORD: "app-password-value",
+    };
+
+    test("production with credentials and no SMTP_TLS or SMTP_PORT is rejected", () => {
+      expect(() => loadMailConfig(production)).toThrow(
+        "Invalid environment configuration: SMTP_PORT, SMTP_TLS",
+      );
+      expect(() => loadMailConfig({ ...production, SMTP_PORT: "587" })).toThrow(
+        "Invalid environment configuration: SMTP_TLS",
+      );
+      expect(() => loadMailConfig({ ...production, SMTP_TLS: "starttls" })).toThrow(
+        "Invalid environment configuration: SMTP_PORT",
+      );
+    });
+
+    test("production with credentials and SMTP_TLS=none is rejected without echoing the password", () => {
+      const attempt = () => loadMailConfig({ ...production, SMTP_PORT: "587", SMTP_TLS: "none" });
+      expect(attempt).toThrow("Invalid environment configuration: SMTP_TLS");
+      expect(attempt).toThrow(
+        expect.not.objectContaining({ message: expect.stringContaining("app-password-value") }),
+      );
+    });
+
+    test("credentials with SMTP_TLS=none are rejected in any environment", () => {
+      expect(() =>
+        loadMailConfig({
+          SMTP_USER: "sender@example.test",
+          SMTP_PASSWORD: "app-password-value",
+          SMTP_TLS: "none",
+        }),
+      ).toThrow("Invalid environment configuration: SMTP_TLS");
+      expect(() =>
+        loadMailConfig({ SMTP_USER: "sender@example.test", SMTP_PASSWORD: "app-password-value" }),
+      ).toThrow("Invalid environment configuration: SMTP_TLS");
+    });
+
+    test.each([
+      ["starttls", "587"],
+      ["implicit", "465"],
+    ])("production with %s and an explicit port passes", (SMTP_TLS, SMTP_PORT) => {
+      expect(loadMailConfig({ ...production, SMTP_TLS, SMTP_PORT })).toMatchObject({
+        tls: SMTP_TLS,
+        port: Number(SMTP_PORT),
+      });
+    });
+
+    test("development defaults without credentials still pass", () => {
+      expect(loadMailConfig({ NODE_ENV: "development" })).toMatchObject({
+        port: 1035,
+        tls: "none",
+        auth: null,
+      });
+    });
   });
 });

@@ -7,6 +7,8 @@ import { rateLimitEnvName } from "../../src/core/config/rate-limit-config";
 
 const productionMail = {
   SMTP_HOST: "smtp.gmail.com",
+  SMTP_PORT: "587",
+  SMTP_TLS: "starttls",
   SMTP_FROM_ADDRESS: "sender@example.test",
   SMTP_USER: "sender@example.test",
   SMTP_PASSWORD: "app-password-value",
