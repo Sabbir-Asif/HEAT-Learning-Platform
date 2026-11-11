@@ -2,6 +2,8 @@ import { z } from "zod";
 
 export const hlsCookie = { name: "hls_sig", ttlSeconds: 600 } as const;
 
+export const maxPlaybackRate = 1.5;
+
 export const playbackVideoIdSchema = z.string().regex(/^[A-Za-z0-9_-]{1,64}$/);
 
 export const playbackCaptionSchema = z.object({
