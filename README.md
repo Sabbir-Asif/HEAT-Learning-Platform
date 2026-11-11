@@ -141,7 +141,7 @@ pnpm --filter @heat/ui build-storybook                        # static build in 
 
 The toolbar has a theme control (light, dark: the `.dark` class on the story root and on `<html>`). A story pins it with `globals: { theme }`, which locks the toolbar for that story, so each component gets one story for light and one for dark plus a `Default` story that follows the toolbar. The document language is `en`.
 
-An axe violation fails the story test and the output names the rule, for example `button-name`. A story that must accept a known violation sets `parameters.a11y.test` to `"todo"` with a reason. Story tests are not part of `pnpm test` or the coverage gate; they run in `test:stories` and in the `storybook` CI job.
+An axe violation fails the story test and the output names the rule, for example `button-name`. A story that must accept a known violation sets `parameters.a11y.test` to `"todo"` with a reason. Story tests are not part of `pnpm test` or the coverage gate; run them with `test:stories`.
 
 ### Design file and theme
 
