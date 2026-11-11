@@ -36,6 +36,16 @@ describe("parseErrorResponse", () => {
     expect((await parseErrorResponse(response)).failures).toEqual(["Module 1 has no ready video."]);
   });
 
+  test("keeps the next attempt time of a waiting quiz", async () => {
+    const response = new Response(
+      envelope("QUIZ_ATTEMPT_WAIT", { details: { nextAttemptAt: "2026-11-12T10:05:00.000Z" } }),
+      { status: 409 },
+    );
+    expect((await parseErrorResponse(response)).details).toEqual({
+      nextAttemptAt: "2026-11-12T10:05:00.000Z",
+    });
+  });
+
   test("never uses the server message as the error message", async () => {
     const error = await parseErrorResponse(new Response(envelope("FORBIDDEN"), { status: 403 }));
     expect(error.message).toBe("FORBIDDEN");

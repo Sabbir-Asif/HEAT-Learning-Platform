@@ -15,6 +15,7 @@ import {
   QuizQuestion,
 } from "@heat/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { formatAttemptTime } from "../learn/learning-view";
 import { browserStorage, createAnswerStore } from "./quiz-answer-store";
 import type { QuizAnswers, StorageLike } from "./quiz-answer-store";
 import {
@@ -23,7 +24,7 @@ import {
   firstUnansweredIndex,
   unansweredOf,
 } from "./quiz-review";
-import type { SubmitQuiz } from "./quiz-submit";
+import type { QuizSubmitOutcome, SubmitQuiz } from "./quiz-submit";
 
 export interface QuizRunnerProps {
   attemptId: string;
@@ -33,10 +34,18 @@ export interface QuizRunnerProps {
   storage?: StorageLike | null;
 }
 
-const notices = {
-  UNAVAILABLE: "Submitting is not available yet. Your answers are saved on this device.",
-  FAILED: "Your answers could not be submitted. Check your connection and try again.",
-} as const;
+const failureNotice = (outcome: Exclude<QuizSubmitOutcome, { status: "SUBMITTED" }>): string => {
+  if (outcome.status === "WAITING") {
+    return outcome.nextAttemptAt === null
+      ? "You need to wait before submitting another attempt."
+      : `You can submit your next attempt on ${formatAttemptTime(outcome.nextAttemptAt)}.`;
+  }
+  if (outcome.status === "EXHAUSTED") return "You have used all your attempts for this quiz.";
+  if (outcome.status === "CLOSED") {
+    return "This attempt can no longer be submitted. Go back to the module and open the quiz again.";
+  }
+  return "Your answers could not be submitted. Check your connection and try again.";
+};
 
 export function QuizRunner({
   attemptId,
@@ -84,7 +93,7 @@ export function QuizRunner({
       onSubmitted(outcome.attemptId);
       return;
     }
-    setNotice(notices[outcome.status]);
+    setNotice(failureNotice(outcome));
   };
 
   const question = questions[step];

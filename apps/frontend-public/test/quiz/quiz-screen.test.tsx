@@ -14,6 +14,8 @@ vi.mock("@heat/api-client", async (importOriginal) => ({
   useQuizDeliveryGet: (...args: unknown[]) => useQuizDeliveryGet(...args),
 }));
 
+vi.mock("../../src/quiz/use-quiz-submit", () => ({ useQuizSubmit: () => vi.fn() }));
+
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 
 const structureOk = (modules = [makeModule(1, { state: "QUIZ_READY" })]) => ({

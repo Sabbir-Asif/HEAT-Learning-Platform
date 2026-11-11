@@ -5,7 +5,13 @@ import { ZodValidationException } from "nestjs-zod";
 import { ApiException } from "./api-exception";
 import { z } from "zod";
 import { fieldErrorCodes } from "@heat/contracts";
-import type { ErrorCode, ErrorResponse, FieldError, FieldErrorCode } from "@heat/contracts";
+import type {
+  ErrorCode,
+  ErrorDetails,
+  ErrorResponse,
+  FieldError,
+  FieldErrorCode,
+} from "@heat/contracts";
 
 interface RequestLike {
   headers: Record<string, string | string[] | undefined>;
@@ -56,6 +62,10 @@ const messages: Record<ErrorCode, string> = {
   ORIGIN_NOT_ALLOWED: "This request did not come from an allowed site.",
   PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
   PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
+  QUIZ_ANSWER_INVALID: "One of the answers does not belong to this quiz.",
+  QUIZ_ATTEMPT_LIMIT_REACHED: "All attempts for this quiz have been used.",
+  QUIZ_ATTEMPT_NOT_OPEN: "This attempt was already submitted or is no longer open.",
+  QUIZ_ATTEMPT_WAIT: "Wait before submitting another attempt.",
   QUIZ_NOT_UNLOCKED: "Watch the required videos in this module to unlock the quiz.",
   RATE_LIMITED: "Too many requests. Try again later.",
   UNAUTHENTICATED: "Sign in to continue.",
@@ -140,6 +150,7 @@ interface Classified {
   retryAfterSeconds?: number;
   detail?: string;
   failures?: string[];
+  details?: ErrorDetails;
 }
 
 function classify(exception: unknown): Classified {
@@ -154,6 +165,7 @@ function classify(exception: unknown): Classified {
       detail: exception.detail,
       fields: exception.fields,
       failures: exception.failures,
+      details: exception.details,
     };
   }
   const status =
@@ -171,7 +183,8 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const request = http.getRequest<RequestLike>();
     const response = http.getResponse<ResponseLike>();
     const requestId = resolveRequestId(request.headers["x-request-id"]);
-    const { status, code, fields, failures, retryAfterSeconds, detail } = classify(exception);
+    const { status, code, fields, failures, retryAfterSeconds, detail, details } =
+      classify(exception);
 
     const name = exception instanceof Error ? exception.name : typeof exception;
 
@@ -192,6 +205,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
         requestId,
         ...(fields ? { fields } : {}),
         ...(failures ? { failures } : {}),
+        ...(details ? { details } : {}),
       },
     };
     response.setHeader("x-request-id", requestId);
