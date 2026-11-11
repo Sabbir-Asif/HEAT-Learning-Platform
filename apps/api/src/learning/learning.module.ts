@@ -11,6 +11,7 @@ import { QuizDeliveryService } from "./quiz-delivery.service";
 import { QuizGateService } from "./quiz-gate";
 import { QuizSubmissionController } from "./quiz-submission.controller";
 import { QuizSubmissionService } from "./quiz-submission.service";
+import { ModuleCompletionService } from "./module-completion.service";
 import { QUIZ_SCORED_HANDLERS } from "./quiz-scored-handler";
 import { LearningStructureService } from "./learning-structure.service";
 
@@ -29,7 +30,12 @@ import { LearningStructureService } from "./learning-structure.service";
     QuizGateService,
     QuizDeliveryService,
     QuizSubmissionService,
-    { provide: QUIZ_SCORED_HANDLERS, useFactory: () => [] },
+    ModuleCompletionService,
+    {
+      provide: QUIZ_SCORED_HANDLERS,
+      useFactory: (completion: ModuleCompletionService) => [completion],
+      inject: [ModuleCompletionService],
+    },
   ],
   exports: [QuizGateService],
 })
