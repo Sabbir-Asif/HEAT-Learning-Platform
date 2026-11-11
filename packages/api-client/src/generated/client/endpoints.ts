@@ -74,6 +74,7 @@ import type {
   PlaybackSessionResponseDto,
   ProgressBatchDto,
   ProgressResponseDto,
+  QuizAccessResponseDto,
   QuizQuestionRequestDto,
   QuizRulesRequestDto,
   QuizSummaryDto,
@@ -6547,6 +6548,109 @@ export function useLessonContentRead<TData = Awaited<ReturnType<typeof lessonCon
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getLessonContentReadQueryOptions(courseId,moduleId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getQuizAccessCheckUrl = (courseId: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/quiz-access`
+}
+
+export const quizAccessCheck = async (courseId: string,
+    moduleId: string, options?: Parameters<typeof customFetch>[1]): Promise<QuizAccessResponseDto> => {
+
+  return customFetch<QuizAccessResponseDto>(getQuizAccessCheckUrl(courseId,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getQuizAccessCheckQueryKey = (courseId: string,
+    moduleId: string,) => {
+    return [
+    `/api/courses/${courseId}/modules/${moduleId}/quiz-access`
+    ] as const;
+    }
+
+
+export const getQuizAccessCheckQueryOptions = <TData = Awaited<ReturnType<typeof quizAccessCheck>>, TError = ErrorType<unknown>>(courseId: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizAccessCheck>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getQuizAccessCheckQueryKey(courseId,moduleId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof quizAccessCheck>>> = ({ signal }) => quizAccessCheck(courseId,moduleId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: courseId !== null && courseId !== undefined && moduleId !== null && moduleId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof quizAccessCheck>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type QuizAccessCheckQueryResult = NonNullable<Awaited<ReturnType<typeof quizAccessCheck>>>
+export type QuizAccessCheckQueryError = ErrorType<unknown>
+
+
+export function useQuizAccessCheck<TData = Awaited<ReturnType<typeof quizAccessCheck>>, TError = ErrorType<unknown>>(
+ courseId: string,
+    moduleId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizAccessCheck>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof quizAccessCheck>>,
+          TError,
+          Awaited<ReturnType<typeof quizAccessCheck>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useQuizAccessCheck<TData = Awaited<ReturnType<typeof quizAccessCheck>>, TError = ErrorType<unknown>>(
+ courseId: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizAccessCheck>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof quizAccessCheck>>,
+          TError,
+          Awaited<ReturnType<typeof quizAccessCheck>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useQuizAccessCheck<TData = Awaited<ReturnType<typeof quizAccessCheck>>, TError = ErrorType<unknown>>(
+ courseId: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizAccessCheck>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useQuizAccessCheck<TData = Awaited<ReturnType<typeof quizAccessCheck>>, TError = ErrorType<unknown>>(
+ courseId: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizAccessCheck>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getQuizAccessCheckQueryOptions(courseId,moduleId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

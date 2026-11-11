@@ -124,6 +124,8 @@ export * from './playbackSessionResponseDtoCaptionsItem';
 export * from './progressBatchDto';
 export * from './progressBatchDtoIntervalsItem';
 export * from './progressResponseDto';
+export * from './quizAccessResponseDto';
+export * from './quizAccessResponseDtoModuleState';
 export * from './quizQuestionRequestDto';
 export * from './quizQuestionRequestDtoOptionsItem';
 export * from './quizQuestionRequestDtoType';
