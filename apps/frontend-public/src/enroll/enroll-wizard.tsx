@@ -23,12 +23,20 @@ import {
 } from "@heat/ui";
 import type { FormControlProps } from "@heat/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeftIcon, ArrowRightIcon, BuildingIcon } from "lucide-react";
+import { ArrowRightIcon, BuildingIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Ref } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { chooseFaculty, chooseUniversity, dropStaleSelections } from "./cascade";
-import { emptyStepOne, readStepOne, writeStepOne, type StepOneValues } from "./step-one-store";
+import { EnrollSuccess } from "./enroll-success";
+import {
+  clearStepOne,
+  emptyStepOne,
+  readStepOne,
+  writeStepOne,
+  type StepOneValues,
+} from "./step-one-store";
+import { StepTwo } from "./step-two";
 
 interface LookupOption {
   id: string;
@@ -101,6 +109,7 @@ function LookupState({ failed, empty, emptyTitle, onRetry }: LookupStateProps) {
 
 export function EnrollWizard() {
   const [step, setStep] = useState<1 | 2>(1);
+  const [enrolledEmail, setEnrolledEmail] = useState<string>();
   const hydrated = useRef(false);
   const form = useForm<StepOneValues>({
     resolver: zodResolver(enrollmentStepOneSchema),
@@ -173,15 +182,17 @@ export function EnrollWizard() {
     setStep(2);
   }
 
+  if (enrolledEmail !== undefined) return <EnrollSuccess email={enrolledEmail} />;
+
   if (step === 2) {
     return (
-      <div className="flex flex-col gap-5">
-        <PageHeader title="Create your account" />
-        <Button variant="outline" onClick={() => setStep(1)}>
-          <ArrowLeftIcon data-icon="inline-start" />
-          Back
-        </Button>
-      </div>
+      <StepTwo
+        onBack={() => setStep(1)}
+        onSuccess={(email) => {
+          clearStepOne();
+          setEnrolledEmail(email);
+        }}
+      />
     );
   }
 

@@ -44,6 +44,8 @@ export * from './departmentSummaryDtoFaculty';
 export * from './departmentSummaryDtoUniversity';
 export * from './directoryOptionListResponseDto';
 export * from './directoryOptionListResponseDtoItemsItem';
+export * from './enrollmentAcceptedResponseDto';
+export * from './enrollmentRequestDto';
 export * from './facultiesListParams';
 export * from './facultiesListSort';
 export * from './facultiesListStatus';

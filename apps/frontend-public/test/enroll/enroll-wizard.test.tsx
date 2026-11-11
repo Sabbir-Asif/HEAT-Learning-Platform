@@ -244,7 +244,7 @@ describe("EnrollWizard step one", () => {
     for (const [url, init] of fetchMock.mock.calls) {
       expect(String(url)).not.toContain("Anne");
       expect(String(url)).not.toContain("2020-21");
-      expect(init?.body).toBeUndefined();
+      expect(String(init?.body ?? "")).not.toMatch(/Anne|2020-21/);
     }
   });
 

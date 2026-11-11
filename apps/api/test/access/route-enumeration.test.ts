@@ -118,6 +118,7 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/auth/refresh": "sessionRefresh",
       "POST /api/auth/sign-in": "signIn",
       "POST /api/captcha": "captcha",
+      "POST /api/enrollment": "enrollment",
     });
   });
 
@@ -136,6 +137,7 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/auth/refresh",
       "POST /api/auth/sign-in",
       "POST /api/captcha",
+      "POST /api/enrollment",
     ]);
     expect(modes).toMatchObject({
       "POST /api/auth/sign-out": "token",
