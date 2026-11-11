@@ -1815,6 +1815,196 @@
         ],
         "type": "object"
       },
+      "QuizQuestionRequestDto": {
+        "properties": {
+          "explanation": {
+            "maxLength": 2000,
+            "nullable": true,
+            "type": "string"
+          },
+          "options": {
+            "items": {
+              "properties": {
+                "isCorrect": {
+                  "type": "boolean"
+                },
+                "text": {
+                  "maxLength": 300,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "isCorrect"
+              ],
+              "type": "object"
+            },
+            "maxItems": 6,
+            "minItems": 2,
+            "type": "array"
+          },
+          "text": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": {
+            "default": "SINGLE_CHOICE",
+            "enum": [
+              "SINGLE_CHOICE"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "options"
+        ],
+        "type": "object"
+      },
+      "QuizRulesRequestDto": {
+        "properties": {
+          "attemptLimit": {
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          },
+          "passMarkPercent": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "waitMinutes": {
+            "maximum": 10080,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "passMarkPercent",
+          "attemptLimit",
+          "waitMinutes"
+        ],
+        "type": "object"
+      },
+      "QuizSummaryDto": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "nullable": true,
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "questions": {
+            "items": {
+              "properties": {
+                "explanation": {
+                  "maxLength": 2000,
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "options": {
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "isCorrect": {
+                        "type": "boolean"
+                      },
+                      "order": {
+                        "maximum": 9007199254740991,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "order",
+                      "text",
+                      "isCorrect"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "order": {
+                  "maximum": 9007199254740991,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "type": {
+                  "enum": [
+                    "SINGLE_CHOICE"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "order",
+                "type",
+                "text",
+                "explanation",
+                "options"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "rules": {
+            "properties": {
+              "attemptLimit": {
+                "maximum": 9007199254740991,
+                "minimum": 1,
+                "nullable": true,
+                "type": "integer"
+              },
+              "passMarkPercent": {
+                "maximum": 100,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "waitMinutes": {
+                "maximum": 10080,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "passMarkPercent",
+              "attemptLimit",
+              "waitMinutes"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "rules",
+          "questions",
+          "locked"
+        ],
+        "type": "object"
+      },
       "ReorderRequestDto": {
         "properties": {
           "orderedIds": {
@@ -2075,6 +2265,47 @@
         },
         "required": [
           "title"
+        ],
+        "type": "object"
+      },
+      "UpdateQuizQuestionRequestDto": {
+        "properties": {
+          "explanation": {
+            "maxLength": 2000,
+            "nullable": true,
+            "type": "string"
+          },
+          "options": {
+            "items": {
+              "properties": {
+                "isCorrect": {
+                  "type": "boolean"
+                },
+                "text": {
+                  "maxLength": 300,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "isCorrect"
+              ],
+              "type": "object"
+            },
+            "maxItems": 6,
+            "minItems": 2,
+            "type": "array"
+          },
+          "text": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "options"
         ],
         "type": "object"
       },
@@ -3104,6 +3335,316 @@
         },
         "tags": [
           "modules"
+        ]
+      }
+    },
+    "/api/admin/courses/{id}/modules/{moduleId}/quiz": {
+      "get": {
+        "operationId": "quizGet",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "moduleId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizSummaryDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "quiz"
+        ]
+      }
+    },
+    "/api/admin/courses/{id}/modules/{moduleId}/quiz/questions": {
+      "post": {
+        "operationId": "quizCreateQuestion",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "moduleId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizQuestionRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizSummaryDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "quiz"
+        ]
+      }
+    },
+    "/api/admin/courses/{id}/modules/{moduleId}/quiz/questions/reorder": {
+      "post": {
+        "operationId": "quizReorderQuestions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "moduleId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizSummaryDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "quiz"
+        ]
+      }
+    },
+    "/api/admin/courses/{id}/modules/{moduleId}/quiz/questions/{questionId}": {
+      "delete": {
+        "operationId": "quizRemoveQuestion",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "moduleId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "questionId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizSummaryDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "quiz"
+        ]
+      },
+      "patch": {
+        "operationId": "quizUpdateQuestion",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "moduleId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "questionId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuizQuestionRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizSummaryDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "quiz"
+        ]
+      }
+    },
+    "/api/admin/courses/{id}/modules/{moduleId}/quiz/rules": {
+      "put": {
+        "operationId": "quizUpdateRules",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "moduleId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizRulesRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizSummaryDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "quiz"
         ]
       }
     },

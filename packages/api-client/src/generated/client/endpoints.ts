@@ -69,6 +69,9 @@ import type {
   MeResponseDto,
   ModuleListResponseDto,
   ModuleSummaryDto,
+  QuizQuestionRequestDto,
+  QuizRulesRequestDto,
+  QuizSummaryDto,
   ReorderRequestDto,
   SignInRequestDto,
   UniversitiesListParams,
@@ -78,6 +81,7 @@ import type {
   UpdateDepartmentRequestDto,
   UpdateFacultyRequestDto,
   UpdateModuleRequestDto,
+  UpdateQuizQuestionRequestDto,
   UpdateUniversityRequestDto,
   UpdateVideoSlotRequestDto,
   VerificationAcceptedResponseDto,
@@ -2105,6 +2109,523 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getModulesUpdateMutationOptions(options), queryClient);
+    }
+
+export const getQuizGetUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz`
+}
+
+export const quizGet = async (id: string,
+    moduleId: string, options?: Parameters<typeof customFetch>[1]): Promise<QuizSummaryDto> => {
+
+  return customFetch<QuizSummaryDto>(getQuizGetUrl(id,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getQuizGetQueryKey = (id: string,
+    moduleId: string,) => {
+    return [
+    `/api/admin/courses/${id}/modules/${moduleId}/quiz`
+    ] as const;
+    }
+
+
+export const getQuizGetQueryOptions = <TData = Awaited<ReturnType<typeof quizGet>>, TError = ErrorType<unknown>>(id: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getQuizGetQueryKey(id,moduleId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof quizGet>>> = ({ signal }) => quizGet(id,moduleId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined && moduleId !== null && moduleId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof quizGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type QuizGetQueryResult = NonNullable<Awaited<ReturnType<typeof quizGet>>>
+export type QuizGetQueryError = ErrorType<unknown>
+
+
+export function useQuizGet<TData = Awaited<ReturnType<typeof quizGet>>, TError = ErrorType<unknown>>(
+ id: string,
+    moduleId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof quizGet>>,
+          TError,
+          Awaited<ReturnType<typeof quizGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useQuizGet<TData = Awaited<ReturnType<typeof quizGet>>, TError = ErrorType<unknown>>(
+ id: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof quizGet>>,
+          TError,
+          Awaited<ReturnType<typeof quizGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useQuizGet<TData = Awaited<ReturnType<typeof quizGet>>, TError = ErrorType<unknown>>(
+ id: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useQuizGet<TData = Awaited<ReturnType<typeof quizGet>>, TError = ErrorType<unknown>>(
+ id: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getQuizGetQueryOptions(id,moduleId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getQuizCreateQuestionUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/questions`
+}
+
+export const quizCreateQuestion = async (id: string,
+    moduleId: string,
+    quizQuestionRequestDto: QuizQuestionRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<QuizSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<QuizSummaryDto>(getQuizCreateQuestionUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quizQuestionRequestDto)
+  }
+);}
+
+
+
+
+
+export const getQuizCreateQuestionMutationKey = () => ['quizCreateQuestion'] as const;
+
+export const getQuizCreateQuestionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quizCreateQuestion>>, TError,QuizCreateQuestionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof quizCreateQuestion>>, TError,QuizCreateQuestionMutationVariables, TContext> => {
+
+const mutationKey = getQuizCreateQuestionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof quizCreateQuestion>>, QuizCreateQuestionMutationVariables> = (props) => {
+          const {id,moduleId,data} = props ?? {};
+
+          return  quizCreateQuestion(id,moduleId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type QuizCreateQuestionMutationResult = NonNullable<Awaited<ReturnType<typeof quizCreateQuestion>>>
+    export type QuizCreateQuestionMutationBody = QuizQuestionRequestDto
+    export type QuizCreateQuestionMutationError = ErrorType<unknown>
+    export type QuizCreateQuestionMutationVariables = {id: string;moduleId: string;data: QuizQuestionRequestDto}
+
+    export const useQuizCreateQuestion = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quizCreateQuestion>>, TError,QuizCreateQuestionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof quizCreateQuestion>>,
+        TError,
+        QuizCreateQuestionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getQuizCreateQuestionMutationOptions(options), queryClient);
+    }
+
+export const getQuizReorderQuestionsUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/questions/reorder`
+}
+
+export const quizReorderQuestions = async (id: string,
+    moduleId: string,
+    reorderRequestDto: ReorderRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<QuizSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<QuizSummaryDto>(getQuizReorderQuestionsUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reorderRequestDto)
+  }
+);}
+
+
+
+
+
+export const getQuizReorderQuestionsMutationKey = () => ['quizReorderQuestions'] as const;
+
+export const getQuizReorderQuestionsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quizReorderQuestions>>, TError,QuizReorderQuestionsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof quizReorderQuestions>>, TError,QuizReorderQuestionsMutationVariables, TContext> => {
+
+const mutationKey = getQuizReorderQuestionsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof quizReorderQuestions>>, QuizReorderQuestionsMutationVariables> = (props) => {
+          const {id,moduleId,data} = props ?? {};
+
+          return  quizReorderQuestions(id,moduleId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type QuizReorderQuestionsMutationResult = NonNullable<Awaited<ReturnType<typeof quizReorderQuestions>>>
+    export type QuizReorderQuestionsMutationBody = ReorderRequestDto
+    export type QuizReorderQuestionsMutationError = ErrorType<unknown>
+    export type QuizReorderQuestionsMutationVariables = {id: string;moduleId: string;data: ReorderRequestDto}
+
+    export const useQuizReorderQuestions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quizReorderQuestions>>, TError,QuizReorderQuestionsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof quizReorderQuestions>>,
+        TError,
+        QuizReorderQuestionsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getQuizReorderQuestionsMutationOptions(options), queryClient);
+    }
+
+export const getQuizRemoveQuestionUrl = (id: string,
+    moduleId: string,
+    questionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/questions/${questionId}`
+}
+
+export const quizRemoveQuestion = async (id: string,
+    moduleId: string,
+    questionId: string, options?: Parameters<typeof customFetch>[1]): Promise<QuizSummaryDto> => {
+
+  return customFetch<QuizSummaryDto>(getQuizRemoveQuestionUrl(id,moduleId,questionId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getQuizRemoveQuestionMutationKey = () => ['quizRemoveQuestion'] as const;
+
+export const getQuizRemoveQuestionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quizRemoveQuestion>>, TError,QuizRemoveQuestionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof quizRemoveQuestion>>, TError,QuizRemoveQuestionMutationVariables, TContext> => {
+
+const mutationKey = getQuizRemoveQuestionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof quizRemoveQuestion>>, QuizRemoveQuestionMutationVariables> = (props) => {
+          const {id,moduleId,questionId} = props ?? {};
+
+          return  quizRemoveQuestion(id,moduleId,questionId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type QuizRemoveQuestionMutationResult = NonNullable<Awaited<ReturnType<typeof quizRemoveQuestion>>>
+
+    export type QuizRemoveQuestionMutationError = ErrorType<unknown>
+    export type QuizRemoveQuestionMutationVariables = {id: string;moduleId: string;questionId: string}
+
+    export const useQuizRemoveQuestion = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quizRemoveQuestion>>, TError,QuizRemoveQuestionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof quizRemoveQuestion>>,
+        TError,
+        QuizRemoveQuestionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getQuizRemoveQuestionMutationOptions(options), queryClient);
+    }
+
+export const getQuizUpdateQuestionUrl = (id: string,
+    moduleId: string,
+    questionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/questions/${questionId}`
+}
+
+export const quizUpdateQuestion = async (id: string,
+    moduleId: string,
+    questionId: string,
+    updateQuizQuestionRequestDto: UpdateQuizQuestionRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<QuizSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<QuizSummaryDto>(getQuizUpdateQuestionUrl(id,moduleId,questionId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateQuizQuestionRequestDto)
+  }
+);}
+
+
+
+
+
+export const getQuizUpdateQuestionMutationKey = () => ['quizUpdateQuestion'] as const;
+
+export const getQuizUpdateQuestionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quizUpdateQuestion>>, TError,QuizUpdateQuestionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof quizUpdateQuestion>>, TError,QuizUpdateQuestionMutationVariables, TContext> => {
+
+const mutationKey = getQuizUpdateQuestionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof quizUpdateQuestion>>, QuizUpdateQuestionMutationVariables> = (props) => {
+          const {id,moduleId,questionId,data} = props ?? {};
+
+          return  quizUpdateQuestion(id,moduleId,questionId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type QuizUpdateQuestionMutationResult = NonNullable<Awaited<ReturnType<typeof quizUpdateQuestion>>>
+    export type QuizUpdateQuestionMutationBody = UpdateQuizQuestionRequestDto
+    export type QuizUpdateQuestionMutationError = ErrorType<unknown>
+    export type QuizUpdateQuestionMutationVariables = {id: string;moduleId: string;questionId: string;data: UpdateQuizQuestionRequestDto}
+
+    export const useQuizUpdateQuestion = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quizUpdateQuestion>>, TError,QuizUpdateQuestionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof quizUpdateQuestion>>,
+        TError,
+        QuizUpdateQuestionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getQuizUpdateQuestionMutationOptions(options), queryClient);
+    }
+
+export const getQuizUpdateRulesUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/rules`
+}
+
+export const quizUpdateRules = async (id: string,
+    moduleId: string,
+    quizRulesRequestDto: QuizRulesRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<QuizSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<QuizSummaryDto>(getQuizUpdateRulesUrl(id,moduleId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quizRulesRequestDto)
+  }
+);}
+
+
+
+
+
+export const getQuizUpdateRulesMutationKey = () => ['quizUpdateRules'] as const;
+
+export const getQuizUpdateRulesMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quizUpdateRules>>, TError,QuizUpdateRulesMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof quizUpdateRules>>, TError,QuizUpdateRulesMutationVariables, TContext> => {
+
+const mutationKey = getQuizUpdateRulesMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof quizUpdateRules>>, QuizUpdateRulesMutationVariables> = (props) => {
+          const {id,moduleId,data} = props ?? {};
+
+          return  quizUpdateRules(id,moduleId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type QuizUpdateRulesMutationResult = NonNullable<Awaited<ReturnType<typeof quizUpdateRules>>>
+    export type QuizUpdateRulesMutationBody = QuizRulesRequestDto
+    export type QuizUpdateRulesMutationError = ErrorType<unknown>
+    export type QuizUpdateRulesMutationVariables = {id: string;moduleId: string;data: QuizRulesRequestDto}
+
+    export const useQuizUpdateRules = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quizUpdateRules>>, TError,QuizUpdateRulesMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof quizUpdateRules>>,
+        TError,
+        QuizUpdateRulesMutationVariables,
+        TContext
+      > => {
+      return useMutation(getQuizUpdateRulesMutationOptions(options), queryClient);
     }
 
 export const getLessonSectionsCreateUrl = (id: string,
