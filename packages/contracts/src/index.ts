@@ -14,6 +14,7 @@ export * from "./learning";
 export * from "./modules";
 export * from "./playback";
 export * from "./progress";
+export * from "./quiz-delivery";
 export * from "./quizzes";
 export * from "./verification";
 export * from "./videos";
