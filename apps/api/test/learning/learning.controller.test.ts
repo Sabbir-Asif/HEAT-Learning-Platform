@@ -1,9 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
-import {
-  AUDIENCE_KEY,
-  COURSE_ACCESS_KEY,
-  ROLES_KEY,
-} from "../../src/access/access.decorators";
+import { AUDIENCE_KEY, COURSE_ACCESS_KEY, ROLES_KEY } from "../../src/access/access.decorators";
 import { LearningController } from "../../src/learning/learning.controller";
 import { RATE_LIMIT_PROFILE_KEY } from "../../src/rate-limit/rate-limit.guard";
 

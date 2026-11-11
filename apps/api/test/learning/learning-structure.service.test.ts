@@ -182,7 +182,9 @@ describe("LearningStructureService.describe", () => {
       enrollment: enrollmentRow({ course: { ...enrollmentRow().course, deletedAt: now } }),
     });
     const deletedRevision = build({
-      enrollment: enrollmentRow({ courseRevision: { id: ids.revision, number: 3, deletedAt: now } }),
+      enrollment: enrollmentRow({
+        courseRevision: { id: ids.revision, number: 3, deletedAt: now },
+      }),
     });
 
     await expect(deletedCourse.service.describe("u1", ids.course)).rejects.toBeInstanceOf(
