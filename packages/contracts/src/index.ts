@@ -9,6 +9,7 @@ export * from "./courses";
 export * from "./directory";
 export * from "./enrollment";
 export * from "./errors";
+export * from "./modules";
 
 export const healthResponseSchema = z.object({
   status: z.literal("ok"),

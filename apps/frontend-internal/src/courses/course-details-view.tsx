@@ -26,6 +26,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { GlobeIcon, SearchXIcon } from "lucide-react";
 import { useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
+import { ModulesTab } from "../modules/modules-tab";
 import { CourseForm } from "./course-form";
 import { publishFailedMessage } from "./courses-copy";
 
@@ -118,6 +119,7 @@ export function CourseDetailsView({ id }: { id: string }) {
       <Tabs defaultValue="details">
         <TabsList variant="line">
           <TabsTrigger value="details">Details</TabsTrigger>
+          <TabsTrigger value="modules">Modules</TabsTrigger>
         </TabsList>
         <TabsContent value="details" className="max-w-2xl">
           <CourseForm
@@ -127,6 +129,9 @@ export function CourseDetailsView({ id }: { id: string }) {
               await refresh();
             }}
           />
+        </TabsContent>
+        <TabsContent value="modules">
+          <ModulesTab courseId={id} />
         </TabsContent>
       </Tabs>
     </ShellContent>
