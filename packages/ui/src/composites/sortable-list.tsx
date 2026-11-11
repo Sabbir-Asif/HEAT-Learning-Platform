@@ -40,11 +40,17 @@ function SortableList({
   ...props
 }: SortableListProps) {
   const listRef = React.useRef<HTMLOListElement>(null);
-  const pendingFocus = React.useRef<{ id: string; direction: SortableDirection } | null>(null);
+  const pendingFocus = React.useRef<{
+    id: string;
+    direction: SortableDirection;
+    fromKey: string;
+  } | null>(null);
+  const ids = items.map((item) => item.id);
+  const idsKey = ids.join("|");
 
   React.useEffect(() => {
     const pending = pendingFocus.current;
-    if (pending === null) return;
+    if (pending === null || pending.fromKey === idsKey || disabled) return;
     pendingFocus.current = null;
     const row = listRef.current?.querySelector<HTMLElement>(`[data-sortable-id="${pending.id}"]`);
     const preferred = row?.querySelector<HTMLButtonElement>(`[data-move="${pending.direction}"]`);
@@ -52,14 +58,12 @@ function SortableList({
     const fallback = row?.querySelector<HTMLButtonElement>(`[data-move="${other}"]`);
     if (preferred && !preferred.disabled) preferred.focus();
     else fallback?.focus();
-  }, [items]);
-
-  const ids = items.map((item) => item.id);
+  }, [idsKey, disabled]);
 
   function move(id: string, direction: SortableDirection) {
     const next = moveId(ids, id, direction);
     if (next === null || disabled) return;
-    pendingFocus.current = { id, direction };
+    pendingFocus.current = { id, direction, fromKey: idsKey };
     onReorder(next);
   }
 

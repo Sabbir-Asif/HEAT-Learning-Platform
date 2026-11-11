@@ -66,6 +66,26 @@ describe("SortableList", () => {
     expect(document.activeElement).toBe(screen.getByRole("button", { name: "Move Beta down" }));
   });
 
+  test("keeps the pending focus through re-renders that do not change the order", () => {
+    const { rerender } = render(<SortableList items={items} onReorder={() => undefined} />);
+    const button = screen.getByRole("button", { name: "Move Gamma up" });
+    button.focus();
+    fireEvent.click(button);
+    rerender(<SortableList items={[...items]} onReorder={() => undefined} disabled />);
+    rerender(<SortableList items={[...items]} onReorder={() => undefined} disabled />);
+    rerender(
+      <SortableList
+        items={[items[0]!, items[2]!, items[1]!]}
+        onReorder={() => undefined}
+        disabled
+      />,
+    );
+    rerender(
+      <SortableList items={[items[0]!, items[2]!, items[1]!]} onReorder={() => undefined} />,
+    );
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Move Gamma up" }));
+  });
+
   test("disables every control while saving", () => {
     const onReorder = vi.fn();
     render(<SortableList items={items} onReorder={onReorder} disabled />);
