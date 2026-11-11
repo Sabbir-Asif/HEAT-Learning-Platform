@@ -141,6 +141,7 @@ describe("loadConfig", () => {
         TRUSTED_ORIGINS: "https://learn.example.test",
         ADMIN_APP_URL: "https://admin.example.test",
         VIDEO_UPLOAD_DIR: "/srv/heat/uploads",
+        HLS_MEDIA_DIR: "/srv/heat/media/hls",
       }).csrf.trustedOrigins,
     ).toEqual(["https://learn.example.test"]);
   });
@@ -312,13 +313,67 @@ describe("video uploads", () => {
     };
     expect(() => loadConfig(production)).toThrow("VIDEO_UPLOAD_DIR");
     expect(
-      loadConfig({ ...production, VIDEO_UPLOAD_DIR: "/srv/heat/uploads" }).videoUploads.directory,
+      loadConfig({
+        ...production,
+        VIDEO_UPLOAD_DIR: "/srv/heat/uploads",
+        HLS_MEDIA_DIR: "/srv/heat/media/hls",
+      }).videoUploads.directory,
     ).toBe("/srv/heat/uploads");
   });
 
   test("refuses a zero expiry", () => {
     expect(() => loadConfig({ ...valid, VIDEO_UPLOAD_EXPIRY_HOURS: "0" })).toThrow(
       "VIDEO_UPLOAD_EXPIRY_HOURS",
+    );
+  });
+});
+
+describe("transcode config", () => {
+  test("defaults to a local HLS directory and a timeout of eight times the source", () => {
+    const { transcode } = loadConfig(valid);
+    expect(transcode.hlsDirectory).toMatch(/\.data[\\/]hls$/);
+    expect(transcode.timeout).toEqual({ factor: 8, minSeconds: 600, maxSeconds: 14400 });
+  });
+
+  test("takes the directory and timeout from the environment", () => {
+    const { transcode } = loadConfig({
+      ...valid,
+      HLS_MEDIA_DIR: "/srv/heat/media/hls",
+      TRANSCODE_TIMEOUT_FACTOR: "4",
+      TRANSCODE_TIMEOUT_MIN_SECONDS: "60",
+      TRANSCODE_TIMEOUT_MAX_SECONDS: "3600",
+    });
+    expect(transcode).toEqual({
+      hlsDirectory: "/srv/heat/media/hls",
+      timeout: { factor: 4, minSeconds: 60, maxSeconds: 3600 },
+    });
+  });
+
+  test("requires the directory in production", () => {
+    const production = {
+      ...valid,
+      ...productionMail,
+      NODE_ENV: "production",
+      ADMIN_APP_URL: "https://admin.example.test",
+      TRUSTED_ORIGINS: "https://admin.example.test",
+      VIDEO_UPLOAD_DIR: "/srv/heat/uploads",
+    };
+    expect(() => loadConfig(production)).toThrow("HLS_MEDIA_DIR");
+    expect(
+      loadConfig({ ...production, HLS_MEDIA_DIR: "/srv/heat/media/hls" }).transcode.hlsDirectory,
+    ).toBe("/srv/heat/media/hls");
+  });
+
+  test("refuses a minimum above the maximum and a zero factor", () => {
+    expect(() =>
+      loadConfig({
+        ...valid,
+        TRANSCODE_TIMEOUT_MIN_SECONDS: "900",
+        TRANSCODE_TIMEOUT_MAX_SECONDS: "600",
+      }),
+    ).toThrow("TRANSCODE_TIMEOUT_MIN_SECONDS");
+    expect(() => loadConfig({ ...valid, TRANSCODE_TIMEOUT_FACTOR: "0" })).toThrow(
+      "TRANSCODE_TIMEOUT_FACTOR",
     );
   });
 });

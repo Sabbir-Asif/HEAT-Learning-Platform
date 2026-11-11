@@ -93,6 +93,10 @@ const envSchema = z
     RESPONSE_FLOOR_MS: positiveInt.default(1000),
     VIDEO_UPLOAD_DIR: z.string().min(1).optional(),
     VIDEO_UPLOAD_EXPIRY_HOURS: positiveInt.default(24),
+    HLS_MEDIA_DIR: z.string().min(1).optional(),
+    TRANSCODE_TIMEOUT_FACTOR: positiveInt.default(8),
+    TRANSCODE_TIMEOUT_MIN_SECONDS: positiveInt.default(600),
+    TRANSCODE_TIMEOUT_MAX_SECONDS: positiveInt.default(14400),
     HLS_SIGNING_KEYS: hlsSigningKeys,
     HLS_ACTIVE_KEY_ID: z.string().regex(hlsKeyId).optional(),
     BREACHED_PASSWORD_RANGE_URL: z.url().default("https://api.pwnedpasswords.com/range/"),
@@ -115,6 +119,20 @@ const envSchema = z
         message: "VIDEO_UPLOAD_DIR is required in production",
       });
     }
+    if (env.NODE_ENV === "production" && env.HLS_MEDIA_DIR === undefined) {
+      context.addIssue({
+        code: "custom",
+        path: ["HLS_MEDIA_DIR"],
+        message: "HLS_MEDIA_DIR is required in production",
+      });
+    }
+    if (env.TRANSCODE_TIMEOUT_MIN_SECONDS > env.TRANSCODE_TIMEOUT_MAX_SECONDS) {
+      context.addIssue({
+        code: "custom",
+        path: ["TRANSCODE_TIMEOUT_MIN_SECONDS"],
+        message: "TRANSCODE_TIMEOUT_MIN_SECONDS must not exceed TRANSCODE_TIMEOUT_MAX_SECONDS",
+      });
+    }
     if (env.NODE_ENV === "production" && env.ADMIN_APP_URL === undefined) {
       context.addIssue({
         code: "custom",
@@ -132,6 +150,7 @@ const envSchema = z
   });
 
 const localVideoUploadDirectory = "../../.data/uploads";
+const localHlsMediaDirectory = "../../.data/hls";
 const localAdminAppUrl = "http://localhost:3001";
 const localTrustedOrigins = [
   "http://localhost:3000",
@@ -148,6 +167,11 @@ export interface HlsConfig {
 export interface VideoUploadConfig {
   directory: string;
   expiryHours: number;
+}
+
+export interface TranscodeConfig {
+  hlsDirectory: string;
+  timeout: { factor: number; minSeconds: number; maxSeconds: number };
 }
 
 export interface AppConfig {
@@ -173,6 +197,7 @@ export interface AppConfig {
   rateLimit: RateLimitConfig;
   hls: HlsConfig | undefined;
   videoUploads: VideoUploadConfig;
+  transcode: TranscodeConfig;
   mail: MailConfig;
 }
 
@@ -234,6 +259,14 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
     videoUploads: {
       directory: values.VIDEO_UPLOAD_DIR ?? resolve(localVideoUploadDirectory),
       expiryHours: values.VIDEO_UPLOAD_EXPIRY_HOURS,
+    },
+    transcode: {
+      hlsDirectory: values.HLS_MEDIA_DIR ?? resolve(localHlsMediaDirectory),
+      timeout: {
+        factor: values.TRANSCODE_TIMEOUT_FACTOR,
+        minSeconds: values.TRANSCODE_TIMEOUT_MIN_SECONDS,
+        maxSeconds: values.TRANSCODE_TIMEOUT_MAX_SECONDS,
+      },
     },
     mail: loadMailConfig(env),
   };
