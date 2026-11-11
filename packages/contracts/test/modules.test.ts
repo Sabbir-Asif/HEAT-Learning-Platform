@@ -58,9 +58,9 @@ describe("lessonSectionRequestSchema", () => {
 
 describe("reorderRequestSchema", () => {
   test("accepts two id lists", () => {
-    expect(reorderRequestSchema.safeParse({ previousIds: [a, b], orderedIds: [b, a] }).success).toBe(
-      true,
-    );
+    expect(
+      reorderRequestSchema.safeParse({ previousIds: [a, b], orderedIds: [b, a] }).success,
+    ).toBe(true);
   });
 
   test("rejects a repeated id and a non-uuid", () => {
