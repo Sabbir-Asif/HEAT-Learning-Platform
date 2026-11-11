@@ -3,7 +3,6 @@ import { z } from "zod";
 export const progressMaxVideoSeconds = 86400;
 export const progressMaxIntervalsPerBatch = 64;
 export const progressMaxSequence = 2147483647;
-export const progressHeartbeatSeconds = 15;
 
 const progressSecondsSchema = z.number().min(0).max(progressMaxVideoSeconds);
 

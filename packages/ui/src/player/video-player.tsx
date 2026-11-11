@@ -19,6 +19,8 @@ import {
   renditionForChoice,
 } from "./engine-config";
 import { PlayerControls } from "./player-controls";
+import { attachProgressEvents, progressIntervalMs } from "./progress-events";
+import type { PlayerProgress } from "./watch-tracker";
 import {
   automaticChoice,
   browserStorage,
@@ -59,6 +61,7 @@ interface VideoPlayerProps {
   startPositionSeconds?: number;
   autoPlay?: boolean;
   captions?: readonly { language: string }[];
+  onProgress?: (progress: PlayerProgress) => void;
   className?: string;
 }
 
@@ -67,11 +70,13 @@ function PlayerSurface({
   manifestPath,
   initialExpiresAt,
   refreshSession,
+  maxPlaybackRate,
   startPositionSeconds = 0,
   autoPlay = false,
   captions = [],
+  onProgress,
   className,
-}: Omit<VideoPlayerProps, "maxPlaybackRate">) {
+}: VideoPlayerProps) {
   const store = usePlayer();
   const renditions = usePlayer((state) => state.videoRenditionList);
   const mediaRef = React.useRef<HlsJsAdapter>(null);
@@ -81,6 +86,11 @@ function PlayerSurface({
   const settledAtRef = React.useRef(0);
   const lastErrorTypeRef = React.useRef<string | null>(null);
   const appliedChoiceRef = React.useRef(false);
+  const onProgressRef = React.useRef(onProgress);
+
+  React.useEffect(() => {
+    onProgressRef.current = onProgress;
+  }, [onProgress]);
 
   const coordinator = React.useMemo(
     () =>
@@ -207,6 +217,33 @@ function PlayerSurface({
   }, [coordinator]);
 
   React.useEffect(() => {
+    let detach: (() => void) | null = null;
+    const attach = (): boolean => {
+      const media = videoRef.current;
+      if (!media) return false;
+      detach = attachProgressEvents({
+        media,
+        document,
+        window,
+        maxRate: maxPlaybackRate,
+        intervalMs: progressIntervalMs,
+        onProgress: (progress) => onProgressRef.current?.(progress),
+      });
+      return true;
+    };
+    let poll: ReturnType<typeof setInterval> | null = null;
+    if (!attach()) {
+      poll = setInterval(() => {
+        if (attach() && poll) clearInterval(poll);
+      }, enginePollMs);
+    }
+    return () => {
+      if (poll) clearInterval(poll);
+      detach?.();
+    };
+  }, [maxPlaybackRate]);
+
+  React.useEffect(() => {
     const save = () => {
       const engine = mediaRef.current?.engine;
       if (engine) writeBandwidthEstimate(storage, engine.bandwidthEstimate);
@@ -316,7 +353,7 @@ function VideoPlayer({ maxPlaybackRate, ...props }: VideoPlayerProps) {
   const rates = React.useMemo(() => playbackRatesUpTo(maxPlaybackRate), [maxPlaybackRate]);
   return (
     <Player defaultPlaybackRates={rates}>
-      <PlayerSurface {...props} />
+      <PlayerSurface maxPlaybackRate={maxPlaybackRate} {...props} />
     </Player>
   );
 }
