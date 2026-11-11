@@ -6,7 +6,7 @@ import type { SpawnedProcess, SpawnOptions } from "../../src/transcode/ffmpeg-ru
 const safeArgs = ["-protocol_whitelist", "file", "-nostdin", "-i", "/in.orig", "/out/index.m3u8"];
 
 class FakeProcess extends EventEmitter implements SpawnedProcess {
-  readonly kill = vi.fn((_signal: "SIGKILL") => {
+  readonly kill = vi.fn(() => {
     queueMicrotask(() => this.emit("close", null));
     return true;
   });
