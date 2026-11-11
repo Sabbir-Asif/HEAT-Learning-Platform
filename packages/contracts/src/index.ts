@@ -13,6 +13,7 @@ export * from "./errors";
 export * from "./learning";
 export * from "./modules";
 export * from "./playback";
+export * from "./progress";
 export * from "./quizzes";
 export * from "./verification";
 export * from "./videos";
