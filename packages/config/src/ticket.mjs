@@ -270,7 +270,7 @@ export function loadTicket({ gh, repo, number, localBranches = [] }) {
     branch,
     resuming,
     pr: branch ? findPr(gh, repo, branch.name) : null,
-    needsApproval: item?.size === "L" || labels.includes("security"),
+    needsApproval: item?.size === "L" || labels.includes("needs-approval"),
     planApproved: comments.some(
       (comment) => comment.association === "OWNER" && comment.body.includes(approvalMarker),
     ),

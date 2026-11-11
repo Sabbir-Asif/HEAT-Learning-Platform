@@ -27,6 +27,11 @@ export const labels = [
     color: "b60205",
     description: "Touches auth, permissions, uploads, personal data or secrets",
   },
+  {
+    name: "needs-approval",
+    color: "b60205",
+    description: "Plan waits for the owner before implementation",
+  },
   { name: "critical-path", color: "d93f0b", description: "P0: blocks a phase exit" },
   {
     name: "needs-refinement",
@@ -48,6 +53,7 @@ export const milestones = [
   "P6 · Hardening",
   "P7 · Pilot and launch",
   "Backlog · Later (v1.1)",
+  "v0 · Thin slice",
 ];
 
 const range = (prefix, from, to) =>

@@ -396,6 +396,7 @@ describe("what the script manages", () => {
         "type:chore",
         "type:epic",
         "security",
+        "needs-approval",
         "needs-refinement",
         "ready",
         "blocked",
