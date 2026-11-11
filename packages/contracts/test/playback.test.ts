@@ -3,6 +3,7 @@ import {
   hlsCookie,
   hlsCookiePath,
   hlsManifestPath,
+  maxPlaybackRate,
   playbackAdminParamsSchema,
   playbackSessionResponseSchema,
   playbackVideoIdSchema,
@@ -57,5 +58,9 @@ describe("playback contracts", () => {
       playbackAdminParamsSchema.safeParse({ videoId: "0198f1a0-0000-7000-8000-0000000000c1" })
         .success,
     ).toBe(true);
+  });
+
+  test("caps playback speed at one and a half times", () => {
+    expect(maxPlaybackRate).toBe(1.5);
   });
 });

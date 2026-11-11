@@ -227,6 +227,12 @@
 }
 
 @layer base {
+  [data-slot="video-player"] video::cue {
+    background-color: var(--player);
+    color: var(--player-foreground);
+    font-family: var(--font-sans);
+  }
+
   * {
     border-color: var(--divider);
   }

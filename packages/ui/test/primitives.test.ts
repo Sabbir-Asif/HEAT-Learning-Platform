@@ -3,7 +3,17 @@ import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
 const srcRoot = join(import.meta.dirname, "../src");
-const scanned = ["components", "composites", "lib", "hooks", "charts", "data", "shell", "upload"];
+const scanned = [
+  "components",
+  "composites",
+  "lib",
+  "hooks",
+  "charts",
+  "data",
+  "shell",
+  "upload",
+  "player",
+];
 
 const allowedPackages = [
   "react",
@@ -24,6 +34,7 @@ const folderPackages: Record<string, string[]> = {
   charts: ["recharts"],
   data: ["@tanstack/react-table", "nuqs"],
   upload: ["@uppy/core"],
+  player: ["@videojs/react", "@videojs/hlsjs-video"],
 };
 
 const forbiddenPackagePrefixes = ["@radix-ui/", "@headlessui/", "@mui/", "@chakra-ui/", "antd"];
