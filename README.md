@@ -97,18 +97,18 @@ The Tailwind plugin reads its theme from `packages/config/eslint/tailwind-entry.
 | Command                  | Runs                                                                                                                                                                                                                                        |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `pnpm e2e`               | Both suites on the host, after `pnpm turbo build --filter=frontend-public --filter=frontend-internal`. Needs `pnpm --filter @heat/e2e exec playwright install chromium` once. Screenshots rendered on the host will not match the baselines |
-| `pnpm e2e:docker:visual` | The screenshot comparison in the pinned image, as CI runs it                                                                                                                                                                                |
+| `pnpm e2e:docker:visual` | The screenshot comparison in the pinned image                                                                                                                                                                                               |
 | `pnpm e2e:docker:update` | Regenerates every baseline in the pinned image on any host OS and replaces `packages/e2e/test/*/__screenshots__`                                                                                                                            |
 
 The image is `mcr.microsoft.com/playwright:v1.65.0-noble@sha256:6e3fb709361521eb27161606e6da6d2674e5e89fa16516cb37d6fdd91372273d`, the Playwright 1.65 image (tag and digest). The Playwright version is pinned once in the `catalog:` block of `pnpm-workspace.yaml`; when it changes, change the tag and digest in `packages/e2e/bin/docker.mjs` and here, then regenerate the baselines. `packages/config/test/e2e.test.mjs` fails if they drift apart. The commands copy the tracked files into a work folder inside `packages/e2e`, install and build there as the current user, and need about 4 GB of memory for Docker. pnpm inside the image is installed from the npm tarball and checked against the sha512 in the root `packageManager` field before it is used (the image has no Corepack); `packages/config/test/e2e.test.mjs` covers the check. Update that hash together with the version.
 
 The screenshot suite covers representative pages only, named `{app}-{page}-{width}-{theme}.png`, with animations disabled, the caret hidden, fonts awaited and the `dark` class asserted before capture. Two runs of the same commit in the image differ by zero pixels, so no pixel tolerance is set. Review the changed PNGs in a pull request like any other change.
 
-The `screenshots` CI job runs on every pull request and is not a required check. It never fails the run; it writes a `::warning` annotation and a job summary naming the changed screens and uploads actual, expected and diff images as the `screenshot-diffs` artifact for 7 days.
+The screenshot suite is not run in CI; run it locally with the commands above.
 
 ### Performance budgets (Lighthouse)
 
-The `lighthouse` job audits pages of the production build (`next build`, then the standalone server on port 3000 through `packages/e2e/bin/standalone.mjs`, no secrets, database or API) with Lighthouse in `packages/e2e/lighthouse`. It runs on every pull request, is not a required check, and never fails the run.
+The audit covers pages of the production build (`next build`, then the standalone server on port 3000 through `packages/e2e/bin/standalone.mjs`, no secrets, database or API) with Lighthouse in `packages/e2e/lighthouse`. It runs on every pull request, is not a required check, and never fails the run.
 
 | Budget                               | Limit                                            |
 | ------------------------------------ | ------------------------------------------------ |
@@ -141,7 +141,7 @@ pnpm --filter @heat/ui build-storybook                        # static build in 
 
 The toolbar has a theme control (light, dark: the `.dark` class on the story root and on `<html>`). A story pins it with `globals: { theme }`, which locks the toolbar for that story, so each component gets one story for light and one for dark plus a `Default` story that follows the toolbar. The document language is `en`.
 
-An axe violation fails the story test and the output names the rule, for example `button-name`. A story that must accept a known violation sets `parameters.a11y.test` to `"todo"` with a reason. Story tests are not part of `pnpm test` or the coverage gate; they run in `test:stories` and in the `storybook` CI job.
+An axe violation fails the story test and the output names the rule, for example `button-name`. A story that must accept a known violation sets `parameters.a11y.test` to `"todo"` with a reason. Story tests are not part of `pnpm test` or the coverage gate; run them with `test:stories`.
 
 ### Design file and theme
 
@@ -252,13 +252,7 @@ Pull requests and pushes to `main` run these checks in GitHub Actions; each is a
 | `integration`                                  | `test:integration` in any package that defines it (Testcontainers)   |
 | `audit`                                        | `pnpm audit:deps`, also weekly; fails on high or critical advisories |
 
-The `storybook` job is separate and not yet a required check: it runs the story tests with axe and builds static Storybook, and uploads it as the `storybook-static` artifact (7 days, also when the tests fail). It runs on every pull request. The owner adds it to `.github/branch-protection.json` and re-applies the protection.
-
 The `migrations` job is separate and not yet a required check. On pull requests it fails when a migration directory that exists on the base branch is modified or deleted (`packages/config/bin/migrations.mjs immutable`, naming each file), then applies the migrations to an empty Postgres 17 service with `prisma migrate deploy` and fails when `prisma migrate diff` finds the schema differs. It is a quick pre-check for the drift test in `packages/db/test/integration/migrate.integration.test.ts`, which the required `integration` job also runs. Review rules for migrations are in [docs/runbooks/migration-review.md](docs/runbooks/migration-review.md). The owner adds `migrations` to `.github/branch-protection.json` and re-applies the protection.
-
-The `screenshots` job is not required. See Visual baselines.
-
-The `lighthouse` job is separate and not a required check: it audits the production build against the performance budgets and only warns. See Performance budgets (Lighthouse).
 
 The `api-client-drift` job is separate and not yet a required check either. It builds contracts and the API, regenerates `apps/api/openapi.json` and `packages/api-client/src/generated/`, and fails when any file differs from what is committed (modified, deleted or new), listing the files. Run `pnpm generate` and commit the result to fix it.
 
