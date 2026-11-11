@@ -25,5 +25,6 @@ Records 0001 to 0016 (0009 was superseded by 0018 and removed) are the design de
 | 0018 | [English only interface](0018-english-only-interface.md)                                                    | D9         | Accepted |
 | 0019 | [Content-Security-Policy with nonces and hashes](0019-content-security-policy-nonces-and-hashes.md) | D15 | Accepted |
 | 0020 | [HLS rendition ladder and FFmpeg flags](0020-hls-rendition-ladder.md) | D5 | Proposed |
+| 0021 | [HLS signed-cookie format and njs verification](0021-hls-signed-cookie-verification-in-njs.md) | D5 | Proposed |
 
 Conventions for the whole repo: [CLAUDE.md](../../CLAUDE.md).
