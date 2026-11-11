@@ -52,9 +52,11 @@ services:
       - ../nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
       - ../nginx/proxy.inc:/etc/nginx/conf.d/proxy.inc:ro
       - ../nginx/hls.inc:/etc/nginx/conf.d/hls.inc:ro
+      - ../nginx/certificates.inc:/etc/nginx/conf.d/certificates.inc:ro
       - ../nginx/hls.js:/etc/nginx/njs/hls.js:ro
       - ../nginx/hls-verify.js:/etc/nginx/njs/hls-verify.js:ro
       - ${HLS_MEDIA_DIR:-../../.data/hls}:/srv/media/hls:ro
+      - ${CERTIFICATE_STORAGE_DIR:-../../.data/certificates}:/srv/certificates:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:

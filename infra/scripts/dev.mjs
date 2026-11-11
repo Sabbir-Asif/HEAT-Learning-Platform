@@ -51,10 +51,15 @@ const nginxReachable = async (seconds) => {
   return false;
 };
 
-const ensureMediaDirectory = () => {
+const ensureDirectory = (variable, fallback) => {
   const env = readFileSync(join(root, "infra/compose/.env"), "utf8");
-  const configured = env.match(/^HLS_MEDIA_DIR=(.+)$/m)?.[1];
-  mkdirSync(resolve(dirname(composeFile), configured ?? "../../.data/hls"), { recursive: true });
+  const configured = env.match(new RegExp(`^${variable}=(.+)$`, "m"))?.[1];
+  mkdirSync(resolve(dirname(composeFile), configured ?? fallback), { recursive: true });
+};
+
+const ensureMediaDirectory = () => {
+  ensureDirectory("HLS_MEDIA_DIR", "../../.data/hls");
+  ensureDirectory("CERTIFICATE_STORAGE_DIR", "../../.data/certificates");
 };
 
 const up = async () => {
