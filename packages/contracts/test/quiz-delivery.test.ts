@@ -1,6 +1,5 @@
 import { describe, expect, test } from "vitest";
 import {
-  quizDeliveryAvailableSchema,
   quizDeliveryOptionSchema,
   quizDeliveryParamsSchema,
   quizDeliveryQuestionSchema,
@@ -9,10 +8,19 @@ import {
 
 const id = "0192f3a4-7b2c-7d3e-8f10-aabbccddeeff";
 
-const available = {
-  status: "AVAILABLE",
+const base = {
   attemptsUsed: 0,
   attemptsAllowed: 10,
+  quiz: null,
+  attempt: null,
+  questions: [],
+  nextAttemptAt: null,
+  bestResult: null,
+};
+
+const available = {
+  ...base,
+  status: "AVAILABLE",
   quiz: { id, passMarkPercent: 70 },
   attempt: { id, startedAt: "2026-11-12T04:00:00.000Z" },
   questions: [{ id, order: 1, text: "Q", options: [{ id, text: "A" }] }],
@@ -32,7 +40,7 @@ describe("quiz delivery schemas", () => {
   test("no schema in the delivery response names a correct flag or an explanation", () => {
     const names = JSON.stringify(
       [
-        quizDeliveryAvailableSchema.shape,
+        quizDeliveryResponseSchema.shape,
         quizDeliveryQuestionSchema.shape,
         quizDeliveryOptionSchema.shape,
       ].map((shape) => Object.keys(shape)),
@@ -59,43 +67,42 @@ describe("quiz delivery schemas", () => {
     expect(text).not.toContain("explanation");
   });
 
+  test("the response carries only status, counts, quiz, attempt, questions, wait time and best result", () => {
+    expect(keysOf(quizDeliveryResponseSchema)).toEqual([
+      "attempt",
+      "attemptsAllowed",
+      "attemptsUsed",
+      "bestResult",
+      "nextAttemptAt",
+      "questions",
+      "quiz",
+      "status",
+    ]);
+  });
+
   test("the four states parse and an unknown state is refused", () => {
     expect(quizDeliveryResponseSchema.safeParse(available).success).toBe(true);
     expect(
       quizDeliveryResponseSchema.safeParse({
+        ...base,
         status: "WAITING",
         attemptsUsed: 1,
-        attemptsAllowed: 10,
         nextAttemptAt: "2026-11-12T04:10:00.000Z",
       }).success,
     ).toBe(true);
     expect(
-      quizDeliveryResponseSchema.safeParse({
-        status: "EXHAUSTED",
-        attemptsUsed: 10,
-        attemptsAllowed: 10,
-      }).success,
+      quizDeliveryResponseSchema.safeParse({ ...base, status: "EXHAUSTED", attemptsUsed: 10 })
+        .success,
     ).toBe(true);
     expect(
       quizDeliveryResponseSchema.safeParse({
+        ...base,
         status: "PASSED",
-        attemptsUsed: 1,
         attemptsAllowed: null,
-        passMarkPercent: 70,
-        bestResult: null,
+        quiz: { id, passMarkPercent: 70 },
       }).success,
     ).toBe(true);
-    expect(quizDeliveryResponseSchema.safeParse({ status: "OTHER" }).success).toBe(false);
-  });
-
-  test("the waiting state needs the next attempt time", () => {
-    expect(
-      quizDeliveryResponseSchema.safeParse({
-        status: "WAITING",
-        attemptsUsed: 1,
-        attemptsAllowed: 10,
-      }).success,
-    ).toBe(false);
+    expect(quizDeliveryResponseSchema.safeParse({ ...base, status: "OTHER" }).success).toBe(false);
   });
 
   test("params need a course id and a module id", () => {

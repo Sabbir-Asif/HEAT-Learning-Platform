@@ -14,29 +14,7 @@ export const quizDeliveryQuestionSchema = z.object({
   options: z.array(quizDeliveryOptionSchema),
 });
 
-const attemptCountsShape = {
-  attemptsUsed: z.number().int().min(0),
-  attemptsAllowed: z.number().int().min(0).nullable(),
-};
-
-export const quizDeliveryAvailableSchema = z.object({
-  status: z.literal("AVAILABLE"),
-  ...attemptCountsShape,
-  quiz: z.object({ id: z.uuid(), passMarkPercent: z.number().int().min(0).max(100) }),
-  attempt: z.object({ id: z.uuid(), startedAt: z.iso.datetime() }),
-  questions: z.array(quizDeliveryQuestionSchema),
-});
-
-export const quizDeliveryWaitingSchema = z.object({
-  status: z.literal("WAITING"),
-  ...attemptCountsShape,
-  nextAttemptAt: z.iso.datetime(),
-});
-
-export const quizDeliveryExhaustedSchema = z.object({
-  status: z.literal("EXHAUSTED"),
-  ...attemptCountsShape,
-});
+export const quizDeliveryStatusSchema = z.enum(["AVAILABLE", "WAITING", "EXHAUSTED", "PASSED"]);
 
 export const quizPastResultSchema = z.object({
   attemptId: z.uuid(),
@@ -45,20 +23,18 @@ export const quizPastResultSchema = z.object({
   submittedAt: z.iso.datetime(),
 });
 
-export const quizDeliveryPassedSchema = z.object({
-  status: z.literal("PASSED"),
-  ...attemptCountsShape,
-  passMarkPercent: z.number().int().min(0).max(100),
+export const quizDeliveryResponseSchema = z.object({
+  status: quizDeliveryStatusSchema,
+  attemptsUsed: z.number().int().min(0),
+  attemptsAllowed: z.number().int().min(0).nullable(),
+  quiz: z.object({ id: z.uuid(), passMarkPercent: z.number().int().min(0).max(100) }).nullable(),
+  attempt: z.object({ id: z.uuid(), startedAt: z.iso.datetime() }).nullable(),
+  questions: z.array(quizDeliveryQuestionSchema),
+  nextAttemptAt: z.iso.datetime().nullable(),
   bestResult: quizPastResultSchema.nullable(),
 });
 
-export const quizDeliveryResponseSchema = z.discriminatedUnion("status", [
-  quizDeliveryAvailableSchema,
-  quizDeliveryWaitingSchema,
-  quizDeliveryExhaustedSchema,
-  quizDeliveryPassedSchema,
-]);
-
+export type QuizDeliveryStatus = z.infer<typeof quizDeliveryStatusSchema>;
 export type QuizDeliveryQuestion = z.infer<typeof quizDeliveryQuestionSchema>;
 export type QuizPastResult = z.infer<typeof quizPastResultSchema>;
 export type QuizDeliveryResponse = z.infer<typeof quizDeliveryResponseSchema>;
