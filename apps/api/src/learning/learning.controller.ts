@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
-import { Audience, RequireCourseAccess } from "../access";
+import { Audience } from "../access";
 import { CurrentSession } from "../auth";
 import type { AuthenticatedSession } from "../auth";
 import { RateLimit } from "../rate-limit";
@@ -14,7 +14,6 @@ export class LearningController {
   constructor(private readonly learning: LearningStructureService) {}
 
   @RateLimit("learningRead")
-  @RequireCourseAccess("courseId")
   @Get()
   @ApiOkResponse({ type: LearningStructureResponseDto })
   structure(

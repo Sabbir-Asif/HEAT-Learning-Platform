@@ -4,12 +4,12 @@ import { LearningController } from "../../src/learning/learning.controller";
 import { RATE_LIMIT_PROFILE_KEY } from "../../src/rate-limit/rate-limit.guard";
 
 describe("LearningController", () => {
-  test("is student only with the course access check and the learningRead rate limit", () => {
+  test("is student only, checks enrollment in the service and has the learningRead rate limit", () => {
     expect(Reflect.getMetadata(AUDIENCE_KEY, LearningController)).toBe("student");
     expect(Reflect.getMetadata(ROLES_KEY, LearningController)).toBeUndefined();
-    expect(Reflect.getMetadata(COURSE_ACCESS_KEY, LearningController.prototype.structure)).toBe(
-      "courseId",
-    );
+    expect(
+      Reflect.getMetadata(COURSE_ACCESS_KEY, LearningController.prototype.structure),
+    ).toBeUndefined();
     expect(
       Reflect.getMetadata(RATE_LIMIT_PROFILE_KEY, LearningController.prototype.structure),
     ).toBe("learningRead");

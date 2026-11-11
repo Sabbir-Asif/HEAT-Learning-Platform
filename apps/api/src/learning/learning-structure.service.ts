@@ -32,15 +32,30 @@ export class LearningStructureService {
         courseRevisionId: true,
         course: { select: { id: true, slug: true, title: true, deletedAt: true } },
         courseRevision: { select: { id: true, number: true, deletedAt: true } },
+        decisions: {
+          where: { action: { in: ["REJECT", "REMOVE"] } },
+          orderBy: { decidedAt: "desc" },
+          take: 1,
+          select: { reason: true },
+        },
       },
     });
-    if (
-      enrollment === null ||
-      (enrollment.status !== "APPROVED" && enrollment.status !== "COMPLETED")
-    ) {
-      throw new ApiException(403, "ENROLLMENT_NOT_ACTIVE");
-    }
+    if (enrollment === null) throw new ApiException(403, "ENROLLMENT_NOT_ACTIVE");
     const { course, courseRevision } = enrollment;
+    const summary = { id: course.id, slug: course.slug, title: course.title };
+    if (enrollment.status !== "APPROVED" && enrollment.status !== "COMPLETED") {
+      return {
+        course: summary,
+        enrollment: {
+          status: enrollment.status,
+          reason:
+            enrollment.status === "REMOVED" || enrollment.status === "REJECTED"
+              ? (enrollment.decisions[0]?.reason ?? null)
+              : null,
+        },
+        learning: null,
+      };
+    }
     if (
       enrollment.courseRevisionId === null ||
       courseRevision === null ||
@@ -176,16 +191,18 @@ export class LearningStructureService {
     });
     const next = nextModuleIndex(states);
     return {
-      course: { id: course.id, slug: course.slug, title: course.title },
-      revision: { id: courseRevision.id, number: courseRevision.number },
-      enrollment: { status: enrollment.status },
-      summary: {
-        overallProgressPercent: overallProgressPercent(states),
-        modulesCompleted: states.filter((state) => state === "COMPLETED").length,
-        modulesTotal: states.length,
-        nextModuleId: next === null ? null : (modules[next]?.id ?? null),
+      course: summary,
+      enrollment: { status: enrollment.status, reason: null },
+      learning: {
+        revision: { id: courseRevision.id, number: courseRevision.number },
+        summary: {
+          overallProgressPercent: overallProgressPercent(states),
+          modulesCompleted: states.filter((state) => state === "COMPLETED").length,
+          modulesTotal: states.length,
+          nextModuleId: next === null ? null : (modules[next]?.id ?? null),
+        },
+        modules: described,
       },
-      modules: described,
     };
   }
 }

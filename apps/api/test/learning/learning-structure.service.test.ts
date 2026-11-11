@@ -30,6 +30,7 @@ const enrollmentRow = (overrides: object = {}) => ({
   courseRevisionId: ids.revision,
   course: { id: ids.course, slug: "heat", title: "HEAT", deletedAt: null },
   courseRevision: { id: ids.revision, number: 3, deletedAt: null },
+  decisions: [],
   ...overrides,
 });
 
@@ -98,11 +99,17 @@ const build = (options: Options = {}) => {
   return { service, database };
 };
 
+const learningOf = async (service: LearningStructureService) => {
+  const response = await service.describe("u1", ids.course);
+  if (response.learning === null) throw new Error("expected learning content");
+  return response.learning;
+};
+
 describe("LearningStructureService.describe", () => {
   test("a student who has not started sees module 1 unlocked and module 2 locked", async () => {
     const { service } = build();
 
-    const result = await service.describe("u1", ids.course);
+    const result = await learningOf(service);
 
     expect(result.modules.map((entry) => entry.state)).toEqual(["UNLOCKED", "LOCKED"]);
     expect(result.summary).toEqual({
@@ -111,14 +118,15 @@ describe("LearningStructureService.describe", () => {
       modulesTotal: 2,
       nextModuleId: ids.m1,
     });
-    expect(result.enrollment).toEqual({ status: "APPROVED" });
-    expect(result.course).toEqual({ id: ids.course, slug: "heat", title: "HEAT" });
+    const full = await service.describe("u1", ids.course);
+    expect(full.enrollment).toEqual({ status: "APPROVED", reason: null });
+    expect(full.course).toEqual({ id: ids.course, slug: "heat", title: "HEAT" });
   });
 
   test("reads the structure from the pinned revision, not the latest", async () => {
     const { service, database } = build();
 
-    const result = await service.describe("u1", ids.course);
+    const result = await learningOf(service);
 
     expect(database.module.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { revisionId: ids.revision, deletedAt: null } }),
@@ -147,27 +155,66 @@ describe("LearningStructureService.describe", () => {
     );
   });
 
-  test.each(["PENDING_VERIFICATION", "PENDING_APPROVAL", "REJECTED", "EXPIRED", "REMOVED"])(
-    "refuses a %s enrollment with 403 before looking at the revision",
+  test.each(["PENDING_VERIFICATION", "PENDING_APPROVAL", "EXPIRED"])(
+    "a %s enrollment gets its status only and no content",
     async (status) => {
       const { service, database } = build({
         enrollment: enrollmentRow({ status, courseRevisionId: null, courseRevision: null }),
       });
 
-      await expect(service.describe("u1", ids.course)).rejects.toMatchObject({
-        code: "ENROLLMENT_NOT_ACTIVE",
+      expect(await service.describe("u1", ids.course)).toEqual({
+        course: { id: ids.course, slug: "heat", title: "HEAT" },
+        enrollment: { status, reason: null },
+        learning: null,
       });
-      await expect(service.describe("u1", ids.course)).rejects.toBeInstanceOf(ApiException);
+      expect(database.module.findMany).not.toHaveBeenCalled();
+      expect(database.moduleProgress.findMany).not.toHaveBeenCalled();
+    },
+  );
+
+  test.each(["REMOVED", "REJECTED"])(
+    "a %s enrollment returns the latest decision reason and no content",
+    async (status) => {
+      const { service, database } = build({
+        enrollment: enrollmentRow({
+          status,
+          decisions: [{ reason: "Left the university" }],
+        }),
+      });
+
+      const response = await service.describe("u1", ids.course);
+
+      expect(response.enrollment).toEqual({ status, reason: "Left the university" });
+      expect(response.learning).toBeNull();
+      expect(JSON.stringify(response)).not.toContain("Module 1");
       expect(database.module.findMany).not.toHaveBeenCalled();
     },
   );
 
-  test("refuses a missing enrollment with 403", async () => {
-    const { service } = build({ enrollment: null });
+  test("only reject and remove decisions are read for the reason", async () => {
+    const { service, database } = build({ enrollment: enrollmentRow({ status: "REMOVED" }) });
+
+    await service.describe("u1", ids.course);
+
+    expect(database.enrollment.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.objectContaining({
+          decisions: expect.objectContaining({
+            where: { action: { in: ["REJECT", "REMOVE"] } },
+          }),
+        }),
+      }),
+    );
+  });
+
+  test("a student with no enrollment in the course is refused with 403", async () => {
+    const { service, database } = build({ enrollment: null });
 
     await expect(service.describe("u1", ids.course)).rejects.toMatchObject({
       code: "ENROLLMENT_NOT_ACTIVE",
     });
+    await expect(service.describe("u1", ids.course)).rejects.toBeInstanceOf(ApiException);
+    expect(database.module.findMany).not.toHaveBeenCalled();
   });
 
   test("an active enrollment without a pinned revision is not found", async () => {
@@ -199,7 +246,7 @@ describe("LearningStructureService.describe", () => {
   test("a completed enrollment sees every module completed", async () => {
     const { service } = build({ enrollment: enrollmentRow({ status: "COMPLETED" }), progress: [] });
 
-    const result = await service.describe("u1", ids.course);
+    const result = await learningOf(service);
 
     expect(result.modules.map((entry) => entry.state)).toEqual(["COMPLETED", "COMPLETED"]);
     expect(result.summary).toMatchObject({ overallProgressPercent: 100, nextModuleId: null });
@@ -213,7 +260,7 @@ describe("LearningStructureService.describe", () => {
       ],
     });
 
-    const [first] = (await service.describe("u1", ids.course)).modules;
+    const [first] = (await learningOf(service)).modules;
 
     expect(first?.objectives).toEqual(["Know the policy"]);
     expect(first?.lessonSections).toEqual([{ id: ids.s1, order: 1, title: "Intro" }]);
@@ -249,7 +296,7 @@ describe("LearningStructureService.describe", () => {
       ],
     });
 
-    const [first] = (await service.describe("u1", ids.course)).modules;
+    const [first] = (await learningOf(service)).modules;
 
     expect(first?.videos[0]).toMatchObject({ coveragePercent: 100, status: "COMPLETED" });
   });
@@ -267,7 +314,7 @@ describe("LearningStructureService.describe", () => {
       grants: [{ quizId: ids.q1, extraAttempts: 2 }],
     });
 
-    const [first] = (await service.describe("u1", ids.course)).modules;
+    const [first] = (await learningOf(service)).modules;
 
     expect(first?.quiz).toEqual({
       id: ids.q1,
@@ -283,7 +330,7 @@ describe("LearningStructureService.describe", () => {
   test("a soft-deleted quiz is not exposed", async () => {
     const { service } = build({ modules: moduleRows({ deletedAt: now }) });
 
-    expect((await service.describe("u1", ids.course)).modules[0]?.quiz).toBeNull();
+    expect((await learningOf(service)).modules[0]?.quiz).toBeNull();
   });
 
   test("the response carries no answer keys, disk paths or other students' data", async () => {
@@ -301,7 +348,7 @@ describe("LearningStructureService.describe", () => {
   test("a course without modules has no next module", async () => {
     const { service } = build({ modules: [], progress: [] });
 
-    const result = await service.describe("u1", ids.course);
+    const result = await learningOf(service);
 
     expect(result.modules).toEqual([]);
     expect(result.summary).toEqual({
