@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { academicSessionSchema } from "./academic-session";
+import { emailAddressSchema, passwordMaxLength, passwordMinLength } from "./auth";
+import { captchaFieldsShape } from "./captcha";
 
 export const englishNameMinLength = 2;
 export const englishNameMaxLength = 100;
@@ -32,3 +34,42 @@ export const enrollmentStepOneSchema = z.object({
 
 export type EnrollmentStepOne = z.infer<typeof enrollmentStepOneSchema>;
 export type EnrollmentStepOneInput = z.input<typeof enrollmentStepOneSchema>;
+
+export const passwordConfirmationRequiredMessage = "Retype your password.";
+export const passwordMismatchMessage = "The passwords do not match.";
+
+const passwordSchema = z
+  .string({ error: `Use at least ${passwordMinLength} characters.` })
+  .min(passwordMinLength, `Use at least ${passwordMinLength} characters.`)
+  .max(passwordMaxLength, `Use at most ${passwordMaxLength} characters.`);
+
+const stepTwoShape = {
+  email: emailAddressSchema,
+  password: passwordSchema,
+  confirmPassword: z.string().min(1, passwordConfirmationRequiredMessage),
+  ...captchaFieldsShape,
+};
+
+const passwordsMatch = (value: { password: string; confirmPassword: string }): boolean =>
+  value.password === value.confirmPassword;
+
+const passwordMismatch = { path: ["confirmPassword"], message: passwordMismatchMessage };
+
+export const enrollmentStepTwoSchema = z
+  .object(stepTwoShape)
+  .refine(passwordsMatch, passwordMismatch);
+
+export type EnrollmentStepTwo = z.infer<typeof enrollmentStepTwoSchema>;
+export type EnrollmentStepTwoInput = z.input<typeof enrollmentStepTwoSchema>;
+
+export const enrollmentRequestSchema = z
+  .object({ ...enrollmentStepOneSchema.shape, ...stepTwoShape })
+  .refine(passwordsMatch, passwordMismatch);
+
+export type EnrollmentRequest = z.infer<typeof enrollmentRequestSchema>;
+
+export const enrollmentAcceptedResponseSchema = z.object({
+  accepted: z.literal(true),
+});
+
+export type EnrollmentAcceptedResponse = z.infer<typeof enrollmentAcceptedResponseSchema>;
