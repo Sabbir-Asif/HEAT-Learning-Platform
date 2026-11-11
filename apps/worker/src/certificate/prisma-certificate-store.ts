@@ -7,7 +7,6 @@ import type {
   NewCertificate,
   StoredFile,
 } from "./certificate-ports";
-import type { ExistingCertificate } from "./issue-rules";
 
 export const CERTIFICATE_ISSUED_EVENT_TYPE = "certificate.issued";
 export const CERTIFICATE_EMAIL_TEMPLATE = "certificate-ready";
