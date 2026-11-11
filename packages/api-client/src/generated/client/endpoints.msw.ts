@@ -64,6 +64,7 @@ import type {
   ProgressBatchDto,
   ProgressResponseDto,
   QuizAccessResponseDto,
+  QuizDeliveryResponseDto,
   QuizQuestionRequestDto,
   QuizRulesRequestDto,
   QuizSummaryDto,
@@ -220,6 +221,8 @@ export const getLearningStructureResponseMock = (overrideResponse: Partial<Extra
 export const getLessonContentReadResponseMock = (overrideResponse: Partial<Extract<LessonContentResponseDto, object>> = {}): LessonContentResponseDto => ({module: {id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), title: faker.string.alpha({length: {min: 10, max: 20}})}, sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({body: {
         [faker.string.alphanumeric(5)]: {}
       }, id: faker.string.uuid(), order: faker.number.int({min: -9007199254740991, max: 9007199254740991}), schemaVersion: faker.number.int({min: -9007199254740991, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
+
+export const getQuizDeliveryGetResponseMock = (overrideResponse: Partial<Extract<QuizDeliveryResponseDto, object>> = {}): QuizDeliveryResponseDto => ({attempt: faker.helpers.arrayElement([{id: faker.string.uuid(), startedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'},null,]), attemptsAllowed: faker.helpers.arrayElement([faker.number.int({min: 0, max: 9007199254740991}), null]), attemptsUsed: faker.number.int({min: 0, max: 9007199254740991}), bestResult: faker.helpers.arrayElement([{attemptId: faker.string.uuid(), passed: faker.datatype.boolean(), scorePercent: faker.number.int({min: 0, max: 100}), submittedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'},null,]), nextAttemptAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), questions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), options: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), text: faker.string.alpha({length: {min: 10, max: 20}})})), order: faker.number.int({min: -9007199254740991, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}})})), quiz: faker.helpers.arrayElement([{id: faker.string.uuid(), passMarkPercent: faker.number.int({min: 0, max: 100})},null,]), status: faker.helpers.arrayElement(['AVAILABLE','WAITING','EXHAUSTED','PASSED'] as const), ...overrideResponse})
 
 export const getQuizAccessCheckResponseMock = (overrideResponse: Partial<Extract<QuizAccessResponseDto, object>> = {}): QuizAccessResponseDto => ({moduleState: faker.helpers.arrayElement(['LOCKED','UNLOCKED','IN_PROGRESS','QUIZ_READY','COMPLETED'] as const), ...overrideResponse})
 
@@ -1156,6 +1159,18 @@ export const getLessonContentReadMockHandler = (overrideResponse?: LessonContent
   }, options)
 }
 
+export const getQuizDeliveryGetMockHandler = (overrideResponse?: QuizDeliveryResponseDto | ((info: Parameters<HttpResponseResolver<{ courseId: string; moduleId: string }>>[0]) => Promise<QuizDeliveryResponseDto> | QuizDeliveryResponseDto), options?: RequestHandlerOptions) => {
+  return http.get<{ courseId: string; moduleId: string }>('*/api/courses/:courseId/modules/:moduleId/quiz', async (info: Parameters<HttpResponseResolver<{ courseId: string; moduleId: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getQuizDeliveryGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getQuizAccessCheckMockHandler = (overrideResponse?: QuizAccessResponseDto | ((info: Parameters<HttpResponseResolver<{ courseId: string; moduleId: string }>>[0]) => Promise<QuizAccessResponseDto> | QuizAccessResponseDto), options?: RequestHandlerOptions) => {
   return http.get<{ courseId: string; moduleId: string }>('*/api/courses/:courseId/modules/:moduleId/quiz-access', async (info: Parameters<HttpResponseResolver<{ courseId: string; moduleId: string }>>[0]) => {
 
@@ -1354,6 +1369,7 @@ export const getHeatLmsApiMock = () => [
   getCaptchaIssueMockHandler(),
   getLearningStructureMockHandler(),
   getLessonContentReadMockHandler(),
+  getQuizDeliveryGetMockHandler(),
   getQuizAccessCheckMockHandler(),
   getDirectoryLookupsListUniversitiesMockHandler(),
   getDirectoryLookupsListFacultiesMockHandler(),
