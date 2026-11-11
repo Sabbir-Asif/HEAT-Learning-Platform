@@ -6,6 +6,7 @@
     ".": "./src/index.ts",
     "./charts": "./src/charts/index.ts",
     "./data": "./src/data/index.ts",
+    "./player": "./src/player/index.ts",
     "./shell": "./src/shell/index.ts",
     "./upload": "./src/upload/index.ts",
     "./styles.css": "./src/styles.css"
@@ -52,6 +53,8 @@
     "@fontsource-variable/source-serif-4": "5.3.1",
     "@tanstack/react-table": "9.3.1",
     "@uppy/core": "6.3.1",
+    "@videojs/hlsjs-video": "10.3.0",
+    "@videojs/react": "10.3.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "lucide-react": "1.70.0",

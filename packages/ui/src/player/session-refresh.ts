@@ -42,7 +42,9 @@ export interface RefreshCoordinatorOptions {
   now?: () => number;
 }
 
-export const createRefreshCoordinator = (options: RefreshCoordinatorOptions): RefreshCoordinator => {
+export const createRefreshCoordinator = (
+  options: RefreshCoordinatorOptions,
+): RefreshCoordinator => {
   const now = options.now ?? Date.now;
   let sessionWindow = sessionWindowOf(options.initialExpiresAt, now());
   let inFlight: Promise<RecoveryOutcome> | null = null;

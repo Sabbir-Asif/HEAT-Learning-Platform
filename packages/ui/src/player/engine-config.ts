@@ -16,11 +16,15 @@ export interface RenditionLike {
   height?: number | undefined;
 }
 
-export const renditionForChoice = (choice: string, renditions: readonly RenditionLike[]): string | null => {
+export const renditionForChoice = (
+  choice: string,
+  renditions: readonly RenditionLike[],
+): string | null => {
   const wanted = Number.parseInt(choice, 10);
   if (!Number.isFinite(wanted)) return null;
   const sized = renditions.filter(
-    (rendition): rendition is RenditionLike & { height: number } => typeof rendition.height === "number",
+    (rendition): rendition is RenditionLike & { height: number } =>
+      typeof rendition.height === "number",
   );
   const exact = sized.find((rendition) => rendition.height === wanted);
   if (exact) return exact.id;
