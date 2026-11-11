@@ -42,6 +42,10 @@ export type FormErrorCopyKey =
   | "ORIGIN_NOT_ALLOWED"
   | "PASSWORD_BREACHED"
   | "PASSWORD_CHANGE_REQUIRED"
+  | "QUIZ_ANSWER_INVALID"
+  | "QUIZ_ATTEMPT_LIMIT_REACHED"
+  | "QUIZ_ATTEMPT_NOT_OPEN"
+  | "QUIZ_ATTEMPT_WAIT"
   | "QUIZ_NOT_UNLOCKED"
   | "RATE_LIMITED"
   | "UNAUTHENTICATED"
@@ -112,6 +116,10 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   ORIGIN_NOT_ALLOWED: "This request did not come from an allowed site.",
   PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
   PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
+  QUIZ_ANSWER_INVALID: "One of the answers does not belong to this quiz. Reload the quiz and try again.",
+  QUIZ_ATTEMPT_LIMIT_REACHED: "You have used all your attempts for this quiz.",
+  QUIZ_ATTEMPT_NOT_OPEN: "This attempt was already submitted or is no longer open. Reload the quiz.",
+  QUIZ_ATTEMPT_WAIT: "You need to wait before you can submit another attempt.",
   QUIZ_NOT_UNLOCKED: "Watch the required videos in this module to unlock the quiz.",
   RATE_LIMITED: "Too many attempts. Wait a little and try again.",
   UNAUTHENTICATED: "Your session has ended. Sign in again to continue.",

@@ -33,6 +33,10 @@ export const errorCodes = [
   "ORIGIN_NOT_ALLOWED",
   "PASSWORD_BREACHED",
   "PASSWORD_CHANGE_REQUIRED",
+  "QUIZ_ANSWER_INVALID",
+  "QUIZ_ATTEMPT_LIMIT_REACHED",
+  "QUIZ_ATTEMPT_NOT_OPEN",
+  "QUIZ_ATTEMPT_WAIT",
   "QUIZ_NOT_UNLOCKED",
   "RATE_LIMITED",
   "UNAUTHENTICATED",
@@ -79,6 +83,10 @@ export const fieldErrorSchema = z.object({
   code: z.enum(fieldErrorCodes),
 });
 
+export const errorDetailsSchema = z.object({
+  nextAttemptAt: z.iso.datetime().optional(),
+});
+
 export const errorResponseSchema = z.object({
   error: z.object({
     code: errorCodeSchema,
@@ -86,8 +94,10 @@ export const errorResponseSchema = z.object({
     requestId: z.string(),
     fields: z.array(fieldErrorSchema).optional(),
     failures: z.array(z.string()).optional(),
+    details: errorDetailsSchema.optional(),
   }),
 });
 
+export type ErrorDetails = z.infer<typeof errorDetailsSchema>;
 export type FieldError = z.infer<typeof fieldErrorSchema>;
 export type ErrorResponse = z.infer<typeof errorResponseSchema>;

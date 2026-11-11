@@ -1,5 +1,5 @@
 import { HttpException } from "@nestjs/common";
-import type { ErrorCode, FieldError } from "@heat/contracts";
+import type { ErrorCode, ErrorDetails, FieldError } from "@heat/contracts";
 
 export class ApiException extends HttpException {
   constructor(
@@ -9,6 +9,7 @@ export class ApiException extends HttpException {
     readonly detail?: string,
     readonly fields?: FieldError[],
     readonly failures?: string[],
+    readonly details?: ErrorDetails,
   ) {
     super(code, status);
   }
