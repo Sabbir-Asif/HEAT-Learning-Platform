@@ -1811,6 +1811,7 @@ export const StudentAuthSignInBody = zod.object({
 
 export const studentAuthSignInResponseEnrollmentsItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const studentAuthSignInResponseUserIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentAuthSignInResponseVerificationEmailSentAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 
 
 export const StudentAuthSignInResponse = zod.object({
@@ -1828,11 +1829,63 @@ export const StudentAuthSignInResponse = zod.object({
   "mustChangePassword": zod.boolean(),
   "name": zod.string().optional(),
   "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT'])
-})
+}),
+  "verificationEmail": zod.union([zod.literal('ON_ITS_WAY'),zod.literal('SENT'),zod.literal('FAILED'),zod.literal(null)]).nullable(),
+  "verificationEmailSentAt": zod.iso.datetime({"offset":true}).regex(studentAuthSignInResponseVerificationEmailSentAtRegExp).nullable()
 })
 
 
 export const StudentAuthSignOutResponse = zod.void()
+
+
+export const verificationConfirmBodyTokenMax = 512;
+
+
+
+export const VerificationConfirmBody = zod.object({
+  "token": zod.string().min(1).max(verificationConfirmBodyTokenMax)
+})
+
+export const verificationConfirmResponseEnrollmentsItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const verificationConfirmResponseUserIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const verificationConfirmResponseVerificationEmailSentAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const VerificationConfirmResponse = zod.object({
+  "enrollments": zod.array(zod.object({
+  "courseId": zod.uuid().regex(verificationConfirmResponseEnrollmentsItemCourseIdRegExp),
+  "courseSlug": zod.string(),
+  "courseTitle": zod.string(),
+  "reason": zod.string().optional(),
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED'])
+})),
+  "user": zod.object({
+  "email": zod.string(),
+  "emailVerified": zod.boolean(),
+  "id": zod.uuid().regex(verificationConfirmResponseUserIdRegExp),
+  "mustChangePassword": zod.boolean(),
+  "name": zod.string().optional(),
+  "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT'])
+}),
+  "verificationEmail": zod.union([zod.literal('ON_ITS_WAY'),zod.literal('SENT'),zod.literal('FAILED'),zod.literal(null)]).nullable(),
+  "verificationEmailSentAt": zod.iso.datetime({"offset":true}).regex(verificationConfirmResponseVerificationEmailSentAtRegExp).nullable()
+})
+
+
+export const verificationResendBodyCaptchaAnswerMax = 12;
+
+export const verificationResendBodyCaptchaIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const VerificationResendBody = zod.object({
+  "captchaAnswer": zod.string().min(1).max(verificationResendBodyCaptchaAnswerMax),
+  "captchaId": zod.uuid().regex(verificationResendBodyCaptchaIdRegExp),
+  "email": zod.string()
+})
+
+export const VerificationResendResponse = zod.object({
+  "accepted": zod.literal(true)
+})
 
 
 export const captchaIssueBodyReplacesRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
@@ -1947,6 +2000,7 @@ export const HealthCheckResponse = zod.object({
 
 export const meDescribeResponseEnrollmentsItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const meDescribeResponseUserIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const meDescribeResponseVerificationEmailSentAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 
 
 export const MeDescribeResponse = zod.object({
@@ -1964,5 +2018,7 @@ export const MeDescribeResponse = zod.object({
   "mustChangePassword": zod.boolean(),
   "name": zod.string().optional(),
   "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT'])
-})
+}),
+  "verificationEmail": zod.union([zod.literal('ON_ITS_WAY'),zod.literal('SENT'),zod.literal('FAILED'),zod.literal(null)]).nullable(),
+  "verificationEmailSentAt": zod.iso.datetime({"offset":true}).regex(meDescribeResponseVerificationEmailSentAtRegExp).nullable()
 })
