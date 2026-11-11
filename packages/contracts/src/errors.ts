@@ -33,6 +33,10 @@ export const errorCodes = [
   "RATE_LIMITED",
   "UNAUTHENTICATED",
   "VALIDATION_FAILED",
+  "VERIFICATION_LINK_EXPIRED",
+  "VERIFICATION_LINK_INVALID",
+  "VERIFICATION_LINK_USED",
+  "VERIFICATION_RESEND_LIMIT",
 ] as const;
 
 export const clientErrorCodes = [

@@ -63,9 +63,31 @@ describe("meResponseSchema", () => {
         mustChangePassword: false,
       },
       enrollments: [],
+      verificationEmail: null,
+      verificationEmailSentAt: null,
     });
 
     expect(parsed.success).toBe(true);
+  });
+
+  test("accepts each verification email status and rejects others", () => {
+    const base = {
+      user: {
+        id: "0190b3a2-7c1e-7a55-9a3b-1f2e3d4c5b6a",
+        email: "a@b.test",
+        role: "STUDENT",
+        emailVerified: false,
+        mustChangePassword: false,
+      },
+      enrollments: [],
+      verificationEmailSentAt: null,
+    };
+    for (const verificationEmail of ["ON_ITS_WAY", "SENT", "FAILED", null]) {
+      expect(meResponseSchema.safeParse({ ...base, verificationEmail }).success).toBe(true);
+    }
+    expect(meResponseSchema.safeParse({ ...base, verificationEmail: "QUEUED" }).success).toBe(
+      false,
+    );
   });
 });
 
