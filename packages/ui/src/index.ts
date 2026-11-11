@@ -33,6 +33,7 @@ export * from "./composites/empty-state";
 export * from "./composites/error-state";
 export * from "./composites/form";
 export * from "./composites/page-header";
+export * from "./composites/sortable-list";
 export * from "./composites/stat-card";
 export * from "./composites/status-badge";
 export { applyServerError } from "./composites/apply-server-error";
