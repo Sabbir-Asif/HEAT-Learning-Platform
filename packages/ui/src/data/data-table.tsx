@@ -11,6 +11,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { Button } from "../components/button";
+import { Checkbox } from "../components/checkbox";
 import {
   Select,
   SelectContent,
@@ -25,6 +26,7 @@ import { ErrorState } from "../composites/error-state";
 import { useIsMobile } from "../hooks/use-mobile";
 import { cn } from "../lib/utils";
 import { Pagination } from "./pagination";
+import { pageSelectionState, toggleId, togglePage } from "./selection";
 import type { PageSize, SortState } from "./url-state";
 
 type DataTableColumn<Row extends RowData> = {
@@ -35,6 +37,12 @@ type DataTableColumn<Row extends RowData> = {
 };
 
 type DataTableStatus = "ready" | "loading" | "error";
+
+type DataTableSelection<Row extends RowData> = {
+  selectedIds: ReadonlySet<string>;
+  onSelectedChange: (ids: ReadonlySet<string>) => void;
+  rowLabel: (row: Row) => string;
+};
 
 type DataTableProps<Row extends RowData> = {
   label: string;
@@ -57,6 +65,7 @@ type DataTableProps<Row extends RowData> = {
   emptyTitle?: string;
   emptyDescription?: string;
   actions?: (row: Row) => React.ReactNode;
+  selection?: DataTableSelection<Row>;
   className?: string;
 };
 
@@ -85,6 +94,7 @@ function DataTable<Row extends RowData>({
   emptyTitle = "Nothing here yet",
   emptyDescription,
   actions,
+  selection,
   className,
 }: DataTableProps<Row>) {
   const isMobile = useIsMobile();
@@ -118,10 +128,33 @@ function DataTable<Row extends RowData>({
   }
 
   const hasActions = actions !== undefined;
+  const pageIds = rows.map((row) => getRowId(row));
+  const pageState = selection ? pageSelectionState(selection.selectedIds, pageIds) : "none";
+  const selectAll = selection ? (
+    <Checkbox
+      aria-label="Select all on this page"
+      checked={pageState === "all"}
+      indeterminate={pageState === "some"}
+      onCheckedChange={() => selection.onSelectedChange(togglePage(selection.selectedIds, pageIds))}
+    />
+  ) : null;
+  const rowCheckbox = (row: Row) =>
+    selection ? (
+      <Checkbox
+        aria-label={selection.rowLabel(row)}
+        checked={selection.selectedIds.has(getRowId(row))}
+        onCheckedChange={() =>
+          selection.onSelectedChange(toggleId(selection.selectedIds, getRowId(row)))
+        }
+      />
+    ) : null;
 
   const body =
     status === "loading" ? (
-      <LoadingRows columns={columns.length + (hasActions ? 1 : 0)} mobile={isMobile} />
+      <LoadingRows
+        columns={columns.length + (hasActions ? 1 : 0) + (selection ? 1 : 0)}
+        mobile={isMobile}
+      />
     ) : rows.length === 0 ? (
       <EmptyRows
         filtersActive={filtersActive}
@@ -134,9 +167,18 @@ function DataTable<Row extends RowData>({
         {sortableIds.size > 0 ? (
           <MobileSort columns={columns} sort={sort} onSortChange={onSortChange} />
         ) : null}
+        {selection ? (
+          <div className="flex items-center gap-2 text-sm">
+            {selectAll}
+            <span>Select all on this page</span>
+          </div>
+        ) : null}
         <ul className="flex flex-col gap-3" aria-label={label}>
           {table.getRowModel().rows.map((row) => (
             <li key={row.id} className="flex flex-col gap-2 rounded-lg border p-3">
+              {selection ? (
+                <div className="flex items-center">{rowCheckbox(row.original)}</div>
+              ) : null}
               <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
                 {row.getAllCells().map((cell) => (
                   <React.Fragment key={cell.id}>
@@ -161,6 +203,7 @@ function DataTable<Row extends RowData>({
         <TableHeader>
           {table.getHeaderGroups().map((group) => (
             <TableRow key={group.id}>
+              {selection ? <TableHead className="w-8">{selectAll}</TableHead> : null}
               {group.headers.map((header) => {
                 const direction =
                   sort?.id === header.column.id ? (sort.desc ? "desc" : "asc") : false;
@@ -202,7 +245,11 @@ function DataTable<Row extends RowData>({
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
+            <TableRow
+              key={row.id}
+              data-state={selection?.selectedIds.has(row.id) ? "selected" : undefined}
+            >
+              {selection ? <TableCell>{rowCheckbox(row.original)}</TableCell> : null}
               {row.getAllCells().map((cell) => (
                 <TableCell key={cell.id}>
                   <table.FlexRender cell={cell} />
@@ -337,4 +384,4 @@ function EmptyRows({ filtersActive, onClearFilters, title, description }: EmptyR
 }
 
 export { DataTable };
-export type { DataTableColumn, DataTableProps, DataTableStatus };
+export type { DataTableColumn, DataTableProps, DataTableSelection, DataTableStatus };

@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { AuditModule } from "../audit";
 import { CoreModule } from "../core";
+import { ContentLockService } from "./content-lock.service";
 import { CourseLookupService } from "./course-lookup.service";
 import { CoursesController } from "./courses.controller";
 import { CoursesService } from "./courses.service";
@@ -16,10 +17,11 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
   providers: [
     CoursesService,
     CourseLookupService,
+    ContentLockService,
     ModulesService,
     LessonSectionsService,
     { provide: COURSE_PUBLISH_CHECKS, useValue: [] },
   ],
-  exports: [CoursesService, CourseLookupService, COURSE_PUBLISH_CHECKS],
+  exports: [CoursesService, CourseLookupService, ContentLockService, COURSE_PUBLISH_CHECKS],
 })
 export class CatalogModule {}

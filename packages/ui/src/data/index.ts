@@ -1,6 +1,8 @@
 export * from "./data-table";
 export * from "./filter-bar";
 export * from "./pagination";
+export { pageSelectionState, toggleId, togglePage } from "./selection";
+export type { PageSelectionState } from "./selection";
 export * from "./use-table-url-state";
 export { defaultPageSize, pageSizes } from "./url-state";
 export type { PageSize, SortState } from "./url-state";

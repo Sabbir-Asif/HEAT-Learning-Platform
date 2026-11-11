@@ -31,8 +31,13 @@ import type {
   AdminSignInRequestDto,
   AdminSummaryDto,
   AdminUsersListParams,
+  ApprovalQueueResponseDto,
+  ApproveEnrollmentRequestDto,
+  ApproveEnrollmentsRequestDto,
+  ApprovedEnrollmentDto,
   AuditLogListParams,
   AuditLogListResponseDto,
+  BulkApprovalResponseDto,
   CaptchaRequestDto,
   CaptchaResponseDto,
   ChangePasswordRequestDto,
@@ -50,6 +55,7 @@ import type {
   DepartmentsListParams,
   DirectoryOptionListResponseDto,
   EnrollmentAcceptedResponseDto,
+  EnrollmentApprovalListPendingParams,
   EnrollmentRequestDto,
   FacultiesListParams,
   FacultyListResponseDto,
@@ -4331,6 +4337,273 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getUniversitiesRestoreMutationOptions(options), queryClient);
+    }
+
+export const getEnrollmentApprovalApproveManyUrl = () => {
+
+
+
+
+  return `/api/admin/enrollments/approve`
+}
+
+export const enrollmentApprovalApproveMany = async (approveEnrollmentsRequestDto: ApproveEnrollmentsRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<BulkApprovalResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<BulkApprovalResponseDto>(getEnrollmentApprovalApproveManyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(approveEnrollmentsRequestDto)
+  }
+);}
+
+
+
+
+
+export const getEnrollmentApprovalApproveManyMutationKey = () => ['enrollmentApprovalApproveMany'] as const;
+
+export const getEnrollmentApprovalApproveManyMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentApprovalApproveMany>>, TError,EnrollmentApprovalApproveManyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof enrollmentApprovalApproveMany>>, TError,EnrollmentApprovalApproveManyMutationVariables, TContext> => {
+
+const mutationKey = getEnrollmentApprovalApproveManyMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof enrollmentApprovalApproveMany>>, EnrollmentApprovalApproveManyMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  enrollmentApprovalApproveMany(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EnrollmentApprovalApproveManyMutationResult = NonNullable<Awaited<ReturnType<typeof enrollmentApprovalApproveMany>>>
+    export type EnrollmentApprovalApproveManyMutationBody = ApproveEnrollmentsRequestDto
+    export type EnrollmentApprovalApproveManyMutationError = ErrorType<unknown>
+    export type EnrollmentApprovalApproveManyMutationVariables = {data: ApproveEnrollmentsRequestDto}
+
+    export const useEnrollmentApprovalApproveMany = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentApprovalApproveMany>>, TError,EnrollmentApprovalApproveManyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof enrollmentApprovalApproveMany>>,
+        TError,
+        EnrollmentApprovalApproveManyMutationVariables,
+        TContext
+      > => {
+      return useMutation(getEnrollmentApprovalApproveManyMutationOptions(options), queryClient);
+    }
+
+export const getEnrollmentApprovalListPendingUrl = (params?: EnrollmentApprovalListPendingParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/enrollments/pending?${stringifiedParams}` : `/api/admin/enrollments/pending`
+}
+
+export const enrollmentApprovalListPending = async (params?: EnrollmentApprovalListPendingParams, options?: Parameters<typeof customFetch>[1]): Promise<ApprovalQueueResponseDto> => {
+
+  return customFetch<ApprovalQueueResponseDto>(getEnrollmentApprovalListPendingUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getEnrollmentApprovalListPendingQueryKey = (params?: EnrollmentApprovalListPendingParams,) => {
+    return [
+    `/api/admin/enrollments/pending`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getEnrollmentApprovalListPendingQueryOptions = <TData = Awaited<ReturnType<typeof enrollmentApprovalListPending>>, TError = ErrorType<unknown>>(params?: EnrollmentApprovalListPendingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof enrollmentApprovalListPending>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getEnrollmentApprovalListPendingQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof enrollmentApprovalListPending>>> = ({ signal }) => enrollmentApprovalListPending(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof enrollmentApprovalListPending>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type EnrollmentApprovalListPendingQueryResult = NonNullable<Awaited<ReturnType<typeof enrollmentApprovalListPending>>>
+export type EnrollmentApprovalListPendingQueryError = ErrorType<unknown>
+
+
+export function useEnrollmentApprovalListPending<TData = Awaited<ReturnType<typeof enrollmentApprovalListPending>>, TError = ErrorType<unknown>>(
+ params: undefined |  EnrollmentApprovalListPendingParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof enrollmentApprovalListPending>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof enrollmentApprovalListPending>>,
+          TError,
+          Awaited<ReturnType<typeof enrollmentApprovalListPending>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEnrollmentApprovalListPending<TData = Awaited<ReturnType<typeof enrollmentApprovalListPending>>, TError = ErrorType<unknown>>(
+ params?: EnrollmentApprovalListPendingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof enrollmentApprovalListPending>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof enrollmentApprovalListPending>>,
+          TError,
+          Awaited<ReturnType<typeof enrollmentApprovalListPending>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEnrollmentApprovalListPending<TData = Awaited<ReturnType<typeof enrollmentApprovalListPending>>, TError = ErrorType<unknown>>(
+ params?: EnrollmentApprovalListPendingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof enrollmentApprovalListPending>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useEnrollmentApprovalListPending<TData = Awaited<ReturnType<typeof enrollmentApprovalListPending>>, TError = ErrorType<unknown>>(
+ params?: EnrollmentApprovalListPendingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof enrollmentApprovalListPending>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getEnrollmentApprovalListPendingQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getEnrollmentApprovalApproveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/enrollments/${id}/approve`
+}
+
+export const enrollmentApprovalApprove = async (id: string,
+    approveEnrollmentRequestDto: ApproveEnrollmentRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<ApprovedEnrollmentDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ApprovedEnrollmentDto>(getEnrollmentApprovalApproveUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(approveEnrollmentRequestDto)
+  }
+);}
+
+
+
+
+
+export const getEnrollmentApprovalApproveMutationKey = () => ['enrollmentApprovalApprove'] as const;
+
+export const getEnrollmentApprovalApproveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentApprovalApprove>>, TError,EnrollmentApprovalApproveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof enrollmentApprovalApprove>>, TError,EnrollmentApprovalApproveMutationVariables, TContext> => {
+
+const mutationKey = getEnrollmentApprovalApproveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof enrollmentApprovalApprove>>, EnrollmentApprovalApproveMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  enrollmentApprovalApprove(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EnrollmentApprovalApproveMutationResult = NonNullable<Awaited<ReturnType<typeof enrollmentApprovalApprove>>>
+    export type EnrollmentApprovalApproveMutationBody = ApproveEnrollmentRequestDto
+    export type EnrollmentApprovalApproveMutationError = ErrorType<unknown>
+    export type EnrollmentApprovalApproveMutationVariables = {id: string;data: ApproveEnrollmentRequestDto}
+
+    export const useEnrollmentApprovalApprove = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentApprovalApprove>>, TError,EnrollmentApprovalApproveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof enrollmentApprovalApprove>>,
+        TError,
+        EnrollmentApprovalApproveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getEnrollmentApprovalApproveMutationOptions(options), queryClient);
     }
 
 export const getAdminMeDescribeUrl = () => {

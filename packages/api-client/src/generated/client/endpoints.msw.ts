@@ -25,7 +25,12 @@ import type {
   AdminMeResponseDto,
   AdminSignInRequestDto,
   AdminSummaryDto,
+  ApprovalQueueResponseDto,
+  ApproveEnrollmentRequestDto,
+  ApproveEnrollmentsRequestDto,
+  ApprovedEnrollmentDto,
   AuditLogListResponseDto,
+  BulkApprovalResponseDto,
   CaptchaRequestDto,
   CaptchaResponseDto,
   ChangePasswordRequestDto,
@@ -152,6 +157,12 @@ export const getUniversitiesUpdateResponseMock = (overrideResponse: Partial<Extr
 export const getUniversitiesArchiveResponseMock = (overrideResponse: Partial<Extract<UniversitySummaryDto, object>> = {}): UniversitySummaryDto => ({archivedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', departmentCount: faker.number.int({min: 0, max: 9007199254740991}), facultyCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), studentCount: faker.number.int({min: 0, max: 9007199254740991}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 export const getUniversitiesRestoreResponseMock = (overrideResponse: Partial<Extract<UniversitySummaryDto, object>> = {}): UniversitySummaryDto => ({archivedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', departmentCount: faker.number.int({min: 0, max: 9007199254740991}), facultyCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), studentCount: faker.number.int({min: 0, max: 9007199254740991}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getEnrollmentApprovalApproveManyResponseMock = (overrideResponse: Partial<Extract<BulkApprovalResponseDto, object>> = {}): BulkApprovalResponseDto => ({failed: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement(['AUDIT_ACTOR_FILTER_TOO_BROAD','BAD_REQUEST','CANNOT_DEACTIVATE_SELF','CAPTCHA_EXPIRED','CAPTCHA_INVALID','CONTENT_LOCKED','COURSE_HAS_ENROLLMENTS','COURSE_LOCKED','COURSE_NOT_AVAILABLE','COURSE_NOT_DRAFT','COURSE_PUBLISH_CHECKS_FAILED','COURSE_SLUG_TAKEN','CSRF_TOKEN_INVALID','DIRECTORY_ARCHIVED','DIRECTORY_IN_USE','DIRECTORY_NAME_TAKEN','EMAIL_IN_USE','ENROLLMENT_ALREADY_DECIDED','ENROLLMENT_NOT_ACTIVE','ENROLLMENT_NOT_VERIFIED','FORBIDDEN','INTERNAL','INVALID_CREDENTIALS','INVITATION_EXPIRED','INVITATION_INVALID','INVITATION_NOT_PENDING','NOT_FOUND','ORDER_CONFLICT','ORIGIN_NOT_ALLOWED','PASSWORD_BREACHED','PASSWORD_CHANGE_REQUIRED','RATE_LIMITED','UNAUTHENTICATED','VALIDATION_FAILED','VERIFICATION_LINK_EXPIRED','VERIFICATION_LINK_INVALID','VERIFICATION_LINK_USED','VERIFICATION_RESEND_LIMIT'] as const), id: faker.string.uuid()})), succeeded: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), ...overrideResponse})
+
+export const getEnrollmentApprovalListPendingResponseMock = (overrideResponse: Partial<Extract<ApprovalQueueResponseDto, object>> = {}): ApprovalQueueResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({course: {id: faker.string.uuid(), title: faker.string.alpha({length: {min: 10, max: 20}})}, department: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, id: faker.string.uuid(), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', session: faker.string.alpha({length: {min: 10, max: 20}}), student: {email: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}})}, university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, verifiedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
+
+export const getEnrollmentApprovalApproveResponseMock = (overrideResponse: Partial<Extract<ApprovedEnrollmentDto, object>> = {}): ApprovedEnrollmentDto => ({approvedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', courseRevisionId: faker.string.uuid(), id: faker.string.uuid(), status: faker.helpers.arrayElement(['APPROVED'] as const), ...overrideResponse})
 
 export const getAdminMeDescribeResponseMock = (overrideResponse: Partial<Extract<AdminMeResponseDto, object>> = {}): AdminMeResponseDto => ({user: {email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
 
@@ -784,6 +795,42 @@ export const getUniversitiesRestoreMockHandler = (overrideResponse?: UniversityS
   }, options)
 }
 
+export const getEnrollmentApprovalApproveManyMockHandler = (overrideResponse?: BulkApprovalResponseDto | ((info: Parameters<HttpResponseResolver<PathParams, ApproveEnrollmentsRequestDto>>[0]) => Promise<BulkApprovalResponseDto> | BulkApprovalResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, ApproveEnrollmentsRequestDto>('*/api/admin/enrollments/approve', async (info: Parameters<HttpResponseResolver<PathParams, ApproveEnrollmentsRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getEnrollmentApprovalApproveManyResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getEnrollmentApprovalListPendingMockHandler = (overrideResponse?: ApprovalQueueResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<ApprovalQueueResponseDto> | ApprovalQueueResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/enrollments/pending', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getEnrollmentApprovalListPendingResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getEnrollmentApprovalApproveMockHandler = (overrideResponse?: ApprovedEnrollmentDto | ((info: Parameters<HttpResponseResolver<{ id: string }, ApproveEnrollmentRequestDto>>[0]) => Promise<ApprovedEnrollmentDto> | ApprovedEnrollmentDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string }, ApproveEnrollmentRequestDto>('*/api/admin/enrollments/:id/approve', async (info: Parameters<HttpResponseResolver<{ id: string }, ApproveEnrollmentRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getEnrollmentApprovalApproveResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getAdminMeDescribeMockHandler = (overrideResponse?: AdminMeResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<AdminMeResponseDto> | AdminMeResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/admin/me', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1000,6 +1047,9 @@ export const getHeatLmsApiMock = () => [
   getUniversitiesUpdateMockHandler(),
   getUniversitiesArchiveMockHandler(),
   getUniversitiesRestoreMockHandler(),
+  getEnrollmentApprovalApproveManyMockHandler(),
+  getEnrollmentApprovalListPendingMockHandler(),
+  getEnrollmentApprovalApproveMockHandler(),
   getAdminMeDescribeMockHandler(),
   getStudentAuthCsrfTokenMockHandler(),
   getStudentAuthRefreshMockHandler(),
