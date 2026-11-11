@@ -11,7 +11,7 @@ import { studentCsrf } from "@heat/contracts";
 import type { ProgressResponse } from "@heat/contracts";
 import type { PlayerProgress } from "@heat/ui/player";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { createBeaconSender, createProgressReporter } from "./progress-reporter";
 import type { ReporterStorage } from "./progress-reporter";
 
@@ -45,18 +45,12 @@ export function useProgressReporting({
 }: ProgressReportingOptions): (progress: PlayerProgress) => void {
   const queryClient = useQueryClient();
   const { mutateAsync } = useProgressRecord();
-  const sendRef = useRef(mutateAsync);
-  const lastResponseRef = useRef<ProgressResponse | null>(null);
-
-  useEffect(() => {
-    sendRef.current = mutateAsync;
-  }, [mutateAsync]);
-
   const reporter = useMemo(() => {
     if (sessionId === null) return null;
+    let last: ProgressResponse | null = null;
     return createProgressReporter({
       sessionId,
-      send: (batch) => sendRef.current({ id: videoId, data: batch }),
+      send: (batch) => mutateAsync({ id: videoId, data: batch }),
       beacon: createBeaconSender({
         url: getProgressRecordUrl(videoId),
         readToken: () => readDocumentCookie(studentCsrf.cookie),
@@ -69,19 +63,19 @@ export function useProgressReporting({
       storage: browserStorage(),
       storageKey: storageKeyFor(videoId),
       onAccepted: (response) => {
-        const last = lastResponseRef.current;
-        lastResponseRef.current = response;
+        const previous = last;
+        last = response;
         if (
-          last !== null &&
-          last.coveragePercent === response.coveragePercent &&
-          last.completed === response.completed
+          previous !== null &&
+          previous.coveragePercent === response.coveragePercent &&
+          previous.completed === response.completed
         ) {
           return;
         }
         void queryClient.invalidateQueries({ queryKey: getLearningStructureQueryKey(courseId) });
       },
     });
-  }, [sessionId, videoId, courseId, queryClient]);
+  }, [sessionId, videoId, courseId, queryClient, mutateAsync]);
 
   useEffect(() => {
     if (reporter === null) return;
