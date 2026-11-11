@@ -33,7 +33,7 @@ const enrollmentRow = (overrides: object = {}) => ({
   ...overrides,
 });
 
-const moduleRows = () => [
+const moduleRows = (quizOverrides: object = {}) => [
   {
     id: ids.m1,
     order: 1,
@@ -63,6 +63,7 @@ const moduleRows = () => [
       waitMinutes: 10,
       deletedAt: null,
       _count: { questions: 5 },
+      ...quizOverrides,
     },
   },
   {
@@ -280,10 +281,7 @@ describe("LearningStructureService.describe", () => {
   });
 
   test("a soft-deleted quiz is not exposed", async () => {
-    const rows = moduleRows();
-    const first = rows[0] as { quiz: { deletedAt: Date } };
-    first.quiz.deletedAt = now;
-    const { service } = build({ modules: rows });
+    const { service } = build({ modules: moduleRows({ deletedAt: now }) });
 
     expect((await service.describe("u1", ids.course)).modules[0]?.quiz).toBeNull();
   });
