@@ -102,19 +102,21 @@ describe("StudentPlaybackService.start", () => {
     await expect(service.start("u1", videoId)).resolves.toBeDefined();
   });
 
-  test.each(["PENDING_APPROVAL", "REJECTED", "REMOVED"])(
-    "refuses a %s enrollment and signs nothing",
-    async (status) => {
-      const { service, issue, database } = build({
-        enrollment: { id: "e1", status, courseRevisionId: "rev1" },
-      });
-      await expect(service.start("u1", videoId)).rejects.toMatchObject({
-        code: "ENROLLMENT_NOT_ACTIVE",
-      });
-      expect(issue).not.toHaveBeenCalled();
-      expect(database.playbackSession.create).not.toHaveBeenCalled();
-    },
-  );
+  test.each([
+    ["PENDING_VERIFICATION", null],
+    ["PENDING_APPROVAL", null],
+    ["REJECTED", null],
+    ["REMOVED", "rev1"],
+  ])("refuses a %s enrollment and signs nothing", async (status, courseRevisionId) => {
+    const { service, issue, database } = build({
+      enrollment: { id: "e1", status, courseRevisionId },
+    });
+    await expect(service.start("u1", videoId)).rejects.toMatchObject({
+      code: "ENROLLMENT_NOT_ACTIVE",
+    });
+    expect(issue).not.toHaveBeenCalled();
+    expect(database.playbackSession.create).not.toHaveBeenCalled();
+  });
 
   test("refuses a student with no enrollment in the course", async () => {
     const { service } = build({ enrollment: null });

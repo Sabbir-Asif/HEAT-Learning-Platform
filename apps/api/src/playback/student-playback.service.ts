@@ -43,7 +43,12 @@ export class StudentPlaybackService {
       where: { userId, courseId: video.module.revision.courseId, deletedAt: null },
       select: { id: true, status: true, courseRevisionId: true },
     });
-    if (enrollment !== null && enrollment.courseRevisionId !== video.module.revisionId) {
+    const playable = enrollment?.status === "APPROVED" || enrollment?.status === "COMPLETED";
+    if (
+      enrollment !== null &&
+      playable &&
+      enrollment.courseRevisionId !== video.module.revisionId
+    ) {
       throw new NotFoundException();
     }
     const progress =
