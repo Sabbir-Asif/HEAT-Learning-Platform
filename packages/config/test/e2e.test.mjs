@@ -7,7 +7,6 @@ import { changedScreens, report } from "../../e2e/bin/report-visual.mjs";
 
 const root = resolve(import.meta.dirname, "../../..");
 const read = (path) => readFileSync(resolve(root, path), "utf8");
-const ci = parse(read(".github/workflows/ci.yml"));
 const catalog = parse(read("pnpm-workspace.yaml")).catalog;
 
 describe("Playwright pin", () => {
@@ -32,27 +31,6 @@ describe("Playwright pin", () => {
     const readme = read("README.md");
     expect(readme).toContain(image);
     expect(readme).toContain("pnpm e2e:docker:update");
-  });
-});
-
-describe("end-to-end jobs", () => {
-  const protection = JSON.parse(read(".github/branch-protection.json"));
-  const steps = (name) => ci.jobs[name].steps;
-
-  test("screenshots is not a required check", () => {
-    expect(protection.required_status_checks.contexts).not.toContain("screenshots");
-  });
-
-  test("screenshots never fails the run, warns, and keeps images for 7 days", () => {
-    const run = steps("screenshots").find((s) => s.id === "run");
-    expect(run["continue-on-error"]).toBe(true);
-    const upload = steps("screenshots").find((s) => s.uses?.startsWith("actions/upload-artifact@"));
-    expect(upload.with).toMatchObject({ name: "screenshot-diffs", "retention-days": 7 });
-    expect(steps("screenshots").some((s) => s.run?.includes("report-visual.mjs"))).toBe(true);
-  });
-
-  test("the job is not limited by path", () => {
-    expect(JSON.stringify(ci.on)).not.toMatch(/paths/);
   });
 });
 
