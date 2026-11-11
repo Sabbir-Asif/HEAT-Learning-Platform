@@ -24,6 +24,17 @@ describe("DepartmentOfferingService.assertDepartmentOfferable", () => {
     });
   });
 
+  test("also matches the university and faculty the department sits under", async () => {
+    const { service, database } = build({ id });
+    const parents = { universityId: "u-1", facultyId: "f-1" };
+
+    await service.assertDepartmentOfferable(id, database as never, parents);
+
+    expect(database.department.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ id, ...parents }) }),
+    );
+  });
+
   test("refuses an archived, hidden or unknown department with a field error on departmentId", async () => {
     const { service } = build(null);
 

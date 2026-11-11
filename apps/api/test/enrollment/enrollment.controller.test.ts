@@ -4,13 +4,19 @@ import { describe, expect, test, vi } from "vitest";
 import { EnrollmentController } from "../../src/enrollment/enrollment.controller";
 
 describe("EnrollmentController.submit", () => {
-  test("hands the body to the service", async () => {
+  test("hands the body and the request actor to the service", async () => {
     const submit = vi.fn().mockResolvedValue({ accepted: true });
     const controller = new EnrollmentController({ submit } as never);
     const body = { email: "anne@example.com" };
 
-    expect(await controller.submit(body as never)).toEqual({ accepted: true });
-    expect(submit).toHaveBeenCalledWith(body);
+    const request = { ip: "203.0.113.4", headers: { "x-request-id": "req-1" } };
+
+    expect(await controller.submit(body as never, request as never)).toEqual({ accepted: true });
+    expect(submit).toHaveBeenCalledWith(body, {
+      actorId: null,
+      ipAddress: "203.0.113.4",
+      requestId: "req-1",
+    });
   });
 
   test("is public and limited by the enrollment profile", () => {

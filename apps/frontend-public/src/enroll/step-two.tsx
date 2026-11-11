@@ -33,11 +33,12 @@ const emptyStepTwo: EnrollmentStepTwoInput = {
 };
 
 interface StepTwoProps {
+  courseSlug: string;
   onBack: () => void;
   onSuccess: (email: string) => void;
 }
 
-export function StepTwo({ onBack, onSuccess }: StepTwoProps) {
+export function StepTwo({ courseSlug, onBack, onSuccess }: StepTwoProps) {
   const form = useForm<EnrollmentStepTwoInput, unknown, EnrollmentStepTwo>({
     resolver: zodResolver(enrollmentStepTwoSchema),
     defaultValues: emptyStepTwo,
@@ -57,7 +58,7 @@ export function StepTwo({ onBack, onSuccess }: StepTwoProps) {
       return;
     }
     try {
-      await submit.mutateAsync({ data: { ...stepOne.data, ...values } });
+      await submit.mutateAsync({ data: { ...stepOne.data, ...values, courseSlug } });
     } catch (error) {
       const failure = classifySubmitError(error);
       if (failure.refreshCaptcha) {

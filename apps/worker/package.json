@@ -18,14 +18,20 @@
     "@heat/db": "workspace:*",
     "@nestjs/common": "^12.4.0",
     "@nestjs/core": "^12.4.0",
+    "@react-email/components": "^1.0.12",
+    "@react-email/render": "^2.3.0",
     "api": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@heat/config": "workspace:*",
     "@nestjs/cli": "^12.0.12",
     "@types/node": "catalog:",
+    "@types/react": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:",

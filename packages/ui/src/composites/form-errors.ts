@@ -18,6 +18,7 @@ export type FormErrorCopyKey =
   | "CONTENT_LOCKED"
   | "COURSE_HAS_ENROLLMENTS"
   | "COURSE_LOCKED"
+  | "COURSE_NOT_AVAILABLE"
   | "COURSE_NOT_DRAFT"
   | "COURSE_PUBLISH_CHECKS_FAILED"
   | "COURSE_SLUG_TAKEN"
@@ -71,6 +72,7 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
     "This course is locked. Modules and sections cannot be added, removed or reordered.",
   COURSE_HAS_ENROLLMENTS: "This course has enrollments, so it cannot be deleted.",
   COURSE_LOCKED: "This course is locked. Only the description and thumbnail can be changed.",
+  COURSE_NOT_AVAILABLE: "This course is not open for enrollment.",
   COURSE_NOT_DRAFT: "This action is only available for a draft course.",
   COURSE_PUBLISH_CHECKS_FAILED: "The course is not ready to publish.",
   COURSE_SLUG_TAKEN: "A course with this slug already exists.",

@@ -62,7 +62,7 @@ async function mount() {
   await act(async () =>
     root?.render(
       <QueryClientProvider client={client}>
-        <EnrollWizard />
+        <EnrollWizard courseSlug="gender-safety" />
       </QueryClientProvider>,
     ),
   );

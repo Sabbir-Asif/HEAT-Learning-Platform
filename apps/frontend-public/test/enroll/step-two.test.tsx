@@ -77,7 +77,7 @@ async function openStepTwo() {
   await act(async () =>
     root?.render(
       <QueryClientProvider client={client}>
-        <EnrollWizard />
+        <EnrollWizard courseSlug="gender-safety" />
       </QueryClientProvider>,
     ),
   );
@@ -188,8 +188,21 @@ describe("EnrollWizard step two", () => {
       confirmPassword: password,
       captchaId: firstCaptcha,
       captchaAnswer: "AB12",
+      courseSlug: "gender-safety",
     });
     expect(sessionStorage.getItem(stepOneStorageKey)).toBeNull();
+  });
+
+  test("shows the course message when the course is not open", async () => {
+    enrollmentResponse = () => apiError("COURSE_NOT_AVAILABLE", 404);
+    const view = await openStepTwo();
+    await fillValid(view);
+
+    await submitForm();
+
+    await vi.waitFor(() =>
+      expect(view.textContent).toContain("This course is not open for enrollment."),
+    );
   });
 
   test("never writes the password to storage", async () => {
