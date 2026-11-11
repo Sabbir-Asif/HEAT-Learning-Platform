@@ -2160,10 +2160,9 @@
             "items": {
               "properties": {
                 "assetKey": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
+                  "maxLength": 128,
+                  "nullable": true,
+                  "type": "string"
                 },
                 "id": {
                   "format": "uuid",

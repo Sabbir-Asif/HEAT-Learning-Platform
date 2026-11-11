@@ -34,7 +34,7 @@ export const videoSlotSummarySchema = z.object({
   title: z.string(),
   required: z.boolean(),
   status: videoSlotStatusSchema,
-  assetKey: z.string().nullable(),
+  assetKey: z.string().max(128).nullable(),
 });
 
 export type VideoSlotSummary = z.infer<typeof videoSlotSummarySchema>;
