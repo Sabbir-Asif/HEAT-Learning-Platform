@@ -18,7 +18,12 @@ export type AdminActor = AuditActor & { actorId: string };
 type ApprovalTransaction = ContentLockTransaction &
   Pick<
     HeatClient,
-    "enrollment" | "moduleProgress" | "enrollmentDecision" | "outbox" | "auditLog" | "courseRevision"
+    | "enrollment"
+    | "moduleProgress"
+    | "enrollmentDecision"
+    | "outbox"
+    | "auditLog"
+    | "courseRevision"
   >;
 
 @Injectable()
@@ -123,7 +128,8 @@ export class EnrollmentApprovalService {
       where: { id },
       select: { status: true },
     });
-    const refusal = current === null ? null : approvalRefusal(current.status as EnrollmentStatusName);
+    const refusal =
+      current === null ? null : approvalRefusal(current.status as EnrollmentStatusName);
     throw refusal ?? new ApiException(409, "ENROLLMENT_ALREADY_DECIDED");
   }
 }

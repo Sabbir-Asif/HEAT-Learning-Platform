@@ -33,9 +33,7 @@ describe("approvalQueueQuerySchema", () => {
   });
 
   test("rejects a malformed date and an inverted range", () => {
-    expect(approvalQueueQuerySchema.safeParse({ submittedFrom: "01/11/2026" }).success).toBe(
-      false,
-    );
+    expect(approvalQueueQuerySchema.safeParse({ submittedFrom: "01/11/2026" }).success).toBe(false);
     expect(
       approvalQueueQuerySchema.safeParse({
         submittedFrom: "2026-11-30",
