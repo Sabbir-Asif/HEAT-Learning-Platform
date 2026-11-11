@@ -345,6 +345,7 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   INVITATION_EXPIRED: 'INVITATION_EXPIRED',
   INVITATION_INVALID: 'INVITATION_INVALID',
   INVITATION_NOT_PENDING: 'INVITATION_NOT_PENDING',
+  MODULE_LOCKED: 'MODULE_LOCKED',
   NOT_FOUND: 'NOT_FOUND',
   ORDER_CONFLICT: 'ORDER_CONFLICT',
   ORIGIN_NOT_ALLOWED: 'ORIGIN_NOT_ALLOWED',
@@ -362,6 +363,7 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   VERIFICATION_LINK_USED: 'VERIFICATION_LINK_USED',
   VERIFICATION_RESEND_LIMIT: 'VERIFICATION_RESEND_LIMIT',
   VIDEO_NOT_FAILED: 'VIDEO_NOT_FAILED',
+  VIDEO_NOT_READY: 'VIDEO_NOT_READY',
 } as const;
 
 export type BulkApprovalResponseDtoFailedItem = {
@@ -991,9 +993,29 @@ export interface ModuleSummaryDto {
   updatedAt: string;
 }
 
+export type PlaybackSessionResponseDtoCaptionsItem = {
+  /**
+     * @minLength 1
+     * @maxLength 35
+     */
+  language: string;
+};
+
 export interface PlaybackSessionResponseDto {
+  captions: PlaybackSessionResponseDtoCaptionsItem[];
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   expiresAt: string;
+  manifestPath: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  resumePositionSeconds: number;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  sessionId: string | null;
 }
 
 export type QuizQuestionRequestDtoOptionsItem = {
@@ -3583,7 +3605,7 @@ export const adminMeDescribe = async ( options?: Parameters<typeof serverFetch>[
 
 
 
-export const getPlaybackIssueUrl = (videoId: string,) => {
+export const getAdminPlaybackPreviewUrl = (videoId: string,) => {
 
 
 
@@ -3591,9 +3613,9 @@ export const getPlaybackIssueUrl = (videoId: string,) => {
   return `/api/admin/playback-sessions/${videoId}`
 }
 
-export const playbackIssue = async (videoId: string, options?: Parameters<typeof serverFetch>[1]): Promise<PlaybackSessionResponseDto> => {
+export const adminPlaybackPreview = async (videoId: string, options?: Parameters<typeof serverFetch>[1]): Promise<PlaybackSessionResponseDto> => {
 
-  return serverFetch<PlaybackSessionResponseDto>(getPlaybackIssueUrl(videoId),
+  return serverFetch<PlaybackSessionResponseDto>(getAdminPlaybackPreviewUrl(videoId),
   {
     ...options,
     method: 'POST'
@@ -3942,6 +3964,48 @@ export const meDescribe = async ( options?: Parameters<typeof serverFetch>[1]): 
   {
     ...options,
     method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getStudentPlaybackStartUrl = (id: string,) => {
+
+
+
+
+  return `/api/videos/${id}/playback-session`
+}
+
+export const studentPlaybackStart = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<PlaybackSessionResponseDto> => {
+
+  return serverFetch<PlaybackSessionResponseDto>(getStudentPlaybackStartUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getStudentPlaybackRefreshUrl = (id: string,) => {
+
+
+
+
+  return `/api/videos/${id}/playback-session/refresh`
+}
+
+export const studentPlaybackRefresh = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<PlaybackSessionResponseDto> => {
+
+  return serverFetch<PlaybackSessionResponseDto>(getStudentPlaybackRefreshUrl(id),
+  {
+    ...options,
+    method: 'POST'
 
 
   }

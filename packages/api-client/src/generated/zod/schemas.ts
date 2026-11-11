@@ -2393,7 +2393,7 @@ export const enrollmentApprovalApproveManyResponseSucceededItemRegExp = new RegE
 
 export const EnrollmentApprovalApproveManyResponse = zod.object({
   "failed": zod.array(zod.object({
-  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_VERIFIED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'RATE_LIMITED', 'UNAUTHENTICATED', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED']),
+  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_VERIFIED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'MODULE_LOCKED', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'RATE_LIMITED', 'UNAUTHENTICATED', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED', 'VIDEO_NOT_READY']),
   "id": zod.uuid().regex(enrollmentApprovalApproveManyResponseFailedItemIdRegExp)
 })),
   "succeeded": zod.array(zod.uuid().regex(enrollmentApprovalApproveManyResponseSucceededItemRegExp))
@@ -2520,15 +2520,30 @@ export const AdminMeDescribeResponse = zod.object({
 })
 
 
-export const PlaybackIssueParams = zod.object({
-  "videoId": zod.string()
+export const adminPlaybackPreviewPathVideoIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminPlaybackPreviewParams = zod.object({
+  "videoId": zod.uuid().regex(adminPlaybackPreviewPathVideoIdRegExp)
 })
 
-export const playbackIssueResponseExpiresAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminPlaybackPreviewResponseCaptionsItemLanguageMax = 35;
+
+export const adminPlaybackPreviewResponseExpiresAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminPlaybackPreviewResponseResumePositionSecondsMin = 0;
+export const adminPlaybackPreviewResponseResumePositionSecondsMax = 9007199254740991;
+
+export const adminPlaybackPreviewResponseSessionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 
-export const PlaybackIssueResponse = zod.object({
-  "expiresAt": zod.iso.datetime({"offset":true}).regex(playbackIssueResponseExpiresAtRegExp)
+export const AdminPlaybackPreviewResponse = zod.object({
+  "captions": zod.array(zod.object({
+  "language": zod.string().min(1).max(adminPlaybackPreviewResponseCaptionsItemLanguageMax)
+})),
+  "expiresAt": zod.iso.datetime({"offset":true}).regex(adminPlaybackPreviewResponseExpiresAtRegExp),
+  "manifestPath": zod.string(),
+  "resumePositionSeconds": zod.int().min(adminPlaybackPreviewResponseResumePositionSecondsMin).max(adminPlaybackPreviewResponseResumePositionSecondsMax),
+  "sessionId": zod.uuid().regex(adminPlaybackPreviewResponseSessionIdRegExp).nullable()
 })
 
 
@@ -2761,4 +2776,58 @@ export const MeDescribeResponse = zod.object({
 }),
   "verificationEmail": zod.union([zod.literal('ON_ITS_WAY'),zod.literal('SENT'),zod.literal('FAILED'),zod.literal(null)]).nullable(),
   "verificationEmailSentAt": zod.iso.datetime({"offset":true}).regex(meDescribeResponseVerificationEmailSentAtRegExp).nullable()
+})
+
+
+export const studentPlaybackStartPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const StudentPlaybackStartParams = zod.object({
+  "id": zod.uuid().regex(studentPlaybackStartPathIdRegExp)
+})
+
+export const studentPlaybackStartResponseCaptionsItemLanguageMax = 35;
+
+export const studentPlaybackStartResponseExpiresAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const studentPlaybackStartResponseResumePositionSecondsMin = 0;
+export const studentPlaybackStartResponseResumePositionSecondsMax = 9007199254740991;
+
+export const studentPlaybackStartResponseSessionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const StudentPlaybackStartResponse = zod.object({
+  "captions": zod.array(zod.object({
+  "language": zod.string().min(1).max(studentPlaybackStartResponseCaptionsItemLanguageMax)
+})),
+  "expiresAt": zod.iso.datetime({"offset":true}).regex(studentPlaybackStartResponseExpiresAtRegExp),
+  "manifestPath": zod.string(),
+  "resumePositionSeconds": zod.int().min(studentPlaybackStartResponseResumePositionSecondsMin).max(studentPlaybackStartResponseResumePositionSecondsMax),
+  "sessionId": zod.uuid().regex(studentPlaybackStartResponseSessionIdRegExp).nullable()
+})
+
+
+export const studentPlaybackRefreshPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const StudentPlaybackRefreshParams = zod.object({
+  "id": zod.uuid().regex(studentPlaybackRefreshPathIdRegExp)
+})
+
+export const studentPlaybackRefreshResponseCaptionsItemLanguageMax = 35;
+
+export const studentPlaybackRefreshResponseExpiresAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const studentPlaybackRefreshResponseResumePositionSecondsMin = 0;
+export const studentPlaybackRefreshResponseResumePositionSecondsMax = 9007199254740991;
+
+export const studentPlaybackRefreshResponseSessionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const StudentPlaybackRefreshResponse = zod.object({
+  "captions": zod.array(zod.object({
+  "language": zod.string().min(1).max(studentPlaybackRefreshResponseCaptionsItemLanguageMax)
+})),
+  "expiresAt": zod.iso.datetime({"offset":true}).regex(studentPlaybackRefreshResponseExpiresAtRegExp),
+  "manifestPath": zod.string(),
+  "resumePositionSeconds": zod.int().min(studentPlaybackRefreshResponseResumePositionSecondsMin).max(studentPlaybackRefreshResponseResumePositionSecondsMax),
+  "sessionId": zod.uuid().regex(studentPlaybackRefreshResponseSessionIdRegExp).nullable()
 })

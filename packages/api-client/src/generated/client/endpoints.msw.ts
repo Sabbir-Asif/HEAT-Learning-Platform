@@ -190,7 +190,7 @@ export const getUniversitiesArchiveResponseMock = (overrideResponse: Partial<Ext
 
 export const getUniversitiesRestoreResponseMock = (overrideResponse: Partial<Extract<UniversitySummaryDto, object>> = {}): UniversitySummaryDto => ({archivedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', departmentCount: faker.number.int({min: 0, max: 9007199254740991}), facultyCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), studentCount: faker.number.int({min: 0, max: 9007199254740991}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
-export const getEnrollmentApprovalApproveManyResponseMock = (overrideResponse: Partial<Extract<BulkApprovalResponseDto, object>> = {}): BulkApprovalResponseDto => ({failed: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement(['AUDIT_ACTOR_FILTER_TOO_BROAD','BAD_REQUEST','CANNOT_DEACTIVATE_SELF','CAPTCHA_EXPIRED','CAPTCHA_INVALID','CONTENT_LOCKED','COURSE_HAS_ENROLLMENTS','COURSE_LOCKED','COURSE_NOT_AVAILABLE','COURSE_NOT_DRAFT','COURSE_PUBLISH_CHECKS_FAILED','COURSE_SLUG_TAKEN','CSRF_TOKEN_INVALID','DIRECTORY_ARCHIVED','DIRECTORY_IN_USE','DIRECTORY_NAME_TAKEN','EMAIL_IN_USE','ENROLLMENT_ALREADY_DECIDED','ENROLLMENT_NOT_ACTIVE','ENROLLMENT_NOT_VERIFIED','FORBIDDEN','INTERNAL','INVALID_CREDENTIALS','INVITATION_EXPIRED','INVITATION_INVALID','INVITATION_NOT_PENDING','NOT_FOUND','ORDER_CONFLICT','ORIGIN_NOT_ALLOWED','PASSWORD_BREACHED','PASSWORD_CHANGE_REQUIRED','RATE_LIMITED','UNAUTHENTICATED','UPLOAD_EXPIRED','UPLOAD_OFFSET_MISMATCH','UPLOAD_TOO_LARGE','UPLOAD_TYPE_NOT_ALLOWED','VALIDATION_FAILED','VERIFICATION_LINK_EXPIRED','VERIFICATION_LINK_INVALID','VERIFICATION_LINK_USED','VERIFICATION_RESEND_LIMIT','VIDEO_NOT_FAILED'] as const), id: faker.string.uuid()})), succeeded: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), ...overrideResponse})
+export const getEnrollmentApprovalApproveManyResponseMock = (overrideResponse: Partial<Extract<BulkApprovalResponseDto, object>> = {}): BulkApprovalResponseDto => ({failed: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement(['AUDIT_ACTOR_FILTER_TOO_BROAD','BAD_REQUEST','CANNOT_DEACTIVATE_SELF','CAPTCHA_EXPIRED','CAPTCHA_INVALID','CONTENT_LOCKED','COURSE_HAS_ENROLLMENTS','COURSE_LOCKED','COURSE_NOT_AVAILABLE','COURSE_NOT_DRAFT','COURSE_PUBLISH_CHECKS_FAILED','COURSE_SLUG_TAKEN','CSRF_TOKEN_INVALID','DIRECTORY_ARCHIVED','DIRECTORY_IN_USE','DIRECTORY_NAME_TAKEN','EMAIL_IN_USE','ENROLLMENT_ALREADY_DECIDED','ENROLLMENT_NOT_ACTIVE','ENROLLMENT_NOT_VERIFIED','FORBIDDEN','INTERNAL','INVALID_CREDENTIALS','INVITATION_EXPIRED','INVITATION_INVALID','INVITATION_NOT_PENDING','MODULE_LOCKED','NOT_FOUND','ORDER_CONFLICT','ORIGIN_NOT_ALLOWED','PASSWORD_BREACHED','PASSWORD_CHANGE_REQUIRED','RATE_LIMITED','UNAUTHENTICATED','UPLOAD_EXPIRED','UPLOAD_OFFSET_MISMATCH','UPLOAD_TOO_LARGE','UPLOAD_TYPE_NOT_ALLOWED','VALIDATION_FAILED','VERIFICATION_LINK_EXPIRED','VERIFICATION_LINK_INVALID','VERIFICATION_LINK_USED','VERIFICATION_RESEND_LIMIT','VIDEO_NOT_FAILED','VIDEO_NOT_READY'] as const), id: faker.string.uuid()})), succeeded: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), ...overrideResponse})
 
 export const getEnrollmentApprovalListPendingResponseMock = (overrideResponse: Partial<Extract<ApprovalQueueResponseDto, object>> = {}): ApprovalQueueResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({course: {id: faker.string.uuid(), title: faker.string.alpha({length: {min: 10, max: 20}})}, department: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, id: faker.string.uuid(), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', session: faker.string.alpha({length: {min: 10, max: 20}}), student: {email: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}})}, university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, verifiedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
 
@@ -198,7 +198,7 @@ export const getEnrollmentApprovalApproveResponseMock = (overrideResponse: Parti
 
 export const getAdminMeDescribeResponseMock = (overrideResponse: Partial<Extract<AdminMeResponseDto, object>> = {}): AdminMeResponseDto => ({user: {email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
 
-export const getPlaybackIssueResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+export const getAdminPlaybackPreviewResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({captions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({language: faker.string.alpha({length: {min: 1, max: 35}})})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', manifestPath: faker.string.alpha({length: {min: 10, max: 20}}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), sessionId: faker.helpers.arrayElement([faker.string.uuid(), null]), ...overrideResponse})
 
 export const getStudentAuthCsrfTokenResponseMock = (overrideResponse: Partial<Extract<CsrfTokenResponseDto, object>> = {}): CsrfTokenResponseDto => ({token: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
@@ -221,6 +221,10 @@ export const getEnrollmentSubmitResponseMock = (overrideResponse: Partial<Extrac
 export const getHealthCheckResponseMock = (overrideResponse: Partial<Extract<HealthResponseDto, object>> = {}): HealthResponseDto => ({status: faker.helpers.arrayElement(['ok'] as const), ...overrideResponse})
 
 export const getMeDescribeResponseMock = (overrideResponse: Partial<Extract<MeResponseDto, object>> = {}): MeResponseDto => ({enrollments: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), reason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const)})), user: {email: faker.string.alpha({length: {min: 10, max: 20}}), emailVerified: faker.datatype.boolean(), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, verificationEmail: faker.helpers.arrayElement([faker.helpers.arrayElement(['ON_ITS_WAY','SENT','FAILED'] as const), null]), verificationEmailSentAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), ...overrideResponse})
+
+export const getStudentPlaybackStartResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({captions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({language: faker.string.alpha({length: {min: 1, max: 35}})})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', manifestPath: faker.string.alpha({length: {min: 10, max: 20}}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), sessionId: faker.helpers.arrayElement([faker.string.uuid(), null]), ...overrideResponse})
+
+export const getStudentPlaybackRefreshResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({captions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({language: faker.string.alpha({length: {min: 1, max: 35}})})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', manifestPath: faker.string.alpha({length: {min: 10, max: 20}}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), sessionId: faker.helpers.arrayElement([faker.string.uuid(), null]), ...overrideResponse})
 
 
 export const getAdminAccountChangePasswordMockHandler = (overrideResponse?: void | ((info: Parameters<HttpResponseResolver<PathParams, ChangePasswordRequestDto>>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
@@ -1021,13 +1025,13 @@ export const getAdminMeDescribeMockHandler = (overrideResponse?: AdminMeResponse
   }, options)
 }
 
-export const getPlaybackIssueMockHandler = (overrideResponse?: PlaybackSessionResponseDto | ((info: Parameters<HttpResponseResolver<{ videoId: string }>>[0]) => Promise<PlaybackSessionResponseDto> | PlaybackSessionResponseDto), options?: RequestHandlerOptions) => {
+export const getAdminPlaybackPreviewMockHandler = (overrideResponse?: PlaybackSessionResponseDto | ((info: Parameters<HttpResponseResolver<{ videoId: string }>>[0]) => Promise<PlaybackSessionResponseDto> | PlaybackSessionResponseDto), options?: RequestHandlerOptions) => {
   return http.post<{ videoId: string }>('*/api/admin/playback-sessions/:videoId', async (info: Parameters<HttpResponseResolver<{ videoId: string }>>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getPlaybackIssueResponseMock(),
+    : getAdminPlaybackPreviewResponseMock(),
       { status: 200
       })
   }, options)
@@ -1184,6 +1188,30 @@ export const getMeDescribeMockHandler = (overrideResponse?: MeResponseDto | ((in
       })
   }, options)
 }
+
+export const getStudentPlaybackStartMockHandler = (overrideResponse?: PlaybackSessionResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<PlaybackSessionResponseDto> | PlaybackSessionResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string }>('*/api/videos/:id/playback-session', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getStudentPlaybackStartResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getStudentPlaybackRefreshMockHandler = (overrideResponse?: PlaybackSessionResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<PlaybackSessionResponseDto> | PlaybackSessionResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string }>('*/api/videos/:id/playback-session/refresh', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getStudentPlaybackRefreshResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 export const getHeatLmsApiMock = () => [
   getAdminAccountChangePasswordMockHandler(),
   getAdminUsersListMockHandler(),
@@ -1253,7 +1281,7 @@ export const getHeatLmsApiMock = () => [
   getEnrollmentApprovalListPendingMockHandler(),
   getEnrollmentApprovalApproveMockHandler(),
   getAdminMeDescribeMockHandler(),
-  getPlaybackIssueMockHandler(),
+  getAdminPlaybackPreviewMockHandler(),
   getStudentAuthCsrfTokenMockHandler(),
   getStudentAuthRefreshMockHandler(),
   getStudentAuthSignInMockHandler(),
@@ -1266,5 +1294,7 @@ export const getHeatLmsApiMock = () => [
   getDirectoryLookupsListDepartmentsMockHandler(),
   getEnrollmentSubmitMockHandler(),
   getHealthCheckMockHandler(),
-  getMeDescribeMockHandler()
+  getMeDescribeMockHandler(),
+  getStudentPlaybackStartMockHandler(),
+  getStudentPlaybackRefreshMockHandler()
 ]
