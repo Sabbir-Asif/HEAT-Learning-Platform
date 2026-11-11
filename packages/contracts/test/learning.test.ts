@@ -121,7 +121,9 @@ describe("lesson content schemas", () => {
   test("the response carries the module, its objectives and section bodies", () => {
     const response = {
       module: { id, title: "Module 1", objectives: ["Know the policy"] },
-      sections: [{ id, order: 1, title: "Intro", schemaVersion: 1, body: { type: "doc", content: [] } }],
+      sections: [
+        { id, order: 1, title: "Intro", schemaVersion: 1, body: { type: "doc", content: [] } },
+      ],
     };
 
     expect(lessonContentResponseSchema.parse(response)).toEqual(response);
