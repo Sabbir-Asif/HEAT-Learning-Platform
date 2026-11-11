@@ -31,8 +31,16 @@ describe("publishDirectory", () => {
   test("moves the previous output aside, swaps the new one in and removes the old", async () => {
     const filesystem = withOutput(stagingPath(root, key, "a2"), "new");
     filesystem.files.set(`/hls/${key}/master.m3u8`, "old");
-    await publishDirectory(filesystem, root, key, stagingPath(root, key, "a2"), "a2");
+    const publication = await publishDirectory(
+      filesystem,
+      root,
+      key,
+      stagingPath(root, key, "a2"),
+      "a2",
+    );
     expect(filesystem.files.get(`/hls/${key}/master.m3u8`)).toBe("new");
+    expect(filesystem.files.get(`/hls/.previous-${key}-a2/master.m3u8`)).toBe("old");
+    await publication.commit();
     expect(filesystem.filesUnder(`/hls/.previous-${key}-a2`)).toEqual([]);
     expect(filesystem.log).toEqual([
       `rename /hls/${key} -> /hls/.previous-${key}-a2`,
@@ -60,8 +68,43 @@ describe("publishDirectory", () => {
   test("keeps the published output when removing the old copy fails", async () => {
     const filesystem = withOutput(stagingPath(root, key, "a5"), "new");
     filesystem.files.set(`/hls/${key}/master.m3u8`, "old");
+    const publication = await publishDirectory(
+      filesystem,
+      root,
+      key,
+      stagingPath(root, key, "a5"),
+      "a5",
+    );
     filesystem.remove = () => Promise.reject(new Error("busy"));
-    await publishDirectory(filesystem, root, key, stagingPath(root, key, "a5"), "a5");
+    await expect(publication.commit()).resolves.toBeUndefined();
     expect(filesystem.files.get(`/hls/${key}/master.m3u8`)).toBe("new");
+  });
+
+  test("rolling back a first publish removes the output", async () => {
+    const filesystem = withOutput(stagingPath(root, key, "a6"), "new");
+    const publication = await publishDirectory(
+      filesystem,
+      root,
+      key,
+      stagingPath(root, key, "a6"),
+      "a6",
+    );
+    await publication.rollback();
+    expect(filesystem.filesUnder(`/hls/${key}`)).toEqual([]);
+  });
+
+  test("rolling back a swap puts the previous output back", async () => {
+    const filesystem = withOutput(stagingPath(root, key, "a7"), "new");
+    filesystem.files.set(`/hls/${key}/master.m3u8`, "old");
+    const publication = await publishDirectory(
+      filesystem,
+      root,
+      key,
+      stagingPath(root, key, "a7"),
+      "a7",
+    );
+    await publication.rollback();
+    expect(filesystem.files.get(`/hls/${key}/master.m3u8`)).toBe("old");
+    expect(filesystem.filesUnder(`/hls/.previous-${key}-a7`)).toEqual([]);
   });
 });

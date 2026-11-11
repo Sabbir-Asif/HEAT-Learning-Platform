@@ -39,6 +39,8 @@ interface Options {
   probeError?: boolean;
   encode?: (args: readonly string[], filesystem: FakeFilesystem) => EncodeResult;
   codecs?: string[] | null;
+  codecsError?: boolean;
+  readyError?: boolean;
   claimed?: boolean;
   ready?: boolean;
   times?: number[];
@@ -59,7 +61,11 @@ const build = (options: Options = {}) => {
   const filesystem = new FakeFilesystem();
   const store: TranscodeStore = {
     claim: vi.fn().mockResolvedValue(options.claimed === false ? null : { assetKey: key }),
-    markReady: vi.fn().mockResolvedValue(options.ready ?? true),
+    markReady: vi.fn(() =>
+      options.readyError === true
+        ? Promise.reject(new Error("db down"))
+        : Promise.resolve(options.ready ?? true),
+    ),
     markFailed: vi.fn().mockResolvedValue(undefined),
   };
   const times = [...(options.times ?? [])];
@@ -78,9 +84,11 @@ const build = (options: Options = {}) => {
     ),
   };
   const codecs = {
-    codecs: vi
-      .fn()
-      .mockResolvedValue(options.codecs === undefined ? ["h264", "aac"] : options.codecs),
+    codecs: vi.fn(() =>
+      options.codecsError === true
+        ? Promise.reject(Object.assign(new Error("spawn"), { code: "ENOENT" }))
+        : Promise.resolve(options.codecs === undefined ? ["h264", "aac"] : options.codecs),
+    ),
   };
   let attempt = 0;
   const job = new TranscodeJob(
@@ -304,5 +312,66 @@ describe("TranscodeJob failures", () => {
     const second = calls[1]?.[0].at(-1) ?? "";
     expect(first).toContain(".staging-");
     expect(first.split("/index.m3u8")[0]).not.toBe(second.split("/index.m3u8")[0]);
+  });
+});
+
+describe("TranscodeJob unexpected errors", () => {
+  test("a codec probe that cannot run is retried while attempts remain", async () => {
+    const { job, store } = build({ codecsError: true });
+    expect(await job.run(assetId, false)).toEqual({
+      status: "retry",
+      reason: "VALIDATION_FAILED",
+    });
+    expect(store.markFailed).not.toHaveBeenCalled();
+  });
+
+  test("a codec probe that cannot run ends the asset failed on the final attempt", async () => {
+    const { job, store, filesystem } = build({ codecsError: true });
+    expect(await job.run(assetId, true)).toEqual({
+      status: "failed",
+      reason: "VALIDATION_FAILED",
+    });
+    expect(store.markFailed).toHaveBeenCalledWith(assetId, "VALIDATION_FAILED");
+    expect(filesystem.filesUnder(output)).toEqual([]);
+  });
+
+  test("a store error on the final attempt still marks the asset failed and rethrows", async () => {
+    const { job, store, filesystem } = build({ readyError: true });
+    await expect(job.run(assetId, true)).rejects.toThrow("db down");
+    expect(store.markFailed).toHaveBeenCalledWith(assetId, "ENCODE_FAILED");
+    expect(filesystem.filesUnder(output)).toEqual([]);
+  });
+
+  test("a store error before the final attempt rethrows without marking failed", async () => {
+    const { job, store } = build({ readyError: true });
+    await expect(job.run(assetId, false)).rejects.toThrow("db down");
+    expect(store.markFailed).not.toHaveBeenCalled();
+  });
+
+  test("a failing markFailed does not hide the original error", async () => {
+    const { job, store } = build({ readyError: true });
+    vi.mocked(store.markFailed).mockRejectedValueOnce(new Error("also down"));
+    await expect(job.run(assetId, true)).rejects.toThrow("db down");
+  });
+
+  test("removes the published output when the asset can no longer be marked ready", async () => {
+    const { job, filesystem } = build({ ready: false });
+    expect(await job.run(assetId, false)).toEqual({ status: "skipped" });
+    expect(filesystem.filesUnder(output)).toEqual([]);
+  });
+
+  test("puts the previous output back when marking ready is refused", async () => {
+    const { job, filesystem } = build({ ready: false });
+    filesystem.files.set(`${output}/master.m3u8`, "old");
+    await job.run(assetId, false);
+    expect(filesystem.files.get(`${output}/master.m3u8`)).toBe("old");
+    expect(filesystem.filesUnder(`${hls}/.previous-${key}-a1`)).toEqual([]);
+  });
+
+  test("puts the previous output back when marking ready throws", async () => {
+    const { job, filesystem } = build({ readyError: true });
+    filesystem.files.set(`${output}/master.m3u8`, "old");
+    await expect(job.run(assetId, false)).rejects.toThrow("db down");
+    expect(filesystem.files.get(`${output}/master.m3u8`)).toBe("old");
   });
 });

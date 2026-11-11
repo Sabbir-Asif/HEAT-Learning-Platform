@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { FfmpegRunner } from "./ffmpeg-runner";
 import type { HlsFilesystem } from "./hls-filesystem";
 import { publishDirectory, stagingPath } from "./hls-publish";
+import type { Publication } from "./hls-publish";
 import { buildMasterPlaylist, buildRenditionArgs, renditionsForSource } from "./ladder";
 import type { Rendition } from "./ladder";
 import type { CodecProbe, SourceInfo, SourceProbe } from "./media-probe";
@@ -54,7 +55,8 @@ interface Failure {
   retryable: boolean;
 }
 
-type AttemptResult = ({ failure: null } & ReadyResult) | { failure: Failure };
+type AttemptResult =
+  { failure: null; ready: ReadyResult; publication: Publication } | { failure: Failure };
 
 const safeKey = /^[A-Za-z0-9_-]{32}$/;
 
@@ -78,22 +80,44 @@ export class TranscodeJob {
     const attemptId = newAttemptId();
     const staging = stagingPath(this.settings.hlsDirectory, asset.assetKey, attemptId);
     try {
-      const result = await this.attempt(asset.assetKey, staging, attemptId);
-      if (result.failure === null) {
-        const applied = await store.markReady(assetId, {
-          durationSeconds: result.durationSeconds,
-          renditions: result.renditions,
-        });
-        return applied ? { status: "ready" } : { status: "skipped" };
-      }
-      if (result.failure.retryable && !finalAttempt) {
-        return { status: "retry", reason: result.failure.reason };
-      }
-      await store.markFailed(assetId, result.failure.reason);
-      return { status: "failed", reason: result.failure.reason };
+      return await this.conclude(assetId, asset.assetKey, staging, attemptId, finalAttempt);
+    } catch (error) {
+      if (finalAttempt) await store.markFailed(assetId, "ENCODE_FAILED").catch(() => undefined);
+      throw error;
     } finally {
       await filesystem.remove(staging).catch(() => undefined);
     }
+  }
+
+  private async conclude(
+    assetId: string,
+    assetKey: string,
+    staging: string,
+    attemptId: string,
+    finalAttempt: boolean,
+  ): Promise<TranscodeOutcome> {
+    const { store } = this.dependencies;
+    const result = await this.attempt(assetKey, staging, attemptId);
+    if (result.failure === null) {
+      let applied: boolean;
+      try {
+        applied = await store.markReady(assetId, result.ready);
+      } catch (error) {
+        await result.publication.rollback();
+        throw error;
+      }
+      if (!applied) {
+        await result.publication.rollback();
+        return { status: "skipped" };
+      }
+      await result.publication.commit();
+      return { status: "ready" };
+    }
+    if (result.failure.retryable && !finalAttempt) {
+      return { status: "retry", reason: result.failure.reason };
+    }
+    await store.markFailed(assetId, result.failure.reason);
+    return { status: "failed", reason: result.failure.reason };
   }
 
   private async attempt(
@@ -114,23 +138,25 @@ export class TranscodeJob {
     const built = await this.build(input, staging, source, renditions);
     if (built !== null) return built;
     const hasAudio = source.hasAudio;
-    const snapshot = await collectOutput(
-      this.dependencies.filesystem,
-      this.dependencies.codecs,
-      staging,
-      renditions.map((rendition) => rendition.name),
-    );
-    const problems = validateOutput(
-      {
-        renditionNames: renditions.map((rendition) => rendition.name),
-        sourceDurationSeconds: source.durationSeconds,
-        hasAudio,
-      },
-      snapshot,
-    );
-    if (problems.length > 0) return failure("VALIDATION_FAILED", false);
+    const names = renditions.map((rendition) => rendition.name);
     try {
-      await publishDirectory(
+      const snapshot = await collectOutput(
+        this.dependencies.filesystem,
+        this.dependencies.codecs,
+        staging,
+        names,
+      );
+      const problems = validateOutput(
+        { renditionNames: names, sourceDurationSeconds: source.durationSeconds, hasAudio },
+        snapshot,
+      );
+      if (problems.length > 0) return failure("VALIDATION_FAILED", false);
+    } catch {
+      return failure("VALIDATION_FAILED", true);
+    }
+    let publication: Publication;
+    try {
+      publication = await publishDirectory(
         this.dependencies.filesystem,
         this.settings.hlsDirectory,
         assetKey,
@@ -142,11 +168,14 @@ export class TranscodeJob {
     }
     return {
       failure: null,
-      durationSeconds: Math.round(source.durationSeconds),
-      renditions: renditions.map((rendition) => ({
-        label: rendition.name,
-        bitrateKbps: bitrateOf(rendition, hasAudio),
-      })),
+      publication,
+      ready: {
+        durationSeconds: Math.round(source.durationSeconds),
+        renditions: renditions.map((rendition) => ({
+          label: rendition.name,
+          bitrateKbps: bitrateOf(rendition, hasAudio),
+        })),
+      },
     };
   }
 

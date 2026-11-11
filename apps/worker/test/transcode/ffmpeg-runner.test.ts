@@ -64,6 +64,20 @@ describe("NodeFfmpegRunner", () => {
     expect(await result).toBe("failed");
   });
 
+  test("reports the exit code to the observer", async () => {
+    const child = new FakeProcess();
+    const codes: Array<number | null> = [];
+    const runner = new NodeFfmpegRunner(
+      () => child,
+      "/usr/bin",
+      (code) => codes.push(code),
+    );
+    const result = runner.run(safeArgs, 1000);
+    child.emit("close", 137);
+    await result;
+    expect(codes).toEqual([137]);
+  });
+
   test("reports a spawn error as failed", async () => {
     const { child, runner } = harness();
     const result = runner.run(safeArgs, 1000);

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { exitedWithStatus, ffprobeArguments, nodeExecFile } from "./video-probe";
-import type { ExecFile } from "./video-probe";
+import type { ExecFile, ExecOptions } from "./video-probe";
 
 export interface SourceInfo {
   width: number;
@@ -94,14 +94,19 @@ export const parseCodecNames = (text: string): string[] =>
     .map((line) => line.trim())
     .filter((line) => line !== "");
 
-const options = { timeout: probeTimeoutMs, maxBuffer: maxOutputBytes, shell: false } as const;
+const execOptions = (): ExecOptions => ({
+  timeout: probeTimeoutMs,
+  maxBuffer: maxOutputBytes,
+  shell: false,
+  env: { PATH: process.env.PATH ?? "" },
+});
 
 export class FfprobeSourceProbe implements SourceProbe {
   constructor(private readonly run: ExecFile = nodeExecFile) {}
 
   async probe(path: string): Promise<SourceInfo | null> {
     try {
-      const { stdout } = await this.run("ffprobe", ffprobeArguments(path), { ...options });
+      const { stdout } = await this.run("ffprobe", ffprobeArguments(path), execOptions());
       return parseSourceInfo(stdout);
     } catch (error) {
       if (exitedWithStatus(error)) return null;
@@ -115,7 +120,7 @@ export class FfprobeCodecProbe implements CodecProbe {
 
   async codecs(playlistPath: string): Promise<string[] | null> {
     try {
-      const { stdout } = await this.run("ffprobe", codecArguments(playlistPath), { ...options });
+      const { stdout } = await this.run("ffprobe", codecArguments(playlistPath), execOptions());
       return parseCodecNames(stdout);
     } catch (error) {
       if (exitedWithStatus(error)) return null;

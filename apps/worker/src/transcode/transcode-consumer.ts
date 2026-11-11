@@ -32,7 +32,9 @@ export class TranscodeConsumer implements OnApplicationBootstrap, OnApplicationS
         store: new PrismaTranscodeStore(database),
         source: new FfprobeSourceProbe(),
         codecs: new FfprobeCodecProbe(),
-        ffmpeg: new NodeFfmpegRunner(),
+        ffmpeg: new NodeFfmpegRunner(undefined, undefined, (code) => {
+          if (code !== 0) this.logger.warn(`FFmpeg exited with code ${String(code)}`);
+        }),
         filesystem: new NodeHlsFilesystem(),
         newAttemptId: () => randomUUID().replaceAll("-", ""),
         nowMs: () => Date.now(),

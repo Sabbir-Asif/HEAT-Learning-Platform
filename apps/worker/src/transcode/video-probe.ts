@@ -11,6 +11,7 @@ export interface ExecOptions {
   timeout: number;
   maxBuffer: number;
   shell: false;
+  env?: Record<string, string>;
 }
 
 export type ExecFile = (

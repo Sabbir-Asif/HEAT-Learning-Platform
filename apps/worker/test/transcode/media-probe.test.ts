@@ -68,7 +68,16 @@ describe("FfprobeSourceProbe", () => {
     const run = vi.fn().mockResolvedValue({ stdout: source() });
     expect(await new FfprobeSourceProbe(run).probe("/in.orig")).toMatchObject({ height: 1080 });
     expect(run.mock.calls[0]?.[0]).toBe("ffprobe");
-    expect(run.mock.calls[0]?.[2]).toMatchObject({ shell: false });
+    expect(run.mock.calls[0]?.[2]).toMatchObject({
+      shell: false,
+      env: { PATH: process.env.PATH ?? "" },
+    });
+  });
+
+  test("gives the codec probe only PATH in its environment", async () => {
+    const run = vi.fn().mockResolvedValue({ stdout: "h264\n" });
+    await new FfprobeCodecProbe(run).codecs("/p");
+    expect(run.mock.calls[0]?.[2]).toMatchObject({ env: { PATH: process.env.PATH ?? "" } });
   });
 
   test("treats an error exit as unreadable and rethrows other failures", async () => {

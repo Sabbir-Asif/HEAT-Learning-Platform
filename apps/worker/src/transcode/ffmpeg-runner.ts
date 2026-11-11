@@ -40,6 +40,7 @@ export class NodeFfmpegRunner implements FfmpegRunner {
   constructor(
     private readonly start: SpawnProcess = defaultSpawn,
     private readonly path: string = process.env.PATH ?? "",
+    private readonly onExit: (code: number | null) => void = () => undefined,
   ) {}
 
   run(args: readonly string[], timeoutMs: number): Promise<EncodeResult> {
@@ -61,7 +62,10 @@ export class NodeFfmpegRunner implements FfmpegRunner {
         resolve(timedOut ? "timed-out" : result);
       };
       child.once("error", () => finish("failed"));
-      child.once("close", (code: number | null) => finish(code === 0 ? "ok" : "failed"));
+      child.once("close", (code: number | null) => {
+        this.onExit(code);
+        finish(code === 0 ? "ok" : "failed");
+      });
     });
   }
 }
