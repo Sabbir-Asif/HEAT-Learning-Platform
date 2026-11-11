@@ -2,6 +2,8 @@ import { Module } from "@nestjs/common";
 import { AuthModule } from "../auth";
 import { CoreModule } from "../core";
 import { RateLimitModule } from "../rate-limit";
+import { DashboardController } from "./dashboard.controller";
+import { DashboardService } from "./dashboard.service";
 import { LearningController } from "./learning.controller";
 import { LessonContentController } from "./lesson-content.controller";
 import { LessonContentService } from "./lesson-content.service";
@@ -18,6 +20,7 @@ import { LearningStructureService } from "./learning-structure.service";
 @Module({
   imports: [CoreModule, AuthModule, RateLimitModule],
   controllers: [
+    DashboardController,
     LearningController,
     LessonContentController,
     QuizAccessController,
@@ -25,6 +28,7 @@ import { LearningStructureService } from "./learning-structure.service";
     QuizSubmissionController,
   ],
   providers: [
+    DashboardService,
     LearningStructureService,
     LessonContentService,
     QuizGateService,

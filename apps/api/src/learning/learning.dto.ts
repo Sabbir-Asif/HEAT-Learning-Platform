@@ -1,4 +1,5 @@
 import {
+  dashboardResponseSchema,
   learningStructureParamsSchema,
   learningStructureResponseSchema,
   lessonContentParamsSchema,
@@ -22,3 +23,4 @@ export class QuizDeliveryParamsDto extends createZodDto(quizDeliveryParamsSchema
 export class QuizDeliveryResponseDto extends createZodDto(quizDeliveryResponseSchema) {}
 export class QuizSubmitRequestDto extends createZodDto(quizSubmitRequestSchema) {}
 export class QuizSubmitResponseDto extends createZodDto(quizSubmitResponseSchema) {}
+export class DashboardResponseDto extends createZodDto(dashboardResponseSchema) {}
