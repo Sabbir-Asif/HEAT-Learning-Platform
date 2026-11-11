@@ -40,7 +40,7 @@ export function verificationCopy(
   if (status === "FAILED") {
     return "We could not send your verification email. Request a new link below.";
   }
-  return "Your verification email is on its way";
+  return "Your verification email is on its way.";
 }
 
 const pendingCopy = {
