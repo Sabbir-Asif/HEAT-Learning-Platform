@@ -25,6 +25,8 @@ const messages: Record<ErrorCode, string> = {
   CANNOT_DEACTIVATE_SELF: "You cannot deactivate your own account.",
   CAPTCHA_EXPIRED: "This security check can no longer be used. Request a new one.",
   CAPTCHA_INVALID: "The characters do not match. Try again.",
+  CONTENT_LOCKED:
+    "This course is locked. Its modules and sections cannot be added, removed or reordered.",
   COURSE_HAS_ENROLLMENTS: "This course has enrollments, so it cannot be deleted.",
   COURSE_LOCKED: "This course is locked. Only the description and thumbnail can be changed.",
   COURSE_NOT_DRAFT: "This action is only available for a draft course.",
@@ -45,6 +47,7 @@ const messages: Record<ErrorCode, string> = {
   INVITATION_INVALID: "This invitation link is not valid.",
   INVITATION_NOT_PENDING: "This admin has no pending invitation.",
   NOT_FOUND: "The requested resource was not found.",
+  ORDER_CONFLICT: "The order was changed by someone else. Reload and try again.",
   ORIGIN_NOT_ALLOWED: "This request did not come from an allowed site.",
   PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
   PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
