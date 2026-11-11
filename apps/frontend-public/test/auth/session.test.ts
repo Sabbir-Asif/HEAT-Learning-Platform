@@ -2,7 +2,11 @@ import { ApiError } from "@heat/api-client";
 import type { MeResponse } from "@heat/contracts";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+const calls: string[] = [];
 const meDescribe = vi.fn();
+const connection = vi.fn(async () => {
+  calls.push("connection");
+});
 const headerValues = new Map<string, string>();
 const redirect = vi.fn((location: string): never => {
   throw new Error(`redirect:${location}`);
@@ -14,6 +18,7 @@ vi.mock("next/headers", () => ({
   headers: async () => ({ get: (n: string) => headerValues.get(n) ?? null }),
 }));
 vi.mock("next/navigation", () => ({ redirect: (location: string) => redirect(location) }));
+vi.mock("next/server", () => ({ connection: () => connection() }));
 vi.mock("react", async (importOriginal) => ({
   ...(await importOriginal<typeof import("react")>()),
   cache: <T>(fn: T) => fn,
@@ -37,6 +42,8 @@ const me = (statuses: Array<[string, string]>): MeResponse => ({
 
 beforeEach(() => {
   meDescribe.mockReset();
+  connection.mockClear();
+  calls.length = 0;
   redirect.mockClear();
   headerValues.clear();
 });
@@ -48,6 +55,18 @@ describe("verifySession", () => {
     const { verifySession } = await import("../../src/auth/session");
 
     await expect(verifySession()).resolves.toBe(session);
+  });
+
+  test("waits for a request before calling the API so the page is never prerendered", async () => {
+    meDescribe.mockImplementation(() => {
+      calls.push("me");
+      return Promise.resolve(me([]));
+    });
+    const { verifySession } = await import("../../src/auth/session");
+
+    await verifySession();
+
+    expect(calls).toEqual(["connection", "me"]);
   });
 
   test("redirects to the refresh page with the current path on 401", async () => {

@@ -5,6 +5,7 @@ import { grantsCourseAccess } from "@heat/contracts";
 import type { MeEnrollment, MeResponse } from "@heat/contracts";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { cache } from "react";
 import { safeNextPath } from "./next-path";
 import { pathnameHeader } from "./session-gate";
@@ -16,6 +17,7 @@ async function refreshLocation(): Promise<string> {
 }
 
 export const verifySession = cache(async (): Promise<MeResponse> => {
+  await connection();
   try {
     return await meDescribe();
   } catch (error) {
