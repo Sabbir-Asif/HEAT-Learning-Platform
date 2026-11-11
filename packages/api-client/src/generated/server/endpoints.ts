@@ -1261,6 +1261,55 @@ export interface PlaybackSessionResponseDto {
   sessionId: string | null;
 }
 
+export type ProgressBatchDtoIntervalsItem = {
+  /**
+     * @minimum 0
+     * @maximum 86400
+     */
+  end: number;
+  /**
+     * @minimum 0
+     * @maximum 86400
+     */
+  start: number;
+};
+
+export interface ProgressBatchDto {
+  /**
+     * @minLength 1
+     * @maxLength 512
+     */
+  csrfToken?: string;
+  /** @maxItems 64 */
+  intervals: ProgressBatchDtoIntervalsItem[];
+  /**
+     * @minimum 0
+     * @maximum 86400
+     */
+  positionSeconds: number;
+  /**
+     * @minimum 1
+     * @maximum 2147483647
+     */
+  sequence: number;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  sessionId: string;
+}
+
+export interface ProgressResponseDto {
+  completed: boolean;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  coveragePercent: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  resumePositionSeconds: number;
+}
+
 export type QuizQuestionRequestDtoOptionsItem = {
   isCorrect: boolean;
   /**
@@ -4295,5 +4344,41 @@ export const studentPlaybackRefresh = async (id: string, options?: Parameters<ty
     method: 'POST'
 
 
+  }
+);}
+
+
+
+export const getProgressRecordUrl = (id: string,) => {
+
+
+
+
+  return `/api/videos/${id}/progress`
+}
+
+export const progressRecord = async (id: string,
+    progressBatchDto: ProgressBatchDto, options?: Parameters<typeof serverFetch>[1]): Promise<ProgressResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ProgressResponseDto>(getProgressRecordUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(progressBatchDto)
   }
 );}

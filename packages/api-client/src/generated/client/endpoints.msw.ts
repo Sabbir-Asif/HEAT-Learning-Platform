@@ -61,6 +61,8 @@ import type {
   ModuleListResponseDto,
   ModuleSummaryDto,
   PlaybackSessionResponseDto,
+  ProgressBatchDto,
+  ProgressResponseDto,
   QuizQuestionRequestDto,
   QuizRulesRequestDto,
   QuizSummaryDto,
@@ -233,6 +235,8 @@ export const getMeDescribeResponseMock = (overrideResponse: Partial<Extract<MeRe
 export const getStudentPlaybackStartResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({captions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({language: faker.string.alpha({length: {min: 1, max: 35}})})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', manifestPath: faker.string.alpha({length: {min: 10, max: 20}}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), sessionId: faker.helpers.arrayElement([faker.string.uuid(), null]), ...overrideResponse})
 
 export const getStudentPlaybackRefreshResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({captions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({language: faker.string.alpha({length: {min: 1, max: 35}})})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', manifestPath: faker.string.alpha({length: {min: 10, max: 20}}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), sessionId: faker.helpers.arrayElement([faker.string.uuid(), null]), ...overrideResponse})
+
+export const getProgressRecordResponseMock = (overrideResponse: Partial<Extract<ProgressResponseDto, object>> = {}): ProgressResponseDto => ({completed: faker.datatype.boolean(), coveragePercent: faker.number.int({min: 0, max: 100}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
 
 
 export const getAdminAccountChangePasswordMockHandler = (overrideResponse?: void | ((info: Parameters<HttpResponseResolver<PathParams, ChangePasswordRequestDto>>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
@@ -1244,6 +1248,18 @@ export const getStudentPlaybackRefreshMockHandler = (overrideResponse?: Playback
       })
   }, options)
 }
+
+export const getProgressRecordMockHandler = (overrideResponse?: ProgressResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string }, ProgressBatchDto>>[0]) => Promise<ProgressResponseDto> | ProgressResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string }, ProgressBatchDto>('*/api/videos/:id/progress', async (info: Parameters<HttpResponseResolver<{ id: string }, ProgressBatchDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getProgressRecordResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 export const getHeatLmsApiMock = () => [
   getAdminAccountChangePasswordMockHandler(),
   getAdminUsersListMockHandler(),
@@ -1330,5 +1346,6 @@ export const getHeatLmsApiMock = () => [
   getHealthCheckMockHandler(),
   getMeDescribeMockHandler(),
   getStudentPlaybackStartMockHandler(),
-  getStudentPlaybackRefreshMockHandler()
+  getStudentPlaybackRefreshMockHandler(),
+  getProgressRecordMockHandler()
 ]

@@ -9,7 +9,7 @@ import {
   reachesCompletion,
   remainingBudgetSeconds,
   resumePositionOf,
-} from "../../src/progress/progress-rules";
+} from "../../src/playback/progress-rules";
 
 const start = new Date("2026-11-11T10:00:00.000Z");
 const after = (seconds: number): Date => new Date(start.getTime() + seconds * 1000);
