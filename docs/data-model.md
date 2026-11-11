@@ -378,6 +378,8 @@ erDiagram
     DateTime startedAt
     DateTime lastSeenAt
     DateTime endedAt
+    Float acceptedSeconds
+    Int lastSequence
     DateTime createdAt
     DateTime updatedAt
   }

@@ -2991,3 +2991,54 @@ export const StudentPlaybackRefreshResponse = zod.object({
   "resumePositionSeconds": zod.int().min(studentPlaybackRefreshResponseResumePositionSecondsMin).max(studentPlaybackRefreshResponseResumePositionSecondsMax),
   "sessionId": zod.uuid().regex(studentPlaybackRefreshResponseSessionIdRegExp).nullable()
 })
+
+
+export const progressRecordPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProgressRecordParams = zod.object({
+  "id": zod.uuid().regex(progressRecordPathIdRegExp)
+})
+
+export const progressRecordBodyCsrfTokenMax = 512;
+
+export const progressRecordBodyIntervalsItemEndMin = 0;
+export const progressRecordBodyIntervalsItemEndMax = 86400;
+
+export const progressRecordBodyIntervalsItemStartMin = 0;
+export const progressRecordBodyIntervalsItemStartMax = 86400;
+
+export const progressRecordBodyIntervalsMax = 64;
+
+export const progressRecordBodyPositionSecondsMin = 0;
+export const progressRecordBodyPositionSecondsMax = 86400;
+
+export const progressRecordBodySequenceMax = 2147483647;
+
+export const progressRecordBodySessionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProgressRecordBody = zod.object({
+  "csrfToken": zod.string().min(1).max(progressRecordBodyCsrfTokenMax).optional(),
+  "intervals": zod.array(zod.object({
+  "end": zod.number().min(progressRecordBodyIntervalsItemEndMin).max(progressRecordBodyIntervalsItemEndMax),
+  "start": zod.number().min(progressRecordBodyIntervalsItemStartMin).max(progressRecordBodyIntervalsItemStartMax)
+})).max(progressRecordBodyIntervalsMax),
+  "positionSeconds": zod.number().min(progressRecordBodyPositionSecondsMin).max(progressRecordBodyPositionSecondsMax),
+  "sequence": zod.int().min(1).max(progressRecordBodySequenceMax),
+  "sessionId": zod.uuid().regex(progressRecordBodySessionIdRegExp)
+})
+
+export const progressRecordResponseCoveragePercentMin = 0;
+export const progressRecordResponseCoveragePercentMax = 100;
+
+export const progressRecordResponseResumePositionSecondsMin = 0;
+export const progressRecordResponseResumePositionSecondsMax = 9007199254740991;
+
+
+
+export const ProgressRecordResponse = zod.object({
+  "completed": zod.boolean(),
+  "coveragePercent": zod.int().min(progressRecordResponseCoveragePercentMin).max(progressRecordResponseCoveragePercentMax),
+  "resumePositionSeconds": zod.int().min(progressRecordResponseResumePositionSecondsMin).max(progressRecordResponseResumePositionSecondsMax)
+})

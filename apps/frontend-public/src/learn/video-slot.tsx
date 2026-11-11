@@ -18,18 +18,25 @@ import { VideoPlayer } from "@heat/ui/player";
 import { PlayIcon } from "lucide-react";
 import { useCallback } from "react";
 import { videoStatusText } from "./learning-view";
+import { useProgressReporting } from "./use-progress-reporting";
 import type { LearningModule } from "./learning-view";
 
 export interface VideoSlotProps {
+  courseId: string;
   videos: LearningModule["videos"];
 }
 
 type LessonVideo = LearningModule["videos"][number];
 
-function VideoFrame({ video }: { video: LessonVideo }) {
+function VideoFrame({ courseId, video }: { courseId: string; video: LessonVideo }) {
   const start = useStudentPlaybackStart();
   const refresh = useStudentPlaybackRefresh();
   const { mutateAsync } = refresh;
+  const onProgress = useProgressReporting({
+    courseId,
+    videoId: video.id,
+    sessionId: start.data?.sessionId ?? null,
+  });
   const refreshSession = useCallback(() => mutateAsync({ id: video.id }), [mutateAsync, video.id]);
 
   if (video.status === "UNAVAILABLE") {
@@ -52,6 +59,7 @@ function VideoFrame({ video }: { video: LessonVideo }) {
         captions={start.data.captions}
         maxPlaybackRate={maxPlaybackRate}
         refreshSession={refreshSession}
+        onProgress={onProgress}
         autoPlay
       />
     );
@@ -93,7 +101,7 @@ function VideoFrame({ video }: { video: LessonVideo }) {
   );
 }
 
-export default function VideoSlot({ videos }: VideoSlotProps) {
+export default function VideoSlot({ courseId, videos }: VideoSlotProps) {
   return (
     <section aria-label="Videos" className="flex flex-col gap-4">
       {videos.map((video) => (
@@ -107,7 +115,7 @@ export default function VideoSlot({ videos }: VideoSlotProps) {
             ) : null}
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
-            <VideoFrame video={video} />
+            <VideoFrame courseId={courseId} video={video} />
           </CardContent>
         </Card>
       ))}

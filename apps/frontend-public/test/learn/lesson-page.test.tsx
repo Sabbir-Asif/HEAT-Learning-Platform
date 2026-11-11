@@ -40,6 +40,7 @@ const paragraphs = (...texts: string[]) => ({
 const render = (lesson: LessonContentState, module = makeModule(1)) =>
   mount(
     <LessonPage
+      courseId="c1"
       courseSlug="heat"
       courseTitle="HEAT"
       module={module}

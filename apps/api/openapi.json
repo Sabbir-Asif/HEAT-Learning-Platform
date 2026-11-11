@@ -2259,6 +2259,83 @@
         ],
         "type": "object"
       },
+      "ProgressBatchDto": {
+        "properties": {
+          "csrfToken": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "intervals": {
+            "items": {
+              "properties": {
+                "end": {
+                  "maximum": 86400,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "start": {
+                  "maximum": 86400,
+                  "minimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "start",
+                "end"
+              ],
+              "type": "object"
+            },
+            "maxItems": 64,
+            "type": "array"
+          },
+          "positionSeconds": {
+            "maximum": 86400,
+            "minimum": 0,
+            "type": "number"
+          },
+          "sequence": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "sessionId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessionId",
+          "sequence",
+          "positionSeconds",
+          "intervals"
+        ],
+        "type": "object"
+      },
+      "ProgressResponseDto": {
+        "properties": {
+          "completed": {
+            "type": "boolean"
+          },
+          "coveragePercent": {
+            "maximum": 100,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "resumePositionSeconds": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "coveragePercent",
+          "resumePositionSeconds",
+          "completed"
+        ],
+        "type": "object"
+      },
       "QuizQuestionRequestDto": {
         "properties": {
           "explanation": {
@@ -6316,6 +6393,48 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PlaybackSessionResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "playback"
+        ]
+      }
+    },
+    "/api/videos/{id}/progress": {
+      "post": {
+        "operationId": "progressRecord",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgressBatchDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressResponseDto"
                 }
               }
             },

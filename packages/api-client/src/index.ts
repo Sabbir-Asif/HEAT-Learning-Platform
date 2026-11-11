@@ -10,7 +10,7 @@ export type {
   UnauthorizedHandler,
 } from "./mutator/extensions";
 export { fetchResponse } from "./mutator/raw-fetch";
-export { createCsrfInterceptor, installCsrf } from "./mutator/csrf";
+export { createCsrfInterceptor, installCsrf, readDocumentCookie } from "./mutator/csrf";
 export type { CsrfOptions } from "./mutator/csrf";
 export { createSessionRefresh, installSessionRefresh } from "./mutator/session-refresh";
 export type { SessionRefreshOptions } from "./mutator/session-refresh";
