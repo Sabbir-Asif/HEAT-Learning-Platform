@@ -57,4 +57,14 @@ describe("LessonText", () => {
 
     expect(container.querySelector('[data-slot="lesson-text"]')?.childElementCount).toBe(0);
   });
+
+  test("renders a title as a level 2 heading and skips an empty one", () => {
+    const { rerender } = render(<LessonText title="Intro" blocks={[]} />);
+
+    expect(screen.getByRole("heading", { level: 2, name: "Intro" })).toBeTruthy();
+
+    rerender(<LessonText title="" blocks={[]} />);
+
+    expect(screen.queryByRole("heading")).toBeNull();
+  });
 });

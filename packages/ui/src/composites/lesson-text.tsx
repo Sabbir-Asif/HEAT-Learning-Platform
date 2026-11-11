@@ -16,6 +16,7 @@ type LessonBlock =
 
 type LessonTextProps = Omit<React.ComponentProps<"div">, "children"> & {
   blocks: readonly LessonBlock[];
+  title?: string;
 };
 
 const headingTags = { 2: "h3", 3: "h4", 4: "h5" } as const;
@@ -68,13 +69,16 @@ function Block({ block }: { block: LessonBlock }) {
   );
 }
 
-function LessonText({ blocks, className, ...props }: LessonTextProps) {
+function LessonText({ blocks, title, className, ...props }: LessonTextProps) {
   return (
     <div
       data-slot="lesson-text"
       className={cn("flex flex-col gap-4 text-base leading-relaxed break-words", className)}
       {...props}
     >
+      {title === undefined || title === "" ? null : (
+        <h2 className="font-heading text-xl font-semibold">{title}</h2>
+      )}
       {blocks.map((block, index) => (
         <Block key={index} block={block} />
       ))}
