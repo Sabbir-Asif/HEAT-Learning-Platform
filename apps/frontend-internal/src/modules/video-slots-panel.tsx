@@ -30,6 +30,7 @@ import {
   videoSlotLockedMessage,
 } from "./modules-copy";
 import { VideoSlotForm } from "./video-slot-form";
+import { VideoSlotUpload } from "./video-slot-upload";
 
 type EditingSlot = { id: string; title: string; required: boolean } | "new" | null;
 
@@ -108,45 +109,56 @@ export function VideoSlotsPanel({ courseId, moduleId, courseLocked }: VideoSlots
               id: slot.id,
               label: slot.title,
               content: (
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="mr-auto">
-                    {slot.order}. {slot.title}
-                  </span>
-                  <Badge variant="outline">{slot.required ? "Required" : "Optional"}</Badge>
-                  {slot.status === "NOT_UPLOADED" ? (
-                    <Badge variant="outline">No video uploaded</Badge>
-                  ) : (
-                    <StatusBadge kind="video" status={slot.status} />
-                  )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      setEditing({ id: slot.id, title: slot.title, required: slot.required })
-                    }
-                  >
-                    <PencilIcon data-icon="inline-start" />
-                    Edit
-                  </Button>
-                  <ConfirmDialog
-                    trigger={
-                      <Button type="button" variant="outline" size="sm" disabled={locked}>
-                        <Trash2Icon data-icon="inline-start" />
-                        Remove
-                      </Button>
-                    }
-                    title="Remove this video slot?"
-                    itemName={slot.title}
-                    description="The slot is removed from the module. The uploaded file stays available to other course versions."
-                    confirmLabel="Remove video"
-                    destructive
-                    errorMessage={videoSlotDeleteFailedMessage(slot.title)}
-                    onConfirm={async () => {
-                      refresh(
-                        await remove.mutateAsync({ id: courseId, moduleId, videoId: slot.id }),
-                      );
-                    }}
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="mr-auto">
+                      {slot.order}. {slot.title}
+                    </span>
+                    <Badge variant="outline">{slot.required ? "Required" : "Optional"}</Badge>
+                    {slot.status === "NOT_UPLOADED" ? (
+                      <Badge variant="outline">No video uploaded</Badge>
+                    ) : (
+                      <StatusBadge kind="video" status={slot.status} />
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setEditing({ id: slot.id, title: slot.title, required: slot.required })
+                      }
+                    >
+                      <PencilIcon data-icon="inline-start" />
+                      Edit
+                    </Button>
+                    <ConfirmDialog
+                      trigger={
+                        <Button type="button" variant="outline" size="sm" disabled={locked}>
+                          <Trash2Icon data-icon="inline-start" />
+                          Remove
+                        </Button>
+                      }
+                      title="Remove this video slot?"
+                      itemName={slot.title}
+                      description="The slot is removed from the module. The uploaded file stays available to other course versions."
+                      confirmLabel="Remove video"
+                      destructive
+                      errorMessage={videoSlotDeleteFailedMessage(slot.title)}
+                      onConfirm={async () => {
+                        refresh(
+                          await remove.mutateAsync({ id: courseId, moduleId, videoId: slot.id }),
+                        );
+                      }}
+                    />
+                  </div>
+                  <VideoSlotUpload
+                    courseId={courseId}
+                    moduleId={moduleId}
+                    videoId={slot.id}
+                    title={slot.title}
+                    hasVideo={slot.status !== "NOT_UPLOADED"}
+                    disabled={locked}
+                    onFinished={() => void queryClient.invalidateQueries({ queryKey: listKey })}
                   />
                 </div>
               ),

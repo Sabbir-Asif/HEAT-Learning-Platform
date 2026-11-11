@@ -198,4 +198,18 @@ describe("createTusUpload", () => {
       "PATCH:10",
     ]);
   });
+
+  test("starting again after a failure continues the same upload without a new creation", async () => {
+    const { calls, send } = harness([
+      () => Promise.resolve(created()),
+      () => Promise.reject(new TypeError("down")),
+      () => Promise.reject(new TypeError("down")),
+      () => Promise.resolve(offsetOf(0)),
+      () => Promise.resolve(patched(20)),
+    ]);
+    const upload = createTusUpload(file(20), { ...options(send), retryDelays: [0] });
+    await upload.start().catch(() => undefined);
+    expect(await upload.start()).toBe("completed");
+    expect(calls.filter(({ method }) => method === "POST")).toHaveLength(1);
+  });
 });

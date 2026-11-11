@@ -17,6 +17,21 @@ export const videoSlotDeleteFailedMessage = (title: string): string =>
 export const videoSlotLockedMessage =
   "This course is locked. Video slots cannot be added, removed, reordered or switched between required and optional.";
 
+export const videoUploadFailedMessage = (code: string | undefined): string => {
+  if (code === "CONTENT_LOCKED") return "This course is locked, so videos cannot be uploaded.";
+  if (code === "UPLOAD_TOO_LARGE") return "This file is larger than the upload limit.";
+  if (code === "UPLOAD_TYPE_NOT_ALLOWED") {
+    return "This file is not a supported video. Use MP4, MOV, WebM or MKV.";
+  }
+  if (code === "UPLOAD_EXPIRED")
+    return "This upload expired before it finished. Choose the file again.";
+  if (code === "RATE_LIMITED") return "Too many upload requests. Wait a moment and retry.";
+  if (code === "NETWORK_ERROR") {
+    return "The connection dropped. Retry to continue from where it stopped.";
+  }
+  return "The upload failed. Try again.";
+};
+
 export const reorderFailedMessage = (code: string | undefined): string => {
   if (code === "ORDER_CONFLICT") {
     return "Someone else changed this order. Reload the list and try again.";

@@ -137,7 +137,7 @@ export function createTusUpload(file: Blob, options: TusUploadOptions): TusUploa
     (error instanceof TusUploadError && retryableStatuses.has(error.status));
 
   const run = async (): Promise<TusOutcome> => {
-    location = await create();
+    location ??= await create();
     let attempt = 0;
     while (!cancelled) {
       if (paused) {
