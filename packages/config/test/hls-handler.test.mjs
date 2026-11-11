@@ -1,13 +1,13 @@
 import { createHmac } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import hls from "../../../infra/nginx/hls.js";
-import { signingInput } from "../../../infra/nginx/hls-verify.js";
+import verify from "../../../infra/nginx/hls-verify.js";
 
 const now = 1_800_000_000;
 const secrets = { k1: "secret-one-0123456789", k2: "secret-two-0123456789" };
 
 const cookieFor = (videoId, kid, expiry) =>
-  `hls_sig=${kid}.${expiry}.${createHmac("sha256", secrets[kid]).update(signingInput(videoId, expiry)).digest("hex")}`;
+  `hls_sig=${kid}.${expiry}.${createHmac("sha256", secrets[kid]).update(verify.signingInput(videoId, expiry)).digest("hex")}`;
 
 const requestFor = (uri, cookie) => {
   const logs = [];

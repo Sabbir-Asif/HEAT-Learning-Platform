@@ -14,7 +14,7 @@ const hasForbiddenCharacter = (text) => {
   return false;
 };
 
-export const constantTimeEqual = (left, right) => {
+const constantTimeEqual = (left, right) => {
   const length = Math.max(left.length, right.length);
   let difference = left.length ^ right.length;
   for (let index = 0; index < length; index++) {
@@ -25,7 +25,7 @@ export const constantTimeEqual = (left, right) => {
   return difference === 0;
 };
 
-export const normalisePath = (rawUri) => {
+const normalisePath = (rawUri) => {
   if (typeof rawUri !== "string") return null;
   const cut = rawUri.search(/[?#]/);
   const path = cut < 0 ? rawUri : rawUri.slice(0, cut);
@@ -53,10 +53,12 @@ export const normalisePath = (rawUri) => {
   return "/" + segments.join("/");
 };
 
-export const parseKeys = (text) => {
+const parseKeys = (text) => {
   const keys = {};
   if (typeof text !== "string") return keys;
-  for (const entry of text.split(",")) {
+  const entries = text.split(",");
+  for (let index = 0; index < entries.length; index++) {
+    const entry = entries[index];
     const separator = entry.indexOf(":");
     if (separator < 0) continue;
     const id = entry.slice(0, separator).trim();
@@ -66,14 +68,14 @@ export const parseKeys = (text) => {
   return keys;
 };
 
-export const signingInput = (videoId, expiry) =>
-  videoId + "\n/hls/" + videoId + "/\n" + String(expiry);
+const signingInput = (videoId, expiry) => videoId + "\n/hls/" + videoId + "/\n" + String(expiry);
 
 const readCookie = (header) => {
   if (typeof header !== "string" || header === "") return { state: "missing" };
   const values = [];
-  for (const part of header.split(";")) {
-    const pair = part.trim();
+  const parts = header.split(";");
+  for (let index = 0; index < parts.length; index++) {
+    const pair = parts[index].trim();
     const separator = pair.indexOf("=");
     if (separator < 0) continue;
     if (pair.slice(0, separator) === cookieName) values.push(pair.slice(separator + 1));
@@ -91,20 +93,23 @@ const readCookie = (header) => {
   return { state: "ok", keyId, expiry: parseInt(expiry, 10), signature };
 };
 
-export const verifyRequest = ({ uri, cookieHeader, keys, now, hmacHex }) => {
-  const path = normalisePath(uri);
+const verifyRequest = (input) => {
+  const keys = input.keys;
+  const path = normalisePath(input.uri);
   if (path === null) return fail("bad-path");
   const prefix = /^\/hls\/([A-Za-z0-9_-]{1,64})\//.exec(path);
   if (prefix === null || !videoIdPattern.test(prefix[1])) return fail("bad-path");
   const videoId = prefix[1];
 
-  const cookie = readCookie(cookieHeader);
+  const cookie = readCookie(input.cookieHeader);
   if (cookie.state === "missing") return fail("no-cookie");
   if (cookie.state === "malformed") return fail("malformed");
 
   if (!Object.prototype.hasOwnProperty.call(keys, cookie.keyId)) return fail("unknown-key");
-  const expected = hmacHex(keys[cookie.keyId], signingInput(videoId, cookie.expiry));
+  const expected = input.hmacHex(keys[cookie.keyId], signingInput(videoId, cookie.expiry));
   if (!constantTimeEqual(expected, cookie.signature)) return fail("bad-signature");
-  if (cookie.expiry <= now) return fail("expired");
+  if (cookie.expiry <= input.now) return fail("expired");
   return { ok: true, videoId, keyId: cookie.keyId };
 };
+
+export default { constantTimeEqual, normalisePath, parseKeys, signingInput, verifyRequest };

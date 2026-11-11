@@ -1,13 +1,13 @@
 import crypto from "crypto";
-import { parseKeys, verifyRequest } from "./hls-verify.js";
+import verify from "./hls-verify.js";
 
 const hmacHex = (secret, data) => crypto.createHmac("sha256", secret).update(data).digest("hex");
 
 const authorize = (r) => {
-  const result = verifyRequest({
+  const result = verify.verifyRequest({
     uri: r.variables.request_uri,
     cookieHeader: r.headersIn.Cookie,
-    keys: parseKeys(process.env.HLS_SIGNING_KEYS),
+    keys: verify.parseKeys(process.env.HLS_SIGNING_KEYS),
     now: Math.floor(Date.now() / 1000),
     hmacHex,
   });

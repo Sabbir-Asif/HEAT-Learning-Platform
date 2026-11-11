@@ -1,12 +1,8 @@
 import { createHmac } from "node:crypto";
 import { describe, expect, test } from "vitest";
-import {
-  constantTimeEqual,
-  normalisePath,
-  parseKeys,
-  signingInput,
-  verifyRequest,
-} from "../../../infra/nginx/hls-verify.js";
+import verify from "../../../infra/nginx/hls-verify.js";
+
+const { constantTimeEqual, normalisePath, parseKeys, signingInput, verifyRequest } = verify;
 
 const hmacHex = (secret, data) => createHmac("sha256", secret).update(data).digest("hex");
 const now = 1_800_000_000;

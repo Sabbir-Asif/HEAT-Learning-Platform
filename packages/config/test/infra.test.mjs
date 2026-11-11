@@ -120,6 +120,68 @@ describe("dev Nginx config", () => {
   });
 });
 
+describe("HLS delivery config", () => {
+  const hls = read("infra/nginx/hls.inc");
+  const mainConf = read("infra/nginx/nginx.conf");
+
+  test("both hosts include the same /hls/ location", () => {
+    for (const host of ["learn.localhost", "admin.localhost"])
+      expect(server(host)).toContain("include /etc/nginx/conf.d/hls.inc;");
+    expect(compose).toContain("../nginx/hls.inc:/etc/nginx/conf.d/hls.inc:ro");
+  });
+
+  test("the location denies unless njs authorizes, before anything is served", () => {
+    expect(hls).toMatch(/location \/hls\/ \{\s*if \(\$hls_authorized != "1"\) \{\s*return 403;/);
+    expect(nginx).toContain("js_set $hls_authorized hls.authorize;");
+  });
+
+  test("files are served from a read-only media root with sendfile, GET and HEAD only", () => {
+    expect(hls).toContain("root /srv/media;");
+    expect(hls).toContain("sendfile on;");
+    expect(hls).toMatch(/limit_except GET HEAD \{\s*deny all;/);
+    expect(hls).not.toContain("proxy_pass");
+    expect(service("nginx")).toMatch(/:\/srv\/media\/hls:ro/);
+  });
+
+  test("playlists and segments have explicit MIME types", () => {
+    expect(hls).toContain("application/vnd.apple.mpegurl m3u8;");
+    expect(hls).toContain("video/mp2t ts;");
+    expect(hls).toContain("video/iso.segment m4s;");
+  });
+
+  test("responses are private and vary on the cookie", () => {
+    expect(hls).toContain("add_header Cache-Control $hls_cache_control always;");
+    expect(hls).toContain("add_header Vary Cookie always;");
+    expect(nginx).toContain('~\\.m3u8$ "private, no-store";');
+    expect(nginx).toContain('default   "private, max-age=600";');
+    expect(`${hls}${nginx}`).not.toMatch(/\bpublic\b/);
+  });
+
+  test("signing keys reach Nginx only through the environment", () => {
+    expect(mainConf).toContain("env HLS_SIGNING_KEYS;");
+    expect(mainConf).toContain("load_module modules/ngx_http_js_module.so;");
+    expect(service("nginx")).toContain("HLS_SIGNING_KEYS: ${HLS_SIGNING_KEYS:?run pnpm dev:up}");
+    expect(`${hls}${nginx}${mainConf}`).not.toMatch(/dev-only-hls-key/);
+  });
+
+  test("the njs files and the originals", () => {
+    expect(compose).toContain("../nginx/hls.js:/etc/nginx/njs/hls.js:ro");
+    expect(compose).toContain("../nginx/hls-verify.js:/etc/nginx/njs/hls-verify.js:ro");
+    expect(compose).not.toMatch(/original/i);
+    expect(hls).not.toMatch(/original/i);
+  });
+
+  test("the njs sources use only the syntax njs supports", () => {
+    for (const file of ["hls.js", "hls-verify.js"]) {
+      const source = read(`infra/nginx/${file}`);
+      expect(source).not.toMatch(/\bfor \(const \w+ of\b/);
+      expect(source).not.toMatch(/^export (const|function)/m);
+      expect(source).not.toMatch(/^import \{/m);
+      expect(source.match(/^export default/gm)).toHaveLength(1);
+    }
+  });
+});
+
 describe("environment files", () => {
   test.each(apps)("apps/%s has an .env.example", (app) => {
     expect(Object.keys(parseEnv(read(`apps/${app}/.env.example`))).length).toBeGreaterThan(0);
