@@ -14,9 +14,18 @@ vi.mock("@heat/api-client", async (importOriginal) => ({
   useLessonContentRead: (...args: unknown[]) => useLessonContentRead(...args),
 }));
 
-vi.mock("../../src/learn/video-area", async () => ({
-  VideoArea: (await import("../../src/learn/video-slot")).default,
-}));
+vi.mock("../../src/learn/video-area", async () => {
+  const { QueryClient, QueryClientProvider } = await import("@tanstack/react-query");
+  const { default: VideoSlot } = await import("../../src/learn/video-slot");
+  const client = new QueryClient();
+  return {
+    VideoArea: (props: React.ComponentProps<typeof VideoSlot>) => (
+      <QueryClientProvider client={client}>
+        <VideoSlot {...props} />
+      </QueryClientProvider>
+    ),
+  };
+});
 
 const lessonOk = {
   isError: false,

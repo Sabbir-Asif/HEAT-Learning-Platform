@@ -57,6 +57,7 @@ interface VideoPlayerProps {
   refreshSession: () => Promise<RefreshedSession>;
   maxPlaybackRate: number;
   startPositionSeconds?: number;
+  autoPlay?: boolean;
   captions?: readonly { language: string }[];
   className?: string;
 }
@@ -67,6 +68,7 @@ function PlayerSurface({
   initialExpiresAt,
   refreshSession,
   startPositionSeconds = 0,
+  autoPlay = false,
   captions = [],
   className,
 }: Omit<VideoPlayerProps, "maxPlaybackRate">) {
@@ -259,6 +261,7 @@ function PlayerSurface({
         mediaRef={mediaRef}
         source={source}
         playsInline
+        autoPlay={autoPlay}
         preload="metadata"
         className="size-full object-contain"
         onError={() => {
