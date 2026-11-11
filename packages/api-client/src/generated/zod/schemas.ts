@@ -1908,6 +1908,10 @@ export const enrollmentSubmitBodyCaptchaAnswerMax = 12;
 
 export const enrollmentSubmitBodyCaptchaIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
+export const enrollmentSubmitBodyCourseSlugMax = 80;
+
+
+export const enrollmentSubmitBodyCourseSlugRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
 export const enrollmentSubmitBodyDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const enrollmentSubmitBodyFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const enrollmentSubmitBodyPasswordMin = 12;
@@ -1921,6 +1925,7 @@ export const EnrollmentSubmitBody = zod.object({
   "captchaAnswer": zod.string().min(1).max(enrollmentSubmitBodyCaptchaAnswerMax),
   "captchaId": zod.uuid().regex(enrollmentSubmitBodyCaptchaIdRegExp),
   "confirmPassword": zod.string().min(1),
+  "courseSlug": zod.string().min(1).max(enrollmentSubmitBodyCourseSlugMax).regex(enrollmentSubmitBodyCourseSlugRegExp),
   "departmentId": zod.uuid().regex(enrollmentSubmitBodyDepartmentIdRegExp),
   "email": zod.string(),
   "facultyId": zod.uuid().regex(enrollmentSubmitBodyFacultyIdRegExp),

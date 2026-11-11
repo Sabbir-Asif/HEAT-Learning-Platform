@@ -1,5 +1,7 @@
-import { Body, Controller, HttpCode, Post } from "@nestjs/common";
+import { Body, Controller, HttpCode, Post, Req } from "@nestjs/common";
 import { ApiAcceptedResponse, ApiTags } from "@nestjs/swagger";
+import { actorOf } from "../audit";
+import type { AuditableRequest } from "../audit";
 import { Public } from "../auth";
 import { RateLimit } from "../rate-limit";
 import { EnrollmentAcceptedResponseDto, EnrollmentRequestDto } from "./enrollment.dto";
@@ -15,7 +17,10 @@ export class EnrollmentController {
   @Post()
   @HttpCode(202)
   @ApiAcceptedResponse({ type: EnrollmentAcceptedResponseDto })
-  submit(@Body() body: EnrollmentRequestDto): Promise<EnrollmentAcceptedResponseDto> {
-    return this.enrollment.submit(body);
+  submit(
+    @Body() body: EnrollmentRequestDto,
+    @Req() request: AuditableRequest,
+  ): Promise<EnrollmentAcceptedResponseDto> {
+    return this.enrollment.submit(body, actorOf(request));
   }
 }
