@@ -140,6 +140,7 @@ describe("loadConfig", () => {
         NODE_ENV: "production",
         TRUSTED_ORIGINS: "https://learn.example.test",
         ADMIN_APP_URL: "https://admin.example.test",
+        VIDEO_UPLOAD_DIR: "/srv/heat/uploads",
       }).csrf.trustedOrigins,
     ).toEqual(["https://learn.example.test"]);
   });
@@ -282,5 +283,59 @@ describe("HLS signing keys", () => {
     const keys = example.match(/^HLS_SIGNING_KEYS=(.*)$/m)?.[1];
     expect(keys).toBeDefined();
     expect(loadConfig({ ...valid, HLS_SIGNING_KEYS: keys }).hls?.keys.size).toBe(2);
+  });
+});
+
+describe("video uploads", () => {
+  test("default to a local directory and a 24 hour expiry", () => {
+    const { videoUploads } = loadConfig(valid);
+    expect(videoUploads.expiryHours).toBe(24);
+    expect(videoUploads.directory).toMatch(/\.data[\\/]uploads$/);
+  });
+
+  test("take the directory and expiry from the environment", () => {
+    const { videoUploads } = loadConfig({
+      ...valid,
+      VIDEO_UPLOAD_DIR: "/srv/heat/uploads",
+      VIDEO_UPLOAD_EXPIRY_HOURS: "6",
+    });
+    expect(videoUploads).toEqual({ directory: "/srv/heat/uploads", expiryHours: 6 });
+  });
+
+  test("require the directory in production", () => {
+    const production = {
+      ...valid,
+      ...productionMail,
+      NODE_ENV: "production",
+      ADMIN_APP_URL: "https://admin.example.test",
+      TRUSTED_ORIGINS: "https://admin.example.test",
+    };
+    expect(() => loadConfig(production)).toThrow("VIDEO_UPLOAD_DIR");
+    expect(
+      loadConfig({ ...production, VIDEO_UPLOAD_DIR: "/srv/heat/uploads" }).videoUploads.directory,
+    ).toBe("/srv/heat/uploads");
+  });
+
+  test("refuses a zero expiry", () => {
+    expect(() => loadConfig({ ...valid, VIDEO_UPLOAD_EXPIRY_HOURS: "0" })).toThrow(
+      "VIDEO_UPLOAD_EXPIRY_HOURS",
+    );
+  });
+});
+
+describe("video upload rate limit profiles", () => {
+  test("keep the start tight and give chunk traffic room for a long upload", () => {
+    const { profiles } = loadConfig(valid).rateLimit;
+    expect(profiles.videoUploadStart.limit).toBeLessThanOrEqual(60);
+    expect(profiles.videoUploadChunk.limit).toBeGreaterThanOrEqual(3000);
+    expect(profiles.videoUploadChunk.ipLimit).toBeGreaterThan(profiles.videoUploadChunk.limit);
+  });
+
+  test("can be tuned from the environment", () => {
+    const { profiles } = loadConfig({
+      ...valid,
+      RATE_LIMIT_VIDEO_UPLOAD_CHUNK_LIMIT: "9000",
+    }).rateLimit;
+    expect(profiles.videoUploadChunk.limit).toBe(9000);
   });
 });

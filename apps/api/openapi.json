@@ -578,6 +578,10 @@
                     "PASSWORD_CHANGE_REQUIRED",
                     "RATE_LIMITED",
                     "UNAUTHENTICATED",
+                    "UPLOAD_EXPIRED",
+                    "UPLOAD_OFFSET_MISMATCH",
+                    "UPLOAD_TOO_LARGE",
+                    "UPLOAD_TYPE_NOT_ALLOWED",
                     "VALIDATION_FAILED",
                     "VERIFICATION_LINK_EXPIRED",
                     "VERIFICATION_LINK_INVALID",
@@ -2418,6 +2422,18 @@
                   "minimum": 1,
                   "type": "integer"
                 },
+                "rejectionReason": {
+                  "enum": [
+                    "NOT_A_VIDEO",
+                    "UNSUPPORTED_CONTAINER",
+                    "UNSUPPORTED_CODEC",
+                    "TOO_LARGE",
+                    "NO_DURATION",
+                    null
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
                 "required": {
                   "type": "boolean"
                 },
@@ -2444,7 +2460,8 @@
                 "title",
                 "required",
                 "status",
-                "assetKey"
+                "assetKey",
+                "rejectionReason"
               ],
               "type": "object"
             },

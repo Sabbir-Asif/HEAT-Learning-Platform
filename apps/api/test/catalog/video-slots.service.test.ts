@@ -13,7 +13,7 @@ interface SlotFixture {
   title: string;
   required: boolean;
   assetId: string | null;
-  asset: { status: string; assetKey: string } | null;
+  asset: { status: string; assetKey: string; rejectionReason?: string | null } | null;
 }
 
 const slot = (id: string, order: number, overrides: Partial<SlotFixture> = {}): SlotFixture => ({
@@ -90,6 +90,27 @@ const failureOf = (promise: Promise<unknown>): Promise<unknown> =>
     () => undefined,
     (error: unknown) => error,
   );
+
+describe("VideoSlotsService.list rejection reason", () => {
+  test("shows why a rejected video was refused and null otherwise", async () => {
+    const { service } = build({
+      slots: [
+        slot("a", 1, {
+          assetId: "x",
+          asset: { status: "REJECTED", assetKey: "k1", rejectionReason: "UNSUPPORTED_CODEC" },
+        }),
+        slot("b", 2, { assetId: "y", asset: { status: "READY", assetKey: "k2" } }),
+        slot("c", 3),
+      ],
+    });
+    const result = await service.list(courseId, "m");
+    expect(result.items.map((item) => item.rejectionReason)).toEqual([
+      "UNSUPPORTED_CODEC",
+      null,
+      null,
+    ]);
+  });
+});
 
 describe("VideoSlotsService.list", () => {
   test("returns the slots in order with their status and no disk path", async () => {

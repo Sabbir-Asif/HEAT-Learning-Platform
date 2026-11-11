@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { z } from "zod";
 import { loadMailConfig } from "../mail/mail-config";
 import type { MailConfig } from "../mail/mail-config";
@@ -90,6 +91,8 @@ const envSchema = z
     AUDIT_TRANSACTION_MAX_WAIT_MS: positiveInt.default(5000),
     AUDIT_TRANSACTION_TIMEOUT_MS: positiveInt.default(15000),
     RESPONSE_FLOOR_MS: positiveInt.default(1000),
+    VIDEO_UPLOAD_DIR: z.string().min(1).optional(),
+    VIDEO_UPLOAD_EXPIRY_HOURS: positiveInt.default(24),
     HLS_SIGNING_KEYS: hlsSigningKeys,
     HLS_ACTIVE_KEY_ID: z.string().regex(hlsKeyId).optional(),
     BREACHED_PASSWORD_RANGE_URL: z.url().default("https://api.pwnedpasswords.com/range/"),
@@ -103,6 +106,13 @@ const envSchema = z
         code: "custom",
         path: ["HLS_ACTIVE_KEY_ID"],
         message: "HLS_ACTIVE_KEY_ID must be one of the HLS_SIGNING_KEYS ids",
+      });
+    }
+    if (env.NODE_ENV === "production" && env.VIDEO_UPLOAD_DIR === undefined) {
+      context.addIssue({
+        code: "custom",
+        path: ["VIDEO_UPLOAD_DIR"],
+        message: "VIDEO_UPLOAD_DIR is required in production",
       });
     }
     if (env.NODE_ENV === "production" && env.ADMIN_APP_URL === undefined) {
@@ -121,6 +131,7 @@ const envSchema = z
     }
   });
 
+const localVideoUploadDirectory = "../../.data/uploads";
 const localAdminAppUrl = "http://localhost:3001";
 const localTrustedOrigins = [
   "http://localhost:3000",
@@ -132,6 +143,11 @@ const localTrustedOrigins = [
 export interface HlsConfig {
   keys: ReadonlyMap<string, string>;
   activeKeyId: string;
+}
+
+export interface VideoUploadConfig {
+  directory: string;
+  expiryHours: number;
 }
 
 export interface AppConfig {
@@ -156,6 +172,7 @@ export interface AppConfig {
   accountProtection: { responseFloorMs: number };
   rateLimit: RateLimitConfig;
   hls: HlsConfig | undefined;
+  videoUploads: VideoUploadConfig;
   mail: MailConfig;
 }
 
@@ -214,6 +231,10 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
     accountProtection: { responseFloorMs: values.RESPONSE_FLOOR_MS },
     rateLimit,
     hls: hlsOf(values.HLS_SIGNING_KEYS, values.HLS_ACTIVE_KEY_ID),
+    videoUploads: {
+      directory: values.VIDEO_UPLOAD_DIR ?? resolve(localVideoUploadDirectory),
+      expiryHours: values.VIDEO_UPLOAD_EXPIRY_HOURS,
+    },
     mail: loadMailConfig(env),
   };
 };

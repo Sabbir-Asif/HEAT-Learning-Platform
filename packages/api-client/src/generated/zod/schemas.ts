@@ -1299,6 +1299,7 @@ export const VideoSlotsListResponse = zod.object({
   "assetKey": zod.string().max(videoSlotsListResponseItemsItemAssetKeyMax).nullable(),
   "id": zod.uuid().regex(videoSlotsListResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsListResponseItemsItemOrderMax),
+  "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
   "title": zod.string()
@@ -1335,6 +1336,7 @@ export const VideoSlotsCreateResponse = zod.object({
   "assetKey": zod.string().max(videoSlotsCreateResponseItemsItemAssetKeyMax).nullable(),
   "id": zod.uuid().regex(videoSlotsCreateResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsCreateResponseItemsItemOrderMax),
+  "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
   "title": zod.string()
@@ -1377,6 +1379,7 @@ export const VideoSlotsReorderResponse = zod.object({
   "assetKey": zod.string().max(videoSlotsReorderResponseItemsItemAssetKeyMax).nullable(),
   "id": zod.uuid().regex(videoSlotsReorderResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsReorderResponseItemsItemOrderMax),
+  "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
   "title": zod.string()
@@ -1408,6 +1411,7 @@ export const VideoSlotsRemoveResponse = zod.object({
   "assetKey": zod.string().max(videoSlotsRemoveResponseItemsItemAssetKeyMax).nullable(),
   "id": zod.uuid().regex(videoSlotsRemoveResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsRemoveResponseItemsItemOrderMax),
+  "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
   "title": zod.string()
@@ -1444,6 +1448,7 @@ export const VideoSlotsUpdateResponse = zod.object({
   "assetKey": zod.string().max(videoSlotsUpdateResponseItemsItemAssetKeyMax).nullable(),
   "id": zod.uuid().regex(videoSlotsUpdateResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsUpdateResponseItemsItemOrderMax),
+  "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
   "title": zod.string()
@@ -2350,7 +2355,7 @@ export const enrollmentApprovalApproveManyResponseSucceededItemRegExp = new RegE
 
 export const EnrollmentApprovalApproveManyResponse = zod.object({
   "failed": zod.array(zod.object({
-  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_VERIFIED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'RATE_LIMITED', 'UNAUTHENTICATED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT']),
+  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_VERIFIED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'RATE_LIMITED', 'UNAUTHENTICATED', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT']),
   "id": zod.uuid().regex(enrollmentApprovalApproveManyResponseFailedItemIdRegExp)
 })),
   "succeeded": zod.array(zod.uuid().regex(enrollmentApprovalApproveManyResponseSucceededItemRegExp))

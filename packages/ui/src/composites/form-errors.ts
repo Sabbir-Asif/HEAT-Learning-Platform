@@ -43,6 +43,10 @@ export type FormErrorCopyKey =
   | "PASSWORD_CHANGE_REQUIRED"
   | "RATE_LIMITED"
   | "UNAUTHENTICATED"
+  | "UPLOAD_EXPIRED"
+  | "UPLOAD_OFFSET_MISMATCH"
+  | "UPLOAD_TOO_LARGE"
+  | "UPLOAD_TYPE_NOT_ALLOWED"
   | "VALIDATION_FAILED"
   | "VERIFICATION_LINK_EXPIRED"
   | "VERIFICATION_LINK_INVALID"
@@ -105,6 +109,10 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
   RATE_LIMITED: "Too many attempts. Wait a little and try again.",
   UNAUTHENTICATED: "Your session has ended. Sign in again to continue.",
+  UPLOAD_EXPIRED: "This upload expired before it finished. Start it again.",
+  UPLOAD_OFFSET_MISMATCH: "The upload got out of step with the server. Start it again.",
+  UPLOAD_TOO_LARGE: "This file is larger than the upload limit.",
+  UPLOAD_TYPE_NOT_ALLOWED: "This file is not a supported video. Use MP4, MOV, WebM or MKV.",
   VALIDATION_FAILED: genericFormMessage,
   VERIFICATION_LINK_EXPIRED: "This verification link has expired. Request a new one.",
   VERIFICATION_LINK_INVALID: "This verification link is not valid.",

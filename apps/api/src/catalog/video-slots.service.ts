@@ -1,6 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { videoRejectionReasonSchema } from "@heat/contracts";
 import type {
   CreateVideoSlotRequest,
+  VideoRejectionReason,
   ReorderRequest,
   UpdateVideoSlotRequest,
   VideoSlotListResponse,
@@ -24,7 +26,7 @@ const slotSelect = {
   title: true,
   required: true,
   assetId: true,
-  asset: { select: { status: true, assetKey: true } },
+  asset: { select: { status: true, assetKey: true, rejectionReason: true } },
 };
 
 interface SlotRow {
@@ -33,8 +35,17 @@ interface SlotRow {
   title: string;
   required: boolean;
   assetId: string | null;
-  asset: { status: VideoSlotStatus; assetKey: string } | null;
+  asset: {
+    status: VideoSlotStatus;
+    assetKey: string;
+    rejectionReason: string | null;
+  } | null;
 }
+
+const reasonOf = (value: string | null): VideoRejectionReason | null => {
+  const parsed = videoRejectionReasonSchema.safeParse(value);
+  return parsed.success ? parsed.data : null;
+};
 
 const toSlotSummary = (row: SlotRow): VideoSlotSummary => ({
   id: row.id,
@@ -43,6 +54,7 @@ const toSlotSummary = (row: SlotRow): VideoSlotSummary => ({
   required: row.required,
   status: slotStatusOf(row.asset),
   assetKey: row.asset?.assetKey ?? null,
+  rejectionReason: reasonOf(row.asset?.rejectionReason ?? null),
 });
 
 const auditedFields = (moduleId: string, row: SlotRow) => ({

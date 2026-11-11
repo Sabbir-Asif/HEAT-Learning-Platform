@@ -9,6 +9,7 @@ export type {
   UnauthorizedContext,
   UnauthorizedHandler,
 } from "./mutator/extensions";
+export { fetchResponse } from "./mutator/raw-fetch";
 export { createCsrfInterceptor, installCsrf } from "./mutator/csrf";
 export type { CsrfOptions } from "./mutator/csrf";
 export { createSessionRefresh, installSessionRefresh } from "./mutator/session-refresh";

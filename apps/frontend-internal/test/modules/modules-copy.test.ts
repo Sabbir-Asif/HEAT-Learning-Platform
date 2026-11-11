@@ -6,6 +6,8 @@ import {
   reorderFailedMessage,
   videoSlotDeleteFailedMessage,
   videoSlotLockedMessage,
+  videoRejectionMessage,
+  videoUploadFailedMessage,
 } from "../../src/modules/modules-copy";
 
 describe("moduleFormValuesOf", () => {
@@ -53,5 +55,34 @@ describe("video slot copy", () => {
   test("explains what a locked course refuses", () => {
     expect(videoSlotLockedMessage).toContain("locked");
     expect(videoSlotLockedMessage).toContain("required");
+  });
+});
+
+describe("videoUploadFailedMessage", () => {
+  test("says why the server refused the upload", () => {
+    expect(videoUploadFailedMessage("CONTENT_LOCKED")).toContain("locked");
+    expect(videoUploadFailedMessage("UPLOAD_TOO_LARGE")).toContain("limit");
+    expect(videoUploadFailedMessage("UPLOAD_TYPE_NOT_ALLOWED")).toContain("MP4, MOV, WebM or MKV");
+    expect(videoUploadFailedMessage("UPLOAD_EXPIRED")).toContain("expired");
+    expect(videoUploadFailedMessage("RATE_LIMITED")).toContain("Wait");
+  });
+
+  test("says the connection dropped and that retry continues", () => {
+    expect(videoUploadFailedMessage("NETWORK_ERROR")).toContain("Retry");
+  });
+
+  test("falls back to a plain message for anything else", () => {
+    expect(videoUploadFailedMessage(undefined)).toBe("The upload failed. Try again.");
+    expect(videoUploadFailedMessage("INTERNAL")).toBe("The upload failed. Try again.");
+  });
+});
+
+describe("videoRejectionMessage", () => {
+  test("explains each reason the probe can give", () => {
+    expect(videoRejectionMessage("NOT_A_VIDEO")).toContain("not a video");
+    expect(videoRejectionMessage("UNSUPPORTED_CONTAINER")).toContain("format");
+    expect(videoRejectionMessage("UNSUPPORTED_CODEC")).toContain("video codec is not supported");
+    expect(videoRejectionMessage("TOO_LARGE")).toContain("limit");
+    expect(videoRejectionMessage("NO_DURATION")).toContain("incomplete");
   });
 });

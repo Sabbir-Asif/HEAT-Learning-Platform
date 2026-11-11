@@ -32,6 +32,13 @@ export const documentRules: UploadRules = {
   maxFiles: 5,
 };
 
+export const videoRules = (maxBytes: number): UploadRules => ({
+  extensions: ["mp4", "mov", "webm", "mkv"],
+  mimeTypes: ["video/mp4", "video/quicktime", "video/webm", "video/x-matroska"],
+  maxBytes,
+  maxFiles: 1,
+});
+
 export function formatBytes(bytes: number): string {
   if (bytes >= mebibyte) return `${Number((bytes / mebibyte).toFixed(1))} MB`;
   if (bytes >= 1024) return `${Number((bytes / 1024).toFixed(1))} KB`;

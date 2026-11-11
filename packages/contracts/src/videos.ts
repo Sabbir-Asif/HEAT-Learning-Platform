@@ -14,6 +14,16 @@ export const videoSlotStatusSchema = z.enum([
 
 export type VideoSlotStatus = z.infer<typeof videoSlotStatusSchema>;
 
+export const videoRejectionReasonSchema = z.enum([
+  "NOT_A_VIDEO",
+  "UNSUPPORTED_CONTAINER",
+  "UNSUPPORTED_CODEC",
+  "TOO_LARGE",
+  "NO_DURATION",
+]);
+
+export type VideoRejectionReason = z.infer<typeof videoRejectionReasonSchema>;
+
 export const createVideoSlotRequestSchema = z.object({
   title: courseTitleSchema,
   required: z.boolean().default(true),
@@ -35,6 +45,7 @@ export const videoSlotSummarySchema = z.object({
   required: z.boolean(),
   status: videoSlotStatusSchema,
   assetKey: z.string().max(128).nullable(),
+  rejectionReason: videoRejectionReasonSchema.nullable(),
 });
 
 export type VideoSlotSummary = z.infer<typeof videoSlotSummarySchema>;
@@ -50,4 +61,33 @@ export const videoSlotParamsSchema = z.object({
   id: z.uuid(),
   moduleId: z.uuid(),
   videoId: z.uuid(),
+});
+
+const gibibyte = 1024 ** 3;
+
+export const videoUploadLimits = {
+  maxBytes: 2 * gibibyte,
+  minBytes: 12,
+  extensions: ["mp4", "mov", "webm", "mkv"],
+  containers: ["mov", "mp4", "matroska", "webm"],
+  videoCodecs: ["h264", "hevc", "vp8", "vp9", "av1"],
+} as const;
+
+export const tusProtocol = {
+  version: "1.0.0",
+  offsetContentType: "application/offset+octet-stream",
+} as const;
+
+export const videoUploadedEventType = "video.uploaded";
+
+export const videoQueuedEventType = "video.queued";
+
+export const videoUploadedPayloadSchema = z.object({ assetId: z.uuid() });
+
+export type VideoUploadedPayload = z.infer<typeof videoUploadedPayloadSchema>;
+
+export const assetKeySchema = z.string().regex(/^[A-Za-z0-9_-]{32}$/);
+
+export const videoUploadParamsSchema = videoSlotParamsSchema.extend({
+  assetKey: assetKeySchema,
 });

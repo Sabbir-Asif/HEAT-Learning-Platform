@@ -352,6 +352,10 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   PASSWORD_CHANGE_REQUIRED: 'PASSWORD_CHANGE_REQUIRED',
   RATE_LIMITED: 'RATE_LIMITED',
   UNAUTHENTICATED: 'UNAUTHENTICATED',
+  UPLOAD_EXPIRED: 'UPLOAD_EXPIRED',
+  UPLOAD_OFFSET_MISMATCH: 'UPLOAD_OFFSET_MISMATCH',
+  UPLOAD_TOO_LARGE: 'UPLOAD_TOO_LARGE',
+  UPLOAD_TYPE_NOT_ALLOWED: 'UPLOAD_TYPE_NOT_ALLOWED',
   VALIDATION_FAILED: 'VALIDATION_FAILED',
   VERIFICATION_LINK_EXPIRED: 'VERIFICATION_LINK_EXPIRED',
   VERIFICATION_LINK_INVALID: 'VERIFICATION_LINK_INVALID',
@@ -1310,6 +1314,20 @@ export interface VerifyEmailRequestDto {
   token: string;
 }
 
+/**
+ * @nullable
+ */
+export type VideoSlotListResponseDtoItemsItemRejectionReason = typeof VideoSlotListResponseDtoItemsItemRejectionReason[keyof typeof VideoSlotListResponseDtoItemsItemRejectionReason] | null;
+
+
+export const VideoSlotListResponseDtoItemsItemRejectionReason = {
+  NOT_A_VIDEO: 'NOT_A_VIDEO',
+  UNSUPPORTED_CONTAINER: 'UNSUPPORTED_CONTAINER',
+  UNSUPPORTED_CODEC: 'UNSUPPORTED_CODEC',
+  TOO_LARGE: 'TOO_LARGE',
+  NO_DURATION: 'NO_DURATION',
+} as const;
+
 export type VideoSlotListResponseDtoItemsItemStatus = typeof VideoSlotListResponseDtoItemsItemStatus[keyof typeof VideoSlotListResponseDtoItemsItemStatus];
 
 
@@ -1337,6 +1355,8 @@ export type VideoSlotListResponseDtoItemsItem = {
      * @maximum 9007199254740991
      */
   order: number;
+  /** @nullable */
+  rejectionReason: VideoSlotListResponseDtoItemsItemRejectionReason;
   required: boolean;
   status: VideoSlotListResponseDtoItemsItemStatus;
   title: string;
