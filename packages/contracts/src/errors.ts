@@ -6,6 +6,11 @@ export const errorCodes = [
   "CANNOT_DEACTIVATE_SELF",
   "CAPTCHA_EXPIRED",
   "CAPTCHA_INVALID",
+  "COURSE_HAS_ENROLLMENTS",
+  "COURSE_LOCKED",
+  "COURSE_NOT_DRAFT",
+  "COURSE_PUBLISH_CHECKS_FAILED",
+  "COURSE_SLUG_TAKEN",
   "CSRF_TOKEN_INVALID",
   "DIRECTORY_ARCHIVED",
   "DIRECTORY_IN_USE",
@@ -63,6 +68,7 @@ export const errorResponseSchema = z.object({
     message: z.string(),
     requestId: z.string(),
     fields: z.array(fieldErrorSchema).optional(),
+    failures: z.array(z.string()).optional(),
   }),
 });
 
