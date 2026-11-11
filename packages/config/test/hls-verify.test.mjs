@@ -14,6 +14,15 @@ const cookieFor = (videoId, { kid = "k1", expiry = now + 600, secret = keys[kid]
 const check = (uri, cookie, overrides = {}) =>
   verifyRequest({ uri, cookieHeader: cookie, keys, now, hmacHex, ...overrides });
 
+describe("shared test vector with the API signer", () => {
+  test("the API test pins the same signature for this input", () => {
+    expect(signingInput("abc_1", 1800000600)).toBe("abc_1\n/hls/abc_1/\n1800000600");
+    expect(hmacHex("secret-one-0123456789", signingInput("abc_1", 1800000600))).toBe(
+      "64e3c18a34b0cbe6cf0f767661fa0e0c77ee902f5690f714768b497619ef147b",
+    );
+  });
+});
+
 describe("normalisePath", () => {
   test("returns a clean path unchanged and drops the query string", () => {
     expect(normalisePath("/hls/abc/index.m3u8?x=1")).toBe("/hls/abc/index.m3u8");

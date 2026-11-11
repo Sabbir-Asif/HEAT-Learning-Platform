@@ -21,6 +21,32 @@ const encryptionKey = z
   .transform((value) => Buffer.from(value, "base64"))
   .refine((key) => key.length === 32, "AUTH_ENCRYPTION_KEY must be 32 bytes, base64 encoded");
 
+const hlsKeyId = /^[A-Za-z0-9_-]{1,32}$/;
+
+const hlsSigningKeys = z
+  .string()
+  .transform((value, context) => {
+    const keys = new Map<string, string>();
+    for (const entry of value.split(",")) {
+      const text = entry.trim();
+      if (text === "") continue;
+      const separator = text.indexOf(":");
+      const id = separator < 0 ? "" : text.slice(0, separator);
+      const keySecret = separator < 0 ? "" : text.slice(separator + 1);
+      if (!hlsKeyId.test(id) || keySecret.length < 32 || keys.has(id)) {
+        context.addIssue({ code: "custom", message: "HLS_SIGNING_KEYS entry is invalid" });
+        return z.NEVER;
+      }
+      keys.set(id, keySecret);
+    }
+    if (keys.size === 0) {
+      context.addIssue({ code: "custom", message: "HLS_SIGNING_KEYS has no keys" });
+      return z.NEVER;
+    }
+    return keys;
+  })
+  .optional();
+
 const envSchema = z
   .object({
     DATABASE_URL: z.string().min(1),
@@ -64,9 +90,21 @@ const envSchema = z
     AUDIT_TRANSACTION_MAX_WAIT_MS: positiveInt.default(5000),
     AUDIT_TRANSACTION_TIMEOUT_MS: positiveInt.default(15000),
     RESPONSE_FLOOR_MS: positiveInt.default(1000),
+    HLS_SIGNING_KEYS: hlsSigningKeys,
+    HLS_ACTIVE_KEY_ID: z.string().regex(hlsKeyId).optional(),
     BREACHED_PASSWORD_RANGE_URL: z.url().default("https://api.pwnedpasswords.com/range/"),
   })
   .superRefine((env, context) => {
+    if (
+      env.HLS_ACTIVE_KEY_ID !== undefined &&
+      !(env.HLS_SIGNING_KEYS?.has(env.HLS_ACTIVE_KEY_ID) ?? false)
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["HLS_ACTIVE_KEY_ID"],
+        message: "HLS_ACTIVE_KEY_ID must be one of the HLS_SIGNING_KEYS ids",
+      });
+    }
     if (env.NODE_ENV === "production" && env.ADMIN_APP_URL === undefined) {
       context.addIssue({
         code: "custom",
@@ -91,6 +129,11 @@ const localTrustedOrigins = [
   "http://admin.localhost",
 ];
 
+export interface HlsConfig {
+  keys: ReadonlyMap<string, string>;
+  activeKeyId: string;
+}
+
 export interface AppConfig {
   databaseUrl: string;
   redisUrl: string;
@@ -112,8 +155,18 @@ export interface AppConfig {
   audit: { transactionMaxWaitMs: number; transactionTimeoutMs: number };
   accountProtection: { responseFloorMs: number };
   rateLimit: RateLimitConfig;
+  hls: HlsConfig | undefined;
   mail: MailConfig;
 }
+
+const hlsOf = (
+  keys: ReadonlyMap<string, string> | undefined,
+  activeKeyId: string | undefined,
+): HlsConfig | undefined => {
+  if (keys === undefined) return undefined;
+  const first = keys.keys().next().value;
+  return { keys, activeKeyId: activeKeyId ?? String(first) };
+};
 
 export const APP_CONFIG = Symbol("APP_CONFIG");
 
@@ -160,6 +213,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
     },
     accountProtection: { responseFloorMs: values.RESPONSE_FLOOR_MS },
     rateLimit,
+    hls: hlsOf(values.HLS_SIGNING_KEYS, values.HLS_ACTIVE_KEY_ID),
     mail: loadMailConfig(env),
   };
 };

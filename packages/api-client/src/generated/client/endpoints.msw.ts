@@ -58,6 +58,7 @@ import type {
   MeResponseDto,
   ModuleListResponseDto,
   ModuleSummaryDto,
+  PlaybackSessionResponseDto,
   QuizQuestionRequestDto,
   QuizRulesRequestDto,
   QuizSummaryDto,
@@ -194,6 +195,8 @@ export const getEnrollmentApprovalListPendingResponseMock = (overrideResponse: P
 export const getEnrollmentApprovalApproveResponseMock = (overrideResponse: Partial<Extract<ApprovedEnrollmentDto, object>> = {}): ApprovedEnrollmentDto => ({approvedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', courseRevisionId: faker.string.uuid(), id: faker.string.uuid(), status: faker.helpers.arrayElement(['APPROVED'] as const), ...overrideResponse})
 
 export const getAdminMeDescribeResponseMock = (overrideResponse: Partial<Extract<AdminMeResponseDto, object>> = {}): AdminMeResponseDto => ({user: {email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
+
+export const getPlaybackIssueResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 export const getStudentAuthCsrfTokenResponseMock = (overrideResponse: Partial<Extract<CsrfTokenResponseDto, object>> = {}): CsrfTokenResponseDto => ({token: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
@@ -1004,6 +1007,18 @@ export const getAdminMeDescribeMockHandler = (overrideResponse?: AdminMeResponse
   }, options)
 }
 
+export const getPlaybackIssueMockHandler = (overrideResponse?: PlaybackSessionResponseDto | ((info: Parameters<HttpResponseResolver<{ videoId: string }>>[0]) => Promise<PlaybackSessionResponseDto> | PlaybackSessionResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<{ videoId: string }>('*/api/admin/playback-sessions/:videoId', async (info: Parameters<HttpResponseResolver<{ videoId: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPlaybackIssueResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getStudentAuthCsrfTokenMockHandler = (overrideResponse?: CsrfTokenResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<CsrfTokenResponseDto> | CsrfTokenResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/auth/csrf', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1223,6 +1238,7 @@ export const getHeatLmsApiMock = () => [
   getEnrollmentApprovalListPendingMockHandler(),
   getEnrollmentApprovalApproveMockHandler(),
   getAdminMeDescribeMockHandler(),
+  getPlaybackIssueMockHandler(),
   getStudentAuthCsrfTokenMockHandler(),
   getStudentAuthRefreshMockHandler(),
   getStudentAuthSignInMockHandler(),
