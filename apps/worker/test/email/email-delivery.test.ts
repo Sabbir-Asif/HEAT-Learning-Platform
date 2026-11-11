@@ -122,8 +122,12 @@ describe("EmailDelivery", () => {
       expect(await delivery.deliver("job-1", false)).toBe("skipped");
       expect(transport.attempts).toEqual([]);
     }
-    const missing = setup(null);
-    expect(await missing.delivery.deliver("job-1", false)).toBe("skipped");
+  });
+
+  test("throws when the job row is not visible yet so the queue retries", async () => {
+    const { transport, delivery } = setup(null);
+    await expect(delivery.deliver("job-1", false)).rejects.toThrow("Email job job-1 not found");
+    expect(transport.attempts).toEqual([]);
   });
 
   test("fails without sending when the template or its variables are invalid", async () => {

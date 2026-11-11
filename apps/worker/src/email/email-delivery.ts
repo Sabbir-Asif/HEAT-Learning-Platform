@@ -44,7 +44,8 @@ export class EmailDelivery {
 
   async deliver(emailJobId: string, finalAttempt: boolean): Promise<DeliveryOutcome> {
     const job = await this.store.load(emailJobId);
-    if (job === null || job.status === "SENT" || job.status === "FAILED") return "skipped";
+    if (job === null) throw new Error(`Email job ${emailJobId} not found`);
+    if (job.status === "SENT" || job.status === "FAILED") return "skipped";
 
     const message = await this.compose(job);
     if (message === null) {
