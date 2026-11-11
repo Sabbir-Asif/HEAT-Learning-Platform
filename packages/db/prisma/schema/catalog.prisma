@@ -14,21 +14,25 @@ enum VideoAssetStatus {
 }
 
 model Course {
-  id          String       @id @default(uuid(7)) @db.Uuid
-  slug        String       @unique
-  title       String
-  description String?
-  status      CourseStatus @default(DRAFT)
-  lockedAt    DateTime?
-  publishedAt DateTime?
-  deletedAt   DateTime?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id               String       @id @default(uuid(7)) @db.Uuid
+  slug             String       @unique
+  title            String
+  description      String?
+  thumbnailAssetId String?      @db.Uuid
+  status           CourseStatus @default(DRAFT)
+  lockedAt         DateTime?
+  publishedAt      DateTime?
+  deletedAt        DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 
+  thumbnail   MediaAsset?      @relation(fields: [thumbnailAssetId], references: [id], onDelete: Restrict)
   revisions   CourseRevision[]
   tags        CourseTag[]
   enrollments Enrollment[]
   resources   Resource[]
+
+  @@index([thumbnailAssetId])
 }
 
 model CourseRevision {
