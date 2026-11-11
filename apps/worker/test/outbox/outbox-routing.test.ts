@@ -51,11 +51,23 @@ describe("routeOutboxEvent", () => {
     });
   });
 
-  test("routes an uploaded video to the transcode queue", () => {
+  test("routes an uploaded video to the probe queue", () => {
     const assetId = "0194f3a0-0000-7000-8000-000000000009";
     expect(routeOutboxEvent("video.uploaded", { assetId })).toEqual({
       outcome: "routed",
+      actions: [{ kind: "probe", assetId }],
+    });
+  });
+
+  test("routes a queued video to the transcode queue", () => {
+    const assetId = "0194f3a0-0000-7000-8000-000000000009";
+    expect(routeOutboxEvent("video.queued", { assetId })).toEqual({
+      outcome: "routed",
       actions: [{ kind: "transcode", assetId }],
+    });
+    expect(routeOutboxEvent("video.queued", { assetId: "x" })).toEqual({
+      outcome: "skipped",
+      reason: "invalid video payload",
     });
   });
 

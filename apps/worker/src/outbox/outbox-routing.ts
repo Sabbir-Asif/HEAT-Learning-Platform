@@ -1,4 +1,8 @@
-import { videoUploadedEventType, videoUploadedPayloadSchema } from "@heat/contracts";
+import {
+  videoQueuedEventType,
+  videoUploadedEventType,
+  videoUploadedPayloadSchema,
+} from "@heat/contracts";
 import { z } from "zod";
 import { listEmailTemplates, type EmailCategory } from "../email";
 
@@ -20,6 +24,7 @@ export const CERTIFICATE_REQUESTED_EVENT_TYPE = "certificate.requested";
 export type RoutedAction =
   | { kind: "email"; template: string; category: EmailCategory; userId: string }
   | { kind: "certificate"; enrollmentId: string }
+  | { kind: "probe"; assetId: string }
   | { kind: "transcode"; assetId: string }
   | { kind: "notification"; userId: string; type: NotificationKind; data: JsonObject };
 
@@ -49,10 +54,13 @@ export const routeOutboxEvent = (eventType: string, payload: unknown): Routing =
     actions.push({ kind: "certificate", enrollmentId: certificate.data.enrollmentId });
   }
 
-  if (eventType === videoUploadedEventType) {
+  if (eventType === videoUploadedEventType || eventType === videoQueuedEventType) {
     const video = videoUploadedPayloadSchema.safeParse(payload);
     if (!video.success) return { outcome: "skipped", reason: "invalid video payload" };
-    actions.push({ kind: "transcode", assetId: video.data.assetId });
+    actions.push({
+      kind: eventType === videoUploadedEventType ? "probe" : "transcode",
+      assetId: video.data.assetId,
+    });
   }
 
   const email = emailEnvelope.safeParse(payload);

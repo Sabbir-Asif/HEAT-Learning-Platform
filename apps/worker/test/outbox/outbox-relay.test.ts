@@ -80,15 +80,16 @@ const setup = () => {
   const email = new FakeQueue();
   const certificate = new FakeQueue();
   const transcode = new FakeQueue();
+  const probe = new FakeQueue();
   const errors: string[] = [];
   const warnings: string[] = [];
   const relay = new OutboxRelay(
     store,
-    { email, certificate, transcode },
+    { email, certificate, transcode, probe },
     { now: () => new Date("2026-11-11T10:05:00Z") },
     { warn: (line) => warnings.push(line), error: (line) => errors.push(line) },
   );
-  return { store, email, certificate, transcode, relay, errors, warnings };
+  return { store, email, certificate, transcode, probe, relay, errors, warnings };
 };
 
 describe("OutboxRelay", () => {
@@ -153,15 +154,17 @@ describe("OutboxRelay", () => {
     expect(certificate.jobs.get("job-2")).toEqual({ outboxId: "job-2", enrollmentId });
   });
 
-  test("routes an uploaded video to the transcode queue with the outbox id", async () => {
-    const { store, transcode, relay } = setup();
+  test("routes an uploaded video to the probe queue and a queued one to transcode", async () => {
+    const { store, transcode, probe, relay } = setup();
     const assetId = "0194f3a0-0000-7000-8000-000000000009";
     store.unrelayed.push(event("job-4", "video.uploaded", { assetId }));
+    store.unrelayed.push(event("job-5", "video.queued", { assetId }));
 
     await relay.relayBatch(10);
 
-    expect(transcode.jobs.get("job-4")).toEqual({ outboxId: "job-4", assetId });
-    expect(store.relayedIds).toContain("job-4");
+    expect(probe.jobs.get("job-4")).toEqual({ outboxId: "job-4", assetId });
+    expect(transcode.jobs.get("job-5")).toEqual({ outboxId: "job-5", assetId });
+    expect(transcode.jobs.has("job-4")).toBe(false);
   });
 
   test("creates an in-app notification", async () => {

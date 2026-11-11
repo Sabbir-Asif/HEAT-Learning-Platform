@@ -6,6 +6,7 @@ import type { Redis } from "ioredis";
 import {
   CERTIFICATE_QUEUE,
   EMAIL_QUEUE,
+  PROBE_QUEUE,
   TRANSCODE_QUEUE,
   createQueue,
   type BullJobQueue,
@@ -25,6 +26,7 @@ export class OutboxRelayRunner implements OnApplicationBootstrap, OnApplicationS
   private readonly queues: {
     email: BullJobQueue;
     certificate: BullJobQueue;
+    probe: BullJobQueue;
     transcode: BullJobQueue;
   };
   private readonly relay: OutboxRelay;
@@ -41,6 +43,7 @@ export class OutboxRelayRunner implements OnApplicationBootstrap, OnApplicationS
     this.queues = {
       email: createQueue(EMAIL_QUEUE, connection),
       certificate: createQueue(CERTIFICATE_QUEUE, connection),
+      probe: createQueue(PROBE_QUEUE, connection),
       transcode: createQueue(TRANSCODE_QUEUE, connection),
     };
     this.relay = new OutboxRelay(this.store, this.queues, clock, this.logger);
@@ -55,6 +58,7 @@ export class OutboxRelayRunner implements OnApplicationBootstrap, OnApplicationS
     await Promise.all([
       this.queues.email.close(),
       this.queues.certificate.close(),
+      this.queues.probe.close(),
       this.queues.transcode.close(),
     ]);
   }
