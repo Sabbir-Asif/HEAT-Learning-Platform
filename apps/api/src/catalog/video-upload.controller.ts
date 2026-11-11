@@ -66,6 +66,7 @@ export class VideoUploadController {
       { courseId: params.id, moduleId: params.moduleId, videoId: params.videoId },
       params.assetKey,
       single(request.headers["tus-resumable"]),
+      actorOf(request),
     );
     noStore(response);
     response.setHeader("Upload-Offset", String(position.offset));

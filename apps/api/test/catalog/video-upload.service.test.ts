@@ -256,14 +256,14 @@ describe("VideoUploadService.position and append", () => {
   test("reports the offset the server holds", async () => {
     const { service, store } = await started();
     await append(service, "0", chunk(mp4Header));
-    expect(await service.position(slot, key, version)).toEqual({ offset: 24, length: 40 });
+    expect(await service.position(slot, key, version, actor)).toEqual({ offset: 24, length: 40 });
     expect(store.files.get(key)?.data.length).toBe(24);
   });
 
   test("resumes from the last confirmed offset after a dropped connection", async () => {
     const { service } = await started();
     await append(service, "0", chunk(mp4Header.subarray(0, 14)));
-    const resumeAt = (await service.position(slot, key, version)).offset;
+    const resumeAt = (await service.position(slot, key, version, actor)).offset;
     expect(resumeAt).toBe(14);
     const result = await append(service, String(resumeAt), chunk(mp4Header.subarray(14)));
     expect(result.offset).toBe(24);
@@ -367,7 +367,7 @@ describe("VideoUploadService.position and append", () => {
   test("an upload that was never finished expires and is left for the cleanup job", async () => {
     const { service, store } = await started({ now: new Date("2026-11-12T06:00:01.000Z") });
     await expectFailure(append(service, "0", chunk(mp4Header)), 410, "UPLOAD_EXPIRED");
-    await expectFailure(service.position(slot, key, version), 410, "UPLOAD_EXPIRED");
+    await expectFailure(service.position(slot, key, version, actor), 410, "UPLOAD_EXPIRED");
     expect(store.discarded).toEqual([]);
     expect(store.files.has(key)).toBe(true);
   });
@@ -379,7 +379,7 @@ describe("VideoUploadService.position and append", () => {
     });
     await service["store"].append(key, chunk(mp4Header), 40);
     await service["store"].complete(key);
-    expect(await service.position(slot, key, version)).toEqual({ offset: 40, length: 40 });
+    expect(await service.position(slot, key, version, actor)).toEqual({ offset: 40, length: 40 });
     await expectFailure(
       append(service, "40", chunk(Buffer.alloc(1))),
       409,
@@ -403,6 +403,31 @@ describe("VideoUploadService.position and append", () => {
     expect(database.outbox.create).toHaveBeenCalledTimes(1);
   });
 
+  test("a head after the file was stored but the database failed recovers the completion", async () => {
+    const { service, store, database } = await started({}, 24);
+    database.$transaction.mockRejectedValueOnce(new Error("database down"));
+    await expect(append(service, "0", chunk(mp4Header))).rejects.toThrow("database down");
+    const before = store.files.get(key)?.data.length;
+    expect(await service.position(slot, key, version, actor)).toEqual({ offset: 24, length: 24 });
+    expect(store.files.get(key)?.data.length).toBe(before);
+    expect(database.videoAsset.updateMany).toHaveBeenLastCalledWith({
+      where: { id: "asset-1", status: "UPLOADING" },
+      data: { status: "UPLOADED" },
+    });
+    expect(database.outbox.create).toHaveBeenCalledTimes(1);
+    expect(database.auditLog.create.mock.calls[0]?.[0].data.actorId).toBe("admin-1");
+  });
+
+  test("a head on a finished upload whose asset already moved on changes nothing", async () => {
+    const { service, database } = await started({
+      slotAsset: { id: "asset-1", status: "UPLOADED" },
+    });
+    await service["store"].append(key, chunk(mp4Header), 40);
+    await service["store"].complete(key);
+    await service.position(slot, key, version, actor);
+    expect(database.$transaction).not.toHaveBeenCalled();
+  });
+
   test("an upload key that is not the slot's current asset is not found", async () => {
     const { service } = await started();
     await expectFailure(
@@ -416,7 +441,7 @@ describe("VideoUploadService.position and append", () => {
       "NOT_FOUND",
     );
     await expectFailure(
-      service.position({ ...slot, videoId: "other" }, key, version),
+      service.position({ ...slot, videoId: "other" }, key, version, actor),
       404,
       "NOT_FOUND",
     );
@@ -424,7 +449,7 @@ describe("VideoUploadService.position and append", () => {
 
   test("a rejected asset is not found", async () => {
     const { service } = await started({ slotAsset: { id: "asset-1", status: "REJECTED" } });
-    await expectFailure(service.position(slot, key, version), 404, "NOT_FOUND");
+    await expectFailure(service.position(slot, key, version, actor), 404, "NOT_FOUND");
   });
 
   test("two writers on the same upload cannot interleave", async () => {

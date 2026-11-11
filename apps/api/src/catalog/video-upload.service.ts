@@ -102,10 +102,14 @@ export class VideoUploadService {
     slot: UploadSlot,
     assetKey: string,
     version: string | undefined,
+    actor: AuditActor,
   ): Promise<UploadPosition> {
     assertTusVersion(version);
     const { asset, state } = await this.locate(slot, assetKey);
     this.assertOpen(asset.status, state);
+    if (state.complete && asset.status === "UPLOADING") {
+      await this.finish(assetKey, asset.id, slot, actor, false);
+    }
     return { offset: state.offset, length: state.length };
   }
 
