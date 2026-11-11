@@ -3,7 +3,13 @@ import type { OnApplicationBootstrap, OnApplicationShutdown } from "@nestjs/comm
 import { CLOCK, DATABASE, REDIS, type Clock } from "api/core";
 import type { HeatClient } from "@heat/db";
 import type { Redis } from "ioredis";
-import { CERTIFICATE_QUEUE, EMAIL_QUEUE, createQueue, type BullJobQueue } from "../queues";
+import {
+  CERTIFICATE_QUEUE,
+  EMAIL_QUEUE,
+  TRANSCODE_QUEUE,
+  createQueue,
+  type BullJobQueue,
+} from "../queues";
 import { readOutboxLagSeconds } from "./outbox-lag";
 import { OutboxRelay } from "./outbox-relay";
 import { PrismaOutboxStore } from "./prisma-outbox-store";
@@ -16,7 +22,11 @@ const lagWarningSeconds = 60;
 export class OutboxRelayRunner implements OnApplicationBootstrap, OnApplicationShutdown {
   private readonly logger = new Logger("OutboxRelay");
   private readonly store: PrismaOutboxStore;
-  private readonly queues: { email: BullJobQueue; certificate: BullJobQueue };
+  private readonly queues: {
+    email: BullJobQueue;
+    certificate: BullJobQueue;
+    transcode: BullJobQueue;
+  };
   private readonly relay: OutboxRelay;
   private timer: NodeJS.Timeout | null = null;
   private running = false;
@@ -31,6 +41,7 @@ export class OutboxRelayRunner implements OnApplicationBootstrap, OnApplicationS
     this.queues = {
       email: createQueue(EMAIL_QUEUE, connection),
       certificate: createQueue(CERTIFICATE_QUEUE, connection),
+      transcode: createQueue(TRANSCODE_QUEUE, connection),
     };
     this.relay = new OutboxRelay(this.store, this.queues, clock, this.logger);
   }
@@ -41,7 +52,11 @@ export class OutboxRelayRunner implements OnApplicationBootstrap, OnApplicationS
 
   async onApplicationShutdown(): Promise<void> {
     if (this.timer !== null) clearInterval(this.timer);
-    await Promise.all([this.queues.email.close(), this.queues.certificate.close()]);
+    await Promise.all([
+      this.queues.email.close(),
+      this.queues.certificate.close(),
+      this.queues.transcode.close(),
+    ]);
   }
 
   private async tick(): Promise<void> {

@@ -44,6 +44,7 @@ export interface JobQueue {
 export interface RelayQueues {
   email: JobQueue;
   certificate: JobQueue;
+  transcode: JobQueue;
 }
 
 export interface RelayLogger {
@@ -111,6 +112,10 @@ export class OutboxRelay {
         outboxId: event.id,
         enrollmentId: action.enrollmentId,
       });
+      return;
+    }
+    if (action.kind === "transcode") {
+      await this.queues.transcode.add(event.id, { outboxId: event.id, assetId: action.assetId });
       return;
     }
     const recipientAddress = await transaction.findRecipientAddress(action.userId);

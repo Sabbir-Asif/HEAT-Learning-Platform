@@ -3,6 +3,7 @@ import type { JobQueue } from "./outbox/outbox-relay";
 
 export const EMAIL_QUEUE = "email";
 export const CERTIFICATE_QUEUE = "certificate";
+export const TRANSCODE_QUEUE = "transcode";
 
 export const emailJobOptions = {
   attempts: 6,

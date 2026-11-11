@@ -79,15 +79,16 @@ const setup = () => {
   const store = new FakeStore();
   const email = new FakeQueue();
   const certificate = new FakeQueue();
+  const transcode = new FakeQueue();
   const errors: string[] = [];
   const warnings: string[] = [];
   const relay = new OutboxRelay(
     store,
-    { email, certificate },
+    { email, certificate, transcode },
     { now: () => new Date("2026-11-11T10:05:00Z") },
     { warn: (line) => warnings.push(line), error: (line) => errors.push(line) },
   );
-  return { store, email, certificate, relay, errors, warnings };
+  return { store, email, certificate, transcode, relay, errors, warnings };
 };
 
 describe("OutboxRelay", () => {
@@ -150,6 +151,17 @@ describe("OutboxRelay", () => {
     await relay.relayBatch(10);
 
     expect(certificate.jobs.get("job-2")).toEqual({ outboxId: "job-2", enrollmentId });
+  });
+
+  test("routes an uploaded video to the transcode queue with the outbox id", async () => {
+    const { store, transcode, relay } = setup();
+    const assetId = "0194f3a0-0000-7000-8000-000000000009";
+    store.unrelayed.push(event("job-4", "video.uploaded", { assetId }));
+
+    await relay.relayBatch(10);
+
+    expect(transcode.jobs.get("job-4")).toEqual({ outboxId: "job-4", assetId });
+    expect(store.relayedIds).toContain("job-4");
   });
 
   test("creates an in-app notification", async () => {
