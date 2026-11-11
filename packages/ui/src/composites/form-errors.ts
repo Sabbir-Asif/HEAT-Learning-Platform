@@ -15,6 +15,7 @@ export type FormErrorCopyKey =
   | "CANNOT_DEACTIVATE_SELF"
   | "CAPTCHA_EXPIRED"
   | "CAPTCHA_INVALID"
+  | "CONTENT_LOCKED"
   | "COURSE_HAS_ENROLLMENTS"
   | "COURSE_LOCKED"
   | "COURSE_NOT_DRAFT"
@@ -33,6 +34,7 @@ export type FormErrorCopyKey =
   | "INVITATION_INVALID"
   | "INVITATION_NOT_PENDING"
   | "NOT_FOUND"
+  | "ORDER_CONFLICT"
   | "ORIGIN_NOT_ALLOWED"
   | "PASSWORD_BREACHED"
   | "PASSWORD_CHANGE_REQUIRED"
@@ -65,6 +67,8 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   CANNOT_DEACTIVATE_SELF: "You cannot deactivate your own account.",
   CAPTCHA_EXPIRED: "This security check can no longer be used. Request a new one.",
   CAPTCHA_INVALID: "The characters do not match. Try again.",
+  CONTENT_LOCKED:
+    "This course is locked. Modules and sections cannot be added, removed or reordered.",
   COURSE_HAS_ENROLLMENTS: "This course has enrollments, so it cannot be deleted.",
   COURSE_LOCKED: "This course is locked. Only the description and thumbnail can be changed.",
   COURSE_NOT_DRAFT: "This action is only available for a draft course.",
@@ -84,6 +88,7 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   INVITATION_INVALID: "This invitation link is not valid.",
   INVITATION_NOT_PENDING: "This admin has no pending invitation.",
   NOT_FOUND: "This item could not be found. It may have been removed.",
+  ORDER_CONFLICT: "Someone else changed this order. Reload the list and try again.",
   ORIGIN_NOT_ALLOWED: "This request did not come from an allowed site.",
   PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
   PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
