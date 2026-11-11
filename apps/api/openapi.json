@@ -577,6 +577,7 @@
                     "ORIGIN_NOT_ALLOWED",
                     "PASSWORD_BREACHED",
                     "PASSWORD_CHANGE_REQUIRED",
+                    "QUIZ_NOT_UNLOCKED",
                     "RATE_LIMITED",
                     "UNAUTHENTICATED",
                     "UPLOAD_EXPIRED",
@@ -2333,6 +2334,24 @@
           "coveragePercent",
           "resumePositionSeconds",
           "completed"
+        ],
+        "type": "object"
+      },
+      "QuizAccessResponseDto": {
+        "properties": {
+          "moduleState": {
+            "enum": [
+              "LOCKED",
+              "UNLOCKED",
+              "IN_PROGRESS",
+              "QUIZ_READY",
+              "COMPLETED"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "moduleState"
         ],
         "type": "object"
       },
@@ -6161,6 +6180,48 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LessonContentResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "learning"
+        ]
+      }
+    },
+    "/api/courses/{courseId}/modules/{moduleId}/quiz-access": {
+      "get": {
+        "operationId": "quizAccessCheck",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "courseId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "moduleId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizAccessResponseDto"
                 }
               }
             },

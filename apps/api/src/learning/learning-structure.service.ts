@@ -11,6 +11,7 @@ import {
   overallProgressPercent,
   quizStateOf,
   requiredVideoCompletion,
+  requiredVideosWatched,
   videoStatusOf,
 } from "./learning-rules";
 
@@ -126,6 +127,15 @@ export class LearningStructureService {
     const states = effectiveModuleStates(
       access.status,
       modules.map((entry) => progressByModule.get(entry.id) ?? null),
+      modules.map((entry) =>
+        requiredVideosWatched(
+          entry.videos.map((video) => ({
+            required: video.required,
+            coverage: progressByVideo.get(video.id)?.coverage ?? 0,
+            completedAt: progressByVideo.get(video.id)?.completedAt ?? null,
+          })),
+        ),
+      ),
     );
     const now = this.clock.now();
     const described = modules.map((entry, index) => {

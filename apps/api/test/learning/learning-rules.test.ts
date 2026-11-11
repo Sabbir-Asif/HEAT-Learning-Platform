@@ -4,7 +4,10 @@ import {
   nextModuleIndex,
   overallProgressPercent,
   quizStateOf,
+  quizUnlocked,
   requiredVideoCompletion,
+  requiredVideosWatched,
+  isVideoWatched,
   videoStatusOf,
 } from "../../src/learning/learning-rules";
 
@@ -206,5 +209,64 @@ describe("quizStateOf", () => {
         .availability,
     ).toBe("PASSED");
     expect(quizStateOf("COMPLETED", facts(), now).availability).toBe("PASSED");
+  });
+});
+
+const rv = (required: boolean, coverage: number, completedAt: Date | null = null) => ({
+  required,
+  coverage,
+  completedAt,
+});
+
+describe("requiredVideosWatched", () => {
+  test("holds when there are no videos or no required videos", () => {
+    expect(requiredVideosWatched([])).toBe(true);
+    expect(requiredVideosWatched([rv(false, 0)])).toBe(true);
+  });
+
+  test("a single required video needs 80 percent coverage", () => {
+    expect(requiredVideosWatched([rv(true, 0.79)])).toBe(false);
+    expect(requiredVideosWatched([rv(true, 0.8)])).toBe(true);
+    expect(requiredVideosWatched([rv(true, 1)])).toBe(true);
+  });
+
+  test("a recorded completion counts even when coverage is lower", () => {
+    expect(isVideoWatched({ coverage: 0.1, completedAt: now })).toBe(true);
+    expect(requiredVideosWatched([rv(true, 0.1, now)])).toBe(true);
+  });
+
+  test("every required video must pass: 100 percent and 50 percent is refused", () => {
+    expect(requiredVideosWatched([rv(true, 1), rv(true, 0.5)])).toBe(false);
+    expect(requiredVideosWatched([rv(true, 1), rv(true, 0.8), rv(true, 0.95)])).toBe(true);
+  });
+
+  test("optional videos never block", () => {
+    expect(requiredVideosWatched([rv(true, 0.9), rv(false, 0)])).toBe(true);
+    expect(requiredVideosWatched([rv(true, 0.5), rv(false, 1)])).toBe(false);
+  });
+});
+
+describe("effectiveModuleStates with watch results", () => {
+  test("an unlocked or in progress module whose requirement is met is quiz ready", () => {
+    expect(effectiveModuleStates("APPROVED", ["IN_PROGRESS"], [true])).toEqual(["QUIZ_READY"]);
+    expect(effectiveModuleStates("APPROVED", [null], [true])).toEqual(["QUIZ_READY"]);
+    expect(effectiveModuleStates("APPROVED", ["IN_PROGRESS"], [false])).toEqual(["IN_PROGRESS"]);
+  });
+
+  test("a locked or completed module is not changed by watch results", () => {
+    expect(
+      effectiveModuleStates("APPROVED", ["IN_PROGRESS", "LOCKED", "LOCKED"], [true, true, true]),
+    ).toEqual(["QUIZ_READY", "LOCKED", "LOCKED"]);
+    expect(effectiveModuleStates("APPROVED", ["COMPLETED"], [true])).toEqual(["COMPLETED"]);
+  });
+});
+
+describe("quizUnlocked", () => {
+  test("only quiz ready and completed modules unlock the quiz", () => {
+    expect(quizUnlocked("QUIZ_READY")).toBe(true);
+    expect(quizUnlocked("COMPLETED")).toBe(true);
+    expect(quizUnlocked("LOCKED")).toBe(false);
+    expect(quizUnlocked("UNLOCKED")).toBe(false);
+    expect(quizUnlocked("IN_PROGRESS")).toBe(false);
   });
 });

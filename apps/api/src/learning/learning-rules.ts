@@ -12,9 +12,16 @@ export interface VideoFacts {
   completedAt: Date | null;
 }
 
+export const isVideoWatched = (facts: { coverage: number; completedAt: Date | null }): boolean =>
+  facts.completedAt !== null || facts.coverage >= videoCompletionThreshold;
+
+export const requiredVideosWatched = (
+  videos: readonly { required: boolean; coverage: number; completedAt: Date | null }[],
+): boolean => videos.every((video) => !video.required || isVideoWatched(video));
+
 export const videoStatusOf = (facts: VideoFacts): LearningVideoStatus => {
   if (!facts.assetReady) return "UNAVAILABLE";
-  if (facts.completedAt !== null || facts.coverage >= videoCompletionThreshold) return "COMPLETED";
+  if (isVideoWatched(facts)) return "COMPLETED";
   if (facts.coverage > 0 || facts.resumePositionSeconds > 0) return "IN_PROGRESS";
   return "NOT_STARTED";
 };
@@ -32,18 +39,25 @@ export const requiredVideoCompletion = (
 export const effectiveModuleStates = (
   enrollmentStatus: "APPROVED" | "COMPLETED",
   stored: readonly (LearningModuleState | null)[],
+  watched: readonly boolean[] = [],
 ): LearningModuleState[] => {
   if (enrollmentStatus === "COMPLETED") return stored.map(() => "COMPLETED");
   const states: LearningModuleState[] = [];
   stored.forEach((status, index) => {
-    if (index === 0) {
-      states.push(status ?? "UNLOCKED");
-      return;
-    }
-    states.push(states[index - 1] === "COMPLETED" ? (status ?? "LOCKED") : "LOCKED");
+    const base =
+      index === 0
+        ? (status ?? "UNLOCKED")
+        : states[index - 1] === "COMPLETED"
+          ? (status ?? "LOCKED")
+          : "LOCKED";
+    const reachesQuiz = (base === "UNLOCKED" || base === "IN_PROGRESS") && watched[index] === true;
+    states.push(reachesQuiz ? "QUIZ_READY" : base);
   });
   return states;
 };
+
+export const quizUnlocked = (state: LearningModuleState): boolean =>
+  state === "QUIZ_READY" || state === "COMPLETED";
 
 const workable: readonly LearningModuleState[] = ["UNLOCKED", "IN_PROGRESS", "QUIZ_READY"];
 

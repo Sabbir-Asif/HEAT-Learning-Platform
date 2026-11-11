@@ -106,6 +106,7 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/videos/:id/progress": "playbackProgress",
       "GET /api/courses/:courseId/learning-structure": "learningRead",
       "GET /api/courses/:courseId/modules/:moduleId/lesson": "learningRead",
+      "GET /api/courses/:courseId/modules/:moduleId/quiz-access": "learningRead",
     });
   });
 

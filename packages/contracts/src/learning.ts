@@ -126,3 +126,9 @@ export const lessonContentResponseSchema = z.object({
 
 export type LessonContentSection = z.infer<typeof lessonContentSectionSchema>;
 export type LessonContentResponse = z.infer<typeof lessonContentResponseSchema>;
+
+export const quizAccessParamsSchema = z.object({ courseId: z.uuid(), moduleId: z.uuid() });
+
+export const quizAccessResponseSchema = z.object({ moduleState: learningModuleStateSchema });
+
+export type QuizAccessResponse = z.infer<typeof quizAccessResponseSchema>;

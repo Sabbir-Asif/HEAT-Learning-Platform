@@ -351,6 +351,7 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   ORIGIN_NOT_ALLOWED: 'ORIGIN_NOT_ALLOWED',
   PASSWORD_BREACHED: 'PASSWORD_BREACHED',
   PASSWORD_CHANGE_REQUIRED: 'PASSWORD_CHANGE_REQUIRED',
+  QUIZ_NOT_UNLOCKED: 'QUIZ_NOT_UNLOCKED',
   RATE_LIMITED: 'RATE_LIMITED',
   UNAUTHENTICATED: 'UNAUTHENTICATED',
   UPLOAD_EXPIRED: 'UPLOAD_EXPIRED',
@@ -1308,6 +1309,21 @@ export interface ProgressResponseDto {
      * @maximum 9007199254740991
      */
   resumePositionSeconds: number;
+}
+
+export type QuizAccessResponseDtoModuleState = typeof QuizAccessResponseDtoModuleState[keyof typeof QuizAccessResponseDtoModuleState];
+
+
+export const QuizAccessResponseDtoModuleState = {
+  LOCKED: 'LOCKED',
+  UNLOCKED: 'UNLOCKED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  QUIZ_READY: 'QUIZ_READY',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export interface QuizAccessResponseDto {
+  moduleState: QuizAccessResponseDtoModuleState;
 }
 
 export type QuizQuestionRequestDtoOptionsItem = {
@@ -4155,6 +4171,29 @@ export const lessonContentRead = async (courseId: string,
     moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<LessonContentResponseDto> => {
 
   return serverFetch<LessonContentResponseDto>(getLessonContentReadUrl(courseId,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getQuizAccessCheckUrl = (courseId: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/quiz-access`
+}
+
+export const quizAccessCheck = async (courseId: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<QuizAccessResponseDto> => {
+
+  return serverFetch<QuizAccessResponseDto>(getQuizAccessCheckUrl(courseId,moduleId),
   {
     ...options,
     method: 'GET'
