@@ -1,9 +1,13 @@
 import { BadRequestException, ServiceUnavailableException } from "@nestjs/common";
+import { PATH_METADATA } from "@nestjs/common/constants";
 import { describe, expect, test, vi } from "vitest";
 import { AUDIENCE_KEY, ROLES_KEY } from "../../src/access/access.decorators";
 import { RATE_LIMIT_PROFILE_KEY } from "../../src/rate-limit/rate-limit.guard";
 import { loadConfig } from "../../src/core";
-import { PlaybackController } from "../../src/playback/playback.controller";
+import { AdminPlaybackController } from "../../src/playback/admin-playback.controller";
+import { StudentPlaybackController } from "../../src/playback/student-playback.controller";
+import { applyPlaybackGrant } from "../../src/playback/playback-grant";
+import type { PlaybackGrant } from "../../src/playback/playback-grant";
 import { PlaybackService } from "../../src/playback/playback.service";
 
 const keyOne = "dev-hls-key-one-0123456789abcdefgh";
@@ -22,8 +26,7 @@ const expiry = Math.floor(now.getTime() / 1000) + 600;
 const build = (env: Record<string, string>) => {
   const service = new PlaybackService(loadConfig({ ...base, ...env }), clock);
   const cookie = vi.fn();
-  const controller = new PlaybackController(service);
-  return { service, controller, cookie, response: { cookie, clearCookie: vi.fn() } };
+  return { service, cookie, response: { cookie, clearCookie: vi.fn() } };
 };
 
 describe("PlaybackService", () => {
@@ -55,11 +58,26 @@ describe("PlaybackService", () => {
   });
 });
 
-describe("PlaybackController", () => {
-  test("sets hls_sig scoped to the video, HttpOnly, Secure and Strict, for ten minutes", () => {
-    const { controller, cookie, response } = build({ HLS_SIGNING_KEYS: `k1:${keyOne}` });
-    const body = controller.issue("abc_1", response);
-    expect(body).toEqual({ expiresAt: "2026-11-11T10:10:00.000Z" });
+describe("applyPlaybackGrant", () => {
+  const grantFor = (service: PlaybackService, assetKey: string): PlaybackGrant => {
+    const session = service.issue(assetKey);
+    return {
+      assetKey,
+      session,
+      body: {
+        expiresAt: session.expiresAt,
+        manifestPath: `/hls/${assetKey}/master.m3u8`,
+        sessionId: null,
+        resumePositionSeconds: 0,
+        captions: [],
+      },
+    };
+  };
+
+  test("sets hls_sig scoped to the asset key, HttpOnly, Secure and Strict, for ten minutes", () => {
+    const { service, cookie, response } = build({ HLS_SIGNING_KEYS: `k1:${keyOne}` });
+    const body = applyPlaybackGrant(response, grantFor(service, "abc_1"));
+    expect(body.expiresAt).toBe("2026-11-11T10:10:00.000Z");
     expect(cookie).toHaveBeenCalledTimes(1);
     expect(cookie).toHaveBeenCalledWith(
       "hls_sig",
@@ -75,17 +93,36 @@ describe("PlaybackController", () => {
   });
 
   test("the response body never contains the cookie value", () => {
-    const { controller, response } = build({ HLS_SIGNING_KEYS: `k1:${keyOne}` });
-    expect(JSON.stringify(controller.issue("abc_1", response))).not.toContain("k1.");
+    const { service, response } = build({ HLS_SIGNING_KEYS: `k1:${keyOne}` });
+    expect(JSON.stringify(applyPlaybackGrant(response, grantFor(service, "abc_1")))).not.toContain(
+      "k1.",
+    );
   });
 });
 
-describe("PlaybackController guards", () => {
-  test("is admin only, role restricted and rate limited per account", () => {
-    expect(Reflect.getMetadata(AUDIENCE_KEY, PlaybackController)).toBe("admin");
-    expect(Reflect.getMetadata(ROLES_KEY, PlaybackController)).toEqual(["ADMIN", "SUPER_ADMIN"]);
-    expect(Reflect.getMetadata(RATE_LIMIT_PROFILE_KEY, PlaybackController.prototype.issue)).toBe(
-      "playbackSession",
+describe("playback controller guards", () => {
+  test("the admin endpoint is admin only, role restricted and rate limited", () => {
+    expect(Reflect.getMetadata(AUDIENCE_KEY, AdminPlaybackController)).toBe("admin");
+    expect(Reflect.getMetadata(ROLES_KEY, AdminPlaybackController)).toEqual([
+      "ADMIN",
+      "SUPER_ADMIN",
+    ]);
+    expect(
+      Reflect.getMetadata(RATE_LIMIT_PROFILE_KEY, AdminPlaybackController.prototype.preview),
+    ).toBe("playbackSession");
+  });
+
+  test("the student endpoints are student audience with the default student role", () => {
+    expect(Reflect.getMetadata(AUDIENCE_KEY, StudentPlaybackController)).toBe("student");
+    expect(Reflect.getMetadata(ROLES_KEY, StudentPlaybackController)).toBeUndefined();
+    expect(Reflect.getMetadata(PATH_METADATA, StudentPlaybackController)).toBe(
+      "videos/:id/playback-session",
     );
+  });
+
+  test.each(["start", "refresh"] as const)("the student %s endpoint is rate limited", (name) => {
+    expect(
+      Reflect.getMetadata(RATE_LIMIT_PROFILE_KEY, StudentPlaybackController.prototype[name]),
+    ).toBe("playbackSession");
   });
 });

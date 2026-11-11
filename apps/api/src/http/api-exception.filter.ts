@@ -50,6 +50,7 @@ const messages: Record<ErrorCode, string> = {
   INVITATION_EXPIRED: "This invitation has expired. Ask the super admin to send a new one.",
   INVITATION_INVALID: "This invitation link is not valid.",
   INVITATION_NOT_PENDING: "This admin has no pending invitation.",
+  MODULE_LOCKED: "This module is locked until you finish the previous one.",
   NOT_FOUND: "The requested resource was not found.",
   ORDER_CONFLICT: "The order was changed by someone else. Reload and try again.",
   ORIGIN_NOT_ALLOWED: "This request did not come from an allowed site.",
@@ -68,6 +69,7 @@ const messages: Record<ErrorCode, string> = {
   VERIFICATION_LINK_USED: "This verification link has already been used or replaced.",
   VERIFICATION_RESEND_LIMIT: "Too many verification emails were requested for this registration.",
   VIDEO_NOT_FAILED: "Only a video whose processing failed can be retried.",
+  VIDEO_NOT_READY: "This video is not ready to play yet.",
 };
 
 const issuesSchema = z.object({

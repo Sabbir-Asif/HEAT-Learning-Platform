@@ -5730,7 +5730,7 @@ export function useAdminMeDescribe<TData = Awaited<ReturnType<typeof adminMeDesc
 
 
 
-export const getPlaybackIssueUrl = (videoId: string,) => {
+export const getAdminPlaybackPreviewUrl = (videoId: string,) => {
 
 
 
@@ -5738,9 +5738,9 @@ export const getPlaybackIssueUrl = (videoId: string,) => {
   return `/api/admin/playback-sessions/${videoId}`
 }
 
-export const playbackIssue = async (videoId: string, options?: Parameters<typeof customFetch>[1]): Promise<PlaybackSessionResponseDto> => {
+export const adminPlaybackPreview = async (videoId: string, options?: Parameters<typeof customFetch>[1]): Promise<PlaybackSessionResponseDto> => {
 
-  return customFetch<PlaybackSessionResponseDto>(getPlaybackIssueUrl(videoId),
+  return customFetch<PlaybackSessionResponseDto>(getAdminPlaybackPreviewUrl(videoId),
   {
     ...options,
     method: 'POST'
@@ -5753,13 +5753,13 @@ export const playbackIssue = async (videoId: string, options?: Parameters<typeof
 
 
 
-export const getPlaybackIssueMutationKey = () => ['playbackIssue'] as const;
+export const getAdminPlaybackPreviewMutationKey = () => ['adminPlaybackPreview'] as const;
 
-export const getPlaybackIssueMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof playbackIssue>>, TError,PlaybackIssueMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof playbackIssue>>, TError,PlaybackIssueMutationVariables, TContext> => {
+export const getAdminPlaybackPreviewMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminPlaybackPreview>>, TError,AdminPlaybackPreviewMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminPlaybackPreview>>, TError,AdminPlaybackPreviewMutationVariables, TContext> => {
 
-const mutationKey = getPlaybackIssueMutationKey();
+const mutationKey = getAdminPlaybackPreviewMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -5769,10 +5769,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof playbackIssue>>, PlaybackIssueMutationVariables> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminPlaybackPreview>>, AdminPlaybackPreviewMutationVariables> = (props) => {
           const {videoId} = props ?? {};
 
-          return  playbackIssue(videoId,requestOptions)
+          return  adminPlaybackPreview(videoId,requestOptions)
         }
 
 
@@ -5782,20 +5782,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PlaybackIssueMutationResult = NonNullable<Awaited<ReturnType<typeof playbackIssue>>>
+    export type AdminPlaybackPreviewMutationResult = NonNullable<Awaited<ReturnType<typeof adminPlaybackPreview>>>
 
-    export type PlaybackIssueMutationError = ErrorType<unknown>
-    export type PlaybackIssueMutationVariables = {videoId: string}
+    export type AdminPlaybackPreviewMutationError = ErrorType<unknown>
+    export type AdminPlaybackPreviewMutationVariables = {videoId: string}
 
-    export const usePlaybackIssue = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof playbackIssue>>, TError,PlaybackIssueMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+    export const useAdminPlaybackPreview = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminPlaybackPreview>>, TError,AdminPlaybackPreviewMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof playbackIssue>>,
+        Awaited<ReturnType<typeof adminPlaybackPreview>>,
         TError,
-        PlaybackIssueMutationVariables,
+        AdminPlaybackPreviewMutationVariables,
         TContext
       > => {
-      return useMutation(getPlaybackIssueMutationOptions(options), queryClient);
+      return useMutation(getAdminPlaybackPreviewMutationOptions(options), queryClient);
     }
 
 export const getStudentAuthCsrfTokenUrl = () => {
@@ -6921,4 +6921,140 @@ export function useMeDescribe<TData = Awaited<ReturnType<typeof meDescribe>>, TE
 
 
 
+
+export const getStudentPlaybackStartUrl = (id: string,) => {
+
+
+
+
+  return `/api/videos/${id}/playback-session`
+}
+
+export const studentPlaybackStart = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<PlaybackSessionResponseDto> => {
+
+  return customFetch<PlaybackSessionResponseDto>(getStudentPlaybackStartUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getStudentPlaybackStartMutationKey = () => ['studentPlaybackStart'] as const;
+
+export const getStudentPlaybackStartMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPlaybackStart>>, TError,StudentPlaybackStartMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof studentPlaybackStart>>, TError,StudentPlaybackStartMutationVariables, TContext> => {
+
+const mutationKey = getStudentPlaybackStartMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof studentPlaybackStart>>, StudentPlaybackStartMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  studentPlaybackStart(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StudentPlaybackStartMutationResult = NonNullable<Awaited<ReturnType<typeof studentPlaybackStart>>>
+
+    export type StudentPlaybackStartMutationError = ErrorType<unknown>
+    export type StudentPlaybackStartMutationVariables = {id: string}
+
+    export const useStudentPlaybackStart = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPlaybackStart>>, TError,StudentPlaybackStartMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof studentPlaybackStart>>,
+        TError,
+        StudentPlaybackStartMutationVariables,
+        TContext
+      > => {
+      return useMutation(getStudentPlaybackStartMutationOptions(options), queryClient);
+    }
+
+export const getStudentPlaybackRefreshUrl = (id: string,) => {
+
+
+
+
+  return `/api/videos/${id}/playback-session/refresh`
+}
+
+export const studentPlaybackRefresh = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<PlaybackSessionResponseDto> => {
+
+  return customFetch<PlaybackSessionResponseDto>(getStudentPlaybackRefreshUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getStudentPlaybackRefreshMutationKey = () => ['studentPlaybackRefresh'] as const;
+
+export const getStudentPlaybackRefreshMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPlaybackRefresh>>, TError,StudentPlaybackRefreshMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof studentPlaybackRefresh>>, TError,StudentPlaybackRefreshMutationVariables, TContext> => {
+
+const mutationKey = getStudentPlaybackRefreshMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof studentPlaybackRefresh>>, StudentPlaybackRefreshMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  studentPlaybackRefresh(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StudentPlaybackRefreshMutationResult = NonNullable<Awaited<ReturnType<typeof studentPlaybackRefresh>>>
+
+    export type StudentPlaybackRefreshMutationError = ErrorType<unknown>
+    export type StudentPlaybackRefreshMutationVariables = {id: string}
+
+    export const useStudentPlaybackRefresh = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof studentPlaybackRefresh>>, TError,StudentPlaybackRefreshMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof studentPlaybackRefresh>>,
+        TError,
+        StudentPlaybackRefreshMutationVariables,
+        TContext
+      > => {
+      return useMutation(getStudentPlaybackRefreshMutationOptions(options), queryClient);
+    }
 

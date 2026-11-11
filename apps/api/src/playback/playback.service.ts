@@ -8,12 +8,7 @@ import {
 import { APP_CONFIG, CLOCK } from "../core";
 import type { AppConfig, Clock } from "../core";
 import { issueHlsCookieValue } from "./hls-cookie";
-
-export interface HlsSession {
-  value: string;
-  expiresAt: string;
-  maxAgeMilliseconds: number;
-}
+import type { HlsSession } from "./playback-grant";
 
 @Injectable()
 export class PlaybackService {
@@ -22,9 +17,9 @@ export class PlaybackService {
     @Inject(CLOCK) private readonly clock: Clock,
   ) {}
 
-  issue(videoId: string): HlsSession {
-    if (!playbackVideoIdSchema.safeParse(videoId).success) {
-      throw new BadRequestException("Invalid video id");
+  issue(assetKey: string): HlsSession {
+    if (!playbackVideoIdSchema.safeParse(assetKey).success) {
+      throw new BadRequestException("Invalid asset key");
     }
     const hls = this.config.hls;
     const secret = hls?.keys.get(hls.activeKeyId);
@@ -33,7 +28,7 @@ export class PlaybackService {
     }
     const expiresAtSeconds = Math.floor(this.clock.now().getTime() / 1000) + hlsCookie.ttlSeconds;
     return {
-      value: issueHlsCookieValue(hls.activeKeyId, secret, videoId, expiresAtSeconds),
+      value: issueHlsCookieValue(hls.activeKeyId, secret, assetKey, expiresAtSeconds),
       expiresAt: new Date(expiresAtSeconds * 1000).toISOString(),
       maxAgeMilliseconds: hlsCookie.ttlSeconds * 1000,
     };

@@ -102,6 +102,7 @@ export * from './moduleListResponseDtoItemsItemSectionsItem';
 export * from './moduleSummaryDto';
 export * from './moduleSummaryDtoSectionsItem';
 export * from './playbackSessionResponseDto';
+export * from './playbackSessionResponseDtoCaptionsItem';
 export * from './quizQuestionRequestDto';
 export * from './quizQuestionRequestDtoOptionsItem';
 export * from './quizQuestionRequestDtoType';
