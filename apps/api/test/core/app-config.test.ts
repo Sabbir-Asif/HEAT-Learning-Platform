@@ -235,3 +235,52 @@ describe("loadConfig rate limits", () => {
     expect(example).toContain("TRUSTED_ORIGINS=");
   });
 });
+
+describe("HLS signing keys", () => {
+  const keyOne = "dev-hls-key-one-0123456789abcdefgh";
+  const keyTwo = "dev-hls-key-two-0123456789abcdefgh";
+
+  test("are absent by default", () => {
+    expect(loadConfig(valid).hls).toBeUndefined();
+  });
+
+  test("parse a list of id:secret pairs, active key defaults to the first", () => {
+    const config = loadConfig({ ...valid, HLS_SIGNING_KEYS: `k1:${keyOne},k2:${keyTwo}` });
+    expect(config.hls?.activeKeyId).toBe("k1");
+    expect([...(config.hls?.keys ?? new Map())]).toEqual([
+      ["k1", keyOne],
+      ["k2", keyTwo],
+    ]);
+  });
+
+  test("a chosen active key must be in the list", () => {
+    const keys = `k1:${keyOne},k2:${keyTwo}`;
+    expect(
+      loadConfig({ ...valid, HLS_SIGNING_KEYS: keys, HLS_ACTIVE_KEY_ID: "k2" }).hls,
+    ).toMatchObject({
+      activeKeyId: "k2",
+    });
+    expect(() => loadConfig({ ...valid, HLS_SIGNING_KEYS: keys, HLS_ACTIVE_KEY_ID: "k3" })).toThrow(
+      /HLS_ACTIVE_KEY_ID/,
+    );
+  });
+
+  test.each([
+    ["a short secret", "k1:short"],
+    ["a missing secret", "k1:"],
+    ["a missing id", `:${keyOne}`],
+    ["an id with a dot", `k.1:${keyOne}`],
+    ["a duplicate id", `k1:${keyOne},k1:${keyTwo}`],
+    ["no separator", keyOne],
+    ["an empty list", " , "],
+  ])("refuses %s", (_name, keys) => {
+    expect(() => loadConfig({ ...valid, HLS_SIGNING_KEYS: keys })).toThrow(/HLS_SIGNING_KEYS/);
+  });
+
+  test("the example environment declares valid keys", () => {
+    const example = readFileSync(join(__dirname, "../../.env.example"), "utf8");
+    const keys = example.match(/^HLS_SIGNING_KEYS=(.*)$/m)?.[1];
+    expect(keys).toBeDefined();
+    expect(loadConfig({ ...valid, HLS_SIGNING_KEYS: keys }).hls?.keys.size).toBe(2);
+  });
+});

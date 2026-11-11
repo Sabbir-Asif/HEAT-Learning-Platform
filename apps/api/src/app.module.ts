@@ -14,6 +14,7 @@ import { EnrollmentModule } from "./enrollment/enrollment.module";
 import { HealthController } from "./health/health.controller";
 import { HttpApiModule } from "./http/http.module";
 import { MeModule } from "./me/me.module";
+import { PlaybackModule } from "./playback";
 import { StudentAuthModule } from "./student-auth/student-auth.module";
 
 @Module({
@@ -33,6 +34,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     DirectoryModule,
     EmailVerificationModule,
     EnrollmentModule,
+    PlaybackModule,
   ],
   controllers: [HealthController],
 })

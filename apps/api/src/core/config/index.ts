@@ -1,4 +1,4 @@
-export { APP_CONFIG, loadConfig, type AppConfig } from "./app-config";
+export { APP_CONFIG, loadConfig, type AppConfig, type HlsConfig } from "./app-config";
 export {
   ipWindowSeconds,
   rateLimitProfileNames,

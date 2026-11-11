@@ -101,6 +101,7 @@ export * from './moduleListResponseDtoItemsItem';
 export * from './moduleListResponseDtoItemsItemSectionsItem';
 export * from './moduleSummaryDto';
 export * from './moduleSummaryDtoSectionsItem';
+export * from './playbackSessionResponseDto';
 export * from './quizQuestionRequestDto';
 export * from './quizQuestionRequestDtoOptionsItem';
 export * from './quizQuestionRequestDtoType';

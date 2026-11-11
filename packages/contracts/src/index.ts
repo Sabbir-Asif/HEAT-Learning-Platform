@@ -11,6 +11,7 @@ export * from "./directory";
 export * from "./enrollment";
 export * from "./errors";
 export * from "./modules";
+export * from "./playback";
 export * from "./quizzes";
 export * from "./verification";
 export * from "./videos";
