@@ -144,7 +144,7 @@ export const quizQuestionSummarySchema = z.object({
   order: z.number().int().min(1),
   type: questionTypeSchema,
   text: z.string(),
-  explanation: z.string().nullable(),
+  explanation: z.string().max(quizExplanationMaxLength).nullable(),
   options: z.array(quizOptionSummarySchema),
 });
 
