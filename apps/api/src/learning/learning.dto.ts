@@ -5,6 +5,8 @@ import {
   lessonContentResponseSchema,
   quizAccessParamsSchema,
   quizAccessResponseSchema,
+  quizDeliveryParamsSchema,
+  quizDeliveryResponseSchema,
 } from "@heat/contracts";
 import { createZodDto } from "nestjs-zod";
 
@@ -14,3 +16,5 @@ export class LessonContentResponseDto extends createZodDto(lessonContentResponse
 export class LessonContentParamsDto extends createZodDto(lessonContentParamsSchema) {}
 export class QuizAccessParamsDto extends createZodDto(quizAccessParamsSchema) {}
 export class QuizAccessResponseDto extends createZodDto(quizAccessResponseSchema) {}
+export class QuizDeliveryParamsDto extends createZodDto(quizDeliveryParamsSchema) {}
+export class QuizDeliveryResponseDto extends createZodDto(quizDeliveryResponseSchema) {}

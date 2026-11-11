@@ -1326,6 +1326,100 @@ export interface QuizAccessResponseDto {
   moduleState: QuizAccessResponseDtoModuleState;
 }
 
+/**
+ * @nullable
+ */
+export type QuizDeliveryResponseDtoAttempt = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  startedAt: string;
+} | null;
+
+/**
+ * @nullable
+ */
+export type QuizDeliveryResponseDtoBestResult = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  attemptId: string;
+  passed: boolean;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  scorePercent: number;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  submittedAt: string;
+} | null;
+
+export type QuizDeliveryResponseDtoQuestionsItemOptionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  text: string;
+};
+
+export type QuizDeliveryResponseDtoQuestionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  options: QuizDeliveryResponseDtoQuestionsItemOptionsItem[];
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  text: string;
+};
+
+/**
+ * @nullable
+ */
+export type QuizDeliveryResponseDtoQuiz = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  passMarkPercent: number;
+} | null;
+
+export type QuizDeliveryResponseDtoStatus = typeof QuizDeliveryResponseDtoStatus[keyof typeof QuizDeliveryResponseDtoStatus];
+
+
+export const QuizDeliveryResponseDtoStatus = {
+  AVAILABLE: 'AVAILABLE',
+  WAITING: 'WAITING',
+  EXHAUSTED: 'EXHAUSTED',
+  PASSED: 'PASSED',
+} as const;
+
+export interface QuizDeliveryResponseDto {
+  /** @nullable */
+  attempt: QuizDeliveryResponseDtoAttempt;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attemptsAllowed: number | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  attemptsUsed: number;
+  /** @nullable */
+  bestResult: QuizDeliveryResponseDtoBestResult;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  nextAttemptAt: string | null;
+  questions: QuizDeliveryResponseDtoQuestionsItem[];
+  /** @nullable */
+  quiz: QuizDeliveryResponseDtoQuiz;
+  status: QuizDeliveryResponseDtoStatus;
+}
+
 export type QuizQuestionRequestDtoOptionsItem = {
   isCorrect: boolean;
   /**
@@ -4171,6 +4265,29 @@ export const lessonContentRead = async (courseId: string,
     moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<LessonContentResponseDto> => {
 
   return serverFetch<LessonContentResponseDto>(getLessonContentReadUrl(courseId,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getQuizDeliveryGetUrl = (courseId: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/quiz`
+}
+
+export const quizDeliveryGet = async (courseId: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<QuizDeliveryResponseDto> => {
+
+  return serverFetch<QuizDeliveryResponseDto>(getQuizDeliveryGetUrl(courseId,moduleId),
   {
     ...options,
     method: 'GET'
