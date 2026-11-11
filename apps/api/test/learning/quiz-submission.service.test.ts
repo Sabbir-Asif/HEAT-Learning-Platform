@@ -302,4 +302,29 @@ describe("QuizSubmissionService.submit", () => {
     const { service } = build({ handlers: [handler] });
     await expect(service.submit("u1", "c1", "m1", request)).rejects.toThrow("boom");
   });
+
+  test("refuses a submission on a completed module with the stable code and writes nothing", async () => {
+    const gate = vi.fn().mockResolvedValue("COMPLETED");
+    const { service, tx } = build({ gate });
+    await expect(service.submit("u1", "c1", "m1", request)).rejects.toMatchObject({
+      code: "QUIZ_ATTEMPT_NOT_OPEN",
+    });
+    expect(tx.answer.createMany).not.toHaveBeenCalled();
+    expect(tx.quizAttempt.update).not.toHaveBeenCalled();
+  });
+
+  test("still replays the passing submission by key after the module is completed", async () => {
+    const gate = vi.fn().mockResolvedValue("COMPLETED");
+    const { service } = build({
+      gate,
+      attempt: { ...openAttempt, idempotencyKey: "key-1", submittedAt: new Date() },
+      replayAnswers: [
+        { questionId: "q1", optionId: "q1a" },
+        { questionId: "q2", optionId: "q2b" },
+      ],
+    });
+    await expect(service.submit("u1", "c1", "m1", request)).resolves.toMatchObject({
+      passed: true,
+    });
+  });
 });
