@@ -196,7 +196,6 @@ describe("enrollmentRequestSchema", () => {
   });
 
   test("rejects a missing step", () => {
-    const { name: _name, ...rest } = valid;
-    expect(enrollmentRequestSchema.safeParse(rest).success).toBe(false);
+    expect(enrollmentRequestSchema.safeParse({ ...valid, name: undefined }).success).toBe(false);
   });
 });
