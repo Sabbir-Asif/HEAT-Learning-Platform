@@ -192,6 +192,7 @@ erDiagram
     String recipientName
     String fileKey
     String fileSha256
+    Int fileSizeBytes
     DateTime issuedAt
     DateTime revokedAt
     DateTime createdAt
