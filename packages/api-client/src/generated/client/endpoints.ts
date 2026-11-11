@@ -71,7 +71,10 @@ import type {
   UpdateDepartmentRequestDto,
   UpdateFacultyRequestDto,
   UpdateModuleRequestDto,
-  UpdateUniversityRequestDto
+  UpdateUniversityRequestDto,
+  VerificationAcceptedResponseDto,
+  VerificationResendRequestDto,
+  VerifyEmailRequestDto
 } from './model';
 
 import { customFetch } from '../../mutator/custom-fetch';
@@ -4736,6 +4739,170 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getStudentAuthSignOutMutationOptions(options), queryClient);
+    }
+
+export const getVerificationConfirmUrl = () => {
+
+
+
+
+  return `/api/auth/verify-email`
+}
+
+export const verificationConfirm = async (verifyEmailRequestDto: VerifyEmailRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<MeResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<MeResponseDto>(getVerificationConfirmUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(verifyEmailRequestDto)
+  }
+);}
+
+
+
+
+
+export const getVerificationConfirmMutationKey = () => ['verificationConfirm'] as const;
+
+export const getVerificationConfirmMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verificationConfirm>>, TError,VerificationConfirmMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof verificationConfirm>>, TError,VerificationConfirmMutationVariables, TContext> => {
+
+const mutationKey = getVerificationConfirmMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verificationConfirm>>, VerificationConfirmMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  verificationConfirm(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerificationConfirmMutationResult = NonNullable<Awaited<ReturnType<typeof verificationConfirm>>>
+    export type VerificationConfirmMutationBody = VerifyEmailRequestDto
+    export type VerificationConfirmMutationError = ErrorType<unknown>
+    export type VerificationConfirmMutationVariables = {data: VerifyEmailRequestDto}
+
+    export const useVerificationConfirm = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verificationConfirm>>, TError,VerificationConfirmMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof verificationConfirm>>,
+        TError,
+        VerificationConfirmMutationVariables,
+        TContext
+      > => {
+      return useMutation(getVerificationConfirmMutationOptions(options), queryClient);
+    }
+
+export const getVerificationResendUrl = () => {
+
+
+
+
+  return `/api/auth/verify-email/resend`
+}
+
+export const verificationResend = async (verificationResendRequestDto: VerificationResendRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<VerificationAcceptedResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<VerificationAcceptedResponseDto>(getVerificationResendUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(verificationResendRequestDto)
+  }
+);}
+
+
+
+
+
+export const getVerificationResendMutationKey = () => ['verificationResend'] as const;
+
+export const getVerificationResendMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verificationResend>>, TError,VerificationResendMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof verificationResend>>, TError,VerificationResendMutationVariables, TContext> => {
+
+const mutationKey = getVerificationResendMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verificationResend>>, VerificationResendMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  verificationResend(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerificationResendMutationResult = NonNullable<Awaited<ReturnType<typeof verificationResend>>>
+    export type VerificationResendMutationBody = VerificationResendRequestDto
+    export type VerificationResendMutationError = ErrorType<unknown>
+    export type VerificationResendMutationVariables = {data: VerificationResendRequestDto}
+
+    export const useVerificationResend = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verificationResend>>, TError,VerificationResendMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof verificationResend>>,
+        TError,
+        VerificationResendMutationVariables,
+        TContext
+      > => {
+      return useMutation(getVerificationResendMutationOptions(options), queryClient);
     }
 
 export const getCaptchaIssueUrl = () => {

@@ -5,6 +5,7 @@ import { CaptchaModule } from "../captcha";
 import { CatalogModule } from "../catalog";
 import { CoreModule } from "../core";
 import { DirectoryModule } from "../directory";
+import { EmailVerificationModule } from "../email-verification";
 import { RateLimitModule } from "../rate-limit";
 import { EnrollmentController } from "./enrollment.controller";
 import { EnrollmentService } from "./enrollment.service";
@@ -17,6 +18,7 @@ import { EnrollmentService } from "./enrollment.service";
     CaptchaModule,
     CatalogModule,
     DirectoryModule,
+    EmailVerificationModule,
     RateLimitModule,
   ],
   controllers: [EnrollmentController],

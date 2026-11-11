@@ -741,9 +741,28 @@ export type MeResponseDtoUser = {
   role: MeResponseDtoUserRole;
 };
 
+/**
+ * @nullable
+ */
+export type MeResponseDtoVerificationEmail = typeof MeResponseDtoVerificationEmail[keyof typeof MeResponseDtoVerificationEmail] | null;
+
+
+export const MeResponseDtoVerificationEmail = {
+  ON_ITS_WAY: 'ON_ITS_WAY',
+  SENT: 'SENT',
+  FAILED: 'FAILED',
+} as const;
+
 export interface MeResponseDto {
   enrollments: MeResponseDtoEnrollmentsItem[];
   user: MeResponseDtoUser;
+  /** @nullable */
+  verificationEmail: MeResponseDtoVerificationEmail;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  verificationEmailSentAt: string | null;
 }
 
 export type ModuleListResponseDtoItemsItemSectionsItem = {
@@ -948,6 +967,29 @@ export interface UpdateModuleRequestDto {
 
 export interface UpdateUniversityRequestDto {
   name: string;
+}
+
+export interface VerificationAcceptedResponseDto {
+  accepted: true;
+}
+
+export interface VerificationResendRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 12
+     */
+  captchaAnswer: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  captchaId: string;
+  email: string;
+}
+
+export interface VerifyEmailRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 512
+     */
+  token: string;
 }
 
 export type AdminUsersListParams = {
@@ -2716,6 +2758,76 @@ export const studentAuthSignOut = async ( options?: Parameters<typeof serverFetc
     method: 'POST'
 
 
+  }
+);}
+
+
+
+export const getVerificationConfirmUrl = () => {
+
+
+
+
+  return `/api/auth/verify-email`
+}
+
+export const verificationConfirm = async (verifyEmailRequestDto: VerifyEmailRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<MeResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<MeResponseDto>(getVerificationConfirmUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(verifyEmailRequestDto)
+  }
+);}
+
+
+
+export const getVerificationResendUrl = () => {
+
+
+
+
+  return `/api/auth/verify-email/resend`
+}
+
+export const verificationResend = async (verificationResendRequestDto: VerificationResendRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<VerificationAcceptedResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<VerificationAcceptedResponseDto>(getVerificationResendUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(verificationResendRequestDto)
   }
 );}
 

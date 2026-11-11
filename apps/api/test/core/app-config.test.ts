@@ -37,6 +37,13 @@ describe("loadConfig", () => {
     expect(config.auth.encryptionKey).toHaveLength(32);
   });
 
+  test("defaults the verification token lifetime to 48 hours and reads an override", () => {
+    expect(loadConfig(valid).verification).toEqual({ tokenTtlHours: 48 });
+    expect(loadConfig({ ...valid, VERIFICATION_TOKEN_TTL_HOURS: "12" }).verification).toEqual({
+      tokenTtlHours: 12,
+    });
+  });
+
   test("defaults the invitation lifetime and admin app URL, and reads overrides", () => {
     expect(loadConfig(valid).invitations).toEqual({
       ttlHours: 72,

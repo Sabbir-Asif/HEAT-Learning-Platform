@@ -2,6 +2,7 @@ import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import type { MeResponse } from "@heat/contracts";
 import type { HeatClient } from "@heat/db";
 import { DATABASE } from "../core";
+import { deriveVerificationEmail } from "./verification-email";
 
 @Injectable()
 export class MeService {
@@ -34,6 +35,15 @@ export class MeService {
         },
       },
     });
+    const latestJob =
+      user.emailVerifiedAt === null
+        ? await this.database.emailJob.findFirst({
+            where: { userId, category: "VERIFICATION", template: "student-verification" },
+            orderBy: { queuedAt: "desc" },
+            select: { status: true, sentAt: true },
+          })
+        : null;
+    const verificationEmail = deriveVerificationEmail(user.emailVerifiedAt, latestJob);
     return {
       user: {
         id: user.id,
@@ -50,6 +60,8 @@ export class MeService {
         status: enrollment.status,
         reason: enrollment.decisions[0]?.reason ?? undefined,
       })),
+      verificationEmail: verificationEmail.status,
+      verificationEmailSentAt: verificationEmail.sentAt?.toISOString() ?? null,
     };
   }
 }

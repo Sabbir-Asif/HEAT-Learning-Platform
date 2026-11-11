@@ -111,4 +111,43 @@ describe("AwaitingApprovalView", () => {
     expect(view.textContent).toContain("You have no enrollment requests");
     expect(view.querySelector('a[href="/courses"]')).not.toBeNull();
   });
+
+  test("says the verification email is on its way while it is queued", async () => {
+    const view = await mount(
+      <AwaitingApprovalView
+        enrollments={[enrollment("PENDING_VERIFICATION")]}
+        emailVerified={false}
+        verificationEmail="ON_ITS_WAY"
+      />,
+    );
+
+    expect(view.textContent).toContain("Your verification email is on its way");
+  });
+
+  test("shows when the verification email was sent, in Dhaka time", async () => {
+    const view = await mount(
+      <AwaitingApprovalView
+        enrollments={[enrollment("PENDING_VERIFICATION")]}
+        emailVerified={false}
+        verificationEmail="SENT"
+        verificationEmailSentAt="2026-11-02T08:30:00.000Z"
+      />,
+    );
+
+    expect(view.textContent).toContain("2 Nov 2026");
+    expect(view.textContent).toContain("14:30");
+    expect(view.textContent).not.toContain("on its way");
+  });
+
+  test("tells the student to request a new link when sending failed", async () => {
+    const view = await mount(
+      <AwaitingApprovalView
+        enrollments={[enrollment("PENDING_VERIFICATION")]}
+        emailVerified={false}
+        verificationEmail="FAILED"
+      />,
+    );
+
+    expect(view.textContent).toContain("could not send your verification email");
+  });
 });

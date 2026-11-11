@@ -1,5 +1,10 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { VerifyEmailView } from "@/verify-email/verify-email-view";
 
-export default function Page() {
-  return <PlaceholderPage title="Verify email" />;
+interface VerifyEmailPageProps {
+  params: Promise<{ token: string }>;
+}
+
+export default async function Page({ params }: VerifyEmailPageProps) {
+  const { token } = await params;
+  return <VerifyEmailView token={token} />;
 }

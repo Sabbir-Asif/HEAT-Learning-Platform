@@ -53,6 +53,7 @@ const envSchema = z
         "TRUSTED_ORIGINS must be a comma separated list of origins without a path",
       ),
     ADMIN_INVITE_TTL_HOURS: positiveInt.default(72),
+    VERIFICATION_TOKEN_TTL_HOURS: positiveInt.default(48),
     ADMIN_APP_URL: z
       .url()
       .optional()
@@ -107,6 +108,7 @@ export interface AppConfig {
   argon2: { memoryCost: number; timeCost: number; parallelism: number };
   breachedPasswordRangeUrl: string;
   invitations: { ttlHours: number; adminAppUrl: string };
+  verification: { tokenTtlHours: number };
   audit: { transactionMaxWaitMs: number; transactionTimeoutMs: number };
   accountProtection: { responseFloorMs: number };
   rateLimit: RateLimitConfig;
@@ -151,6 +153,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
       ttlHours: values.ADMIN_INVITE_TTL_HOURS,
       adminAppUrl: values.ADMIN_APP_URL ?? localAdminAppUrl,
     },
+    verification: { tokenTtlHours: values.VERIFICATION_TOKEN_TTL_HOURS },
     audit: {
       transactionMaxWaitMs: values.AUDIT_TRANSACTION_MAX_WAIT_MS,
       transactionTimeoutMs: values.AUDIT_TRANSACTION_TIMEOUT_MS,

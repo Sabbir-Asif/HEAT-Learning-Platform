@@ -55,6 +55,23 @@ describe("error codes", () => {
   });
 });
 
+describe("verification error codes", () => {
+  test("the four link and resend codes are published", () => {
+    expect(errorCodes).toEqual(
+      expect.arrayContaining([
+        "VERIFICATION_LINK_EXPIRED",
+        "VERIFICATION_LINK_INVALID",
+        "VERIFICATION_LINK_USED",
+        "VERIFICATION_RESEND_LIMIT",
+      ]),
+    );
+  });
+
+  test("the codes stay sorted", () => {
+    expect([...errorCodes]).toEqual([...errorCodes].sort());
+  });
+});
+
 describe("errorResponseSchema", () => {
   const base = { code: "NOT_FOUND", message: "Not found", requestId: "req-1" };
 
