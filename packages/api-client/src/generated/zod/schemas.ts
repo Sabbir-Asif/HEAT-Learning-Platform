@@ -2393,7 +2393,7 @@ export const enrollmentApprovalApproveManyResponseSucceededItemRegExp = new RegE
 
 export const EnrollmentApprovalApproveManyResponse = zod.object({
   "failed": zod.array(zod.object({
-  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_VERIFIED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'MODULE_LOCKED', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'QUIZ_NOT_UNLOCKED', 'RATE_LIMITED', 'UNAUTHENTICATED', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED', 'VIDEO_NOT_READY']),
+  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_VERIFIED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'MODULE_LOCKED', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'QUIZ_ANSWER_INVALID', 'QUIZ_ATTEMPT_LIMIT_REACHED', 'QUIZ_ATTEMPT_NOT_OPEN', 'QUIZ_ATTEMPT_WAIT', 'QUIZ_NOT_UNLOCKED', 'RATE_LIMITED', 'UNAUTHENTICATED', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED', 'VIDEO_NOT_READY']),
   "id": zod.uuid().regex(enrollmentApprovalApproveManyResponseFailedItemIdRegExp)
 })),
   "succeeded": zod.array(zod.uuid().regex(enrollmentApprovalApproveManyResponseSucceededItemRegExp))
@@ -2899,6 +2899,51 @@ export const QuizAccessCheckParams = zod.object({
 
 export const QuizAccessCheckResponse = zod.object({
   "moduleState": zod.enum(['LOCKED', 'UNLOCKED', 'IN_PROGRESS', 'QUIZ_READY', 'COMPLETED'])
+})
+
+
+export const quizSubmissionSubmitPathCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizSubmissionSubmitPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const QuizSubmissionSubmitParams = zod.object({
+  "courseId": zod.uuid().regex(quizSubmissionSubmitPathCourseIdRegExp),
+  "moduleId": zod.uuid().regex(quizSubmissionSubmitPathModuleIdRegExp)
+})
+
+export const quizSubmissionSubmitBodyAnswersRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizSubmissionSubmitBodyAttemptIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizSubmissionSubmitBodyIdempotencyKeyRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const QuizSubmissionSubmitBody = zod.object({
+  "answers": zod.record(zod.string(), zod.uuid().regex(quizSubmissionSubmitBodyAnswersRegExpOne)),
+  "attemptId": zod.uuid().regex(quizSubmissionSubmitBodyAttemptIdRegExp),
+  "idempotencyKey": zod.uuid().regex(quizSubmissionSubmitBodyIdempotencyKeyRegExp)
+})
+
+export const quizSubmissionSubmitResponseAttemptIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizSubmissionSubmitResponseCorrectCountMin = 0;
+export const quizSubmissionSubmitResponseCorrectCountMax = 9007199254740991;
+
+export const quizSubmissionSubmitResponsePassMarkPercentMin = 0;
+export const quizSubmissionSubmitResponsePassMarkPercentMax = 100;
+
+export const quizSubmissionSubmitResponseScorePercentMin = 0;
+export const quizSubmissionSubmitResponseScorePercentMax = 100;
+
+export const quizSubmissionSubmitResponseTotalQuestionsMin = 0;
+export const quizSubmissionSubmitResponseTotalQuestionsMax = 9007199254740991;
+
+
+
+export const QuizSubmissionSubmitResponse = zod.object({
+  "attemptId": zod.uuid().regex(quizSubmissionSubmitResponseAttemptIdRegExp),
+  "correctCount": zod.int().min(quizSubmissionSubmitResponseCorrectCountMin).max(quizSubmissionSubmitResponseCorrectCountMax),
+  "passMarkPercent": zod.int().min(quizSubmissionSubmitResponsePassMarkPercentMin).max(quizSubmissionSubmitResponsePassMarkPercentMax),
+  "passed": zod.boolean(),
+  "scorePercent": zod.int().min(quizSubmissionSubmitResponseScorePercentMin).max(quizSubmissionSubmitResponseScorePercentMax),
+  "totalQuestions": zod.int().min(quizSubmissionSubmitResponseTotalQuestionsMin).max(quizSubmissionSubmitResponseTotalQuestionsMax)
 })
 
 

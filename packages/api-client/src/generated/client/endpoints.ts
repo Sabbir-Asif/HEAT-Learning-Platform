@@ -78,6 +78,8 @@ import type {
   QuizDeliveryResponseDto,
   QuizQuestionRequestDto,
   QuizRulesRequestDto,
+  QuizSubmitRequestDto,
+  QuizSubmitResponseDto,
   QuizSummaryDto,
   ReorderRequestDto,
   SignInRequestDto,
@@ -6766,6 +6768,91 @@ export function useQuizAccessCheck<TData = Awaited<ReturnType<typeof quizAccessC
 
 
 
+
+export const getQuizSubmissionSubmitUrl = (courseId: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/quiz/attempts`
+}
+
+export const quizSubmissionSubmit = async (courseId: string,
+    moduleId: string,
+    quizSubmitRequestDto: QuizSubmitRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<QuizSubmitResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<QuizSubmitResponseDto>(getQuizSubmissionSubmitUrl(courseId,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quizSubmitRequestDto)
+  }
+);}
+
+
+
+
+
+export const getQuizSubmissionSubmitMutationKey = () => ['quizSubmissionSubmit'] as const;
+
+export const getQuizSubmissionSubmitMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quizSubmissionSubmit>>, TError,QuizSubmissionSubmitMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof quizSubmissionSubmit>>, TError,QuizSubmissionSubmitMutationVariables, TContext> => {
+
+const mutationKey = getQuizSubmissionSubmitMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof quizSubmissionSubmit>>, QuizSubmissionSubmitMutationVariables> = (props) => {
+          const {courseId,moduleId,data} = props ?? {};
+
+          return  quizSubmissionSubmit(courseId,moduleId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type QuizSubmissionSubmitMutationResult = NonNullable<Awaited<ReturnType<typeof quizSubmissionSubmit>>>
+    export type QuizSubmissionSubmitMutationBody = QuizSubmitRequestDto
+    export type QuizSubmissionSubmitMutationError = ErrorType<unknown>
+    export type QuizSubmissionSubmitMutationVariables = {courseId: string;moduleId: string;data: QuizSubmitRequestDto}
+
+    export const useQuizSubmissionSubmit = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof quizSubmissionSubmit>>, TError,QuizSubmissionSubmitMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof quizSubmissionSubmit>>,
+        TError,
+        QuizSubmissionSubmitMutationVariables,
+        TContext
+      > => {
+      return useMutation(getQuizSubmissionSubmitMutationOptions(options), queryClient);
+    }
 
 export const getDirectoryLookupsListUniversitiesUrl = () => {
 

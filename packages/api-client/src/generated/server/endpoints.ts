@@ -351,6 +351,10 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   ORIGIN_NOT_ALLOWED: 'ORIGIN_NOT_ALLOWED',
   PASSWORD_BREACHED: 'PASSWORD_BREACHED',
   PASSWORD_CHANGE_REQUIRED: 'PASSWORD_CHANGE_REQUIRED',
+  QUIZ_ANSWER_INVALID: 'QUIZ_ANSWER_INVALID',
+  QUIZ_ATTEMPT_LIMIT_REACHED: 'QUIZ_ATTEMPT_LIMIT_REACHED',
+  QUIZ_ATTEMPT_NOT_OPEN: 'QUIZ_ATTEMPT_NOT_OPEN',
+  QUIZ_ATTEMPT_WAIT: 'QUIZ_ATTEMPT_WAIT',
   QUIZ_NOT_UNLOCKED: 'QUIZ_NOT_UNLOCKED',
   RATE_LIMITED: 'RATE_LIMITED',
   UNAUTHENTICATED: 'UNAUTHENTICATED',
@@ -1472,6 +1476,42 @@ export interface QuizRulesRequestDto {
      * @maximum 10080
      */
   waitMinutes: number;
+}
+
+export type QuizSubmitRequestDtoAnswers = {[key: string]: string};
+
+export interface QuizSubmitRequestDto {
+  answers: QuizSubmitRequestDtoAnswers;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  attemptId: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  idempotencyKey: string;
+}
+
+export interface QuizSubmitResponseDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  attemptId: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  correctCount: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  passMarkPercent: number;
+  passed: boolean;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  scorePercent: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  totalQuestions: number;
 }
 
 export type QuizSummaryDtoQuestionsItemOptionsItem = {
@@ -4316,6 +4356,44 @@ export const quizAccessCheck = async (courseId: string,
     method: 'GET'
 
 
+  }
+);}
+
+
+
+export const getQuizSubmissionSubmitUrl = (courseId: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/quiz/attempts`
+}
+
+export const quizSubmissionSubmit = async (courseId: string,
+    moduleId: string,
+    quizSubmitRequestDto: QuizSubmitRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSubmitResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<QuizSubmitResponseDto>(getQuizSubmissionSubmitUrl(courseId,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quizSubmitRequestDto)
   }
 );}
 
