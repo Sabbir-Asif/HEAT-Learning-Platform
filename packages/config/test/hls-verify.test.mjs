@@ -70,13 +70,28 @@ describe("constantTimeEqual", () => {
   });
 });
 
+describe("parseKeys limits", () => {
+  const long = "s".repeat(32);
+
+  test("skips secrets under 32 characters", () => {
+    expect(parseKeys(`k1:${"s".repeat(31)},k2:${long}`)).toEqual({ k2: long });
+  });
+
+  test("keeps the first of a duplicated id", () => {
+    expect(parseKeys(`k1:${long},k1:${"t".repeat(32)}`)).toEqual({ k1: long });
+  });
+});
+
 describe("parseKeys", () => {
   test("reads id:secret pairs separated by commas", () => {
-    expect(parseKeys("k1:aaa,k2:bbb")).toEqual({ k1: "aaa", k2: "bbb" });
+    const a = "a".repeat(32);
+    const b = "b".repeat(32);
+    expect(parseKeys(`k1:${a},k2:${b}`)).toEqual({ k1: a, k2: b });
   });
 
   test("ignores blanks and malformed entries", () => {
-    expect(parseKeys(" k1:aaa , ,nocolon,:empty,bad id:x")).toEqual({ k1: "aaa" });
+    const a = "a".repeat(32);
+    expect(parseKeys(` k1:${a} , ,nocolon,:empty,bad id:${a}`)).toEqual({ k1: a });
     expect(parseKeys(undefined)).toEqual({});
     expect(parseKeys("")).toEqual({});
   });

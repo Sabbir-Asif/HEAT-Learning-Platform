@@ -46,7 +46,7 @@ services:
     ports:
       - "127.0.0.1:${HTTP_PORT:?run pnpm dev:up}:80"
     environment:
-      HLS_SIGNING_KEYS: ${HLS_SIGNING_KEYS:?run pnpm dev:up}
+      HLS_SIGNING_KEYS: ${HLS_SIGNING_KEYS:-k1:dev-only-hls-key-one-0123456789abcdef,k2:dev-only-hls-key-two-0123456789abcdef}
     volumes:
       - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ../nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
@@ -54,7 +54,7 @@ services:
       - ../nginx/hls.inc:/etc/nginx/conf.d/hls.inc:ro
       - ../nginx/hls.js:/etc/nginx/njs/hls.js:ro
       - ../nginx/hls-verify.js:/etc/nginx/njs/hls-verify.js:ro
-      - ${HLS_MEDIA_DIR:?run pnpm dev:up}:/srv/media/hls:ro
+      - ${HLS_MEDIA_DIR:-../../.data/hls}:/srv/media/hls:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:

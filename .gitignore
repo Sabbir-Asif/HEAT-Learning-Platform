@@ -20,3 +20,4 @@ playwright-report
 .work-*
 lighthouse-results
 packages/db/src/generated
+.data/

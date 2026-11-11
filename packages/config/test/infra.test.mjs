@@ -160,7 +160,7 @@ describe("HLS delivery config", () => {
   test("signing keys reach Nginx only through the environment", () => {
     expect(mainConf).toContain("env HLS_SIGNING_KEYS;");
     expect(mainConf).toContain("load_module modules/ngx_http_js_module.so;");
-    expect(service("nginx")).toContain("HLS_SIGNING_KEYS: ${HLS_SIGNING_KEYS:?run pnpm dev:up}");
+    expect(service("nginx")).toContain("HLS_SIGNING_KEYS: ${HLS_SIGNING_KEYS:-");
     expect(`${hls}${nginx}${mainConf}`).not.toMatch(/dev-only-hls-key/);
   });
 
@@ -179,6 +179,31 @@ describe("HLS delivery config", () => {
       expect(source).not.toMatch(/^import \{/m);
       expect(source.match(/^export default/gm)).toHaveLength(1);
     }
+  });
+});
+
+describe("HLS defaults for existing environments", () => {
+  test("compose gives the signing keys and media directory safe dev defaults", () => {
+    const block = service("nginx");
+    expect(block).toMatch(
+      /HLS_SIGNING_KEYS: \$\{HLS_SIGNING_KEYS:-k1:dev-only-hls-key-one-\S+,k2:dev-only-hls-key-two-\S+\}/,
+    );
+    expect(block).toContain("${HLS_MEDIA_DIR:-../../.data/hls}:/srv/media/hls:ro");
+    expect(compose).not.toMatch(/HLS_\w+:\?/);
+  });
+
+  test("the defaults equal the values in .env.example", () => {
+    expect(compose).toContain(composeEnv.HLS_SIGNING_KEYS);
+    expect(compose).toContain(`:-${composeEnv.HLS_MEDIA_DIR}}`);
+  });
+
+  test(".data is ignored by git and dev.mjs creates the media directory before compose up", () => {
+    expect(() =>
+      execFileSync("git", ["check-ignore", "-q", ".data/hls/x"], { cwd: root }),
+    ).not.toThrow();
+    const script = read("infra/scripts/dev.mjs");
+    expect(script).toContain("mkdirSync(");
+    expect(script.indexOf("ensureMediaDirectory();")).toBeLessThan(script.indexOf('compose("up"'));
   });
 });
 

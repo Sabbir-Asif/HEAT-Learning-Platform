@@ -63,7 +63,8 @@ const parseKeys = (text) => {
     if (separator < 0) continue;
     const id = entry.slice(0, separator).trim();
     const secret = entry.slice(separator + 1).trim();
-    if (keyIdPattern.test(id) && secret !== "") keys[id] = secret;
+    if (keyIdPattern.test(id) && secret.length >= 32 && !Object.prototype.hasOwnProperty.call(keys, id))
+      keys[id] = secret;
   }
   return keys;
 };
