@@ -7,6 +7,7 @@ import { AuditModule } from "./audit";
 import { AuthModule } from "./auth";
 import { CaptchaModule } from "./captcha";
 import { CatalogModule } from "./catalog";
+import { CertificatesModule } from "./certificates";
 import { CoreModule } from "./core";
 import { DirectoryModule } from "./directory";
 import { EmailVerificationModule } from "./email-verification";
@@ -32,6 +33,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     AdminManagementModule,
     CaptchaModule,
     CatalogModule,
+    CertificatesModule,
     DirectoryModule,
     EmailVerificationModule,
     EnrollmentModule,

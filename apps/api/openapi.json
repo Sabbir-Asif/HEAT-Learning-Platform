@@ -661,6 +661,69 @@
         ],
         "type": "object"
       },
+      "CertificateListResponseDto": {
+        "properties": {
+          "certificates": {
+            "items": {
+              "properties": {
+                "courseId": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "courseTitle": {
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "issuedAt": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                  "type": "string"
+                },
+                "number": {
+                  "maxLength": 64,
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "READY",
+                    "PENDING",
+                    "REVOKED"
+                  ],
+                  "type": "string"
+                },
+                "verificationUrl": {
+                  "format": "uri",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "courseId",
+                "courseTitle",
+                "status",
+                "number",
+                "issuedAt",
+                "verificationUrl"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "certificates"
+        ],
+        "type": "object"
+      },
       "ChangePasswordRequestDto": {
         "properties": {
           "currentPassword": {
@@ -1037,10 +1100,29 @@
           "courses": {
             "items": {
               "properties": {
-                "certificateNumber": {
-                  "maxLength": 64,
+                "certificate": {
                   "nullable": true,
-                  "type": "string"
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "READY",
+                        "PENDING",
+                        "REVOKED"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status"
+                  ],
+                  "type": "object"
                 },
                 "courseId": {
                   "format": "uuid",
@@ -1142,7 +1224,7 @@
                 "reason",
                 "progress",
                 "nextModule",
-                "certificateNumber"
+                "certificate"
               ],
               "type": "object"
             },
@@ -3810,6 +3892,39 @@
         ]
       }
     },
+    "/api/admin/certificates/{id}/download": {
+      "get": {
+        "operationId": "adminCertificatesDownload",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Empty body; Nginx serves the PDF through X-Accel-Redirect"
+          }
+        },
+        "tags": [
+          "certificates"
+        ]
+      }
+    },
     "/api/admin/courses": {
       "get": {
         "operationId": "coursesList",
@@ -6470,6 +6585,39 @@
         ]
       }
     },
+    "/api/certificates/{id}/download": {
+      "get": {
+        "operationId": "certificatesDownload",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Empty body; Nginx serves the PDF through X-Accel-Redirect"
+          }
+        },
+        "tags": [
+          "certificates"
+        ]
+      }
+    },
     "/api/courses/{courseId}/learning-structure": {
       "get": {
         "operationId": "learningStructure",
@@ -6845,6 +6993,27 @@
         },
         "tags": [
           "me"
+        ]
+      }
+    },
+    "/api/me/certificates": {
+      "get": {
+        "operationId": "meCertificatesList",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateListResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "certificates"
         ]
       }
     },

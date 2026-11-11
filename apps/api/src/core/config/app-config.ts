@@ -88,6 +88,13 @@ const envSchema = z
         (value) => value === undefined || new URL(value).origin === value,
         "ADMIN_APP_URL must be an origin",
       ),
+    PUBLIC_APP_URL: z
+      .url()
+      .optional()
+      .refine(
+        (value) => value === undefined || new URL(value).origin === value,
+        "PUBLIC_APP_URL must be an origin",
+      ),
     AUDIT_TRANSACTION_MAX_WAIT_MS: positiveInt.default(5000),
     AUDIT_TRANSACTION_TIMEOUT_MS: positiveInt.default(15000),
     RESPONSE_FLOOR_MS: positiveInt.default(1000),
@@ -152,6 +159,7 @@ const envSchema = z
 const localVideoUploadDirectory = "../../.data/uploads";
 const localHlsMediaDirectory = "../../.data/hls";
 const localAdminAppUrl = "http://localhost:3001";
+const localPublicAppUrl = "http://localhost:3000";
 const localTrustedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
@@ -191,6 +199,7 @@ export interface AppConfig {
   argon2: { memoryCost: number; timeCost: number; parallelism: number };
   breachedPasswordRangeUrl: string;
   invitations: { ttlHours: number; adminAppUrl: string };
+  publicAppUrl: string;
   verification: { tokenTtlHours: number };
   audit: { transactionMaxWaitMs: number; transactionTimeoutMs: number };
   accountProtection: { responseFloorMs: number };
@@ -248,6 +257,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
       ttlHours: values.ADMIN_INVITE_TTL_HOURS,
       adminAppUrl: values.ADMIN_APP_URL ?? localAdminAppUrl,
     },
+    publicAppUrl: values.PUBLIC_APP_URL ?? localPublicAppUrl,
     verification: { tokenTtlHours: values.VERIFICATION_TOKEN_TTL_HOURS },
     audit: {
       transactionMaxWaitMs: values.AUDIT_TRANSACTION_MAX_WAIT_MS,

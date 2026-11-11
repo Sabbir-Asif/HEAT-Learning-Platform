@@ -1,7 +1,6 @@
 import type { DashboardCourse } from "@heat/contracts";
 import { describe, expect, test } from "vitest";
 import {
-  certificateHrefOf,
   continueTargetOf,
   dashboardRedirectPath,
   formatResumePosition,
@@ -18,7 +17,7 @@ const course = (overrides: Partial<DashboardCourse> = {}): DashboardCourse => ({
   reason: null,
   progress: { modulesCompleted: 1, modulesTotal: 4, percent: 25 },
   nextModule: { id, order: 2, title: "Module 2", resumeVideoId: null, resumePositionSeconds: 0 },
-  certificateNumber: null,
+  certificate: null,
   ...overrides,
 });
 
@@ -114,19 +113,6 @@ describe("continueTargetOf", () => {
 
   test("encodes the course slug", () => {
     expect(continueTargetOf(course({ courseSlug: "a b" }))?.href).toBe(`/learn/a%20b/${id}`);
-  });
-});
-
-describe("certificateHrefOf", () => {
-  test("links a completed course with a certificate to its verification page", () => {
-    expect(certificateHrefOf(course({ status: "COMPLETED", certificateNumber: "ABC123" }))).toBe(
-      "/verify/ABC123",
-    );
-  });
-
-  test("is null without a certificate or for other states", () => {
-    expect(certificateHrefOf(course({ status: "COMPLETED" }))).toBeNull();
-    expect(certificateHrefOf(course({ certificateNumber: "ABC123" }))).toBeNull();
   });
 });
 

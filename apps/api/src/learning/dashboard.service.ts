@@ -1,6 +1,7 @@
 import type { DashboardCourse, DashboardResponse, LearningModuleState } from "@heat/contracts";
 import type { HeatClient } from "@heat/db";
 import { Inject, Injectable } from "@nestjs/common";
+import { certificateStatusOf } from "../certificates/certificate-rules";
 import { DATABASE } from "../core";
 import { learnsCourse } from "./course-access";
 import { resumePointOf } from "./dashboard-rules";
@@ -24,7 +25,7 @@ export class DashboardService {
         status: true,
         courseRevisionId: true,
         course: { select: { id: true, slug: true, title: true } },
-        certificate: { select: { number: true, revokedAt: true } },
+        certificate: { select: { id: true, fileKey: true, revokedAt: true } },
         decisions: {
           where: { action: { in: ["REJECT", "REMOVE"] } },
           orderBy: { decidedAt: "desc" },
@@ -84,9 +85,12 @@ export class DashboardService {
           enrollment.status === "EXPIRED"
             ? (enrollment.decisions[0]?.reason ?? null)
             : null,
-        certificateNumber:
-          enrollment.status === "COMPLETED" && enrollment.certificate?.revokedAt === null
-            ? enrollment.certificate.number
+        certificate:
+          enrollment.status === "COMPLETED"
+            ? {
+                id: enrollment.certificate?.fileKey == null ? null : enrollment.certificate.id,
+                status: certificateStatusOf(enrollment.certificate),
+              }
             : null,
       };
       if (!learnsCourse(enrollment.status) || enrollment.courseRevisionId === null) {

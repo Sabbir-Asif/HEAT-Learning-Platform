@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { approvalReasonMaxLength } from "./approvals";
 import { enrollmentStatusSchema } from "./auth";
+import { dashboardCertificateSchema } from "./certificates";
 
 export const dashboardNextModuleSchema = z.object({
   id: z.uuid(),
@@ -24,7 +25,7 @@ export const dashboardCourseSchema = z.object({
   reason: z.string().max(approvalReasonMaxLength).nullable(),
   progress: dashboardProgressSchema.nullable(),
   nextModule: dashboardNextModuleSchema.nullable(),
-  certificateNumber: z.string().max(64).nullable(),
+  certificate: dashboardCertificateSchema.nullable(),
 });
 
 export type DashboardCourse = z.infer<typeof dashboardCourseSchema>;

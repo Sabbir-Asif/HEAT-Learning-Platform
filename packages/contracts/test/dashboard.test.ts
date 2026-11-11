@@ -11,7 +11,7 @@ const course = {
   reason: null,
   progress: { modulesCompleted: 1, modulesTotal: 4, percent: 25 },
   nextModule: { id, order: 2, title: "Module 2", resumeVideoId: id, resumePositionSeconds: 42 },
-  certificateNumber: null,
+  certificate: null,
 };
 
 describe("dashboardResponseSchema", () => {

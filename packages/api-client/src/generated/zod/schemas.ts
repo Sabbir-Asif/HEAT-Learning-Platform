@@ -287,6 +287,16 @@ export const AdminAuthSignInResponse = zod.object({
 export const AdminAuthSignOutResponse = zod.void()
 
 
+export const adminCertificatesDownloadPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminCertificatesDownloadParams = zod.object({
+  "id": zod.uuid().regex(adminCertificatesDownloadPathIdRegExp)
+})
+
+export const AdminCertificatesDownloadResponse = zod.unknown()
+
+
 export const coursesListQueryStatusDefault = `all`;
 export const coursesListQueryPageDefault = 1;
 export const coursesListQueryPageMax = 9007199254740991;
@@ -2663,6 +2673,16 @@ export const CaptchaIssueResponse = zod.object({
 })
 
 
+export const certificatesDownloadPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const CertificatesDownloadParams = zod.object({
+  "id": zod.uuid().regex(certificatesDownloadPathIdRegExp)
+})
+
+export const CertificatesDownloadResponse = zod.unknown()
+
+
 export const learningStructurePathCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 
@@ -3063,8 +3083,27 @@ export const MeDescribeResponse = zod.object({
 })
 
 
-export const dashboardDescribeResponseCoursesItemCertificateNumberMax = 64;
+export const meCertificatesListResponseCertificatesItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const meCertificatesListResponseCertificatesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const meCertificatesListResponseCertificatesItemIssuedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const meCertificatesListResponseCertificatesItemNumberMax = 64;
 
+
+
+export const MeCertificatesListResponse = zod.object({
+  "certificates": zod.array(zod.object({
+  "courseId": zod.uuid().regex(meCertificatesListResponseCertificatesItemCourseIdRegExp),
+  "courseTitle": zod.string(),
+  "id": zod.uuid().regex(meCertificatesListResponseCertificatesItemIdRegExp).nullable(),
+  "issuedAt": zod.iso.datetime({"offset":true}).regex(meCertificatesListResponseCertificatesItemIssuedAtRegExp).nullable(),
+  "number": zod.string().max(meCertificatesListResponseCertificatesItemNumberMax).nullable(),
+  "status": zod.enum(['READY', 'PENDING', 'REVOKED']),
+  "verificationUrl": zod.url().nullable()
+}))
+})
+
+
+export const dashboardDescribeResponseCoursesItemCertificateIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const dashboardDescribeResponseCoursesItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const dashboardDescribeResponseCoursesItemNextModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const dashboardDescribeResponseCoursesItemNextModuleOrderMin = -9007199254740991;
@@ -3089,7 +3128,10 @@ export const dashboardDescribeResponseCoursesItemReasonMax = 500;
 
 export const DashboardDescribeResponse = zod.object({
   "courses": zod.array(zod.object({
-  "certificateNumber": zod.string().max(dashboardDescribeResponseCoursesItemCertificateNumberMax).nullable(),
+  "certificate": zod.object({
+  "id": zod.uuid().regex(dashboardDescribeResponseCoursesItemCertificateIdRegExp).nullable(),
+  "status": zod.enum(['READY', 'PENDING', 'REVOKED'])
+}).nullable(),
   "courseId": zod.uuid().regex(dashboardDescribeResponseCoursesItemCourseIdRegExp),
   "courseSlug": zod.string(),
   "courseTitle": zod.string(),

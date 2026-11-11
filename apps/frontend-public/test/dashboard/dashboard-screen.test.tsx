@@ -23,7 +23,7 @@ const course = (overrides: Partial<DashboardCourse> = {}): DashboardCourse => ({
   reason: null,
   progress: { modulesCompleted: 1, modulesTotal: 4, percent: 25 },
   nextModule: { id, order: 2, title: "Consent", resumeVideoId: id, resumePositionSeconds: 65 },
-  certificateNumber: null,
+  certificate: null,
   ...overrides,
 });
 
@@ -52,7 +52,7 @@ describe("DashboardScreen", () => {
         courseTitle: "Completed course",
         status: "COMPLETED",
         nextModule: null,
-        certificateNumber: "ABC123",
+        certificate: { id: "0198f1a0-0000-7000-8000-0000000000c1", status: "READY" },
       }),
       course({
         courseId: "0198f1a0-0000-7000-8000-0000000000a3",
@@ -67,8 +67,36 @@ describe("DashboardScreen", () => {
     const headings = [...view.querySelectorAll("h2")].map((heading) => heading.textContent);
 
     expect(headings).toEqual(["Completed", "Waiting for approval"]);
-    expect(link(view, "View certificate")?.getAttribute("href")).toBe("/verify/ABC123");
+    expect(link(view, "View certificate")?.getAttribute("href")).toBe("/certificates");
+    expect(link(view, "Download certificate")?.getAttribute("href")).toBe(
+      "/api/certificates/0198f1a0-0000-7000-8000-0000000000c1/download",
+    );
     expect(link(view, "Continue learning")).toBeUndefined();
+  });
+
+  test("a completed course whose certificate is not ready shows its state without a download", async () => {
+    ready([
+      course({
+        courseTitle: "Held course",
+        status: "COMPLETED",
+        nextModule: null,
+        certificate: { id: null, status: "PENDING" },
+      }),
+      course({
+        courseId: "0198f1a0-0000-7000-8000-0000000000a9",
+        courseTitle: "Revoked course",
+        status: "COMPLETED",
+        nextModule: null,
+        certificate: { id: "0198f1a0-0000-7000-8000-0000000000c2", status: "REVOKED" },
+      }),
+    ]);
+
+    const view = await mount(<DashboardScreen />);
+
+    expect(view.textContent).toContain("Your certificate is being prepared.");
+    expect(view.textContent).toContain("This certificate has been revoked.");
+    expect(link(view, "Download certificate")).toBeUndefined();
+    expect(link(view, "View certificate")).toBeUndefined();
   });
 
   test("a removed course shows its reason and no continue link", async () => {

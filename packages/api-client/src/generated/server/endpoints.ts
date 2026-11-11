@@ -399,6 +399,43 @@ export interface CaptchaResponseDto {
   svg: string;
 }
 
+export type CertificateListResponseDtoCertificatesItemStatus = typeof CertificateListResponseDtoCertificatesItemStatus[keyof typeof CertificateListResponseDtoCertificatesItemStatus];
+
+
+export const CertificateListResponseDtoCertificatesItemStatus = {
+  READY: 'READY',
+  PENDING: 'PENDING',
+  REVOKED: 'REVOKED',
+} as const;
+
+export type CertificateListResponseDtoCertificatesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId: string;
+  courseTitle: string;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  id: string | null;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  issuedAt: string | null;
+  /**
+     * @maxLength 64
+     * @nullable
+     */
+  number: string | null;
+  status: CertificateListResponseDtoCertificatesItemStatus;
+  /** @nullable */
+  verificationUrl: string | null;
+};
+
+export interface CertificateListResponseDto {
+  certificates: CertificateListResponseDtoCertificatesItem[];
+}
+
 export interface ChangePasswordRequestDto {
   /**
      * @minLength 1
@@ -612,6 +649,27 @@ export interface CsrfTokenResponseDto {
   token: string;
 }
 
+export type DashboardResponseDtoCoursesItemCertificateStatus = typeof DashboardResponseDtoCoursesItemCertificateStatus[keyof typeof DashboardResponseDtoCoursesItemCertificateStatus];
+
+
+export const DashboardResponseDtoCoursesItemCertificateStatus = {
+  READY: 'READY',
+  PENDING: 'PENDING',
+  REVOKED: 'REVOKED',
+} as const;
+
+/**
+ * @nullable
+ */
+export type DashboardResponseDtoCoursesItemCertificate = {
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  id: string | null;
+  status: DashboardResponseDtoCoursesItemCertificateStatus;
+} | null;
+
 /**
  * @nullable
  */
@@ -671,11 +729,8 @@ export const DashboardResponseDtoCoursesItemStatus = {
 } as const;
 
 export type DashboardResponseDtoCoursesItem = {
-  /**
-     * @maxLength 64
-     * @nullable
-     */
-  certificateNumber: string | null;
+  /** @nullable */
+  certificate: DashboardResponseDtoCoursesItemCertificate;
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   courseId: string;
   courseSlug: string;
@@ -2545,6 +2600,27 @@ export const adminAuthSignOut = async ( options?: Parameters<typeof serverFetch>
 
 
 
+export const getAdminCertificatesDownloadUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/certificates/${id}/download`
+}
+
+export const adminCertificatesDownload = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<Blob> => {
+
+  return serverFetch<Blob>(getAdminCertificatesDownloadUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export const getCoursesListUrl = (params?: CoursesListParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -4355,6 +4431,27 @@ return serverFetch<CaptchaResponseDto>(getCaptchaIssueUrl(),
 
 
 
+export const getCertificatesDownloadUrl = (id: string,) => {
+
+
+
+
+  return `/api/certificates/${id}/download`
+}
+
+export const certificatesDownload = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<Blob> => {
+
+  return serverFetch<Blob>(getCertificatesDownloadUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export const getLearningStructureUrl = (courseId: string,) => {
 
 
@@ -4615,6 +4712,27 @@ export const getMeDescribeUrl = () => {
 export const meDescribe = async ( options?: Parameters<typeof serverFetch>[1]): Promise<MeResponseDto> => {
 
   return serverFetch<MeResponseDto>(getMeDescribeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getMeCertificatesListUrl = () => {
+
+
+
+
+  return `/api/me/certificates`
+}
+
+export const meCertificatesList = async ( options?: Parameters<typeof serverFetch>[1]): Promise<CertificateListResponseDto> => {
+
+  return serverFetch<CertificateListResponseDto>(getMeCertificatesListUrl(),
   {
     ...options,
     method: 'GET'

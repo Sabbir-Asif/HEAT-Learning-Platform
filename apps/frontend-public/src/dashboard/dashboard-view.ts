@@ -70,8 +70,3 @@ export const continueTargetOf = (course: DashboardCourse): ContinueTarget | null
         : `Resume at ${formatResumePosition(nextModule.resumePositionSeconds)}`,
   };
 };
-
-export const certificateHrefOf = (course: DashboardCourse): string | null =>
-  course.status === "COMPLETED" && course.certificateNumber !== null
-    ? `/verify/${encodeURIComponent(course.certificateNumber)}`
-    : null;

@@ -19,6 +19,7 @@ export const rateLimitProfileNames = [
   "directoryLookup",
   "learningRead",
   "quizSubmit",
+  "certificateDownload",
 ] as const;
 
 export type RateLimitProfileName = (typeof rateLimitProfileNames)[number];
@@ -66,6 +67,7 @@ const defaults: Record<RateLimitProfileName, RateLimitProfile> = {
   directoryLookup: { limit: 600, windowSeconds: 60, ipLimit: 3000 },
   learningRead: { limit: 120, windowSeconds: 60, ipLimit: 6000 },
   quizSubmit: { limit: 20, windowSeconds: 60, ipLimit: 3000 },
+  certificateDownload: { limit: 30, windowSeconds: 60, ipLimit: 3000 },
 };
 
 const lockoutDefaults: LockoutPolicy = {

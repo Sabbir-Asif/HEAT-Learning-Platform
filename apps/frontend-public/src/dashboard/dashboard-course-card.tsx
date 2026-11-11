@@ -12,11 +12,12 @@ import {
   StatusBadge,
 } from "@heat/ui";
 import Link from "next/link";
-import { certificateHrefOf, continueTargetOf } from "./dashboard-view";
+import { dashboardCertificateOf } from "../certificates/certificate-view";
+import { continueTargetOf } from "./dashboard-view";
 
 export function DashboardCourseCard({ course }: { course: DashboardCourse }) {
   const target = continueTargetOf(course);
-  const certificateHref = certificateHrefOf(course);
+  const certificate = dashboardCertificateOf(course);
   const { progress } = course;
   return (
     <Card size="sm" className="h-full">
@@ -48,14 +49,28 @@ export function DashboardCourseCard({ course }: { course: DashboardCourse }) {
             </div>
           </>
         )}
-        {certificateHref === null ? null : (
-          <div>
-            <Button variant="outline" nativeButton={false} render={<Link href={certificateHref} />}>
+        {certificate?.kind === "ready" ? (
+          <div className="flex flex-wrap gap-2">
+            <Button nativeButton={false} render={<a href={certificate.downloadHref} />}>
+              Download certificate
+              <span className="sr-only"> for {course.courseTitle}</span>
+            </Button>
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={<Link href={certificate.viewHref} />}
+            >
               View certificate
               <span className="sr-only"> for {course.courseTitle}</span>
             </Button>
           </div>
-        )}
+        ) : null}
+        {certificate?.kind === "pending" ? (
+          <CardDescription>Your certificate is being prepared.</CardDescription>
+        ) : null}
+        {certificate?.kind === "revoked" ? (
+          <CardDescription>This certificate has been revoked.</CardDescription>
+        ) : null}
         {course.reason === null ? null : <CardDescription>Reason: {course.reason}</CardDescription>}
       </CardContent>
     </Card>

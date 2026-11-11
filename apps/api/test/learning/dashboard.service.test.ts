@@ -109,7 +109,7 @@ describe("DashboardService.describe", () => {
           resumeVideoId: id(22),
           resumePositionSeconds: 45,
         },
-        certificateNumber: null,
+        certificate: null,
       },
     ]);
   });
@@ -134,7 +134,7 @@ describe("DashboardService.describe", () => {
       enrollments: [
         enrollmentRow({
           status: "COMPLETED",
-          certificate: { number: "ABC123", revokedAt: null },
+          certificate: { id: "c1", fileKey: "k", revokedAt: null },
         }),
       ],
     });
@@ -145,18 +145,49 @@ describe("DashboardService.describe", () => {
       status: "COMPLETED",
       progress: { modulesCompleted: 3, modulesTotal: 3, percent: 100 },
       nextModule: null,
-      certificateNumber: "ABC123",
+      certificate: { id: "c1", status: "READY" },
     });
   });
 
-  test("a revoked certificate gives no link", async () => {
+  test("a revoked certificate is reported as revoked", async () => {
     const { service } = build({
       enrollments: [
-        enrollmentRow({ status: "COMPLETED", certificate: { number: "X", revokedAt: at(1) } }),
+        enrollmentRow({
+          status: "COMPLETED",
+          certificate: { id: "c1", fileKey: "k", revokedAt: at(1) },
+        }),
       ],
     });
 
-    expect((await service.describe("u1")).courses[0]?.certificateNumber).toBeNull();
+    expect((await service.describe("u1")).courses[0]?.certificate).toEqual({
+      id: "c1",
+      status: "REVOKED",
+    });
+  });
+
+  test("a completed course without a stored file or row shows a pending certificate", async () => {
+    const { service } = build({
+      enrollments: [
+        enrollmentRow({
+          status: "COMPLETED",
+          certificate: { id: "c1", fileKey: null, revokedAt: null },
+        }),
+        enrollmentRow({ id: "e2", status: "COMPLETED", course: course(2), certificate: null }),
+      ],
+    });
+
+    const { courses } = await service.describe("u1");
+
+    expect(courses.map((entry) => entry.certificate)).toEqual([
+      { id: null, status: "PENDING" },
+      { id: null, status: "PENDING" },
+    ]);
+  });
+
+  test("a course that is not completed has no certificate state", async () => {
+    const { service } = build();
+
+    expect((await service.describe("u1")).courses[0]?.certificate).toBeNull();
   });
 
   test("a pending course has its status only and triggers no content query", async () => {

@@ -182,6 +182,34 @@ describe("HLS delivery config", () => {
   });
 });
 
+describe("certificate delivery config", () => {
+  const certificates = read("infra/nginx/certificates.inc");
+
+  test("both hosts include the internal certificates location", () => {
+    for (const host of ["learn.localhost", "admin.localhost"])
+      expect(server(host)).toContain("include /etc/nginx/conf.d/certificates.inc;");
+    expect(compose).toContain("../nginx/certificates.inc:/etc/nginx/conf.d/certificates.inc:ro");
+  });
+
+  test("the location is internal, private and read from a read-only mount", () => {
+    expect(certificates).toMatch(/location \/internal\/certificates\/ \{\s*internal;/);
+    expect(certificates).toContain("alias /srv/certificates/;");
+    expect(certificates).toContain("autoindex off;");
+    expect(certificates).toContain("application/pdf pdf;");
+    expect(certificates).toContain('add_header Cache-Control "private, no-store" always;');
+    expect(certificates).not.toContain("proxy_pass");
+    expect(service("nginx")).toContain(
+      "${CERTIFICATE_STORAGE_DIR:-../../.data/certificates}:/srv/certificates:ro",
+    );
+    expect(compose).toContain(`:-${composeEnv.CERTIFICATE_STORAGE_DIR}}`);
+  });
+
+  test("dev.mjs creates the certificate directory before compose up", () => {
+    const script = read("infra/scripts/dev.mjs");
+    expect(script).toContain('ensureDirectory("CERTIFICATE_STORAGE_DIR"');
+  });
+});
+
 describe("HLS defaults for existing environments", () => {
   test("compose gives the signing keys and media directory safe dev defaults", () => {
     const block = service("nginx");
