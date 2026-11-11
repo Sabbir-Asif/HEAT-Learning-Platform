@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { CoreModule } from "api/core";
+import { CoreModule, WorkerMailConnectionCheck } from "api/core";
 
-@Module({ imports: [CoreModule] })
+@Module({ imports: [CoreModule], providers: [WorkerMailConnectionCheck] })
 export class WorkerModule {}

@@ -1,4 +1,4 @@
-import { Inject, Module } from "@nestjs/common";
+import { Inject, Logger, Module } from "@nestjs/common";
 import type { OnApplicationShutdown } from "@nestjs/common";
 import { createClient } from "@heat/db";
 import type { HeatClient } from "@heat/db";
@@ -7,6 +7,8 @@ import { CLOCK, systemClock } from "./clock";
 import { APP_CONFIG, loadConfig } from "./config";
 import type { AppConfig } from "./config";
 import { DATABASE, REDIS } from "./tokens";
+import { MAIL_TRANSPORT } from "./mail/mail-transport";
+import { createSmtpClient, SmtpMailTransport } from "./mail/smtp-mail-transport";
 import { SecretBox } from "./secret-box";
 
 @Module({
@@ -28,8 +30,18 @@ import { SecretBox } from "./secret-box";
       inject: [APP_CONFIG],
       useFactory: (config: AppConfig) => new SecretBox(config.auth.encryptionKey),
     },
+    {
+      provide: MAIL_TRANSPORT,
+      inject: [APP_CONFIG],
+      useFactory: (config: AppConfig) =>
+        new SmtpMailTransport(
+          createSmtpClient(config.mail),
+          config.mail,
+          new Logger("MailTransport"),
+        ),
+    },
   ],
-  exports: [APP_CONFIG, CLOCK, DATABASE, REDIS, SecretBox],
+  exports: [APP_CONFIG, CLOCK, DATABASE, REDIS, SecretBox, MAIL_TRANSPORT],
 })
 export class CoreModule implements OnApplicationShutdown {
   constructor(
