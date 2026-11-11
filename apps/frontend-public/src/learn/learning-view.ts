@@ -82,7 +82,7 @@ const attemptTime = new Intl.DateTimeFormat("en-GB", {
   hourCycle: "h23",
 });
 
-const formatAttemptTime = (iso: string): string => {
+export const formatAttemptTime = (iso: string): string => {
   const parts = attemptTime.formatToParts(new Date(iso));
   const part = (type: Intl.DateTimeFormatPartTypes): string =>
     parts.find((entry) => entry.type === type)?.value ?? "";
