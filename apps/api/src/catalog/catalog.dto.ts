@@ -22,6 +22,7 @@ import {
   updateVideoSlotRequestSchema,
   videoSlotListResponseSchema,
   videoSlotParamsSchema,
+  videoUploadParamsSchema,
 } from "@heat/contracts";
 import { createZodDto } from "nestjs-zod";
 
@@ -60,6 +61,8 @@ export class UpdateVideoSlotRequestDto extends createZodDto(updateVideoSlotReque
 export class VideoSlotListResponseDto extends createZodDto(videoSlotListResponseSchema) {}
 
 export class VideoSlotParamsDto extends createZodDto(videoSlotParamsSchema) {}
+
+export class VideoUploadParamsDto extends createZodDto(videoUploadParamsSchema) {}
 
 export class QuizSummaryDto extends createZodDto(quizSummarySchema) {}
 

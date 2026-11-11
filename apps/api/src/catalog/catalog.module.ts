@@ -1,6 +1,9 @@
 import { Module } from "@nestjs/common";
+import { randomBytes } from "node:crypto";
 import { AuditModule } from "../audit";
-import { CoreModule } from "../core";
+import { APP_CONFIG, CoreModule } from "../core";
+import type { AppConfig } from "../core";
+import { RateLimitModule } from "../rate-limit";
 import { ContentLockService } from "./content-lock.service";
 import { CourseLookupService } from "./course-lookup.service";
 import { CoursesController } from "./courses.controller";
@@ -13,15 +16,19 @@ import { QuizController } from "./quiz.controller";
 import { QuizService } from "./quiz.service";
 import { VideoSlotsController } from "./video-slots.controller";
 import { VideoSlotsService } from "./video-slots.service";
+import { VideoUploadController } from "./video-upload.controller";
+import { UPLOAD_RANDOM, VideoUploadService } from "./video-upload.service";
+import { FileUploadStore, UPLOAD_STORE } from "./video-upload-store";
 import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
 
 @Module({
-  imports: [CoreModule, AuditModule],
+  imports: [CoreModule, AuditModule, RateLimitModule],
   controllers: [
     CoursesController,
     ModulesController,
     LessonSectionsController,
     VideoSlotsController,
+    VideoUploadController,
     QuizController,
   ],
   providers: [
@@ -31,6 +38,13 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     ModulesService,
     LessonSectionsService,
     VideoSlotsService,
+    VideoUploadService,
+    { provide: UPLOAD_RANDOM, useValue: randomBytes },
+    {
+      provide: UPLOAD_STORE,
+      inject: [APP_CONFIG],
+      useFactory: (config: AppConfig) => new FileUploadStore(config.videoUploads.directory),
+    },
     QuizService,
     { provide: COURSE_PUBLISH_CHECKS, useValue: [] },
   ],
