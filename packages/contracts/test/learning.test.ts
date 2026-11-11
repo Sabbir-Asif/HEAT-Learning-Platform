@@ -1,6 +1,8 @@
 import { describe, expect, test } from "vitest";
 import {
   learningModuleStateSchema,
+  lessonContentParamsSchema,
+  lessonContentResponseSchema,
   learningStructureParamsSchema,
   learningStructureResponseSchema,
   videoCompletionThreshold,
@@ -104,5 +106,24 @@ describe("learning contracts", () => {
       },
     });
     expect(JSON.stringify(parsed)).not.toContain("isCorrect");
+  });
+});
+
+describe("lesson content schemas", () => {
+  test("params need a course id and a module id", () => {
+    expect(lessonContentParamsSchema.safeParse({ courseId: id, moduleId: id }).success).toBe(true);
+    expect(lessonContentParamsSchema.safeParse({ courseId: id }).success).toBe(false);
+    expect(lessonContentParamsSchema.safeParse({ courseId: "x", moduleId: id }).success).toBe(
+      false,
+    );
+  });
+
+  test("the response carries the module, its objectives and section bodies", () => {
+    const response = {
+      module: { id, title: "Module 1", objectives: ["Know the policy"] },
+      sections: [{ id, order: 1, title: "Intro", schemaVersion: 1, body: { type: "doc", content: [] } }],
+    };
+
+    expect(lessonContentResponseSchema.parse(response)).toEqual(response);
   });
 });
