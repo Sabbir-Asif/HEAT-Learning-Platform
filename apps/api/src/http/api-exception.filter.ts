@@ -5,7 +5,13 @@ import { ZodValidationException } from "nestjs-zod";
 import { ApiException } from "./api-exception";
 import { z } from "zod";
 import { fieldErrorCodes } from "@heat/contracts";
-import type { ErrorCode, ErrorDetails, ErrorResponse, FieldError, FieldErrorCode } from "@heat/contracts";
+import type {
+  ErrorCode,
+  ErrorDetails,
+  ErrorResponse,
+  FieldError,
+  FieldErrorCode,
+} from "@heat/contracts";
 
 interface RequestLike {
   headers: Record<string, string | string[] | undefined>;
