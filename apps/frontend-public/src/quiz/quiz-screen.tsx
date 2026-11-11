@@ -26,7 +26,7 @@ import { courseHref, lessonViewOf, moduleHref, quizActionOf } from "../learn/lea
 import type { LearningModule } from "../learn/learning-view";
 import { QuizExhausted, QuizLoading, QuizPassed, QuizWaiting } from "./quiz-states";
 import { QuizRunner } from "./quiz-runner";
-import { submitQuiz } from "./quiz-submit";
+import { useQuizSubmit } from "./use-quiz-submit";
 
 export interface QuizScreenProps {
   courseId: string;
@@ -41,6 +41,7 @@ interface QuizBodyProps {
 
 function QuizBody({ courseId, courseSlug, module }: QuizBodyProps) {
   const router = useRouter();
+  const submit = useQuizSubmit(courseId, module.id);
   const delivery = useQuizDeliveryGet(courseId, module.id, {
     query: { staleTime: Infinity, gcTime: 0, refetchOnWindowFocus: false, retry: false },
   });
@@ -105,7 +106,7 @@ function QuizBody({ courseId, courseSlug, module }: QuizBodyProps) {
       <QuizRunner
         attemptId={data.attempt.id}
         questions={data.questions}
-        submit={submitQuiz}
+        submit={submit}
         onSubmitted={(attemptId) =>
           router.push(`${moduleHref(courseSlug, module.id)}/quiz/result/${attemptId}`)
         }

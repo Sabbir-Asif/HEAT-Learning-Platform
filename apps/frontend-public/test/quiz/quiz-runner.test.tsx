@@ -96,16 +96,48 @@ describe("QuizRunner", () => {
     expect(view.textContent).toContain("Question text 4");
   });
 
-  test("a complete review says so and a failed submission keeps the saved answers", async () => {
+  test("a complete review says so and a refused submission keeps the saved answers", async () => {
     const all = Object.fromEntries(questions.map((q) => [q.id, `${q.id}-a`]));
     const storage = memoryStorage({ [answerStorageKey("att1")]: JSON.stringify(all) });
-    const submit = vi.fn().mockResolvedValue({ status: "UNAVAILABLE" });
+    const submit = vi.fn().mockResolvedValue({ status: "CLOSED" });
     const view = await mount(<QuizRunner {...props({ storage, submit })} />);
     expect(view.textContent).toContain("All 5 questions are answered.");
     await click(button(view, "Submit answers"));
     expect(submit).toHaveBeenCalledWith({ attemptId: "att1", answers: all });
-    expect(view.querySelector('[role="alert"]')?.textContent).toContain("saved on this device");
+    expect(view.querySelector('[role="alert"]')?.textContent).toContain(
+      "can no longer be submitted",
+    );
     expect(storage.entries.has(answerStorageKey("att1"))).toBe(true);
+  });
+
+  test("a waiting refusal shows when the next attempt opens and keeps the answers", async () => {
+    const submit = vi
+      .fn()
+      .mockResolvedValue({ status: "WAITING", nextAttemptAt: "2026-11-12T10:05:00.000Z" });
+    const storage = memoryStorage({
+      [answerStorageKey("att1")]: JSON.stringify({ q1: "q1-a" }),
+    });
+    const view = await mount(<QuizRunner {...props({ storage, submit })} />);
+    await toReview(view);
+    await click(button(view, "Submit answers"));
+    expect(view.querySelector('[role="alert"]')?.textContent).toContain("next attempt on");
+    expect(storage.entries.has(answerStorageKey("att1"))).toBe(true);
+  });
+
+  test("a waiting refusal without a time still asks the learner to wait", async () => {
+    const submit = vi.fn().mockResolvedValue({ status: "WAITING", nextAttemptAt: null });
+    const view = await mount(<QuizRunner {...props({ submit })} />);
+    await toReview(view);
+    await click(button(view, "Submit answers"));
+    expect(view.querySelector('[role="alert"]')?.textContent).toContain("need to wait");
+  });
+
+  test("an exhausted refusal says all attempts are used", async () => {
+    const submit = vi.fn().mockResolvedValue({ status: "EXHAUSTED" });
+    const view = await mount(<QuizRunner {...props({ submit })} />);
+    await toReview(view);
+    await click(button(view, "Submit answers"));
+    expect(view.querySelector('[role="alert"]')?.textContent).toContain("used all your attempts");
   });
 
   test("a failed submission asks the learner to try again", async () => {

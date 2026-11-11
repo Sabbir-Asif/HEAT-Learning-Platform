@@ -40,8 +40,9 @@ export const answersAreValid = (
   answers: Readonly<Record<string, string>>,
 ): boolean => {
   const byQuestion = new Map(questions.map((question) => [question.id, question]));
-  return Object.entries(answers).every(([questionId, optionId]) =>
-    byQuestion.get(questionId)?.options.some((option) => option.id === optionId) === true,
+  return Object.entries(answers).every(
+    ([questionId, optionId]) =>
+      byQuestion.get(questionId)?.options.some((option) => option.id === optionId) === true,
   );
 };
 
@@ -64,10 +65,7 @@ export const scoreOf = (
   passed: totalQuestions > 0 && correctCount * 100 >= passMarkPercent * totalQuestions,
 });
 
-export const submissionEligibility = (
-  facts: SubmissionFacts,
-  now: Date,
-): SubmissionEligibility => {
+export const submissionEligibility = (facts: SubmissionFacts, now: Date): SubmissionEligibility => {
   if (facts.attempts.some((attempt) => attempt.passed === true)) return { kind: "ALREADY_PASSED" };
   if (
     facts.attemptLimit !== null &&
