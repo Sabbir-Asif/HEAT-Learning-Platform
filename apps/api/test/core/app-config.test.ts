@@ -146,6 +146,16 @@ describe("loadConfig", () => {
     ).toEqual(["https://learn.example.test"]);
   });
 
+  test("exposes the public app origin with a local default and rejects a path", () => {
+    expect(loadConfig(valid).publicAppUrl).toBe("http://localhost:3000");
+    expect(
+      loadConfig({ ...valid, PUBLIC_APP_URL: "https://learn.example.test" }).publicAppUrl,
+    ).toBe("https://learn.example.test");
+    expect(() =>
+      loadConfig({ ...valid, PUBLIC_APP_URL: "https://learn.example.test/app" }),
+    ).toThrow(/PUBLIC_APP_URL/);
+  });
+
   test("exposes the mail configuration and defaults it to the local Mailpit", () => {
     expect(loadConfig(valid).mail).toMatchObject({ host: "localhost", port: 1035, auth: null });
     expect(() => loadConfig({ ...valid, SMTP_TLS: "ssl" })).toThrow(/SMTP_TLS/);
