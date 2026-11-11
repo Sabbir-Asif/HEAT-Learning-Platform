@@ -28,11 +28,11 @@ const noStore = (response: UploadResponse): void => {
 @Controller("admin/courses/:id/modules/:moduleId/videos/:videoId/upload")
 @Audience("admin")
 @Roles("ADMIN", "SUPER_ADMIN")
-@RateLimit("videoUpload")
 export class VideoUploadController {
   constructor(private readonly uploads: VideoUploadService) {}
 
   @Post()
+  @RateLimit("videoUploadStart")
   @Audited({ action: "video-upload.start", entity: "VideoAsset" })
   async create(
     @Param() params: VideoSlotParamsDto,
@@ -55,6 +55,7 @@ export class VideoUploadController {
   }
 
   @Head(":assetKey")
+  @RateLimit("videoUploadChunk")
   @HttpCode(200)
   async head(
     @Param() params: VideoUploadParamsDto,
@@ -72,6 +73,7 @@ export class VideoUploadController {
   }
 
   @Patch(":assetKey")
+  @RateLimit("videoUploadChunk")
   @HttpCode(204)
   async patch(
     @Param() params: VideoUploadParamsDto,

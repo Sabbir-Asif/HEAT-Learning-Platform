@@ -33,15 +33,14 @@ const requestOf = (headers: Record<string, string>) =>
   }) as never;
 
 describe("VideoUploadController guards", () => {
-  test("is admin only, role restricted and rate limited on every route", () => {
+  test("is admin only and role restricted, with a tight start limit and a generous chunk limit", () => {
     expect(Reflect.getMetadata(AUDIENCE_KEY, VideoUploadController)).toBe("admin");
     expect(Reflect.getMetadata(ROLES_KEY, VideoUploadController)).toEqual(["ADMIN", "SUPER_ADMIN"]);
-    for (const method of ["create", "head", "patch"] as const) {
-      expect(
-        Reflect.getMetadata(RATE_LIMIT_PROFILE_KEY, VideoUploadController) ??
-          Reflect.getMetadata(RATE_LIMIT_PROFILE_KEY, VideoUploadController.prototype[method]),
-      ).toBe("videoUpload");
-    }
+    const profileOf = (method: "create" | "head" | "patch") =>
+      Reflect.getMetadata(RATE_LIMIT_PROFILE_KEY, VideoUploadController.prototype[method]);
+    expect(profileOf("create")).toBe("videoUploadStart");
+    expect(profileOf("head")).toBe("videoUploadChunk");
+    expect(profileOf("patch")).toBe("videoUploadChunk");
   });
 
   test("only the start is audited so chunk requests hold no transaction", () => {

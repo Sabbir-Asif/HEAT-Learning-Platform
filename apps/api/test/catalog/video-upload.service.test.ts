@@ -303,7 +303,7 @@ describe("VideoUploadService.position and append", () => {
     expect(store.discarded).toEqual([key]);
     expect(database.videoAsset.updateMany).toHaveBeenCalledWith({
       where: { id: "asset-1", status: "UPLOADING" },
-      data: { status: "REJECTED" },
+      data: { status: "REJECTED", rejectionReason: "NOT_A_VIDEO" },
     });
     expect(database.outbox.create).not.toHaveBeenCalled();
   });
@@ -385,6 +385,22 @@ describe("VideoUploadService.position and append", () => {
       409,
       "UPLOAD_OFFSET_MISMATCH",
     );
+  });
+
+  test("a retried patch after the file was stored but the database failed finishes without writing", async () => {
+    const { service, store, database } = await started({}, 24);
+    database.$transaction.mockRejectedValueOnce(new Error("database down"));
+    await expect(append(service, "0", chunk(mp4Header))).rejects.toThrow("database down");
+    expect(store.files.get(key)?.complete).toBe(true);
+    const before = store.files.get(key)?.data.length;
+    const result = await append(service, "24", chunk(Buffer.alloc(0)));
+    expect(result).toEqual({ offset: 24, length: 24 });
+    expect(store.files.get(key)?.data.length).toBe(before);
+    expect(database.videoAsset.updateMany).toHaveBeenLastCalledWith({
+      where: { id: "asset-1", status: "UPLOADING" },
+      data: { status: "UPLOADED" },
+    });
+    expect(database.outbox.create).toHaveBeenCalledTimes(1);
   });
 
   test("an upload key that is not the slot's current asset is not found", async () => {

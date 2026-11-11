@@ -1299,6 +1299,7 @@ export const VideoSlotsListResponse = zod.object({
   "assetKey": zod.string().max(videoSlotsListResponseItemsItemAssetKeyMax).nullable(),
   "id": zod.uuid().regex(videoSlotsListResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsListResponseItemsItemOrderMax),
+  "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
   "title": zod.string()
@@ -1335,6 +1336,7 @@ export const VideoSlotsCreateResponse = zod.object({
   "assetKey": zod.string().max(videoSlotsCreateResponseItemsItemAssetKeyMax).nullable(),
   "id": zod.uuid().regex(videoSlotsCreateResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsCreateResponseItemsItemOrderMax),
+  "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
   "title": zod.string()
@@ -1377,6 +1379,7 @@ export const VideoSlotsReorderResponse = zod.object({
   "assetKey": zod.string().max(videoSlotsReorderResponseItemsItemAssetKeyMax).nullable(),
   "id": zod.uuid().regex(videoSlotsReorderResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsReorderResponseItemsItemOrderMax),
+  "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
   "title": zod.string()
@@ -1408,6 +1411,7 @@ export const VideoSlotsRemoveResponse = zod.object({
   "assetKey": zod.string().max(videoSlotsRemoveResponseItemsItemAssetKeyMax).nullable(),
   "id": zod.uuid().regex(videoSlotsRemoveResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsRemoveResponseItemsItemOrderMax),
+  "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
   "title": zod.string()
@@ -1444,6 +1448,7 @@ export const VideoSlotsUpdateResponse = zod.object({
   "assetKey": zod.string().max(videoSlotsUpdateResponseItemsItemAssetKeyMax).nullable(),
   "id": zod.uuid().regex(videoSlotsUpdateResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsUpdateResponseItemsItemOrderMax),
+  "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
   "title": zod.string()

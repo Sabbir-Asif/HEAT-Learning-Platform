@@ -2422,6 +2422,18 @@
                   "minimum": 1,
                   "type": "integer"
                 },
+                "rejectionReason": {
+                  "enum": [
+                    "NOT_A_VIDEO",
+                    "UNSUPPORTED_CONTAINER",
+                    "UNSUPPORTED_CODEC",
+                    "TOO_LARGE",
+                    "NO_DURATION",
+                    null
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
                 "required": {
                   "type": "boolean"
                 },
@@ -2448,7 +2460,8 @@
                 "title",
                 "required",
                 "status",
-                "assetKey"
+                "assetKey",
+                "rejectionReason"
               ],
               "type": "object"
             },

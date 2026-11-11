@@ -322,3 +322,20 @@ describe("video uploads", () => {
     );
   });
 });
+
+describe("video upload rate limit profiles", () => {
+  test("keep the start tight and give chunk traffic room for a long upload", () => {
+    const { profiles } = loadConfig(valid).rateLimit;
+    expect(profiles.videoUploadStart.limit).toBeLessThanOrEqual(60);
+    expect(profiles.videoUploadChunk.limit).toBeGreaterThanOrEqual(3000);
+    expect(profiles.videoUploadChunk.ipLimit).toBeGreaterThan(profiles.videoUploadChunk.limit);
+  });
+
+  test("can be tuned from the environment", () => {
+    const { profiles } = loadConfig({
+      ...valid,
+      RATE_LIMIT_VIDEO_UPLOAD_CHUNK_LIMIT: "9000",
+    }).rateLimit;
+    expect(profiles.videoUploadChunk.limit).toBe(9000);
+  });
+});

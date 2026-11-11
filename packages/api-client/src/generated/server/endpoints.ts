@@ -1314,6 +1314,20 @@ export interface VerifyEmailRequestDto {
   token: string;
 }
 
+/**
+ * @nullable
+ */
+export type VideoSlotListResponseDtoItemsItemRejectionReason = typeof VideoSlotListResponseDtoItemsItemRejectionReason[keyof typeof VideoSlotListResponseDtoItemsItemRejectionReason] | null;
+
+
+export const VideoSlotListResponseDtoItemsItemRejectionReason = {
+  NOT_A_VIDEO: 'NOT_A_VIDEO',
+  UNSUPPORTED_CONTAINER: 'UNSUPPORTED_CONTAINER',
+  UNSUPPORTED_CODEC: 'UNSUPPORTED_CODEC',
+  TOO_LARGE: 'TOO_LARGE',
+  NO_DURATION: 'NO_DURATION',
+} as const;
+
 export type VideoSlotListResponseDtoItemsItemStatus = typeof VideoSlotListResponseDtoItemsItemStatus[keyof typeof VideoSlotListResponseDtoItemsItemStatus];
 
 
@@ -1341,6 +1355,8 @@ export type VideoSlotListResponseDtoItemsItem = {
      * @maximum 9007199254740991
      */
   order: number;
+  /** @nullable */
+  rejectionReason: VideoSlotListResponseDtoItemsItemRejectionReason;
   required: boolean;
   status: VideoSlotListResponseDtoItemsItemStatus;
   title: string;

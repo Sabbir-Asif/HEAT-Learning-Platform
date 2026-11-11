@@ -4,6 +4,7 @@
  * HEAT LMS API
  * OpenAPI spec version: 1.0.0
  */
+import type { VideoSlotListResponseDtoItemsItemRejectionReason } from './videoSlotListResponseDtoItemsItemRejectionReason';
 import type { VideoSlotListResponseDtoItemsItemStatus } from './videoSlotListResponseDtoItemsItemStatus';
 
 export type VideoSlotListResponseDtoItemsItem = {
@@ -19,6 +20,8 @@ export type VideoSlotListResponseDtoItemsItem = {
      * @maximum 9007199254740991
      */
   order: number;
+  /** @nullable */
+  rejectionReason: VideoSlotListResponseDtoItemsItemRejectionReason;
   required: boolean;
   status: VideoSlotListResponseDtoItemsItemStatus;
   title: string;

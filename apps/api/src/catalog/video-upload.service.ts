@@ -126,9 +126,13 @@ export class VideoUploadService {
     if (this.active.has(assetKey)) throw new ApiException(409, "UPLOAD_OFFSET_MISMATCH");
     this.active.add(assetKey);
     try {
+      if (state.complete) {
+        await this.finish(assetKey, asset.id, slot, actor, false);
+        return { offset: state.length, length: state.length };
+      }
       const offset = await this.store.append(assetKey, request.body, state.length - state.offset);
       await this.checkSignature(assetKey, asset.id, state.offset, offset);
-      if (offset === state.length) await this.finish(assetKey, asset.id, slot, actor);
+      if (offset === state.length) await this.finish(assetKey, asset.id, slot, actor, true);
       return { offset, length: state.length };
     } finally {
       this.active.delete(assetKey);
@@ -175,7 +179,7 @@ export class VideoUploadService {
     await this.store.discard(assetKey);
     await this.database.videoAsset.updateMany({
       where: { id: assetId, status: "UPLOADING" },
-      data: { status: "REJECTED" },
+      data: { status: "REJECTED", rejectionReason: "NOT_A_VIDEO" },
     });
     throw new ApiException(415, "UPLOAD_TYPE_NOT_ALLOWED");
   }
@@ -185,8 +189,9 @@ export class VideoUploadService {
     assetId: string,
     slot: UploadSlot,
     actor: AuditActor,
+    needsStore: boolean,
   ): Promise<void> {
-    await this.store.complete(assetKey);
+    if (needsStore) await this.store.complete(assetKey);
     await this.database.$transaction(async (tx) => {
       const flipped = await tx.videoAsset.updateMany({
         where: { id: assetId, status: "UPLOADING" },
