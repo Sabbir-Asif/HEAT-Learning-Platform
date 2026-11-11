@@ -74,6 +74,11 @@ describe.each(emailTemplateKeys)("%s", (key) => {
     expect(message.html).not.toMatch(/<img/i);
   });
 
+  test("matches the snapshot", async () => {
+    const message = await renderEmail(key, variables, context);
+    expect({ subject: message.subject, text: message.text }).toMatchSnapshot();
+  });
+
   test("text part carries every link of the HTML part", async () => {
     const message = await renderEmail(key, variables, context);
     const hrefs = [...message.html.matchAll(/href="([^"]+)"/g)]
