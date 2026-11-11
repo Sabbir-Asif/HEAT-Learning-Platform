@@ -1,0 +1,171 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`admin-invitation > matches the snapshot 1`] = `
+{
+  "subject": "You are invited to the HEAT admin console",
+  "text": "HEAT
+
+Hello Rahim,
+
+You have been invited to the HEAT admin console. Set your password to begin.
+
+Accept the invitation: https://admin.heat.example/accept-invite/inv456
+
+The invitation expires on 14 November 2026 at 12:00 (Asia/Dhaka).
+
+Questions? Write to support@heat.example.",
+}
+`;
+
+exports[`certificate-ready > matches the snapshot 1`] = `
+{
+  "subject": "Your certificate for HEAT Basics is ready",
+  "text": "HEAT
+
+Hello Amina,
+
+Congratulations on completing HEAT Basics. Your certificate is ready.
+
+Verify your certificate: https://learn.heat.example/verify-certificate/CERT-001
+
+Download it from your account: https://learn.heat.example/certificates
+
+Questions? Write to support@heat.example.",
+}
+`;
+
+exports[`enrollment-approved > matches the snapshot 1`] = `
+{
+  "subject": "Your enrollment in HEAT Basics is approved",
+  "text": "HEAT
+
+Hello Amina,
+
+Your enrollment in HEAT Basics has been approved. You can start learning now.
+
+Go to your dashboard: https://learn.heat.example/dashboard
+
+Questions? Write to support@heat.example.",
+}
+`;
+
+exports[`enrollment-reinstated > matches the snapshot 1`] = `
+{
+  "subject": "Your enrollment in HEAT Basics is active again",
+  "text": "HEAT
+
+Hello Amina,
+
+Your enrollment in HEAT Basics has been reinstated. Your progress is kept.
+
+Go to your dashboard: https://learn.heat.example/dashboard
+
+Questions? Write to support@heat.example.",
+}
+`;
+
+exports[`enrollment-rejected > matches the snapshot 1`] = `
+{
+  "subject": "Your enrollment request for HEAT Basics was not approved",
+  "text": "HEAT
+
+Hello Amina,
+
+Your enrollment request for HEAT Basics was not approved.
+
+Reason: Incomplete form
+
+If you think this is a mistake, contact support.
+
+Questions? Write to support@heat.example.",
+}
+`;
+
+exports[`enrollment-removed > matches the snapshot 1`] = `
+{
+  "subject": "You were removed from HEAT Basics",
+  "text": "HEAT
+
+Hello Amina,
+
+Your enrollment in HEAT Basics has been removed.
+
+Reason: Duplicate account
+
+If you think this is a mistake, contact support.
+
+Questions? Write to support@heat.example.",
+}
+`;
+
+exports[`password-change-code > matches the snapshot 1`] = `
+{
+  "subject": "Your HEAT password change code",
+  "text": "HEAT
+
+Hello Amina,
+
+Use this code to confirm your password change:
+
+482910
+
+The code expires in 15 minutes.
+
+If you did not ask for this, change your password and tell support.
+
+Questions? Write to support@heat.example.",
+}
+`;
+
+exports[`password-reset > matches the snapshot 1`] = `
+{
+  "subject": "Reset your HEAT password",
+  "text": "HEAT
+
+Hello Amina,
+
+We received a request to reset your password.
+
+Choose a new password: https://learn.heat.example/reset-password/tok123
+
+If you did not ask for this, you can ignore this message.
+
+Questions? Write to support@heat.example.",
+}
+`;
+
+exports[`student-already-registered > matches the snapshot 1`] = `
+{
+  "subject": "You already have a HEAT account",
+  "text": "HEAT
+
+Hello Amina,
+
+Someone tried to register for HEAT with this email address, which already has an account.
+
+Sign in: https://learn.heat.example/sign-in
+
+Reset your password: https://learn.heat.example/forgot-password
+
+If this was not you, no action is needed.
+
+Questions? Write to support@heat.example.",
+}
+`;
+
+exports[`student-verification > matches the snapshot 1`] = `
+{
+  "subject": "Verify your email address for HEAT",
+  "text": "HEAT
+
+Hello Amina,
+
+Thank you for registering for HEAT. Please confirm that this is your email address.
+
+Verify your email: https://learn.heat.example/verify-email/tok123
+
+If you did not register, you can ignore this message.
+
+Questions? Write to support@heat.example.",
+}
+`;
