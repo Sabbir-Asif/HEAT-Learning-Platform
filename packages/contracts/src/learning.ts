@@ -73,10 +73,20 @@ export const learningModuleSchema = z.object({
   quiz: learningQuizSchema.nullable(),
 });
 
-export const learningStructureResponseSchema = z.object({
-  course: z.object({ id: z.uuid(), slug: z.string(), title: z.string() }),
+export const learningEnrollmentStatusSchema = z.enum([
+  "PENDING_VERIFICATION",
+  "PENDING_APPROVAL",
+  "APPROVED",
+  "COMPLETED",
+  "REJECTED",
+  "EXPIRED",
+  "REMOVED",
+]);
+
+export type LearningEnrollmentStatus = z.infer<typeof learningEnrollmentStatusSchema>;
+
+export const learningContentSchema = z.object({
   revision: z.object({ id: z.uuid(), number: z.number().int() }),
-  enrollment: z.object({ status: z.enum(["APPROVED", "COMPLETED"]) }),
   summary: z.object({
     overallProgressPercent: z.number().int().min(0).max(100),
     modulesCompleted: z.number().int().min(0),
@@ -86,4 +96,14 @@ export const learningStructureResponseSchema = z.object({
   modules: z.array(learningModuleSchema),
 });
 
+export const learningStructureResponseSchema = z.object({
+  course: z.object({ id: z.uuid(), slug: z.string(), title: z.string() }),
+  enrollment: z.object({
+    status: learningEnrollmentStatusSchema,
+    reason: z.string().nullable(),
+  }),
+  learning: learningContentSchema.nullable(),
+});
+
+export type LearningContent = z.infer<typeof learningContentSchema>;
 export type LearningStructureResponse = z.infer<typeof learningStructureResponseSchema>;
