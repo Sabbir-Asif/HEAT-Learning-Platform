@@ -874,15 +874,25 @@ export type LearningStructureResponseDtoEnrollmentStatus = typeof LearningStruct
 
 
 export const LearningStructureResponseDtoEnrollmentStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
   APPROVED: 'APPROVED',
   COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
 } as const;
 
 export type LearningStructureResponseDtoEnrollment = {
+  /**
+     * @maxLength 500
+     * @nullable
+     */
+  reason: string | null;
   status: LearningStructureResponseDtoEnrollmentStatus;
 };
 
-export type LearningStructureResponseDtoModulesItemLessonSectionsItem = {
+export type LearningStructureResponseDtoLearningModulesItemLessonSectionsItem = {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
   /**
@@ -893,10 +903,10 @@ export type LearningStructureResponseDtoModulesItemLessonSectionsItem = {
   title: string;
 };
 
-export type LearningStructureResponseDtoModulesItemQuizAvailability = typeof LearningStructureResponseDtoModulesItemQuizAvailability[keyof typeof LearningStructureResponseDtoModulesItemQuizAvailability];
+export type LearningStructureResponseDtoLearningModulesItemQuizAvailability = typeof LearningStructureResponseDtoLearningModulesItemQuizAvailability[keyof typeof LearningStructureResponseDtoLearningModulesItemQuizAvailability];
 
 
-export const LearningStructureResponseDtoModulesItemQuizAvailability = {
+export const LearningStructureResponseDtoLearningModulesItemQuizAvailability = {
   UNAVAILABLE: 'UNAVAILABLE',
   AVAILABLE: 'AVAILABLE',
   WAITING: 'WAITING',
@@ -907,7 +917,7 @@ export const LearningStructureResponseDtoModulesItemQuizAvailability = {
 /**
  * @nullable
  */
-export type LearningStructureResponseDtoModulesItemQuiz = {
+export type LearningStructureResponseDtoLearningModulesItemQuiz = {
   /**
      * @minimum 0
      * @maximum 9007199254740991
@@ -919,7 +929,7 @@ export type LearningStructureResponseDtoModulesItemQuiz = {
      * @maximum 9007199254740991
      */
   attemptsUsed: number;
-  availability: LearningStructureResponseDtoModulesItemQuizAvailability;
+  availability: LearningStructureResponseDtoLearningModulesItemQuizAvailability;
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
   /**
@@ -939,10 +949,10 @@ export type LearningStructureResponseDtoModulesItemQuiz = {
   questionCount: number;
 } | null;
 
-export type LearningStructureResponseDtoModulesItemState = typeof LearningStructureResponseDtoModulesItemState[keyof typeof LearningStructureResponseDtoModulesItemState];
+export type LearningStructureResponseDtoLearningModulesItemState = typeof LearningStructureResponseDtoLearningModulesItemState[keyof typeof LearningStructureResponseDtoLearningModulesItemState];
 
 
-export const LearningStructureResponseDtoModulesItemState = {
+export const LearningStructureResponseDtoLearningModulesItemState = {
   LOCKED: 'LOCKED',
   UNLOCKED: 'UNLOCKED',
   IN_PROGRESS: 'IN_PROGRESS',
@@ -950,17 +960,17 @@ export const LearningStructureResponseDtoModulesItemState = {
   COMPLETED: 'COMPLETED',
 } as const;
 
-export type LearningStructureResponseDtoModulesItemVideosItemStatus = typeof LearningStructureResponseDtoModulesItemVideosItemStatus[keyof typeof LearningStructureResponseDtoModulesItemVideosItemStatus];
+export type LearningStructureResponseDtoLearningModulesItemVideosItemStatus = typeof LearningStructureResponseDtoLearningModulesItemVideosItemStatus[keyof typeof LearningStructureResponseDtoLearningModulesItemVideosItemStatus];
 
 
-export const LearningStructureResponseDtoModulesItemVideosItemStatus = {
+export const LearningStructureResponseDtoLearningModulesItemVideosItemStatus = {
   UNAVAILABLE: 'UNAVAILABLE',
   NOT_STARTED: 'NOT_STARTED',
   IN_PROGRESS: 'IN_PROGRESS',
   COMPLETED: 'COMPLETED',
 } as const;
 
-export type LearningStructureResponseDtoModulesItemVideosItem = {
+export type LearningStructureResponseDtoLearningModulesItemVideosItem = {
   /**
      * @minimum 0
      * @maximum 100
@@ -985,14 +995,14 @@ export type LearningStructureResponseDtoModulesItemVideosItem = {
      * @maximum 9007199254740991
      */
   resumePositionSeconds: number;
-  status: LearningStructureResponseDtoModulesItemVideosItemStatus;
+  status: LearningStructureResponseDtoLearningModulesItemVideosItemStatus;
   title: string;
 };
 
-export type LearningStructureResponseDtoModulesItem = {
+export type LearningStructureResponseDtoLearningModulesItem = {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
-  lessonSections: LearningStructureResponseDtoModulesItemLessonSectionsItem[];
+  lessonSections: LearningStructureResponseDtoLearningModulesItemLessonSectionsItem[];
   objectives: string[];
   /**
      * @minimum -9007199254740991
@@ -1000,7 +1010,7 @@ export type LearningStructureResponseDtoModulesItem = {
      */
   order: number;
   /** @nullable */
-  quiz: LearningStructureResponseDtoModulesItemQuiz;
+  quiz: LearningStructureResponseDtoLearningModulesItemQuiz;
   /**
      * @minimum 0
      * @maximum 9007199254740991
@@ -1011,12 +1021,12 @@ export type LearningStructureResponseDtoModulesItem = {
      * @maximum 9007199254740991
      */
   requiredVideosTotal: number;
-  state: LearningStructureResponseDtoModulesItemState;
+  state: LearningStructureResponseDtoLearningModulesItemState;
   title: string;
-  videos: LearningStructureResponseDtoModulesItemVideosItem[];
+  videos: LearningStructureResponseDtoLearningModulesItemVideosItem[];
 };
 
-export type LearningStructureResponseDtoRevision = {
+export type LearningStructureResponseDtoLearningRevision = {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
   /**
@@ -1026,7 +1036,7 @@ export type LearningStructureResponseDtoRevision = {
   number: number;
 };
 
-export type LearningStructureResponseDtoSummary = {
+export type LearningStructureResponseDtoLearningSummary = {
   /**
      * @minimum 0
      * @maximum 9007199254740991
@@ -1049,12 +1059,20 @@ export type LearningStructureResponseDtoSummary = {
   overallProgressPercent: number;
 };
 
+/**
+ * @nullable
+ */
+export type LearningStructureResponseDtoLearning = {
+  modules: LearningStructureResponseDtoLearningModulesItem[];
+  revision: LearningStructureResponseDtoLearningRevision;
+  summary: LearningStructureResponseDtoLearningSummary;
+} | null;
+
 export interface LearningStructureResponseDto {
   course: LearningStructureResponseDtoCourse;
   enrollment: LearningStructureResponseDtoEnrollment;
-  modules: LearningStructureResponseDtoModulesItem[];
-  revision: LearningStructureResponseDtoRevision;
-  summary: LearningStructureResponseDtoSummary;
+  /** @nullable */
+  learning: LearningStructureResponseDtoLearning;
 }
 
 export interface LessonSectionRequestDto {

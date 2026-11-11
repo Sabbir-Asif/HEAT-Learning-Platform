@@ -6,14 +6,11 @@
  */
 import type { LearningStructureResponseDtoCourse } from './learningStructureResponseDtoCourse';
 import type { LearningStructureResponseDtoEnrollment } from './learningStructureResponseDtoEnrollment';
-import type { LearningStructureResponseDtoModulesItem } from './learningStructureResponseDtoModulesItem';
-import type { LearningStructureResponseDtoRevision } from './learningStructureResponseDtoRevision';
-import type { LearningStructureResponseDtoSummary } from './learningStructureResponseDtoSummary';
+import type { LearningStructureResponseDtoLearning } from './learningStructureResponseDtoLearning';
 
 export interface LearningStructureResponseDto {
   course: LearningStructureResponseDtoCourse;
   enrollment: LearningStructureResponseDtoEnrollment;
-  modules: LearningStructureResponseDtoModulesItem[];
-  revision: LearningStructureResponseDtoRevision;
-  summary: LearningStructureResponseDtoSummary;
+  /** @nullable */
+  learning: LearningStructureResponseDtoLearning;
 }

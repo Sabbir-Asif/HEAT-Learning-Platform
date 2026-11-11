@@ -4,9 +4,9 @@
  * HEAT LMS API
  * OpenAPI spec version: 1.0.0
  */
-import type { LearningStructureResponseDtoModulesItemVideosItemStatus } from './learningStructureResponseDtoModulesItemVideosItemStatus';
+import type { LearningStructureResponseDtoLearningModulesItemVideosItemStatus } from './learningStructureResponseDtoLearningModulesItemVideosItemStatus';
 
-export type LearningStructureResponseDtoModulesItemVideosItem = {
+export type LearningStructureResponseDtoLearningModulesItemVideosItem = {
   /**
      * @minimum 0
      * @maximum 100
@@ -31,6 +31,6 @@ export type LearningStructureResponseDtoModulesItemVideosItem = {
      * @maximum 9007199254740991
      */
   resumePositionSeconds: number;
-  status: LearningStructureResponseDtoModulesItemVideosItemStatus;
+  status: LearningStructureResponseDtoLearningModulesItemVideosItemStatus;
   title: string;
 };

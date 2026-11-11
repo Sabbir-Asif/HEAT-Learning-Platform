@@ -1580,10 +1580,9 @@
           "enrollment": {
             "properties": {
               "reason": {
-                "type": [
-                  "string",
-                  "null"
-                ]
+                "maxLength": 500,
+                "nullable": true,
+                "type": "string"
               },
               "status": {
                 "enum": [

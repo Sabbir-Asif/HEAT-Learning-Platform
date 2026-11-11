@@ -4,12 +4,12 @@
  * HEAT LMS API
  * OpenAPI spec version: 1.0.0
  */
-import type { LearningStructureResponseDtoModulesItemQuizAvailability } from './learningStructureResponseDtoModulesItemQuizAvailability';
+import type { LearningStructureResponseDtoLearningModulesItemQuizAvailability } from './learningStructureResponseDtoLearningModulesItemQuizAvailability';
 
 /**
  * @nullable
  */
-export type LearningStructureResponseDtoModulesItemQuiz = {
+export type LearningStructureResponseDtoLearningModulesItemQuiz = {
   /**
      * @minimum 0
      * @maximum 9007199254740991
@@ -21,7 +21,7 @@ export type LearningStructureResponseDtoModulesItemQuiz = {
      * @maximum 9007199254740991
      */
   attemptsUsed: number;
-  availability: LearningStructureResponseDtoModulesItemQuizAvailability;
+  availability: LearningStructureResponseDtoLearningModulesItemQuizAvailability;
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
   /**

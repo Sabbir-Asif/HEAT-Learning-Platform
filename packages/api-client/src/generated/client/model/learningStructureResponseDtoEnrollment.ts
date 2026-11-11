@@ -7,5 +7,10 @@
 import type { LearningStructureResponseDtoEnrollmentStatus } from './learningStructureResponseDtoEnrollmentStatus';
 
 export type LearningStructureResponseDtoEnrollment = {
+  /**
+     * @maxLength 500
+     * @nullable
+     */
+  reason: string | null;
   status: LearningStructureResponseDtoEnrollmentStatus;
 };

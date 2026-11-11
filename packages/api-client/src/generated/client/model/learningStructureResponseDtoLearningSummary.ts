@@ -5,7 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type LearningStructureResponseDtoSummary = {
+export type LearningStructureResponseDtoLearningSummary = {
   /**
      * @minimum 0
      * @maximum 9007199254740991

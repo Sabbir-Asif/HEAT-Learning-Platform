@@ -9,6 +9,11 @@ export type LearningStructureResponseDtoEnrollmentStatus = typeof LearningStruct
 
 
 export const LearningStructureResponseDtoEnrollmentStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
   APPROVED: 'APPROVED',
   COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
 } as const;
