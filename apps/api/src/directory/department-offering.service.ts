@@ -10,10 +10,12 @@ export class DepartmentOfferingService {
   async assertDepartmentOfferable(
     departmentId: string,
     client: Pick<HeatClient, "department"> = this.database,
+    parents?: { universityId: string; facultyId: string },
   ): Promise<void> {
     const offered = await client.department.findFirst({
       where: {
         id: departmentId,
+        ...parents,
         archivedAt: null,
         universityFaculty: { university: { archivedAt: null }, faculty: { archivedAt: null } },
       },

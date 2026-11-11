@@ -107,7 +107,11 @@ function LookupState({ failed, empty, emptyTitle, onRetry }: LookupStateProps) {
   return null;
 }
 
-export function EnrollWizard() {
+interface EnrollWizardProps {
+  courseSlug: string;
+}
+
+export function EnrollWizard({ courseSlug }: EnrollWizardProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const [enrolledEmail, setEnrolledEmail] = useState<string>();
   const hydrated = useRef(false);
@@ -187,6 +191,7 @@ export function EnrollWizard() {
   if (step === 2) {
     return (
       <StepTwo
+        courseSlug={courseSlug}
         onBack={() => setStep(1)}
         onSuccess={(email) => {
           clearStepOne();
