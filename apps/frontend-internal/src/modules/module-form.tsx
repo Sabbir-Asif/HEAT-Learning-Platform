@@ -18,7 +18,7 @@ import {
 } from "@heat/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, Trash2Icon } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { moduleFormValuesOf, moduleLockedMessage, moduleRequestOf } from "./modules-copy";
 
@@ -49,7 +49,12 @@ export function ModuleForm({
 
   const { reset } = form;
   const { isDirty } = form.formState;
+  const dirtyRef = useRef(isDirty);
+  dirtyRef.current = isDirty;
+  const shownId = useRef(module?.id);
   useEffect(() => {
+    if (dirtyRef.current && shownId.current === module?.id) return;
+    shownId.current = module?.id;
     reset(moduleFormValuesOf(module));
   }, [reset, module]);
 
@@ -71,6 +76,7 @@ export function ModuleForm({
         module === null
           ? await create.mutateAsync({ id: courseId, data })
           : await update.mutateAsync({ id: courseId, moduleId: module.id, data });
+      reset(moduleFormValuesOf(saved));
       await onSaved(saved);
     } catch (error) {
       if (isApiError(error) && error.code === "RATE_LIMITED") {
