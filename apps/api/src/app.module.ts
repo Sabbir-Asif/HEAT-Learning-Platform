@@ -9,6 +9,7 @@ import { CaptchaModule } from "./captcha";
 import { CatalogModule } from "./catalog";
 import { CoreModule } from "./core";
 import { DirectoryModule } from "./directory";
+import { EmailVerificationModule } from "./email-verification";
 import { EnrollmentModule } from "./enrollment/enrollment.module";
 import { HealthController } from "./health/health.controller";
 import { HttpApiModule } from "./http/http.module";
@@ -30,6 +31,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     CaptchaModule,
     CatalogModule,
     DirectoryModule,
+    EmailVerificationModule,
     EnrollmentModule,
   ],
   controllers: [HealthController],

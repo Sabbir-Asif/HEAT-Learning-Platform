@@ -2,6 +2,7 @@ import { UnauthorizedException } from "@nestjs/common";
 import { describe, expect, test, vi } from "vitest";
 import { MeController } from "../../src/me/me.controller";
 import { MeService } from "../../src/me/me.service";
+import { deriveVerificationEmail } from "../../src/me/verification-email";
 
 const user = {
   id: "user-id",
@@ -14,10 +15,11 @@ const user = {
 
 const course = { id: "course-id", slug: "heat", title: "HEAT" };
 
-const build = (userRow: unknown, enrollments: unknown[] = []) => {
+const build = (userRow: unknown, enrollments: unknown[] = [], job: unknown = null) => {
   const database = {
     user: { findFirst: vi.fn().mockResolvedValue(userRow) },
     enrollment: { findMany: vi.fn().mockResolvedValue(enrollments) },
+    emailJob: { findFirst: vi.fn().mockResolvedValue(job) },
   };
   return { service: new MeService(database as never), database };
 };
@@ -64,6 +66,8 @@ describe("MeService.describe", () => {
           reason: undefined,
         },
       ],
+      verificationEmail: null,
+      verificationEmailSentAt: null,
     });
   });
 
@@ -75,6 +79,68 @@ describe("MeService.describe", () => {
     expect(result.user.emailVerified).toBe(false);
     expect(result.user.name).toBeUndefined();
     expect(result.enrollments).toEqual([]);
+    expect(result.verificationEmail).toBe("ON_ITS_WAY");
+  });
+
+  test("reports the sent time of a sent verification email", async () => {
+    const sentAt = new Date("2026-11-02T08:30:00.000Z");
+    const { service, database } = build({ ...user, emailVerifiedAt: null }, [], {
+      status: "SENT",
+      sentAt,
+    });
+
+    const result = await service.describe("user-id");
+
+    expect(result.verificationEmail).toBe("SENT");
+    expect(result.verificationEmailSentAt).toBe("2026-11-02T08:30:00.000Z");
+    expect(database.emailJob.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { userId: "user-id", category: "VERIFICATION", template: "student-verification" },
+        orderBy: { queuedAt: "desc" },
+      }),
+    );
+  });
+
+  test("does not look up the email job for a verified account", async () => {
+    const { service, database } = build(user);
+
+    await service.describe("user-id");
+
+    expect(database.emailJob.findFirst).not.toHaveBeenCalled();
+  });
+});
+
+describe("deriveVerificationEmail", () => {
+  const unverified = null;
+  const sentAt = new Date("2026-11-02T08:30:00.000Z");
+
+  test("is null once verified", () => {
+    expect(deriveVerificationEmail(new Date(), { status: "SENT", sentAt })).toEqual({
+      status: null,
+      sentAt: null,
+    });
+  });
+
+  test("maps SENT with its time and FAILED without one", () => {
+    expect(deriveVerificationEmail(unverified, { status: "SENT", sentAt })).toEqual({
+      status: "SENT",
+      sentAt,
+    });
+    expect(deriveVerificationEmail(unverified, { status: "FAILED", sentAt: null })).toEqual({
+      status: "FAILED",
+      sentAt: null,
+    });
+  });
+
+  test.each(["QUEUED", "DELAYED", "SENDING"] as const)("treats %s as on its way", (status) => {
+    expect(deriveVerificationEmail(unverified, { status, sentAt: null }).status).toBe("ON_ITS_WAY");
+  });
+
+  test("treats no job yet as on its way", () => {
+    expect(deriveVerificationEmail(unverified, null)).toEqual({
+      status: "ON_ITS_WAY",
+      sentAt: null,
+    });
   });
 });
 

@@ -13,6 +13,7 @@ import { CaptchaService } from "../captcha";
 import { CourseLookupService } from "../catalog";
 import { DATABASE } from "../core";
 import { DepartmentOfferingService } from "../directory";
+import { VERIFICATION_EMAIL_TEMPLATE, VerificationTokenService } from "../email-verification";
 
 export const ENROLLMENT_REQUESTED_EVENT_TYPE = "EnrollmentRequested";
 
@@ -31,6 +32,7 @@ export class EnrollmentService {
     private readonly departments: DepartmentOfferingService,
     private readonly registrations: RegistrationPolicyService,
     private readonly timing: ResponseTiming,
+    private readonly verification: VerificationTokenService,
   ) {}
 
   async submit(request: EnrollmentRequest, actor: AuditActor): Promise<EnrollmentAcceptedResponse> {
@@ -62,7 +64,7 @@ export class EnrollmentService {
     if (outcome.kind === "ALREADY_REGISTERED") return;
     const user = await tx.user.create({
       data: { email: request.email, passwordHash, role: "STUDENT", realm: "STUDENT" },
-      select: { id: true },
+      select: { id: true, createdAt: true },
     });
     await tx.studentProfile.create({
       data: {
@@ -76,10 +78,18 @@ export class EnrollmentService {
       data: { userId: user.id, courseId: course.id, status: "PENDING_VERIFICATION" },
       select: { id: true },
     });
+    const issued = await this.verification.issue(tx, user);
     await tx.outbox.create({
       data: {
         eventType: ENROLLMENT_REQUESTED_EVENT_TYPE,
-        payload: { userId: user.id, enrollmentId: enrollment.id, courseId: course.id },
+        payload: {
+          userId: user.id,
+          enrollmentId: enrollment.id,
+          courseId: course.id,
+          ...(issued === null
+            ? {}
+            : { template: VERIFICATION_EMAIL_TEMPLATE, encryptedToken: issued.encryptedToken }),
+        },
       },
     });
   }

@@ -117,6 +117,8 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/admin/auth/sign-in": "adminSignIn",
       "POST /api/auth/refresh": "sessionRefresh",
       "POST /api/auth/sign-in": "signIn",
+      "POST /api/auth/verify-email": "verify",
+      "POST /api/auth/verify-email/resend": "resendVerification",
       "POST /api/captcha": "captcha",
       "POST /api/enrollment": "enrollment",
     });
@@ -136,6 +138,8 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/admin/auth/sign-in",
       "POST /api/auth/refresh",
       "POST /api/auth/sign-in",
+      "POST /api/auth/verify-email",
+      "POST /api/auth/verify-email/resend",
       "POST /api/captcha",
       "POST /api/enrollment",
     ]);
