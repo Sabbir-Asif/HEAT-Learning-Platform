@@ -34,6 +34,7 @@ export * from "./composites/error-state";
 export * from "./composites/form";
 export * from "./composites/lesson-text";
 export * from "./composites/page-header";
+export * from "./composites/quiz-question";
 export * from "./composites/sortable-list";
 export * from "./composites/stat-card";
 export * from "./composites/status-badge";
