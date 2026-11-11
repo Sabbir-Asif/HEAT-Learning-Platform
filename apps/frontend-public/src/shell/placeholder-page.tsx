@@ -3,10 +3,17 @@ import { EmptyState, PageHeader } from "@heat/ui";
 import { ShellContent } from "@heat/ui/shell";
 import { ConstructionIcon } from "lucide-react";
 
-export function PlaceholderPage({ title, action }: { title: string; action?: ReactNode }) {
+interface PlaceholderPageProps {
+  title: string;
+  action?: ReactNode;
+  children?: ReactNode;
+}
+
+export function PlaceholderPage({ title, action, children }: PlaceholderPageProps) {
   return (
     <ShellContent>
       <PageHeader title={title} action={action} />
+      {children}
       <EmptyState
         icon={ConstructionIcon}
         title="This page is coming soon"

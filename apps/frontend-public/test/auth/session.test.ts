@@ -38,6 +38,8 @@ const me = (statuses: Array<[string, string]>): MeResponse => ({
     courseTitle: courseSlug,
     status: status as MeResponse["enrollments"][number]["status"],
   })),
+  verificationEmail: null,
+  verificationEmailSentAt: null,
 });
 
 beforeEach(() => {

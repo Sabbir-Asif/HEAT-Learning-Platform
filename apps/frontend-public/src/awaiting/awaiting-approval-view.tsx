@@ -1,4 +1,4 @@
-import type { MeEnrollment } from "@heat/contracts";
+import type { MeEnrollment, VerificationEmailStatus } from "@heat/contracts";
 import {
   Button,
   Card,
@@ -19,10 +19,31 @@ export interface AwaitingApprovalViewProps {
   enrollments: ReadonlyArray<MeEnrollment>;
   emailVerified: boolean;
   resendVerification?: ReactNode;
+  verificationEmail?: VerificationEmailStatus | null;
+  verificationEmailSentAt?: string | null;
+}
+
+const sentTimeFormat = new Intl.DateTimeFormat("en-GB", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "Asia/Dhaka",
+});
+
+export function verificationCopy(
+  status: VerificationEmailStatus | null | undefined,
+  sentAt: string | null | undefined,
+): string {
+  if (status === "SENT" && sentAt) {
+    return `We sent your verification email on ${sentTimeFormat.format(new Date(sentAt))}. Open the link in it to verify your address.`;
+  }
+  if (status === "SENT") return "We sent your verification email. Open the link in it.";
+  if (status === "FAILED") {
+    return "We could not send your verification email. Request a new link below.";
+  }
+  return "Your verification email is on its way";
 }
 
 const pendingCopy = {
-  PENDING_VERIFICATION: "Verify your email address using the link we sent you.",
   PENDING_APPROVAL: "An administrator is reviewing your request.",
   REJECTED: "Your request was not approved.",
   EXPIRED: "This request expired before the email address was verified.",
@@ -37,9 +58,15 @@ interface EnrollmentCardProps {
   enrollment: MeEnrollment;
   emailVerified: boolean;
   resendVerification?: ReactNode;
+  verificationText: string;
 }
 
-function EnrollmentCard({ enrollment, emailVerified, resendVerification }: EnrollmentCardProps) {
+function EnrollmentCard({
+  enrollment,
+  emailVerified,
+  resendVerification,
+  verificationText,
+}: EnrollmentCardProps) {
   const { status } = enrollment;
   const opensCourse = status === "APPROVED" || status === "COMPLETED";
   return (
@@ -51,7 +78,11 @@ function EnrollmentCard({ enrollment, emailVerified, resendVerification }: Enrol
         </CardAction>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
-        {hasCopy(status) ? <CardDescription>{pendingCopy[status]}</CardDescription> : null}
+        {status === "PENDING_VERIFICATION" ? (
+          <CardDescription role="status">{verificationText}</CardDescription>
+        ) : hasCopy(status) ? (
+          <CardDescription>{pendingCopy[status]}</CardDescription>
+        ) : null}
         {enrollment.reason !== undefined ? <p>Reason: {enrollment.reason}</p> : null}
         {status === "PENDING_VERIFICATION" && !emailVerified ? resendVerification : null}
         {opensCourse ? (
@@ -73,7 +104,10 @@ export function AwaitingApprovalView({
   enrollments,
   emailVerified,
   resendVerification,
+  verificationEmail,
+  verificationEmailSentAt,
 }: AwaitingApprovalViewProps) {
+  const verificationText = verificationCopy(verificationEmail, verificationEmailSentAt);
   return (
     <div className="flex flex-col gap-4">
       <PageHeader
@@ -102,6 +136,7 @@ export function AwaitingApprovalView({
                 enrollment={enrollment}
                 emailVerified={emailVerified}
                 resendVerification={resendVerification}
+                verificationText={verificationText}
               />
             </li>
           ))}
