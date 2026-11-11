@@ -7,6 +7,7 @@ export * from "./audit";
 export * from "./auth";
 export * from "./captcha";
 export * from "./courses";
+export * from "./dashboard";
 export * from "./directory";
 export * from "./enrollment";
 export * from "./errors";
