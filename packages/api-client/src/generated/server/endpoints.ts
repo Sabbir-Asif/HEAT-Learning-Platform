@@ -612,6 +612,90 @@ export interface CsrfTokenResponseDto {
   token: string;
 }
 
+/**
+ * @nullable
+ */
+export type DashboardResponseDtoCoursesItemNextModule = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  resumePositionSeconds: number;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  resumeVideoId: string | null;
+  title: string;
+} | null;
+
+/**
+ * @nullable
+ */
+export type DashboardResponseDtoCoursesItemProgress = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  modulesCompleted: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  modulesTotal: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  percent: number;
+} | null;
+
+export type DashboardResponseDtoCoursesItemStatus = typeof DashboardResponseDtoCoursesItemStatus[keyof typeof DashboardResponseDtoCoursesItemStatus];
+
+
+export const DashboardResponseDtoCoursesItemStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
+export type DashboardResponseDtoCoursesItem = {
+  /**
+     * @maxLength 64
+     * @nullable
+     */
+  certificateNumber: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId: string;
+  courseSlug: string;
+  courseTitle: string;
+  /** @nullable */
+  nextModule: DashboardResponseDtoCoursesItemNextModule;
+  /** @nullable */
+  progress: DashboardResponseDtoCoursesItemProgress;
+  /**
+     * @maxLength 500
+     * @nullable
+     */
+  reason: string | null;
+  status: DashboardResponseDtoCoursesItemStatus;
+};
+
+export interface DashboardResponseDto {
+  courses: DashboardResponseDtoCoursesItem[];
+}
+
 export type DepartmentListResponseDtoItemsItemFaculty = {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
@@ -4531,6 +4615,27 @@ export const getMeDescribeUrl = () => {
 export const meDescribe = async ( options?: Parameters<typeof serverFetch>[1]): Promise<MeResponseDto> => {
 
   return serverFetch<MeResponseDto>(getMeDescribeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getDashboardDescribeUrl = () => {
+
+
+
+
+  return `/api/me/dashboard`
+}
+
+export const dashboardDescribe = async ( options?: Parameters<typeof serverFetch>[1]): Promise<DashboardResponseDto> => {
+
+  return serverFetch<DashboardResponseDto>(getDashboardDescribeUrl(),
   {
     ...options,
     method: 'GET'

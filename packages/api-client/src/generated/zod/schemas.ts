@@ -3063,6 +3063,54 @@ export const MeDescribeResponse = zod.object({
 })
 
 
+export const dashboardDescribeResponseCoursesItemCertificateNumberMax = 64;
+
+export const dashboardDescribeResponseCoursesItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const dashboardDescribeResponseCoursesItemNextModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const dashboardDescribeResponseCoursesItemNextModuleOrderMin = -9007199254740991;
+export const dashboardDescribeResponseCoursesItemNextModuleOrderMax = 9007199254740991;
+
+export const dashboardDescribeResponseCoursesItemNextModuleResumePositionSecondsMin = 0;
+export const dashboardDescribeResponseCoursesItemNextModuleResumePositionSecondsMax = 9007199254740991;
+
+export const dashboardDescribeResponseCoursesItemNextModuleResumeVideoIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const dashboardDescribeResponseCoursesItemProgressModulesCompletedMin = 0;
+export const dashboardDescribeResponseCoursesItemProgressModulesCompletedMax = 9007199254740991;
+
+export const dashboardDescribeResponseCoursesItemProgressModulesTotalMin = 0;
+export const dashboardDescribeResponseCoursesItemProgressModulesTotalMax = 9007199254740991;
+
+export const dashboardDescribeResponseCoursesItemProgressPercentMin = 0;
+export const dashboardDescribeResponseCoursesItemProgressPercentMax = 100;
+
+export const dashboardDescribeResponseCoursesItemReasonMax = 500;
+
+
+
+export const DashboardDescribeResponse = zod.object({
+  "courses": zod.array(zod.object({
+  "certificateNumber": zod.string().max(dashboardDescribeResponseCoursesItemCertificateNumberMax).nullable(),
+  "courseId": zod.uuid().regex(dashboardDescribeResponseCoursesItemCourseIdRegExp),
+  "courseSlug": zod.string(),
+  "courseTitle": zod.string(),
+  "nextModule": zod.object({
+  "id": zod.uuid().regex(dashboardDescribeResponseCoursesItemNextModuleIdRegExp),
+  "order": zod.int().min(dashboardDescribeResponseCoursesItemNextModuleOrderMin).max(dashboardDescribeResponseCoursesItemNextModuleOrderMax),
+  "resumePositionSeconds": zod.int().min(dashboardDescribeResponseCoursesItemNextModuleResumePositionSecondsMin).max(dashboardDescribeResponseCoursesItemNextModuleResumePositionSecondsMax),
+  "resumeVideoId": zod.uuid().regex(dashboardDescribeResponseCoursesItemNextModuleResumeVideoIdRegExp).nullable(),
+  "title": zod.string()
+}).nullable(),
+  "progress": zod.object({
+  "modulesCompleted": zod.int().min(dashboardDescribeResponseCoursesItemProgressModulesCompletedMin).max(dashboardDescribeResponseCoursesItemProgressModulesCompletedMax),
+  "modulesTotal": zod.int().min(dashboardDescribeResponseCoursesItemProgressModulesTotalMin).max(dashboardDescribeResponseCoursesItemProgressModulesTotalMax),
+  "percent": zod.int().min(dashboardDescribeResponseCoursesItemProgressPercentMin).max(dashboardDescribeResponseCoursesItemProgressPercentMax)
+}).nullable(),
+  "reason": zod.string().max(dashboardDescribeResponseCoursesItemReasonMax).nullable(),
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED'])
+}))
+})
+
+
 export const studentPlaybackStartPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 
