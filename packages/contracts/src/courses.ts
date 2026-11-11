@@ -105,7 +105,7 @@ export const courseSummarySchema = z.object({
   id: z.uuid(),
   slug: z.string(),
   title: z.string(),
-  description: z.string().nullable(),
+  description: z.string().max(courseDescriptionMaxLength).nullable(),
   thumbnailAssetId: z.uuid().nullable(),
   status: courseStatusSchema,
   lockedAt: z.iso.datetime().nullable(),
