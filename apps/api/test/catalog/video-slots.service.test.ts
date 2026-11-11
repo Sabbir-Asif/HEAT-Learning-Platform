@@ -13,7 +13,9 @@ interface SlotFixture {
   title: string;
   required: boolean;
   assetId: string | null;
-  asset: { status: string; assetKey: string; rejectionReason?: string | null } | null;
+  asset: { status: string; assetKey: string; rejectionReason?: string | null;
+    failureReason?: string | null;
+  } | null;
 }
 
 const slot = (id: string, order: number, overrides: Partial<SlotFixture> = {}): SlotFixture => ({
@@ -109,6 +111,26 @@ describe("VideoSlotsService.list rejection reason", () => {
       null,
       null,
     ]);
+  });
+});
+
+describe("VideoSlotsService.list failure reason", () => {
+  test("shows why processing failed, and null for unknown or missing reasons", async () => {
+    const { service } = build({
+      slots: [
+        slot("a", 1, {
+          assetId: "x",
+          asset: { status: "FAILED", assetKey: "k1", failureReason: "TIMED_OUT" },
+        }),
+        slot("b", 2, {
+          assetId: "y",
+          asset: { status: "FAILED", assetKey: "k2", failureReason: "legacy" },
+        }),
+        slot("c", 3, { assetId: "z", asset: { status: "READY", assetKey: "k3" } }),
+      ],
+    });
+    const result = await service.list(courseId, "m");
+    expect(result.items.map((item) => item.failureReason)).toEqual(["TIMED_OUT", null, null]);
   });
 });
 

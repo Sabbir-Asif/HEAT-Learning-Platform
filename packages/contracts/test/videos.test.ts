@@ -5,6 +5,7 @@ import {
   videoSlotListResponseSchema,
   videoSlotStatusSchema,
   videoQueuedEventType,
+  videoFailureReasonSchema,
   videoRejectionReasonSchema,
   videoUploadLimits,
   videoUploadParamsSchema,
@@ -55,11 +56,19 @@ describe("video slot responses", () => {
           status: "NOT_UPLOADED",
           assetKey: null,
           rejectionReason: null,
+          failureReason: null,
         },
       ],
       locked: false,
     });
     expect(parsed.items[0]?.assetKey).toBeNull();
+  });
+});
+
+describe("video failure reasons", () => {
+  test("accepts the stored reasons and nothing else", () => {
+    expect(videoFailureReasonSchema.parse("TIMED_OUT")).toBe("TIMED_OUT");
+    expect(videoFailureReasonSchema.safeParse("OUT_OF_DISK").success).toBe(false);
   });
 });
 
