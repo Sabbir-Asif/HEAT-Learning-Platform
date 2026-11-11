@@ -12,12 +12,14 @@ export const notificationTypes = [
 
 export type NotificationKind = (typeof notificationTypes)[number];
 
+export type JsonObject = Record<string, z.core.util.JSONType>;
+
 export const CERTIFICATE_REQUESTED_EVENT_TYPE = "certificate.requested";
 
 export type RoutedAction =
   | { kind: "email"; template: string; category: EmailCategory; userId: string }
   | { kind: "certificate"; enrollmentId: string }
-  | { kind: "notification"; userId: string; type: NotificationKind; data: Record<string, unknown> };
+  | { kind: "notification"; userId: string; type: NotificationKind; data: JsonObject };
 
 export type Routing =
   { outcome: "routed"; actions: RoutedAction[] } | { outcome: "skipped"; reason: string };
@@ -28,7 +30,7 @@ const notificationEnvelope = z.object({
   userId: z.uuid(),
   notification: z.object({
     type: z.enum(notificationTypes),
-    data: z.record(z.string(), z.unknown()).default({}),
+    data: z.record(z.string(), z.json()).default({}),
   }),
 });
 

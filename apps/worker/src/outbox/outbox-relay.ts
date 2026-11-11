@@ -1,4 +1,6 @@
-import type { RoutedAction } from "./outbox-routing";
+import type { JsonObject } from "./outbox-routing";
+import type { EmailCategory } from "../email";
+import type { NotificationKind, RoutedAction } from "./outbox-routing";
 import { routeOutboxEvent } from "./outbox-routing";
 
 export interface OutboxEvent {
@@ -13,7 +15,7 @@ export interface EmailJobRecord {
   outboxId: string;
   userId: string;
   recipientAddress: string;
-  category: string;
+  category: EmailCategory;
   template: string;
 }
 
@@ -22,8 +24,8 @@ export interface RelayTransaction {
   recordEmailJob(job: EmailJobRecord): Promise<void>;
   createNotification(notification: {
     userId: string;
-    type: string;
-    data: Record<string, unknown>;
+    type: NotificationKind;
+    data: JsonObject;
   }): Promise<void>;
 }
 
