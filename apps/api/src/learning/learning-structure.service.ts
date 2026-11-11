@@ -1,9 +1,10 @@
 import type { LearningStructureResponse } from "@heat/contracts";
 import type { HeatClient } from "@heat/db";
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { CLOCK, DATABASE } from "../core";
 import type { Clock } from "../core";
 import { ApiException } from "../http/api-exception";
+import { learnsCourse, requireLearnableEnrollment } from "./course-access";
 import {
   effectiveModuleStates,
   nextModuleIndex,
@@ -41,9 +42,9 @@ export class LearningStructureService {
       },
     });
     if (enrollment === null) throw new ApiException(403, "ENROLLMENT_NOT_ACTIVE");
-    const { course, courseRevision } = enrollment;
+    const { course } = enrollment;
     const summary = { id: course.id, slug: course.slug, title: course.title };
-    if (enrollment.status !== "APPROVED" && enrollment.status !== "COMPLETED") {
+    if (!learnsCourse(enrollment.status)) {
       return {
         course: summary,
         enrollment: {
@@ -56,16 +57,9 @@ export class LearningStructureService {
         learning: null,
       };
     }
-    if (
-      enrollment.courseRevisionId === null ||
-      courseRevision === null ||
-      course.deletedAt !== null ||
-      courseRevision.deletedAt !== null
-    ) {
-      throw new NotFoundException();
-    }
+    const access = requireLearnableEnrollment(enrollment);
     const modules = await this.database.module.findMany({
-      where: { revisionId: courseRevision.id, deletedAt: null },
+      where: { revisionId: access.revisionId, deletedAt: null },
       orderBy: { order: "asc" },
       select: {
         id: true,
@@ -107,26 +101,30 @@ export class LearningStructureService {
     );
     const [progress, videoProgress, attempts, grants] = await Promise.all([
       this.database.moduleProgress.findMany({
-        where: { enrollmentId: enrollment.id, moduleId: { in: moduleIds } },
+        where: { enrollmentId: access.enrollmentId, moduleId: { in: moduleIds } },
         select: { moduleId: true, status: true },
       }),
       this.database.videoProgress.findMany({
-        where: { enrollmentId: enrollment.id, videoId: { in: videoIds } },
+        where: { enrollmentId: access.enrollmentId, videoId: { in: videoIds } },
         select: { videoId: true, coverage: true, resumePositionSeconds: true, completedAt: true },
       }),
       this.database.quizAttempt.findMany({
-        where: { enrollmentId: enrollment.id, quizId: { in: quizIds }, submittedAt: { not: null } },
+        where: {
+          enrollmentId: access.enrollmentId,
+          quizId: { in: quizIds },
+          submittedAt: { not: null },
+        },
         select: { quizId: true, passed: true, submittedAt: true },
       }),
       this.database.attemptGrant.findMany({
-        where: { enrollmentId: enrollment.id, quizId: { in: quizIds } },
+        where: { enrollmentId: access.enrollmentId, quizId: { in: quizIds } },
         select: { quizId: true, extraAttempts: true },
       }),
     ]);
     const progressByModule = new Map(progress.map((row) => [row.moduleId, row.status]));
     const progressByVideo = new Map(videoProgress.map((row) => [row.videoId, row]));
     const states = effectiveModuleStates(
-      enrollment.status,
+      access.status,
       modules.map((entry) => progressByModule.get(entry.id) ?? null),
     );
     const now = this.clock.now();
@@ -192,9 +190,9 @@ export class LearningStructureService {
     const next = nextModuleIndex(states);
     return {
       course: summary,
-      enrollment: { status: enrollment.status, reason: null },
+      enrollment: { status: access.status, reason: null },
       learning: {
-        revision: { id: courseRevision.id, number: courseRevision.number },
+        revision: { id: access.revisionId, number: access.revisionNumber },
         summary: {
           overallProgressPercent: overallProgressPercent(states),
           modulesCompleted: states.filter((state) => state === "COMPLETED").length,
