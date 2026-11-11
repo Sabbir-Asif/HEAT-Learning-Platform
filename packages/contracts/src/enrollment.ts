@@ -2,6 +2,7 @@ import { z } from "zod";
 import { academicSessionSchema } from "./academic-session";
 import { emailAddressSchema, passwordMaxLength, passwordMinLength } from "./auth";
 import { captchaFieldsShape } from "./captcha";
+import { courseSlugSchema } from "./courses";
 
 export const englishNameMinLength = 2;
 export const englishNameMaxLength = 100;
@@ -63,7 +64,7 @@ export type EnrollmentStepTwo = z.infer<typeof enrollmentStepTwoSchema>;
 export type EnrollmentStepTwoInput = z.input<typeof enrollmentStepTwoSchema>;
 
 export const enrollmentRequestSchema = z
-  .object({ ...enrollmentStepOneSchema.shape, ...stepTwoShape })
+  .object({ ...enrollmentStepOneSchema.shape, ...stepTwoShape, courseSlug: courseSlugSchema })
   .refine(passwordsMatch, passwordMismatch);
 
 export type EnrollmentRequest = z.infer<typeof enrollmentRequestSchema>;

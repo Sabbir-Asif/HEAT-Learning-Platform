@@ -170,6 +170,7 @@ describe("enrollmentRequestSchema", () => {
     confirmPassword: "correct horse battery",
     captchaId: "1b4e28ba-2fa1-41d2-883f-0016d3cca427",
     captchaAnswer: "AB12",
+    courseSlug: "gender-safety",
   };
 
   test("accepts the full payload", () => {
@@ -193,6 +194,11 @@ describe("enrollmentRequestSchema", () => {
   test("applies the step-two rules to a direct call", () => {
     const result = enrollmentRequestSchema.safeParse({ ...valid, confirmPassword: "other" });
     expect(result.error?.issues.map((issue) => issue.path)).toEqual([["confirmPassword"]]);
+  });
+
+  test.each(["", "Not A Slug", "-bad", undefined])("rejects course slug %j", (courseSlug) => {
+    const result = enrollmentRequestSchema.safeParse({ ...valid, courseSlug });
+    expect(result.error?.issues[0]?.path).toEqual(["courseSlug"]);
   });
 
   test("rejects a missing step", () => {
