@@ -109,7 +109,7 @@ export class OutboxRelay {
       return;
     }
     if (action.kind === "certificate") {
-      await this.queues.certificate.add(event.id, {
+      await this.queues.certificate.add(`certificate-${action.enrollmentId}-${event.id}`, {
         outboxId: event.id,
         enrollmentId: action.enrollmentId,
       });
