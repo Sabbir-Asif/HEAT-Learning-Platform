@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { EnrollWizard } from "@/enroll/enroll-wizard";
 
 export default function Page() {
-  return <PlaceholderPage title="Enroll" />;
+  return <EnrollWizard />;
 }
