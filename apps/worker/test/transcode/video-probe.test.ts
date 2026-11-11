@@ -27,6 +27,7 @@ describe("FfprobeVideoProbe", () => {
       timeout: 5000,
       maxBuffer: 1024 * 1024,
       shell: false,
+      env: { PATH: process.env.PATH ?? "" },
     });
   });
 

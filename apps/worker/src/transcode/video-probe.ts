@@ -11,7 +11,7 @@ export interface ExecOptions {
   timeout: number;
   maxBuffer: number;
   shell: false;
-  env?: Record<string, string>;
+  env: Record<string, string>;
 }
 
 export type ExecFile = (
@@ -59,6 +59,7 @@ export class FfprobeVideoProbe implements VideoProbe {
         timeout: this.timeoutMs,
         maxBuffer: maxOutputBytes,
         shell: false,
+        env: { PATH: process.env.PATH ?? "" },
       });
       return parseFfprobeJson(stdout);
     } catch (error) {
