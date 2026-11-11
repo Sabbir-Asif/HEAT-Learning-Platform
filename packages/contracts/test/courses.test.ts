@@ -25,6 +25,12 @@ describe("createCourseRequestSchema", () => {
     ).toBeNull();
   });
 
+  test("keeps a written description trimmed", () => {
+    expect(
+      createCourseRequestSchema.parse({ ...valid, description: "  Gender safety  " }).description,
+    ).toBe("Gender safety");
+  });
+
   test.each(["Heat", "heat_foundations", "-heat", "heat-", "heat--course", "heat course", ""])(
     "rejects the slug %j",
     (slug) => {
