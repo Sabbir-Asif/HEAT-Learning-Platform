@@ -1,6 +1,7 @@
 import { ApiError } from "@heat/api-client";
 import { describe, expect, test, vi } from "vitest";
 import { createQuizSubmit, outcomeOfSubmitError } from "../../src/quiz/quiz-submit";
+import type { QuizSubmitDependencies } from "../../src/quiz/quiz-submit";
 
 const attemptId = "6f2d1c1e-0a53-4d0e-9f0b-1d3b7a4c1111";
 const answers = { q1: "o1" };
@@ -13,7 +14,7 @@ const response = {
   totalQuestions: 5,
 };
 
-const build = (send: ReturnType<typeof vi.fn>) => {
+const build = (send: QuizSubmitDependencies["send"]) => {
   const onSubmitted = vi.fn();
   return { submit: createQuizSubmit({ send, onSubmitted }), onSubmitted };
 };
