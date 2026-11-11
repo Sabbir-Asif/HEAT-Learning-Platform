@@ -61,7 +61,11 @@ const build = (
     },
     option: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
     question: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
-    video: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
+    video: {
+      findMany: vi.fn().mockResolvedValue([{ assetId: "asset-1" }]),
+      deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
+    },
+    videoAsset: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
     moduleTag: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
     lessonSection: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
   };
@@ -145,6 +149,15 @@ describe("ModulesService.update", () => {
 });
 
 describe("ModulesService.remove", () => {
+  test("drops the reference count of each video asset in the module", async () => {
+    const { service, database, inAuditScope } = build();
+    await inAuditScope(() => service.remove(courseId, "a"));
+    expect(database.videoAsset.updateMany).toHaveBeenCalledWith({
+      where: { id: "asset-1", referenceCount: { gt: 0 } },
+      data: { referenceCount: { decrement: 1 } },
+    });
+  });
+
   test("removes sections, videos, tags and the quiz with the module, then closes the gap", async () => {
     const { service, database, calls, inAuditScope } = build({ quiz: true });
     database.module.findMany.mockResolvedValue([moduleRow("b", 2), moduleRow("c", 3)]);

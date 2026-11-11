@@ -133,6 +133,16 @@ export class ModulesService {
       await client.question.deleteMany({ where: { quizId: quiz.id } });
       await client.quiz.delete({ where: { id: quiz.id } });
     }
+    const slots = await client.video.findMany({
+      where: { moduleId, assetId: { not: null } },
+      select: { assetId: true },
+    });
+    for (const slot of slots) {
+      await client.videoAsset.updateMany({
+        where: { id: slot.assetId ?? "", referenceCount: { gt: 0 } },
+        data: { referenceCount: { decrement: 1 } },
+      });
+    }
     await client.video.deleteMany({ where: { moduleId } });
     await client.moduleTag.deleteMany({ where: { moduleId } });
     await client.lessonSection.deleteMany({ where: { moduleId } });
