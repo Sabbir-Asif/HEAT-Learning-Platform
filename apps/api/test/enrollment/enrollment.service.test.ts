@@ -26,7 +26,7 @@ const build = (outcome: unknown = { kind: "PROCEED", replacedUserId: null }) => 
     user: {
       create: vi.fn().mockImplementation(async () => {
         order.push("user");
-        return { id: "user-id" };
+        return { id: "user-id", createdAt: new Date("2026-11-01T00:00:00.000Z") };
       }),
     },
     studentProfile: {
@@ -85,6 +85,12 @@ const build = (outcome: unknown = { kind: "PROCEED", replacedUserId: null }) => 
     }),
   };
   const timing = { equalise: vi.fn().mockImplementation((work: () => unknown) => work()) };
+  const verification = {
+    issue: vi.fn().mockImplementation(async () => {
+      order.push("token");
+      return { encryptedToken: "sealed-token", expiresAt: new Date("2026-11-03T00:00:00.000Z") };
+    }),
+  };
   const service = new EnrollmentService(
     database as never,
     captcha as never,
@@ -93,8 +99,21 @@ const build = (outcome: unknown = { kind: "PROCEED", replacedUserId: null }) => 
     departments as never,
     policy as never,
     timing as never,
+    verification as never,
   );
-  return { service, tx, database, captcha, passwords, courses, departments, policy, timing, order };
+  return {
+    service,
+    tx,
+    database,
+    captcha,
+    passwords,
+    courses,
+    departments,
+    policy,
+    timing,
+    verification,
+    order,
+  };
 };
 
 describe("EnrollmentService.submit", () => {
@@ -114,6 +133,7 @@ describe("EnrollmentService.submit", () => {
       "user",
       "profile",
       "enrollment",
+      "token",
       "outbox",
     ]);
     expect(tx.user.create).toHaveBeenCalledWith({
@@ -123,7 +143,7 @@ describe("EnrollmentService.submit", () => {
         role: "STUDENT",
         realm: "STUDENT",
       },
-      select: { id: true },
+      select: { id: true, createdAt: true },
     });
     expect(tx.studentProfile.create).toHaveBeenCalledWith({
       data: {
@@ -140,8 +160,25 @@ describe("EnrollmentService.submit", () => {
     expect(tx.outbox.create).toHaveBeenCalledWith({
       data: {
         eventType: ENROLLMENT_REQUESTED_EVENT_TYPE,
-        payload: { userId: "user-id", enrollmentId: "enrollment-id", courseId: "course-id" },
+        payload: {
+          userId: "user-id",
+          enrollmentId: "enrollment-id",
+          courseId: "course-id",
+          template: "student-verification",
+          encryptedToken: "sealed-token",
+        },
       },
+    });
+  });
+
+  test("issues the verification token for the new user inside the same transaction", async () => {
+    const { service, tx, verification } = build();
+
+    await service.submit(request, actor);
+
+    expect(verification.issue).toHaveBeenCalledWith(tx, {
+      id: "user-id",
+      createdAt: new Date("2026-11-01T00:00:00.000Z"),
     });
   });
 

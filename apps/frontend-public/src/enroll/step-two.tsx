@@ -19,10 +19,11 @@ import { ArrowLeftIcon } from "lucide-react";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { readStepOne } from "./step-one-store";
+import { supportEmail } from "./support-contact";
 import { classifySubmitError } from "./submit-error";
 import { useCaptcha } from "./use-captcha";
 
-export const supportEmail = "support@heat.du.ac.bd";
+export { supportEmail };
 
 const emptyStepTwo: EnrollmentStepTwoInput = {
   email: "",

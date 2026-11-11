@@ -42,6 +42,10 @@ export type FormErrorCopyKey =
   | "RATE_LIMITED"
   | "UNAUTHENTICATED"
   | "VALIDATION_FAILED"
+  | "VERIFICATION_LINK_EXPIRED"
+  | "VERIFICATION_LINK_INVALID"
+  | "VERIFICATION_LINK_USED"
+  | "VERIFICATION_RESEND_LIMIT"
   | "NETWORK_ERROR"
   | "REQUEST_ABORTED"
   | "UNEXPECTED_RESPONSE";
@@ -97,6 +101,11 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   RATE_LIMITED: "Too many attempts. Wait a little and try again.",
   UNAUTHENTICATED: "Your session has ended. Sign in again to continue.",
   VALIDATION_FAILED: genericFormMessage,
+  VERIFICATION_LINK_EXPIRED: "This verification link has expired. Request a new one.",
+  VERIFICATION_LINK_INVALID: "This verification link is not valid.",
+  VERIFICATION_LINK_USED: "This verification link has already been used or replaced.",
+  VERIFICATION_RESEND_LIMIT:
+    "Too many verification emails were requested. Contact support if you still need help.",
   NETWORK_ERROR: "The connection failed. Check your network and try again.",
   REQUEST_ABORTED: "The request was cancelled. Try again.",
   UNEXPECTED_RESPONSE: "The server sent an unexpected reply. Try again in a moment.",

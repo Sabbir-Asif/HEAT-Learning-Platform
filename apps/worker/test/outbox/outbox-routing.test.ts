@@ -19,6 +19,38 @@ describe("routeOutboxEvent", () => {
     });
   });
 
+  test("routes the registration event with a verification template to the email queue", () => {
+    expect(
+      routeOutboxEvent("EnrollmentRequested", {
+        userId,
+        enrollmentId,
+        courseId: enrollmentId,
+        template: "student-verification",
+        encryptedToken: "sealed",
+      }),
+    ).toEqual({
+      outcome: "routed",
+      actions: [
+        { kind: "email", template: "student-verification", category: "VERIFICATION", userId },
+      ],
+    });
+  });
+
+  test("routes the resend event to the verification email", () => {
+    expect(
+      routeOutboxEvent("student.verification.resend", {
+        template: "student-verification",
+        userId,
+        encryptedToken: "sealed",
+      }),
+    ).toEqual({
+      outcome: "routed",
+      actions: [
+        { kind: "email", template: "student-verification", category: "VERIFICATION", userId },
+      ],
+    });
+  });
+
   test("routes a certificate request to the certificate queue", () => {
     expect(routeOutboxEvent("certificate.requested", { enrollmentId })).toEqual({
       outcome: "routed",

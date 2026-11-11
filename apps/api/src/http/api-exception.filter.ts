@@ -55,6 +55,10 @@ const messages: Record<ErrorCode, string> = {
   RATE_LIMITED: "Too many requests. Try again later.",
   UNAUTHENTICATED: "Sign in to continue.",
   VALIDATION_FAILED: "Some fields are not valid.",
+  VERIFICATION_LINK_EXPIRED: "This verification link has expired. Request a new one.",
+  VERIFICATION_LINK_INVALID: "This verification link is not valid.",
+  VERIFICATION_LINK_USED: "This verification link has already been used or replaced.",
+  VERIFICATION_RESEND_LIMIT: "Too many verification emails were requested for this registration.",
 };
 
 const issuesSchema = z.object({

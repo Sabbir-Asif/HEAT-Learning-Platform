@@ -46,6 +46,10 @@ export const meEnrollmentSchema = z.object({
 
 export type MeEnrollment = z.infer<typeof meEnrollmentSchema>;
 
+export const verificationEmailStatuses = ["ON_ITS_WAY", "SENT", "FAILED"] as const;
+export const verificationEmailStatusSchema = z.enum(verificationEmailStatuses);
+export type VerificationEmailStatus = z.infer<typeof verificationEmailStatusSchema>;
+
 export const meResponseSchema = z.object({
   user: z.object({
     id: z.uuid(),
@@ -56,6 +60,8 @@ export const meResponseSchema = z.object({
     mustChangePassword: z.boolean(),
   }),
   enrollments: z.array(meEnrollmentSchema),
+  verificationEmail: verificationEmailStatusSchema.nullable(),
+  verificationEmailSentAt: z.iso.datetime().nullable(),
 });
 
 export type MeResponse = z.infer<typeof meResponseSchema>;

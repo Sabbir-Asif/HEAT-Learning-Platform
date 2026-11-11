@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   outputFileTracingRoot: path.join(__dirname, "../.."),
   transpilePackages: ["@heat/ui", "@heat/api-client", "@heat/contracts"],
+  async headers() {
+    return [
+      {
+        source: "/verify-email/:token*",
+        headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

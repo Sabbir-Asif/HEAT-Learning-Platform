@@ -1334,11 +1334,29 @@
               "mustChangePassword"
             ],
             "type": "object"
+          },
+          "verificationEmail": {
+            "enum": [
+              "ON_ITS_WAY",
+              "SENT",
+              "FAILED",
+              null
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "verificationEmailSentAt": {
+            "format": "date-time",
+            "nullable": true,
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "type": "string"
           }
         },
         "required": [
           "user",
-          "enrollments"
+          "enrollments",
+          "verificationEmail",
+          "verificationEmailSentAt"
         ],
         "type": "object"
       },
@@ -1766,6 +1784,56 @@
         },
         "required": [
           "name"
+        ],
+        "type": "object"
+      },
+      "VerificationAcceptedResponseDto": {
+        "properties": {
+          "accepted": {
+            "enum": [
+              true
+            ],
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accepted"
+        ],
+        "type": "object"
+      },
+      "VerificationResendRequestDto": {
+        "properties": {
+          "captchaAnswer": {
+            "maxLength": 12,
+            "minLength": 1,
+            "type": "string"
+          },
+          "captchaId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "captchaId",
+          "captchaAnswer"
+        ],
+        "type": "object"
+      },
+      "VerifyEmailRequestDto": {
+        "properties": {
+          "token": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
         ],
         "type": "object"
       }
@@ -3923,6 +3991,68 @@
         "parameters": [],
         "responses": {
           "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/verify-email": {
+      "post": {
+        "operationId": "verificationConfirm",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/verify-email/resend": {
+      "post": {
+        "operationId": "verificationResend",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerificationResendRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationAcceptedResponseDto"
+                }
+              }
+            },
             "description": ""
           }
         },
