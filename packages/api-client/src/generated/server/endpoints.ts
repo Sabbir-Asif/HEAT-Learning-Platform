@@ -149,6 +149,105 @@ export interface AdminSummaryDto {
   status: AdminSummaryDtoStatus;
 }
 
+export type ApprovalQueueResponseDtoItemsItemCourse = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+export type ApprovalQueueResponseDtoItemsItemDepartment = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type ApprovalQueueResponseDtoItemsItemFaculty = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type ApprovalQueueResponseDtoItemsItemStudent = {
+  email: string;
+  name: string;
+};
+
+export type ApprovalQueueResponseDtoItemsItemUniversity = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type ApprovalQueueResponseDtoItemsItem = {
+  course: ApprovalQueueResponseDtoItemsItemCourse;
+  department: ApprovalQueueResponseDtoItemsItemDepartment;
+  faculty: ApprovalQueueResponseDtoItemsItemFaculty;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  requestedAt: string;
+  session: string;
+  student: ApprovalQueueResponseDtoItemsItemStudent;
+  university: ApprovalQueueResponseDtoItemsItemUniversity;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  verifiedAt: string | null;
+};
+
+export interface ApprovalQueueResponseDto {
+  items: ApprovalQueueResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+}
+
+export interface ApproveEnrollmentRequestDto {
+  /** @maxLength 500 */
+  reason?: string;
+}
+
+export interface ApproveEnrollmentsRequestDto {
+  /**
+     * @minItems 1
+     * @maxItems 100
+     * @items.pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  ids: string[];
+  /** @maxLength 500 */
+  reason?: string;
+}
+
+export type ApprovedEnrollmentDtoStatus = typeof ApprovedEnrollmentDtoStatus[keyof typeof ApprovedEnrollmentDtoStatus];
+
+
+export const ApprovedEnrollmentDtoStatus = {
+  APPROVED: 'APPROVED',
+} as const;
+
+export interface ApprovedEnrollmentDto {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  approvedAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseRevisionId: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  status: ApprovedEnrollmentDtoStatus;
+}
+
 /**
  * @nullable
  */
@@ -214,6 +313,62 @@ export interface AuditLogListResponseDto {
      * @maximum 9007199254740991
      */
   total: number;
+}
+
+export type BulkApprovalResponseDtoFailedItemCode = typeof BulkApprovalResponseDtoFailedItemCode[keyof typeof BulkApprovalResponseDtoFailedItemCode];
+
+
+export const BulkApprovalResponseDtoFailedItemCode = {
+  AUDIT_ACTOR_FILTER_TOO_BROAD: 'AUDIT_ACTOR_FILTER_TOO_BROAD',
+  BAD_REQUEST: 'BAD_REQUEST',
+  CANNOT_DEACTIVATE_SELF: 'CANNOT_DEACTIVATE_SELF',
+  CAPTCHA_EXPIRED: 'CAPTCHA_EXPIRED',
+  CAPTCHA_INVALID: 'CAPTCHA_INVALID',
+  CONTENT_LOCKED: 'CONTENT_LOCKED',
+  COURSE_HAS_ENROLLMENTS: 'COURSE_HAS_ENROLLMENTS',
+  COURSE_LOCKED: 'COURSE_LOCKED',
+  COURSE_NOT_AVAILABLE: 'COURSE_NOT_AVAILABLE',
+  COURSE_NOT_DRAFT: 'COURSE_NOT_DRAFT',
+  COURSE_PUBLISH_CHECKS_FAILED: 'COURSE_PUBLISH_CHECKS_FAILED',
+  COURSE_SLUG_TAKEN: 'COURSE_SLUG_TAKEN',
+  CSRF_TOKEN_INVALID: 'CSRF_TOKEN_INVALID',
+  DIRECTORY_ARCHIVED: 'DIRECTORY_ARCHIVED',
+  DIRECTORY_IN_USE: 'DIRECTORY_IN_USE',
+  DIRECTORY_NAME_TAKEN: 'DIRECTORY_NAME_TAKEN',
+  EMAIL_IN_USE: 'EMAIL_IN_USE',
+  ENROLLMENT_ALREADY_DECIDED: 'ENROLLMENT_ALREADY_DECIDED',
+  ENROLLMENT_NOT_ACTIVE: 'ENROLLMENT_NOT_ACTIVE',
+  ENROLLMENT_NOT_VERIFIED: 'ENROLLMENT_NOT_VERIFIED',
+  FORBIDDEN: 'FORBIDDEN',
+  INTERNAL: 'INTERNAL',
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  INVITATION_EXPIRED: 'INVITATION_EXPIRED',
+  INVITATION_INVALID: 'INVITATION_INVALID',
+  INVITATION_NOT_PENDING: 'INVITATION_NOT_PENDING',
+  NOT_FOUND: 'NOT_FOUND',
+  ORDER_CONFLICT: 'ORDER_CONFLICT',
+  ORIGIN_NOT_ALLOWED: 'ORIGIN_NOT_ALLOWED',
+  PASSWORD_BREACHED: 'PASSWORD_BREACHED',
+  PASSWORD_CHANGE_REQUIRED: 'PASSWORD_CHANGE_REQUIRED',
+  RATE_LIMITED: 'RATE_LIMITED',
+  UNAUTHENTICATED: 'UNAUTHENTICATED',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+  VERIFICATION_LINK_EXPIRED: 'VERIFICATION_LINK_EXPIRED',
+  VERIFICATION_LINK_INVALID: 'VERIFICATION_LINK_INVALID',
+  VERIFICATION_LINK_USED: 'VERIFICATION_LINK_USED',
+  VERIFICATION_RESEND_LIMIT: 'VERIFICATION_RESEND_LIMIT',
+} as const;
+
+export type BulkApprovalResponseDtoFailedItem = {
+  code: BulkApprovalResponseDtoFailedItemCode;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+};
+
+export interface BulkApprovalResponseDto {
+  failed: BulkApprovalResponseDtoFailedItem[];
+  /** @items.pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  succeeded: string[];
 }
 
 export interface CaptchaRequestDto {
@@ -1210,6 +1365,42 @@ export const UniversitiesListSort = {
   '-name': '-name',
   createdAt: 'createdAt',
   '-createdAt': '-createdAt',
+} as const;
+
+export type EnrollmentApprovalListPendingParams = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId?: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session?: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$ */
+  submittedFrom?: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$ */
+  submittedTo?: string;
+  sort?: EnrollmentApprovalListPendingSort;
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  pageSize?: number;
+};
+
+export type EnrollmentApprovalListPendingSort = typeof EnrollmentApprovalListPendingSort[keyof typeof EnrollmentApprovalListPendingSort];
+
+
+export const EnrollmentApprovalListPendingSort = {
+  requestedAt: 'requestedAt',
+  '-requestedAt': '-requestedAt',
 } as const;
 
 export const getAdminAccountChangePasswordUrl = () => {
@@ -2639,6 +2830,105 @@ export const universitiesRestore = async (id: string, options?: Parameters<typeo
     method: 'POST'
 
 
+  }
+);}
+
+
+
+export const getEnrollmentApprovalApproveManyUrl = () => {
+
+
+
+
+  return `/api/admin/enrollments/approve`
+}
+
+export const enrollmentApprovalApproveMany = async (approveEnrollmentsRequestDto: ApproveEnrollmentsRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<BulkApprovalResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<BulkApprovalResponseDto>(getEnrollmentApprovalApproveManyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(approveEnrollmentsRequestDto)
+  }
+);}
+
+
+
+export const getEnrollmentApprovalListPendingUrl = (params?: EnrollmentApprovalListPendingParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/enrollments/pending?${stringifiedParams}` : `/api/admin/enrollments/pending`
+}
+
+export const enrollmentApprovalListPending = async (params?: EnrollmentApprovalListPendingParams, options?: Parameters<typeof serverFetch>[1]): Promise<ApprovalQueueResponseDto> => {
+
+  return serverFetch<ApprovalQueueResponseDto>(getEnrollmentApprovalListPendingUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getEnrollmentApprovalApproveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/enrollments/${id}/approve`
+}
+
+export const enrollmentApprovalApprove = async (id: string,
+    approveEnrollmentRequestDto: ApproveEnrollmentRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ApprovedEnrollmentDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ApprovedEnrollmentDto>(getEnrollmentApprovalApproveUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(approveEnrollmentRequestDto)
   }
 );}
 
