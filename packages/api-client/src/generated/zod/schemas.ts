@@ -1248,6 +1248,37 @@ export const DirectoryLookupsListDepartmentsResponse = zod.object({
 })
 
 
+export const enrollmentSubmitBodyCaptchaAnswerMax = 12;
+
+export const enrollmentSubmitBodyCaptchaIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+export const enrollmentSubmitBodyDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const enrollmentSubmitBodyFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const enrollmentSubmitBodyPasswordMin = 12;
+export const enrollmentSubmitBodyPasswordMax = 256;
+
+export const enrollmentSubmitBodySessionRegExp = new RegExp('^(\\d{4})-(\\d{2})$');
+export const enrollmentSubmitBodyUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const EnrollmentSubmitBody = zod.object({
+  "captchaAnswer": zod.string().min(1).max(enrollmentSubmitBodyCaptchaAnswerMax),
+  "captchaId": zod.uuid().regex(enrollmentSubmitBodyCaptchaIdRegExp),
+  "confirmPassword": zod.string().min(1),
+  "departmentId": zod.uuid().regex(enrollmentSubmitBodyDepartmentIdRegExp),
+  "email": zod.string(),
+  "facultyId": zod.uuid().regex(enrollmentSubmitBodyFacultyIdRegExp),
+  "name": zod.string(),
+  "password": zod.string().min(enrollmentSubmitBodyPasswordMin).max(enrollmentSubmitBodyPasswordMax),
+  "session": zod.string().regex(enrollmentSubmitBodySessionRegExp),
+  "universityId": zod.uuid().regex(enrollmentSubmitBodyUniversityIdRegExp)
+})
+
+export const EnrollmentSubmitResponse = zod.object({
+  "accepted": zod.literal(true)
+})
+
+
 export const HealthCheckResponse = zod.object({
   "status": zod.enum(['ok'])
 })

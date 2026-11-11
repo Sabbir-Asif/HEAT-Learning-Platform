@@ -36,6 +36,8 @@ import type {
   DepartmentListResponseDto,
   DepartmentSummaryDto,
   DirectoryOptionListResponseDto,
+  EnrollmentAcceptedResponseDto,
+  EnrollmentRequestDto,
   FacultyListResponseDto,
   FacultySummaryDto,
   HealthResponseDto,
@@ -123,6 +125,8 @@ export const getDirectoryLookupsListUniversitiesResponseMock = (overrideResponse
 export const getDirectoryLookupsListFacultiesResponseMock = (overrideResponse: Partial<Extract<DirectoryOptionListResponseDto, object>> = {}): DirectoryOptionListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
 export const getDirectoryLookupsListDepartmentsResponseMock = (overrideResponse: Partial<Extract<DirectoryOptionListResponseDto, object>> = {}): DirectoryOptionListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
+
+export const getEnrollmentSubmitResponseMock = (overrideResponse: Partial<Extract<EnrollmentAcceptedResponseDto, object>> = {}): EnrollmentAcceptedResponseDto => ({accepted: faker.helpers.arrayElement([true] as const), ...overrideResponse})
 
 export const getHealthCheckResponseMock = (overrideResponse: Partial<Extract<HealthResponseDto, object>> = {}): HealthResponseDto => ({status: faker.helpers.arrayElement(['ok'] as const), ...overrideResponse})
 
@@ -651,6 +655,18 @@ export const getDirectoryLookupsListDepartmentsMockHandler = (overrideResponse?:
   }, options)
 }
 
+export const getEnrollmentSubmitMockHandler = (overrideResponse?: EnrollmentAcceptedResponseDto | ((info: Parameters<HttpResponseResolver<PathParams, EnrollmentRequestDto>>[0]) => Promise<EnrollmentAcceptedResponseDto> | EnrollmentAcceptedResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, EnrollmentRequestDto>('*/api/enrollment', async (info: Parameters<HttpResponseResolver<PathParams, EnrollmentRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getEnrollmentSubmitResponseMock(),
+      { status: 202
+      })
+  }, options)
+}
+
 export const getHealthCheckMockHandler = (overrideResponse?: HealthResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<HealthResponseDto> | HealthResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/health', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -720,6 +736,7 @@ export const getHeatLmsApiMock = () => [
   getDirectoryLookupsListUniversitiesMockHandler(),
   getDirectoryLookupsListFacultiesMockHandler(),
   getDirectoryLookupsListDepartmentsMockHandler(),
+  getEnrollmentSubmitMockHandler(),
   getHealthCheckMockHandler(),
   getMeDescribeMockHandler()
 ]

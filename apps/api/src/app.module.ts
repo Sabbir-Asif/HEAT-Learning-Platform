@@ -8,6 +8,7 @@ import { AuthModule } from "./auth";
 import { CaptchaModule } from "./captcha";
 import { CoreModule } from "./core";
 import { DirectoryModule } from "./directory";
+import { EnrollmentModule } from "./enrollment/enrollment.module";
 import { HealthController } from "./health/health.controller";
 import { HttpApiModule } from "./http/http.module";
 import { MeModule } from "./me/me.module";
@@ -27,6 +28,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     AdminManagementModule,
     CaptchaModule,
     DirectoryModule,
+    EnrollmentModule,
   ],
   controllers: [HealthController],
 })
