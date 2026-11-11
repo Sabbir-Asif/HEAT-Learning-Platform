@@ -29,6 +29,7 @@ import { useState } from "react";
 import { ModuleForm } from "./module-form";
 import { moduleDeleteFailedMessage } from "./modules-copy";
 import { SectionsPanel } from "./sections-panel";
+import { VideoSlotsPanel } from "./video-slots-panel";
 
 type ModuleContentViewProps = { courseId: string; moduleId: string };
 
@@ -114,6 +115,7 @@ export function ModuleContentView({ courseId, moduleId }: ModuleContentViewProps
       <Tabs defaultValue="content">
         <TabsList variant="line">
           <TabsTrigger value="content">Content</TabsTrigger>
+          <TabsTrigger value="video">Video</TabsTrigger>
         </TabsList>
         <TabsContent value="content" className="flex max-w-2xl flex-col gap-8">
           <ModuleForm
@@ -127,6 +129,9 @@ export function ModuleContentView({ courseId, moduleId }: ModuleContentViewProps
             }}
           />
           <SectionsPanel courseId={courseId} module={current} locked={locked} />
+        </TabsContent>
+        <TabsContent value="video" className="flex max-w-2xl flex-col gap-8">
+          <VideoSlotsPanel courseId={courseId} moduleId={moduleId} courseLocked={locked} />
         </TabsContent>
       </Tabs>
     </ShellContent>

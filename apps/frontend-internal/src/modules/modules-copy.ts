@@ -11,6 +11,12 @@ export const moduleDeleteFailedMessage = (title: string): string =>
 export const sectionDeleteFailedMessage = (title: string): string =>
   `${title} could not be removed. Try again.`;
 
+export const videoSlotDeleteFailedMessage = (title: string): string =>
+  `${title} could not be removed. Try again.`;
+
+export const videoSlotLockedMessage =
+  "This course is locked. Video slots cannot be added, removed, reordered or switched between required and optional.";
+
 export const reorderFailedMessage = (code: string | undefined): string => {
   if (code === "ORDER_CONFLICT") {
     return "Someone else changed this order. Reload the list and try again.";
