@@ -7,12 +7,14 @@ import type { AuthenticatedRequest } from "../auth";
 import { APP_CONFIG } from "../core";
 import type { AppConfig } from "../core";
 import { ApiException } from "../http/api-exception";
+import { CSRF_BODY_TOKEN_KEY } from "./access.decorators";
 import { resolveAccessPolicy } from "./access-policy";
 import { constantTimeEqual } from "./constant-time-equal";
 
 interface CsrfRequest extends AuthenticatedRequest {
   method: string;
   headers: AuthenticatedRequest["headers"] & Record<string, string | string[] | undefined>;
+  body?: unknown;
 }
 
 const safeMethods: ReadonlySet<string> = new Set(["GET", "HEAD", "OPTIONS"]);
@@ -21,6 +23,12 @@ const originlessFetchSites: ReadonlySet<string> = new Set(["same-origin", "none"
 
 const single = (value: string | string[] | undefined): string | undefined =>
   typeof value === "string" ? value : undefined;
+
+const bodyToken = (body: unknown): string | undefined => {
+  if (typeof body !== "object" || body === null) return undefined;
+  const value: unknown = Reflect.get(body, "csrfToken");
+  return typeof value === "string" ? value : undefined;
+};
 
 @Injectable()
 export class CsrfGuard implements CanActivate {
@@ -40,7 +48,11 @@ export class CsrfGuard implements CanActivate {
     this.assertOrigin(request);
     const policy = resolveAccessPolicy(this.reflector, [context.getHandler(), context.getClass()]);
     if (policy.kind !== "protected") return true;
-    this.assertToken(request);
+    const bodyToken = this.reflector.getAllAndOverride<boolean | undefined>(CSRF_BODY_TOKEN_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    this.assertToken(request, bodyToken === true);
     return true;
   }
 
@@ -61,9 +73,10 @@ export class CsrfGuard implements CanActivate {
     }
   }
 
-  private assertToken(request: CsrfRequest): void {
+  private assertToken(request: CsrfRequest, allowBody: boolean): void {
     const session = request.authSession;
-    const header = single(request.headers[csrfHeaderName]);
+    const header =
+      single(request.headers[csrfHeaderName]) ?? (allowBody ? bodyToken(request.body) : undefined);
     const cookie =
       session === undefined
         ? undefined
