@@ -50,7 +50,9 @@ export function ModuleForm({
   const { reset } = form;
   const { isDirty } = form.formState;
   const dirtyRef = useRef(isDirty);
-  dirtyRef.current = isDirty;
+  useEffect(() => {
+    dirtyRef.current = isDirty;
+  }, [isDirty]);
   const shownId = useRef(module?.id);
   useEffect(() => {
     if (dirtyRef.current && shownId.current === module?.id) return;
