@@ -119,8 +119,8 @@ For any change to a screen, in either frontend or in `@heat/ui`. A failed item b
 
 New code copies the first implementation of its pattern. Each ticket that lands the first of a pattern fills in its row.
 
-| Pattern | Reference                                                                  |
-| ------- | -------------------------------------------------------------------------- |
-| Module  | `apps/api/src/directory` (controller, service, DTOs, `@Audited` writes)    |
-| Form    | `packages/ui/src/composites/form.tsx` (`Form`, `FormField`, `FormMessage`) |
-| Job     | none yet; the first worker job to land is added here                       |
+| Pattern | Reference                                                                                                       |
+| ------- | --------------------------------------------------------------------------------------------------------------- |
+| Module  | `apps/api/src/directory` (controller, service, DTOs, `@Audited` writes)                                         |
+| Form    | `packages/ui/src/composites/form.tsx` (`Form`, `FormField`, `FormMessage`)                                      |
+| Job     | `apps/worker/src/outbox` and `apps/worker/src/email/email-delivery.ts` (logic behind ports, adapters kept thin) |
