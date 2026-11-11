@@ -1,6 +1,6 @@
 # 0020. HLS rendition ladder and FFmpeg flags
 
-- Status: Proposed (one of Proposed, Accepted, Superseded by NNNN)
+- Status: Proposed
 - Date: 2026-11-11
 - Plan: [D5, section 02 Design decisions](../plan/heat-lms-project-plan.html#decisions), Critical flows (rendition table)
 
@@ -21,7 +21,7 @@ The starting ladder, implemented in `apps/worker/src/transcode/ladder.ts`:
 | 720p      | 1100 Kbps     | 1177k   | 2200k   | 96 Kbps AAC | 90 MB           |
 | 1080p     | 2200 Kbps     | 2354k   | 4400k   | 96 Kbps AAC | 188 MB          |
 
-- 720p uses 1100 Kbps, inside the plan's 1.0 to 1.2 Mbps. 1080p uses 2200 Kbps, inside 2.0 to 2.5 Mbps. The plan's 90 MB and 188 MB estimates correspond to the upper ends (1.2 and 2.5 Mbps), so the measured sizes at these values should come in lower.
+- 720p uses 1100 Kbps, inside the plan's 1.0 to 1.2 Mbps. 1080p uses 2200 Kbps, inside 2.0 to 2.5 Mbps. The plan's 30, 49, 90 and 188 MB figures are video only. AAC at 96 Kbps adds about 7 MB per 10 minutes to every rendition, so compare video size to the plan figure and total size to the plan figure plus 7 MB.
 - No upscaling. A source gets the renditions whose height is at or below its own: 720p gives 360p, 480p and 720p; a source taller than 1080p is capped at 1080p. A source below 360p gets one rendition at its own height (rounded down to an even number) at the 360p bitrate, so a very small upload still plays.
 - Segments are about 6 seconds, format MPEG-TS (`-hls_segment_type mpegts`), VOD playlists with `-hls_flags independent_segments`.
 - Keyframes align across renditions because every rendition uses the same frame rate and the same rules: `-r <fps>`, `-g` and `-keyint_min` equal to fps times 6, `-sc_threshold 0`, and `-force_key_frames expr:gte(t,n_forced*6)`. The frame rate comes from ffprobe and is capped at 30.
@@ -30,7 +30,7 @@ The starting ladder, implemented in `apps/worker/src/transcode/ladder.ts`:
 The command per rendition (arguments are passed as an array, never through a shell):
 
 ```
-nice -n 19 ffmpeg -nostdin -y -i <input> -map 0:v:0 -map 0:a:0?
+nice -n 19 ffmpeg -protocol_whitelist file -nostdin -y -i <input> -map 0:v:0 -map 0:a:0?
   -vf scale=-2:<height> -r <fps>
   -c:v libx264 -preset veryfast -profile:v high -level 4.0 -pix_fmt yuv420p
   -b:v <kbps>k -maxrate <1.07 x kbps>k -bufsize <2 x kbps>k
@@ -51,6 +51,8 @@ What the unit tests prove without FFmpeg: the ladder values, rendition selection
 - E8-7 starts from `ladder.ts` and the verification rules in `ladder-verify.ts`, once the measurements are in and the owner accepts the values.
 - The master playlist `RESOLUTION` assumes 16:9. A source with another aspect ratio is scaled with `scale=-2:<height>` so the real width differs from the declared one. E8-7 should compute the width from the probed source.
 - One FFmpeg process per rendition decodes the source four times. This keeps each command simple and each rendition restartable. If measured encode time is too high, a single process with a split filter graph is the alternative to test.
+- Every FFmpeg and ffprobe call starts with `-protocol_whitelist file`, so a playlist or container cannot make the tool open network or other protocols (worker isolation). This is untested against real HLS input; if ffprobe cannot read `index.m3u8` with it, widen it to `file,crypto` and record that here. The output directory must not contain `%`, because FFmpeg expands it in the segment filename pattern.
+- A source with no audio track produces video-only renditions (`-map 0:a:0?`), but the master playlist still declares `mp4a.40.2` and the audio bandwidth for them. E8-7 should omit both when the probe finds no audio.
 - `-preset veryfast` is a guess that favours VPS cost over file size. The measurement may move it.
 
 ## Alternatives considered
@@ -71,9 +73,9 @@ Commands, run on the target VPS from the repository root after `pnpm --filter wo
 node apps/worker/bin/verify-ladder.mjs <outputDir>
 ```
 
-`encode-ladder.mjs` prints wall seconds and megabytes per rendition. `/usr/bin/time -v` reports total CPU time and peak memory. Scale encode time to 10 minutes of source if the footage is longer or shorter. Repeat once with a 720p copy of the source (`ffmpeg -i <input.mp4> -vf scale=-2:720 -c:a copy <input-720p.mp4>`) to confirm no 1080p rendition is produced. Open `master.m3u8` in hls.js and in Safari, and switch qualities mid-stream.
+`encode-ladder.mjs` prints wall seconds and total megabytes per rendition, audio included. Record the total, and subtract about 7 MB (or measure the audio stream alone) to compare with the video-only plan figure. `/usr/bin/time -v` reports total CPU time and peak memory. Scale encode time to 10 minutes of source if the footage is longer or shorter. Repeat once with a 720p copy of the source (`ffmpeg -i <input.mp4> -vf scale=-2:720 -c:a copy <input-720p.mp4>`) to confirm no 1080p rendition is produced. Open `master.m3u8` in hls.js and in Safari, and switch qualities mid-stream.
 
-| Footage      | Rendition | Encode wall time per 10 min | CPU time per 10 min | Size per 10 min | Plan estimate | Result |
+| Footage      | Rendition | Encode wall time per 10 min | CPU time per 10 min | Size per 10 min | Plan estimate (video only, add about 7 MB audio) | Result |
 | ------------ | --------- | --------------------------- | ------------------- | --------------- | ------------- | ------ |
 | Talking head | 360p      | pending                     | pending             | pending         | 30 MB         | pending |
 | Talking head | 480p      | pending                     | pending             | pending         | 49 MB         | pending |
