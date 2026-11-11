@@ -9,6 +9,9 @@ import { QuizAccessController } from "./quiz-access.controller";
 import { QuizDeliveryController } from "./quiz-delivery.controller";
 import { QuizDeliveryService } from "./quiz-delivery.service";
 import { QuizGateService } from "./quiz-gate";
+import { QuizSubmissionController } from "./quiz-submission.controller";
+import { QuizSubmissionService } from "./quiz-submission.service";
+import { QUIZ_SCORED_HANDLERS } from "./quiz-scored-handler";
 import { LearningStructureService } from "./learning-structure.service";
 
 @Module({
@@ -18,8 +21,16 @@ import { LearningStructureService } from "./learning-structure.service";
     LessonContentController,
     QuizAccessController,
     QuizDeliveryController,
+    QuizSubmissionController,
   ],
-  providers: [LearningStructureService, LessonContentService, QuizGateService, QuizDeliveryService],
+  providers: [
+    LearningStructureService,
+    LessonContentService,
+    QuizGateService,
+    QuizDeliveryService,
+    QuizSubmissionService,
+    { provide: QUIZ_SCORED_HANDLERS, useFactory: () => [] },
+  ],
   exports: [QuizGateService],
 })
 export class LearningModule {}
