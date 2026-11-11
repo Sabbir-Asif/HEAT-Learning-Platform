@@ -1,6 +1,7 @@
 export const SEGMENT_SECONDS = 6;
 
 const AUDIO_KBPS = 96;
+const LOWEST_VIDEO_KBPS = 400;
 const MAXRATE_FACTOR = 1.07;
 const BUFSIZE_FACTOR = 2;
 const CODECS = "avc1.640028,mp4a.40.2";
@@ -22,7 +23,7 @@ const rung = (height: number, width: number, videoKbps: number): Rendition => ({
 });
 
 export const LADDER: readonly Rendition[] = [
-  rung(360, 640, 400),
+  rung(360, 640, LOWEST_VIDEO_KBPS),
   rung(480, 854, 650),
   rung(720, 1280, 1100),
   rung(1080, 1920, 2200),
@@ -37,7 +38,7 @@ export function selectRenditions(sourceHeight: number): Rendition[] {
   const fitting = LADDER.filter((r) => r.height <= sourceHeight);
   if (fitting.length > 0) return fitting;
   const height = Math.max(2, sourceHeight - (sourceHeight % 2));
-  return [{ ...rung(height, evenWidthFor(height), LADDER[0].videoKbps) }];
+  return [{ ...rung(height, evenWidthFor(height), LOWEST_VIDEO_KBPS) }];
 }
 
 export function gopFrames(fps: number): number {

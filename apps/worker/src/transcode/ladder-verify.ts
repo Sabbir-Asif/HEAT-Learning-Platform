@@ -13,7 +13,8 @@ export function parseTimes(text: string): number[] {
 
 export function keyframesAligned(a: readonly number[], b: readonly number[]): boolean {
   return (
-    a.length === b.length && a.every((t, i) => Math.abs(t - b[i]) <= KEYFRAME_TOLERANCE_SECONDS)
+    a.length === b.length &&
+    a.every((t, i) => Math.abs(t - (b[i] ?? Number.NaN)) <= KEYFRAME_TOLERANCE_SECONDS)
   );
 }
 

@@ -60,11 +60,12 @@ describe("gopFrames", () => {
 
 describe("buildRenditionArgs", () => {
   const options = { input: "/work/in.mp4", outputDir: "/work/out", fps: 25 };
-  const argsFor = (name: string) => {
-    const rendition = LADDER.find((r) => r.name === name);
-    if (!rendition) throw new Error(name);
-    return buildRenditionArgs(rendition, options);
+  const rendition = (name: string) => {
+    const found = LADDER.find((r) => r.name === name);
+    if (!found) throw new Error(name);
+    return found;
   };
+  const argsFor = (name: string) => buildRenditionArgs(rendition(name), options);
   const valueAfter = (args: string[], flag: string) => args[args.indexOf(flag) + 1];
 
   test("returns an argument array with no shell string", () => {
@@ -114,7 +115,7 @@ describe("buildRenditionArgs", () => {
   });
 
   test("rejects a frame rate that is not positive", () => {
-    expect(() => buildRenditionArgs(LADDER[0], { ...options, fps: 0 })).toThrow();
+    expect(() => buildRenditionArgs(rendition("360p"), { ...options, fps: 0 })).toThrow();
   });
 });
 
@@ -129,8 +130,7 @@ describe("buildMasterPlaylist", () => {
   });
 
   test("declares version, independent segments, bandwidth, resolution and codecs", () => {
-    const [first] = selectRenditions(360);
-    const lines = buildMasterPlaylist([first]).trimEnd().split("\n");
+    const lines = buildMasterPlaylist(selectRenditions(360)).trimEnd().split("\n");
     expect(lines).toEqual([
       "#EXTM3U",
       "#EXT-X-VERSION:3",
