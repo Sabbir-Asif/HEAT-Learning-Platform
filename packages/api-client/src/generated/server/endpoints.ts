@@ -1075,6 +1075,37 @@ export interface LearningStructureResponseDto {
   learning: LearningStructureResponseDtoLearning;
 }
 
+export type LessonContentResponseDtoModule = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  objectives: string[];
+  title: string;
+};
+
+export type LessonContentResponseDtoSectionsItemBody = {[key: string]: unknown};
+
+export type LessonContentResponseDtoSectionsItem = {
+  body: LessonContentResponseDtoSectionsItemBody;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  schemaVersion: number;
+  title: string;
+};
+
+export interface LessonContentResponseDto {
+  module: LessonContentResponseDtoModule;
+  sections: LessonContentResponseDtoSectionsItem[];
+}
+
 export interface LessonSectionRequestDto {
   title: string;
 }
@@ -4052,6 +4083,29 @@ export const getLearningStructureUrl = (courseId: string,) => {
 export const learningStructure = async (courseId: string, options?: Parameters<typeof serverFetch>[1]): Promise<LearningStructureResponseDto> => {
 
   return serverFetch<LearningStructureResponseDto>(getLearningStructureUrl(courseId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getLessonContentReadUrl = (courseId: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/lesson`
+}
+
+export const lessonContentRead = async (courseId: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<LessonContentResponseDto> => {
+
+  return serverFetch<LessonContentResponseDto>(getLessonContentReadUrl(courseId,moduleId),
   {
     ...options,
     method: 'GET'

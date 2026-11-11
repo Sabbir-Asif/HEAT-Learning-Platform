@@ -2788,6 +2788,41 @@ export const LearningStructureResponse = zod.object({
 })
 
 
+export const lessonContentReadPathCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonContentReadPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const LessonContentReadParams = zod.object({
+  "courseId": zod.uuid().regex(lessonContentReadPathCourseIdRegExp),
+  "moduleId": zod.uuid().regex(lessonContentReadPathModuleIdRegExp)
+})
+
+export const lessonContentReadResponseModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonContentReadResponseSectionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonContentReadResponseSectionsItemOrderMin = -9007199254740991;
+export const lessonContentReadResponseSectionsItemOrderMax = 9007199254740991;
+
+export const lessonContentReadResponseSectionsItemSchemaVersionMin = -9007199254740991;
+export const lessonContentReadResponseSectionsItemSchemaVersionMax = 9007199254740991;
+
+
+
+export const LessonContentReadResponse = zod.object({
+  "module": zod.object({
+  "id": zod.uuid().regex(lessonContentReadResponseModuleIdRegExp),
+  "objectives": zod.array(zod.string()),
+  "title": zod.string()
+}),
+  "sections": zod.array(zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "id": zod.uuid().regex(lessonContentReadResponseSectionsItemIdRegExp),
+  "order": zod.int().min(lessonContentReadResponseSectionsItemOrderMin).max(lessonContentReadResponseSectionsItemOrderMax),
+  "schemaVersion": zod.int().min(lessonContentReadResponseSectionsItemSchemaVersionMin).max(lessonContentReadResponseSectionsItemSchemaVersionMax),
+  "title": zod.string()
+}))
+})
+
+
 export const directoryLookupsListUniversitiesResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 

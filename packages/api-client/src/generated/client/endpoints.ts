@@ -66,6 +66,7 @@ import type {
   InvitationLookupResponseDto,
   InviteAdminRequestDto,
   LearningStructureResponseDto,
+  LessonContentResponseDto,
   LessonSectionRequestDto,
   MeResponseDto,
   ModuleListResponseDto,
@@ -6441,6 +6442,109 @@ export function useLearningStructure<TData = Awaited<ReturnType<typeof learningS
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getLearningStructureQueryOptions(courseId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getLessonContentReadUrl = (courseId: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/lesson`
+}
+
+export const lessonContentRead = async (courseId: string,
+    moduleId: string, options?: Parameters<typeof customFetch>[1]): Promise<LessonContentResponseDto> => {
+
+  return customFetch<LessonContentResponseDto>(getLessonContentReadUrl(courseId,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getLessonContentReadQueryKey = (courseId: string,
+    moduleId: string,) => {
+    return [
+    `/api/courses/${courseId}/modules/${moduleId}/lesson`
+    ] as const;
+    }
+
+
+export const getLessonContentReadQueryOptions = <TData = Awaited<ReturnType<typeof lessonContentRead>>, TError = ErrorType<unknown>>(courseId: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof lessonContentRead>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getLessonContentReadQueryKey(courseId,moduleId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof lessonContentRead>>> = ({ signal }) => lessonContentRead(courseId,moduleId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: courseId !== null && courseId !== undefined && moduleId !== null && moduleId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof lessonContentRead>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type LessonContentReadQueryResult = NonNullable<Awaited<ReturnType<typeof lessonContentRead>>>
+export type LessonContentReadQueryError = ErrorType<unknown>
+
+
+export function useLessonContentRead<TData = Awaited<ReturnType<typeof lessonContentRead>>, TError = ErrorType<unknown>>(
+ courseId: string,
+    moduleId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof lessonContentRead>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lessonContentRead>>,
+          TError,
+          Awaited<ReturnType<typeof lessonContentRead>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useLessonContentRead<TData = Awaited<ReturnType<typeof lessonContentRead>>, TError = ErrorType<unknown>>(
+ courseId: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof lessonContentRead>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lessonContentRead>>,
+          TError,
+          Awaited<ReturnType<typeof lessonContentRead>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useLessonContentRead<TData = Awaited<ReturnType<typeof lessonContentRead>>, TError = ErrorType<unknown>>(
+ courseId: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof lessonContentRead>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useLessonContentRead<TData = Awaited<ReturnType<typeof lessonContentRead>>, TError = ErrorType<unknown>>(
+ courseId: string,
+    moduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof lessonContentRead>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getLessonContentReadQueryOptions(courseId,moduleId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
