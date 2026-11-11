@@ -27,6 +27,7 @@ export const errorCodes = [
   "INVITATION_EXPIRED",
   "INVITATION_INVALID",
   "INVITATION_NOT_PENDING",
+  "MODULE_LOCKED",
   "NOT_FOUND",
   "ORDER_CONFLICT",
   "ORIGIN_NOT_ALLOWED",
@@ -44,6 +45,7 @@ export const errorCodes = [
   "VERIFICATION_LINK_USED",
   "VERIFICATION_RESEND_LIMIT",
   "VIDEO_NOT_FAILED",
+  "VIDEO_NOT_READY",
 ] as const;
 
 export const clientErrorCodes = [

@@ -36,6 +36,7 @@ export type FormErrorCopyKey =
   | "INVITATION_EXPIRED"
   | "INVITATION_INVALID"
   | "INVITATION_NOT_PENDING"
+  | "MODULE_LOCKED"
   | "NOT_FOUND"
   | "ORDER_CONFLICT"
   | "ORIGIN_NOT_ALLOWED"
@@ -53,6 +54,7 @@ export type FormErrorCopyKey =
   | "VERIFICATION_LINK_USED"
   | "VERIFICATION_RESEND_LIMIT"
   | "VIDEO_NOT_FAILED"
+  | "VIDEO_NOT_READY"
   | "NETWORK_ERROR"
   | "REQUEST_ABORTED"
   | "UNEXPECTED_RESPONSE";
@@ -103,6 +105,7 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   INVITATION_EXPIRED: "This invitation has expired. Ask the super admin to send a new one.",
   INVITATION_INVALID: "This invitation link is not valid.",
   INVITATION_NOT_PENDING: "This admin has no pending invitation.",
+  MODULE_LOCKED: "This module is locked until you finish the previous one.",
   NOT_FOUND: "This item could not be found. It may have been removed.",
   ORDER_CONFLICT: "Someone else changed this order. Reload the list and try again.",
   ORIGIN_NOT_ALLOWED: "This request did not come from an allowed site.",
@@ -121,6 +124,7 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   VERIFICATION_RESEND_LIMIT:
     "Too many verification emails were requested. Contact support if you still need help.",
   VIDEO_NOT_FAILED: "Only a video whose processing failed can be retried.",
+  VIDEO_NOT_READY: "This video is not ready to play yet.",
   NETWORK_ERROR: "The connection failed. Check your network and try again.",
   REQUEST_ABORTED: "The request was cancelled. Try again.",
   UNEXPECTED_RESPONSE: "The server sent an unexpected reply. Try again in a moment.",
