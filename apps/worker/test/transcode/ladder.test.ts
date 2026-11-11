@@ -98,7 +98,14 @@ describe("buildRenditionArgs", () => {
   });
 
   test("keyframe and segment parameters are identical across renditions", () => {
-    const keyframeFlags = ["-g", "-keyint_min", "-sc_threshold", "-force_key_frames", "-r", "-hls_time"];
+    const keyframeFlags = [
+      "-g",
+      "-keyint_min",
+      "-sc_threshold",
+      "-force_key_frames",
+      "-r",
+      "-hls_time",
+    ];
     const reference = keyframeFlags.map((f) => valueAfter(argsFor("360p"), f));
     expect(reference).toEqual(["150", "150", "0", "expr:gte(t,n_forced*6)", "25", "6"]);
     for (const { name } of LADDER) {

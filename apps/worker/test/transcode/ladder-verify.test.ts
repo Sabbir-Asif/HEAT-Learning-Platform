@@ -28,7 +28,8 @@ describe("keyframesAligned", () => {
 
 describe("parseMediaPlaylistDurations", () => {
   test("reads every EXTINF duration", () => {
-    const text = "#EXTM3U\n#EXTINF:6.000000,\na.ts\n#EXTINF:6.000000,\nb.ts\n#EXTINF:2.4,\nc.ts\n#EXT-X-ENDLIST\n";
+    const text =
+      "#EXTM3U\n#EXTINF:6.000000,\na.ts\n#EXTINF:6.000000,\nb.ts\n#EXTINF:2.4,\nc.ts\n#EXT-X-ENDLIST\n";
     expect(parseMediaPlaylistDurations(text)).toEqual([6, 6, 2.4]);
   });
 });
