@@ -1,15 +1,4 @@
-export interface InlineText {
-  kind: "text";
-  text: string;
-  bold: boolean;
-  italic: boolean;
-  href: string | null;
-}
-
-export type LessonBlock =
-  | { kind: "paragraph"; children: InlineText[] }
-  | { kind: "heading"; level: 2 | 3 | 4; children: InlineText[] }
-  | { kind: "list"; ordered: boolean; items: InlineText[][] };
+import type { LessonBlock, LessonInline } from "@heat/ui";
 
 const allowedProtocols: readonly string[] = ["https:", "mailto:"];
 
@@ -33,9 +22,14 @@ export const safeHref = (value: unknown): string | null => {
 };
 
 const marksOf = (node: Node): Node[] =>
-  Array.isArray(node.marks) ? node.marks.flatMap((mark) => asNode(mark) ?? []) : [];
+  Array.isArray(node.marks)
+    ? node.marks.flatMap((mark: unknown): Node[] => {
+        const entry = asNode(mark);
+        return entry === null ? [] : [entry];
+      })
+    : [];
 
-const inlineOf = (value: unknown): InlineText | null => {
+const inlineOf = (value: unknown): LessonInline | null => {
   const node = asNode(value);
   if (node === null || node.type !== "text" || typeof node.text !== "string") return null;
   const marks = marksOf(node);
@@ -49,10 +43,10 @@ const inlineOf = (value: unknown): InlineText | null => {
   };
 };
 
-const inlinesOf = (node: Node): InlineText[] =>
+const inlinesOf = (node: Node): LessonInline[] =>
   childrenOf(node).flatMap((child) => inlineOf(child) ?? []);
 
-const itemOf = (value: unknown): InlineText[] | null => {
+const itemOf = (value: unknown): LessonInline[] | null => {
   const node = asNode(value);
   if (node === null || node.type !== "listItem") return null;
   const inlines = childrenOf(node).flatMap((child) => {
@@ -82,7 +76,7 @@ const blockOf = (value: unknown): LessonBlock | null => {
   if (node.type === "bulletList" || node.type === "orderedList") {
     const items = childrenOf(node)
       .map(itemOf)
-      .filter((item): item is InlineText[] => item !== null);
+      .filter((item): item is LessonInline[] => item !== null);
     return items.length === 0
       ? null
       : { kind: "list", ordered: node.type === "orderedList", items };

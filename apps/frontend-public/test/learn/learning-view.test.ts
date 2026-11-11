@@ -3,7 +3,10 @@ import { describe, expect, test } from "vitest";
 import {
   enrollmentNotice,
   lessonViewOf,
+  moduleActionLabel,
   moduleHref,
+  quizSummaryOf,
+  videoStatusText,
   moduleStateLabel,
   quizActionOf,
   watchRequirementOf,
@@ -241,5 +244,55 @@ describe("lessonViewOf", () => {
 
     expect(view).toMatchObject({ kind: "ready", module: { id: uuid(11) }, courseSlug: "heat" });
     expect(view.kind === "ready" && view.modules).toEqual(modules);
+  });
+});
+
+describe("moduleActionLabel", () => {
+  test("names the next step for each openable state", () => {
+    expect(moduleActionLabel.UNLOCKED).toBe("Start");
+    expect(moduleActionLabel.IN_PROGRESS).toBe("Continue");
+    expect(moduleActionLabel.QUIZ_READY).toBe("Continue");
+    expect(moduleActionLabel.COMPLETED).toBe("Review");
+  });
+});
+
+describe("videoStatusText", () => {
+  const video = (status: LearningModule["videos"][number]["status"], coveragePercent = 0) => ({
+    id: uuid(50),
+    order: 1,
+    title: "Welcome",
+    required: true,
+    durationSeconds: 60,
+    status,
+    coveragePercent,
+    resumePositionSeconds: 0,
+  });
+
+  test.each([
+    [video("UNAVAILABLE"), "This video is not available yet."],
+    [video("NOT_STARTED"), "Not started"],
+    [video("IN_PROGRESS", 40), "40% watched"],
+    [video("COMPLETED", 100), "Watched"],
+  ])("describes the video", (entry, text) => {
+    expect(videoStatusText(entry)).toBe(text);
+  });
+});
+
+describe("quizSummaryOf", () => {
+  test("summarises the quiz for the module list", () => {
+    expect(quizSummaryOf("heat", module_(1, { quiz: null }))).toBeNull();
+    expect(quizSummaryOf("heat", module_(1, { state: "COMPLETED" }))).toBe("Quiz passed");
+    expect(
+      quizSummaryOf(
+        "heat",
+        module_(1, {
+          state: "QUIZ_READY",
+          quiz: { ...module_(1).quiz!, availability: "AVAILABLE" },
+        }),
+      ),
+    ).toBe("Quiz available");
+    expect(quizSummaryOf("heat", module_(1, { state: "UNLOCKED" }))).toBe(
+      "Watch the 2 required videos to at least 80% to unlock the quiz.",
+    );
   });
 });

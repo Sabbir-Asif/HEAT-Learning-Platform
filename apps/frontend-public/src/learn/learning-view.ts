@@ -16,6 +16,29 @@ export const moduleStateLabel: Record<LearningModuleState, string> = {
   COMPLETED: "Completed",
 };
 
+export const moduleActionLabel: Record<LearningModuleState, string> = {
+  LOCKED: "Locked",
+  UNLOCKED: "Start",
+  IN_PROGRESS: "Continue",
+  QUIZ_READY: "Continue",
+  COMPLETED: "Review",
+};
+
+export const videoStatusText = (video: LearningModule["videos"][number]): string => {
+  if (video.status === "UNAVAILABLE") return "This video is not available yet.";
+  if (video.status === "COMPLETED") return "Watched";
+  if (video.status === "IN_PROGRESS") return `${video.coveragePercent}% watched`;
+  return "Not started";
+};
+
+export const quizSummaryOf = (courseSlug: string, module: LearningModule): string | null => {
+  const action = quizActionOf(courseSlug, module);
+  if (action.kind === "none") return null;
+  if (action.kind === "done") return "Quiz passed";
+  if (action.kind === "open") return "Quiz available";
+  return action.reason;
+};
+
 export const moduleHref = (courseSlug: string, moduleId: string): string =>
   `/learn/${encodeURIComponent(courseSlug)}/${encodeURIComponent(moduleId)}`;
 
@@ -149,11 +172,11 @@ export const lessonViewOf = (response: LearningStructureResponse, moduleId: stri
   }
   const { modules } = response.learning;
   const index = modules.findIndex((entry) => entry.id === moduleId);
-  const module = modules[index];
-  if (module === undefined) return { kind: "missing" };
+  const entry = modules[index];
+  if (entry === undefined) return { kind: "missing" };
   const courseSlug = response.course.slug;
-  if (module.state === "LOCKED") {
-    return { kind: "locked", module, reason: lockedReason(modules, index), courseSlug };
+  if (entry.state === "LOCKED") {
+    return { kind: "locked", module: entry, reason: lockedReason(modules, index), courseSlug };
   }
-  return { kind: "ready", module, modules, courseSlug, courseTitle: response.course.title };
+  return { kind: "ready", module: entry, modules, courseSlug, courseTitle: response.course.title };
 };
