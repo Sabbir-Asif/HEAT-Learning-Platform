@@ -2663,6 +2663,131 @@ export const CaptchaIssueResponse = zod.object({
 })
 
 
+export const learningStructurePathCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const LearningStructureParams = zod.object({
+  "courseId": zod.uuid().regex(learningStructurePathCourseIdRegExp)
+})
+
+export const learningStructureResponseCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const learningStructureResponseEnrollmentReasonMax = 500;
+
+export const learningStructureResponseLearningModulesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const learningStructureResponseLearningModulesItemLessonSectionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const learningStructureResponseLearningModulesItemLessonSectionsItemOrderMin = -9007199254740991;
+export const learningStructureResponseLearningModulesItemLessonSectionsItemOrderMax = 9007199254740991;
+
+export const learningStructureResponseLearningModulesItemOrderMin = -9007199254740991;
+export const learningStructureResponseLearningModulesItemOrderMax = 9007199254740991;
+
+export const learningStructureResponseLearningModulesItemQuizAttemptsAllowedMin = 0;
+export const learningStructureResponseLearningModulesItemQuizAttemptsAllowedMax = 9007199254740991;
+
+export const learningStructureResponseLearningModulesItemQuizAttemptsUsedMin = 0;
+export const learningStructureResponseLearningModulesItemQuizAttemptsUsedMax = 9007199254740991;
+
+export const learningStructureResponseLearningModulesItemQuizIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const learningStructureResponseLearningModulesItemQuizNextAttemptAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const learningStructureResponseLearningModulesItemQuizPassMarkPercentMin = 0;
+export const learningStructureResponseLearningModulesItemQuizPassMarkPercentMax = 100;
+
+export const learningStructureResponseLearningModulesItemQuizQuestionCountMin = 0;
+export const learningStructureResponseLearningModulesItemQuizQuestionCountMax = 9007199254740991;
+
+export const learningStructureResponseLearningModulesItemRequiredVideosCompletedMin = 0;
+export const learningStructureResponseLearningModulesItemRequiredVideosCompletedMax = 9007199254740991;
+
+export const learningStructureResponseLearningModulesItemRequiredVideosTotalMin = 0;
+export const learningStructureResponseLearningModulesItemRequiredVideosTotalMax = 9007199254740991;
+
+export const learningStructureResponseLearningModulesItemVideosItemCoveragePercentMin = 0;
+export const learningStructureResponseLearningModulesItemVideosItemCoveragePercentMax = 100;
+
+export const learningStructureResponseLearningModulesItemVideosItemDurationSecondsMin = 0;
+export const learningStructureResponseLearningModulesItemVideosItemDurationSecondsMax = 9007199254740991;
+
+export const learningStructureResponseLearningModulesItemVideosItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const learningStructureResponseLearningModulesItemVideosItemOrderMin = -9007199254740991;
+export const learningStructureResponseLearningModulesItemVideosItemOrderMax = 9007199254740991;
+
+export const learningStructureResponseLearningModulesItemVideosItemResumePositionSecondsMin = 0;
+export const learningStructureResponseLearningModulesItemVideosItemResumePositionSecondsMax = 9007199254740991;
+
+export const learningStructureResponseLearningRevisionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const learningStructureResponseLearningRevisionNumberMin = -9007199254740991;
+export const learningStructureResponseLearningRevisionNumberMax = 9007199254740991;
+
+export const learningStructureResponseLearningSummaryModulesCompletedMin = 0;
+export const learningStructureResponseLearningSummaryModulesCompletedMax = 9007199254740991;
+
+export const learningStructureResponseLearningSummaryModulesTotalMin = 0;
+export const learningStructureResponseLearningSummaryModulesTotalMax = 9007199254740991;
+
+export const learningStructureResponseLearningSummaryNextModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const learningStructureResponseLearningSummaryOverallProgressPercentMin = 0;
+export const learningStructureResponseLearningSummaryOverallProgressPercentMax = 100;
+
+
+
+export const LearningStructureResponse = zod.object({
+  "course": zod.object({
+  "id": zod.uuid().regex(learningStructureResponseCourseIdRegExp),
+  "slug": zod.string(),
+  "title": zod.string()
+}),
+  "enrollment": zod.object({
+  "reason": zod.string().max(learningStructureResponseEnrollmentReasonMax).nullable(),
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED'])
+}),
+  "learning": zod.object({
+  "modules": zod.array(zod.object({
+  "id": zod.uuid().regex(learningStructureResponseLearningModulesItemIdRegExp),
+  "lessonSections": zod.array(zod.object({
+  "id": zod.uuid().regex(learningStructureResponseLearningModulesItemLessonSectionsItemIdRegExp),
+  "order": zod.int().min(learningStructureResponseLearningModulesItemLessonSectionsItemOrderMin).max(learningStructureResponseLearningModulesItemLessonSectionsItemOrderMax),
+  "title": zod.string()
+})),
+  "objectives": zod.array(zod.string()),
+  "order": zod.int().min(learningStructureResponseLearningModulesItemOrderMin).max(learningStructureResponseLearningModulesItemOrderMax),
+  "quiz": zod.object({
+  "attemptsAllowed": zod.int().min(learningStructureResponseLearningModulesItemQuizAttemptsAllowedMin).max(learningStructureResponseLearningModulesItemQuizAttemptsAllowedMax).nullable(),
+  "attemptsUsed": zod.int().min(learningStructureResponseLearningModulesItemQuizAttemptsUsedMin).max(learningStructureResponseLearningModulesItemQuizAttemptsUsedMax),
+  "availability": zod.enum(['UNAVAILABLE', 'AVAILABLE', 'WAITING', 'EXHAUSTED', 'PASSED']),
+  "id": zod.uuid().regex(learningStructureResponseLearningModulesItemQuizIdRegExp),
+  "nextAttemptAt": zod.iso.datetime({"offset":true}).regex(learningStructureResponseLearningModulesItemQuizNextAttemptAtRegExp).nullable(),
+  "passMarkPercent": zod.int().min(learningStructureResponseLearningModulesItemQuizPassMarkPercentMin).max(learningStructureResponseLearningModulesItemQuizPassMarkPercentMax),
+  "questionCount": zod.int().min(learningStructureResponseLearningModulesItemQuizQuestionCountMin).max(learningStructureResponseLearningModulesItemQuizQuestionCountMax)
+}).nullable(),
+  "requiredVideosCompleted": zod.int().min(learningStructureResponseLearningModulesItemRequiredVideosCompletedMin).max(learningStructureResponseLearningModulesItemRequiredVideosCompletedMax),
+  "requiredVideosTotal": zod.int().min(learningStructureResponseLearningModulesItemRequiredVideosTotalMin).max(learningStructureResponseLearningModulesItemRequiredVideosTotalMax),
+  "state": zod.enum(['LOCKED', 'UNLOCKED', 'IN_PROGRESS', 'QUIZ_READY', 'COMPLETED']),
+  "title": zod.string(),
+  "videos": zod.array(zod.object({
+  "coveragePercent": zod.int().min(learningStructureResponseLearningModulesItemVideosItemCoveragePercentMin).max(learningStructureResponseLearningModulesItemVideosItemCoveragePercentMax),
+  "durationSeconds": zod.int().min(learningStructureResponseLearningModulesItemVideosItemDurationSecondsMin).max(learningStructureResponseLearningModulesItemVideosItemDurationSecondsMax).nullable(),
+  "id": zod.uuid().regex(learningStructureResponseLearningModulesItemVideosItemIdRegExp),
+  "order": zod.int().min(learningStructureResponseLearningModulesItemVideosItemOrderMin).max(learningStructureResponseLearningModulesItemVideosItemOrderMax),
+  "required": zod.boolean(),
+  "resumePositionSeconds": zod.int().min(learningStructureResponseLearningModulesItemVideosItemResumePositionSecondsMin).max(learningStructureResponseLearningModulesItemVideosItemResumePositionSecondsMax),
+  "status": zod.enum(['UNAVAILABLE', 'NOT_STARTED', 'IN_PROGRESS', 'COMPLETED']),
+  "title": zod.string()
+}))
+})),
+  "revision": zod.object({
+  "id": zod.uuid().regex(learningStructureResponseLearningRevisionIdRegExp),
+  "number": zod.int().min(learningStructureResponseLearningRevisionNumberMin).max(learningStructureResponseLearningRevisionNumberMax)
+}),
+  "summary": zod.object({
+  "modulesCompleted": zod.int().min(learningStructureResponseLearningSummaryModulesCompletedMin).max(learningStructureResponseLearningSummaryModulesCompletedMax),
+  "modulesTotal": zod.int().min(learningStructureResponseLearningSummaryModulesTotalMin).max(learningStructureResponseLearningSummaryModulesTotalMax),
+  "nextModuleId": zod.uuid().regex(learningStructureResponseLearningSummaryNextModuleIdRegExp).nullable(),
+  "overallProgressPercent": zod.int().min(learningStructureResponseLearningSummaryOverallProgressPercentMin).max(learningStructureResponseLearningSummaryOverallProgressPercentMax)
+})
+}).nullable()
+})
+
+
 export const directoryLookupsListUniversitiesResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 

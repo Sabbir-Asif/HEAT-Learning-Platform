@@ -863,6 +863,218 @@ export interface InviteAdminRequestDto {
   email: string;
 }
 
+export type LearningStructureResponseDtoCourse = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  slug: string;
+  title: string;
+};
+
+export type LearningStructureResponseDtoEnrollmentStatus = typeof LearningStructureResponseDtoEnrollmentStatus[keyof typeof LearningStructureResponseDtoEnrollmentStatus];
+
+
+export const LearningStructureResponseDtoEnrollmentStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
+export type LearningStructureResponseDtoEnrollment = {
+  /**
+     * @maxLength 500
+     * @nullable
+     */
+  reason: string | null;
+  status: LearningStructureResponseDtoEnrollmentStatus;
+};
+
+export type LearningStructureResponseDtoLearningModulesItemLessonSectionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  title: string;
+};
+
+export type LearningStructureResponseDtoLearningModulesItemQuizAvailability = typeof LearningStructureResponseDtoLearningModulesItemQuizAvailability[keyof typeof LearningStructureResponseDtoLearningModulesItemQuizAvailability];
+
+
+export const LearningStructureResponseDtoLearningModulesItemQuizAvailability = {
+  UNAVAILABLE: 'UNAVAILABLE',
+  AVAILABLE: 'AVAILABLE',
+  WAITING: 'WAITING',
+  EXHAUSTED: 'EXHAUSTED',
+  PASSED: 'PASSED',
+} as const;
+
+/**
+ * @nullable
+ */
+export type LearningStructureResponseDtoLearningModulesItemQuiz = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attemptsAllowed: number | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  attemptsUsed: number;
+  availability: LearningStructureResponseDtoLearningModulesItemQuizAvailability;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  nextAttemptAt: string | null;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  passMarkPercent: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  questionCount: number;
+} | null;
+
+export type LearningStructureResponseDtoLearningModulesItemState = typeof LearningStructureResponseDtoLearningModulesItemState[keyof typeof LearningStructureResponseDtoLearningModulesItemState];
+
+
+export const LearningStructureResponseDtoLearningModulesItemState = {
+  LOCKED: 'LOCKED',
+  UNLOCKED: 'UNLOCKED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  QUIZ_READY: 'QUIZ_READY',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export type LearningStructureResponseDtoLearningModulesItemVideosItemStatus = typeof LearningStructureResponseDtoLearningModulesItemVideosItemStatus[keyof typeof LearningStructureResponseDtoLearningModulesItemVideosItemStatus];
+
+
+export const LearningStructureResponseDtoLearningModulesItemVideosItemStatus = {
+  UNAVAILABLE: 'UNAVAILABLE',
+  NOT_STARTED: 'NOT_STARTED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export type LearningStructureResponseDtoLearningModulesItemVideosItem = {
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  coveragePercent: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  durationSeconds: number | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  required: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  resumePositionSeconds: number;
+  status: LearningStructureResponseDtoLearningModulesItemVideosItemStatus;
+  title: string;
+};
+
+export type LearningStructureResponseDtoLearningModulesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  lessonSections: LearningStructureResponseDtoLearningModulesItemLessonSectionsItem[];
+  objectives: string[];
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  /** @nullable */
+  quiz: LearningStructureResponseDtoLearningModulesItemQuiz;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  requiredVideosCompleted: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  requiredVideosTotal: number;
+  state: LearningStructureResponseDtoLearningModulesItemState;
+  title: string;
+  videos: LearningStructureResponseDtoLearningModulesItemVideosItem[];
+};
+
+export type LearningStructureResponseDtoLearningRevision = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  number: number;
+};
+
+export type LearningStructureResponseDtoLearningSummary = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  modulesCompleted: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  modulesTotal: number;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  nextModuleId: string | null;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  overallProgressPercent: number;
+};
+
+/**
+ * @nullable
+ */
+export type LearningStructureResponseDtoLearning = {
+  modules: LearningStructureResponseDtoLearningModulesItem[];
+  revision: LearningStructureResponseDtoLearningRevision;
+  summary: LearningStructureResponseDtoLearningSummary;
+} | null;
+
+export interface LearningStructureResponseDto {
+  course: LearningStructureResponseDtoCourse;
+  enrollment: LearningStructureResponseDtoEnrollment;
+  /** @nullable */
+  learning: LearningStructureResponseDtoLearning;
+}
+
 export interface LessonSectionRequestDto {
   title: string;
 }
@@ -3824,6 +4036,27 @@ return serverFetch<CaptchaResponseDto>(getCaptchaIssueUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(captchaRequestDto)
+  }
+);}
+
+
+
+export const getLearningStructureUrl = (courseId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/learning-structure`
+}
+
+export const learningStructure = async (courseId: string, options?: Parameters<typeof serverFetch>[1]): Promise<LearningStructureResponseDto> => {
+
+  return serverFetch<LearningStructureResponseDto>(getLearningStructureUrl(courseId),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 
