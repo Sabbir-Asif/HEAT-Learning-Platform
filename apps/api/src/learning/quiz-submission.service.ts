@@ -37,9 +37,9 @@ export class QuizSubmissionService {
     moduleId: string,
     request: QuizSubmitRequest,
   ): Promise<QuizSubmitResponse> {
-    await this.gate.requireUnlocked(userId, courseId, moduleId);
+    const state = await this.gate.requireUnlocked(userId, courseId, moduleId);
     const result = await this.database.$transaction((tx) =>
-      this.score(tx, userId, courseId, moduleId, request),
+      this.score(tx, userId, courseId, moduleId, request, state === "COMPLETED"),
     );
     return toResponse(result);
   }
@@ -50,6 +50,7 @@ export class QuizSubmissionService {
     courseId: string,
     moduleId: string,
     request: QuizSubmitRequest,
+    moduleCompleted: boolean,
   ): Promise<ScoredQuizAttempt> {
     const enrollment = await tx.enrollment.findFirst({
       where: { userId, courseId, deletedAt: null },
@@ -81,6 +82,7 @@ export class QuizSubmissionService {
       }
       return this.replay(tx, attempt.id, attempt.passMarkSnapshot, quiz.questions);
     }
+    if (moduleCompleted) throw new ApiException(409, "QUIZ_ATTEMPT_NOT_OPEN");
     const [submitted, grants] = await Promise.all([
       tx.quizAttempt.findMany({
         where: { enrollmentId: enrollment.id, quizId: quiz.id, submittedAt: { not: null } },
