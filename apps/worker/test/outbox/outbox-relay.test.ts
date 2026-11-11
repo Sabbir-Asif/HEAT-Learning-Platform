@@ -145,13 +145,16 @@ describe("OutboxRelay", () => {
     expect(store.relayedIds).toEqual(["job-1"]);
   });
 
-  test("routes certificate requests to the certificate queue with the outbox id", async () => {
+  test("routes certificate requests to the certificate queue with a job id from the enrollment and event", async () => {
     const { store, certificate, relay } = setup();
     store.unrelayed.push(event("job-2", "certificate.requested", { enrollmentId }));
 
     await relay.relayBatch(10);
 
-    expect(certificate.jobs.get("job-2")).toEqual({ outboxId: "job-2", enrollmentId });
+    expect(certificate.jobs.get(`certificate-${enrollmentId}-job-2`)).toEqual({
+      outboxId: "job-2",
+      enrollmentId,
+    });
   });
 
   test("routes an uploaded video to the probe queue and a queued one to transcode", async () => {
