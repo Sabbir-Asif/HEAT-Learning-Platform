@@ -65,6 +65,7 @@ import type {
   InvitationLookupRequestDto,
   InvitationLookupResponseDto,
   InviteAdminRequestDto,
+  LearningStructureResponseDto,
   LessonSectionRequestDto,
   MeResponseDto,
   ModuleListResponseDto,
@@ -6356,6 +6357,101 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCaptchaIssueMutationOptions(options), queryClient);
     }
+
+export const getLearningStructureUrl = (courseId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/learning-structure`
+}
+
+export const learningStructure = async (courseId: string, options?: Parameters<typeof customFetch>[1]): Promise<LearningStructureResponseDto> => {
+
+  return customFetch<LearningStructureResponseDto>(getLearningStructureUrl(courseId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getLearningStructureQueryKey = (courseId: string,) => {
+    return [
+    `/api/courses/${courseId}/learning-structure`
+    ] as const;
+    }
+
+
+export const getLearningStructureQueryOptions = <TData = Awaited<ReturnType<typeof learningStructure>>, TError = ErrorType<unknown>>(courseId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof learningStructure>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getLearningStructureQueryKey(courseId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof learningStructure>>> = ({ signal }) => learningStructure(courseId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: courseId !== null && courseId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof learningStructure>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type LearningStructureQueryResult = NonNullable<Awaited<ReturnType<typeof learningStructure>>>
+export type LearningStructureQueryError = ErrorType<unknown>
+
+
+export function useLearningStructure<TData = Awaited<ReturnType<typeof learningStructure>>, TError = ErrorType<unknown>>(
+ courseId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof learningStructure>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof learningStructure>>,
+          TError,
+          Awaited<ReturnType<typeof learningStructure>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useLearningStructure<TData = Awaited<ReturnType<typeof learningStructure>>, TError = ErrorType<unknown>>(
+ courseId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof learningStructure>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof learningStructure>>,
+          TError,
+          Awaited<ReturnType<typeof learningStructure>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useLearningStructure<TData = Awaited<ReturnType<typeof learningStructure>>, TError = ErrorType<unknown>>(
+ courseId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof learningStructure>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useLearningStructure<TData = Awaited<ReturnType<typeof learningStructure>>, TError = ErrorType<unknown>>(
+ courseId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof learningStructure>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getLearningStructureQueryOptions(courseId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getDirectoryLookupsListUniversitiesUrl = () => {
 

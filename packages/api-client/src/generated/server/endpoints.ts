@@ -863,6 +863,200 @@ export interface InviteAdminRequestDto {
   email: string;
 }
 
+export type LearningStructureResponseDtoCourse = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  slug: string;
+  title: string;
+};
+
+export type LearningStructureResponseDtoEnrollmentStatus = typeof LearningStructureResponseDtoEnrollmentStatus[keyof typeof LearningStructureResponseDtoEnrollmentStatus];
+
+
+export const LearningStructureResponseDtoEnrollmentStatus = {
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export type LearningStructureResponseDtoEnrollment = {
+  status: LearningStructureResponseDtoEnrollmentStatus;
+};
+
+export type LearningStructureResponseDtoModulesItemLessonSectionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  title: string;
+};
+
+export type LearningStructureResponseDtoModulesItemQuizAvailability = typeof LearningStructureResponseDtoModulesItemQuizAvailability[keyof typeof LearningStructureResponseDtoModulesItemQuizAvailability];
+
+
+export const LearningStructureResponseDtoModulesItemQuizAvailability = {
+  UNAVAILABLE: 'UNAVAILABLE',
+  AVAILABLE: 'AVAILABLE',
+  WAITING: 'WAITING',
+  EXHAUSTED: 'EXHAUSTED',
+  PASSED: 'PASSED',
+} as const;
+
+/**
+ * @nullable
+ */
+export type LearningStructureResponseDtoModulesItemQuiz = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attemptsAllowed: number | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  attemptsUsed: number;
+  availability: LearningStructureResponseDtoModulesItemQuizAvailability;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  nextAttemptAt: string | null;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  passMarkPercent: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  questionCount: number;
+} | null;
+
+export type LearningStructureResponseDtoModulesItemState = typeof LearningStructureResponseDtoModulesItemState[keyof typeof LearningStructureResponseDtoModulesItemState];
+
+
+export const LearningStructureResponseDtoModulesItemState = {
+  LOCKED: 'LOCKED',
+  UNLOCKED: 'UNLOCKED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  QUIZ_READY: 'QUIZ_READY',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export type LearningStructureResponseDtoModulesItemVideosItemStatus = typeof LearningStructureResponseDtoModulesItemVideosItemStatus[keyof typeof LearningStructureResponseDtoModulesItemVideosItemStatus];
+
+
+export const LearningStructureResponseDtoModulesItemVideosItemStatus = {
+  UNAVAILABLE: 'UNAVAILABLE',
+  NOT_STARTED: 'NOT_STARTED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export type LearningStructureResponseDtoModulesItemVideosItem = {
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  coveragePercent: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  durationSeconds: number | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  required: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  resumePositionSeconds: number;
+  status: LearningStructureResponseDtoModulesItemVideosItemStatus;
+  title: string;
+};
+
+export type LearningStructureResponseDtoModulesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  lessonSections: LearningStructureResponseDtoModulesItemLessonSectionsItem[];
+  objectives: string[];
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  /** @nullable */
+  quiz: LearningStructureResponseDtoModulesItemQuiz;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  requiredVideosCompleted: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  requiredVideosTotal: number;
+  state: LearningStructureResponseDtoModulesItemState;
+  title: string;
+  videos: LearningStructureResponseDtoModulesItemVideosItem[];
+};
+
+export type LearningStructureResponseDtoRevision = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  number: number;
+};
+
+export type LearningStructureResponseDtoSummary = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  modulesCompleted: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  modulesTotal: number;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  nextModuleId: string | null;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  overallProgressPercent: number;
+};
+
+export interface LearningStructureResponseDto {
+  course: LearningStructureResponseDtoCourse;
+  enrollment: LearningStructureResponseDtoEnrollment;
+  modules: LearningStructureResponseDtoModulesItem[];
+  revision: LearningStructureResponseDtoRevision;
+  summary: LearningStructureResponseDtoSummary;
+}
+
 export interface LessonSectionRequestDto {
   title: string;
 }
@@ -3824,6 +4018,27 @@ return serverFetch<CaptchaResponseDto>(getCaptchaIssueUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(captchaRequestDto)
+  }
+);}
+
+
+
+export const getLearningStructureUrl = (courseId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/learning-structure`
+}
+
+export const learningStructure = async (courseId: string, options?: Parameters<typeof serverFetch>[1]): Promise<LearningStructureResponseDto> => {
+
+  return serverFetch<LearningStructureResponseDto>(getLearningStructureUrl(courseId),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 
