@@ -100,6 +100,9 @@ describe("deny-by-default route enumeration", () => {
         "videoTranscodeRetry",
       "POST /api/admin/auth/invitations/lookup": "verify",
       "POST /api/admin/auth/invitations/accept": "verify",
+      "POST /api/admin/playback-sessions/:videoId": "playbackSession",
+      "POST /api/videos/:id/playback-session": "playbackSession",
+      "POST /api/videos/:id/playback-session/refresh": "playbackSession",
     });
   });
 
@@ -153,6 +156,9 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/admin/admins/:id/deactivate": "token",
       "POST /api/admin/admins/:id/reactivate": "token",
       "POST /api/admin/admins/:id/resend-invitation": "token",
+      "POST /api/admin/playback-sessions/:videoId": "token",
+      "POST /api/videos/:id/playback-session": "token",
+      "POST /api/videos/:id/playback-session/refresh": "token",
     });
     expect(Object.keys(modes).some((route) => route.startsWith("GET "))).toBe(false);
   });
