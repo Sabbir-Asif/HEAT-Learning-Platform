@@ -33,6 +33,7 @@ import type {
   BulkApprovalResponseDto,
   CaptchaRequestDto,
   CaptchaResponseDto,
+  CertificateListResponseDto,
   ChangePasswordRequestDto,
   CourseListResponseDto,
   CourseSummaryDto,
@@ -106,6 +107,8 @@ export const getAdminAuthCsrfTokenResponseMock = (overrideResponse: Partial<Extr
 export const getAdminInvitationLookupResponseMock = (overrideResponse: Partial<Extract<InvitationLookupResponseDto, object>> = {}): InvitationLookupResponseDto => ({email: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), status: faker.helpers.arrayElement(['VALID','EXPIRED','INVALID'] as const), ...overrideResponse})
 
 export const getAdminAuthSignInResponseMock = (overrideResponse: Partial<Extract<AdminMeResponseDto, object>> = {}): AdminMeResponseDto => ({user: {email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
+
+export const getAdminCertificatesDownloadResponseMock = (): Blob => (new Blob([new Uint8Array(faker.number.int({ min: 1, max: 64 }))]))
 
 export const getCoursesListResponseMock = (overrideResponse: Partial<Extract<CourseListResponseDto, object>> = {}): CourseListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', currentRevision: faker.helpers.arrayElement([{id: faker.string.uuid(), number: faker.number.int({min: 1, max: 9007199254740991}), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])},null,]), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 5000}}), null]), enrollmentCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), lockedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), slug: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['DRAFT','PUBLISHED'] as const), thumbnailAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
 
@@ -219,6 +222,8 @@ export const getVerificationResendResponseMock = (overrideResponse: Partial<Extr
 
 export const getCaptchaIssueResponseMock = (overrideResponse: Partial<Extract<CaptchaResponseDto, object>> = {}): CaptchaResponseDto => ({expiresInSeconds: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), svg: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
+export const getCertificatesDownloadResponseMock = (): Blob => (new Blob([new Uint8Array(faker.number.int({ min: 1, max: 64 }))]))
+
 export const getLearningStructureResponseMock = (overrideResponse: Partial<Extract<LearningStructureResponseDto, object>> = {}): LearningStructureResponseDto => ({course: {id: faker.string.uuid(), slug: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}})}, enrollment: {reason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 500}}), null]), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const)}, learning: faker.helpers.arrayElement([{modules: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), lessonSections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: -9007199254740991, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: -9007199254740991, max: 9007199254740991}), quiz: faker.helpers.arrayElement([{attemptsAllowed: faker.helpers.arrayElement([faker.number.int({min: 0, max: 9007199254740991}), null]), attemptsUsed: faker.number.int({min: 0, max: 9007199254740991}), availability: faker.helpers.arrayElement(['UNAVAILABLE','AVAILABLE','WAITING','EXHAUSTED','PASSED'] as const), id: faker.string.uuid(), nextAttemptAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), passMarkPercent: faker.number.int({min: 0, max: 100}), questionCount: faker.number.int({min: 0, max: 9007199254740991})},null,]), requiredVideosCompleted: faker.number.int({min: 0, max: 9007199254740991}), requiredVideosTotal: faker.number.int({min: 0, max: 9007199254740991}), state: faker.helpers.arrayElement(['LOCKED','UNLOCKED','IN_PROGRESS','QUIZ_READY','COMPLETED'] as const), title: faker.string.alpha({length: {min: 10, max: 20}}), videos: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({coveragePercent: faker.number.int({min: 0, max: 100}), durationSeconds: faker.helpers.arrayElement([faker.number.int({min: 0, max: 9007199254740991}), null]), id: faker.string.uuid(), order: faker.number.int({min: -9007199254740991, max: 9007199254740991}), required: faker.datatype.boolean(), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), status: faker.helpers.arrayElement(['UNAVAILABLE','NOT_STARTED','IN_PROGRESS','COMPLETED'] as const), title: faker.string.alpha({length: {min: 10, max: 20}})}))})), revision: {id: faker.string.uuid(), number: faker.number.int({min: -9007199254740991, max: 9007199254740991})}, summary: {modulesCompleted: faker.number.int({min: 0, max: 9007199254740991}), modulesTotal: faker.number.int({min: 0, max: 9007199254740991}), nextModuleId: faker.helpers.arrayElement([faker.string.uuid(), null]), overallProgressPercent: faker.number.int({min: 0, max: 100})}},null,]), ...overrideResponse})
 
 export const getLessonContentReadResponseMock = (overrideResponse: Partial<Extract<LessonContentResponseDto, object>> = {}): LessonContentResponseDto => ({module: {id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), title: faker.string.alpha({length: {min: 10, max: 20}})}, sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({body: {
@@ -243,7 +248,9 @@ export const getHealthCheckResponseMock = (overrideResponse: Partial<Extract<Hea
 
 export const getMeDescribeResponseMock = (overrideResponse: Partial<Extract<MeResponseDto, object>> = {}): MeResponseDto => ({enrollments: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), reason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const)})), user: {email: faker.string.alpha({length: {min: 10, max: 20}}), emailVerified: faker.datatype.boolean(), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, verificationEmail: faker.helpers.arrayElement([faker.helpers.arrayElement(['ON_ITS_WAY','SENT','FAILED'] as const), null]), verificationEmailSentAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), ...overrideResponse})
 
-export const getDashboardDescribeResponseMock = (overrideResponse: Partial<Extract<DashboardResponseDto, object>> = {}): DashboardResponseDto => ({courses: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({certificateNumber: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 64}}), null]), courseId: faker.string.uuid(), courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), nextModule: faker.helpers.arrayElement([{id: faker.string.uuid(), order: faker.number.int({min: -9007199254740991, max: 9007199254740991}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), resumeVideoId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}})},null,]), progress: faker.helpers.arrayElement([{modulesCompleted: faker.number.int({min: 0, max: 9007199254740991}), modulesTotal: faker.number.int({min: 0, max: 9007199254740991}), percent: faker.number.int({min: 0, max: 100})},null,]), reason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 500}}), null]), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const)})), ...overrideResponse})
+export const getMeCertificatesListResponseMock = (overrideResponse: Partial<Extract<CertificateListResponseDto, object>> = {}): CertificateListResponseDto => ({certificates: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.helpers.arrayElement([faker.string.uuid(), null]), issuedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), number: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 64}}), null]), status: faker.helpers.arrayElement(['READY','PENDING','REVOKED'] as const), verificationUrl: faker.helpers.arrayElement([faker.internet.url(), null])})), ...overrideResponse})
+
+export const getDashboardDescribeResponseMock = (overrideResponse: Partial<Extract<DashboardResponseDto, object>> = {}): DashboardResponseDto => ({courses: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({certificate: faker.helpers.arrayElement([{id: faker.helpers.arrayElement([faker.string.uuid(), null]), status: faker.helpers.arrayElement(['READY','PENDING','REVOKED'] as const)},null,]), courseId: faker.string.uuid(), courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), nextModule: faker.helpers.arrayElement([{id: faker.string.uuid(), order: faker.number.int({min: -9007199254740991, max: 9007199254740991}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), resumeVideoId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}})},null,]), progress: faker.helpers.arrayElement([{modulesCompleted: faker.number.int({min: 0, max: 9007199254740991}), modulesTotal: faker.number.int({min: 0, max: 9007199254740991}), percent: faker.number.int({min: 0, max: 100})},null,]), reason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 500}}), null]), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const)})), ...overrideResponse})
 
 export const getStudentPlaybackStartResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({captions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({language: faker.string.alpha({length: {min: 1, max: 35}})})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', manifestPath: faker.string.alpha({length: {min: 10, max: 20}}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), sessionId: faker.helpers.arrayElement([faker.string.uuid(), null]), ...overrideResponse})
 
@@ -396,6 +403,19 @@ export const getAdminAuthSignOutMockHandler = (overrideResponse?: void | ((info:
 
     return new HttpResponse(null,
       { status: 204
+      })
+  }, options)
+}
+
+export const getAdminCertificatesDownloadMockHandler = (overrideResponse?: Blob | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<Blob> | Blob), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string }>('*/api/admin/certificates/:id/download', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+  const binaryBody = overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminCertificatesDownloadResponseMock();
+    return new HttpResponse(binaryBody,
+      { status: 200,
+        headers: { 'Content-Type': 'application/pdf' }
       })
   }, options)
 }
@@ -1142,6 +1162,19 @@ export const getCaptchaIssueMockHandler = (overrideResponse?: CaptchaResponseDto
   }, options)
 }
 
+export const getCertificatesDownloadMockHandler = (overrideResponse?: Blob | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<Blob> | Blob), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string }>('*/api/certificates/:id/download', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+  const binaryBody = overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCertificatesDownloadResponseMock();
+    return new HttpResponse(binaryBody,
+      { status: 200,
+        headers: { 'Content-Type': 'application/pdf' }
+      })
+  }, options)
+}
+
 export const getLearningStructureMockHandler = (overrideResponse?: LearningStructureResponseDto | ((info: Parameters<HttpResponseResolver<{ courseId: string }>>[0]) => Promise<LearningStructureResponseDto> | LearningStructureResponseDto), options?: RequestHandlerOptions) => {
   return http.get<{ courseId: string }>('*/api/courses/:courseId/learning-structure', async (info: Parameters<HttpResponseResolver<{ courseId: string }>>[0]) => {
 
@@ -1274,6 +1307,18 @@ export const getMeDescribeMockHandler = (overrideResponse?: MeResponseDto | ((in
   }, options)
 }
 
+export const getMeCertificatesListMockHandler = (overrideResponse?: CertificateListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<CertificateListResponseDto> | CertificateListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/me/certificates', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getMeCertificatesListResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getDashboardDescribeMockHandler = (overrideResponse?: DashboardResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<DashboardResponseDto> | DashboardResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/me/dashboard', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1335,6 +1380,7 @@ export const getHeatLmsApiMock = () => [
   getAdminAuthRefreshMockHandler(),
   getAdminAuthSignInMockHandler(),
   getAdminAuthSignOutMockHandler(),
+  getAdminCertificatesDownloadMockHandler(),
   getCoursesListMockHandler(),
   getCoursesCreateMockHandler(),
   getCoursesRemoveMockHandler(),
@@ -1398,6 +1444,7 @@ export const getHeatLmsApiMock = () => [
   getVerificationConfirmMockHandler(),
   getVerificationResendMockHandler(),
   getCaptchaIssueMockHandler(),
+  getCertificatesDownloadMockHandler(),
   getLearningStructureMockHandler(),
   getLessonContentReadMockHandler(),
   getQuizDeliveryGetMockHandler(),
@@ -1409,6 +1456,7 @@ export const getHeatLmsApiMock = () => [
   getEnrollmentSubmitMockHandler(),
   getHealthCheckMockHandler(),
   getMeDescribeMockHandler(),
+  getMeCertificatesListMockHandler(),
   getDashboardDescribeMockHandler(),
   getStudentPlaybackStartMockHandler(),
   getStudentPlaybackRefreshMockHandler(),

@@ -40,6 +40,7 @@ import type {
   BulkApprovalResponseDto,
   CaptchaRequestDto,
   CaptchaResponseDto,
+  CertificateListResponseDto,
   ChangePasswordRequestDto,
   CourseListResponseDto,
   CourseSummaryDto,
@@ -1171,6 +1172,101 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAdminAuthSignOutMutationOptions(options), queryClient);
     }
+
+export const getAdminCertificatesDownloadUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/certificates/${id}/download`
+}
+
+export const adminCertificatesDownload = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getAdminCertificatesDownloadUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminCertificatesDownloadQueryKey = (id: string,) => {
+    return [
+    `/api/admin/certificates/${id}/download`
+    ] as const;
+    }
+
+
+export const getAdminCertificatesDownloadQueryOptions = <TData = Awaited<ReturnType<typeof adminCertificatesDownload>>, TError = ErrorType<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminCertificatesDownload>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminCertificatesDownloadQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminCertificatesDownload>>> = ({ signal }) => adminCertificatesDownload(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminCertificatesDownload>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdminCertificatesDownloadQueryResult = NonNullable<Awaited<ReturnType<typeof adminCertificatesDownload>>>
+export type AdminCertificatesDownloadQueryError = ErrorType<unknown>
+
+
+export function useAdminCertificatesDownload<TData = Awaited<ReturnType<typeof adminCertificatesDownload>>, TError = ErrorType<unknown>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminCertificatesDownload>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminCertificatesDownload>>,
+          TError,
+          Awaited<ReturnType<typeof adminCertificatesDownload>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminCertificatesDownload<TData = Awaited<ReturnType<typeof adminCertificatesDownload>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminCertificatesDownload>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminCertificatesDownload>>,
+          TError,
+          Awaited<ReturnType<typeof adminCertificatesDownload>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminCertificatesDownload<TData = Awaited<ReturnType<typeof adminCertificatesDownload>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminCertificatesDownload>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useAdminCertificatesDownload<TData = Awaited<ReturnType<typeof adminCertificatesDownload>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminCertificatesDownload>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdminCertificatesDownloadQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getCoursesListUrl = (params?: CoursesListParams,) => {
   const normalizedParams = new URLSearchParams();
@@ -6366,6 +6462,101 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getCaptchaIssueMutationOptions(options), queryClient);
     }
 
+export const getCertificatesDownloadUrl = (id: string,) => {
+
+
+
+
+  return `/api/certificates/${id}/download`
+}
+
+export const certificatesDownload = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getCertificatesDownloadUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getCertificatesDownloadQueryKey = (id: string,) => {
+    return [
+    `/api/certificates/${id}/download`
+    ] as const;
+    }
+
+
+export const getCertificatesDownloadQueryOptions = <TData = Awaited<ReturnType<typeof certificatesDownload>>, TError = ErrorType<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof certificatesDownload>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCertificatesDownloadQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof certificatesDownload>>> = ({ signal }) => certificatesDownload(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof certificatesDownload>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CertificatesDownloadQueryResult = NonNullable<Awaited<ReturnType<typeof certificatesDownload>>>
+export type CertificatesDownloadQueryError = ErrorType<unknown>
+
+
+export function useCertificatesDownload<TData = Awaited<ReturnType<typeof certificatesDownload>>, TError = ErrorType<unknown>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof certificatesDownload>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof certificatesDownload>>,
+          TError,
+          Awaited<ReturnType<typeof certificatesDownload>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCertificatesDownload<TData = Awaited<ReturnType<typeof certificatesDownload>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof certificatesDownload>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof certificatesDownload>>,
+          TError,
+          Awaited<ReturnType<typeof certificatesDownload>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCertificatesDownload<TData = Awaited<ReturnType<typeof certificatesDownload>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof certificatesDownload>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useCertificatesDownload<TData = Awaited<ReturnType<typeof certificatesDownload>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof certificatesDownload>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCertificatesDownloadQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
 export const getLearningStructureUrl = (courseId: string,) => {
 
 
@@ -7408,6 +7599,101 @@ export function useMeDescribe<TData = Awaited<ReturnType<typeof meDescribe>>, TE
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getMeDescribeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getMeCertificatesListUrl = () => {
+
+
+
+
+  return `/api/me/certificates`
+}
+
+export const meCertificatesList = async ( options?: Parameters<typeof customFetch>[1]): Promise<CertificateListResponseDto> => {
+
+  return customFetch<CertificateListResponseDto>(getMeCertificatesListUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getMeCertificatesListQueryKey = () => {
+    return [
+    `/api/me/certificates`
+    ] as const;
+    }
+
+
+export const getMeCertificatesListQueryOptions = <TData = Awaited<ReturnType<typeof meCertificatesList>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meCertificatesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMeCertificatesListQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof meCertificatesList>>> = ({ signal }) => meCertificatesList({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof meCertificatesList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MeCertificatesListQueryResult = NonNullable<Awaited<ReturnType<typeof meCertificatesList>>>
+export type MeCertificatesListQueryError = ErrorType<unknown>
+
+
+export function useMeCertificatesList<TData = Awaited<ReturnType<typeof meCertificatesList>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof meCertificatesList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof meCertificatesList>>,
+          TError,
+          Awaited<ReturnType<typeof meCertificatesList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMeCertificatesList<TData = Awaited<ReturnType<typeof meCertificatesList>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meCertificatesList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof meCertificatesList>>,
+          TError,
+          Awaited<ReturnType<typeof meCertificatesList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMeCertificatesList<TData = Awaited<ReturnType<typeof meCertificatesList>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meCertificatesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useMeCertificatesList<TData = Awaited<ReturnType<typeof meCertificatesList>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meCertificatesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMeCertificatesListQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

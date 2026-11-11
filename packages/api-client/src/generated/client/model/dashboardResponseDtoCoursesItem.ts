@@ -4,16 +4,14 @@
  * HEAT LMS API
  * OpenAPI spec version: 1.0.0
  */
+import type { DashboardResponseDtoCoursesItemCertificate } from './dashboardResponseDtoCoursesItemCertificate';
 import type { DashboardResponseDtoCoursesItemNextModule } from './dashboardResponseDtoCoursesItemNextModule';
 import type { DashboardResponseDtoCoursesItemProgress } from './dashboardResponseDtoCoursesItemProgress';
 import type { DashboardResponseDtoCoursesItemStatus } from './dashboardResponseDtoCoursesItemStatus';
 
 export type DashboardResponseDtoCoursesItem = {
-  /**
-     * @maxLength 64
-     * @nullable
-     */
-  certificateNumber: string | null;
+  /** @nullable */
+  certificate: DashboardResponseDtoCoursesItemCertificate;
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   courseId: string;
   courseSlug: string;
