@@ -4,7 +4,7 @@ import hls from "../../../infra/nginx/hls.js";
 import verify from "../../../infra/nginx/hls-verify.js";
 
 const now = 1_800_000_000;
-const secrets = { k1: "secret-one-0123456789", k2: "secret-two-0123456789" };
+const secrets = { k1: "secret-one-0123456789-abcdefghij", k2: "secret-two-0123456789-abcdefghij" };
 
 const cookieFor = (videoId, kid, expiry) =>
   `hls_sig=${kid}.${expiry}.${createHmac("sha256", secrets[kid]).update(verify.signingInput(videoId, expiry)).digest("hex")}`;
