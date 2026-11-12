@@ -150,6 +150,7 @@ describe("QuizScreen", () => {
     const view = await screenView();
     expect(view.textContent).toContain("You passed this quiz with 90%");
     expect(view.textContent).toContain("Pass mark 70%");
+    expect(view.querySelector(`a[href$="/quiz/result/${uuid(6)}"]`)).not.toBeNull();
   });
 
   test("a passed quiz without a stored result still says passed", async () => {

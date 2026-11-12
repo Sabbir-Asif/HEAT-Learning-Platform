@@ -3201,6 +3201,61 @@ export const QuizSubmissionSubmitResponse = zod.object({
 })
 
 
+export const quizResultGetPathCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizResultGetPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizResultGetPathAttemptIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const QuizResultGetParams = zod.object({
+  "courseId": zod.uuid().regex(quizResultGetPathCourseIdRegExp),
+  "moduleId": zod.uuid().regex(quizResultGetPathModuleIdRegExp),
+  "attemptId": zod.uuid().regex(quizResultGetPathAttemptIdRegExp)
+})
+
+export const quizResultGetResponseAttemptIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizResultGetResponseCorrectCountMin = 0;
+export const quizResultGetResponseCorrectCountMax = 9007199254740991;
+
+export const quizResultGetResponsePassMarkPercentMin = 0;
+export const quizResultGetResponsePassMarkPercentMax = 100;
+
+export const quizResultGetResponseReviewItemCorrectOptionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizResultGetResponseReviewItemExplanationMax = 2000;
+
+export const quizResultGetResponseReviewItemOptionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizResultGetResponseReviewItemQuestionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizResultGetResponseReviewItemSelectedOptionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const quizResultGetResponseScorePercentMin = 0;
+export const quizResultGetResponseScorePercentMax = 100;
+
+export const quizResultGetResponseSubmittedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const quizResultGetResponseTotalQuestionsMin = 0;
+export const quizResultGetResponseTotalQuestionsMax = 9007199254740991;
+
+
+
+export const QuizResultGetResponse = zod.object({
+  "attemptId": zod.uuid().regex(quizResultGetResponseAttemptIdRegExp),
+  "correctCount": zod.int().min(quizResultGetResponseCorrectCountMin).max(quizResultGetResponseCorrectCountMax),
+  "passMarkPercent": zod.int().min(quizResultGetResponsePassMarkPercentMin).max(quizResultGetResponsePassMarkPercentMax),
+  "passed": zod.boolean(),
+  "review": zod.array(zod.object({
+  "correctOptionId": zod.uuid().regex(quizResultGetResponseReviewItemCorrectOptionIdRegExp),
+  "explanation": zod.string().max(quizResultGetResponseReviewItemExplanationMax).nullable(),
+  "options": zod.array(zod.object({
+  "id": zod.uuid().regex(quizResultGetResponseReviewItemOptionsItemIdRegExp),
+  "text": zod.string()
+})),
+  "questionId": zod.uuid().regex(quizResultGetResponseReviewItemQuestionIdRegExp),
+  "selectedOptionId": zod.uuid().regex(quizResultGetResponseReviewItemSelectedOptionIdRegExp).nullable(),
+  "text": zod.string()
+})).nullable(),
+  "scorePercent": zod.int().min(quizResultGetResponseScorePercentMin).max(quizResultGetResponseScorePercentMax),
+  "submittedAt": zod.iso.datetime({"offset":true}).regex(quizResultGetResponseSubmittedAtRegExp),
+  "totalQuestions": zod.int().min(quizResultGetResponseTotalQuestionsMin).max(quizResultGetResponseTotalQuestionsMax)
+})
+
+
 export const directoryLookupsListUniversitiesResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 

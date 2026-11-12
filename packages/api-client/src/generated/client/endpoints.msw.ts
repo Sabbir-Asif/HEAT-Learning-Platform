@@ -73,6 +73,7 @@ import type {
   QuizAccessResponseDto,
   QuizDeliveryResponseDto,
   QuizQuestionRequestDto,
+  QuizResultResponseDto,
   QuizRulesRequestDto,
   QuizSubmitRequestDto,
   QuizSubmitResponseDto,
@@ -256,6 +257,8 @@ export const getQuizDeliveryGetResponseMock = (overrideResponse: Partial<Extract
 export const getQuizAccessCheckResponseMock = (overrideResponse: Partial<Extract<QuizAccessResponseDto, object>> = {}): QuizAccessResponseDto => ({moduleState: faker.helpers.arrayElement(['LOCKED','UNLOCKED','IN_PROGRESS','QUIZ_READY','COMPLETED'] as const), ...overrideResponse})
 
 export const getQuizSubmissionSubmitResponseMock = (overrideResponse: Partial<Extract<QuizSubmitResponseDto, object>> = {}): QuizSubmitResponseDto => ({attemptId: faker.string.uuid(), correctCount: faker.number.int({min: 0, max: 9007199254740991}), passMarkPercent: faker.number.int({min: 0, max: 100}), passed: faker.datatype.boolean(), scorePercent: faker.number.int({min: 0, max: 100}), totalQuestions: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
+
+export const getQuizResultGetResponseMock = (overrideResponse: Partial<Extract<QuizResultResponseDto, object>> = {}): QuizResultResponseDto => ({attemptId: faker.string.uuid(), correctCount: faker.number.int({min: 0, max: 9007199254740991}), passMarkPercent: faker.number.int({min: 0, max: 100}), passed: faker.datatype.boolean(), review: faker.helpers.arrayElement([Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({correctOptionId: faker.string.uuid(), explanation: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 2000}}), null]), options: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), text: faker.string.alpha({length: {min: 10, max: 20}})})), questionId: faker.string.uuid(), selectedOptionId: faker.helpers.arrayElement([faker.string.uuid(), null]), text: faker.string.alpha({length: {min: 10, max: 20}})})), null]), scorePercent: faker.number.int({min: 0, max: 100}), submittedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', totalQuestions: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
 
 export const getDirectoryLookupsListUniversitiesResponseMock = (overrideResponse: Partial<Extract<DirectoryOptionListResponseDto, object>> = {}): DirectoryOptionListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
@@ -1328,6 +1331,18 @@ export const getQuizSubmissionSubmitMockHandler = (overrideResponse?: QuizSubmit
   }, options)
 }
 
+export const getQuizResultGetMockHandler = (overrideResponse?: QuizResultResponseDto | ((info: Parameters<HttpResponseResolver<{ courseId: string; moduleId: string; attemptId: string }>>[0]) => Promise<QuizResultResponseDto> | QuizResultResponseDto), options?: RequestHandlerOptions) => {
+  return http.get<{ courseId: string; moduleId: string; attemptId: string }>('*/api/courses/:courseId/modules/:moduleId/quiz/attempts/:attemptId', async (info: Parameters<HttpResponseResolver<{ courseId: string; moduleId: string; attemptId: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getQuizResultGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getDirectoryLookupsListUniversitiesMockHandler = (overrideResponse?: DirectoryOptionListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<DirectoryOptionListResponseDto> | DirectoryOptionListResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/directory/universities', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1596,6 +1611,7 @@ export const getHeatLmsApiMock = () => [
   getQuizDeliveryGetMockHandler(),
   getQuizAccessCheckMockHandler(),
   getQuizSubmissionSubmitMockHandler(),
+  getQuizResultGetMockHandler(),
   getDirectoryLookupsListUniversitiesMockHandler(),
   getDirectoryLookupsListFacultiesMockHandler(),
   getDirectoryLookupsListDepartmentsMockHandler(),

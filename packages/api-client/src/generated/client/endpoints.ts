@@ -85,6 +85,7 @@ import type {
   QuizAccessResponseDto,
   QuizDeliveryResponseDto,
   QuizQuestionRequestDto,
+  QuizResultResponseDto,
   QuizRulesRequestDto,
   QuizSubmitRequestDto,
   QuizSubmitResponseDto,
@@ -7523,6 +7524,117 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getQuizSubmissionSubmitMutationOptions(options), queryClient);
     }
+
+export const getQuizResultGetUrl = (courseId: string,
+    moduleId: string,
+    attemptId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/quiz/attempts/${attemptId}`
+}
+
+export const quizResultGet = async (courseId: string,
+    moduleId: string,
+    attemptId: string, options?: Parameters<typeof customFetch>[1]): Promise<QuizResultResponseDto> => {
+
+  return customFetch<QuizResultResponseDto>(getQuizResultGetUrl(courseId,moduleId,attemptId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getQuizResultGetQueryKey = (courseId: string,
+    moduleId: string,
+    attemptId: string,) => {
+    return [
+    `/api/courses/${courseId}/modules/${moduleId}/quiz/attempts/${attemptId}`
+    ] as const;
+    }
+
+
+export const getQuizResultGetQueryOptions = <TData = Awaited<ReturnType<typeof quizResultGet>>, TError = ErrorType<unknown>>(courseId: string,
+    moduleId: string,
+    attemptId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizResultGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getQuizResultGetQueryKey(courseId,moduleId,attemptId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof quizResultGet>>> = ({ signal }) => quizResultGet(courseId,moduleId,attemptId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: courseId !== null && courseId !== undefined && moduleId !== null && moduleId !== undefined && attemptId !== null && attemptId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof quizResultGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type QuizResultGetQueryResult = NonNullable<Awaited<ReturnType<typeof quizResultGet>>>
+export type QuizResultGetQueryError = ErrorType<unknown>
+
+
+export function useQuizResultGet<TData = Awaited<ReturnType<typeof quizResultGet>>, TError = ErrorType<unknown>>(
+ courseId: string,
+    moduleId: string,
+    attemptId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizResultGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof quizResultGet>>,
+          TError,
+          Awaited<ReturnType<typeof quizResultGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useQuizResultGet<TData = Awaited<ReturnType<typeof quizResultGet>>, TError = ErrorType<unknown>>(
+ courseId: string,
+    moduleId: string,
+    attemptId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizResultGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof quizResultGet>>,
+          TError,
+          Awaited<ReturnType<typeof quizResultGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useQuizResultGet<TData = Awaited<ReturnType<typeof quizResultGet>>, TError = ErrorType<unknown>>(
+ courseId: string,
+    moduleId: string,
+    attemptId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizResultGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useQuizResultGet<TData = Awaited<ReturnType<typeof quizResultGet>>, TError = ErrorType<unknown>>(
+ courseId: string,
+    moduleId: string,
+    attemptId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof quizResultGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getQuizResultGetQueryOptions(courseId,moduleId,attemptId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getDirectoryLookupsListUniversitiesUrl = () => {
 
