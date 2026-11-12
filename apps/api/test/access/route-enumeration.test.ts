@@ -114,6 +114,7 @@ describe("deny-by-default route enumeration", () => {
       "GET /api/certificates/:id/download": "certificateDownload",
       "GET /api/admin/certificates/:id/download": "certificateDownload",
       "GET /api/me/certificates": "learningRead",
+      "GET /api/admin/students/export": "studentExport",
     });
   });
 

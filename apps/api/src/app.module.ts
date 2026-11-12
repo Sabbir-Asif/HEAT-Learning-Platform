@@ -19,6 +19,7 @@ import { MediaModule } from "./media";
 import { MeModule } from "./me/me.module";
 import { LearningModule } from "./learning";
 import { PlaybackModule } from "./playback";
+import { StudentsModule } from "./students";
 import { StudentAuthModule } from "./student-auth/student-auth.module";
 
 @Module({
@@ -43,6 +44,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     LearningModule,
     MediaModule,
     PlaybackModule,
+    StudentsModule,
   ],
   controllers: [HealthController],
 })
