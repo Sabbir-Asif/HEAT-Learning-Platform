@@ -60,9 +60,12 @@ import type {
   LearningStructureResponseDto,
   LessonContentResponseDto,
   LessonSectionRequestDto,
+  MarkAllNotificationsReadResponseDto,
   MeResponseDto,
   ModuleListResponseDto,
   ModuleSummaryDto,
+  NotificationDto,
+  NotificationListResponseDto,
   PlaybackSessionResponseDto,
   ProgressBatchDto,
   ProgressResponseDto,
@@ -81,6 +84,7 @@ import type {
   StudentListResponseDto,
   UniversityListResponseDto,
   UniversitySummaryDto,
+  UnreadNotificationCountDto,
   UpdateCourseRequestDto,
   UpdateDepartmentRequestDto,
   UpdateFacultyRequestDto,
@@ -262,6 +266,18 @@ export const getMeDescribeResponseMock = (overrideResponse: Partial<Extract<MeRe
 export const getMeCertificatesListResponseMock = (overrideResponse: Partial<Extract<CertificateListResponseDto, object>> = {}): CertificateListResponseDto => ({certificates: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.helpers.arrayElement([faker.string.uuid(), null]), issuedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), number: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 64}}), null]), status: faker.helpers.arrayElement(['READY','PENDING','REVOKED'] as const), verificationUrl: faker.helpers.arrayElement([faker.internet.url(), null])})), ...overrideResponse})
 
 export const getDashboardDescribeResponseMock = (overrideResponse: Partial<Extract<DashboardResponseDto, object>> = {}): DashboardResponseDto => ({courses: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({certificate: faker.helpers.arrayElement([{id: faker.helpers.arrayElement([faker.string.uuid(), null]), status: faker.helpers.arrayElement(['READY','PENDING','REVOKED'] as const)},null,]), courseId: faker.string.uuid(), courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), nextModule: faker.helpers.arrayElement([{id: faker.string.uuid(), order: faker.number.int({min: -9007199254740991, max: 9007199254740991}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), resumeVideoId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}})},null,]), progress: faker.helpers.arrayElement([{modulesCompleted: faker.number.int({min: 0, max: 9007199254740991}), modulesTotal: faker.number.int({min: 0, max: 9007199254740991}), percent: faker.number.int({min: 0, max: 100})},null,]), reason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 500}}), null]), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const)})), ...overrideResponse})
+
+export const getNotificationsListResponseMock = (overrideResponse: Partial<Extract<NotificationListResponseDto, object>> = {}): NotificationListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', data: {
+        [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 200}})
+      }, id: faker.string.uuid(), readAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), type: faker.helpers.arrayElement(['ENROLLMENT_APPROVED','ENROLLMENT_REJECTED','ENROLLMENT_REMOVED','ENROLLMENT_REINSTATED','CERTIFICATE_READY','NEWS_PUBLISHED'] as const)})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
+
+export const getNotificationsMarkAllReadResponseMock = (overrideResponse: Partial<Extract<MarkAllNotificationsReadResponseDto, object>> = {}): MarkAllNotificationsReadResponseDto => ({updated: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
+
+export const getNotificationsUnreadCountResponseMock = (overrideResponse: Partial<Extract<UnreadNotificationCountDto, object>> = {}): UnreadNotificationCountDto => ({count: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
+
+export const getNotificationsMarkReadResponseMock = (overrideResponse: Partial<Extract<NotificationDto, object>> = {}): NotificationDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', data: {
+        [faker.string.alphanumeric(5)]: faker.string.alpha({length: {min: 10, max: 200}})
+      }, id: faker.string.uuid(), readAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), type: faker.helpers.arrayElement(['ENROLLMENT_APPROVED','ENROLLMENT_REJECTED','ENROLLMENT_REMOVED','ENROLLMENT_REINSTATED','CERTIFICATE_READY','NEWS_PUBLISHED'] as const), ...overrideResponse})
 
 export const getStudentPlaybackStartResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({captions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({language: faker.string.alpha({length: {min: 1, max: 35}})})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', manifestPath: faker.string.alpha({length: {min: 10, max: 20}}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), sessionId: faker.helpers.arrayElement([faker.string.uuid(), null]), ...overrideResponse})
 
@@ -1378,6 +1394,54 @@ export const getDashboardDescribeMockHandler = (overrideResponse?: DashboardResp
   }, options)
 }
 
+export const getNotificationsListMockHandler = (overrideResponse?: NotificationListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<NotificationListResponseDto> | NotificationListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/me/notifications', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getNotificationsListResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getNotificationsMarkAllReadMockHandler = (overrideResponse?: MarkAllNotificationsReadResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<MarkAllNotificationsReadResponseDto> | MarkAllNotificationsReadResponseDto), options?: RequestHandlerOptions) => {
+  return http.post('*/api/me/notifications/read-all', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getNotificationsMarkAllReadResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getNotificationsUnreadCountMockHandler = (overrideResponse?: UnreadNotificationCountDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<UnreadNotificationCountDto> | UnreadNotificationCountDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/me/notifications/unread-count', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getNotificationsUnreadCountResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getNotificationsMarkReadMockHandler = (overrideResponse?: NotificationDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<NotificationDto> | NotificationDto), options?: RequestHandlerOptions) => {
+  return http.post<{ id: string }>('*/api/me/notifications/:id/read', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getNotificationsMarkReadResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getStudentPlaybackStartMockHandler = (overrideResponse?: PlaybackSessionResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<PlaybackSessionResponseDto> | PlaybackSessionResponseDto), options?: RequestHandlerOptions) => {
   return http.post<{ id: string }>('*/api/videos/:id/playback-session', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
 
@@ -1508,6 +1572,10 @@ export const getHeatLmsApiMock = () => [
   getMeDescribeMockHandler(),
   getMeCertificatesListMockHandler(),
   getDashboardDescribeMockHandler(),
+  getNotificationsListMockHandler(),
+  getNotificationsMarkAllReadMockHandler(),
+  getNotificationsUnreadCountMockHandler(),
+  getNotificationsMarkReadMockHandler(),
   getStudentPlaybackStartMockHandler(),
   getStudentPlaybackRefreshMockHandler(),
   getProgressRecordMockHandler()

@@ -7,6 +7,7 @@ import { CatalogModule } from "../catalog";
 import { CoreModule } from "../core";
 import { DirectoryModule } from "../directory";
 import { EmailVerificationModule } from "../email-verification";
+import { NotificationsModule } from "../notifications";
 import { RateLimitModule } from "../rate-limit";
 import { ApprovalQueueService } from "./approval-queue.service";
 import { EnrollmentApprovalController } from "./enrollment-approval.controller";
@@ -27,6 +28,7 @@ import { StudentListService } from "./student-list.service";
     CatalogModule,
     DirectoryModule,
     EmailVerificationModule,
+    NotificationsModule,
     RateLimitModule,
   ],
   controllers: [EnrollmentController, EnrollmentApprovalController, StudentListController],

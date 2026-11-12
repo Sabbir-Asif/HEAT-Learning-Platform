@@ -5,6 +5,8 @@ import { AuditService } from "../audit";
 import { CLOCK, DATABASE } from "../core";
 import type { Clock } from "../core";
 import { ApiException } from "../http/api-exception";
+import { NotificationsService } from "../notifications";
+import type { NotificationWriter } from "../notifications";
 import { approvalRefusal } from "./approval-rules";
 import type { EnrollmentStatusName } from "./approval-rules";
 import type { AdminActor } from "./enrollment-approval.service";
@@ -20,7 +22,8 @@ type RejectionTransaction = Pick<
   | "enrollmentDecision"
   | "outbox"
   | "auditLog"
->;
+> &
+  NotificationWriter;
 
 @Injectable()
 export class EnrollmentRejectionService {
@@ -28,6 +31,7 @@ export class EnrollmentRejectionService {
     @Inject(DATABASE) private readonly database: HeatClient,
     @Inject(CLOCK) private readonly clock: Clock,
     private readonly audit: AuditService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   reject(id: string, actor: AdminActor, reason?: string): Promise<RejectedEnrollment> {
@@ -112,6 +116,13 @@ export class EnrollmentRejectionService {
         },
       },
     });
+    if (!accountDeleted) {
+      await this.notifications.createWithin(tx, {
+        userId: enrollment.userId,
+        type: "ENROLLMENT_REJECTED",
+        data: { enrollmentId: id, courseId: enrollment.courseId },
+      });
+    }
     await this.audit.record(tx, actor, {
       action: "enrollment.reject",
       entity: "Enrollment",

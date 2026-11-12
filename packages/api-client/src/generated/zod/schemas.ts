@@ -3285,6 +3285,87 @@ export const DashboardDescribeResponse = zod.object({
 })
 
 
+export const notificationsListQueryPageDefault = 1;
+export const notificationsListQueryPageMax = 9007199254740991;
+
+export const notificationsListQueryPageSizeDefault = 20;
+export const notificationsListQueryPageSizeMax = 50;
+
+
+
+export const NotificationsListQueryParams = zod.object({
+  "page": zod.int().min(1).max(notificationsListQueryPageMax).default(notificationsListQueryPageDefault),
+  "pageSize": zod.int().min(1).max(notificationsListQueryPageSizeMax).default(notificationsListQueryPageSizeDefault)
+})
+
+export const notificationsListResponseItemsItemCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const notificationsListResponseItemsItemDataMaxOne = 200;
+
+export const notificationsListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const notificationsListResponseItemsItemReadAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const notificationsListResponsePageMax = 9007199254740991;
+
+export const notificationsListResponsePageSizeMax = 9007199254740991;
+
+export const notificationsListResponseTotalMin = 0;
+export const notificationsListResponseTotalMax = 9007199254740991;
+
+
+
+export const NotificationsListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "createdAt": zod.iso.datetime({"offset":true}).regex(notificationsListResponseItemsItemCreatedAtRegExp),
+  "data": zod.record(zod.string(), zod.string().max(notificationsListResponseItemsItemDataMaxOne)),
+  "id": zod.uuid().regex(notificationsListResponseItemsItemIdRegExp),
+  "readAt": zod.iso.datetime({"offset":true}).regex(notificationsListResponseItemsItemReadAtRegExp).nullable(),
+  "type": zod.enum(['ENROLLMENT_APPROVED', 'ENROLLMENT_REJECTED', 'ENROLLMENT_REMOVED', 'ENROLLMENT_REINSTATED', 'CERTIFICATE_READY', 'NEWS_PUBLISHED'])
+})),
+  "page": zod.int().min(1).max(notificationsListResponsePageMax),
+  "pageSize": zod.int().min(1).max(notificationsListResponsePageSizeMax),
+  "total": zod.int().min(notificationsListResponseTotalMin).max(notificationsListResponseTotalMax)
+})
+
+
+export const notificationsMarkAllReadResponseUpdatedMin = 0;
+export const notificationsMarkAllReadResponseUpdatedMax = 9007199254740991;
+
+
+
+export const NotificationsMarkAllReadResponse = zod.object({
+  "updated": zod.int().min(notificationsMarkAllReadResponseUpdatedMin).max(notificationsMarkAllReadResponseUpdatedMax)
+})
+
+
+export const notificationsUnreadCountResponseCountMin = 0;
+export const notificationsUnreadCountResponseCountMax = 9007199254740991;
+
+
+
+export const NotificationsUnreadCountResponse = zod.object({
+  "count": zod.int().min(notificationsUnreadCountResponseCountMin).max(notificationsUnreadCountResponseCountMax)
+})
+
+
+export const NotificationsMarkReadParams = zod.object({
+  "id": zod.string()
+})
+
+export const notificationsMarkReadResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const notificationsMarkReadResponseDataMaxOne = 200;
+
+export const notificationsMarkReadResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const notificationsMarkReadResponseReadAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const NotificationsMarkReadResponse = zod.object({
+  "createdAt": zod.iso.datetime({"offset":true}).regex(notificationsMarkReadResponseCreatedAtRegExp),
+  "data": zod.record(zod.string(), zod.string().max(notificationsMarkReadResponseDataMaxOne)),
+  "id": zod.uuid().regex(notificationsMarkReadResponseIdRegExp),
+  "readAt": zod.iso.datetime({"offset":true}).regex(notificationsMarkReadResponseReadAtRegExp).nullable(),
+  "type": zod.enum(['ENROLLMENT_APPROVED', 'ENROLLMENT_REJECTED', 'ENROLLMENT_REMOVED', 'ENROLLMENT_REINSTATED', 'CERTIFICATE_READY', 'NEWS_PUBLISHED'])
+})
+
+
 export const studentPlaybackStartPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 

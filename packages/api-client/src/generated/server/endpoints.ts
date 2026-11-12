@@ -1322,6 +1322,14 @@ export interface LessonSectionRequestDto {
   title: string;
 }
 
+export interface MarkAllNotificationsReadResponseDto {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  updated: number;
+}
+
 export type MeResponseDtoEnrollmentsItemStatus = typeof MeResponseDtoEnrollmentsItemStatus[keyof typeof MeResponseDtoEnrollmentsItemStatus];
 
 
@@ -1446,6 +1454,81 @@ export interface ModuleSummaryDto {
   title: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   updatedAt: string;
+}
+
+export type NotificationDtoData = {[key: string]: string};
+
+export type NotificationDtoType = typeof NotificationDtoType[keyof typeof NotificationDtoType];
+
+
+export const NotificationDtoType = {
+  ENROLLMENT_APPROVED: 'ENROLLMENT_APPROVED',
+  ENROLLMENT_REJECTED: 'ENROLLMENT_REJECTED',
+  ENROLLMENT_REMOVED: 'ENROLLMENT_REMOVED',
+  ENROLLMENT_REINSTATED: 'ENROLLMENT_REINSTATED',
+  CERTIFICATE_READY: 'CERTIFICATE_READY',
+  NEWS_PUBLISHED: 'NEWS_PUBLISHED',
+} as const;
+
+export interface NotificationDto {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  data: NotificationDtoData;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  readAt: string | null;
+  type: NotificationDtoType;
+}
+
+export type NotificationListResponseDtoItemsItemData = {[key: string]: string};
+
+export type NotificationListResponseDtoItemsItemType = typeof NotificationListResponseDtoItemsItemType[keyof typeof NotificationListResponseDtoItemsItemType];
+
+
+export const NotificationListResponseDtoItemsItemType = {
+  ENROLLMENT_APPROVED: 'ENROLLMENT_APPROVED',
+  ENROLLMENT_REJECTED: 'ENROLLMENT_REJECTED',
+  ENROLLMENT_REMOVED: 'ENROLLMENT_REMOVED',
+  ENROLLMENT_REINSTATED: 'ENROLLMENT_REINSTATED',
+  CERTIFICATE_READY: 'CERTIFICATE_READY',
+  NEWS_PUBLISHED: 'NEWS_PUBLISHED',
+} as const;
+
+export type NotificationListResponseDtoItemsItem = {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  data: NotificationListResponseDtoItemsItemData;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  readAt: string | null;
+  type: NotificationListResponseDtoItemsItemType;
+};
+
+export interface NotificationListResponseDto {
+  items: NotificationListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
 }
 
 export type PlaybackSessionResponseDtoCaptionsItem = {
@@ -1998,6 +2081,14 @@ export interface UniversitySummaryDto {
   updatedAt: string;
 }
 
+export interface UnreadNotificationCountDto {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  count: number;
+}
+
 export interface UpdateCourseRequestDto {
   /**
      * @maxLength 5000
@@ -2469,6 +2560,19 @@ export const StudentListListSort = {
   requestedAt: 'requestedAt',
   '-requestedAt': '-requestedAt',
 } as const;
+
+export type NotificationsListParams = {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 50
+   */
+  pageSize?: number;
+};
 
 export const getAdminAccountChangePasswordUrl = () => {
 
@@ -5083,6 +5187,97 @@ export const dashboardDescribe = async ( options?: Parameters<typeof serverFetch
   {
     ...options,
     method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getNotificationsListUrl = (params?: NotificationsListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/me/notifications?${stringifiedParams}` : `/api/me/notifications`
+}
+
+export const notificationsList = async (params?: NotificationsListParams, options?: Parameters<typeof serverFetch>[1]): Promise<NotificationListResponseDto> => {
+
+  return serverFetch<NotificationListResponseDto>(getNotificationsListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getNotificationsMarkAllReadUrl = () => {
+
+
+
+
+  return `/api/me/notifications/read-all`
+}
+
+export const notificationsMarkAllRead = async ( options?: Parameters<typeof serverFetch>[1]): Promise<MarkAllNotificationsReadResponseDto> => {
+
+  return serverFetch<MarkAllNotificationsReadResponseDto>(getNotificationsMarkAllReadUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getNotificationsUnreadCountUrl = () => {
+
+
+
+
+  return `/api/me/notifications/unread-count`
+}
+
+export const notificationsUnreadCount = async ( options?: Parameters<typeof serverFetch>[1]): Promise<UnreadNotificationCountDto> => {
+
+  return serverFetch<UnreadNotificationCountDto>(getNotificationsUnreadCountUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getNotificationsMarkReadUrl = (id: string,) => {
+
+
+
+
+  return `/api/me/notifications/${id}/read`
+}
+
+export const notificationsMarkRead = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<NotificationDto> => {
+
+  return serverFetch<NotificationDto>(getNotificationsMarkReadUrl(id),
+  {
+    ...options,
+    method: 'POST'
 
 
   }
