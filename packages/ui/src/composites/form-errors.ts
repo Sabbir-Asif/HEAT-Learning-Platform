@@ -29,6 +29,9 @@ export type FormErrorCopyKey =
   | "EMAIL_IN_USE"
   | "ENROLLMENT_ALREADY_DECIDED"
   | "ENROLLMENT_NOT_ACTIVE"
+  | "ENROLLMENT_NOT_REMOVABLE"
+  | "ENROLLMENT_NOT_REMOVED"
+  | "ENROLLMENT_STATE_CHANGED"
   | "ENROLLMENT_NOT_VERIFIED"
   | "FORBIDDEN"
   | "INTERNAL"
@@ -102,6 +105,9 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   EMAIL_IN_USE: "An account with this email address already exists.",
   ENROLLMENT_ALREADY_DECIDED: "This request was already decided or was withdrawn.",
   ENROLLMENT_NOT_ACTIVE: "Your enrollment in this course is not active.",
+  ENROLLMENT_NOT_REMOVABLE: "Only an approved or completed student can be removed.",
+  ENROLLMENT_NOT_REMOVED: "This student is not removed, so there is nothing to reinstate.",
+  ENROLLMENT_STATE_CHANGED: "This enrollment was changed by someone else. Reload and try again.",
   ENROLLMENT_NOT_VERIFIED:
     "The student has not verified their email yet, so it cannot be approved.",
   FORBIDDEN: "You do not have permission to do this.",

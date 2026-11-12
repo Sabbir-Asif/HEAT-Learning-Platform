@@ -27,3 +27,11 @@ export const studentSortValue = (sort: SortState | null): StudentSortValue => {
   const id = sort.id === "requestedAt" ? "requestedAt" : "name";
   return sort.desc ? `-${id}` : id;
 };
+
+export const canRemoveStudent = (status: EnrollmentStatusName): boolean =>
+  status === "APPROVED" || status === "COMPLETED";
+
+export const canReinstateStudent = (status: EnrollmentStatusName): boolean => status === "REMOVED";
+
+export const removalNotice = (action: "remove" | "reinstate", name: string): string =>
+  action === "remove" ? `${name} was removed from the course.` : `${name} was reinstated.`;

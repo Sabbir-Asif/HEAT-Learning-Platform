@@ -2448,7 +2448,7 @@ export const enrollmentApprovalApproveManyResponseSucceededItemRegExp = new RegE
 
 export const EnrollmentApprovalApproveManyResponse = zod.object({
   "failed": zod.array(zod.object({
-  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_VERIFIED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'MODULE_LOCKED', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'QUIZ_ANSWER_INVALID', 'QUIZ_ATTEMPT_LIMIT_REACHED', 'QUIZ_ATTEMPT_NOT_OPEN', 'QUIZ_ATTEMPT_WAIT', 'QUIZ_NOT_UNLOCKED', 'RATE_LIMITED', 'UNAUTHENTICATED', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED', 'VIDEO_NOT_READY']),
+  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_REMOVABLE', 'ENROLLMENT_NOT_REMOVED', 'ENROLLMENT_NOT_VERIFIED', 'ENROLLMENT_STATE_CHANGED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'MODULE_LOCKED', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'QUIZ_ANSWER_INVALID', 'QUIZ_ATTEMPT_LIMIT_REACHED', 'QUIZ_ATTEMPT_NOT_OPEN', 'QUIZ_ATTEMPT_WAIT', 'QUIZ_NOT_UNLOCKED', 'RATE_LIMITED', 'UNAUTHENTICATED', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED', 'VIDEO_NOT_READY']),
   "id": zod.uuid().regex(enrollmentApprovalApproveManyResponseFailedItemIdRegExp)
 })),
   "succeeded": zod.array(zod.uuid().regex(enrollmentApprovalApproveManyResponseSucceededItemRegExp))
@@ -2552,7 +2552,7 @@ export const enrollmentApprovalRejectManyResponseSucceededItemRegExp = new RegEx
 
 export const EnrollmentApprovalRejectManyResponse = zod.object({
   "failed": zod.array(zod.object({
-  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_VERIFIED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'MODULE_LOCKED', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'QUIZ_ANSWER_INVALID', 'QUIZ_ATTEMPT_LIMIT_REACHED', 'QUIZ_ATTEMPT_NOT_OPEN', 'QUIZ_ATTEMPT_WAIT', 'QUIZ_NOT_UNLOCKED', 'RATE_LIMITED', 'UNAUTHENTICATED', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED', 'VIDEO_NOT_READY']),
+  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_REMOVABLE', 'ENROLLMENT_NOT_REMOVED', 'ENROLLMENT_NOT_VERIFIED', 'ENROLLMENT_STATE_CHANGED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'MODULE_LOCKED', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'QUIZ_ANSWER_INVALID', 'QUIZ_ATTEMPT_LIMIT_REACHED', 'QUIZ_ATTEMPT_NOT_OPEN', 'QUIZ_ATTEMPT_WAIT', 'QUIZ_NOT_UNLOCKED', 'RATE_LIMITED', 'UNAUTHENTICATED', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED', 'VIDEO_NOT_READY']),
   "id": zod.uuid().regex(enrollmentApprovalRejectManyResponseFailedItemIdRegExp)
 })),
   "succeeded": zod.array(zod.uuid().regex(enrollmentApprovalRejectManyResponseSucceededItemRegExp))
@@ -2587,6 +2587,30 @@ export const EnrollmentApprovalApproveResponse = zod.object({
 })
 
 
+export const enrollmentRemovalReinstatePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const EnrollmentRemovalReinstateParams = zod.object({
+  "id": zod.uuid().regex(enrollmentRemovalReinstatePathIdRegExp)
+})
+
+export const enrollmentRemovalReinstateBodyReasonMax = 500;
+
+
+
+export const EnrollmentRemovalReinstateBody = zod.object({
+  "reason": zod.string().max(enrollmentRemovalReinstateBodyReasonMax).optional()
+})
+
+export const enrollmentRemovalReinstateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const EnrollmentRemovalReinstateResponse = zod.object({
+  "id": zod.uuid().regex(enrollmentRemovalReinstateResponseIdRegExp),
+  "status": zod.enum(['APPROVED', 'COMPLETED'])
+})
+
+
 export const enrollmentApprovalRejectPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 
@@ -2611,6 +2635,32 @@ export const EnrollmentApprovalRejectResponse = zod.object({
   "id": zod.uuid().regex(enrollmentApprovalRejectResponseIdRegExp),
   "rejectedAt": zod.iso.datetime({"offset":true}).regex(enrollmentApprovalRejectResponseRejectedAtRegExp),
   "status": zod.enum(['REJECTED'])
+})
+
+
+export const enrollmentRemovalRemovePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const EnrollmentRemovalRemoveParams = zod.object({
+  "id": zod.uuid().regex(enrollmentRemovalRemovePathIdRegExp)
+})
+
+export const enrollmentRemovalRemoveBodyReasonMax = 500;
+
+
+
+export const EnrollmentRemovalRemoveBody = zod.object({
+  "reason": zod.string().min(1).max(enrollmentRemovalRemoveBodyReasonMax)
+})
+
+export const enrollmentRemovalRemoveResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const enrollmentRemovalRemoveResponseRemovedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const EnrollmentRemovalRemoveResponse = zod.object({
+  "id": zod.uuid().regex(enrollmentRemovalRemoveResponseIdRegExp),
+  "removedAt": zod.iso.datetime({"offset":true}).regex(enrollmentRemovalRemoveResponseRemovedAtRegExp),
+  "status": zod.enum(['REMOVED'])
 })
 
 
