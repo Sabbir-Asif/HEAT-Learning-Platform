@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { courseDescriptionMaxLength } from "./courses";
 
 export const tagNameMaxLength = 60;
 export const tagTagsMaxCount = 50;
@@ -121,7 +122,7 @@ export const publicFrontPageResponseSchema = z.object({
       id: z.uuid(),
       slug: z.string(),
       title: z.string(),
-      description: z.string().nullable(),
+      description: z.string().max(courseDescriptionMaxLength).nullable(),
       thumbnailAssetId: z.uuid().nullable(),
     }),
   ),

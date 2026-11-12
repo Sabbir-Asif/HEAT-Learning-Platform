@@ -1,4 +1,5 @@
 import {
+  adminFrontPageResponseSchema,
   courseIdParamsSchema,
   courseListQuerySchema,
   courseListResponseSchema,
@@ -8,6 +9,7 @@ import {
   courseSummarySchema,
   createCourseRequestSchema,
   createModuleRequestSchema,
+  createTagRequestSchema,
   createVideoSlotRequestSchema,
   lessonSectionParamsSchema,
   lessonSectionRequestSchema,
@@ -15,14 +17,22 @@ import {
   moduleParamsSchema,
   moduleSummarySchema,
   publishChecklistSchema,
+  publicFrontPageResponseSchema,
   quizQuestionParamsSchema,
   quizQuestionRequestSchema,
   quizRulesRequestSchema,
   quizSummarySchema,
   reorderRequestSchema,
+  setTagsRequestSchema,
+  tagDetailSchema,
+  tagIdParamsSchema,
+  tagListResponseSchema,
+  tagRefListResponseSchema,
+  tagSummarySchema,
   updateCourseRequestSchema,
   updateModuleRequestSchema,
   updateQuizQuestionRequestSchema,
+  updateTagRequestSchema,
   updateVideoSlotRequestSchema,
   videoSlotListResponseSchema,
   videoSlotParamsSchema,
@@ -85,3 +95,22 @@ export class CourseRevisionItemDto extends createZodDto(courseRevisionItemSchema
 export class CourseRevisionListResponseDto extends createZodDto(courseRevisionListResponseSchema) {}
 
 export class CourseRevisionParamsDto extends createZodDto(courseRevisionParamsSchema) {}
+export class CreateTagRequestDto extends createZodDto(createTagRequestSchema) {}
+
+export class UpdateTagRequestDto extends createZodDto(updateTagRequestSchema) {}
+
+export class TagSummaryDto extends createZodDto(tagSummarySchema) {}
+
+export class TagListResponseDto extends createZodDto(tagListResponseSchema) {}
+
+export class TagDetailDto extends createZodDto(tagDetailSchema) {}
+
+export class TagIdParamsDto extends createZodDto(tagIdParamsSchema) {}
+
+export class TagRefListResponseDto extends createZodDto(tagRefListResponseSchema) {}
+
+export class SetTagsRequestDto extends createZodDto(setTagsRequestSchema) {}
+
+export class AdminFrontPageResponseDto extends createZodDto(adminFrontPageResponseSchema) {}
+
+export class PublicFrontPageResponseDto extends createZodDto(publicFrontPageResponseSchema) {}
