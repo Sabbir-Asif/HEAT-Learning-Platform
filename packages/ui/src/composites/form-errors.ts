@@ -20,7 +20,10 @@ export type FormErrorCopyKey =
   | "COURSE_LOCKED"
   | "COURSE_NOT_AVAILABLE"
   | "COURSE_NOT_DRAFT"
+  | "COURSE_NOT_PUBLISHED"
   | "COURSE_PUBLISH_CHECKS_FAILED"
+  | "COURSE_REVISION_DRAFT_EXISTS"
+  | "COURSE_REVISION_NOT_DRAFT"
   | "COURSE_SLUG_TAKEN"
   | "CSRF_TOKEN_INVALID"
   | "DIRECTORY_ARCHIVED"
@@ -95,7 +98,11 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   COURSE_LOCKED: "This course is locked. Only the description and thumbnail can be changed.",
   COURSE_NOT_AVAILABLE: "This course is not open for enrollment.",
   COURSE_NOT_DRAFT: "This action is only available for a draft course.",
+  COURSE_NOT_PUBLISHED: "Publish the course before publishing a new revision.",
   COURSE_PUBLISH_CHECKS_FAILED: "The course is not ready to publish.",
+  COURSE_REVISION_DRAFT_EXISTS:
+    "A draft revision already exists. Publish it or finish it before cloning again.",
+  COURSE_REVISION_NOT_DRAFT: "This revision is not an open draft.",
   COURSE_SLUG_TAKEN: "A course with this slug already exists.",
   CSRF_TOKEN_INVALID: "Your session check failed. Reload the page and try again.",
   DIRECTORY_ARCHIVED:

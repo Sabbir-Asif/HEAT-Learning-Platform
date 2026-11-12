@@ -37,7 +37,11 @@ const messages: Record<ErrorCode, string> = {
   COURSE_LOCKED: "This course is locked. Only the description and thumbnail can be changed.",
   COURSE_NOT_AVAILABLE: "This course is not open for enrollment.",
   COURSE_NOT_DRAFT: "This action is only available for a draft course.",
+  COURSE_NOT_PUBLISHED: "Publish the course before publishing a new revision.",
   COURSE_PUBLISH_CHECKS_FAILED: "The course is not ready to publish.",
+  COURSE_REVISION_DRAFT_EXISTS:
+    "A draft revision already exists. Publish it or finish it before cloning again.",
+  COURSE_REVISION_NOT_DRAFT: "This revision is not an open draft.",
   COURSE_SLUG_TAKEN: "A course with this slug already exists.",
   CSRF_TOKEN_INVALID:
     "The security token for this request is missing or no longer valid. Reload the page and try again.",

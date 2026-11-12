@@ -157,3 +157,30 @@ export const publishChecklistSchema = z.object({
 });
 
 export type PublishChecklist = z.infer<typeof publishChecklistSchema>;
+
+export const courseRevisionStatuses = ["DRAFT", "PUBLISHED"] as const;
+
+export const courseRevisionStatusSchema = z.enum(courseRevisionStatuses);
+
+export type CourseRevisionStatus = z.infer<typeof courseRevisionStatusSchema>;
+
+export const courseRevisionItemSchema = z.object({
+  id: z.uuid(),
+  number: z.number().int().min(1),
+  status: courseRevisionStatusSchema,
+  locked: z.boolean(),
+  current: z.boolean(),
+  enrollmentCount: z.number().int().min(0),
+  publishedAt: z.iso.datetime().nullable(),
+  createdAt: z.iso.datetime(),
+});
+
+export type CourseRevisionItem = z.infer<typeof courseRevisionItemSchema>;
+
+export const courseRevisionListResponseSchema = z.object({
+  items: z.array(courseRevisionItemSchema),
+});
+
+export type CourseRevisionListResponse = z.infer<typeof courseRevisionListResponseSchema>;
+
+export const courseRevisionParamsSchema = z.object({ id: z.uuid(), revisionId: z.uuid() });

@@ -329,7 +329,10 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   COURSE_LOCKED: 'COURSE_LOCKED',
   COURSE_NOT_AVAILABLE: 'COURSE_NOT_AVAILABLE',
   COURSE_NOT_DRAFT: 'COURSE_NOT_DRAFT',
+  COURSE_NOT_PUBLISHED: 'COURSE_NOT_PUBLISHED',
   COURSE_PUBLISH_CHECKS_FAILED: 'COURSE_PUBLISH_CHECKS_FAILED',
+  COURSE_REVISION_DRAFT_EXISTS: 'COURSE_REVISION_DRAFT_EXISTS',
+  COURSE_REVISION_NOT_DRAFT: 'COURSE_REVISION_NOT_DRAFT',
   COURSE_SLUG_TAKEN: 'COURSE_SLUG_TAKEN',
   CSRF_TOKEN_INVALID: 'CSRF_TOKEN_INVALID',
   DIRECTORY_ARCHIVED: 'DIRECTORY_ARCHIVED',
@@ -400,7 +403,10 @@ export const BulkRejectionResponseDtoFailedItemCode = {
   COURSE_LOCKED: 'COURSE_LOCKED',
   COURSE_NOT_AVAILABLE: 'COURSE_NOT_AVAILABLE',
   COURSE_NOT_DRAFT: 'COURSE_NOT_DRAFT',
+  COURSE_NOT_PUBLISHED: 'COURSE_NOT_PUBLISHED',
   COURSE_PUBLISH_CHECKS_FAILED: 'COURSE_PUBLISH_CHECKS_FAILED',
+  COURSE_REVISION_DRAFT_EXISTS: 'COURSE_REVISION_DRAFT_EXISTS',
+  COURSE_REVISION_NOT_DRAFT: 'COURSE_REVISION_NOT_DRAFT',
   COURSE_SLUG_TAKEN: 'COURSE_SLUG_TAKEN',
   CSRF_TOKEN_INVALID: 'CSRF_TOKEN_INVALID',
   DIRECTORY_ARCHIVED: 'DIRECTORY_ARCHIVED',
@@ -605,6 +611,76 @@ export interface CourseListResponseDto {
      * @maximum 9007199254740991
      */
   total: number;
+}
+
+export type CourseRevisionItemDtoStatus = typeof CourseRevisionItemDtoStatus[keyof typeof CourseRevisionItemDtoStatus];
+
+
+export const CourseRevisionItemDtoStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+} as const;
+
+export interface CourseRevisionItemDto {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  current: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  enrollmentCount: number;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  locked: boolean;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  number: number;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  publishedAt: string | null;
+  status: CourseRevisionItemDtoStatus;
+}
+
+export type CourseRevisionListResponseDtoItemsItemStatus = typeof CourseRevisionListResponseDtoItemsItemStatus[keyof typeof CourseRevisionListResponseDtoItemsItemStatus];
+
+
+export const CourseRevisionListResponseDtoItemsItemStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+} as const;
+
+export type CourseRevisionListResponseDtoItemsItem = {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  current: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  enrollmentCount: number;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  locked: boolean;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  number: number;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  publishedAt: string | null;
+  status: CourseRevisionListResponseDtoItemsItemStatus;
+};
+
+export interface CourseRevisionListResponseDto {
+  items: CourseRevisionListResponseDtoItemsItem[];
 }
 
 /**
@@ -4302,6 +4378,71 @@ export const coursesPublishChecks = async (id: string, options?: Parameters<type
   {
     ...options,
     method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getRevisionsListUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/revisions`
+}
+
+export const revisionsList = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<CourseRevisionListResponseDto> => {
+
+  return serverFetch<CourseRevisionListResponseDto>(getRevisionsListUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getRevisionsCloneUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/revisions`
+}
+
+export const revisionsClone = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<CourseRevisionItemDto> => {
+
+  return serverFetch<CourseRevisionItemDto>(getRevisionsCloneUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getRevisionsPublishUrl = (id: string,
+    revisionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/revisions/${revisionId}/publish`
+}
+
+export const revisionsPublish = async (id: string,
+    revisionId: string, options?: Parameters<typeof serverFetch>[1]): Promise<CourseRevisionItemDto> => {
+
+  return serverFetch<CourseRevisionItemDto>(getRevisionsPublishUrl(id,revisionId),
+  {
+    ...options,
+    method: 'POST'
 
 
   }
