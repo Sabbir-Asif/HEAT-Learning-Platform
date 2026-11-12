@@ -417,6 +417,9 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   ORIGIN_NOT_ALLOWED: 'ORIGIN_NOT_ALLOWED',
   PASSWORD_BREACHED: 'PASSWORD_BREACHED',
   PASSWORD_CHANGE_REQUIRED: 'PASSWORD_CHANGE_REQUIRED',
+  PASSWORD_CODE_EMAIL_UNVERIFIED: 'PASSWORD_CODE_EMAIL_UNVERIFIED',
+  PASSWORD_CODE_EXPIRED: 'PASSWORD_CODE_EXPIRED',
+  PASSWORD_CODE_INVALID: 'PASSWORD_CODE_INVALID',
   PROFILE_LOCKED: 'PROFILE_LOCKED',
   QUIZ_ANSWER_INVALID: 'QUIZ_ANSWER_INVALID',
   QUIZ_ATTEMPT_LIMIT_REACHED: 'QUIZ_ATTEMPT_LIMIT_REACHED',
@@ -507,6 +510,21 @@ export interface CertificateListResponseDto {
 }
 
 export interface ChangePasswordRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 256
+     */
+  currentPassword: string;
+  /**
+     * @minLength 12
+     * @maxLength 256
+     */
+  newPassword: string;
+}
+
+export interface ChangeStudentPasswordRequestDto {
+  /** @pattern ^\d{6}$ */
+  code: string;
   /**
      * @minLength 1
      * @maxLength 256
@@ -1520,6 +1538,14 @@ export interface ModuleSummaryDto {
   title: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   updatedAt: string;
+}
+
+export interface PasswordCodeRequestedResponseDto {
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  expiresInMinutes: number;
 }
 
 export type PlaybackSessionResponseDtoCaptionsItem = {
@@ -5785,6 +5811,62 @@ return serverFetch<SignedInEnrollmentResponseDto>(getSignedInEnrollmentRequestUr
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(signedInEnrollmentRequestDto)
+  }
+);}
+
+
+
+export const getPasswordChangeChangeUrl = () => {
+
+
+
+
+  return `/api/me/password`
+}
+
+export const passwordChangeChange = async (changeStudentPasswordRequestDto: ChangeStudentPasswordRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<void>(getPasswordChangeChangeUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(changeStudentPasswordRequestDto)
+  }
+);}
+
+
+
+export const getPasswordChangeRequestCodeUrl = () => {
+
+
+
+
+  return `/api/me/password/code`
+}
+
+export const passwordChangeRequestCode = async ( options?: Parameters<typeof serverFetch>[1]): Promise<PasswordCodeRequestedResponseDto> => {
+
+  return serverFetch<PasswordCodeRequestedResponseDto>(getPasswordChangeRequestCodeUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
   }
 );}
 

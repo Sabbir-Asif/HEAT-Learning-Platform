@@ -733,6 +733,9 @@
                     "ORIGIN_NOT_ALLOWED",
                     "PASSWORD_BREACHED",
                     "PASSWORD_CHANGE_REQUIRED",
+                    "PASSWORD_CODE_EMAIL_UNVERIFIED",
+                    "PASSWORD_CODE_EXPIRED",
+                    "PASSWORD_CODE_INVALID",
                     "PROFILE_LOCKED",
                     "QUIZ_ANSWER_INVALID",
                     "QUIZ_ATTEMPT_LIMIT_REACHED",
@@ -899,6 +902,30 @@
         },
         "required": [
           "currentPassword",
+          "newPassword"
+        ],
+        "type": "object"
+      },
+      "ChangeStudentPasswordRequestDto": {
+        "properties": {
+          "code": {
+            "pattern": "^\\d{6}$",
+            "type": "string"
+          },
+          "currentPassword": {
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+          },
+          "newPassword": {
+            "maxLength": 256,
+            "minLength": 12,
+            "type": "string"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "code",
           "newPassword"
         ],
         "type": "object"
@@ -2718,6 +2745,20 @@
           "sections",
           "createdAt",
           "updatedAt"
+        ],
+        "type": "object"
+      },
+      "PasswordCodeRequestedResponseDto": {
+        "properties": {
+          "expiresInMinutes": {
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "expiresInMinutes"
         ],
         "type": "object"
       },
@@ -8741,6 +8782,51 @@
         },
         "tags": [
           "enrollment"
+        ]
+      }
+    },
+    "/api/me/password": {
+      "post": {
+        "operationId": "passwordChangeChange",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeStudentPasswordRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/api/me/password/code": {
+      "post": {
+        "operationId": "passwordChangeRequestCode",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasswordCodeRequestedResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "me"
         ]
       }
     },

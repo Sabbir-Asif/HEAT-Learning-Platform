@@ -44,6 +44,7 @@ import type {
   CaptchaResponseDto,
   CertificateListResponseDto,
   ChangePasswordRequestDto,
+  ChangeStudentPasswordRequestDto,
   CourseListResponseDto,
   CourseSummaryDto,
   CoursesListParams,
@@ -79,6 +80,7 @@ import type {
   MeResponseDto,
   ModuleListResponseDto,
   ModuleSummaryDto,
+  PasswordCodeRequestedResponseDto,
   PlaybackSessionResponseDto,
   ProfileResponseDto,
   ProgressBatchDto,
@@ -9587,6 +9589,156 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getSignedInEnrollmentRequestMutationOptions(options), queryClient);
+    }
+
+export const getPasswordChangeChangeUrl = () => {
+
+
+
+
+  return `/api/me/password`
+}
+
+export const passwordChangeChange = async (changeStudentPasswordRequestDto: ChangeStudentPasswordRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<void>(getPasswordChangeChangeUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(changeStudentPasswordRequestDto)
+  }
+);}
+
+
+
+
+
+export const getPasswordChangeChangeMutationKey = () => ['passwordChangeChange'] as const;
+
+export const getPasswordChangeChangeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof passwordChangeChange>>, TError,PasswordChangeChangeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof passwordChangeChange>>, TError,PasswordChangeChangeMutationVariables, TContext> => {
+
+const mutationKey = getPasswordChangeChangeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof passwordChangeChange>>, PasswordChangeChangeMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  passwordChangeChange(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PasswordChangeChangeMutationResult = NonNullable<Awaited<ReturnType<typeof passwordChangeChange>>>
+    export type PasswordChangeChangeMutationBody = ChangeStudentPasswordRequestDto
+    export type PasswordChangeChangeMutationError = ErrorType<unknown>
+    export type PasswordChangeChangeMutationVariables = {data: ChangeStudentPasswordRequestDto}
+
+    export const usePasswordChangeChange = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof passwordChangeChange>>, TError,PasswordChangeChangeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof passwordChangeChange>>,
+        TError,
+        PasswordChangeChangeMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPasswordChangeChangeMutationOptions(options), queryClient);
+    }
+
+export const getPasswordChangeRequestCodeUrl = () => {
+
+
+
+
+  return `/api/me/password/code`
+}
+
+export const passwordChangeRequestCode = async ( options?: Parameters<typeof customFetch>[1]): Promise<PasswordCodeRequestedResponseDto> => {
+
+  return customFetch<PasswordCodeRequestedResponseDto>(getPasswordChangeRequestCodeUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getPasswordChangeRequestCodeMutationKey = () => ['passwordChangeRequestCode'] as const;
+
+export const getPasswordChangeRequestCodeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof passwordChangeRequestCode>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof passwordChangeRequestCode>>, TError,void, TContext> => {
+
+const mutationKey = getPasswordChangeRequestCodeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof passwordChangeRequestCode>>, void> = () => {
+
+
+          return  passwordChangeRequestCode(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PasswordChangeRequestCodeMutationResult = NonNullable<Awaited<ReturnType<typeof passwordChangeRequestCode>>>
+
+    export type PasswordChangeRequestCodeMutationError = ErrorType<unknown>
+
+
+    export const usePasswordChangeRequestCode = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof passwordChangeRequestCode>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof passwordChangeRequestCode>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getPasswordChangeRequestCodeMutationOptions(options), queryClient);
     }
 
 export const getProfileDescribeUrl = () => {
