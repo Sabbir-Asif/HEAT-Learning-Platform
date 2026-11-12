@@ -43,7 +43,12 @@ export class EmailQuotaPause extends Error {
   }
 }
 
-const reservedPayloadKeys: ReadonlySet<string> = new Set(["template", "userId", "encryptedToken"]);
+const reservedPayloadKeys: ReadonlySet<string> = new Set([
+  "template",
+  "userId",
+  "encryptedToken",
+  "encryptedCode",
+]);
 
 const asRecord = (value: unknown): Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value)
@@ -112,6 +117,8 @@ export class EmailDelivery {
       variables["name"] = job.recipientName ?? nameFromAddress(job.recipientAddress);
       const sealed = payload["encryptedToken"];
       if (typeof sealed === "string") variables["token"] = this.unseal(sealed);
+      const sealedCode = payload["encryptedCode"];
+      if (typeof sealedCode === "string") variables["code"] = this.unseal(sealedCode);
       const rendered = await this.render(job.template, variables);
       const attachments = (await this.attachments?.load(job.template, job.payload)) ?? [];
       return {
