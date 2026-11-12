@@ -98,6 +98,13 @@ export const studentQuizAttemptSchema = z.object({
   passed: z.boolean(),
 });
 
+export const studentQuizSchema = z.object({
+  id: z.uuid(),
+  attemptLimit: z.number().int().nullable(),
+  grantedAttempts: z.number().int().min(0),
+  canGrantAttempt: z.boolean(),
+});
+
 export const studentModuleProgressSchema = z.object({
   moduleId: z.uuid(),
   order: z.number().int(),
@@ -105,6 +112,7 @@ export const studentModuleProgressSchema = z.object({
   status: moduleProgressStatusSchema,
   completedAt: z.iso.datetime().nullable(),
   videos: z.array(studentVideoProgressSchema),
+  quiz: studentQuizSchema.nullable(),
   quizAttempts: z.array(studentQuizAttemptSchema),
 });
 

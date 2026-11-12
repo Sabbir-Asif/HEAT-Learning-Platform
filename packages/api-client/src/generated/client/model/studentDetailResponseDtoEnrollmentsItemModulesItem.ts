@@ -4,6 +4,7 @@
  * HEAT LMS API
  * OpenAPI spec version: 1.0.0
  */
+import type { StudentDetailResponseDtoEnrollmentsItemModulesItemQuiz } from './studentDetailResponseDtoEnrollmentsItemModulesItemQuiz';
 import type { StudentDetailResponseDtoEnrollmentsItemModulesItemQuizAttemptsItem } from './studentDetailResponseDtoEnrollmentsItemModulesItemQuizAttemptsItem';
 import type { StudentDetailResponseDtoEnrollmentsItemModulesItemStatus } from './studentDetailResponseDtoEnrollmentsItemModulesItemStatus';
 import type { StudentDetailResponseDtoEnrollmentsItemModulesItemVideosItem } from './studentDetailResponseDtoEnrollmentsItemModulesItemVideosItem';
@@ -21,6 +22,8 @@ export type StudentDetailResponseDtoEnrollmentsItemModulesItem = {
      * @maximum 9007199254740991
      */
   order: number;
+  /** @nullable */
+  quiz: StudentDetailResponseDtoEnrollmentsItemModulesItemQuiz;
   quizAttempts: StudentDetailResponseDtoEnrollmentsItemModulesItemQuizAttemptsItem[];
   status: StudentDetailResponseDtoEnrollmentsItemModulesItemStatus;
   title: string;

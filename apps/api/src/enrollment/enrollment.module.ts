@@ -9,6 +9,8 @@ import { DirectoryModule } from "../directory";
 import { EmailVerificationModule } from "../email-verification";
 import { NotificationsModule } from "../notifications";
 import { RateLimitModule } from "../rate-limit";
+import { AttemptGrantController } from "./attempt-grant.controller";
+import { AttemptGrantService } from "./attempt-grant.service";
 import { ApprovalQueueService } from "./approval-queue.service";
 import { EnrollmentApprovalController } from "./enrollment-approval.controller";
 import { EnrollmentRemovalController } from "./enrollment-removal.controller";
@@ -39,6 +41,7 @@ import { StudentListService } from "./student-list.service";
     EnrollmentController,
     EnrollmentApprovalController,
     EnrollmentRemovalController,
+    AttemptGrantController,
     StudentListController,
     StudentDetailController,
   ],
@@ -47,6 +50,7 @@ import { StudentListService } from "./student-list.service";
     EnrollmentApprovalService,
     EnrollmentRejectionService,
     EnrollmentRemovalService,
+    AttemptGrantService,
     ApprovalQueueService,
     StudentListService,
     StudentDetailService,

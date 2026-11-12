@@ -1,8 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type { StudentDetail } from "@heat/contracts";
 import type { HeatClient } from "@heat/db";
-import { APP_CONFIG, DATABASE } from "../core";
-import type { AppConfig } from "../core";
+import { APP_CONFIG, CLOCK, DATABASE } from "../core";
+import type { AppConfig, Clock } from "../core";
 import { ApiException } from "../http/api-exception";
 import { toStudentDetail } from "./student-detail-rules";
 
@@ -51,6 +51,7 @@ const enrollmentSelect = {
   },
   videoProgress: { select: { videoId: true, coverage: true, completedAt: true } },
   moduleProgress: { select: { moduleId: true, status: true, completedAt: true } },
+  attemptGrants: { select: { quizId: true, extraAttempts: true } },
   quizAttempts: {
     select: {
       id: true,
@@ -72,7 +73,7 @@ const moduleSelect = {
     where: { deletedAt: null },
     select: { id: true, order: true, title: true, required: true },
   },
-  quiz: { where: { deletedAt: null }, select: { id: true } },
+  quiz: { where: { deletedAt: null }, select: { id: true, attemptLimit: true, waitMinutes: true } },
 } as const;
 
 @Injectable()
@@ -80,6 +81,7 @@ export class StudentDetailService {
   constructor(
     @Inject(DATABASE) private readonly database: HeatClient,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
+    @Inject(CLOCK) private readonly clock: Clock,
   ) {}
 
   async get(userId: string): Promise<StudentDetail> {
@@ -117,6 +119,7 @@ export class StudentDetailService {
         revisionModules: modules.filter((module) => module.revisionId === courseRevisionId),
       })),
       this.config.publicAppUrl,
+      this.clock.now(),
     );
     if (detail === null) throw new ApiException(404, "NOT_FOUND");
     return detail;
