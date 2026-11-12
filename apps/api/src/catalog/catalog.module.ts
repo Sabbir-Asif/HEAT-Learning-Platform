@@ -12,6 +12,11 @@ import { PublicCoursesService } from "./public-courses.service";
 import { PublicImagesService } from "./public-images.service";
 import { HttpPublicRevalidation, PUBLIC_REVALIDATION } from "./public-revalidation";
 import {
+  AdminContactSettingsController,
+  PublicContactSettingsController,
+} from "./contact-settings.controller";
+import { ContactSettingsService } from "./contact-settings.service";
+import {
   AdminSiteSettingsController,
   PublicSiteSettingsController,
 } from "./site-settings.controller";
@@ -57,6 +62,8 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     PublicCoursesController,
     AdminSiteSettingsController,
     PublicSiteSettingsController,
+    AdminContactSettingsController,
+    PublicContactSettingsController,
   ],
   providers: [
     CoursesService,
@@ -83,6 +90,7 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     TagAssignmentsService,
     FrontPageService,
     SiteSettingsService,
+    ContactSettingsService,
     PublicImagesService,
     PublicCoursesService,
     { provide: PUBLIC_REVALIDATION, useClass: HttpPublicRevalidation },

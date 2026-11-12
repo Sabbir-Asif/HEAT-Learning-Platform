@@ -1,4 +1,7 @@
 import {
+  adminContactSettingsResponseSchema,
+  contactSettingsRequestSchema,
+  publicContactSettingsResponseSchema,
   adminFrontPageResponseSchema,
   adminLandingOverviewResponseSchema,
   landingOverviewRequestSchema,
@@ -130,4 +133,14 @@ export class AdminLandingOverviewResponseDto extends createZodDto(
 
 export class PublicLandingOverviewResponseDto extends createZodDto(
   publicLandingOverviewResponseSchema,
+) {}
+
+export class ContactSettingsRequestDto extends createZodDto(contactSettingsRequestSchema) {}
+
+export class AdminContactSettingsResponseDto extends createZodDto(
+  adminContactSettingsResponseSchema,
+) {}
+
+export class PublicContactSettingsResponseDto extends createZodDto(
+  publicContactSettingsResponseSchema,
 ) {}
