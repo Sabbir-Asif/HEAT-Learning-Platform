@@ -8,6 +8,8 @@ import type { ContentLockTransaction } from "../catalog";
 import { CLOCK, DATABASE } from "../core";
 import type { Clock } from "../core";
 import { ApiException } from "../http/api-exception";
+import { NotificationsService } from "../notifications";
+import type { NotificationWriter } from "../notifications";
 import { approvalRefusal } from "./approval-rules";
 import type { EnrollmentStatusName } from "./approval-rules";
 
@@ -24,7 +26,8 @@ type ApprovalTransaction = ContentLockTransaction &
     | "outbox"
     | "auditLog"
     | "courseRevision"
-  >;
+  > &
+  NotificationWriter;
 
 @Injectable()
 export class EnrollmentApprovalService {
@@ -34,6 +37,7 @@ export class EnrollmentApprovalService {
     private readonly courses: CourseLookupService,
     private readonly locks: ContentLockService,
     private readonly audit: AuditService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   approve(id: string, actor: AdminActor, reason?: string): Promise<ApprovedEnrollment> {
@@ -103,6 +107,11 @@ export class EnrollmentApprovalService {
           courseId: enrollment.courseId,
         },
       },
+    });
+    await this.notifications.createWithin(tx, {
+      userId: enrollment.userId,
+      type: "ENROLLMENT_APPROVED",
+      data: { enrollmentId: id, courseId: enrollment.courseId },
     });
     await this.audit.record(tx, actor, {
       action: "enrollment.approve",

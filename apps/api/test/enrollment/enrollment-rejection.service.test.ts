@@ -54,12 +54,14 @@ const build = (options: Options = {}) => {
     }),
   };
   const audit = { record: vi.fn().mockResolvedValue(undefined) };
+  const notifications = { createWithin: vi.fn().mockResolvedValue(true) };
   const service = new EnrollmentRejectionService(
     database as never,
     { now: () => now },
     audit as never,
+    notifications as never,
   );
-  return { service, tx, audit };
+  return { service, tx, audit, notifications };
 };
 
 describe("EnrollmentRejectionService.reject", () => {
@@ -117,6 +119,26 @@ describe("EnrollmentRejectionService.reject", () => {
         id: { not: "enrollment-id" },
         status: { in: ["APPROVED", "COMPLETED"] },
       },
+    });
+  });
+
+  test("creates no notification when the account is deleted", async () => {
+    const { service, notifications } = build({ otherAccess: 0 });
+
+    await service.reject("enrollment-id", actor);
+
+    expect(notifications.createWithin).not.toHaveBeenCalled();
+  });
+
+  test("notifies a student whose account is kept", async () => {
+    const { service, tx, notifications } = build({ otherAccess: 1 });
+
+    await service.reject("enrollment-id", actor);
+
+    expect(notifications.createWithin).toHaveBeenCalledWith(tx, {
+      userId: "user-id",
+      type: "ENROLLMENT_REJECTED",
+      data: { enrollmentId: "enrollment-id", courseId: expect.any(String) },
     });
   });
 
