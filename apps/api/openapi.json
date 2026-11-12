@@ -717,6 +717,7 @@
                     "DIRECTORY_IN_USE",
                     "DIRECTORY_NAME_TAKEN",
                     "EMAIL_IN_USE",
+                    "EMAIL_NOT_VERIFIED",
                     "ENROLLMENT_ALREADY_DECIDED",
                     "ENROLLMENT_NOT_ACTIVE",
                     "ENROLLMENT_NOT_VERIFIED",
@@ -3595,6 +3596,53 @@
         "required": [
           "email",
           "password"
+        ],
+        "type": "object"
+      },
+      "SignedInEnrollmentRequestDto": {
+        "properties": {
+          "courseSlug": {
+            "maxLength": 80,
+            "minLength": 1,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "courseSlug"
+        ],
+        "type": "object"
+      },
+      "SignedInEnrollmentResponseDto": {
+        "properties": {
+          "courseSlug": {
+            "maxLength": 80,
+            "minLength": 1,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "enrollmentId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PENDING_VERIFICATION",
+              "PENDING_APPROVAL",
+              "APPROVED",
+              "COMPLETED",
+              "REJECTED",
+              "EXPIRED",
+              "REMOVED"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "enrollmentId",
+          "courseSlug",
+          "status"
         ],
         "type": "object"
       },
@@ -8473,6 +8521,37 @@
         },
         "tags": [
           "learning"
+        ]
+      }
+    },
+    "/api/me/enrollments": {
+      "post": {
+        "operationId": "signedInEnrollmentRequest",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignedInEnrollmentRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignedInEnrollmentResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "enrollment"
         ]
       }
     },

@@ -13,6 +13,8 @@ import { EnrollmentApprovalController } from "./enrollment-approval.controller";
 import { EnrollmentApprovalService } from "./enrollment-approval.service";
 import { EnrollmentController } from "./enrollment.controller";
 import { EnrollmentService } from "./enrollment.service";
+import { SignedInEnrollmentController } from "./signed-in-enrollment.controller";
+import { SignedInEnrollmentService } from "./signed-in-enrollment.service";
 
 @Module({
   imports: [
@@ -26,7 +28,12 @@ import { EnrollmentService } from "./enrollment.service";
     EmailVerificationModule,
     RateLimitModule,
   ],
-  controllers: [EnrollmentController, EnrollmentApprovalController],
-  providers: [EnrollmentService, EnrollmentApprovalService, ApprovalQueueService],
+  controllers: [EnrollmentController, EnrollmentApprovalController, SignedInEnrollmentController],
+  providers: [
+    EnrollmentService,
+    EnrollmentApprovalService,
+    ApprovalQueueService,
+    SignedInEnrollmentService,
+  ],
 })
 export class EnrollmentModule {}
