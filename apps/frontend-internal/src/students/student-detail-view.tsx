@@ -31,6 +31,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   BanIcon,
   DownloadIcon,
+  PlusIcon,
   RefreshCwIcon,
   RotateCcwIcon,
   SearchXIcon,
@@ -39,11 +40,15 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
+import { StudentAttemptGrantSheet } from "./student-attempt-grant-sheet";
+import type { StudentAttemptGrantTarget } from "./student-attempt-grant-sheet";
 import { StudentCertificateSheet } from "./student-certificate-sheet";
 import type { StudentCertificateTarget } from "./student-certificate-sheet";
 import { StudentRemovalSheet } from "./student-removal-sheet";
 import type { StudentRemovalTarget } from "./student-removal-sheet";
 import {
+  attemptGrantNotice,
+  attemptLimitLabel,
   attemptOutcomeLabel,
   attemptScoreLabel,
   canReinstateStudent,
@@ -90,7 +95,15 @@ function Decisions({ enrollment }: { enrollment: Enrollment }) {
   );
 }
 
-function Modules({ enrollment }: { enrollment: Enrollment }) {
+function Modules({
+  enrollment,
+  studentName,
+  onGrant,
+}: {
+  enrollment: Enrollment;
+  studentName: string;
+  onGrant: (target: NonNullable<StudentAttemptGrantTarget>) => void;
+}) {
   if (enrollment.modules.length === 0) {
     return <FieldDescription>Modules appear after the enrollment is approved.</FieldDescription>;
   }
@@ -121,6 +134,29 @@ function Modules({ enrollment }: { enrollment: Enrollment }) {
                 ))}
               </TableBody>
             </Table>
+          ) : null}
+          {module.quiz !== null ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <FieldDescription>{attemptLimitLabel(module.quiz)}</FieldDescription>
+              {module.quiz.canGrantAttempt ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() =>
+                    module.quiz !== null &&
+                    onGrant({
+                      enrollmentId: enrollment.id,
+                      quizId: module.quiz.id,
+                      studentName,
+                      moduleTitle: module.title,
+                    })
+                  }
+                >
+                  <PlusIcon data-icon="inline-start" />
+                  Grant extra attempt
+                </Button>
+              ) : null}
+            </div>
           ) : null}
           {module.quizAttempts.length > 0 ? (
             <Table aria-label={`Quiz attempts in ${module.title}`}>
@@ -211,6 +247,7 @@ export function StudentDetailView({ id }: { id: string }) {
   const student = useStudentDetailGet(id);
   const [removalTarget, setRemovalTarget] = useState<StudentRemovalTarget>(null);
   const [certificateTarget, setCertificateTarget] = useState<StudentCertificateTarget>(null);
+  const [grantTarget, setGrantTarget] = useState<StudentAttemptGrantTarget>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   if (student.isPending) {
@@ -298,7 +335,14 @@ export function StudentDetailView({ id }: { id: string }) {
           </div>
           <FieldDescription>{`Requested ${formatDhakaTime(enrollment.requestedAt)}`}</FieldDescription>
           <Decisions enrollment={enrollment} />
-          <Modules enrollment={enrollment} />
+          <Modules
+            enrollment={enrollment}
+            studentName={current.name}
+            onGrant={(target) => {
+              setNotice(null);
+              setGrantTarget(target);
+            }}
+          />
           <Certificate
             enrollment={enrollment}
             onAction={(target) => {
@@ -317,6 +361,14 @@ export function StudentDetailView({ id }: { id: string }) {
           void queryClient.invalidateQueries({
             queryKey: getStudentListListQueryKey().slice(0, 1),
           });
+        }}
+      />
+      <StudentAttemptGrantSheet
+        target={grantTarget}
+        onClose={() => setGrantTarget(null)}
+        onFinished={(studentName, moduleTitle) => {
+          setNotice(attemptGrantNotice(studentName, moduleTitle));
+          void queryClient.invalidateQueries({ queryKey: getStudentDetailGetQueryKey(id) });
         }}
       />
       <StudentCertificateSheet
