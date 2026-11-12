@@ -29,8 +29,11 @@ export const dhakaDay = (now: Date): string =>
 export const dhakaHour = (now: Date): number =>
   new Date(now.getTime() + dhakaOffsetMilliseconds).getUTCHours();
 
+export const isDailyRunDue = (now: Date, hour: number, lastRunDay: string | null): boolean =>
+  dhakaHour(now) >= hour && dhakaDay(now) !== lastRunDay;
+
 export const isCleanupDue = (now: Date, lastRunDay: string | null): boolean =>
-  dhakaHour(now) >= runHour && dhakaDay(now) !== lastRunDay;
+  isDailyRunDue(now, runHour, lastRunDay);
 
 export class MediaCleanup {
   constructor(
