@@ -28,6 +28,7 @@ const content = (...bodies: object[]): LessonContentState => ({
       title: `Section ${index + 1}`,
       schemaVersion: 1,
       body: body as Record<string, unknown>,
+      images: [],
     })),
   },
 });
@@ -56,6 +57,31 @@ describe("LessonPage", () => {
     const laptop = view.querySelector('[data-layout="laptop-text"]');
     expect(laptop?.querySelector("h2")?.textContent).toBe("Section 1");
     expect(laptop?.querySelector("p")?.textContent).toBe("First paragraph");
+  });
+
+  test("a rich-text section renders its blockquote and its resolved image", async () => {
+    const assetId = uuid(900);
+    const body = {
+      type: "doc",
+      content: [
+        {
+          type: "blockquote",
+          content: [{ type: "paragraph", content: [{ type: "text", text: "Quote" }] }],
+        },
+        { type: "image", attrs: { assetId, alt: "A poster" } },
+      ],
+    };
+    const lesson = content(body);
+    if (lesson.status === "ready" && lesson.content.sections[0] !== undefined) {
+      lesson.content.sections[0].images = [{ assetId, url: "/media/p/w.webp", alt: "A poster" }];
+    }
+
+    const view = await render(lesson);
+
+    const laptop = view.querySelector('[data-layout="laptop-text"]');
+    expect(laptop?.querySelector("blockquote")?.textContent).toBe("Quote");
+    expect(laptop?.querySelector("img")?.getAttribute("src")).toBe("/media/p/w.webp");
+    expect(laptop?.querySelector("h2")?.textContent).toBe("Section 1");
   });
 
   test("a javascript link is dropped and an unknown node is not rendered", async () => {

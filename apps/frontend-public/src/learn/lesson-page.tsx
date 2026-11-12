@@ -22,6 +22,7 @@ import {
   TabsTrigger,
 } from "@heat/ui";
 import type { LessonBlock } from "@heat/ui";
+import { RichTextRenderer } from "@heat/ui/content";
 import { ShellContent } from "@heat/ui/shell";
 import { FileTextIcon } from "lucide-react";
 import Link from "next/link";
@@ -29,7 +30,7 @@ import { courseHref } from "./learning-view";
 import type { LearningModule } from "./learning-view";
 import { ModuleList } from "./module-list";
 import { QuizAction } from "./quiz-action";
-import { sanitizeLessonBody } from "./lesson-text";
+import { richSectionOf, sanitizeLessonBody } from "./lesson-text";
 import { VideoArea } from "./video-area";
 
 export type LessonContentState =
@@ -106,11 +107,22 @@ function Sections({ lesson }: { lesson: LessonContentState }) {
   }
   return (
     <div className="flex flex-col gap-6">
-      {sections.map((section) => (
-        <section key={section.id} aria-label={section.title === "" ? "Lesson" : section.title}>
-          <LessonText title={section.title} blocks={sanitizeLessonBody(section.body)} />
-        </section>
-      ))}
+      {sections.map((section) => {
+        const rich = richSectionOf(section);
+        return (
+          <section key={section.id} aria-label={section.title === "" ? "Lesson" : section.title}>
+            {rich === null ? (
+              <LessonText title={section.title} blocks={sanitizeLessonBody(section.body)} />
+            ) : (
+              <RichTextRenderer
+                title={section.title}
+                document={rich.document}
+                images={rich.images}
+              />
+            )}
+          </section>
+        );
+      })}
     </div>
   );
 }
