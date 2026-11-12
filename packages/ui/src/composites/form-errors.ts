@@ -51,9 +51,11 @@ export type FormErrorCopyKey =
   | "PASSWORD_BREACHED"
   | "PASSWORD_CHANGE_REQUIRED"
   | "QUIZ_ANSWER_INVALID"
+  | "QUIZ_ATTEMPTS_UNLIMITED"
   | "QUIZ_ATTEMPT_LIMIT_REACHED"
   | "QUIZ_ATTEMPT_NOT_OPEN"
   | "QUIZ_ATTEMPT_WAIT"
+  | "QUIZ_GRANT_NOT_NEEDED"
   | "QUIZ_NOT_UNLOCKED"
   | "RATE_LIMITED"
   | "RESET_LINK_EXPIRED"
@@ -138,10 +140,13 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
   QUIZ_ANSWER_INVALID:
     "One of the answers does not belong to this quiz. Reload the quiz and try again.",
+  QUIZ_ATTEMPTS_UNLIMITED: "This quiz has no attempt limit, so there is nothing to grant.",
   QUIZ_ATTEMPT_LIMIT_REACHED: "You have used all your attempts for this quiz.",
   QUIZ_ATTEMPT_NOT_OPEN:
     "This attempt was already submitted or is no longer open. Reload the quiz.",
   QUIZ_ATTEMPT_WAIT: "You need to wait before you can submit another attempt.",
+  QUIZ_GRANT_NOT_NEEDED:
+    "The student still has attempts left or has already passed, so no extra attempt is needed.",
   QUIZ_NOT_UNLOCKED: "Watch the required videos in this module to unlock the quiz.",
   RATE_LIMITED: "Too many attempts. Wait a little and try again.",
   RESET_LINK_EXPIRED: "This reset link has expired. Request a new one.",
