@@ -6,6 +6,7 @@ import {
   useNotificationsList,
   useNotificationsMarkAllRead,
   useNotificationsMarkRead,
+  useNotificationsUnreadCount,
 } from "@heat/api-client";
 import { Button, NotificationRow, PageHeader, toast } from "@heat/ui";
 import { ShellContent } from "@heat/ui/shell";
@@ -26,6 +27,7 @@ export function NotificationsScreen() {
     { page, pageSize: notificationsPageSize },
     { query: { placeholderData: keepPreviousData } },
   );
+  const unread = useNotificationsUnreadCount();
   const refresh = async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: getNotificationsListQueryKey() }),
@@ -47,7 +49,7 @@ export function NotificationsScreen() {
 
   const models = items.map(toNotificationRowModel);
   const pageCount = Math.max(1, Math.ceil(total / notificationsPageSize));
-  const hasUnread = models.some((model) => model.unread);
+  const hasUnread = (unread.data?.count ?? 0) > 0;
   return (
     <ShellContent>
       <PageHeader

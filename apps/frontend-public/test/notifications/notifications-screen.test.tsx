@@ -7,10 +7,12 @@ import { mount } from "../learn/mount";
 const useNotificationsList = vi.fn();
 const markRead = vi.fn();
 const markAllRead = vi.fn();
+const useNotificationsUnreadCount = vi.fn();
 
 vi.mock("@heat/api-client", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@heat/api-client")>()),
   useNotificationsList: (...args: unknown[]) => useNotificationsList(...args),
+  useNotificationsUnreadCount: () => useNotificationsUnreadCount(),
   useNotificationsMarkRead: () => ({ mutate: markRead, isPending: false, variables: undefined }),
   useNotificationsMarkAllRead: () => ({ mutate: markAllRead, isPending: false }),
 }));
@@ -24,6 +26,8 @@ beforeEach(() => {
   useNotificationsList.mockReset();
   markRead.mockReset();
   markAllRead.mockReset();
+  useNotificationsUnreadCount.mockReset();
+  useNotificationsUnreadCount.mockReturnValue({ data: { count: 1 } });
 });
 
 const id = "0198f1a0-0000-7000-8000-0000000000a1";
@@ -87,8 +91,16 @@ describe("NotificationsScreen", () => {
     expect(markAllRead).toHaveBeenCalledTimes(1);
   });
 
-  test("disables mark all when nothing is unread", async () => {
+  test("keeps mark all enabled when unread items sit on another page", async () => {
+    loaded([item({ readAt: "2026-11-12T05:00:00.000Z" })], 45);
+    useNotificationsUnreadCount.mockReturnValue({ data: { count: 3 } });
+    const view = await mount(<NotificationsScreen />);
+    expect(button(view, "Mark all as read")?.disabled).toBe(false);
+  });
+
+  test("disables mark all when the unread count is zero", async () => {
     loaded([item({ readAt: "2026-11-12T05:00:00.000Z" })]);
+    useNotificationsUnreadCount.mockReturnValue({ data: { count: 0 } });
     const view = await mount(<NotificationsScreen />);
     expect(button(view, "Mark all as read")?.disabled).toBe(true);
   });
