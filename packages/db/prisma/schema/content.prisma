@@ -50,6 +50,7 @@ model Resource {
   url          String?
   mediaAssetId String?      @db.Uuid
   displayOrder Int          @default(0)
+  published    Boolean      @default(false)
   deletedAt    DateTime?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
@@ -59,6 +60,7 @@ model Resource {
 
   @@index([courseId])
   @@index([mediaAssetId])
+  @@index([published, displayOrder])
 }
 
 model NewsPost {
