@@ -10,6 +10,7 @@ function createBrowserQueryClient(): QueryClient {
   if (typeof window !== "undefined") {
     installCsrf();
     installSessionRefresh({
+      skipPaths: ["/api/auth/sign-in", "/api/auth/refresh", "/api/me"],
       onExpired: () => {
         const { pathname, search } = window.location;
         if (pathname === "/sign-in" || pathname === "/auth/refresh") return;
