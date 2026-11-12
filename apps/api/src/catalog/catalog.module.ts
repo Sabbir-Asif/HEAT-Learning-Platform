@@ -34,6 +34,9 @@ import { QuizController } from "./quiz.controller";
 import { QuizService } from "./quiz.service";
 import { VideoLibraryController } from "./video-library.controller";
 import { VideoLibraryService } from "./video-library.service";
+import { VideoCaptionsController, VideoCaptionUploadController } from "./video-captions.controller";
+import { VideoCaptionsService } from "./video-captions.service";
+import { CAPTION_STORE, FileCaptionStore } from "./video-caption-store";
 import { VideoSlotsController } from "./video-slots.controller";
 import { VideoSlotsService } from "./video-slots.service";
 import { VideoUploadController } from "./video-upload.controller";
@@ -51,6 +54,8 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     VideoSlotsController,
     VideoLibraryController,
     VideoUploadController,
+    VideoCaptionUploadController,
+    VideoCaptionsController,
     QuizController,
     TagsController,
     TagAssignmentsController,
@@ -70,6 +75,12 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     VideoSlotsService,
     VideoLibraryService,
     VideoUploadService,
+    VideoCaptionsService,
+    {
+      provide: CAPTION_STORE,
+      inject: [APP_CONFIG],
+      useFactory: (config: AppConfig) => new FileCaptionStore(config.transcode.hlsDirectory),
+    },
     { provide: UPLOAD_RANDOM, useValue: randomBytes },
     {
       provide: UPLOAD_STORE,

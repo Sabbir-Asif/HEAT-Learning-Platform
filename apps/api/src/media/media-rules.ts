@@ -1,7 +1,7 @@
 import { mediaLimits, mediaVariantWidths } from "@heat/contracts";
 import type { MediaUploadFields } from "@heat/contracts";
 import { ApiException } from "../http/api-exception";
-import { isImageType } from "./media-sniff";
+import { isImageType, sniffMediaType } from "./media-sniff";
 import type { SniffedType } from "./media-sniff";
 
 export const assertWithinSize = (
@@ -77,3 +77,17 @@ export const canReadPrivate = (
   viewer: { userId: string; admin: boolean },
   uploaderId: string,
 ): boolean => viewer.admin || viewer.userId === uploaderId;
+
+const captionDecoder = new TextDecoder("utf-8", { fatal: true });
+
+export const assertCaptionFile = (bytes: Buffer): void => {
+  if (bytes.length > mediaLimits.captionBytes) throw new ApiException(413, "UPLOAD_TOO_LARGE");
+  if (sniffMediaType(bytes) !== "text/vtt") {
+    throw new ApiException(415, "UPLOAD_TYPE_NOT_ALLOWED");
+  }
+  try {
+    captionDecoder.decode(bytes);
+  } catch {
+    throw new ApiException(415, "UPLOAD_TYPE_NOT_ALLOWED");
+  }
+};
