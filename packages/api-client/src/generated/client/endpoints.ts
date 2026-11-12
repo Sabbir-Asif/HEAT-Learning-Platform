@@ -110,6 +110,8 @@ import type {
   VerificationAcceptedResponseDto,
   VerificationResendRequestDto,
   VerifyEmailRequestDto,
+  VideoLibraryListParams,
+  VideoLibraryListResponseDto,
   VideoSlotListResponseDto
 } from './model';
 
@@ -6265,6 +6267,108 @@ export function useStudentListList<TData = Awaited<ReturnType<typeof studentList
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getStudentListListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getVideoLibraryListUrl = (params?: VideoLibraryListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/videos?${stringifiedParams}` : `/api/admin/videos`
+}
+
+export const videoLibraryList = async (params?: VideoLibraryListParams, options?: Parameters<typeof customFetch>[1]): Promise<VideoLibraryListResponseDto> => {
+
+  return customFetch<VideoLibraryListResponseDto>(getVideoLibraryListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getVideoLibraryListQueryKey = (params?: VideoLibraryListParams,) => {
+    return [
+    `/api/admin/videos`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getVideoLibraryListQueryOptions = <TData = Awaited<ReturnType<typeof videoLibraryList>>, TError = ErrorType<unknown>>(params?: VideoLibraryListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof videoLibraryList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getVideoLibraryListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof videoLibraryList>>> = ({ signal }) => videoLibraryList(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof videoLibraryList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type VideoLibraryListQueryResult = NonNullable<Awaited<ReturnType<typeof videoLibraryList>>>
+export type VideoLibraryListQueryError = ErrorType<unknown>
+
+
+export function useVideoLibraryList<TData = Awaited<ReturnType<typeof videoLibraryList>>, TError = ErrorType<unknown>>(
+ params: undefined |  VideoLibraryListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof videoLibraryList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof videoLibraryList>>,
+          TError,
+          Awaited<ReturnType<typeof videoLibraryList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useVideoLibraryList<TData = Awaited<ReturnType<typeof videoLibraryList>>, TError = ErrorType<unknown>>(
+ params?: VideoLibraryListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof videoLibraryList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof videoLibraryList>>,
+          TError,
+          Awaited<ReturnType<typeof videoLibraryList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useVideoLibraryList<TData = Awaited<ReturnType<typeof videoLibraryList>>, TError = ErrorType<unknown>>(
+ params?: VideoLibraryListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof videoLibraryList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useVideoLibraryList<TData = Awaited<ReturnType<typeof videoLibraryList>>, TError = ErrorType<unknown>>(
+ params?: VideoLibraryListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof videoLibraryList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getVideoLibraryListQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
