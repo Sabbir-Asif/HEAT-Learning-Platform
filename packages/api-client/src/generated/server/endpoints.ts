@@ -1781,6 +1781,61 @@ export interface QuizQuestionRequestDto {
   type?: QuizQuestionRequestDtoType;
 }
 
+export type QuizResultResponseDtoReviewItemOptionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  text: string;
+};
+
+export type QuizResultResponseDtoReviewItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  correctOptionId: string;
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  explanation: string | null;
+  options: QuizResultResponseDtoReviewItemOptionsItem[];
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  questionId: string;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  selectedOptionId: string | null;
+  text: string;
+};
+
+export interface QuizResultResponseDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  attemptId: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  correctCount: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  passMarkPercent: number;
+  passed: boolean;
+  /** @nullable */
+  review: QuizResultResponseDtoReviewItem[] | null;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  scorePercent: number;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  submittedAt: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  totalQuestions: number;
+}
+
 export interface QuizRulesRequestDto {
   /**
      * @minimum 1
@@ -5225,6 +5280,31 @@ return serverFetch<QuizSubmitResponseDto>(getQuizSubmissionSubmitUrl(courseId,mo
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(quizSubmitRequestDto)
+  }
+);}
+
+
+
+export const getQuizResultGetUrl = (courseId: string,
+    moduleId: string,
+    attemptId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/quiz/attempts/${attemptId}`
+}
+
+export const quizResultGet = async (courseId: string,
+    moduleId: string,
+    attemptId: string, options?: Parameters<typeof serverFetch>[1]): Promise<QuizResultResponseDto> => {
+
+  return serverFetch<QuizResultResponseDto>(getQuizResultGetUrl(courseId,moduleId,attemptId),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 
