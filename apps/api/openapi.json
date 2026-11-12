@@ -4249,6 +4249,15 @@
                   "nullable": true,
                   "type": "string"
                 },
+                "captions": {
+                  "items": {
+                    "enum": [
+                      "en"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
                 "failureReason": {
                   "enum": [
                     "SOURCE_UNREADABLE",
@@ -4311,7 +4320,8 @@
                 "status",
                 "assetKey",
                 "rejectionReason",
-                "failureReason"
+                "failureReason",
+                "captions"
               ],
               "type": "object"
             },
@@ -6229,6 +6239,62 @@
                 }
               }
             },
+            "description": ""
+          }
+        },
+        "tags": [
+          "video-slots"
+        ]
+      }
+    },
+    "/api/admin/courses/{id}/modules/{moduleId}/videos/{videoId}/captions/{language}": {
+      "delete": {
+        "operationId": "videoCaptionsRemove",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "moduleId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "videoId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "language",
+            "required": true,
+            "schema": {
+              "enum": [
+                "en"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
             "description": ""
           }
         },

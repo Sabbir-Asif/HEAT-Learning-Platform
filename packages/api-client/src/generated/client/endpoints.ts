@@ -3898,6 +3898,80 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getVideoSlotsUpdateMutationOptions(options), queryClient);
     }
 
+export const getVideoCaptionsRemoveUrl = (id: string,
+    moduleId: string,
+    videoId: string,
+    language: 'en',) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/${videoId}/captions/${language}`
+}
+
+export const videoCaptionsRemove = async (id: string,
+    moduleId: string,
+    videoId: string,
+    language: 'en', options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getVideoCaptionsRemoveUrl(id,moduleId,videoId,language),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getVideoCaptionsRemoveMutationKey = () => ['videoCaptionsRemove'] as const;
+
+export const getVideoCaptionsRemoveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof videoCaptionsRemove>>, TError,VideoCaptionsRemoveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof videoCaptionsRemove>>, TError,VideoCaptionsRemoveMutationVariables, TContext> => {
+
+const mutationKey = getVideoCaptionsRemoveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof videoCaptionsRemove>>, VideoCaptionsRemoveMutationVariables> = (props) => {
+          const {id,moduleId,videoId,language} = props ?? {};
+
+          return  videoCaptionsRemove(id,moduleId,videoId,language,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VideoCaptionsRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof videoCaptionsRemove>>>
+
+    export type VideoCaptionsRemoveMutationError = ErrorType<unknown>
+    export type VideoCaptionsRemoveMutationVariables = {id: string;moduleId: string;videoId: string;language: 'en'}
+
+    export const useVideoCaptionsRemove = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof videoCaptionsRemove>>, TError,VideoCaptionsRemoveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof videoCaptionsRemove>>,
+        TError,
+        VideoCaptionsRemoveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getVideoCaptionsRemoveMutationOptions(options), queryClient);
+    }
+
 export const getVideoSlotsRetryTranscodeUrl = (id: string,
     moduleId: string,
     videoId: string,) => {

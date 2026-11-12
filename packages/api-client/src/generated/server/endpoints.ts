@@ -2320,6 +2320,13 @@ export interface VerifyEmailRequestDto {
   token: string;
 }
 
+export type VideoSlotListResponseDtoItemsItemCaptionsItem = typeof VideoSlotListResponseDtoItemsItemCaptionsItem[keyof typeof VideoSlotListResponseDtoItemsItemCaptionsItem];
+
+
+export const VideoSlotListResponseDtoItemsItemCaptionsItem = {
+  en: 'en',
+} as const;
+
 /**
  * @nullable
  */
@@ -2368,6 +2375,7 @@ export type VideoSlotListResponseDtoItemsItem = {
      * @nullable
      */
   assetKey: string | null;
+  captions: VideoSlotListResponseDtoItemsItemCaptionsItem[];
   /** @nullable */
   failureReason: VideoSlotListResponseDtoItemsItemFailureReason;
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
@@ -3969,6 +3977,33 @@ return serverFetch<VideoSlotListResponseDto>(getVideoSlotsUpdateUrl(id,moduleId,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(updateVideoSlotRequestDto)
+  }
+);}
+
+
+
+export const getVideoCaptionsRemoveUrl = (id: string,
+    moduleId: string,
+    videoId: string,
+    language: 'en',) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/${videoId}/captions/${language}`
+}
+
+export const videoCaptionsRemove = async (id: string,
+    moduleId: string,
+    videoId: string,
+    language: 'en', options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getVideoCaptionsRemoveUrl(id,moduleId,videoId,language),
+  {
+    ...options,
+    method: 'DELETE'
+
+
   }
 );}
 

@@ -218,6 +218,7 @@ export * from './verificationResendRequestDto';
 export * from './verifyEmailRequestDto';
 export * from './videoSlotListResponseDto';
 export * from './videoSlotListResponseDtoItemsItem';
+export * from './videoSlotListResponseDtoItemsItemCaptionsItem';
 export * from './videoSlotListResponseDtoItemsItemFailureReason';
 export * from './videoSlotListResponseDtoItemsItemRejectionReason';
 export * from './videoSlotListResponseDtoItemsItemStatus';
