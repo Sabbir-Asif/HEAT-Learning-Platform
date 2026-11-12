@@ -2816,6 +2816,72 @@ export const AdminPlaybackPreviewResponse = zod.object({
 })
 
 
+export const adminSiteSettingsGetResponseImageAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminSiteSettingsGetResponseImageAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminSiteSettingsGetResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminSiteSettingsGetResponseSchemaVersionMax = 9007199254740991;
+
+export const adminSiteSettingsGetResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const AdminSiteSettingsGetResponse = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "heading": zod.string(),
+  "image": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(adminSiteSettingsGetResponseImageAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "imageAssetId": zod.uuid().regex(adminSiteSettingsGetResponseImageAssetIdRegExpOne).nullable(),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(adminSiteSettingsGetResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "schemaVersion": zod.int().min(1).max(adminSiteSettingsGetResponseSchemaVersionMax),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(adminSiteSettingsGetResponseUpdatedAtRegExp).nullable()
+})
+
+
+export const adminSiteSettingsUpdateBodyHeadingMax = 120;
+
+export const adminSiteSettingsUpdateBodyImageAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminSiteSettingsUpdateBody = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "heading": zod.string().min(1).max(adminSiteSettingsUpdateBodyHeadingMax),
+  "imageAssetId": zod.uuid().regex(adminSiteSettingsUpdateBodyImageAssetIdRegExp).nullable(),
+  "schemaVersion": zod.literal(1)
+})
+
+export const adminSiteSettingsUpdateResponseImageAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminSiteSettingsUpdateResponseImageAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminSiteSettingsUpdateResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminSiteSettingsUpdateResponseSchemaVersionMax = 9007199254740991;
+
+export const adminSiteSettingsUpdateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const AdminSiteSettingsUpdateResponse = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "heading": zod.string(),
+  "image": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(adminSiteSettingsUpdateResponseImageAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "imageAssetId": zod.uuid().regex(adminSiteSettingsUpdateResponseImageAssetIdRegExpOne).nullable(),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(adminSiteSettingsUpdateResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "schemaVersion": zod.int().min(1).max(adminSiteSettingsUpdateResponseSchemaVersionMax),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(adminSiteSettingsUpdateResponseUpdatedAtRegExp).nullable()
+})
+
+
 export const tagsListResponseItemsItemCourseCountMin = 0;
 export const tagsListResponseItemsItemCourseCountMax = 9007199254740991;
 
@@ -3578,6 +3644,31 @@ export const DashboardDescribeResponse = zod.object({
   "reason": zod.string().max(dashboardDescribeResponseCoursesItemReasonMax).nullable(),
   "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED'])
 }))
+})
+
+
+export const publicSiteSettingsGetResponseImageAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicSiteSettingsGetResponseImageAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicSiteSettingsGetResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicSiteSettingsGetResponseSchemaVersionMax = 9007199254740991;
+
+
+
+export const PublicSiteSettingsGetResponse = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "heading": zod.string(),
+  "image": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(publicSiteSettingsGetResponseImageAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "imageAssetId": zod.uuid().regex(publicSiteSettingsGetResponseImageAssetIdRegExpOne).nullable(),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(publicSiteSettingsGetResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "schemaVersion": zod.int().min(1).max(publicSiteSettingsGetResponseSchemaVersionMax)
 })
 
 

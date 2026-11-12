@@ -45,6 +45,48 @@ export interface AdminFrontPageResponseDto {
   modules: AdminFrontPageResponseDtoModulesItem[];
 }
 
+export type AdminLandingOverviewResponseDtoBody = {[key: string]: unknown};
+
+/**
+ * @nullable
+ */
+export type AdminLandingOverviewResponseDtoImage = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+} | null;
+
+export type AdminLandingOverviewResponseDtoImagesItem = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+};
+
+export interface AdminLandingOverviewResponseDto {
+  body: AdminLandingOverviewResponseDtoBody;
+  heading: string;
+  /** @nullable */
+  image: AdminLandingOverviewResponseDtoImage;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  imageAssetId: string | null;
+  images: AdminLandingOverviewResponseDtoImagesItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  schemaVersion: number;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  updatedAt: string | null;
+}
+
 export type AdminListResponseDtoItemsItemRole = typeof AdminListResponseDtoItemsItemRole[keyof typeof AdminListResponseDtoItemsItemRole];
 
 
@@ -1037,6 +1079,30 @@ export interface InviteAdminRequestDto {
   email: string;
 }
 
+export type LandingOverviewRequestDtoBody = {[key: string]: unknown};
+
+export type LandingOverviewRequestDtoSchemaVersion = typeof LandingOverviewRequestDtoSchemaVersion[keyof typeof LandingOverviewRequestDtoSchemaVersion];
+
+
+export const LandingOverviewRequestDtoSchemaVersion = {
+  NUMBER_1: 1,
+} as const;
+
+export interface LandingOverviewRequestDto {
+  body: LandingOverviewRequestDtoBody;
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  heading: string;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  imageAssetId: string | null;
+  schemaVersion: LandingOverviewRequestDtoSchemaVersion;
+}
+
 export type LearningStructureResponseDtoCourse = {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
@@ -1556,6 +1622,43 @@ export type PublicFrontPageResponseDtoModulesItem = {
 export interface PublicFrontPageResponseDto {
   courses: PublicFrontPageResponseDtoCoursesItem[];
   modules: PublicFrontPageResponseDtoModulesItem[];
+}
+
+export type PublicLandingOverviewResponseDtoBody = {[key: string]: unknown};
+
+/**
+ * @nullable
+ */
+export type PublicLandingOverviewResponseDtoImage = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+} | null;
+
+export type PublicLandingOverviewResponseDtoImagesItem = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+};
+
+export interface PublicLandingOverviewResponseDto {
+  body: PublicLandingOverviewResponseDtoBody;
+  heading: string;
+  /** @nullable */
+  image: PublicLandingOverviewResponseDtoImage;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  imageAssetId: string | null;
+  images: PublicLandingOverviewResponseDtoImagesItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  schemaVersion: number;
 }
 
 export type QuizAccessResponseDtoModuleState = typeof QuizAccessResponseDtoModuleState[keyof typeof QuizAccessResponseDtoModuleState];
@@ -4717,6 +4820,62 @@ export const adminPlaybackPreview = async (videoId: string, options?: Parameters
 
 
 
+export const getAdminSiteSettingsGetUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/landing-overview`
+}
+
+export const adminSiteSettingsGet = async ( options?: Parameters<typeof serverFetch>[1]): Promise<AdminLandingOverviewResponseDto> => {
+
+  return serverFetch<AdminLandingOverviewResponseDto>(getAdminSiteSettingsGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getAdminSiteSettingsUpdateUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/landing-overview`
+}
+
+export const adminSiteSettingsUpdate = async (landingOverviewRequestDto: LandingOverviewRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminLandingOverviewResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<AdminLandingOverviewResponseDto>(getAdminSiteSettingsUpdateUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(landingOverviewRequestDto)
+  }
+);}
+
+
+
 export const getTagsListUrl = () => {
 
 
@@ -5398,6 +5557,27 @@ export const getDashboardDescribeUrl = () => {
 export const dashboardDescribe = async ( options?: Parameters<typeof serverFetch>[1]): Promise<DashboardResponseDto> => {
 
   return serverFetch<DashboardResponseDto>(getDashboardDescribeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getPublicSiteSettingsGetUrl = () => {
+
+
+
+
+  return `/api/site-settings/landing-overview`
+}
+
+export const publicSiteSettingsGet = async ( options?: Parameters<typeof serverFetch>[1]): Promise<PublicLandingOverviewResponseDto> => {
+
+  return serverFetch<PublicLandingOverviewResponseDto>(getPublicSiteSettingsGetUrl(),
   {
     ...options,
     method: 'GET'

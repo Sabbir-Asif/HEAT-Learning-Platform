@@ -27,6 +27,7 @@ import type {
   AcceptInviteRequestDto,
   AdminCsrfTokenResponseDto,
   AdminFrontPageResponseDto,
+  AdminLandingOverviewResponseDto,
   AdminListResponseDto,
   AdminMeResponseDto,
   AdminSignInRequestDto,
@@ -69,6 +70,7 @@ import type {
   InvitationLookupRequestDto,
   InvitationLookupResponseDto,
   InviteAdminRequestDto,
+  LandingOverviewRequestDto,
   LearningStructureResponseDto,
   LessonBodyRequestDto,
   LessonBodyResponseDto,
@@ -81,6 +83,7 @@ import type {
   ProgressBatchDto,
   ProgressResponseDto,
   PublicFrontPageResponseDto,
+  PublicLandingOverviewResponseDto,
   QuizAccessResponseDto,
   QuizDeliveryResponseDto,
   QuizQuestionRequestDto,
@@ -6737,6 +6740,183 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getAdminPlaybackPreviewMutationOptions(options), queryClient);
     }
 
+export const getAdminSiteSettingsGetUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/landing-overview`
+}
+
+export const adminSiteSettingsGet = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdminLandingOverviewResponseDto> => {
+
+  return customFetch<AdminLandingOverviewResponseDto>(getAdminSiteSettingsGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminSiteSettingsGetQueryKey = () => {
+    return [
+    `/api/admin/site-settings/landing-overview`
+    ] as const;
+    }
+
+
+export const getAdminSiteSettingsGetQueryOptions = <TData = Awaited<ReturnType<typeof adminSiteSettingsGet>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminSiteSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminSiteSettingsGetQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminSiteSettingsGet>>> = ({ signal }) => adminSiteSettingsGet({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminSiteSettingsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdminSiteSettingsGetQueryResult = NonNullable<Awaited<ReturnType<typeof adminSiteSettingsGet>>>
+export type AdminSiteSettingsGetQueryError = ErrorType<unknown>
+
+
+export function useAdminSiteSettingsGet<TData = Awaited<ReturnType<typeof adminSiteSettingsGet>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminSiteSettingsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminSiteSettingsGet>>,
+          TError,
+          Awaited<ReturnType<typeof adminSiteSettingsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminSiteSettingsGet<TData = Awaited<ReturnType<typeof adminSiteSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminSiteSettingsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminSiteSettingsGet>>,
+          TError,
+          Awaited<ReturnType<typeof adminSiteSettingsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminSiteSettingsGet<TData = Awaited<ReturnType<typeof adminSiteSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminSiteSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useAdminSiteSettingsGet<TData = Awaited<ReturnType<typeof adminSiteSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminSiteSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdminSiteSettingsGetQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getAdminSiteSettingsUpdateUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/landing-overview`
+}
+
+export const adminSiteSettingsUpdate = async (landingOverviewRequestDto: LandingOverviewRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<AdminLandingOverviewResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AdminLandingOverviewResponseDto>(getAdminSiteSettingsUpdateUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(landingOverviewRequestDto)
+  }
+);}
+
+
+
+
+
+export const getAdminSiteSettingsUpdateMutationKey = () => ['adminSiteSettingsUpdate'] as const;
+
+export const getAdminSiteSettingsUpdateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminSiteSettingsUpdate>>, TError,AdminSiteSettingsUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminSiteSettingsUpdate>>, TError,AdminSiteSettingsUpdateMutationVariables, TContext> => {
+
+const mutationKey = getAdminSiteSettingsUpdateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminSiteSettingsUpdate>>, AdminSiteSettingsUpdateMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminSiteSettingsUpdate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminSiteSettingsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof adminSiteSettingsUpdate>>>
+    export type AdminSiteSettingsUpdateMutationBody = LandingOverviewRequestDto
+    export type AdminSiteSettingsUpdateMutationError = ErrorType<unknown>
+    export type AdminSiteSettingsUpdateMutationVariables = {data: LandingOverviewRequestDto}
+
+    export const useAdminSiteSettingsUpdate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminSiteSettingsUpdate>>, TError,AdminSiteSettingsUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminSiteSettingsUpdate>>,
+        TError,
+        AdminSiteSettingsUpdateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAdminSiteSettingsUpdateMutationOptions(options), queryClient);
+    }
+
 export const getTagsListUrl = () => {
 
 
@@ -9141,6 +9321,101 @@ export function useDashboardDescribe<TData = Awaited<ReturnType<typeof dashboard
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getDashboardDescribeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getPublicSiteSettingsGetUrl = () => {
+
+
+
+
+  return `/api/site-settings/landing-overview`
+}
+
+export const publicSiteSettingsGet = async ( options?: Parameters<typeof customFetch>[1]): Promise<PublicLandingOverviewResponseDto> => {
+
+  return customFetch<PublicLandingOverviewResponseDto>(getPublicSiteSettingsGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getPublicSiteSettingsGetQueryKey = () => {
+    return [
+    `/api/site-settings/landing-overview`
+    ] as const;
+    }
+
+
+export const getPublicSiteSettingsGetQueryOptions = <TData = Awaited<ReturnType<typeof publicSiteSettingsGet>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicSiteSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPublicSiteSettingsGetQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof publicSiteSettingsGet>>> = ({ signal }) => publicSiteSettingsGet({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof publicSiteSettingsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PublicSiteSettingsGetQueryResult = NonNullable<Awaited<ReturnType<typeof publicSiteSettingsGet>>>
+export type PublicSiteSettingsGetQueryError = ErrorType<unknown>
+
+
+export function usePublicSiteSettingsGet<TData = Awaited<ReturnType<typeof publicSiteSettingsGet>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicSiteSettingsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof publicSiteSettingsGet>>,
+          TError,
+          Awaited<ReturnType<typeof publicSiteSettingsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePublicSiteSettingsGet<TData = Awaited<ReturnType<typeof publicSiteSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicSiteSettingsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof publicSiteSettingsGet>>,
+          TError,
+          Awaited<ReturnType<typeof publicSiteSettingsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePublicSiteSettingsGet<TData = Awaited<ReturnType<typeof publicSiteSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicSiteSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function usePublicSiteSettingsGet<TData = Awaited<ReturnType<typeof publicSiteSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicSiteSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPublicSiteSettingsGetQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

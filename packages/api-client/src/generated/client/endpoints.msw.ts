@@ -22,6 +22,7 @@ import type {
   AcceptInviteRequestDto,
   AdminCsrfTokenResponseDto,
   AdminFrontPageResponseDto,
+  AdminLandingOverviewResponseDto,
   AdminListResponseDto,
   AdminMeResponseDto,
   AdminSignInRequestDto,
@@ -58,6 +59,7 @@ import type {
   InvitationLookupRequestDto,
   InvitationLookupResponseDto,
   InviteAdminRequestDto,
+  LandingOverviewRequestDto,
   LearningStructureResponseDto,
   LessonBodyRequestDto,
   LessonBodyResponseDto,
@@ -70,6 +72,7 @@ import type {
   ProgressBatchDto,
   ProgressResponseDto,
   PublicFrontPageResponseDto,
+  PublicLandingOverviewResponseDto,
   QuizAccessResponseDto,
   QuizDeliveryResponseDto,
   QuizQuestionRequestDto,
@@ -245,6 +248,14 @@ export const getAdminMeDescribeResponseMock = (overrideResponse: Partial<Extract
 
 export const getAdminPlaybackPreviewResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({captions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({language: faker.string.alpha({length: {min: 1, max: 35}})})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', manifestPath: faker.string.alpha({length: {min: 10, max: 20}}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), sessionId: faker.helpers.arrayElement([faker.string.uuid(), null]), ...overrideResponse})
 
+export const getAdminSiteSettingsGetResponseMock = (overrideResponse: Partial<Extract<AdminLandingOverviewResponseDto, object>> = {}): AdminLandingOverviewResponseDto => ({body: {
+        [faker.string.alphanumeric(5)]: {}
+      }, heading: faker.string.alpha({length: {min: 10, max: 20}}), image: faker.helpers.arrayElement([{alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})},null,]), imageAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), updatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), ...overrideResponse})
+
+export const getAdminSiteSettingsUpdateResponseMock = (overrideResponse: Partial<Extract<AdminLandingOverviewResponseDto, object>> = {}): AdminLandingOverviewResponseDto => ({body: {
+        [faker.string.alphanumeric(5)]: {}
+      }, heading: faker.string.alpha({length: {min: 10, max: 20}}), image: faker.helpers.arrayElement([{alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})},null,]), imageAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), updatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), ...overrideResponse})
+
 export const getTagsListResponseMock = (overrideResponse: Partial<Extract<TagListResponseDto, object>> = {}): TagListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseCount: faker.number.int({min: 0, max: 9007199254740991}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), isSystem: faker.datatype.boolean(), moduleCount: faker.number.int({min: 0, max: 9007199254740991}), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
 
 export const getTagsCreateResponseMock = (overrideResponse: Partial<Extract<TagSummaryDto, object>> = {}): TagSummaryDto => ({courseCount: faker.number.int({min: 0, max: 9007199254740991}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), isSystem: faker.datatype.boolean(), moduleCount: faker.number.int({min: 0, max: 9007199254740991}), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
@@ -294,6 +305,10 @@ export const getMeDescribeResponseMock = (overrideResponse: Partial<Extract<MeRe
 export const getMeCertificatesListResponseMock = (overrideResponse: Partial<Extract<CertificateListResponseDto, object>> = {}): CertificateListResponseDto => ({certificates: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.helpers.arrayElement([faker.string.uuid(), null]), issuedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), number: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 64}}), null]), status: faker.helpers.arrayElement(['READY','PENDING','REVOKED'] as const), verificationUrl: faker.helpers.arrayElement([faker.internet.url(), null])})), ...overrideResponse})
 
 export const getDashboardDescribeResponseMock = (overrideResponse: Partial<Extract<DashboardResponseDto, object>> = {}): DashboardResponseDto => ({courses: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({certificate: faker.helpers.arrayElement([{id: faker.helpers.arrayElement([faker.string.uuid(), null]), status: faker.helpers.arrayElement(['READY','PENDING','REVOKED'] as const)},null,]), courseId: faker.string.uuid(), courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), nextModule: faker.helpers.arrayElement([{id: faker.string.uuid(), order: faker.number.int({min: -9007199254740991, max: 9007199254740991}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), resumeVideoId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}})},null,]), progress: faker.helpers.arrayElement([{modulesCompleted: faker.number.int({min: 0, max: 9007199254740991}), modulesTotal: faker.number.int({min: 0, max: 9007199254740991}), percent: faker.number.int({min: 0, max: 100})},null,]), reason: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 500}}), null]), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const)})), ...overrideResponse})
+
+export const getPublicSiteSettingsGetResponseMock = (overrideResponse: Partial<Extract<PublicLandingOverviewResponseDto, object>> = {}): PublicLandingOverviewResponseDto => ({body: {
+        [faker.string.alphanumeric(5)]: {}
+      }, heading: faker.string.alpha({length: {min: 10, max: 20}}), image: faker.helpers.arrayElement([{alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})},null,]), imageAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), ...overrideResponse})
 
 export const getStudentPlaybackStartResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({captions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({language: faker.string.alpha({length: {min: 1, max: 35}})})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', manifestPath: faker.string.alpha({length: {min: 10, max: 20}}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), sessionId: faker.helpers.arrayElement([faker.string.uuid(), null]), ...overrideResponse})
 
@@ -1233,6 +1248,30 @@ export const getAdminPlaybackPreviewMockHandler = (overrideResponse?: PlaybackSe
   }, options)
 }
 
+export const getAdminSiteSettingsGetMockHandler = (overrideResponse?: AdminLandingOverviewResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<AdminLandingOverviewResponseDto> | AdminLandingOverviewResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/site-settings/landing-overview', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminSiteSettingsGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getAdminSiteSettingsUpdateMockHandler = (overrideResponse?: AdminLandingOverviewResponseDto | ((info: Parameters<HttpResponseResolver<PathParams, LandingOverviewRequestDto>>[0]) => Promise<AdminLandingOverviewResponseDto> | AdminLandingOverviewResponseDto), options?: RequestHandlerOptions) => {
+  return http.put<PathParams, LandingOverviewRequestDto>('*/api/admin/site-settings/landing-overview', async (info: Parameters<HttpResponseResolver<PathParams, LandingOverviewRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminSiteSettingsUpdateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getTagsListMockHandler = (overrideResponse?: TagListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<TagListResponseDto> | TagListResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/admin/tags', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1552,6 +1591,18 @@ export const getDashboardDescribeMockHandler = (overrideResponse?: DashboardResp
   }, options)
 }
 
+export const getPublicSiteSettingsGetMockHandler = (overrideResponse?: PublicLandingOverviewResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<PublicLandingOverviewResponseDto> | PublicLandingOverviewResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/site-settings/landing-overview', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPublicSiteSettingsGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getStudentPlaybackStartMockHandler = (overrideResponse?: PlaybackSessionResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<PlaybackSessionResponseDto> | PlaybackSessionResponseDto), options?: RequestHandlerOptions) => {
   return http.post<{ id: string }>('*/api/videos/:id/playback-session', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
 
@@ -1667,6 +1718,8 @@ export const getHeatLmsApiMock = () => [
   getAdminFrontPageReorderModulesMockHandler(),
   getAdminMeDescribeMockHandler(),
   getAdminPlaybackPreviewMockHandler(),
+  getAdminSiteSettingsGetMockHandler(),
+  getAdminSiteSettingsUpdateMockHandler(),
   getTagsListMockHandler(),
   getTagsCreateMockHandler(),
   getTagsRemoveMockHandler(),
@@ -1694,6 +1747,7 @@ export const getHeatLmsApiMock = () => [
   getMeDescribeMockHandler(),
   getMeCertificatesListMockHandler(),
   getDashboardDescribeMockHandler(),
+  getPublicSiteSettingsGetMockHandler(),
   getStudentPlaybackStartMockHandler(),
   getStudentPlaybackRefreshMockHandler(),
   getProgressRecordMockHandler()
