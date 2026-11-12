@@ -2771,10 +2771,10 @@
       "ProfileResponseDto": {
         "properties": {
           "avatarUrl": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
+            "maxLength": 2048,
+            "minLength": 1,
+            "nullable": true,
+            "type": "string"
           },
           "department": {
             "properties": {
