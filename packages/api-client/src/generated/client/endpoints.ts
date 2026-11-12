@@ -38,6 +38,7 @@ import type {
   AuditLogListParams,
   AuditLogListResponseDto,
   BulkApprovalResponseDto,
+  BulkRejectionResponseDto,
   CaptchaRequestDto,
   CaptchaResponseDto,
   CertificateListResponseDto,
@@ -83,6 +84,9 @@ import type {
   QuizSubmitRequestDto,
   QuizSubmitResponseDto,
   QuizSummaryDto,
+  RejectEnrollmentRequestDto,
+  RejectEnrollmentsRequestDto,
+  RejectedEnrollmentDto,
   ReorderRequestDto,
   SignInRequestDto,
   UniversitiesListParams,
@@ -5657,6 +5661,88 @@ export function useEnrollmentApprovalListPending<TData = Awaited<ReturnType<type
 
 
 
+export const getEnrollmentApprovalRejectManyUrl = () => {
+
+
+
+
+  return `/api/admin/enrollments/reject`
+}
+
+export const enrollmentApprovalRejectMany = async (rejectEnrollmentsRequestDto: RejectEnrollmentsRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<BulkRejectionResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<BulkRejectionResponseDto>(getEnrollmentApprovalRejectManyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(rejectEnrollmentsRequestDto)
+  }
+);}
+
+
+
+
+
+export const getEnrollmentApprovalRejectManyMutationKey = () => ['enrollmentApprovalRejectMany'] as const;
+
+export const getEnrollmentApprovalRejectManyMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentApprovalRejectMany>>, TError,EnrollmentApprovalRejectManyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof enrollmentApprovalRejectMany>>, TError,EnrollmentApprovalRejectManyMutationVariables, TContext> => {
+
+const mutationKey = getEnrollmentApprovalRejectManyMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof enrollmentApprovalRejectMany>>, EnrollmentApprovalRejectManyMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  enrollmentApprovalRejectMany(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EnrollmentApprovalRejectManyMutationResult = NonNullable<Awaited<ReturnType<typeof enrollmentApprovalRejectMany>>>
+    export type EnrollmentApprovalRejectManyMutationBody = RejectEnrollmentsRequestDto
+    export type EnrollmentApprovalRejectManyMutationError = ErrorType<unknown>
+    export type EnrollmentApprovalRejectManyMutationVariables = {data: RejectEnrollmentsRequestDto}
+
+    export const useEnrollmentApprovalRejectMany = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentApprovalRejectMany>>, TError,EnrollmentApprovalRejectManyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof enrollmentApprovalRejectMany>>,
+        TError,
+        EnrollmentApprovalRejectManyMutationVariables,
+        TContext
+      > => {
+      return useMutation(getEnrollmentApprovalRejectManyMutationOptions(options), queryClient);
+    }
+
 export const getEnrollmentApprovalApproveUrl = (id: string,) => {
 
 
@@ -5738,6 +5824,89 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getEnrollmentApprovalApproveMutationOptions(options), queryClient);
+    }
+
+export const getEnrollmentApprovalRejectUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/enrollments/${id}/reject`
+}
+
+export const enrollmentApprovalReject = async (id: string,
+    rejectEnrollmentRequestDto: RejectEnrollmentRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<RejectedEnrollmentDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<RejectedEnrollmentDto>(getEnrollmentApprovalRejectUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(rejectEnrollmentRequestDto)
+  }
+);}
+
+
+
+
+
+export const getEnrollmentApprovalRejectMutationKey = () => ['enrollmentApprovalReject'] as const;
+
+export const getEnrollmentApprovalRejectMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentApprovalReject>>, TError,EnrollmentApprovalRejectMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof enrollmentApprovalReject>>, TError,EnrollmentApprovalRejectMutationVariables, TContext> => {
+
+const mutationKey = getEnrollmentApprovalRejectMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof enrollmentApprovalReject>>, EnrollmentApprovalRejectMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  enrollmentApprovalReject(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EnrollmentApprovalRejectMutationResult = NonNullable<Awaited<ReturnType<typeof enrollmentApprovalReject>>>
+    export type EnrollmentApprovalRejectMutationBody = RejectEnrollmentRequestDto
+    export type EnrollmentApprovalRejectMutationError = ErrorType<unknown>
+    export type EnrollmentApprovalRejectMutationVariables = {id: string;data: RejectEnrollmentRequestDto}
+
+    export const useEnrollmentApprovalReject = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentApprovalReject>>, TError,EnrollmentApprovalRejectMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof enrollmentApprovalReject>>,
+        TError,
+        EnrollmentApprovalRejectMutationVariables,
+        TContext
+      > => {
+      return useMutation(getEnrollmentApprovalRejectMutationOptions(options), queryClient);
     }
 
 export const getAdminMeDescribeUrl = () => {

@@ -383,6 +383,74 @@ export interface BulkApprovalResponseDto {
   succeeded: string[];
 }
 
+export type BulkRejectionResponseDtoFailedItemCode = typeof BulkRejectionResponseDtoFailedItemCode[keyof typeof BulkRejectionResponseDtoFailedItemCode];
+
+
+export const BulkRejectionResponseDtoFailedItemCode = {
+  AUDIT_ACTOR_FILTER_TOO_BROAD: 'AUDIT_ACTOR_FILTER_TOO_BROAD',
+  BAD_REQUEST: 'BAD_REQUEST',
+  CANNOT_DEACTIVATE_SELF: 'CANNOT_DEACTIVATE_SELF',
+  CAPTCHA_EXPIRED: 'CAPTCHA_EXPIRED',
+  CAPTCHA_INVALID: 'CAPTCHA_INVALID',
+  CONTENT_LOCKED: 'CONTENT_LOCKED',
+  COURSE_HAS_ENROLLMENTS: 'COURSE_HAS_ENROLLMENTS',
+  COURSE_LOCKED: 'COURSE_LOCKED',
+  COURSE_NOT_AVAILABLE: 'COURSE_NOT_AVAILABLE',
+  COURSE_NOT_DRAFT: 'COURSE_NOT_DRAFT',
+  COURSE_PUBLISH_CHECKS_FAILED: 'COURSE_PUBLISH_CHECKS_FAILED',
+  COURSE_SLUG_TAKEN: 'COURSE_SLUG_TAKEN',
+  CSRF_TOKEN_INVALID: 'CSRF_TOKEN_INVALID',
+  DIRECTORY_ARCHIVED: 'DIRECTORY_ARCHIVED',
+  DIRECTORY_IN_USE: 'DIRECTORY_IN_USE',
+  DIRECTORY_NAME_TAKEN: 'DIRECTORY_NAME_TAKEN',
+  EMAIL_IN_USE: 'EMAIL_IN_USE',
+  ENROLLMENT_ALREADY_DECIDED: 'ENROLLMENT_ALREADY_DECIDED',
+  ENROLLMENT_NOT_ACTIVE: 'ENROLLMENT_NOT_ACTIVE',
+  ENROLLMENT_NOT_VERIFIED: 'ENROLLMENT_NOT_VERIFIED',
+  FORBIDDEN: 'FORBIDDEN',
+  INTERNAL: 'INTERNAL',
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  INVITATION_EXPIRED: 'INVITATION_EXPIRED',
+  INVITATION_INVALID: 'INVITATION_INVALID',
+  INVITATION_NOT_PENDING: 'INVITATION_NOT_PENDING',
+  MODULE_LOCKED: 'MODULE_LOCKED',
+  NOT_FOUND: 'NOT_FOUND',
+  ORDER_CONFLICT: 'ORDER_CONFLICT',
+  ORIGIN_NOT_ALLOWED: 'ORIGIN_NOT_ALLOWED',
+  PASSWORD_BREACHED: 'PASSWORD_BREACHED',
+  PASSWORD_CHANGE_REQUIRED: 'PASSWORD_CHANGE_REQUIRED',
+  QUIZ_ANSWER_INVALID: 'QUIZ_ANSWER_INVALID',
+  QUIZ_ATTEMPT_LIMIT_REACHED: 'QUIZ_ATTEMPT_LIMIT_REACHED',
+  QUIZ_ATTEMPT_NOT_OPEN: 'QUIZ_ATTEMPT_NOT_OPEN',
+  QUIZ_ATTEMPT_WAIT: 'QUIZ_ATTEMPT_WAIT',
+  QUIZ_NOT_UNLOCKED: 'QUIZ_NOT_UNLOCKED',
+  RATE_LIMITED: 'RATE_LIMITED',
+  UNAUTHENTICATED: 'UNAUTHENTICATED',
+  UPLOAD_EXPIRED: 'UPLOAD_EXPIRED',
+  UPLOAD_OFFSET_MISMATCH: 'UPLOAD_OFFSET_MISMATCH',
+  UPLOAD_TOO_LARGE: 'UPLOAD_TOO_LARGE',
+  UPLOAD_TYPE_NOT_ALLOWED: 'UPLOAD_TYPE_NOT_ALLOWED',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+  VERIFICATION_LINK_EXPIRED: 'VERIFICATION_LINK_EXPIRED',
+  VERIFICATION_LINK_INVALID: 'VERIFICATION_LINK_INVALID',
+  VERIFICATION_LINK_USED: 'VERIFICATION_LINK_USED',
+  VERIFICATION_RESEND_LIMIT: 'VERIFICATION_RESEND_LIMIT',
+  VIDEO_NOT_FAILED: 'VIDEO_NOT_FAILED',
+  VIDEO_NOT_READY: 'VIDEO_NOT_READY',
+} as const;
+
+export type BulkRejectionResponseDtoFailedItem = {
+  code: BulkRejectionResponseDtoFailedItemCode;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+};
+
+export interface BulkRejectionResponseDto {
+  failed: BulkRejectionResponseDtoFailedItem[];
+  /** @items.pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  succeeded: string[];
+}
+
 export interface CaptchaRequestDto {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   replaces?: string;
@@ -1718,6 +1786,38 @@ export interface QuizSummaryDto {
   locked: boolean;
   questions: QuizSummaryDtoQuestionsItem[];
   rules: QuizSummaryDtoRules;
+}
+
+export interface RejectEnrollmentRequestDto {
+  /** @maxLength 500 */
+  reason?: string;
+}
+
+export interface RejectEnrollmentsRequestDto {
+  /**
+     * @minItems 1
+     * @maxItems 100
+     * @items.pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  ids: string[];
+  /** @maxLength 500 */
+  reason?: string;
+}
+
+export type RejectedEnrollmentDtoStatus = typeof RejectedEnrollmentDtoStatus[keyof typeof RejectedEnrollmentDtoStatus];
+
+
+export const RejectedEnrollmentDtoStatus = {
+  REJECTED: 'REJECTED',
+} as const;
+
+export interface RejectedEnrollmentDto {
+  accountDeleted: boolean;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  rejectedAt: string;
+  status: RejectedEnrollmentDtoStatus;
 }
 
 export interface ReorderRequestDto {
@@ -4150,6 +4250,41 @@ export const enrollmentApprovalListPending = async (params?: EnrollmentApprovalL
 
 
 
+export const getEnrollmentApprovalRejectManyUrl = () => {
+
+
+
+
+  return `/api/admin/enrollments/reject`
+}
+
+export const enrollmentApprovalRejectMany = async (rejectEnrollmentsRequestDto: RejectEnrollmentsRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<BulkRejectionResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<BulkRejectionResponseDto>(getEnrollmentApprovalRejectManyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(rejectEnrollmentsRequestDto)
+  }
+);}
+
+
+
 export const getEnrollmentApprovalApproveUrl = (id: string,) => {
 
 
@@ -4181,6 +4316,42 @@ return serverFetch<ApprovedEnrollmentDto>(getEnrollmentApprovalApproveUrl(id),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(approveEnrollmentRequestDto)
+  }
+);}
+
+
+
+export const getEnrollmentApprovalRejectUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/enrollments/${id}/reject`
+}
+
+export const enrollmentApprovalReject = async (id: string,
+    rejectEnrollmentRequestDto: RejectEnrollmentRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<RejectedEnrollmentDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<RejectedEnrollmentDto>(getEnrollmentApprovalRejectUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(rejectEnrollmentRequestDto)
   }
 );}
 
