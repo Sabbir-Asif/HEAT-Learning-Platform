@@ -114,6 +114,35 @@ describe("OutboxRelay", () => {
     expect(store.relayedIds).toEqual(["job-1"]);
   });
 
+  test("uses the address stored on the event when the account is already gone", async () => {
+    const { store, email, relay } = setup();
+    store.recipients.clear();
+    store.unrelayed.push(
+      event("job-7", "EnrollmentRejected", {
+        template: "enrollment-rejected",
+        userId,
+        enrollmentId,
+        courseTitle: "HEAT Basics",
+        recipientAddress: "gone@du.ac.bd",
+        reason: "Duplicate request",
+      }),
+    );
+
+    await relay.relayBatch(10);
+
+    expect(store.emailJobs).toEqual([
+      {
+        id: "job-7",
+        outboxId: "job-7",
+        userId,
+        recipientAddress: "gone@du.ac.bd",
+        category: "ENROLLMENT",
+        template: "enrollment-rejected",
+      },
+    ]);
+    expect(email.jobs.get("job-7")).toEqual({ emailJobId: "job-7" });
+  });
+
   test("leaves the row unrelayed while Redis is down and relays it once Redis returns", async () => {
     const { store, email, relay, errors } = setup();
     store.unrelayed.push(alreadyRegistered("job-1"));
