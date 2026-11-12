@@ -15,7 +15,7 @@ export const profileResponseSchema = z.object({
   department: namedReferenceSchema,
   session: z.string(),
   locked: z.boolean(),
-  avatarUrl: z.string().nullable(),
+  avatarUrl: z.string().min(1).max(2048).nullable(),
 });
 
 export type ProfileResponse = z.infer<typeof profileResponseSchema>;
