@@ -15,3 +15,10 @@ export const publishFailedMessage = (title: string, failures: readonly string[])
   failures.length === 0
     ? `${title} could not be published. Try again.`
     : `${title} is not ready to publish. ${failures.join(" ")}`;
+
+export const publishBlockersTitle = (count: number): string =>
+  count === 1 ? "1 thing blocks publishing" : `${count} things block publishing`;
+
+export const publishChecklistClearMessage = "Every module has a ready video and a complete quiz.";
+
+export const publishChecklistFailedMessage = "The publish checklist could not be loaded.";

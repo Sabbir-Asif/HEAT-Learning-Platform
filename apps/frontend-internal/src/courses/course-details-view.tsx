@@ -3,8 +3,10 @@
 import {
   getCoursesGetQueryKey,
   getCoursesListQueryKey,
+  getCoursesPublishChecksQueryKey,
   isApiError,
   useCoursesGet,
+  useCoursesPublishChecks,
   useCoursesPublish,
 } from "@heat/api-client";
 import {
@@ -14,6 +16,7 @@ import {
   ErrorState,
   FieldDescription,
   PageHeader,
+  SectionHeading,
   Skeleton,
   StatusBadge,
   Tabs,
@@ -28,12 +31,20 @@ import { useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
 import { ModulesTab } from "../modules/modules-tab";
 import { CourseForm } from "./course-form";
-import { publishFailedMessage } from "./courses-copy";
+import {
+  publishBlockersTitle,
+  publishChecklistClearMessage,
+  publishChecklistFailedMessage,
+  publishFailedMessage,
+} from "./courses-copy";
 
 export function CourseDetailsView({ id }: { id: string }) {
   const queryClient = useQueryClient();
   const course = useCoursesGet(id);
   const publish = useCoursesPublish();
+  const checklist = useCoursesPublishChecks(id, {
+    query: { enabled: course.data?.status === "DRAFT" },
+  });
   const [notice, setNotice] = useState<string | null>(null);
   const [failures, setFailures] = useState<readonly string[]>([]);
 
@@ -71,6 +82,7 @@ export function CourseDetailsView({ id }: { id: string }) {
   const refresh = () =>
     Promise.all([
       queryClient.invalidateQueries({ queryKey: getCoursesGetQueryKey(id) }),
+      queryClient.invalidateQueries({ queryKey: getCoursesPublishChecksQueryKey(id) }),
       queryClient.invalidateQueries({ queryKey: getCoursesListQueryKey().slice(0, 1) }),
     ]);
 
@@ -99,6 +111,7 @@ export function CourseDetailsView({ id }: { id: string }) {
                   await publish.mutateAsync({ id });
                 } catch (error) {
                   if (isApiError(error)) setFailures(error.failures);
+                  void checklist.refetch();
                   throw error;
                 }
                 await refresh();
@@ -116,6 +129,34 @@ export function CourseDetailsView({ id }: { id: string }) {
         </FieldDescription>
       </div>
       {notice !== null ? <FieldDescription role="status">{notice}</FieldDescription> : null}
+      {current.status === "DRAFT" ? (
+        <section aria-labelledby="publish-checklist" className="flex flex-col gap-2">
+          <SectionHeading id="publish-checklist">
+            {checklist.isSuccess && checklist.data.failures.length > 0
+              ? publishBlockersTitle(checklist.data.failures.length)
+              : "Publish checklist"}
+          </SectionHeading>
+          {checklist.isPending ? <Skeleton className="h-6 w-80" /> : null}
+          {checklist.isError ? (
+            <ErrorState
+              title={publishChecklistFailedMessage}
+              onRetry={() => void checklist.refetch()}
+            />
+          ) : null}
+          {checklist.isSuccess && checklist.data.failures.length === 0 ? (
+            <FieldDescription role="status">{publishChecklistClearMessage}</FieldDescription>
+          ) : null}
+          {checklist.isSuccess && checklist.data.failures.length > 0 ? (
+            <ul className="flex flex-col gap-1">
+              {checklist.data.failures.map((failure) => (
+                <li key={`${failure.code}-${failure.moduleId}-${failure.questionId}`}>
+                  <FieldDescription>{failure.message}</FieldDescription>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </section>
+      ) : null}
       <Tabs defaultValue="details">
         <TabsList variant="line">
           <TabsTrigger value="details">Details</TabsTrigger>
