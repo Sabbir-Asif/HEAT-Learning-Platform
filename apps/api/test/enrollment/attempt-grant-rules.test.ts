@@ -24,7 +24,9 @@ describe("attemptGrantRefusal", () => {
   });
 
   test("allows a grant when the wait time from the last attempt is still running", () => {
-    const recent = facts({ attempts: [attempt(false), attempt(false, "2026-11-12T09:59:00.000Z")] });
+    const recent = facts({
+      attempts: [attempt(false), attempt(false, "2026-11-12T09:59:00.000Z")],
+    });
 
     expect(attemptGrantRefusal(recent, now)).toBeNull();
   });

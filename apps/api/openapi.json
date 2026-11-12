@@ -586,9 +586,11 @@
                     "PASSWORD_BREACHED",
                     "PASSWORD_CHANGE_REQUIRED",
                     "QUIZ_ANSWER_INVALID",
+                    "QUIZ_ATTEMPTS_UNLIMITED",
                     "QUIZ_ATTEMPT_LIMIT_REACHED",
                     "QUIZ_ATTEMPT_NOT_OPEN",
                     "QUIZ_ATTEMPT_WAIT",
+                    "QUIZ_GRANT_NOT_NEEDED",
                     "QUIZ_NOT_UNLOCKED",
                     "RATE_LIMITED",
                     "RESET_LINK_EXPIRED",
@@ -686,9 +688,11 @@
                     "PASSWORD_BREACHED",
                     "PASSWORD_CHANGE_REQUIRED",
                     "QUIZ_ANSWER_INVALID",
+                    "QUIZ_ATTEMPTS_UNLIMITED",
                     "QUIZ_ATTEMPT_LIMIT_REACHED",
                     "QUIZ_ATTEMPT_NOT_OPEN",
                     "QUIZ_ATTEMPT_WAIT",
+                    "QUIZ_GRANT_NOT_NEEDED",
                     "QUIZ_NOT_UNLOCKED",
                     "RATE_LIMITED",
                     "RESET_LINK_EXPIRED",
@@ -1999,6 +2003,40 @@
           "email",
           "captchaId",
           "captchaAnswer"
+        ],
+        "type": "object"
+      },
+      "GrantAttemptRequestDto": {
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "GrantedAttemptDto": {
+        "properties": {
+          "grantedAttempts": {
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "quizId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "quizId",
+          "grantedAttempts"
         ],
         "type": "object"
       },
@@ -4005,6 +4043,37 @@
                         "minimum": -9007199254740991,
                         "type": "integer"
                       },
+                      "quiz": {
+                        "nullable": true,
+                        "properties": {
+                          "attemptLimit": {
+                            "maximum": 9007199254740991,
+                            "minimum": -9007199254740991,
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "canGrantAttempt": {
+                            "type": "boolean"
+                          },
+                          "grantedAttempts": {
+                            "maximum": 9007199254740991,
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "attemptLimit",
+                          "grantedAttempts",
+                          "canGrantAttempt"
+                        ],
+                        "type": "object"
+                      },
                       "quizAttempts": {
                         "items": {
                           "properties": {
@@ -4106,6 +4175,7 @@
                       "status",
                       "completedAt",
                       "videos",
+                      "quiz",
                       "quizAttempts"
                     ],
                     "type": "object"
@@ -8105,6 +8175,58 @@
         },
         "tags": [
           "enrollment-approvals"
+        ]
+      }
+    },
+    "/api/admin/enrollments/{id}/quizzes/{quizId}/attempt-grants": {
+      "post": {
+        "operationId": "attemptGrantGrant",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "quizId",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantAttemptRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrantedAttemptDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "attempt-grants"
         ]
       }
     },

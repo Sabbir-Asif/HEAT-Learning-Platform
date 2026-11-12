@@ -15,11 +15,13 @@ interface Options {
 const build = (options: Options = {}) => {
   const tx = {
     enrollment: {
-      findFirst: vi.fn().mockResolvedValue(
-        options.enrollment === undefined
-          ? { id: "e", status: "APPROVED", userId: "student-id", courseRevisionId: "rev" }
-          : options.enrollment,
-      ),
+      findFirst: vi
+        .fn()
+        .mockResolvedValue(
+          options.enrollment === undefined
+            ? { id: "e", status: "APPROVED", userId: "student-id", courseRevisionId: "rev" }
+            : options.enrollment,
+        ),
     },
     quiz: {
       findFirst: vi
