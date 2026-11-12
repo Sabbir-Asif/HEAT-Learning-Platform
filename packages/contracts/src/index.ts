@@ -15,6 +15,7 @@ export * from "./errors";
 export * from "./learning";
 export * from "./media";
 export * from "./modules";
+export * from "./news";
 export * from "./playback";
 export * from "./profile";
 export * from "./progress";
