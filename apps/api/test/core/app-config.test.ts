@@ -163,6 +163,25 @@ describe("loadConfig", () => {
     ).toThrow(/PUBLIC_APP_URL/);
   });
 
+  test("exposes the revalidation target with a local default, an optional secret and rejects a path", () => {
+    expect(loadConfig(valid).revalidation).toEqual({
+      url: "http://localhost:3000",
+      secret: undefined,
+    });
+    const secretValue = "revalidate-secret-0123456789-abcdefghijkl";
+    expect(
+      loadConfig({
+        ...valid,
+        PUBLIC_APP_INTERNAL_URL: "http://frontend-public:3000",
+        REVALIDATE_SECRET: secretValue,
+      }).revalidation,
+    ).toEqual({ url: "http://frontend-public:3000", secret: secretValue });
+    expect(() =>
+      loadConfig({ ...valid, PUBLIC_APP_INTERNAL_URL: "http://frontend-public:3000/app" }),
+    ).toThrow(/PUBLIC_APP_INTERNAL_URL/);
+    expect(() => loadConfig({ ...valid, REVALIDATE_SECRET: "short" })).toThrow(/REVALIDATE_SECRET/);
+  });
+
   test("exposes the mail configuration and defaults it to the local Mailpit", () => {
     expect(loadConfig(valid).mail).toMatchObject({ host: "localhost", port: 1035, auth: null });
     expect(() => loadConfig({ ...valid, SMTP_TLS: "ssl" })).toThrow(/SMTP_TLS/);

@@ -7,7 +7,10 @@ import { MediaModule } from "../media";
 import { RateLimitModule } from "../rate-limit";
 import { AdminFrontPageController, PublicFrontPageController } from "./front-page.controller";
 import { FrontPageService } from "./front-page.service";
-import { NoopPublicRevalidation, PUBLIC_REVALIDATION } from "./public-revalidation";
+import { PublicCoursesController } from "./public-courses.controller";
+import { PublicCoursesService } from "./public-courses.service";
+import { PublicImagesService } from "./public-images.service";
+import { HttpPublicRevalidation, PUBLIC_REVALIDATION } from "./public-revalidation";
 import {
   AdminSiteSettingsController,
   PublicSiteSettingsController,
@@ -53,6 +56,7 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     TagAssignmentsController,
     AdminFrontPageController,
     PublicFrontPageController,
+    PublicCoursesController,
     AdminSiteSettingsController,
     PublicSiteSettingsController,
   ],
@@ -83,7 +87,9 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     TagAssignmentsService,
     FrontPageService,
     SiteSettingsService,
-    { provide: PUBLIC_REVALIDATION, useClass: NoopPublicRevalidation },
+    PublicImagesService,
+    PublicCoursesService,
+    { provide: PUBLIC_REVALIDATION, useClass: HttpPublicRevalidation },
   ],
   exports: [
     CoursesService,

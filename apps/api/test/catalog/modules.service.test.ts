@@ -32,6 +32,7 @@ const build = (
     $queryRaw: vi.fn().mockResolvedValue([{ lockedAt: options.lockedAt ?? null }]),
     course: {
       findUnique: vi.fn().mockResolvedValue({
+        slug: "heat",
         lockedAt: options.lockedAt ?? null,
         revisions: [{ id: "rev" }],
       }),
@@ -69,11 +70,15 @@ const build = (
     moduleTag: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
     lessonSection: { deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
   };
-  const service = new ModulesService(database as never, new AuditService({} as never));
+  const revalidate = vi.fn().mockResolvedValue(undefined);
+  const service = new ModulesService(database as never, new AuditService({} as never), {
+    revalidate,
+  } as never);
   const changes: AuditChange[] = [];
-  const scope = { tx: database as never, changes, afterCommit: [], skipped: false };
+  const afterCommit: Array<() => Promise<void>> = [];
+  const scope = { tx: database as never, changes, afterCommit, skipped: false };
   const inAuditScope = <T>(run: () => Promise<T>): Promise<T> => auditScopeStorage.run(scope, run);
-  return { service, database, changes, calls, inAuditScope };
+  return { service, database, changes, calls, afterCommit, revalidate, inAuditScope };
 };
 
 const failureOf = (promise: Promise<unknown>): Promise<unknown> =>
@@ -108,6 +113,15 @@ describe("ModulesService.create", () => {
       objectives: ["Know"],
     });
     expect(changes[0]?.entityId).toBe("n");
+  });
+
+  test("revalidates the front page and the course tag after commit", async () => {
+    const { service, afterCommit, revalidate, inAuditScope } = build();
+
+    await inAuditScope(() => service.create(courseId, { title: "New", objectives: [] }));
+    await afterCommit[0]?.();
+
+    expect(revalidate).toHaveBeenCalledWith(["front-page", "course:heat"]);
   });
 
   test("is refused with CONTENT_LOCKED on a locked course", async () => {

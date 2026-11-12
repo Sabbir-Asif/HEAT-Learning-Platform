@@ -10,6 +10,7 @@ import { AuditService } from "../audit";
 import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
 import { planReorder } from "./module-rules";
+import { PublicImagesService } from "./public-images.service";
 import { frontPageCacheTag, PUBLIC_REVALIDATION } from "./public-revalidation";
 import type { PublicRevalidation } from "./public-revalidation";
 
@@ -41,6 +42,7 @@ export class FrontPageService {
     @Inject(DATABASE) private readonly database: HeatClient,
     private readonly audit: AuditService,
     @Inject(PUBLIC_REVALIDATION) private readonly revalidation: PublicRevalidation,
+    private readonly images: PublicImagesService,
   ) {}
 
   async admin(): Promise<AdminFrontPageResponse> {
@@ -128,8 +130,15 @@ export class FrontPageService {
         },
       }),
     ]);
+    const images = await this.images.resolve(courses.map((link) => link.course.thumbnailAssetId));
     return {
-      courses: courses.map((link) => link.course),
+      courses: courses.map((link) => ({
+        ...link.course,
+        thumbnail:
+          link.course.thumbnailAssetId === null
+            ? null
+            : (images.get(link.course.thumbnailAssetId) ?? null),
+      })),
       modules: modules.map((link) => ({
         id: link.module.id,
         title: link.module.title,

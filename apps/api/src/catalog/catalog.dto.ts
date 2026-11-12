@@ -4,6 +4,8 @@ import {
   landingOverviewRequestSchema,
   publicLandingOverviewResponseSchema,
   courseIdParamsSchema,
+  courseSlugParamsSchema,
+  publicCourseResponseSchema,
   courseListQuerySchema,
   courseListResponseSchema,
   courseRevisionItemSchema,
@@ -58,6 +60,10 @@ export class CourseSummaryDto extends createZodDto(courseSummarySchema) {}
 export class PublishChecklistDto extends createZodDto(publishChecklistSchema) {}
 
 export class CourseIdParamsDto extends createZodDto(courseIdParamsSchema) {}
+
+export class CourseSlugParamsDto extends createZodDto(courseSlugParamsSchema) {}
+
+export class PublicCourseResponseDto extends createZodDto(publicCourseResponseSchema) {}
 
 export class CreateModuleRequestDto extends createZodDto(createModuleRequestSchema) {}
 

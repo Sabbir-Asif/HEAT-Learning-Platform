@@ -251,6 +251,8 @@ export const lessonBodyImageSchema = z.object({
   alt: z.string(),
 });
 
+export type LessonBodyImage = z.infer<typeof lessonBodyImageSchema>;
+
 export const lessonBodyResponseSchema = z.object({
   id: z.uuid(),
   title: z.string(),
