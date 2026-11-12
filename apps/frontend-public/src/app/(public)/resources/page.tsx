@@ -1,5 +1,12 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { ResourcesList } from "@/public-pages/resources-list";
+import { cachedResources } from "@/public-pages/public-data";
+import type { Metadata } from "next";
 
-export default function Page() {
-  return <PlaceholderPage title="Resources" />;
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = { title: "Resources" };
+
+export default async function Page() {
+  const resources = await cachedResources();
+  return <ResourcesList resources={resources} />;
 }
