@@ -80,6 +80,7 @@ import type {
   ModuleListResponseDto,
   ModuleSummaryDto,
   PlaybackSessionResponseDto,
+  ProfileResponseDto,
   ProgressBatchDto,
   ProgressResponseDto,
   PublicCourseResponseDto,
@@ -108,6 +109,7 @@ import type {
   UpdateDepartmentRequestDto,
   UpdateFacultyRequestDto,
   UpdateModuleRequestDto,
+  UpdateProfileRequestDto,
   UpdateQuizQuestionRequestDto,
   UpdateTagRequestDto,
   UpdateUniversityRequestDto,
@@ -9585,6 +9587,183 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getSignedInEnrollmentRequestMutationOptions(options), queryClient);
+    }
+
+export const getProfileDescribeUrl = () => {
+
+
+
+
+  return `/api/me/profile`
+}
+
+export const profileDescribe = async ( options?: Parameters<typeof customFetch>[1]): Promise<ProfileResponseDto> => {
+
+  return customFetch<ProfileResponseDto>(getProfileDescribeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getProfileDescribeQueryKey = () => {
+    return [
+    `/api/me/profile`
+    ] as const;
+    }
+
+
+export const getProfileDescribeQueryOptions = <TData = Awaited<ReturnType<typeof profileDescribe>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof profileDescribe>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getProfileDescribeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof profileDescribe>>> = ({ signal }) => profileDescribe({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof profileDescribe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ProfileDescribeQueryResult = NonNullable<Awaited<ReturnType<typeof profileDescribe>>>
+export type ProfileDescribeQueryError = ErrorType<unknown>
+
+
+export function useProfileDescribe<TData = Awaited<ReturnType<typeof profileDescribe>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof profileDescribe>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof profileDescribe>>,
+          TError,
+          Awaited<ReturnType<typeof profileDescribe>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useProfileDescribe<TData = Awaited<ReturnType<typeof profileDescribe>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof profileDescribe>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof profileDescribe>>,
+          TError,
+          Awaited<ReturnType<typeof profileDescribe>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useProfileDescribe<TData = Awaited<ReturnType<typeof profileDescribe>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof profileDescribe>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useProfileDescribe<TData = Awaited<ReturnType<typeof profileDescribe>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof profileDescribe>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getProfileDescribeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getProfileUpdateUrl = () => {
+
+
+
+
+  return `/api/me/profile`
+}
+
+export const profileUpdate = async (updateProfileRequestDto: UpdateProfileRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<ProfileResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ProfileResponseDto>(getProfileUpdateUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateProfileRequestDto)
+  }
+);}
+
+
+
+
+
+export const getProfileUpdateMutationKey = () => ['profileUpdate'] as const;
+
+export const getProfileUpdateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof profileUpdate>>, TError,ProfileUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof profileUpdate>>, TError,ProfileUpdateMutationVariables, TContext> => {
+
+const mutationKey = getProfileUpdateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof profileUpdate>>, ProfileUpdateMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  profileUpdate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProfileUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof profileUpdate>>>
+    export type ProfileUpdateMutationBody = UpdateProfileRequestDto
+    export type ProfileUpdateMutationError = ErrorType<unknown>
+    export type ProfileUpdateMutationVariables = {data: UpdateProfileRequestDto}
+
+    export const useProfileUpdate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof profileUpdate>>, TError,ProfileUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof profileUpdate>>,
+        TError,
+        ProfileUpdateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getProfileUpdateMutationOptions(options), queryClient);
     }
 
 export const getPublicSiteSettingsGetUrl = () => {

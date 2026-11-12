@@ -2591,7 +2591,7 @@ export const enrollmentApprovalApproveManyResponseSucceededItemRegExp = new RegE
 
 export const EnrollmentApprovalApproveManyResponse = zod.object({
   "failed": zod.array(zod.object({
-  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'EMAIL_NOT_VERIFIED', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_VERIFIED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'MODULE_LOCKED', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'QUIZ_ANSWER_INVALID', 'QUIZ_ATTEMPT_LIMIT_REACHED', 'QUIZ_ATTEMPT_NOT_OPEN', 'QUIZ_ATTEMPT_WAIT', 'QUIZ_NOT_UNLOCKED', 'RATE_LIMITED', 'TAG_NAME_TAKEN', 'TAG_RESERVED', 'UNAUTHENTICATED', 'UPLOAD_DIMENSIONS_TOO_LARGE', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED', 'VIDEO_NOT_READY']),
+  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'EMAIL_NOT_VERIFIED', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_VERIFIED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'MODULE_LOCKED', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'PROFILE_LOCKED', 'QUIZ_ANSWER_INVALID', 'QUIZ_ATTEMPT_LIMIT_REACHED', 'QUIZ_ATTEMPT_NOT_OPEN', 'QUIZ_ATTEMPT_WAIT', 'QUIZ_NOT_UNLOCKED', 'RATE_LIMITED', 'TAG_NAME_TAKEN', 'TAG_RESERVED', 'UNAUTHENTICATED', 'UPLOAD_DIMENSIONS_TOO_LARGE', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED', 'VIDEO_NOT_READY']),
   "id": zod.uuid().regex(enrollmentApprovalApproveManyResponseFailedItemIdRegExp)
 })),
   "succeeded": zod.array(zod.uuid().regex(enrollmentApprovalApproveManyResponseSucceededItemRegExp))
@@ -3732,6 +3732,74 @@ export const SignedInEnrollmentRequestResponse = zod.object({
   "courseSlug": zod.string().min(1).max(signedInEnrollmentRequestResponseCourseSlugMax).regex(signedInEnrollmentRequestResponseCourseSlugRegExp),
   "enrollmentId": zod.uuid().regex(signedInEnrollmentRequestResponseEnrollmentIdRegExp),
   "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED'])
+})
+
+
+export const profileDescribeResponseDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileDescribeResponseFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileDescribeResponseUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProfileDescribeResponse = zod.object({
+  "avatarUrl": zod.array(zod.string()),
+  "department": zod.object({
+  "id": zod.uuid().regex(profileDescribeResponseDepartmentIdRegExp),
+  "name": zod.string()
+}),
+  "email": zod.string(),
+  "emailVerified": zod.boolean(),
+  "faculty": zod.object({
+  "id": zod.uuid().regex(profileDescribeResponseFacultyIdRegExp),
+  "name": zod.string()
+}),
+  "locked": zod.boolean(),
+  "name": zod.string(),
+  "session": zod.string(),
+  "university": zod.object({
+  "id": zod.uuid().regex(profileDescribeResponseUniversityIdRegExp),
+  "name": zod.string()
+})
+})
+
+
+export const profileUpdateBodyDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileUpdateBodyFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileUpdateBodySessionRegExp = new RegExp('^(\\d{4})-(\\d{2})$');
+export const profileUpdateBodyUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProfileUpdateBody = zod.object({
+  "departmentId": zod.uuid().regex(profileUpdateBodyDepartmentIdRegExp),
+  "facultyId": zod.uuid().regex(profileUpdateBodyFacultyIdRegExp),
+  "name": zod.string(),
+  "session": zod.string().regex(profileUpdateBodySessionRegExp),
+  "universityId": zod.uuid().regex(profileUpdateBodyUniversityIdRegExp)
+})
+
+export const profileUpdateResponseDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileUpdateResponseFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileUpdateResponseUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProfileUpdateResponse = zod.object({
+  "avatarUrl": zod.array(zod.string()),
+  "department": zod.object({
+  "id": zod.uuid().regex(profileUpdateResponseDepartmentIdRegExp),
+  "name": zod.string()
+}),
+  "email": zod.string(),
+  "emailVerified": zod.boolean(),
+  "faculty": zod.object({
+  "id": zod.uuid().regex(profileUpdateResponseFacultyIdRegExp),
+  "name": zod.string()
+}),
+  "locked": zod.boolean(),
+  "name": zod.string(),
+  "session": zod.string(),
+  "university": zod.object({
+  "id": zod.uuid().regex(profileUpdateResponseUniversityIdRegExp),
+  "name": zod.string()
+})
 })
 
 

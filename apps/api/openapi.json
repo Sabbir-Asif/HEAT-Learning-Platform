@@ -733,6 +733,7 @@
                     "ORIGIN_NOT_ALLOWED",
                     "PASSWORD_BREACHED",
                     "PASSWORD_CHANGE_REQUIRED",
+                    "PROFILE_LOCKED",
                     "QUIZ_ANSWER_INVALID",
                     "QUIZ_ATTEMPT_LIMIT_REACHED",
                     "QUIZ_ATTEMPT_NOT_OPEN",
@@ -2767,6 +2768,94 @@
         ],
         "type": "object"
       },
+      "ProfileResponseDto": {
+        "properties": {
+          "avatarUrl": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "department": {
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "type": "object"
+          },
+          "email": {
+            "type": "string"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "faculty": {
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "type": "object"
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "session": {
+            "type": "string"
+          },
+          "university": {
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "emailVerified",
+          "university",
+          "faculty",
+          "department",
+          "session",
+          "locked",
+          "avatarUrl"
+        ],
+        "type": "object"
+      },
       "ProgressBatchDto": {
         "properties": {
           "csrfToken": {
@@ -4108,6 +4197,40 @@
         },
         "required": [
           "title"
+        ],
+        "type": "object"
+      },
+      "UpdateProfileRequestDto": {
+        "properties": {
+          "departmentId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "facultyId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "session": {
+            "pattern": "^(\\d{4})-(\\d{2})$",
+            "type": "string"
+          },
+          "universityId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "universityId",
+          "facultyId",
+          "departmentId",
+          "session"
         ],
         "type": "object"
       },
@@ -8618,6 +8741,56 @@
         },
         "tags": [
           "enrollment"
+        ]
+      }
+    },
+    "/api/me/profile": {
+      "get": {
+        "operationId": "profileDescribe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "me"
+        ]
+      },
+      "patch": {
+        "operationId": "profileUpdate",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "me"
         ]
       }
     },

@@ -417,6 +417,7 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   ORIGIN_NOT_ALLOWED: 'ORIGIN_NOT_ALLOWED',
   PASSWORD_BREACHED: 'PASSWORD_BREACHED',
   PASSWORD_CHANGE_REQUIRED: 'PASSWORD_CHANGE_REQUIRED',
+  PROFILE_LOCKED: 'PROFILE_LOCKED',
   QUIZ_ANSWER_INVALID: 'QUIZ_ANSWER_INVALID',
   QUIZ_ATTEMPT_LIMIT_REACHED: 'QUIZ_ATTEMPT_LIMIT_REACHED',
   QUIZ_ATTEMPT_NOT_OPEN: 'QUIZ_ATTEMPT_NOT_OPEN',
@@ -1546,6 +1547,36 @@ export interface PlaybackSessionResponseDto {
   sessionId: string | null;
 }
 
+export type ProfileResponseDtoDepartment = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type ProfileResponseDtoFaculty = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type ProfileResponseDtoUniversity = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export interface ProfileResponseDto {
+  avatarUrl: string[];
+  department: ProfileResponseDtoDepartment;
+  email: string;
+  emailVerified: boolean;
+  faculty: ProfileResponseDtoFaculty;
+  locked: boolean;
+  name: string;
+  session: string;
+  university: ProfileResponseDtoUniversity;
+}
+
 export type ProgressBatchDtoIntervalsItem = {
   /**
      * @minimum 0
@@ -2255,6 +2286,18 @@ export interface UpdateModuleRequestDto {
   /** @maxItems 10 */
   objectives?: string[];
   title: string;
+}
+
+export interface UpdateProfileRequestDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId: string;
+  name: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId: string;
 }
 
 export type UpdateQuizQuestionRequestDtoOptionsItem = {
@@ -5737,6 +5780,62 @@ return serverFetch<SignedInEnrollmentResponseDto>(getSignedInEnrollmentRequestUr
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(signedInEnrollmentRequestDto)
+  }
+);}
+
+
+
+export const getProfileDescribeUrl = () => {
+
+
+
+
+  return `/api/me/profile`
+}
+
+export const profileDescribe = async ( options?: Parameters<typeof serverFetch>[1]): Promise<ProfileResponseDto> => {
+
+  return serverFetch<ProfileResponseDto>(getProfileDescribeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getProfileUpdateUrl = () => {
+
+
+
+
+  return `/api/me/profile`
+}
+
+export const profileUpdate = async (updateProfileRequestDto: UpdateProfileRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ProfileResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ProfileResponseDto>(getProfileUpdateUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateProfileRequestDto)
   }
 );}
 
