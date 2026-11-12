@@ -1,4 +1,5 @@
-import { act } from "react";
+import Link from "next/link";
+import { act, useEffect } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { useUnsavedChangesGuard } from "../../src/site-pages/use-unsaved-changes-guard";
@@ -14,8 +15,11 @@ let container: HTMLElement | undefined;
 let latest: ReturnType<typeof useUnsavedChangesGuard> | undefined;
 
 function Probe({ dirty }: { dirty: boolean }) {
-  latest = useUnsavedChangesGuard(dirty);
-  return <a href="/courses">Courses</a>;
+  const guard = useUnsavedChangesGuard(dirty);
+  useEffect(() => {
+    latest = guard;
+  });
+  return <Link href="/courses">Courses</Link>;
 }
 
 afterEach(() => {
