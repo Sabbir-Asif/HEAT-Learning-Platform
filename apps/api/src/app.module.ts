@@ -17,6 +17,7 @@ import { HttpApiModule } from "./http/http.module";
 import { MeModule } from "./me/me.module";
 import { NotificationsModule } from "./notifications/notifications.module";
 import { LearningModule } from "./learning";
+import { PasswordResetModule } from "./password-reset";
 import { PlaybackModule } from "./playback";
 import { StudentAuthModule } from "./student-auth/student-auth.module";
 
@@ -40,6 +41,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     EmailVerificationModule,
     EnrollmentModule,
     LearningModule,
+    PasswordResetModule,
     PlaybackModule,
   ],
   controllers: [HealthController],

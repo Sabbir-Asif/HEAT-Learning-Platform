@@ -54,6 +54,9 @@ export type FormErrorCopyKey =
   | "QUIZ_ATTEMPT_WAIT"
   | "QUIZ_NOT_UNLOCKED"
   | "RATE_LIMITED"
+  | "RESET_LINK_EXPIRED"
+  | "RESET_LINK_INVALID"
+  | "RESET_LINK_USED"
   | "UNAUTHENTICATED"
   | "UPLOAD_EXPIRED"
   | "UPLOAD_OFFSET_MISMATCH"
@@ -137,6 +140,9 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   QUIZ_ATTEMPT_WAIT: "You need to wait before you can submit another attempt.",
   QUIZ_NOT_UNLOCKED: "Watch the required videos in this module to unlock the quiz.",
   RATE_LIMITED: "Too many attempts. Wait a little and try again.",
+  RESET_LINK_EXPIRED: "This reset link has expired. Request a new one.",
+  RESET_LINK_INVALID: "This reset link is not valid.",
+  RESET_LINK_USED: "This reset link has already been used or replaced.",
   UNAUTHENTICATED: "Your session has ended. Sign in again to continue.",
   UPLOAD_EXPIRED: "This upload expired before it finished. Start it again.",
   UPLOAD_OFFSET_MISMATCH: "The upload got out of step with the server. Start it again.",

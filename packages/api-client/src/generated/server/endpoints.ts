@@ -363,6 +363,9 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   QUIZ_ATTEMPT_WAIT: 'QUIZ_ATTEMPT_WAIT',
   QUIZ_NOT_UNLOCKED: 'QUIZ_NOT_UNLOCKED',
   RATE_LIMITED: 'RATE_LIMITED',
+  RESET_LINK_EXPIRED: 'RESET_LINK_EXPIRED',
+  RESET_LINK_INVALID: 'RESET_LINK_INVALID',
+  RESET_LINK_USED: 'RESET_LINK_USED',
   UNAUTHENTICATED: 'UNAUTHENTICATED',
   UPLOAD_EXPIRED: 'UPLOAD_EXPIRED',
   UPLOAD_OFFSET_MISMATCH: 'UPLOAD_OFFSET_MISMATCH',
@@ -437,6 +440,9 @@ export const BulkRejectionResponseDtoFailedItemCode = {
   QUIZ_ATTEMPT_WAIT: 'QUIZ_ATTEMPT_WAIT',
   QUIZ_NOT_UNLOCKED: 'QUIZ_NOT_UNLOCKED',
   RATE_LIMITED: 'RATE_LIMITED',
+  RESET_LINK_EXPIRED: 'RESET_LINK_EXPIRED',
+  RESET_LINK_INVALID: 'RESET_LINK_INVALID',
+  RESET_LINK_USED: 'RESET_LINK_USED',
   UNAUTHENTICATED: 'UNAUTHENTICATED',
   UPLOAD_EXPIRED: 'UPLOAD_EXPIRED',
   UPLOAD_OFFSET_MISMATCH: 'UPLOAD_OFFSET_MISMATCH',
@@ -1118,6 +1124,21 @@ export interface FacultySummaryDto {
   universities: FacultySummaryDtoUniversitiesItem[];
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   updatedAt: string;
+}
+
+export interface ForgotPasswordAcceptedResponseDto {
+  accepted: true;
+}
+
+export interface ForgotPasswordRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 12
+     */
+  captchaAnswer: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  captchaId: string;
+  email: string;
 }
 
 export type HealthResponseDtoStatus = typeof HealthResponseDtoStatus[keyof typeof HealthResponseDtoStatus];
@@ -2125,6 +2146,19 @@ export interface ReorderRequestDto {
      * @items.pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
      */
   previousIds: string[];
+}
+
+export interface ResetPasswordRequestDto {
+  /**
+     * @minLength 12
+     * @maxLength 256
+     */
+  password: string;
+  /**
+     * @minLength 1
+     * @maxLength 512
+     */
+  token: string;
 }
 
 export interface SignInRequestDto {
@@ -5427,6 +5461,41 @@ export const studentAuthCsrfToken = async ( options?: Parameters<typeof serverFe
 
 
 
+export const getPasswordResetForgotPasswordUrl = () => {
+
+
+
+
+  return `/api/auth/forgot-password`
+}
+
+export const passwordResetForgotPassword = async (forgotPasswordRequestDto: ForgotPasswordRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ForgotPasswordAcceptedResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ForgotPasswordAcceptedResponseDto>(getPasswordResetForgotPasswordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(forgotPasswordRequestDto)
+  }
+);}
+
+
+
 export const getStudentAuthRefreshUrl = () => {
 
 
@@ -5443,6 +5512,41 @@ export const studentAuthRefresh = async ( options?: Parameters<typeof serverFetc
     method: 'POST'
 
 
+  }
+);}
+
+
+
+export const getPasswordResetResetPasswordUrl = () => {
+
+
+
+
+  return `/api/auth/reset-password`
+}
+
+export const passwordResetResetPassword = async (resetPasswordRequestDto: ResetPasswordRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<void>(getPasswordResetResetPasswordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(resetPasswordRequestDto)
   }
 );}
 

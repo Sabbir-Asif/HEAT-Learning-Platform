@@ -44,6 +44,13 @@ describe("loadConfig", () => {
     });
   });
 
+  test("defaults the password reset lifetime to 60 minutes and reads an override", () => {
+    expect(loadConfig(valid).passwordReset).toEqual({ ttlMinutes: 60 });
+    expect(loadConfig({ ...valid, PASSWORD_RESET_TTL_MINUTES: "30" }).passwordReset).toEqual({
+      ttlMinutes: 30,
+    });
+  });
+
   test("defaults the invitation lifetime and admin app URL, and reads overrides", () => {
     expect(loadConfig(valid).invitations).toEqual({
       ttlHours: 72,
