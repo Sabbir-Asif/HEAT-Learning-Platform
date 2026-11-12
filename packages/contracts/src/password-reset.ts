@@ -17,3 +17,15 @@ export const resetPasswordRequestSchema = z.object({
 });
 
 export type ResetPasswordRequest = z.infer<typeof resetPasswordRequestSchema>;
+
+export const resetPasswordFormSchema = z
+  .object({
+    password: z.string().min(passwordMinLength).max(passwordMaxLength),
+    confirmPassword: z.string(),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "The passwords do not match.",
+  });
+
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordFormSchema>;
