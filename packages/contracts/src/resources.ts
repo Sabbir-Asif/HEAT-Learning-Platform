@@ -38,7 +38,12 @@ export const isHttpsUrl = (value: string): boolean => {
   }
 };
 
-export const resourceUrlSchema = z.string().trim().refine(isHttpsUrl, resourceUrlMessage);
+export const resourceUrlSchema = z
+  .string()
+  .trim()
+  .min(1, resourceUrlMessage)
+  .max(resourceUrlMaxLength, resourceUrlMessage)
+  .refine(isHttpsUrl, resourceUrlMessage);
 
 export const resourceTitleSchema = z
   .string()

@@ -3110,6 +3110,9 @@ export const resourcesCreateBodyPublishedDefault = false;
 export const resourcesCreateBodyTitleMax = 200;
 
 export const resourcesCreateBodyUrlDefault = null;
+export const resourcesCreateBodyUrlMax = 2000;
+
+
 
 export const ResourcesCreateBody = zod.object({
   "courseId": zod.uuid().regex(resourcesCreateBodyCourseIdRegExp).nullish().default(resourcesCreateBodyCourseIdDefault),
@@ -3119,7 +3122,7 @@ export const ResourcesCreateBody = zod.object({
   "mediaAssetId": zod.uuid().regex(resourcesCreateBodyMediaAssetIdRegExp).nullish().default(resourcesCreateBodyMediaAssetIdDefault),
   "published": zod.boolean().default(resourcesCreateBodyPublishedDefault),
   "title": zod.string().min(1).max(resourcesCreateBodyTitleMax),
-  "url": zod.array(zod.string()).default(resourcesCreateBodyUrlDefault)
+  "url": zod.string().min(1).max(resourcesCreateBodyUrlMax).nullish().default(resourcesCreateBodyUrlDefault)
 })
 
 export const resourcesCreateResponseCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
@@ -3241,6 +3244,9 @@ export const resourcesUpdateBodyPublishedDefault = false;
 export const resourcesUpdateBodyTitleMax = 200;
 
 export const resourcesUpdateBodyUrlDefault = null;
+export const resourcesUpdateBodyUrlMax = 2000;
+
+
 
 export const ResourcesUpdateBody = zod.object({
   "courseId": zod.uuid().regex(resourcesUpdateBodyCourseIdRegExp).nullish().default(resourcesUpdateBodyCourseIdDefault),
@@ -3250,7 +3256,7 @@ export const ResourcesUpdateBody = zod.object({
   "mediaAssetId": zod.uuid().regex(resourcesUpdateBodyMediaAssetIdRegExp).nullish().default(resourcesUpdateBodyMediaAssetIdDefault),
   "published": zod.boolean().default(resourcesUpdateBodyPublishedDefault),
   "title": zod.string().min(1).max(resourcesUpdateBodyTitleMax),
-  "url": zod.array(zod.string()).default(resourcesUpdateBodyUrlDefault)
+  "url": zod.string().min(1).max(resourcesUpdateBodyUrlMax).nullish().default(resourcesUpdateBodyUrlDefault)
 })
 
 export const resourcesUpdateResponseCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');

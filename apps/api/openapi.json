@@ -4467,10 +4467,10 @@
           },
           "url": {
             "default": null,
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
+            "maxLength": 2000,
+            "minLength": 1,
+            "nullable": true,
+            "type": "string"
           }
         },
         "required": [

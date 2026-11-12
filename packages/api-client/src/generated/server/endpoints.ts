@@ -2489,7 +2489,12 @@ export interface ResourceRequestDto {
      * @maxLength 200
      */
   title: string;
-  url?: string[];
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     * @nullable
+     */
+  url?: string | null;
 }
 
 export interface SetTagsRequestDto {
