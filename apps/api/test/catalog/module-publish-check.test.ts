@@ -33,7 +33,7 @@ const build = (modules: unknown[], revisions: unknown[] = [{ id: "rev" }]) => {
       return Promise.resolve([]);
     }),
   };
-  return { check: new ModulePublishCheck(), client, order };
+  return { check: new ModulePublishCheck(client as never), client, order };
 };
 
 describe("ModulePublishCheck", () => {
@@ -98,5 +98,14 @@ describe("ModulePublishCheck", () => {
 
     expect(error).toBeInstanceOf(ApiException);
     expect((error as ApiException).code).toBe("NOT_FOUND");
+  });
+
+  test("checklist reads through the database without locking", async () => {
+    const { check, client, order } = build([moduleRow({ quiz: null })]);
+
+    const checklist = await check.checklist(courseId);
+
+    expect(checklist.failures.map((failure) => failure.code)).toEqual(["MODULE_NO_QUIZ"]);
+    expect(order).toEqual(["read"]);
   });
 });

@@ -1,6 +1,7 @@
-import { Injectable } from "@nestjs/common";
-import type { PublishFailure } from "@heat/contracts";
+import { Inject, Injectable } from "@nestjs/common";
+import type { PublishChecklist, PublishFailure } from "@heat/contracts";
 import type { HeatClient } from "@heat/db";
+import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
 import type { CoursePublishCheck } from "./publish-checks";
 import { evaluatePublishChecks } from "./publish-rules";
@@ -62,6 +63,12 @@ const assetIdsOf = (rows: ModuleRow[]): string[] =>
 
 @Injectable()
 export class ModulePublishCheck implements CoursePublishCheck {
+  constructor(@Inject(DATABASE) private readonly database: HeatClient) {}
+
+  checklist(courseId: string): Promise<PublishChecklist> {
+    return this.evaluate(courseId, this.database, false).then((failures) => ({ failures }));
+  }
+
   async evaluate(
     courseId: string,
     client: PublishCheckClient,

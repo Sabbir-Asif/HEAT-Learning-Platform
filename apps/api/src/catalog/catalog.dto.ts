@@ -11,6 +11,7 @@ import {
   moduleListResponseSchema,
   moduleParamsSchema,
   moduleSummarySchema,
+  publishChecklistSchema,
   quizQuestionParamsSchema,
   quizQuestionRequestSchema,
   quizRulesRequestSchema,
@@ -35,6 +36,8 @@ export class CourseListQueryDto extends createZodDto(courseListQuerySchema) {}
 export class CourseListResponseDto extends createZodDto(courseListResponseSchema) {}
 
 export class CourseSummaryDto extends createZodDto(courseSummarySchema) {}
+
+export class PublishChecklistDto extends createZodDto(publishChecklistSchema) {}
 
 export class CourseIdParamsDto extends createZodDto(courseIdParamsSchema) {}
 
