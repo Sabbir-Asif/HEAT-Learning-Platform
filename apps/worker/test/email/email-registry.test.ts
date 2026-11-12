@@ -27,9 +27,11 @@ const validVariables: Record<string, Record<string, unknown>> = {
   "admin-invitation": { name: "Rahim", token: "inv456", expiresAt: "2026-11-14T06:00:00.000Z" },
 };
 
+const optionalFields: Record<string, string[]> = { "enrollment-rejected": ["reason"] };
+
 const stringFieldsOf = (key: string): string[] =>
   Object.entries(validVariables[key] ?? {})
-    .filter(([, value]) => typeof value === "string")
+    .filter(([field, value]) => typeof value === "string" && !optionalFields[key]?.includes(field))
     .map(([field]) => field);
 
 describe("registry", () => {
@@ -95,7 +97,7 @@ describe.each(emailTemplateKeys)("%s", (key) => {
 
   test("fails with the missing variable names and no values", async () => {
     const fields = Object.keys(variables);
-    for (const field of fields) {
+    for (const field of fields.filter((name) => !optionalFields[key]?.includes(name))) {
       const incomplete = { ...variables };
       delete incomplete[field];
       let caught: unknown;
@@ -196,6 +198,26 @@ describe("content", () => {
     expect(message.html).not.toContain("<i>proof</i>");
     expect(message.text).toContain("Needs <i>proof</i>");
     expect(message.text).toContain("HEAT Basics");
+  });
+
+  test("removal mail escapes the reason in html and keeps it verbatim in text", async () => {
+    const message = await renderEmail(
+      "enrollment-removed",
+      { name: "Amina", courseTitle: "HEAT Basics", reason: `<script>alert(1)</script> & "x"` },
+      context,
+    );
+    expect(message.html).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
+    expect(message.html).not.toContain("<script>alert(1)");
+    expect(message.text).toContain("<script>alert(1)</script>");
+  });
+
+  test("rejection mail renders without a reason", async () => {
+    const message = await renderEmail(
+      "enrollment-rejected",
+      { name: "Amina", courseTitle: "HEAT Basics" },
+      context,
+    );
+    expect(message.text).not.toContain("Reason:");
   });
 
   test("subject drops line breaks from variables", async () => {

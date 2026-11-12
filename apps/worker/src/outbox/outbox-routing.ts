@@ -22,7 +22,13 @@ export type JsonObject = Record<string, z.core.util.JSONType>;
 export const CERTIFICATE_REQUESTED_EVENT_TYPE = "certificate.requested";
 
 export type RoutedAction =
-  | { kind: "email"; template: string; category: EmailCategory; userId: string }
+  | {
+      kind: "email";
+      template: string;
+      category: EmailCategory;
+      userId: string;
+      recipientAddress?: string;
+    }
   | { kind: "certificate"; enrollmentId: string }
   | { kind: "probe"; assetId: string }
   | { kind: "transcode"; assetId: string }
@@ -31,7 +37,11 @@ export type RoutedAction =
 export type Routing =
   { outcome: "routed"; actions: RoutedAction[] } | { outcome: "skipped"; reason: string };
 
-const emailEnvelope = z.object({ template: z.string().min(1), userId: z.uuid() });
+const emailEnvelope = z.object({
+  template: z.string().min(1),
+  userId: z.uuid(),
+  recipientAddress: z.string().min(3).max(320).optional(),
+});
 const certificateEnvelope = z.object({ enrollmentId: z.uuid() });
 const notificationEnvelope = z.object({
   userId: z.uuid(),
@@ -72,6 +82,9 @@ export const routeOutboxEvent = (eventType: string, payload: unknown): Routing =
       template: email.data.template,
       category,
       userId: email.data.userId,
+      ...(email.data.recipientAddress === undefined
+        ? {}
+        : { recipientAddress: email.data.recipientAddress }),
     });
   }
 

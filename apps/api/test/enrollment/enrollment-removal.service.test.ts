@@ -34,6 +34,8 @@ const build = (options: Options = {}) => {
         .mockResolvedValue({ status: "REMOVED" }),
       updateMany: vi.fn().mockResolvedValue({ count: options.claimed ?? 1 }),
     },
+    user: { findFirst: vi.fn().mockResolvedValue({ email: "student@du.ac.bd" }) },
+    course: { findFirst: vi.fn().mockResolvedValue({ title: "HEAT Basics" }) },
     enrollmentDecision: { create: vi.fn().mockResolvedValue({}) },
     outbox: { create: vi.fn().mockResolvedValue({}) },
   };
@@ -43,17 +45,19 @@ const build = (options: Options = {}) => {
       .mockImplementation(async (work: (client: unknown) => unknown) => work(tx)),
   };
   const audit = { record: vi.fn().mockResolvedValue(undefined) };
+  const notifications = { createWithin: vi.fn().mockResolvedValue(true) };
   const service = new EnrollmentRemovalService(
     database as never,
     { now: () => now },
     audit as never,
+    notifications as never,
   );
-  return { service, tx, audit };
+  return { service, tx, audit, notifications };
 };
 
 describe("EnrollmentRemovalService.remove", () => {
   test("moves an approved enrollment to removed and stores the previous state", async () => {
-    const { service, tx, audit } = build();
+    const { service, tx, audit, notifications } = build();
 
     const result = await service.remove("enrollment-id", actor, "Left the university");
 
@@ -76,7 +80,23 @@ describe("EnrollmentRemovalService.remove", () => {
       },
     });
     expect(tx.outbox.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({ eventType: ENROLLMENT_REMOVED_EVENT_TYPE }),
+      data: {
+        eventType: ENROLLMENT_REMOVED_EVENT_TYPE,
+        payload: {
+          template: "enrollment-removed",
+          recipientAddress: "student@du.ac.bd",
+          courseTitle: "HEAT Basics",
+          enrollmentId: "enrollment-id",
+          userId: "user-id",
+          courseId: "course-id",
+          reason: "Left the university",
+        },
+      },
+    });
+    expect(notifications.createWithin).toHaveBeenCalledWith(tx, {
+      userId: "user-id",
+      type: "ENROLLMENT_REMOVED",
+      data: { enrollmentId: "enrollment-id", courseId: "course-id" },
     });
     expect(audit.record).toHaveBeenCalledWith(
       tx,
@@ -127,7 +147,7 @@ describe("EnrollmentRemovalService.remove", () => {
 
 describe("EnrollmentRemovalService.reinstate", () => {
   test("restores a completed enrollment and clears the removal fields", async () => {
-    const { service, tx, audit } = build({
+    const { service, tx, audit, notifications } = build({
       status: "REMOVED",
       statusBeforeRemoval: "COMPLETED",
     });
@@ -143,8 +163,18 @@ describe("EnrollmentRemovalService.reinstate", () => {
       data: expect.objectContaining({ action: "REINSTATE", reason: "Appeal accepted" }),
     });
     expect(tx.outbox.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({ eventType: ENROLLMENT_REINSTATED_EVENT_TYPE }),
+      data: expect.objectContaining({
+        eventType: ENROLLMENT_REINSTATED_EVENT_TYPE,
+        payload: expect.objectContaining({
+          template: "enrollment-reinstated",
+          courseTitle: "HEAT Basics",
+        }),
+      }),
     });
+    expect(notifications.createWithin).toHaveBeenCalledWith(
+      tx,
+      expect.objectContaining({ type: "ENROLLMENT_REINSTATED" }),
+    );
     expect(audit.record).toHaveBeenCalledWith(
       tx,
       actor,

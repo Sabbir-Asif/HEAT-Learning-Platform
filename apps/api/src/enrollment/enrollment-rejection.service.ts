@@ -7,6 +7,11 @@ import type { Clock } from "../core";
 import { ApiException } from "../http/api-exception";
 import { NotificationsService } from "../notifications";
 import type { NotificationWriter } from "../notifications";
+import {
+  decisionEmailPayload,
+  ENROLLMENT_REJECTED_TEMPLATE,
+  readDecisionEmailSnapshot,
+} from "./decision-email";
 import { approvalRefusal } from "./approval-rules";
 import type { EnrollmentStatusName } from "./approval-rules";
 import type { AdminActor } from "./enrollment-approval.service";
@@ -17,6 +22,7 @@ type RejectionTransaction = Pick<
   HeatClient,
   | "enrollment"
   | "user"
+  | "course"
   | "studentProfile"
   | "session"
   | "enrollmentDecision"
@@ -74,10 +80,7 @@ export class EnrollmentRejectionService {
       data: { status: "REJECTED", rejectedAt: now },
     });
     if (claimed.count === 0) await this.refuseLostClaim(tx, id);
-    const recipient = await tx.user.findFirst({
-      where: { id: enrollment.userId },
-      select: { email: true },
-    });
+    const snapshot = await readDecisionEmailSnapshot(tx, enrollment.userId, enrollment.courseId);
     await tx.enrollmentDecision.create({
       data: {
         enrollmentId: id,
@@ -108,10 +111,10 @@ export class EnrollmentRejectionService {
       data: {
         eventType: ENROLLMENT_REJECTED_EVENT_TYPE,
         payload: {
+          ...decisionEmailPayload(ENROLLMENT_REJECTED_TEMPLATE, snapshot),
           enrollmentId: id,
           userId: enrollment.userId,
           courseId: enrollment.courseId,
-          recipientAddress: recipient?.email,
           ...(reason === undefined ? {} : { reason }),
         },
       },
