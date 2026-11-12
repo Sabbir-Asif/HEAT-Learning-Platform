@@ -27,6 +27,7 @@ export interface RelayTransaction {
     type: NotificationKind;
     data: JsonObject;
   }): Promise<void>;
+  notifyStudents(notification: { type: NotificationKind; data: JsonObject }): Promise<void>;
 }
 
 export interface OutboxStore {
@@ -106,6 +107,10 @@ export class OutboxRelay {
         type: action.type,
         data: action.data,
       });
+      return;
+    }
+    if (action.kind === "news-notification") {
+      await transaction.notifyStudents({ type: "NEWS_PUBLISHED", data: action.data });
       return;
     }
     if (action.kind === "certificate") {
