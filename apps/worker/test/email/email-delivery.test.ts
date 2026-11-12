@@ -82,6 +82,28 @@ describe("EmailDelivery", () => {
     expect(store.log).toEqual(["sending job-1", `sent job-1 250 ${now.toISOString()}`]);
   });
 
+  test("unseals an encrypted code into the code variable and keeps the sealed value out", async () => {
+    const { delivery, rendered } = setup(
+      snapshot({
+        template: "password-change-code",
+        payload: {
+          template: "password-change-code",
+          userId: "u1",
+          encryptedCode: "sealed-code",
+          expiresInMinutes: 15,
+        },
+      }),
+    );
+
+    await delivery.deliver("job-1", false);
+
+    expect(rendered[0]?.variables).toEqual({
+      expiresInMinutes: 15,
+      name: "rahim",
+      code: "plain-sealed-code",
+    });
+  });
+
   test("uses the profile name when there is one", async () => {
     const { delivery, rendered } = setup(snapshot({ recipientName: "Rahim Uddin" }));
     await delivery.deliver("job-1", false);
