@@ -32,6 +32,13 @@ export const documentRules: UploadRules = {
   maxFiles: 5,
 };
 
+export const captionRules: UploadRules = {
+  extensions: ["vtt"],
+  mimeTypes: ["text/vtt"],
+  maxBytes: mebibyte,
+  maxFiles: 1,
+};
+
 export const videoRules = (maxBytes: number): UploadRules => ({
   extensions: ["mp4", "mov", "webm", "mkv"],
   mimeTypes: ["video/mp4", "video/quicktime", "video/webm", "video/x-matroska"],

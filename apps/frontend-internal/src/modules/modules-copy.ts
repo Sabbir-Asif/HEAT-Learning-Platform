@@ -118,3 +118,17 @@ export const sectionBodyFailedMessage = (code: string | undefined): string => {
   if (code === "VALIDATION_FAILED") return "The text contains content that is not allowed.";
   return "The text could not be saved. Try again.";
 };
+
+export const captionUploadFailedMessage = (code: string | undefined): string => {
+  if (code === "UPLOAD_TOO_LARGE") return "This caption file is larger than 1 MB.";
+  if (code === "UPLOAD_TYPE_NOT_ALLOWED") {
+    return "This is not a WebVTT caption file. It must be UTF-8 text that starts with WEBVTT.";
+  }
+  if (code === "VIDEO_NOT_READY")
+    return "The video must finish processing before it can have captions.";
+  if (code === "RATE_LIMITED") return "Too many uploads. Wait a moment and retry.";
+  if (code === "NETWORK_ERROR") return "The connection dropped. Retry the upload.";
+  return "The caption could not be uploaded. Try again.";
+};
+
+export const captionRemoveFailedMessage = "The caption could not be removed. Try again.";
