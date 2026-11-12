@@ -36,7 +36,7 @@ export function ResourcesList({ resources }: { resources: ResourcePublicListResp
                   <CardTitle>{item.title}</CardTitle>
                   <CardDescription>{detailOf(item)}</CardDescription>
                   {item.description === null ? null : (
-                    <CardDescription className="break-words">{item.description}</CardDescription>
+                    <CardDescription>{item.description}</CardDescription>
                   )}
                   <div>
                     {item.kind === "file" ? (

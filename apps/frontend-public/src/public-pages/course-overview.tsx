@@ -1,5 +1,7 @@
 import type { PublicCourseResponse } from "@heat/contracts";
 import {
+  BodyText,
+  BulletList,
   Card,
   CardContent,
   CardHeader,
@@ -25,9 +27,7 @@ export function CourseOverview({ course }: { course: PublicCourseResponse }) {
         <CatalogImage image={course.thumbnail} sizes="(min-width: 1024px) 960px, 100vw" priority />
       )}
       {descriptionParagraphs(course.description).map((paragraph) => (
-        <p key={paragraph} className="break-words">
-          {paragraph}
-        </p>
+        <BodyText key={paragraph}>{paragraph}</BodyText>
       ))}
       <section aria-labelledby="modules-heading" className="flex flex-col gap-4">
         <SectionHeading id="modules-heading">Modules</SectionHeading>
@@ -49,11 +49,11 @@ export function CourseOverview({ course }: { course: PublicCourseResponse }) {
                   </CardHeader>
                   {module.objectives.length === 0 ? null : (
                     <CardContent>
-                      <ul className="flex list-disc flex-col gap-1 pl-5">
+                      <BulletList>
                         {module.objectives.map((objective) => (
                           <li key={objective}>{objective}</li>
                         ))}
-                      </ul>
+                      </BulletList>
                     </CardContent>
                   )}
                 </Card>

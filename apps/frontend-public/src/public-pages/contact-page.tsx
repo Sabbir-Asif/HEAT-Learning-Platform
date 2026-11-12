@@ -1,6 +1,6 @@
 import { contactEmailHref, contactPhoneHref, hasContactDetails } from "@heat/contracts";
 import type { PublicContactSettingsResponse } from "@heat/contracts";
-import { EmptyState, PageHeader, SectionHeading } from "@heat/ui";
+import { BodyText, EmptyState, PageHeader, SectionHeading } from "@heat/ui";
 import { ShellContent } from "@heat/ui/shell";
 import { MailIcon } from "lucide-react";
 import { contactLines } from "./links";
@@ -9,9 +9,7 @@ function Lines({ value }: { value: string }) {
   return (
     <>
       {contactLines(value).map((line) => (
-        <p key={line} className="break-words">
-          {line}
-        </p>
+        <BodyText key={line}>{line}</BodyText>
       ))}
     </>
   );
