@@ -68,6 +68,8 @@ const messages: Record<ErrorCode, string> = {
   QUIZ_ATTEMPT_WAIT: "Wait before submitting another attempt.",
   QUIZ_NOT_UNLOCKED: "Watch the required videos in this module to unlock the quiz.",
   RATE_LIMITED: "Too many requests. Try again later.",
+  TAG_NAME_TAKEN: "A tag with this name already exists.",
+  TAG_RESERVED: "The front page tag is built in and cannot be renamed or deleted.",
   UNAUTHENTICATED: "Sign in to continue.",
   UPLOAD_EXPIRED: "This upload expired before it finished. Start it again.",
   UPLOAD_OFFSET_MISMATCH:

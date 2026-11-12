@@ -48,6 +48,8 @@ export type FormErrorCopyKey =
   | "QUIZ_ATTEMPT_WAIT"
   | "QUIZ_NOT_UNLOCKED"
   | "RATE_LIMITED"
+  | "TAG_NAME_TAKEN"
+  | "TAG_RESERVED"
   | "UNAUTHENTICATED"
   | "UPLOAD_EXPIRED"
   | "UPLOAD_OFFSET_MISMATCH"
@@ -124,6 +126,8 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   QUIZ_ATTEMPT_WAIT: "You need to wait before you can submit another attempt.",
   QUIZ_NOT_UNLOCKED: "Watch the required videos in this module to unlock the quiz.",
   RATE_LIMITED: "Too many attempts. Wait a little and try again.",
+  TAG_NAME_TAKEN: "A tag with this name already exists.",
+  TAG_RESERVED: "The front page tag is built in and cannot be renamed or deleted.",
   UNAUTHENTICATED: "Your session has ended. Sign in again to continue.",
   UPLOAD_EXPIRED: "This upload expired before it finished. Start it again.",
   UPLOAD_OFFSET_MISMATCH: "The upload got out of step with the server. Start it again.",
