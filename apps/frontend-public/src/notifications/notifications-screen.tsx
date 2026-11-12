@@ -77,7 +77,7 @@ export function NotificationsScreen() {
           <Button variant="outline" disabled={page <= 1} onClick={() => setPage(page - 1)}>
             Previous
           </Button>
-          <span className="text-muted-foreground text-sm">
+          <span>
             Page {page} of {pageCount}
           </span>
           <Button variant="outline" disabled={page >= pageCount} onClick={() => setPage(page + 1)}>
