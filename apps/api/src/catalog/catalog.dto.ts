@@ -2,6 +2,9 @@ import {
   courseIdParamsSchema,
   courseListQuerySchema,
   courseListResponseSchema,
+  courseRevisionItemSchema,
+  courseRevisionListResponseSchema,
+  courseRevisionParamsSchema,
   courseSummarySchema,
   createCourseRequestSchema,
   createModuleRequestSchema,
@@ -76,3 +79,9 @@ export class QuizQuestionRequestDto extends createZodDto(quizQuestionRequestSche
 export class UpdateQuizQuestionRequestDto extends createZodDto(updateQuizQuestionRequestSchema) {}
 
 export class QuizQuestionParamsDto extends createZodDto(quizQuestionParamsSchema) {}
+
+export class CourseRevisionItemDto extends createZodDto(courseRevisionItemSchema) {}
+
+export class CourseRevisionListResponseDto extends createZodDto(courseRevisionListResponseSchema) {}
+
+export class CourseRevisionParamsDto extends createZodDto(courseRevisionParamsSchema) {}

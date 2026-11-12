@@ -44,6 +44,8 @@ import type {
   CertificateListResponseDto,
   ChangePasswordRequestDto,
   CourseListResponseDto,
+  CourseRevisionItemDto,
+  CourseRevisionListResponseDto,
   CourseSummaryDto,
   CoursesListParams,
   CreateCourseRequestDto,
@@ -3749,6 +3751,239 @@ export function useCoursesPublishChecks<TData = Awaited<ReturnType<typeof course
 
 
 
+
+export const getRevisionsListUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/revisions`
+}
+
+export const revisionsList = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<CourseRevisionListResponseDto> => {
+
+  return customFetch<CourseRevisionListResponseDto>(getRevisionsListUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getRevisionsListQueryKey = (id: string,) => {
+    return [
+    `/api/admin/courses/${id}/revisions`
+    ] as const;
+    }
+
+
+export const getRevisionsListQueryOptions = <TData = Awaited<ReturnType<typeof revisionsList>>, TError = ErrorType<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof revisionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getRevisionsListQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof revisionsList>>> = ({ signal }) => revisionsList(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof revisionsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type RevisionsListQueryResult = NonNullable<Awaited<ReturnType<typeof revisionsList>>>
+export type RevisionsListQueryError = ErrorType<unknown>
+
+
+export function useRevisionsList<TData = Awaited<ReturnType<typeof revisionsList>>, TError = ErrorType<unknown>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof revisionsList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof revisionsList>>,
+          TError,
+          Awaited<ReturnType<typeof revisionsList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useRevisionsList<TData = Awaited<ReturnType<typeof revisionsList>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof revisionsList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof revisionsList>>,
+          TError,
+          Awaited<ReturnType<typeof revisionsList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useRevisionsList<TData = Awaited<ReturnType<typeof revisionsList>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof revisionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useRevisionsList<TData = Awaited<ReturnType<typeof revisionsList>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof revisionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getRevisionsListQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRevisionsCloneUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/revisions`
+}
+
+export const revisionsClone = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<CourseRevisionItemDto> => {
+
+  return customFetch<CourseRevisionItemDto>(getRevisionsCloneUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getRevisionsCloneMutationKey = () => ['revisionsClone'] as const;
+
+export const getRevisionsCloneMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revisionsClone>>, TError,RevisionsCloneMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof revisionsClone>>, TError,RevisionsCloneMutationVariables, TContext> => {
+
+const mutationKey = getRevisionsCloneMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof revisionsClone>>, RevisionsCloneMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  revisionsClone(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RevisionsCloneMutationResult = NonNullable<Awaited<ReturnType<typeof revisionsClone>>>
+
+    export type RevisionsCloneMutationError = ErrorType<unknown>
+    export type RevisionsCloneMutationVariables = {id: string}
+
+    export const useRevisionsClone = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revisionsClone>>, TError,RevisionsCloneMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof revisionsClone>>,
+        TError,
+        RevisionsCloneMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRevisionsCloneMutationOptions(options), queryClient);
+    }
+
+export const getRevisionsPublishUrl = (id: string,
+    revisionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/revisions/${revisionId}/publish`
+}
+
+export const revisionsPublish = async (id: string,
+    revisionId: string, options?: Parameters<typeof customFetch>[1]): Promise<CourseRevisionItemDto> => {
+
+  return customFetch<CourseRevisionItemDto>(getRevisionsPublishUrl(id,revisionId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getRevisionsPublishMutationKey = () => ['revisionsPublish'] as const;
+
+export const getRevisionsPublishMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revisionsPublish>>, TError,RevisionsPublishMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof revisionsPublish>>, TError,RevisionsPublishMutationVariables, TContext> => {
+
+const mutationKey = getRevisionsPublishMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof revisionsPublish>>, RevisionsPublishMutationVariables> = (props) => {
+          const {id,revisionId} = props ?? {};
+
+          return  revisionsPublish(id,revisionId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RevisionsPublishMutationResult = NonNullable<Awaited<ReturnType<typeof revisionsPublish>>>
+
+    export type RevisionsPublishMutationError = ErrorType<unknown>
+    export type RevisionsPublishMutationVariables = {id: string;revisionId: string}
+
+    export const useRevisionsPublish = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revisionsPublish>>, TError,RevisionsPublishMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof revisionsPublish>>,
+        TError,
+        RevisionsPublishMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRevisionsPublishMutationOptions(options), queryClient);
+    }
 
 export const getDepartmentsListUrl = (params?: DepartmentsListParams,) => {
   const normalizedParams = new URLSearchParams();

@@ -8,8 +8,7 @@ export const revisionLocked = (revision: {
   publishedAt: Date | null;
   enrollmentCount: number;
   latest: boolean;
-}): boolean =>
-  revision.publishedAt !== null && (revision.enrollmentCount > 0 || !revision.latest);
+}): boolean => revision.publishedAt !== null && (revision.enrollmentCount > 0 || !revision.latest);
 
 export const assertCanCloneRevision = (latest: { publishedAt: Date | null }): void => {
   if (latest.publishedAt === null) throw new ApiException(409, "COURSE_REVISION_DRAFT_EXISTS");
@@ -26,7 +25,9 @@ export const assertCanPublishRevision = (input: {
   }
 };
 
-export const referenceIncrements = (assetIds: ReadonlyArray<string | null>): Map<string, number> => {
+export const referenceIncrements = (
+  assetIds: ReadonlyArray<string | null>,
+): Map<string, number> => {
   const increments = new Map<string, number>();
   for (const assetId of assetIds) {
     if (assetId !== null) increments.set(assetId, (increments.get(assetId) ?? 0) + 1);

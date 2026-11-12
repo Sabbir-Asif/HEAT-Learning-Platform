@@ -13,6 +13,8 @@ import { LessonSectionsService } from "./lesson-sections.service";
 import { ModulePublishCheck } from "./module-publish-check";
 import { ModulesController } from "./modules.controller";
 import { ModulesService } from "./modules.service";
+import { RevisionsController } from "./revisions.controller";
+import { RevisionsService } from "./revisions.service";
 import { QuizController } from "./quiz.controller";
 import { QuizService } from "./quiz.service";
 import { VideoLibraryController } from "./video-library.controller";
@@ -28,6 +30,7 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
   imports: [CoreModule, AuditModule, RateLimitModule],
   controllers: [
     CoursesController,
+    RevisionsController,
     ModulesController,
     LessonSectionsController,
     VideoSlotsController,
@@ -37,6 +40,7 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
   ],
   providers: [
     CoursesService,
+    RevisionsService,
     CourseLookupService,
     ContentLockService,
     ModulesService,
