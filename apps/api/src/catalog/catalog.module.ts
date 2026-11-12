@@ -108,6 +108,8 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     ContentLockService,
     ModulePublishCheck,
     COURSE_PUBLISH_CHECKS,
+    PublicImagesService,
+    PUBLIC_REVALIDATION,
   ],
 })
 export class CatalogModule {}
