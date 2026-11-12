@@ -129,6 +129,13 @@ export const mergeWithinBudget = (input: MergeInput): MergeResult => {
 export const resumePositionOf = (positionSeconds: number, durationSeconds: number): number =>
   Math.floor(Math.min(Math.max(0, positionSeconds), durationSeconds));
 
+export const restartWindowSeconds = 5;
+
+export const startPositionOf = (resumeSeconds: number, durationSeconds: number): number =>
+  durationSeconds <= 0 || resumeSeconds >= durationSeconds - restartWindowSeconds
+    ? 0
+    : resumeSeconds;
+
 export interface SequenceDecision {
   advancesPosition: boolean;
   lastSequence: number;
