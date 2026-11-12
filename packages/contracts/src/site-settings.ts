@@ -8,7 +8,10 @@ export const landingOverviewHeadingSchema = z
   .string()
   .trim()
   .min(1, "Enter the heading.")
-  .max(landingOverviewHeadingMaxLength, `Use at most ${landingOverviewHeadingMaxLength} characters.`);
+  .max(
+    landingOverviewHeadingMaxLength,
+    `Use at most ${landingOverviewHeadingMaxLength} characters.`,
+  );
 
 export const landingOverviewRequestSchema = z.object({
   heading: landingOverviewHeadingSchema,
