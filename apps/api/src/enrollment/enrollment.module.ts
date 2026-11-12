@@ -23,6 +23,8 @@ import { StudentDetailController } from "./student-detail.controller";
 import { StudentDetailService } from "./student-detail.service";
 import { StudentListController } from "./student-list.controller";
 import { StudentListService } from "./student-list.service";
+import { SignedInEnrollmentController } from "./signed-in-enrollment.controller";
+import { SignedInEnrollmentService } from "./signed-in-enrollment.service";
 
 @Module({
   imports: [
@@ -44,6 +46,7 @@ import { StudentListService } from "./student-list.service";
     AttemptGrantController,
     StudentListController,
     StudentDetailController,
+    SignedInEnrollmentController,
   ],
   providers: [
     EnrollmentService,
@@ -54,6 +57,7 @@ import { StudentListService } from "./student-list.service";
     ApprovalQueueService,
     StudentListService,
     StudentDetailService,
+    SignedInEnrollmentService,
   ],
 })
 export class EnrollmentModule {}

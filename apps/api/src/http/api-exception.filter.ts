@@ -52,6 +52,7 @@ const messages: Record<ErrorCode, string> = {
   DIRECTORY_IN_USE: "This record is still in use, so it cannot be deleted.",
   DIRECTORY_NAME_TAKEN: "A record with this name already exists.",
   EMAIL_IN_USE: "An account with this email address already exists.",
+  EMAIL_NOT_VERIFIED: "Verify your email address to request this course.",
   ENROLLMENT_ALREADY_DECIDED: "This request was already decided or was withdrawn.",
   ENROLLMENT_NOT_ACTIVE: "Your enrollment in this course is not active.",
   ENROLLMENT_NOT_REMOVABLE: "Only an approved or completed student can be removed.",
