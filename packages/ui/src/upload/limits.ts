@@ -21,6 +21,11 @@ export const imageRules: UploadRules = {
   maxFiles: 5,
 };
 
+export const avatarRules: UploadRules = {
+  ...imageRules,
+  maxFiles: 1,
+};
+
 export const documentRules: UploadRules = {
   extensions: ["pdf", "doc", "docx"],
   mimeTypes: [

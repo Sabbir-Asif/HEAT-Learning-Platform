@@ -3,6 +3,7 @@ export { ThemeProvider } from "./theme/theme-provider";
 export type { ThemeProviderProps } from "./theme/theme-provider";
 export { cn } from "./lib/utils";
 export { useIsMobile } from "./hooks/use-mobile";
+export * from "./components/avatar";
 export * from "./components/badge";
 export * from "./components/breadcrumb";
 export * from "./components/button";

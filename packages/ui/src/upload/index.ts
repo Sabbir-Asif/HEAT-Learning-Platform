@@ -1,5 +1,6 @@
 export * from "./file-upload";
 export {
+  avatarRules,
   captionRules,
   checkFile,
   documentRules,

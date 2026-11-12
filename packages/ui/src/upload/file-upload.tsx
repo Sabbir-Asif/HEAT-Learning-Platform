@@ -7,6 +7,7 @@ import { Button } from "../components/button";
 import { Progress, ProgressLabel, ProgressValue } from "../components/progress";
 import { cn } from "../lib/utils";
 import {
+  avatarRules,
   captionRules,
   checkFile,
   documentRules,
@@ -28,7 +29,7 @@ type AcceptedFile = { id: string; file: File };
 
 type FileUploadProps = {
   label: string;
-  preset: "images" | "documents" | "captions";
+  preset: "images" | "documents" | "captions" | "avatar";
   statuses?: Record<string, UploadItemState>;
   onFilesAccepted: (files: AcceptedFile[]) => void;
   onCancel: (id: string) => void;
@@ -44,6 +45,7 @@ const presets: Record<FileUploadProps["preset"], UploadRules> = {
   images: imageRules,
   documents: documentRules,
   captions: captionRules,
+  avatar: avatarRules,
 };
 
 const statusText: Record<UploadStatus, string> = {
