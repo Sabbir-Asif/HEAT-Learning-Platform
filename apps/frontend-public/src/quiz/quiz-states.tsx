@@ -105,7 +105,17 @@ export function QuizPassed({
           {passMarkPercent === null ? "" : `Pass mark ${passMarkPercent}%. `}
           Submitted on {formatAttemptTime(result.submittedAt)}.
         </CardDescription>
-        <div>{backAction(courseSlug, moduleId)}</div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            nativeButton={false}
+            render={
+              <Link href={`${moduleHref(courseSlug, moduleId)}/quiz/result/${result.attemptId}`} />
+            }
+          >
+            View result
+          </Button>
+          {backAction(courseSlug, moduleId)}
+        </div>
       </CardContent>
     </Card>
   );

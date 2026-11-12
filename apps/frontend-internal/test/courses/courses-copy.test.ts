@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { courseDeleteBlockedMessage, publishFailedMessage } from "../../src/courses/courses-copy";
+import {
+  courseDeleteBlockedMessage,
+  publishBlockersTitle,
+  publishFailedMessage,
+} from "../../src/courses/courses-copy";
 import { courseStatusFromUrl } from "../../src/courses/courses-status";
 
 describe("courseDeleteBlockedMessage", () => {
@@ -22,6 +26,13 @@ describe("publishFailedMessage", () => {
 
   test("falls back to a retry message without failures", () => {
     expect(publishFailedMessage("HEAT", [])).toBe("HEAT could not be published. Try again.");
+  });
+});
+
+describe("publishBlockersTitle", () => {
+  test("counts the blockers", () => {
+    expect(publishBlockersTitle(1)).toBe("1 thing blocks publishing");
+    expect(publishBlockersTitle(3)).toBe("3 things block publishing");
   });
 });
 

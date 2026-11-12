@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { StudentsView } from "@/students/students-view";
 
 export default function Page() {
-  return <PlaceholderPage title="Students" />;
+  return <StudentsView />;
 }

@@ -32,7 +32,14 @@ const slotSelect = {
   required: true,
   assetId: true,
   asset: {
-    select: { status: true, assetKey: true, rejectionReason: true, failureReason: true },
+    select: {
+      status: true,
+      assetKey: true,
+      rejectionReason: true,
+      failureReason: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   },
 };
 
@@ -47,6 +54,8 @@ interface SlotRow {
     assetKey: string;
     rejectionReason: string | null;
     failureReason: string | null;
+    createdAt: Date;
+    updatedAt: Date;
   } | null;
 }
 
@@ -69,6 +78,8 @@ const toSlotSummary = (row: SlotRow): VideoSlotSummary => ({
   assetKey: row.asset?.assetKey ?? null,
   rejectionReason: reasonOf(row.asset?.rejectionReason ?? null),
   failureReason: failureOf(row.asset?.failureReason ?? null),
+  uploadedAt: row.asset?.createdAt.toISOString() ?? null,
+  statusChangedAt: row.asset?.updatedAt.toISOString() ?? null,
 });
 
 const auditedFields = (moduleId: string, row: SlotRow) => ({

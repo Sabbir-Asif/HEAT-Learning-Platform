@@ -138,6 +138,21 @@ describe("ModulesService.update", () => {
     ).resolves.toBeDefined();
   });
 
+  test("refuses a changed number of objectives on a locked course", async () => {
+    const { service, database, inAuditScope } = build({
+      lockedAt: at,
+      modules: [moduleRow("a", 1, { objectives: ["One"] })],
+    });
+    expect(
+      await failureOf(
+        inAuditScope(() =>
+          service.update(courseId, "a", { title: "Module a", objectives: ["One", "Two"] }),
+        ),
+      ),
+    ).toMatchObject({ code: "CONTENT_LOCKED" });
+    expect(database.module.update).not.toHaveBeenCalled();
+  });
+
   test("answers 404 for a module of another course", async () => {
     const { service, inAuditScope } = build();
     expect(

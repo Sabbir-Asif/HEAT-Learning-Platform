@@ -11,6 +11,8 @@ import { QuizAccessController } from "./quiz-access.controller";
 import { QuizDeliveryController } from "./quiz-delivery.controller";
 import { QuizDeliveryService } from "./quiz-delivery.service";
 import { QuizGateService } from "./quiz-gate";
+import { QuizResultController } from "./quiz-result.controller";
+import { QuizResultService } from "./quiz-result.service";
 import { QuizSubmissionController } from "./quiz-submission.controller";
 import { QuizSubmissionService } from "./quiz-submission.service";
 import { ModuleCompletionService } from "./module-completion.service";
@@ -26,6 +28,7 @@ import { LearningStructureService } from "./learning-structure.service";
     QuizAccessController,
     QuizDeliveryController,
     QuizSubmissionController,
+    QuizResultController,
   ],
   providers: [
     DashboardService,
@@ -34,6 +37,7 @@ import { LearningStructureService } from "./learning-structure.service";
     QuizGateService,
     QuizDeliveryService,
     QuizSubmissionService,
+    QuizResultService,
     ModuleCompletionService,
     {
       provide: QUIZ_SCORED_HANDLERS,

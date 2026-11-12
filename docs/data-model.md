@@ -378,6 +378,7 @@ erDiagram
     String videoId FK
     DateTime startedAt
     DateTime lastSeenAt
+    DateTime positionClaimedAt
     DateTime endedAt
     Float acceptedSeconds
     Int lastSequence

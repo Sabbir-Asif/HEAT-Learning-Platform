@@ -18,6 +18,8 @@ interface SlotFixture {
     assetKey: string;
     rejectionReason?: string | null;
     failureReason?: string | null;
+    createdAt?: Date;
+    updatedAt?: Date;
   } | null;
 }
 
@@ -29,6 +31,7 @@ const slot = (id: string, order: number, overrides: Partial<SlotFixture> = {}): 
   assetId: null,
   asset: null,
   ...overrides,
+  ...(overrides.asset ? { asset: { createdAt: at, updatedAt: at, ...overrides.asset } } : {}),
 });
 
 const build = (options: { lockedAt?: Date | null; slots?: SlotFixture[] } = {}) => {
@@ -378,5 +381,29 @@ describe("VideoSlotsService.retryTranscode", () => {
     const { service, inAuditScope } = build({ slots: [failed], lockedAt: at });
     const result = await inAuditScope(() => service.retryTranscode(courseId, "m", "a"));
     expect(result.locked).toBe(true);
+  });
+});
+
+describe("VideoSlotsService.list timestamps", () => {
+  test("shows when the video was uploaded and when its status last changed", async () => {
+    const { service } = build({
+      slots: [
+        slot("a", 1, {
+          assetId: "x",
+          asset: {
+            status: "PROCESSING",
+            assetKey: "k1",
+            createdAt: new Date("2026-11-11T06:00:00.000Z"),
+            updatedAt: new Date("2026-11-11T06:02:00.000Z"),
+          },
+        }),
+        slot("b", 2),
+      ],
+    });
+    const result = await service.list(courseId, "m");
+    expect(result.items.map((item) => [item.uploadedAt, item.statusChangedAt])).toEqual([
+      ["2026-11-11T06:00:00.000Z", "2026-11-11T06:02:00.000Z"],
+      [null, null],
+    ]);
   });
 });

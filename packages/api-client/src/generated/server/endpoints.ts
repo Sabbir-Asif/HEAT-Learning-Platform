@@ -383,6 +383,74 @@ export interface BulkApprovalResponseDto {
   succeeded: string[];
 }
 
+export type BulkRejectionResponseDtoFailedItemCode = typeof BulkRejectionResponseDtoFailedItemCode[keyof typeof BulkRejectionResponseDtoFailedItemCode];
+
+
+export const BulkRejectionResponseDtoFailedItemCode = {
+  AUDIT_ACTOR_FILTER_TOO_BROAD: 'AUDIT_ACTOR_FILTER_TOO_BROAD',
+  BAD_REQUEST: 'BAD_REQUEST',
+  CANNOT_DEACTIVATE_SELF: 'CANNOT_DEACTIVATE_SELF',
+  CAPTCHA_EXPIRED: 'CAPTCHA_EXPIRED',
+  CAPTCHA_INVALID: 'CAPTCHA_INVALID',
+  CONTENT_LOCKED: 'CONTENT_LOCKED',
+  COURSE_HAS_ENROLLMENTS: 'COURSE_HAS_ENROLLMENTS',
+  COURSE_LOCKED: 'COURSE_LOCKED',
+  COURSE_NOT_AVAILABLE: 'COURSE_NOT_AVAILABLE',
+  COURSE_NOT_DRAFT: 'COURSE_NOT_DRAFT',
+  COURSE_PUBLISH_CHECKS_FAILED: 'COURSE_PUBLISH_CHECKS_FAILED',
+  COURSE_SLUG_TAKEN: 'COURSE_SLUG_TAKEN',
+  CSRF_TOKEN_INVALID: 'CSRF_TOKEN_INVALID',
+  DIRECTORY_ARCHIVED: 'DIRECTORY_ARCHIVED',
+  DIRECTORY_IN_USE: 'DIRECTORY_IN_USE',
+  DIRECTORY_NAME_TAKEN: 'DIRECTORY_NAME_TAKEN',
+  EMAIL_IN_USE: 'EMAIL_IN_USE',
+  ENROLLMENT_ALREADY_DECIDED: 'ENROLLMENT_ALREADY_DECIDED',
+  ENROLLMENT_NOT_ACTIVE: 'ENROLLMENT_NOT_ACTIVE',
+  ENROLLMENT_NOT_VERIFIED: 'ENROLLMENT_NOT_VERIFIED',
+  FORBIDDEN: 'FORBIDDEN',
+  INTERNAL: 'INTERNAL',
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  INVITATION_EXPIRED: 'INVITATION_EXPIRED',
+  INVITATION_INVALID: 'INVITATION_INVALID',
+  INVITATION_NOT_PENDING: 'INVITATION_NOT_PENDING',
+  MODULE_LOCKED: 'MODULE_LOCKED',
+  NOT_FOUND: 'NOT_FOUND',
+  ORDER_CONFLICT: 'ORDER_CONFLICT',
+  ORIGIN_NOT_ALLOWED: 'ORIGIN_NOT_ALLOWED',
+  PASSWORD_BREACHED: 'PASSWORD_BREACHED',
+  PASSWORD_CHANGE_REQUIRED: 'PASSWORD_CHANGE_REQUIRED',
+  QUIZ_ANSWER_INVALID: 'QUIZ_ANSWER_INVALID',
+  QUIZ_ATTEMPT_LIMIT_REACHED: 'QUIZ_ATTEMPT_LIMIT_REACHED',
+  QUIZ_ATTEMPT_NOT_OPEN: 'QUIZ_ATTEMPT_NOT_OPEN',
+  QUIZ_ATTEMPT_WAIT: 'QUIZ_ATTEMPT_WAIT',
+  QUIZ_NOT_UNLOCKED: 'QUIZ_NOT_UNLOCKED',
+  RATE_LIMITED: 'RATE_LIMITED',
+  UNAUTHENTICATED: 'UNAUTHENTICATED',
+  UPLOAD_EXPIRED: 'UPLOAD_EXPIRED',
+  UPLOAD_OFFSET_MISMATCH: 'UPLOAD_OFFSET_MISMATCH',
+  UPLOAD_TOO_LARGE: 'UPLOAD_TOO_LARGE',
+  UPLOAD_TYPE_NOT_ALLOWED: 'UPLOAD_TYPE_NOT_ALLOWED',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+  VERIFICATION_LINK_EXPIRED: 'VERIFICATION_LINK_EXPIRED',
+  VERIFICATION_LINK_INVALID: 'VERIFICATION_LINK_INVALID',
+  VERIFICATION_LINK_USED: 'VERIFICATION_LINK_USED',
+  VERIFICATION_RESEND_LIMIT: 'VERIFICATION_RESEND_LIMIT',
+  VIDEO_NOT_FAILED: 'VIDEO_NOT_FAILED',
+  VIDEO_NOT_READY: 'VIDEO_NOT_READY',
+} as const;
+
+export type BulkRejectionResponseDtoFailedItem = {
+  code: BulkRejectionResponseDtoFailedItemCode;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+};
+
+export interface BulkRejectionResponseDto {
+  failed: BulkRejectionResponseDtoFailedItem[];
+  /** @items.pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  succeeded: string[];
+}
+
 export interface CaptchaRequestDto {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   replaces?: string;
@@ -1254,6 +1322,14 @@ export interface LessonSectionRequestDto {
   title: string;
 }
 
+export interface MarkAllNotificationsReadResponseDto {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  updated: number;
+}
+
 export type MeResponseDtoEnrollmentsItemStatus = typeof MeResponseDtoEnrollmentsItemStatus[keyof typeof MeResponseDtoEnrollmentsItemStatus];
 
 
@@ -1380,6 +1456,81 @@ export interface ModuleSummaryDto {
   updatedAt: string;
 }
 
+export type NotificationDtoData = {[key: string]: string};
+
+export type NotificationDtoType = typeof NotificationDtoType[keyof typeof NotificationDtoType];
+
+
+export const NotificationDtoType = {
+  ENROLLMENT_APPROVED: 'ENROLLMENT_APPROVED',
+  ENROLLMENT_REJECTED: 'ENROLLMENT_REJECTED',
+  ENROLLMENT_REMOVED: 'ENROLLMENT_REMOVED',
+  ENROLLMENT_REINSTATED: 'ENROLLMENT_REINSTATED',
+  CERTIFICATE_READY: 'CERTIFICATE_READY',
+  NEWS_PUBLISHED: 'NEWS_PUBLISHED',
+} as const;
+
+export interface NotificationDto {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  data: NotificationDtoData;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  readAt: string | null;
+  type: NotificationDtoType;
+}
+
+export type NotificationListResponseDtoItemsItemData = {[key: string]: string};
+
+export type NotificationListResponseDtoItemsItemType = typeof NotificationListResponseDtoItemsItemType[keyof typeof NotificationListResponseDtoItemsItemType];
+
+
+export const NotificationListResponseDtoItemsItemType = {
+  ENROLLMENT_APPROVED: 'ENROLLMENT_APPROVED',
+  ENROLLMENT_REJECTED: 'ENROLLMENT_REJECTED',
+  ENROLLMENT_REMOVED: 'ENROLLMENT_REMOVED',
+  ENROLLMENT_REINSTATED: 'ENROLLMENT_REINSTATED',
+  CERTIFICATE_READY: 'CERTIFICATE_READY',
+  NEWS_PUBLISHED: 'NEWS_PUBLISHED',
+} as const;
+
+export type NotificationListResponseDtoItemsItem = {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  data: NotificationListResponseDtoItemsItemData;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  readAt: string | null;
+  type: NotificationListResponseDtoItemsItemType;
+};
+
+export interface NotificationListResponseDto {
+  items: NotificationListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+}
+
 export type PlaybackSessionResponseDtoCaptionsItem = {
   /**
      * @minLength 1
@@ -1452,6 +1603,38 @@ export interface ProgressResponseDto {
      * @maximum 9007199254740991
      */
   resumePositionSeconds: number;
+}
+
+export type PublishChecklistDtoFailuresItemCode = typeof PublishChecklistDtoFailuresItemCode[keyof typeof PublishChecklistDtoFailuresItemCode];
+
+
+export const PublishChecklistDtoFailuresItemCode = {
+  COURSE_NO_MODULES: 'COURSE_NO_MODULES',
+  MODULE_NO_REQUIRED_VIDEO: 'MODULE_NO_REQUIRED_VIDEO',
+  MODULE_VIDEO_NOT_READY: 'MODULE_VIDEO_NOT_READY',
+  MODULE_NO_QUIZ: 'MODULE_NO_QUIZ',
+  MODULE_QUIZ_EMPTY: 'MODULE_QUIZ_EMPTY',
+  QUESTION_OPTION_COUNT: 'QUESTION_OPTION_COUNT',
+  QUESTION_CORRECT_COUNT: 'QUESTION_CORRECT_COUNT',
+} as const;
+
+export type PublishChecklistDtoFailuresItem = {
+  code: PublishChecklistDtoFailuresItemCode;
+  message: string;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  moduleId: string | null;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  questionId: string | null;
+};
+
+export interface PublishChecklistDto {
+  failures: PublishChecklistDtoFailuresItem[];
 }
 
 export type QuizAccessResponseDtoModuleState = typeof QuizAccessResponseDtoModuleState[keyof typeof QuizAccessResponseDtoModuleState];
@@ -1598,6 +1781,61 @@ export interface QuizQuestionRequestDto {
   type?: QuizQuestionRequestDtoType;
 }
 
+export type QuizResultResponseDtoReviewItemOptionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  text: string;
+};
+
+export type QuizResultResponseDtoReviewItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  correctOptionId: string;
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  explanation: string | null;
+  options: QuizResultResponseDtoReviewItemOptionsItem[];
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  questionId: string;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  selectedOptionId: string | null;
+  text: string;
+};
+
+export interface QuizResultResponseDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  attemptId: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  correctCount: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  passMarkPercent: number;
+  passed: boolean;
+  /** @nullable */
+  review: QuizResultResponseDtoReviewItem[] | null;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  scorePercent: number;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  submittedAt: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  totalQuestions: number;
+}
+
 export interface QuizRulesRequestDto {
   /**
      * @minimum 1
@@ -1720,6 +1958,38 @@ export interface QuizSummaryDto {
   rules: QuizSummaryDtoRules;
 }
 
+export interface RejectEnrollmentRequestDto {
+  /** @maxLength 500 */
+  reason?: string;
+}
+
+export interface RejectEnrollmentsRequestDto {
+  /**
+     * @minItems 1
+     * @maxItems 100
+     * @items.pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  ids: string[];
+  /** @maxLength 500 */
+  reason?: string;
+}
+
+export type RejectedEnrollmentDtoStatus = typeof RejectedEnrollmentDtoStatus[keyof typeof RejectedEnrollmentDtoStatus];
+
+
+export const RejectedEnrollmentDtoStatus = {
+  REJECTED: 'REJECTED',
+} as const;
+
+export interface RejectedEnrollmentDto {
+  accountDeleted: boolean;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  rejectedAt: string;
+  status: RejectedEnrollmentDtoStatus;
+}
+
 export interface ReorderRequestDto {
   /**
      * @maxItems 500
@@ -1740,6 +2010,83 @@ export interface SignInRequestDto {
      * @maxLength 256
      */
   password: string;
+}
+
+export type StudentListResponseDtoItemsItemCourse = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+export type StudentListResponseDtoItemsItemDepartment = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type StudentListResponseDtoItemsItemFaculty = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type StudentListResponseDtoItemsItemStatus = typeof StudentListResponseDtoItemsItemStatus[keyof typeof StudentListResponseDtoItemsItemStatus];
+
+
+export const StudentListResponseDtoItemsItemStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
+export type StudentListResponseDtoItemsItemStudent = {
+  email: string;
+  name: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  userId: string;
+};
+
+export type StudentListResponseDtoItemsItemUniversity = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type StudentListResponseDtoItemsItem = {
+  course: StudentListResponseDtoItemsItemCourse;
+  department: StudentListResponseDtoItemsItemDepartment;
+  faculty: StudentListResponseDtoItemsItemFaculty;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  requestedAt: string;
+  session: string;
+  status: StudentListResponseDtoItemsItemStatus;
+  student: StudentListResponseDtoItemsItemStudent;
+  university: StudentListResponseDtoItemsItemUniversity;
+};
+
+export interface StudentListResponseDto {
+  items: StudentListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
 }
 
 export type UniversityListResponseDtoItemsItem = {
@@ -1819,6 +2166,14 @@ export interface UniversitySummaryDto {
   studentCount: number;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   updatedAt: string;
+}
+
+export interface UnreadNotificationCountDto {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  count: number;
 }
 
 export interface UpdateCourseRequestDto {
@@ -1918,6 +2273,95 @@ export interface VerifyEmailRequestDto {
   token: string;
 }
 
+export type VideoLibraryListResponseDtoItemsItemCourse = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+/**
+ * @nullable
+ */
+export type VideoLibraryListResponseDtoItemsItemFailureReason = typeof VideoLibraryListResponseDtoItemsItemFailureReason[keyof typeof VideoLibraryListResponseDtoItemsItemFailureReason] | null;
+
+
+export const VideoLibraryListResponseDtoItemsItemFailureReason = {
+  SOURCE_UNREADABLE: 'SOURCE_UNREADABLE',
+  ENCODE_FAILED: 'ENCODE_FAILED',
+  TIMED_OUT: 'TIMED_OUT',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+  PUBLISH_FAILED: 'PUBLISH_FAILED',
+} as const;
+
+export type VideoLibraryListResponseDtoItemsItemModule = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+/**
+ * @nullable
+ */
+export type VideoLibraryListResponseDtoItemsItemRejectionReason = typeof VideoLibraryListResponseDtoItemsItemRejectionReason[keyof typeof VideoLibraryListResponseDtoItemsItemRejectionReason] | null;
+
+
+export const VideoLibraryListResponseDtoItemsItemRejectionReason = {
+  NOT_A_VIDEO: 'NOT_A_VIDEO',
+  UNSUPPORTED_CONTAINER: 'UNSUPPORTED_CONTAINER',
+  UNSUPPORTED_CODEC: 'UNSUPPORTED_CODEC',
+  TOO_LARGE: 'TOO_LARGE',
+  NO_DURATION: 'NO_DURATION',
+} as const;
+
+export type VideoLibraryListResponseDtoItemsItemStatus = typeof VideoLibraryListResponseDtoItemsItemStatus[keyof typeof VideoLibraryListResponseDtoItemsItemStatus];
+
+
+export const VideoLibraryListResponseDtoItemsItemStatus = {
+  UPLOADING: 'UPLOADING',
+  UPLOADED: 'UPLOADED',
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  READY: 'READY',
+  FAILED: 'FAILED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type VideoLibraryListResponseDtoItemsItem = {
+  course: VideoLibraryListResponseDtoItemsItemCourse;
+  /** @nullable */
+  failureReason: VideoLibraryListResponseDtoItemsItemFailureReason;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  module: VideoLibraryListResponseDtoItemsItemModule;
+  /** @nullable */
+  rejectionReason: VideoLibraryListResponseDtoItemsItemRejectionReason;
+  status: VideoLibraryListResponseDtoItemsItemStatus;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  statusChangedAt: string;
+  title: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  uploadedAt: string;
+};
+
+export interface VideoLibraryListResponseDto {
+  items: VideoLibraryListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+}
+
 /**
  * @nullable
  */
@@ -1979,7 +2423,17 @@ export type VideoSlotListResponseDtoItemsItem = {
   rejectionReason: VideoSlotListResponseDtoItemsItemRejectionReason;
   required: boolean;
   status: VideoSlotListResponseDtoItemsItemStatus;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  statusChangedAt: string | null;
   title: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  uploadedAt: string | null;
 };
 
 export interface VideoSlotListResponseDto {
@@ -2242,6 +2696,109 @@ export const EnrollmentApprovalListPendingSort = {
   requestedAt: 'requestedAt',
   '-requestedAt': '-requestedAt',
 } as const;
+
+export type StudentListListParams = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId?: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session?: string;
+  status?: StudentListListStatus;
+  /** @maxLength 100 */
+  q?: string;
+  sort?: StudentListListSort;
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  pageSize?: number;
+};
+
+export type StudentListListStatus = typeof StudentListListStatus[keyof typeof StudentListListStatus];
+
+
+export const StudentListListStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
+export type StudentListListSort = typeof StudentListListSort[keyof typeof StudentListListSort];
+
+
+export const StudentListListSort = {
+  name: 'name',
+  '-name': '-name',
+  requestedAt: 'requestedAt',
+  '-requestedAt': '-requestedAt',
+} as const;
+
+export type VideoLibraryListParams = {
+  status?: VideoLibraryListStatus;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+  sort?: VideoLibraryListSort;
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  pageSize?: number;
+};
+
+export type VideoLibraryListStatus = typeof VideoLibraryListStatus[keyof typeof VideoLibraryListStatus];
+
+
+export const VideoLibraryListStatus = {
+  UPLOADING: 'UPLOADING',
+  UPLOADED: 'UPLOADED',
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  READY: 'READY',
+  FAILED: 'FAILED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type VideoLibraryListSort = typeof VideoLibraryListSort[keyof typeof VideoLibraryListSort];
+
+
+export const VideoLibraryListSort = {
+  title: 'title',
+  '-title': '-title',
+  statusChangedAt: 'statusChangedAt',
+  '-statusChangedAt': '-statusChangedAt',
+} as const;
+
+export type NotificationsListParams = {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 50
+   */
+  pageSize?: number;
+};
 
 export const getAdminAccountChangePasswordUrl = () => {
 
@@ -3492,6 +4049,27 @@ export const coursesPublish = async (id: string, options?: Parameters<typeof ser
 
 
 
+export const getCoursesPublishChecksUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/publish-checks`
+}
+
+export const coursesPublishChecks = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<PublishChecklistDto> => {
+
+  return serverFetch<PublishChecklistDto>(getCoursesPublishChecksUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export const getDepartmentsListUrl = (params?: DepartmentsListParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -4150,6 +4728,41 @@ export const enrollmentApprovalListPending = async (params?: EnrollmentApprovalL
 
 
 
+export const getEnrollmentApprovalRejectManyUrl = () => {
+
+
+
+
+  return `/api/admin/enrollments/reject`
+}
+
+export const enrollmentApprovalRejectMany = async (rejectEnrollmentsRequestDto: RejectEnrollmentsRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<BulkRejectionResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<BulkRejectionResponseDto>(getEnrollmentApprovalRejectManyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(rejectEnrollmentsRequestDto)
+  }
+);}
+
+
+
 export const getEnrollmentApprovalApproveUrl = (id: string,) => {
 
 
@@ -4181,6 +4794,42 @@ return serverFetch<ApprovedEnrollmentDto>(getEnrollmentApprovalApproveUrl(id),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(approveEnrollmentRequestDto)
+  }
+);}
+
+
+
+export const getEnrollmentApprovalRejectUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/enrollments/${id}/reject`
+}
+
+export const enrollmentApprovalReject = async (id: string,
+    rejectEnrollmentRequestDto: RejectEnrollmentRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<RejectedEnrollmentDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<RejectedEnrollmentDto>(getEnrollmentApprovalRejectUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(rejectEnrollmentRequestDto)
   }
 );}
 
@@ -4221,6 +4870,62 @@ export const adminPlaybackPreview = async (videoId: string, options?: Parameters
   {
     ...options,
     method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getStudentListListUrl = (params?: StudentListListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/students?${stringifiedParams}` : `/api/admin/students`
+}
+
+export const studentListList = async (params?: StudentListListParams, options?: Parameters<typeof serverFetch>[1]): Promise<StudentListResponseDto> => {
+
+  return serverFetch<StudentListResponseDto>(getStudentListListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getVideoLibraryListUrl = (params?: VideoLibraryListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/videos?${stringifiedParams}` : `/api/admin/videos`
+}
+
+export const videoLibraryList = async (params?: VideoLibraryListParams, options?: Parameters<typeof serverFetch>[1]): Promise<VideoLibraryListResponseDto> => {
+
+  return serverFetch<VideoLibraryListResponseDto>(getVideoLibraryListUrl(params),
+  {
+    ...options,
+    method: 'GET'
 
 
   }
@@ -4580,6 +5285,31 @@ return serverFetch<QuizSubmitResponseDto>(getQuizSubmissionSubmitUrl(courseId,mo
 
 
 
+export const getQuizResultGetUrl = (courseId: string,
+    moduleId: string,
+    attemptId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/quiz/attempts/${attemptId}`
+}
+
+export const quizResultGet = async (courseId: string,
+    moduleId: string,
+    attemptId: string, options?: Parameters<typeof serverFetch>[1]): Promise<QuizResultResponseDto> => {
+
+  return serverFetch<QuizResultResponseDto>(getQuizResultGetUrl(courseId,moduleId,attemptId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export const getDirectoryLookupsListUniversitiesUrl = () => {
 
 
@@ -4757,6 +5487,97 @@ export const dashboardDescribe = async ( options?: Parameters<typeof serverFetch
   {
     ...options,
     method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getNotificationsListUrl = (params?: NotificationsListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/me/notifications?${stringifiedParams}` : `/api/me/notifications`
+}
+
+export const notificationsList = async (params?: NotificationsListParams, options?: Parameters<typeof serverFetch>[1]): Promise<NotificationListResponseDto> => {
+
+  return serverFetch<NotificationListResponseDto>(getNotificationsListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getNotificationsMarkAllReadUrl = () => {
+
+
+
+
+  return `/api/me/notifications/read-all`
+}
+
+export const notificationsMarkAllRead = async ( options?: Parameters<typeof serverFetch>[1]): Promise<MarkAllNotificationsReadResponseDto> => {
+
+  return serverFetch<MarkAllNotificationsReadResponseDto>(getNotificationsMarkAllReadUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getNotificationsUnreadCountUrl = () => {
+
+
+
+
+  return `/api/me/notifications/unread-count`
+}
+
+export const notificationsUnreadCount = async ( options?: Parameters<typeof serverFetch>[1]): Promise<UnreadNotificationCountDto> => {
+
+  return serverFetch<UnreadNotificationCountDto>(getNotificationsUnreadCountUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getNotificationsMarkReadUrl = (id: string,) => {
+
+
+
+
+  return `/api/me/notifications/${id}/read`
+}
+
+export const notificationsMarkRead = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<NotificationDto> => {
+
+  return serverFetch<NotificationDto>(getNotificationsMarkReadUrl(id),
+  {
+    ...options,
+    method: 'POST'
 
 
   }

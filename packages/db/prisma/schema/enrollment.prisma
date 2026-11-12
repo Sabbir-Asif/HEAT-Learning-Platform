@@ -47,6 +47,7 @@ model Enrollment {
   @@unique([userId, courseId])
   @@index([courseId, status])
   @@index([courseRevisionId])
+  @@index([status, requestedAt])
 }
 
 model EnrollmentDecision {

@@ -82,19 +82,26 @@ const build = (options: Options = {}) => {
       order.push("audit");
     }),
   };
+  const notifications = {
+    createWithin: vi.fn().mockImplementation(async () => {
+      order.push("notify");
+      return true;
+    }),
+  };
   const service = new EnrollmentApprovalService(
     database as never,
     { now: () => now },
     courses as never,
     locks as never,
     audit as never,
+    notifications as never,
   );
-  return { service, tx, database, courses, locks, audit, order };
+  return { service, tx, database, courses, locks, audit, notifications, order };
 };
 
 describe("EnrollmentApprovalService.approve", () => {
   test("approves, pins the revision, locks, unlocks module 1 and records everything", async () => {
-    const { service, tx, locks, audit, order } = build();
+    const { service, tx, locks, audit, notifications, order } = build();
 
     const result = await service.approve("enrollment-id", actor, "Eligible");
 
@@ -142,7 +149,35 @@ describe("EnrollmentApprovalService.approve", () => {
         after: { status: "APPROVED", courseRevisionId: "revision-id", reason: "Eligible" },
       }),
     );
-    expect(order).toEqual(["target", "claim", "lock", "progress", "decision", "outbox", "audit"]);
+    expect(notifications.createWithin).toHaveBeenCalledWith(tx, {
+      userId: "user-id",
+      type: "ENROLLMENT_APPROVED",
+      data: { enrollmentId: "enrollment-id", courseId: "course-id" },
+    });
+    expect(order).toEqual([
+      "target",
+      "claim",
+      "lock",
+      "progress",
+      "decision",
+      "outbox",
+      "notify",
+      "audit",
+    ]);
+  });
+
+  test("creates no notification when the approval is refused", async () => {
+    const { service, notifications } = build({ status: "APPROVED" });
+
+    await expect(service.approve("enrollment-id", actor)).rejects.toBeDefined();
+    expect(notifications.createWithin).not.toHaveBeenCalled();
+  });
+
+  test("creates no notification when the transaction fails after the claim", async () => {
+    const { service, notifications } = build({ progressFails: true });
+
+    await expect(service.approve("enrollment-id", actor)).rejects.toBeDefined();
+    expect(notifications.createWithin).not.toHaveBeenCalled();
   });
 
   test("stores no reason when none is given", async () => {

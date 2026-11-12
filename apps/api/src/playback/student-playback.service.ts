@@ -5,6 +5,7 @@ import { CLOCK, DATABASE } from "../core";
 import type { Clock } from "../core";
 import type { PlaybackGrant } from "./playback-grant";
 import { playbackRefusal } from "./playback-rules";
+import { startPositionOf } from "./progress-rules";
 import { PlaybackService } from "./playback.service";
 
 @Injectable()
@@ -33,6 +34,7 @@ export class StudentPlaybackService {
           select: {
             assetKey: true,
             status: true,
+            durationSeconds: true,
             captions: { select: { language: true }, orderBy: { language: "asc" } },
           },
         },
@@ -80,7 +82,10 @@ export class StudentPlaybackService {
         expiresAt: session.expiresAt,
         manifestPath: hlsManifestPath(video.asset.assetKey),
         sessionId,
-        resumePositionSeconds: resume?.resumePositionSeconds ?? 0,
+        resumePositionSeconds: startPositionOf(
+          resume?.resumePositionSeconds ?? 0,
+          video.asset.durationSeconds ?? 0,
+        ),
         captions: video.asset.captions,
       },
     };
@@ -91,6 +96,7 @@ export class StudentPlaybackService {
     videoId: string,
     reuse: boolean,
   ): Promise<string> {
+    const now = this.clock.now();
     if (reuse) {
       const open = await this.database.playbackSession.findFirst({
         where: { enrollmentId, videoId, endedAt: null },
@@ -100,14 +106,14 @@ export class StudentPlaybackService {
       if (open !== null) {
         const touched = await this.database.playbackSession.update({
           where: { id: open.id },
-          data: { lastSeenAt: this.clock.now() },
+          data: { lastSeenAt: now, positionClaimedAt: now },
           select: { id: true },
         });
         return touched.id;
       }
     }
     const created = await this.database.playbackSession.create({
-      data: { enrollmentId, videoId },
+      data: { enrollmentId, videoId, positionClaimedAt: now },
       select: { id: true },
     });
     return created.id;

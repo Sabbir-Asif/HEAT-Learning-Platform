@@ -12,7 +12,13 @@ import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
 import { applyOrderPlan, lockScope, readScope } from "./content-access";
 import type { ContentLocker } from "./content-access";
-import { assertContentUnlocked, nextOrder, planReorder, planResequence } from "./module-rules";
+import {
+  assertContentUnlocked,
+  assertObjectivesWording,
+  nextOrder,
+  planReorder,
+  planResequence,
+} from "./module-rules";
 
 export const moduleSelect = {
   id: true,
@@ -109,6 +115,7 @@ export class ModulesService {
     const client = this.audit.client(this.database);
     const scope = await lockScope(client as ContentLocker, courseId);
     const before = await this.existing(client, scope.revisionId, moduleId);
+    assertObjectivesWording(scope.lockedAt, before.objectives, request.objectives);
     const updated = await client.module.update({
       where: { id: moduleId },
       data: { title: request.title, objectives: request.objectives },

@@ -7,12 +7,16 @@ import { CatalogModule } from "../catalog";
 import { CoreModule } from "../core";
 import { DirectoryModule } from "../directory";
 import { EmailVerificationModule } from "../email-verification";
+import { NotificationsModule } from "../notifications";
 import { RateLimitModule } from "../rate-limit";
 import { ApprovalQueueService } from "./approval-queue.service";
 import { EnrollmentApprovalController } from "./enrollment-approval.controller";
 import { EnrollmentApprovalService } from "./enrollment-approval.service";
+import { EnrollmentRejectionService } from "./enrollment-rejection.service";
 import { EnrollmentController } from "./enrollment.controller";
 import { EnrollmentService } from "./enrollment.service";
+import { StudentListController } from "./student-list.controller";
+import { StudentListService } from "./student-list.service";
 
 @Module({
   imports: [
@@ -24,9 +28,16 @@ import { EnrollmentService } from "./enrollment.service";
     CatalogModule,
     DirectoryModule,
     EmailVerificationModule,
+    NotificationsModule,
     RateLimitModule,
   ],
-  controllers: [EnrollmentController, EnrollmentApprovalController],
-  providers: [EnrollmentService, EnrollmentApprovalService, ApprovalQueueService],
+  controllers: [EnrollmentController, EnrollmentApprovalController, StudentListController],
+  providers: [
+    EnrollmentService,
+    EnrollmentApprovalService,
+    EnrollmentRejectionService,
+    ApprovalQueueService,
+    StudentListService,
+  ],
 })
 export class EnrollmentModule {}

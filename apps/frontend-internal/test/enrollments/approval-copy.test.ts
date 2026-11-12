@@ -4,6 +4,8 @@ import {
   approvalSummaryText,
   approveLabel,
   queueSortValue,
+  rejectLabel,
+  rejectionSummaryText,
   selectionLabel,
 } from "../../src/enrollments/approval-copy";
 
@@ -47,5 +49,20 @@ describe("approveLabel", () => {
   test("names how many requests the button approves", () => {
     expect(approveLabel(1)).toBe("Approve 1 request");
     expect(approveLabel(4)).toBe("Approve 4 requests");
+  });
+});
+
+describe("rejectLabel", () => {
+  test("names how many requests the button rejects", () => {
+    expect(rejectLabel(1)).toBe("Reject 1 request");
+    expect(rejectLabel(4)).toBe("Reject 4 requests");
+  });
+});
+
+describe("rejectionSummaryText", () => {
+  test("counts rejected and not rejected requests", () => {
+    expect(rejectionSummaryText(49, 1)).toBe("49 rejected, 1 not rejected.");
+    expect(rejectionSummaryText(1, 0)).toBe("1 rejected.");
+    expect(rejectionSummaryText(0, 2)).toBe("None rejected, 2 not rejected.");
   });
 });

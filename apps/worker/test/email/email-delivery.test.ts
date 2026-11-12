@@ -1,7 +1,10 @@
 import { FakeMailTransport } from "api/core";
 import { describe, expect, test } from "vitest";
+import { EmailQuota, type QuotaEntry, type QuotaLedger } from "../../src/email/email-quota";
 import {
+  EmailCapacityWait,
   EmailDelivery,
+  EmailQuotaPause,
   type DeliveryStatus,
   type EmailDeliveryStore,
   type EmailJobSnapshot,
@@ -34,10 +37,35 @@ class FakeStore implements EmailDeliveryStore {
 
 const now = new Date("2026-11-11T10:00:00Z");
 
+class MemoryLedger implements QuotaLedger {
+  readonly entries = new Map<string, QuotaEntry>();
+  record(category: QuotaEntry["category"], at: Date): Promise<string> {
+    const id = `e${String(this.entries.size + 1)}`;
+    this.entries.set(id, { id, category, at });
+    return Promise.resolve(id);
+  }
+  release(id: string): Promise<void> {
+    this.entries.delete(id);
+    return Promise.resolve();
+  }
+  entriesSince(since: Date): Promise<QuotaEntry[]> {
+    return Promise.resolve(
+      [...this.entries.values()].filter((entry) => entry.at.getTime() > since.getTime()),
+    );
+  }
+}
+
+const quotaConfig = {
+  totalLimit: 10,
+  reservedForPriority: 0,
+  budgets: { VERIFICATION: 10, PASSWORD: 10, ENROLLMENT: 10, CERTIFICATE: 10 },
+};
+
 const snapshot = (overrides: Partial<EmailJobSnapshot> = {}): EmailJobSnapshot => ({
   id: "job-1",
   status: "QUEUED",
   template: "admin-invitation",
+  category: "PASSWORD",
   recipientAddress: "rahim@du.ac.bd",
   recipientName: null,
   payload: {
@@ -49,7 +77,12 @@ const snapshot = (overrides: Partial<EmailJobSnapshot> = {}): EmailJobSnapshot =
   ...overrides,
 });
 
-const setup = (job: EmailJobSnapshot | null = snapshot()) => {
+const setup = (
+  job: EmailJobSnapshot | null = snapshot(),
+  config: typeof quotaConfig = quotaConfig,
+) => {
+  const ledger = new MemoryLedger();
+  const quota = new EmailQuota(ledger, config);
   const store = new FakeStore(job);
   const transport = new FakeMailTransport();
   const rendered: { template: string; variables: unknown }[] = [];
@@ -61,9 +94,10 @@ const setup = (job: EmailJobSnapshot | null = snapshot()) => {
       return Promise.resolve({ subject: "Subject", html: "<p>Hi</p>", text: "Hi" });
     },
     (sealed) => `plain-${sealed}`,
+    quota,
     { now: () => now },
   );
-  return { store, transport, delivery, rendered };
+  return { store, transport, delivery, rendered, ledger };
 };
 
 describe("EmailDelivery", () => {
@@ -109,11 +143,53 @@ describe("EmailDelivery", () => {
     expect(last.store.log[1]).toBe(`failed job-1 null ${now.toISOString()}`);
   });
 
-  test("treats a quota error as a delay", async () => {
-    const { store, transport, delivery } = setup();
+  test("pauses the queue on a quota error, releases the slot and does not use up an attempt", async () => {
+    const { store, transport, delivery, ledger } = setup();
     transport.enqueue({ status: "quota-exceeded", responseCode: 550 });
-    expect(await delivery.deliver("job-1", false)).toBe("delayed");
-    expect(store.log[1]).toBe("delayed job-1 550");
+
+    await expect(delivery.deliver("job-1", true)).rejects.toBeInstanceOf(EmailQuotaPause);
+
+    expect(store.log).toEqual(["sending job-1", "delayed job-1 550"]);
+    expect(ledger.entries.size).toBe(0);
+  });
+
+  test("the quota pause lasts until the oldest counted email leaves the window", async () => {
+    const { transport, delivery, ledger } = setup();
+    const earlier = new Date(now.getTime() - 3600_000);
+    await ledger.record("VERIFICATION", earlier);
+    transport.enqueue({ status: "quota-exceeded", responseCode: 550 });
+
+    const error = await delivery.deliver("job-1", false).catch((caught: unknown) => caught);
+
+    expect(error).toBeInstanceOf(EmailQuotaPause);
+    expect((error as EmailQuotaPause).until).toEqual(new Date(earlier.getTime() + 24 * 3600_000));
+  });
+
+  test("delays without sending when the category budget is used up", async () => {
+    const config = { ...quotaConfig, budgets: { ...quotaConfig.budgets, PASSWORD: 1 } };
+    const { store, transport, delivery, ledger } = setup(snapshot(), config);
+    const earlier = new Date(now.getTime() - 3600_000);
+    await ledger.record("PASSWORD", earlier);
+
+    const error = await delivery.deliver("job-1", false).catch((caught: unknown) => caught);
+
+    expect(error).toBeInstanceOf(EmailCapacityWait);
+    expect((error as EmailCapacityWait).retryAt).toEqual(
+      new Date(earlier.getTime() + 24 * 3600_000),
+    );
+    expect(transport.attempts).toEqual([]);
+    expect(store.log).toEqual(["delayed job-1 null"]);
+  });
+
+  test("keeps the slot after a successful send and frees it after a transient failure", async () => {
+    const sent = setup();
+    await sent.delivery.deliver("job-1", false);
+    expect(sent.ledger.entries.size).toBe(1);
+
+    const failed = setup();
+    failed.transport.enqueue({ status: "transient-failure", responseCode: 421 });
+    await failed.delivery.deliver("job-1", false);
+    expect(failed.ledger.entries.size).toBe(0);
   });
 
   test("does not send again once the job is sent or failed, or when it is missing", async () => {
@@ -137,6 +213,7 @@ describe("EmailDelivery", () => {
       transport,
       () => Promise.reject(new Error("bad variables")),
       (sealed) => sealed,
+      new EmailQuota(new MemoryLedger(), quotaConfig),
       { now: () => now },
     );
 

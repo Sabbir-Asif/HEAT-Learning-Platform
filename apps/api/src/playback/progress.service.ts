@@ -9,6 +9,7 @@ import { requiredVideosWatched } from "../learning";
 import { playbackRefusal } from "./playback-rules";
 import {
   decideSequence,
+  holdsPosition,
   mergeWithinBudget,
   reachesCompletion,
   remainingBudgetSeconds,
@@ -73,7 +74,7 @@ export class ProgressService {
       if (locked.length === 0) throw new NotFoundException();
       const counters = await tx.playbackSession.findUniqueOrThrow({
         where: { id: batch.sessionId },
-        select: { acceptedSeconds: true, lastSequence: true },
+        select: { acceptedSeconds: true, lastSequence: true, positionClaimedAt: true },
       });
       const spent = await tx.playbackSession.aggregate({
         where: { enrollmentId: enrollment.id, videoId },
@@ -102,7 +103,15 @@ export class ProgressService {
         }),
       });
       const sequence = decideSequence(batch.sequence, counters.lastSequence);
-      const resumePositionSeconds = sequence.advancesPosition
+      const newerClaims = await tx.playbackSession.count({
+        where: {
+          enrollmentId: enrollment.id,
+          videoId,
+          id: { not: batch.sessionId },
+          positionClaimedAt: { gt: counters.positionClaimedAt },
+        },
+      });
+      const resumePositionSeconds = holdsPosition(sequence.advancesPosition, newerClaims)
         ? resumePositionOf(batch.positionSeconds, duration)
         : (progress?.resumePositionSeconds ?? 0);
       const completedAt = progress?.completedAt ?? (reachesCompletion(merge.coverage) ? now : null);

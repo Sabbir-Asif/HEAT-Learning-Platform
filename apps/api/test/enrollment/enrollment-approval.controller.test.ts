@@ -17,7 +17,11 @@ describe("EnrollmentApprovalController", () => {
 
   test("lists the queue through the queue service", async () => {
     const list = vi.fn().mockResolvedValue({ items: [] });
-    const controller = new EnrollmentApprovalController({ list } as never, {} as never);
+    const controller = new EnrollmentApprovalController(
+      { list } as never,
+      {} as never,
+      {} as never,
+    );
 
     await controller.listPending({ page: 1 } as never);
 
@@ -26,7 +30,11 @@ describe("EnrollmentApprovalController", () => {
 
   test("approves one request as the signed-in admin", async () => {
     const approve = vi.fn().mockResolvedValue({ id: "e" });
-    const controller = new EnrollmentApprovalController({} as never, { approve } as never);
+    const controller = new EnrollmentApprovalController(
+      {} as never,
+      { approve } as never,
+      {} as never,
+    );
 
     await controller.approve(
       { id: "e" } as never,
@@ -40,7 +48,11 @@ describe("EnrollmentApprovalController", () => {
 
   test("approves many requests as the signed-in admin", async () => {
     const approveMany = vi.fn().mockResolvedValue({ succeeded: [], failed: [] });
-    const controller = new EnrollmentApprovalController({} as never, { approveMany } as never);
+    const controller = new EnrollmentApprovalController(
+      {} as never,
+      { approveMany } as never,
+      {} as never,
+    );
 
     await controller.approveMany(
       { ids: ["a", "b"], reason: "ok" } as never,
@@ -49,5 +61,44 @@ describe("EnrollmentApprovalController", () => {
     );
 
     expect(approveMany).toHaveBeenCalledWith(["a", "b"], actor, "ok");
+  });
+
+  test("rejects one request as the signed-in admin", async () => {
+    const reject = vi.fn().mockResolvedValue({ id: "e" });
+    const controller = new EnrollmentApprovalController(
+      {} as never,
+      {} as never,
+      {
+        reject,
+      } as never,
+    );
+
+    await controller.reject(
+      { id: "e" } as never,
+      { reason: "no" } as never,
+      session as never,
+      request as never,
+    );
+
+    expect(reject).toHaveBeenCalledWith("e", actor, "no");
+  });
+
+  test("rejects many requests as the signed-in admin", async () => {
+    const rejectMany = vi.fn().mockResolvedValue({ succeeded: [], failed: [] });
+    const controller = new EnrollmentApprovalController(
+      {} as never,
+      {} as never,
+      {
+        rejectMany,
+      } as never,
+    );
+
+    await controller.rejectMany(
+      { ids: ["a", "b"], reason: "no" } as never,
+      session as never,
+      request as never,
+    );
+
+    expect(rejectMany).toHaveBeenCalledWith(["a", "b"], actor, "no");
   });
 });

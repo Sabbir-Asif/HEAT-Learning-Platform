@@ -8,6 +8,8 @@ import {
   quizAccessResponseSchema,
   quizDeliveryParamsSchema,
   quizDeliveryResponseSchema,
+  quizResultParamsSchema,
+  quizResultResponseSchema,
   quizSubmitRequestSchema,
   quizSubmitResponseSchema,
 } from "@heat/contracts";
@@ -24,3 +26,5 @@ export class QuizDeliveryResponseDto extends createZodDto(quizDeliveryResponseSc
 export class QuizSubmitRequestDto extends createZodDto(quizSubmitRequestSchema) {}
 export class QuizSubmitResponseDto extends createZodDto(quizSubmitResponseSchema) {}
 export class DashboardResponseDto extends createZodDto(dashboardResponseSchema) {}
+export class QuizResultParamsDto extends createZodDto(quizResultParamsSchema) {}
+export class QuizResultResponseDto extends createZodDto(quizResultResponseSchema) {}

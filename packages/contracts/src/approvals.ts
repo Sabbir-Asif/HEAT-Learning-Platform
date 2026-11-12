@@ -10,6 +10,12 @@ export const approvalReasonPresets = [
   "Details confirmed against the university records",
 ] as const;
 
+export const rejectionReasonPresets = [
+  "Not an eligible student of the listed department",
+  "Details could not be confirmed against the university records",
+  "Duplicate request",
+] as const;
+
 export const approvalSortFields = ["requestedAt", "-requestedAt"] as const;
 
 const dateSchema = z.iso.date();
@@ -112,3 +118,31 @@ export const bulkApprovalResponseSchema = z.object({
 });
 
 export type BulkApprovalResponse = z.infer<typeof bulkApprovalResponseSchema>;
+
+export const rejectEnrollmentRequestSchema = z.object({ reason: reasonSchema });
+
+export type RejectEnrollmentRequest = z.infer<typeof rejectEnrollmentRequestSchema>;
+
+export const rejectEnrollmentsRequestSchema = z.object({
+  ids: z
+    .array(z.uuid())
+    .min(1, "Select at least one request.")
+    .max(maxBulkApprovals, `Reject at most ${maxBulkApprovals} requests at a time.`)
+    .refine((ids) => new Set(ids).size === ids.length, "Each request can be listed once."),
+  reason: reasonSchema,
+});
+
+export type RejectEnrollmentsRequest = z.infer<typeof rejectEnrollmentsRequestSchema>;
+
+export const rejectedEnrollmentSchema = z.object({
+  id: z.uuid(),
+  status: z.literal("REJECTED"),
+  rejectedAt: z.iso.datetime(),
+  accountDeleted: z.boolean(),
+});
+
+export type RejectedEnrollment = z.infer<typeof rejectedEnrollmentSchema>;
+
+export const bulkRejectionResponseSchema = bulkApprovalResponseSchema;
+
+export type BulkRejectionResponse = BulkApprovalResponse;

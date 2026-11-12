@@ -1,5 +1,6 @@
 import type { MailMessage, MailTransport } from "api/core";
-import type { RenderedEmail } from "./email-template";
+import type { EmailQuota } from "./email-quota";
+import type { EmailCategory, RenderedEmail } from "./email-template";
 
 export type DeliveryStatus = "QUEUED" | "DELAYED" | "SENDING" | "SENT" | "FAILED";
 
@@ -7,6 +8,7 @@ export interface EmailJobSnapshot {
   id: string;
   status: DeliveryStatus;
   template: string;
+  category: EmailCategory;
   recipientAddress: string;
   recipientName: string | null;
   payload: unknown;
@@ -24,6 +26,18 @@ export type EmailRenderer = (template: string, variables: unknown) => Promise<Re
 
 export type DeliveryOutcome = "sent" | "failed" | "delayed" | "skipped";
 
+export class EmailCapacityWait extends Error {
+  constructor(readonly retryAt: Date) {
+    super("Email waiting for capacity");
+  }
+}
+
+export class EmailQuotaPause extends Error {
+  constructor(readonly until: Date) {
+    super("Email provider quota reached, queue paused");
+  }
+}
+
 const reservedPayloadKeys: ReadonlySet<string> = new Set(["template", "userId", "encryptedToken"]);
 
 const asRecord = (value: unknown): Record<string, unknown> =>
@@ -39,6 +53,7 @@ export class EmailDelivery {
     private readonly transport: MailTransport,
     private readonly render: EmailRenderer,
     private readonly unseal: (sealed: string) => string,
+    private readonly quota: EmailQuota,
     private readonly clock: { now(): Date },
   ) {}
 
@@ -53,6 +68,12 @@ export class EmailDelivery {
       return "failed";
     }
 
+    const reservation = await this.quota.reserve(job.category, this.clock.now());
+    if (!reservation.granted) {
+      await this.store.markDelayed(job.id, null);
+      throw new EmailCapacityWait(reservation.retryAt);
+    }
+
     await this.store.markSending(job.id);
     const result = await this.transport.send(message);
     const response = result.responseCode === null ? null : String(result.responseCode);
@@ -60,6 +81,11 @@ export class EmailDelivery {
     if (result.status === "sent") {
       await this.store.markSent(job.id, String(result.responseCode), this.clock.now());
       return "sent";
+    }
+    await this.quota.release(reservation.reservationId);
+    if (result.status === "quota-exceeded") {
+      await this.store.markDelayed(job.id, response);
+      throw new EmailQuotaPause(await this.quota.resumeAt(this.clock.now()));
     }
     if (result.status === "permanent-failure" || finalAttempt) {
       await this.store.markFailed(job.id, response, this.clock.now());

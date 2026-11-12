@@ -10,10 +10,13 @@ import { CoursesController } from "./courses.controller";
 import { CoursesService } from "./courses.service";
 import { LessonSectionsController } from "./lesson-sections.controller";
 import { LessonSectionsService } from "./lesson-sections.service";
+import { ModulePublishCheck } from "./module-publish-check";
 import { ModulesController } from "./modules.controller";
 import { ModulesService } from "./modules.service";
 import { QuizController } from "./quiz.controller";
 import { QuizService } from "./quiz.service";
+import { VideoLibraryController } from "./video-library.controller";
+import { VideoLibraryService } from "./video-library.service";
 import { VideoSlotsController } from "./video-slots.controller";
 import { VideoSlotsService } from "./video-slots.service";
 import { VideoUploadController } from "./video-upload.controller";
@@ -28,6 +31,7 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     ModulesController,
     LessonSectionsController,
     VideoSlotsController,
+    VideoLibraryController,
     VideoUploadController,
     QuizController,
   ],
@@ -38,6 +42,7 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     ModulesService,
     LessonSectionsService,
     VideoSlotsService,
+    VideoLibraryService,
     VideoUploadService,
     { provide: UPLOAD_RANDOM, useValue: randomBytes },
     {
@@ -46,8 +51,19 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
       useFactory: (config: AppConfig) => new FileUploadStore(config.videoUploads.directory),
     },
     QuizService,
-    { provide: COURSE_PUBLISH_CHECKS, useValue: [] },
+    ModulePublishCheck,
+    {
+      provide: COURSE_PUBLISH_CHECKS,
+      inject: [ModulePublishCheck],
+      useFactory: (moduleCheck: ModulePublishCheck) => [moduleCheck],
+    },
   ],
-  exports: [CoursesService, CourseLookupService, ContentLockService, COURSE_PUBLISH_CHECKS],
+  exports: [
+    CoursesService,
+    CourseLookupService,
+    ContentLockService,
+    ModulePublishCheck,
+    COURSE_PUBLISH_CHECKS,
+  ],
 })
 export class CatalogModule {}

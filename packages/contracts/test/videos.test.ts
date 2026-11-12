@@ -2,8 +2,12 @@ import { describe, expect, test } from "vitest";
 import {
   createVideoSlotRequestSchema,
   updateVideoSlotRequestSchema,
+  videoLibraryListQuerySchema,
+  videoLibraryListResponseSchema,
+  videoPollIntervalMs,
   videoSlotListResponseSchema,
   videoSlotStatusSchema,
+  videoStatusIsFinal,
   videoQueuedEventType,
   videoFailureReasonSchema,
   videoRejectionReasonSchema,
@@ -57,11 +61,34 @@ describe("video slot responses", () => {
           assetKey: null,
           rejectionReason: null,
           failureReason: null,
+          uploadedAt: null,
+          statusChangedAt: null,
         },
       ],
       locked: false,
     });
     expect(parsed.items[0]?.assetKey).toBeNull();
+  });
+
+  test("a slot carries the timestamps of its video", () => {
+    const parsed = videoSlotListResponseSchema.parse({
+      items: [
+        {
+          id: "0198f1a0-0000-7000-8000-0000000000c1",
+          order: 1,
+          title: "Welcome",
+          required: true,
+          status: "PROCESSING",
+          assetKey: "a".repeat(32),
+          rejectionReason: null,
+          failureReason: null,
+          uploadedAt: "2026-11-11T06:00:00.000Z",
+          statusChangedAt: "2026-11-11T06:01:00.000Z",
+        },
+      ],
+      locked: false,
+    });
+    expect(parsed.items[0]?.statusChangedAt).toBe("2026-11-11T06:01:00.000Z");
   });
 });
 
@@ -107,5 +134,75 @@ describe("video probe contracts", () => {
     expect(videoUploadLimits.videoCodecs).toContain("h264");
     expect(videoRejectionReasonSchema.options).toContain("UNSUPPORTED_CODEC");
     expect(videoQueuedEventType).toBe("video.queued");
+  });
+});
+
+describe("video processing polling", () => {
+  test.each(["READY", "FAILED", "REJECTED", "NOT_UPLOADED"] as const)(
+    "%s is final, so polling stops",
+    (status) => {
+      expect(videoStatusIsFinal(status)).toBe(true);
+    },
+  );
+
+  test.each(["UPLOADING", "UPLOADED", "QUEUED", "PROCESSING"] as const)(
+    "%s is not final, so polling continues",
+    (status) => {
+      expect(videoStatusIsFinal(status)).toBe(false);
+    },
+  );
+
+  test("the interval is a few seconds", () => {
+    expect(videoPollIntervalMs).toBe(5000);
+  });
+});
+
+describe("video library list", () => {
+  test("applies defaults", () => {
+    expect(videoLibraryListQuerySchema.parse({})).toEqual({
+      sort: "-statusChangedAt",
+      page: 1,
+      pageSize: 25,
+    });
+  });
+
+  test("filters by status and course", () => {
+    const parsed = videoLibraryListQuerySchema.parse({
+      status: "FAILED",
+      courseId: "0198f1a0-0000-7000-8000-0000000000c1",
+      page: "2",
+      pageSize: "10",
+    });
+    expect(parsed).toMatchObject({ status: "FAILED", page: 2, pageSize: 10 });
+  });
+
+  test("refuses a slot that was never uploaded as a status filter", () => {
+    expect(videoLibraryListQuerySchema.safeParse({ status: "NOT_UPLOADED" }).success).toBe(false);
+  });
+
+  test("refuses an unlisted page size", () => {
+    expect(videoLibraryListQuerySchema.safeParse({ pageSize: "7" }).success).toBe(false);
+  });
+
+  test("a row names its course, module and failure", () => {
+    const parsed = videoLibraryListResponseSchema.parse({
+      items: [
+        {
+          id: "0198f1a0-0000-7000-8000-0000000000c1",
+          title: "Welcome",
+          status: "FAILED",
+          rejectionReason: null,
+          failureReason: "TIMED_OUT",
+          uploadedAt: "2026-11-11T06:00:00.000Z",
+          statusChangedAt: "2026-11-11T06:01:00.000Z",
+          course: { id: "0198f1a0-0000-7000-8000-0000000000c2", title: "HEAT" },
+          module: { id: "0198f1a0-0000-7000-8000-0000000000c3", title: "Module 1" },
+        },
+      ],
+      total: 1,
+      page: 1,
+      pageSize: 25,
+    });
+    expect(parsed.items[0]?.failureReason).toBe("TIMED_OUT");
   });
 });

@@ -5,7 +5,11 @@ import {
   approveEnrollmentsRequestSchema,
   approvedEnrollmentSchema,
   bulkApprovalResponseSchema,
+  bulkRejectionResponseSchema,
   enrollmentIdParamsSchema,
+  rejectEnrollmentRequestSchema,
+  rejectEnrollmentsRequestSchema,
+  rejectedEnrollmentSchema,
 } from "@heat/contracts";
 import { createZodDto } from "nestjs-zod";
 
@@ -16,3 +20,7 @@ export class ApproveEnrollmentsRequestDto extends createZodDto(approveEnrollment
 export class ApprovedEnrollmentDto extends createZodDto(approvedEnrollmentSchema) {}
 export class BulkApprovalResponseDto extends createZodDto(bulkApprovalResponseSchema) {}
 export class EnrollmentIdParamsDto extends createZodDto(enrollmentIdParamsSchema) {}
+export class RejectEnrollmentRequestDto extends createZodDto(rejectEnrollmentRequestSchema) {}
+export class RejectEnrollmentsRequestDto extends createZodDto(rejectEnrollmentsRequestSchema) {}
+export class RejectedEnrollmentDto extends createZodDto(rejectedEnrollmentSchema) {}
+export class BulkRejectionResponseDto extends createZodDto(bulkRejectionResponseSchema) {}

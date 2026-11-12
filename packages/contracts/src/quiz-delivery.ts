@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { quizExplanationMaxLength } from "./quizzes";
 
 export const maxQuizAnswers = 500;
 
@@ -59,6 +60,29 @@ export const quizSubmitResponseSchema = z.object({
   correctCount: z.number().int().min(0),
   totalQuestions: z.number().int().min(0),
 });
+
+export const quizResultParamsSchema = z.object({
+  courseId: z.uuid(),
+  moduleId: z.uuid(),
+  attemptId: z.uuid(),
+});
+
+export const quizResultReviewQuestionSchema = z.object({
+  questionId: z.uuid(),
+  text: z.string(),
+  explanation: z.string().max(quizExplanationMaxLength).nullable(),
+  selectedOptionId: z.uuid().nullable(),
+  correctOptionId: z.uuid(),
+  options: z.array(quizDeliveryOptionSchema),
+});
+
+export const quizResultResponseSchema = quizSubmitResponseSchema.extend({
+  submittedAt: z.iso.datetime(),
+  review: z.array(quizResultReviewQuestionSchema).nullable(),
+});
+
+export type QuizResultReviewQuestion = z.infer<typeof quizResultReviewQuestionSchema>;
+export type QuizResultResponse = z.infer<typeof quizResultResponseSchema>;
 
 export type QuizAnswers = z.infer<typeof quizAnswersSchema>;
 export type QuizSubmitRequest = z.infer<typeof quizSubmitRequestSchema>;
