@@ -3437,6 +3437,43 @@ export const QuizSubmissionSubmitResponse = zod.object({
 })
 
 
+export const publicCoursesGetPathSlugMax = 80;
+
+
+
+export const PublicCoursesGetParams = zod.object({
+  "slug": zod.string().min(1).max(publicCoursesGetPathSlugMax)
+})
+
+export const publicCoursesGetResponseDescriptionMax = 5000;
+
+export const publicCoursesGetResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicCoursesGetResponseModulesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicCoursesGetResponseModulesItemOrderExclusiveMin = 0;
+export const publicCoursesGetResponseModulesItemOrderMax = 9007199254740991;
+
+export const publicCoursesGetResponseThumbnailAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const PublicCoursesGetResponse = zod.object({
+  "description": zod.string().max(publicCoursesGetResponseDescriptionMax).nullable(),
+  "id": zod.uuid().regex(publicCoursesGetResponseIdRegExp),
+  "modules": zod.array(zod.object({
+  "id": zod.uuid().regex(publicCoursesGetResponseModulesItemIdRegExp),
+  "objectives": zod.array(zod.string()),
+  "order": zod.int().gt(publicCoursesGetResponseModulesItemOrderExclusiveMin).max(publicCoursesGetResponseModulesItemOrderMax),
+  "title": zod.string()
+})),
+  "slug": zod.string(),
+  "thumbnail": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(publicCoursesGetResponseThumbnailAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "title": zod.string()
+})
+
+
 export const directoryLookupsListUniversitiesResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 
@@ -3526,6 +3563,7 @@ export const publicFrontPageGetResponseCoursesItemDescriptionMax = 5000;
 
 export const publicFrontPageGetResponseCoursesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const publicFrontPageGetResponseCoursesItemThumbnailAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicFrontPageGetResponseCoursesItemThumbnailAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const publicFrontPageGetResponseModulesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 
@@ -3534,7 +3572,12 @@ export const PublicFrontPageGetResponse = zod.object({
   "description": zod.string().max(publicFrontPageGetResponseCoursesItemDescriptionMax).nullable(),
   "id": zod.uuid().regex(publicFrontPageGetResponseCoursesItemIdRegExp),
   "slug": zod.string(),
-  "thumbnailAssetId": zod.uuid().regex(publicFrontPageGetResponseCoursesItemThumbnailAssetIdRegExp).nullable(),
+  "thumbnail": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(publicFrontPageGetResponseCoursesItemThumbnailAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "thumbnailAssetId": zod.uuid().regex(publicFrontPageGetResponseCoursesItemThumbnailAssetIdRegExpOne).nullable(),
   "title": zod.string()
 })),
   "modules": zod.array(zod.object({

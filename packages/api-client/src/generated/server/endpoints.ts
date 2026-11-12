@@ -1594,6 +1594,53 @@ export interface ProgressResponseDto {
   resumePositionSeconds: number;
 }
 
+export type PublicCourseResponseDtoModulesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  objectives: string[];
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  order: number;
+  title: string;
+};
+
+/**
+ * @nullable
+ */
+export type PublicCourseResponseDtoThumbnail = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+} | null;
+
+export interface PublicCourseResponseDto {
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  description: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  modules: PublicCourseResponseDtoModulesItem[];
+  slug: string;
+  /** @nullable */
+  thumbnail: PublicCourseResponseDtoThumbnail;
+  title: string;
+}
+
+/**
+ * @nullable
+ */
+export type PublicFrontPageResponseDtoCoursesItemThumbnail = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+} | null;
+
 export type PublicFrontPageResponseDtoCoursesItem = {
   /**
      * @maxLength 5000
@@ -1603,6 +1650,8 @@ export type PublicFrontPageResponseDtoCoursesItem = {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
   slug: string;
+  /** @nullable */
+  thumbnail: PublicFrontPageResponseDtoCoursesItemThumbnail;
   /**
      * @nullable
      * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
@@ -5357,6 +5406,27 @@ return serverFetch<QuizSubmitResponseDto>(getQuizSubmissionSubmitUrl(courseId,mo
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(quizSubmitRequestDto)
+  }
+);}
+
+
+
+export const getPublicCoursesGetUrl = (slug: string,) => {
+
+
+
+
+  return `/api/courses/${slug}`
+}
+
+export const publicCoursesGet = async (slug: string, options?: Parameters<typeof serverFetch>[1]): Promise<PublicCourseResponseDto> => {
+
+  return serverFetch<PublicCourseResponseDto>(getPublicCoursesGetUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 

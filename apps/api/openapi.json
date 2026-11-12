@@ -2843,6 +2843,91 @@
         ],
         "type": "object"
       },
+      "PublicCourseResponseDto": {
+        "properties": {
+          "description": {
+            "maxLength": 5000,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "modules": {
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "objectives": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "order": {
+                  "exclusiveMinimum": true,
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "order",
+                "title",
+                "objectives"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "thumbnail": {
+            "nullable": true,
+            "properties": {
+              "alt": {
+                "type": "string"
+              },
+              "assetId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "assetId",
+              "url",
+              "alt"
+            ],
+            "type": "object"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "description",
+          "thumbnail",
+          "modules"
+        ],
+        "type": "object"
+      },
       "PublicFrontPageResponseDto": {
         "properties": {
           "courses": {
@@ -2861,6 +2946,28 @@
                 "slug": {
                   "type": "string"
                 },
+                "thumbnail": {
+                  "nullable": true,
+                  "properties": {
+                    "alt": {
+                      "type": "string"
+                    },
+                    "assetId": {
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "assetId",
+                    "url",
+                    "alt"
+                  ],
+                  "type": "object"
+                },
                 "thumbnailAssetId": {
                   "format": "uuid",
                   "nullable": true,
@@ -2876,7 +2983,8 @@
                 "slug",
                 "title",
                 "description",
-                "thumbnailAssetId"
+                "thumbnailAssetId",
+                "thumbnail"
               ],
               "type": "object"
             },
@@ -8102,6 +8210,38 @@
         },
         "tags": [
           "learning"
+        ]
+      }
+    },
+    "/api/courses/{slug}": {
+      "get": {
+        "operationId": "publicCoursesGet",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "maxLength": 80,
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicCourseResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "courses"
         ]
       }
     },

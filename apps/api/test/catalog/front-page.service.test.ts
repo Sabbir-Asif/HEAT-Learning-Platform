@@ -22,6 +22,7 @@ const build = (
   options: {
     courses?: ReturnType<typeof courseLink>[];
     modules?: ReturnType<typeof moduleLink>[];
+    images?: Map<string, { assetId: string; url: string; alt: string }>;
   } = {},
 ) => {
   const database = {
@@ -37,14 +38,18 @@ const build = (
     },
   };
   const revalidate = vi.fn().mockResolvedValue(undefined);
-  const service = new FrontPageService(database as never, new AuditService({} as never), {
-    revalidate,
-  } as never);
+  const resolveImages = vi.fn().mockResolvedValue(options.images ?? new Map());
+  const service = new FrontPageService(
+    database as never,
+    new AuditService({} as never),
+    { revalidate } as never,
+    { resolve: resolveImages } as never,
+  );
   const changes: AuditChange[] = [];
   const afterCommit: Array<() => Promise<void>> = [];
   const scope = { tx: database as never, changes, afterCommit, skipped: false };
   const inAuditScope = <T>(run: () => Promise<T>): Promise<T> => auditScopeStorage.run(scope, run);
-  return { service, database, changes, afterCommit, revalidate, inAuditScope };
+  return { service, database, changes, afterCommit, revalidate, resolveImages, inAuditScope };
 };
 
 const failureOf = (promise: Promise<unknown>): Promise<unknown> =>
@@ -120,5 +125,40 @@ describe("FrontPageService.public", () => {
         },
       },
     });
+  });
+
+  test("attaches the resolved thumbnail to each course and null when there is none", async () => {
+    const image = { assetId: "t1", url: "/media/public/x/w640.webp", alt: "Cover" };
+    const withThumbnail = {
+      courseId: "a",
+      course: {
+        id: "a",
+        slug: "a",
+        title: "A",
+        description: null,
+        thumbnailAssetId: "t1",
+        status: "PUBLISHED",
+      },
+    };
+    const without = {
+      courseId: "b",
+      course: {
+        id: "b",
+        slug: "b",
+        title: "B",
+        description: null,
+        thumbnailAssetId: null,
+        status: "PUBLISHED",
+      },
+    };
+    const { service, resolveImages } = build({
+      courses: [withThumbnail, without] as never,
+      images: new Map([["t1", image]]),
+    });
+
+    const result = await service.public();
+
+    expect(resolveImages).toHaveBeenCalledWith(["t1", null]);
+    expect(result.courses.map((course) => course.thumbnail)).toEqual([image, null]);
   });
 });

@@ -63,15 +63,18 @@ const build = (
   const checks = (options.checks ?? []).map((failures) => ({
     failures: vi.fn().mockResolvedValue(failures),
   }));
+  const revalidate = vi.fn().mockResolvedValue(undefined);
   const service = new CoursesService(
     database as never,
     new AuditService({} as never),
     checks as never,
+    { revalidate } as never,
   );
   const changes: AuditChange[] = [];
-  const scope = { tx: database as never, changes, afterCommit: [], skipped: false };
+  const afterCommit: Array<() => Promise<void>> = [];
+  const scope = { tx: database as never, changes, afterCommit, skipped: false };
   const inAuditScope = <T>(run: () => Promise<T>): Promise<T> => auditScopeStorage.run(scope, run);
-  return { service, database, changes, inAuditScope };
+  return { service, database, changes, afterCommit, revalidate, inAuditScope };
 };
 
 const failureOf = (promise: Promise<unknown>): Promise<unknown> =>
@@ -176,6 +179,17 @@ describe("CoursesService.update", () => {
     expect(database.course.update).toHaveBeenCalledTimes(1);
   });
 
+  test("revalidates the front page and the old and new course tags after commit", async () => {
+    const { service, database, afterCommit, revalidate, inAuditScope } = build();
+    database.course.update.mockResolvedValue(row({ slug: "heat-two" }));
+
+    await inAuditScope(() => service.update(id, { ...request, slug: "heat-two" }));
+    expect(revalidate).not.toHaveBeenCalled();
+    await afterCommit[0]?.();
+
+    expect(revalidate).toHaveBeenCalledWith(["front-page", "course:heat", "course:heat-two"]);
+  });
+
   test("refuses a locked course whose title changes", async () => {
     const { service, database, inAuditScope } = build({ existing: row({ lockedAt: at }) });
 
@@ -248,6 +262,18 @@ describe("CoursesService.publish", () => {
       data: { publishedAt: expect.any(Date) },
     });
     expect(changes).toHaveLength(1);
+  });
+
+  test("revalidates the front page and the course tag after commit", async () => {
+    const { service, database, afterCommit, revalidate, inAuditScope } = build();
+    database.course.findUnique
+      .mockResolvedValueOnce(row())
+      .mockResolvedValueOnce(row({ status: "PUBLISHED", publishedAt: at }));
+
+    await inAuditScope(() => service.publish(id));
+    await afterCommit[0]?.();
+
+    expect(revalidate).toHaveBeenCalledWith(["front-page", "course:heat"]);
   });
 
   test("returns every failure from the checks and keeps the course a draft", async () => {

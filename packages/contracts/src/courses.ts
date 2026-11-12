@@ -131,7 +131,7 @@ export type CourseListResponse = z.infer<typeof courseListResponseSchema>;
 export const courseIdParamsSchema = z.object({ id: z.uuid() });
 
 export const courseSlugParamsSchema = z.object({
-  slug: z.string().regex(courseSlugPattern).max(courseSlugMaxLength),
+  slug: z.string().min(1).max(courseSlugMaxLength),
 });
 
 export const publicCourseModuleSchema = z.object({

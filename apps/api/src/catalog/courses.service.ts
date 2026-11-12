@@ -18,6 +18,8 @@ import {
   publishChecksFailed,
 } from "./course-rules";
 import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
+import { courseCacheTag, frontPageCacheTag, PUBLIC_REVALIDATION } from "./public-revalidation";
+import type { PublicRevalidation } from "./public-revalidation";
 import type { CoursePublishCheck } from "./publish-checks";
 
 interface CourseRow {
@@ -109,6 +111,7 @@ export class CoursesService {
     @Inject(DATABASE) private readonly database: HeatClient,
     private readonly audit: AuditService,
     @Inject(COURSE_PUBLISH_CHECKS) private readonly publishChecks: CoursePublishCheck[],
+    @Inject(PUBLIC_REVALIDATION) private readonly revalidation: PublicRevalidation,
   ) {}
 
   async list(query: CourseListQuery): Promise<CourseListResponse> {
@@ -182,6 +185,7 @@ export class CoursesService {
         before: auditedFields(before),
         after: auditedFields(updated),
       });
+      this.revalidateAfterCommit(before.slug, updated.slug);
       return toSummary(updated);
     } catch (error) {
       throw this.translate(error);
@@ -227,7 +231,13 @@ export class CoursesService {
       before: { status: before.status },
       after: { status: published.status, publishedAt: now.toISOString() },
     });
+    this.revalidateAfterCommit(published.slug);
     return toSummary(published);
+  }
+
+  private revalidateAfterCommit(...slugs: string[]): void {
+    const tags = [frontPageCacheTag, ...slugs.map(courseCacheTag)];
+    this.audit.afterCommit(() => this.revalidation.revalidate(tags));
   }
 
   private async existing(id: string, client: Pick<HeatClient, "course">): Promise<CourseRow> {

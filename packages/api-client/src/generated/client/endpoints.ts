@@ -82,6 +82,7 @@ import type {
   PlaybackSessionResponseDto,
   ProgressBatchDto,
   ProgressResponseDto,
+  PublicCourseResponseDto,
   PublicFrontPageResponseDto,
   PublicLandingOverviewResponseDto,
   QuizAccessResponseDto,
@@ -8482,6 +8483,101 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getQuizSubmissionSubmitMutationOptions(options), queryClient);
     }
+
+export const getPublicCoursesGetUrl = (slug: string,) => {
+
+
+
+
+  return `/api/courses/${slug}`
+}
+
+export const publicCoursesGet = async (slug: string, options?: Parameters<typeof customFetch>[1]): Promise<PublicCourseResponseDto> => {
+
+  return customFetch<PublicCourseResponseDto>(getPublicCoursesGetUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getPublicCoursesGetQueryKey = (slug: string,) => {
+    return [
+    `/api/courses/${slug}`
+    ] as const;
+    }
+
+
+export const getPublicCoursesGetQueryOptions = <TData = Awaited<ReturnType<typeof publicCoursesGet>>, TError = ErrorType<unknown>>(slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicCoursesGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPublicCoursesGetQueryKey(slug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof publicCoursesGet>>> = ({ signal }) => publicCoursesGet(slug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: slug !== null && slug !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof publicCoursesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PublicCoursesGetQueryResult = NonNullable<Awaited<ReturnType<typeof publicCoursesGet>>>
+export type PublicCoursesGetQueryError = ErrorType<unknown>
+
+
+export function usePublicCoursesGet<TData = Awaited<ReturnType<typeof publicCoursesGet>>, TError = ErrorType<unknown>>(
+ slug: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicCoursesGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof publicCoursesGet>>,
+          TError,
+          Awaited<ReturnType<typeof publicCoursesGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePublicCoursesGet<TData = Awaited<ReturnType<typeof publicCoursesGet>>, TError = ErrorType<unknown>>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicCoursesGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof publicCoursesGet>>,
+          TError,
+          Awaited<ReturnType<typeof publicCoursesGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePublicCoursesGet<TData = Awaited<ReturnType<typeof publicCoursesGet>>, TError = ErrorType<unknown>>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicCoursesGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function usePublicCoursesGet<TData = Awaited<ReturnType<typeof publicCoursesGet>>, TError = ErrorType<unknown>>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicCoursesGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPublicCoursesGetQueryOptions(slug,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getDirectoryLookupsListUniversitiesUrl = () => {
 

@@ -95,6 +95,14 @@ const envSchema = z
         (value) => value === undefined || new URL(value).origin === value,
         "PUBLIC_APP_URL must be an origin",
       ),
+    PUBLIC_APP_INTERNAL_URL: z
+      .url()
+      .optional()
+      .refine(
+        (value) => value === undefined || new URL(value).origin === value,
+        "PUBLIC_APP_INTERNAL_URL must be an origin",
+      ),
+    REVALIDATE_SECRET: secret.optional(),
     AUDIT_TRANSACTION_MAX_WAIT_MS: positiveInt.default(5000),
     AUDIT_TRANSACTION_TIMEOUT_MS: positiveInt.default(15000),
     RESPONSE_FLOOR_MS: positiveInt.default(1000),
@@ -213,6 +221,7 @@ export interface AppConfig {
   breachedPasswordRangeUrl: string;
   invitations: { ttlHours: number; adminAppUrl: string };
   publicAppUrl: string;
+  revalidation: { url: string; secret: string | undefined };
   verification: { tokenTtlHours: number };
   audit: { transactionMaxWaitMs: number; transactionTimeoutMs: number };
   accountProtection: { responseFloorMs: number };
@@ -272,6 +281,10 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
       adminAppUrl: values.ADMIN_APP_URL ?? localAdminAppUrl,
     },
     publicAppUrl: values.PUBLIC_APP_URL ?? localPublicAppUrl,
+    revalidation: {
+      url: values.PUBLIC_APP_INTERNAL_URL ?? localPublicAppUrl,
+      secret: values.REVALIDATE_SECRET,
+    },
     verification: { tokenTtlHours: values.VERIFICATION_TOKEN_TTL_HOURS },
     audit: {
       transactionMaxWaitMs: values.AUDIT_TRANSACTION_MAX_WAIT_MS,

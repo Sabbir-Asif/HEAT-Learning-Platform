@@ -71,6 +71,7 @@ import type {
   PlaybackSessionResponseDto,
   ProgressBatchDto,
   ProgressResponseDto,
+  PublicCourseResponseDto,
   PublicFrontPageResponseDto,
   PublicLandingOverviewResponseDto,
   QuizAccessResponseDto,
@@ -288,6 +289,8 @@ export const getQuizAccessCheckResponseMock = (overrideResponse: Partial<Extract
 
 export const getQuizSubmissionSubmitResponseMock = (overrideResponse: Partial<Extract<QuizSubmitResponseDto, object>> = {}): QuizSubmitResponseDto => ({attemptId: faker.string.uuid(), correctCount: faker.number.int({min: 0, max: 9007199254740991}), passMarkPercent: faker.number.int({min: 0, max: 100}), passed: faker.datatype.boolean(), scorePercent: faker.number.int({min: 0, max: 100}), totalQuestions: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
 
+export const getPublicCoursesGetResponseMock = (overrideResponse: Partial<Extract<PublicCourseResponseDto, object>> = {}): PublicCourseResponseDto => ({description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 5000}}), null]), id: faker.string.uuid(), modules: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 0, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), slug: faker.string.alpha({length: {min: 10, max: 20}}), thumbnail: faker.helpers.arrayElement([{alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})},null,]), title: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
+
 export const getDirectoryLookupsListUniversitiesResponseMock = (overrideResponse: Partial<Extract<DirectoryOptionListResponseDto, object>> = {}): DirectoryOptionListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
 export const getDirectoryLookupsListFacultiesResponseMock = (overrideResponse: Partial<Extract<DirectoryOptionListResponseDto, object>> = {}): DirectoryOptionListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
@@ -296,7 +299,7 @@ export const getDirectoryLookupsListDepartmentsResponseMock = (overrideResponse:
 
 export const getEnrollmentSubmitResponseMock = (overrideResponse: Partial<Extract<EnrollmentAcceptedResponseDto, object>> = {}): EnrollmentAcceptedResponseDto => ({accepted: faker.helpers.arrayElement([true] as const), ...overrideResponse})
 
-export const getPublicFrontPageGetResponseMock = (overrideResponse: Partial<Extract<PublicFrontPageResponseDto, object>> = {}): PublicFrontPageResponseDto => ({courses: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 5000}}), null]), id: faker.string.uuid(), slug: faker.string.alpha({length: {min: 10, max: 20}}), thumbnailAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}})})), modules: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), title: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
+export const getPublicFrontPageGetResponseMock = (overrideResponse: Partial<Extract<PublicFrontPageResponseDto, object>> = {}): PublicFrontPageResponseDto => ({courses: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 5000}}), null]), id: faker.string.uuid(), slug: faker.string.alpha({length: {min: 10, max: 20}}), thumbnail: faker.helpers.arrayElement([{alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})},null,]), thumbnailAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}})})), modules: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), title: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
 export const getHealthCheckResponseMock = (overrideResponse: Partial<Extract<HealthResponseDto, object>> = {}): HealthResponseDto => ({status: faker.helpers.arrayElement(['ok'] as const), ...overrideResponse})
 
@@ -1483,6 +1486,18 @@ export const getQuizSubmissionSubmitMockHandler = (overrideResponse?: QuizSubmit
   }, options)
 }
 
+export const getPublicCoursesGetMockHandler = (overrideResponse?: PublicCourseResponseDto | ((info: Parameters<HttpResponseResolver<{ slug: string }>>[0]) => Promise<PublicCourseResponseDto> | PublicCourseResponseDto), options?: RequestHandlerOptions) => {
+  return http.get<{ slug: string }>('*/api/courses/:slug', async (info: Parameters<HttpResponseResolver<{ slug: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPublicCoursesGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getDirectoryLookupsListUniversitiesMockHandler = (overrideResponse?: DirectoryOptionListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<DirectoryOptionListResponseDto> | DirectoryOptionListResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/directory/universities', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1738,6 +1753,7 @@ export const getHeatLmsApiMock = () => [
   getQuizDeliveryGetMockHandler(),
   getQuizAccessCheckMockHandler(),
   getQuizSubmissionSubmitMockHandler(),
+  getPublicCoursesGetMockHandler(),
   getDirectoryLookupsListUniversitiesMockHandler(),
   getDirectoryLookupsListFacultiesMockHandler(),
   getDirectoryLookupsListDepartmentsMockHandler(),

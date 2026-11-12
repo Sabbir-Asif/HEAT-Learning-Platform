@@ -12,6 +12,8 @@ import { DATABASE } from "../core";
 import { ApiException } from "../http/api-exception";
 import { applyOrderPlan, lockScope, readScope } from "./content-access";
 import type { ContentLocker } from "./content-access";
+import { courseCacheTag, frontPageCacheTag, PUBLIC_REVALIDATION } from "./public-revalidation";
+import type { PublicRevalidation } from "./public-revalidation";
 import { assertContentUnlocked, nextOrder, planReorder, planResequence } from "./module-rules";
 
 export const moduleSelect = {
@@ -63,6 +65,7 @@ export class ModulesService {
   constructor(
     @Inject(DATABASE) private readonly database: HeatClient,
     private readonly audit: AuditService,
+    @Inject(PUBLIC_REVALIDATION) private readonly revalidation: PublicRevalidation,
   ) {}
 
   async list(courseId: string): Promise<ModuleListResponse> {
@@ -98,6 +101,7 @@ export class ModulesService {
       select: moduleSelect,
     });
     this.audit.capture({ entityId: created.id, after: auditedFields(created) });
+    this.revalidateAfterCommit(courseId);
     return toModuleSummary(created);
   }
 
@@ -119,6 +123,7 @@ export class ModulesService {
       before: auditedFields(before),
       after: auditedFields(updated),
     });
+    this.revalidateAfterCommit(courseId);
     return toModuleSummary(updated);
   }
 
@@ -152,6 +157,7 @@ export class ModulesService {
       client.module.update({ where: { id: step.id }, data: { order: step.order } }),
     );
     this.audit.capture({ entityId: moduleId, before: auditedFields(before) });
+    this.revalidateAfterCommit(courseId);
   }
 
   async reorder(courseId: string, request: ReorderRequest): Promise<ModuleListResponse> {
@@ -168,12 +174,24 @@ export class ModulesService {
       before: { moduleIds: current },
       after: { moduleIds: request.orderedIds },
     });
+    this.revalidateAfterCommit(courseId);
     const rows = await client.module.findMany({
       where: { revisionId: scope.revisionId, deletedAt: null },
       orderBy: { order: "asc" },
       select: moduleSelect,
     });
     return { items: rows.map(toModuleSummary), locked: false };
+  }
+
+  private revalidateAfterCommit(courseId: string): void {
+    this.audit.afterCommit(async () => {
+      const course = await this.database.course.findUnique({
+        where: { id: courseId },
+        select: { slug: true },
+      });
+      const tags = course === null ? [] : [frontPageCacheTag, courseCacheTag(course.slug)];
+      await this.revalidation.revalidate(tags);
+    });
   }
 
   private async existing(
