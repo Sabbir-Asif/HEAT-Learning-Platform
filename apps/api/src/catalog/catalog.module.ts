@@ -10,6 +10,7 @@ import { CoursesController } from "./courses.controller";
 import { CoursesService } from "./courses.service";
 import { LessonSectionsController } from "./lesson-sections.controller";
 import { LessonSectionsService } from "./lesson-sections.service";
+import { ModulePublishCheck } from "./module-publish-check";
 import { ModulesController } from "./modules.controller";
 import { ModulesService } from "./modules.service";
 import { QuizController } from "./quiz.controller";
@@ -46,8 +47,19 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
       useFactory: (config: AppConfig) => new FileUploadStore(config.videoUploads.directory),
     },
     QuizService,
-    { provide: COURSE_PUBLISH_CHECKS, useValue: [] },
+    ModulePublishCheck,
+    {
+      provide: COURSE_PUBLISH_CHECKS,
+      inject: [ModulePublishCheck],
+      useFactory: (moduleCheck: ModulePublishCheck) => [moduleCheck],
+    },
   ],
-  exports: [CoursesService, CourseLookupService, ContentLockService, COURSE_PUBLISH_CHECKS],
+  exports: [
+    CoursesService,
+    CourseLookupService,
+    ContentLockService,
+    ModulePublishCheck,
+    COURSE_PUBLISH_CHECKS,
+  ],
 })
 export class CatalogModule {}
