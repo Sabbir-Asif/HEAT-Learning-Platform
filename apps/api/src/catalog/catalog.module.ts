@@ -15,6 +15,8 @@ import { ModulesController } from "./modules.controller";
 import { ModulesService } from "./modules.service";
 import { QuizController } from "./quiz.controller";
 import { QuizService } from "./quiz.service";
+import { VideoLibraryController } from "./video-library.controller";
+import { VideoLibraryService } from "./video-library.service";
 import { VideoSlotsController } from "./video-slots.controller";
 import { VideoSlotsService } from "./video-slots.service";
 import { VideoUploadController } from "./video-upload.controller";
@@ -29,6 +31,7 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     ModulesController,
     LessonSectionsController,
     VideoSlotsController,
+    VideoLibraryController,
     VideoUploadController,
     QuizController,
   ],
@@ -39,6 +42,7 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     ModulesService,
     LessonSectionsService,
     VideoSlotsService,
+    VideoLibraryService,
     VideoUploadService,
     { provide: UPLOAD_RANDOM, useValue: randomBytes },
     {
