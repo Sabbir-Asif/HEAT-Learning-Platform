@@ -105,6 +105,44 @@ export class MediaService {
     if (result.count === 0) throw new ApiException(404, "NOT_FOUND");
   }
 
+  async linkPublicDocument(
+    assetId: string,
+    entity: string,
+    entityId: string,
+    client: Pick<HeatClient, "mediaAsset"> = this.database,
+  ): Promise<void> {
+    const asset = await client.mediaAsset.findFirst({
+      where: { id: assetId, deletedAt: null, kind: "DOCUMENT", visibility: "PUBLIC" },
+      select: { id: true, mimeType: true, linkedEntity: true, linkedId: true },
+    });
+    const usable =
+      asset !== null &&
+      asset.mimeType !== "text/vtt" &&
+      (asset.linkedEntity === null ||
+        (asset.linkedEntity === entity && asset.linkedId === entityId));
+    if (!usable) {
+      throw new ApiException(400, "VALIDATION_FAILED", undefined, undefined, [
+        { path: "mediaAssetId", code: "invalid" },
+      ]);
+    }
+    await client.mediaAsset.updateMany({
+      where: { id: assetId, linkedEntity: null },
+      data: { linkedEntity: entity, linkedId: entityId },
+    });
+  }
+
+  async unlink(
+    assetId: string,
+    entity: string,
+    entityId: string,
+    client: Pick<HeatClient, "mediaAsset"> = this.database,
+  ): Promise<void> {
+    await client.mediaAsset.updateMany({
+      where: { id: assetId, linkedEntity: entity, linkedId: entityId },
+      data: { linkedEntity: null, linkedId: null },
+    });
+  }
+
   async release(assetId: string): Promise<void> {
     const asset = await this.database.mediaAsset.findUnique({
       where: { id: assetId },
