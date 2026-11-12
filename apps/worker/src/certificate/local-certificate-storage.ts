@@ -72,6 +72,10 @@ export class LocalCertificateStorage implements CertificateStorage {
     return { key, sha256, sizeBytes: bytes.byteLength };
   }
 
+  async read(key: string): Promise<Uint8Array> {
+    return this.operations.read(this.pathFor(key));
+  }
+
   async remove(key: string): Promise<void> {
     await this.operations.remove(this.pathFor(key));
   }

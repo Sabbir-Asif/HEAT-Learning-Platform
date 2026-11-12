@@ -31,13 +31,19 @@ const messages: Record<ErrorCode, string> = {
   CANNOT_DEACTIVATE_SELF: "You cannot deactivate your own account.",
   CAPTCHA_EXPIRED: "This security check can no longer be used. Request a new one.",
   CAPTCHA_INVALID: "The characters do not match. Try again.",
+  CERTIFICATE_NOT_READY: "This certificate is still being prepared.",
+  CERTIFICATE_REVOKED: "This certificate is revoked.",
   CONTENT_LOCKED:
     "This course is locked. Its modules and sections cannot be added, removed or reordered.",
   COURSE_HAS_ENROLLMENTS: "This course has enrollments, so it cannot be deleted.",
   COURSE_LOCKED: "This course is locked. Only the description and thumbnail can be changed.",
   COURSE_NOT_AVAILABLE: "This course is not open for enrollment.",
   COURSE_NOT_DRAFT: "This action is only available for a draft course.",
+  COURSE_NOT_PUBLISHED: "Publish the course before publishing a new revision.",
   COURSE_PUBLISH_CHECKS_FAILED: "The course is not ready to publish.",
+  COURSE_REVISION_DRAFT_EXISTS:
+    "A draft revision already exists. Publish it or finish it before cloning again.",
+  COURSE_REVISION_NOT_DRAFT: "This revision is not an open draft.",
   COURSE_SLUG_TAKEN: "A course with this slug already exists.",
   CSRF_TOKEN_INVALID:
     "The security token for this request is missing or no longer valid. Reload the page and try again.",
@@ -48,6 +54,9 @@ const messages: Record<ErrorCode, string> = {
   EMAIL_IN_USE: "An account with this email address already exists.",
   ENROLLMENT_ALREADY_DECIDED: "This request was already decided or was withdrawn.",
   ENROLLMENT_NOT_ACTIVE: "Your enrollment in this course is not active.",
+  ENROLLMENT_NOT_REMOVABLE: "Only an approved or completed student can be removed.",
+  ENROLLMENT_NOT_REMOVED: "This student is not removed, so there is nothing to reinstate.",
+  ENROLLMENT_STATE_CHANGED: "This enrollment was changed by someone else. Reload and try again.",
   ENROLLMENT_NOT_VERIFIED:
     "The student has not verified their email yet, so it cannot be approved.",
   FORBIDDEN: "You are not allowed to do this.",
@@ -68,6 +77,9 @@ const messages: Record<ErrorCode, string> = {
   QUIZ_ATTEMPT_WAIT: "Wait before submitting another attempt.",
   QUIZ_NOT_UNLOCKED: "Watch the required videos in this module to unlock the quiz.",
   RATE_LIMITED: "Too many requests. Try again later.",
+  RESET_LINK_EXPIRED: "This reset link has expired. Request a new one.",
+  RESET_LINK_INVALID: "This reset link is not valid.",
+  RESET_LINK_USED: "This reset link has already been used or replaced.",
   UNAUTHENTICATED: "Sign in to continue.",
   UPLOAD_EXPIRED: "This upload expired before it finished. Start it again.",
   UPLOAD_OFFSET_MISMATCH:

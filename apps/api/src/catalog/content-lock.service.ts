@@ -12,7 +12,7 @@ export class ContentLockService {
     now: Date,
   ): Promise<boolean> {
     const scope = await lockScope(tx, courseId);
-    if (scope.lockedAt !== null) return false;
+    if (scope.courseLockedAt !== null) return false;
     await tx.course.update({ where: { id: courseId }, data: { lockedAt: now } });
     return true;
   }

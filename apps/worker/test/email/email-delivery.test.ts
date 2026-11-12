@@ -1,5 +1,6 @@
 import { FakeMailTransport } from "api/core";
 import { describe, expect, test } from "vitest";
+import { AttachmentUnavailable } from "../../src/email/certificate-attachment";
 import { EmailQuota, type QuotaEntry, type QuotaLedger } from "../../src/email/email-quota";
 import {
   EmailCapacityWait,
@@ -221,5 +222,50 @@ describe("EmailDelivery", () => {
 
     expect(transport.attempts).toEqual([]);
     expect(store.log).toEqual([`failed job-1 null ${now.toISOString()}`]);
+  });
+});
+
+describe("EmailDelivery attachments", () => {
+  const attachment = {
+    filename: "HEAT-certificate-ABC123.pdf",
+    content: Buffer.from([1, 2, 3]),
+    contentType: "application/pdf",
+  };
+
+  const build = (load: () => Promise<(typeof attachment)[]>) => {
+    const store = new FakeStore(snapshot());
+    const transport = new FakeMailTransport();
+    const errors: { event: string; fields: Record<string, string> }[] = [];
+    const delivery = new EmailDelivery(
+      store,
+      transport,
+      () => Promise.resolve({ subject: "Subject", html: "<p>Hi</p>", text: "Hi" }),
+      (sealed) => sealed,
+      new EmailQuota(new MemoryLedger(), quotaConfig),
+      { now: () => now },
+      { load },
+      { error: (event, fields) => errors.push({ event, fields }) },
+    );
+    return { store, transport, delivery, errors };
+  };
+
+  test("sends the loaded attachments with the message", async () => {
+    const { transport, delivery } = build(() => Promise.resolve([attachment]));
+    expect(await delivery.deliver("job-1", false)).toBe("sent");
+    expect(transport.sent[0]?.attachments).toEqual([attachment]);
+  });
+
+  test("fails with a log entry and no send when the attachment is unavailable", async () => {
+    const { store, transport, delivery, errors } = build(() =>
+      Promise.reject(new AttachmentUnavailable("missing")),
+    );
+
+    expect(await delivery.deliver("job-1", false)).toBe("failed");
+
+    expect(transport.attempts).toEqual([]);
+    expect(store.log).toEqual([`failed job-1 null ${now.toISOString()}`]);
+    expect(errors).toEqual([
+      { event: "email.attachment-unavailable", fields: { emailJobId: "job-1", reason: "missing" } },
+    ]);
   });
 });

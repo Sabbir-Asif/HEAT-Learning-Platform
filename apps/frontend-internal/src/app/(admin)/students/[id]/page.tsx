@@ -1,5 +1,6 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { StudentDetailView } from "@/students/student-detail-view";
 
-export default function Page() {
-  return <PlaceholderPage title="Student" />;
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <StudentDetailView id={id} />;
 }

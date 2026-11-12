@@ -2,6 +2,7 @@ import { createTransport } from "nodemailer";
 import type { MailConfig } from "./mail-config";
 import { maskAddress } from "./mask-address";
 import type {
+  MailAttachment,
   MailMessage,
   MailSendResult,
   MailTransport,
@@ -15,6 +16,7 @@ export interface SmtpSendOptions {
   subject: string;
   text: string;
   html?: string;
+  attachments?: MailAttachment[];
 }
 
 export interface SmtpClient {
@@ -59,6 +61,7 @@ export class SmtpMailTransport implements MailTransport {
         subject: message.subject,
         text: message.text,
         ...(message.html === undefined ? {} : { html: message.html }),
+        ...(message.attachments === undefined ? {} : { attachments: message.attachments }),
       });
       if (info.rejected.length > 0) {
         this.logger.warn(`Mail rejected recipient=${recipient} code=${rejectedRecipientCode}`);

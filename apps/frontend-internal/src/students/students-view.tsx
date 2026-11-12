@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  getStudentListListQueryKey,
   useCoursesList,
   useDepartmentsList,
   useFacultiesList,
@@ -10,6 +11,7 @@ import {
 import type { StudentListListParams, StudentListResponseDtoItemsItem } from "@heat/api-client";
 import { academicSessionSchema, enrollmentStatuses } from "@heat/contracts";
 import {
+  Button,
   Field,
   FieldDescription,
   FieldError,
@@ -26,13 +28,22 @@ import {
 import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
 import { ShellContent } from "@heat/ui/shell";
-import { useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import { RotateCcwIcon, UserMinusIcon } from "lucide-react";
+import { useMemo, useState } from "react";
+import { StudentRemovalSheet } from "./student-removal-sheet";
+import type { StudentRemovalTarget } from "./student-removal-sheet";
 import {
+  canReinstateStudent,
+  canRemoveStudent,
+  removalNotice,
   studentBadgeStatus,
   studentSortValue,
   studentSortable,
   studentStatusFilterKey,
   studentStatusFilterOptions,
+  studentProfileHref,
   studentStatusLabels,
 } from "./student-copy";
 
@@ -50,6 +61,9 @@ const optionLimit = 50;
 const all = "all";
 
 export function StudentsView() {
+  const queryClient = useQueryClient();
+  const [removalTarget, setRemovalTarget] = useState<StudentRemovalTarget>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const url = useTableUrlState({
     sortable: studentSortable,
     filters: filterKeys,
@@ -127,7 +141,13 @@ export function StudentsView() {
         sortable: true,
         cell: (row) => (
           <div className="flex flex-col">
-            <strong>{row.student.name}</strong>
+            <Button
+              variant="link"
+              className="h-auto justify-start p-0"
+              render={<Link href={studentProfileHref(row.student.userId)} />}
+            >
+              {row.student.name}
+            </Button>
             <FieldDescription>{row.student.email}</FieldDescription>
           </div>
         ),
@@ -183,6 +203,7 @@ export function StudentsView() {
   return (
     <ShellContent>
       <PageHeader title="Students" />
+      {notice !== null ? <FieldDescription role="status">{notice}</FieldDescription> : null}
       <FilterBar
         activeCount={url.activeFilterCount}
         onClear={url.clearFilters}
@@ -276,6 +297,43 @@ export function StudentsView() {
         onClearFilters={url.clearFilters}
         emptyTitle="No students found"
         emptyDescription="Students appear here after they request enrollment."
+        actions={(row) =>
+          canRemoveStudent(row.status) ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setNotice(null);
+                setRemovalTarget({ action: "remove", id: row.id, name: row.student.name });
+              }}
+            >
+              <UserMinusIcon data-icon="inline-start" />
+              Remove
+            </Button>
+          ) : canReinstateStudent(row.status) ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setNotice(null);
+                setRemovalTarget({ action: "reinstate", id: row.id, name: row.student.name });
+              }}
+            >
+              <RotateCcwIcon data-icon="inline-start" />
+              Reinstate
+            </Button>
+          ) : null
+        }
+      />
+      <StudentRemovalSheet
+        target={removalTarget}
+        onClose={() => setRemovalTarget(null)}
+        onFinished={(action, name) => {
+          setNotice(removalNotice(action, name));
+          void queryClient.invalidateQueries({
+            queryKey: getStudentListListQueryKey().slice(0, 1),
+          });
+        }}
       />
     </ShellContent>
   );

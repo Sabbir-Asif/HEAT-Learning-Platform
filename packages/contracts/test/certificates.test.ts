@@ -2,7 +2,11 @@ import { describe, expect, test } from "vitest";
 import {
   certificateItemSchema,
   certificateListResponseSchema,
+  certificateVerificationResponseSchema,
+  certificateVerifyParamsSchema,
   dashboardCertificateSchema,
+  reissueCertificateRequestSchema,
+  revokeCertificateRequestSchema,
 } from "../src";
 
 const id = "0198f1a0-0000-7000-8000-0000000000a1";
@@ -44,6 +48,45 @@ describe("certificate contracts", () => {
     expect(dashboardCertificateSchema.safeParse({ id, status: "READY" }).success).toBe(true);
     expect(dashboardCertificateSchema.safeParse({ id: null, status: "PENDING" }).success).toBe(
       true,
+    );
+  });
+});
+
+describe("certificate verification and admin action contracts", () => {
+  test("a verification number is trimmed and upper-cased", () => {
+    const parsed = certificateVerifyParamsSchema.parse({ number: " abcd-efgh-jkmn " });
+    expect(parsed.number).toBe("ABCD-EFGH-JKMN");
+  });
+
+  test("a verification number with other characters or no length is refused", () => {
+    expect(certificateVerifyParamsSchema.safeParse({ number: "AB CD" }).success).toBe(false);
+    expect(certificateVerifyParamsSchema.safeParse({ number: "../etc" }).success).toBe(false);
+    expect(certificateVerifyParamsSchema.safeParse({ number: "  " }).success).toBe(false);
+    expect(certificateVerifyParamsSchema.safeParse({ number: "A".repeat(65) }).success).toBe(false);
+  });
+
+  test("the verification response carries only status, name, course and date", () => {
+    const parsed = certificateVerificationResponseSchema.parse({
+      status: "VALID",
+      holderName: "Rahim",
+      courseTitle: "HEAT",
+      completedAt: "2026-11-12T10:00:00.000Z",
+      email: "leak@example.com",
+    });
+    expect(Object.keys(parsed).sort()).toEqual([
+      "completedAt",
+      "courseTitle",
+      "holderName",
+      "status",
+    ]);
+  });
+
+  test("revoke and reissue require a reason that is trimmed", () => {
+    expect(revokeCertificateRequestSchema.safeParse({ reason: "  " }).success).toBe(false);
+    expect(reissueCertificateRequestSchema.safeParse({}).success).toBe(false);
+    expect(revokeCertificateRequestSchema.parse({ reason: " fraud " }).reason).toBe("fraud");
+    expect(reissueCertificateRequestSchema.safeParse({ reason: "x".repeat(501) }).success).toBe(
+      false,
     );
   });
 });

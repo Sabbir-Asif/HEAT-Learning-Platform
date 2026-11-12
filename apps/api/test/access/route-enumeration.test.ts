@@ -112,6 +112,7 @@ describe("deny-by-default route enumeration", () => {
       "GET /api/certificates/:id/download": "certificateDownload",
       "GET /api/admin/certificates/:id/download": "certificateDownload",
       "GET /api/me/certificates": "learningRead",
+      "GET /api/certificates/verify/:number": "certificateVerify",
     });
   });
 
@@ -129,7 +130,9 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/admin/auth/invitations/lookup": "verify",
       "POST /api/admin/auth/refresh": "sessionRefresh",
       "POST /api/admin/auth/sign-in": "adminSignIn",
+      "POST /api/auth/forgot-password": "reset",
       "POST /api/auth/refresh": "sessionRefresh",
+      "POST /api/auth/reset-password": "reset",
       "POST /api/auth/sign-in": "signIn",
       "POST /api/auth/verify-email": "verify",
       "POST /api/auth/verify-email/resend": "resendVerification",
@@ -150,7 +153,9 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/admin/auth/invitations/lookup",
       "POST /api/admin/auth/refresh",
       "POST /api/admin/auth/sign-in",
+      "POST /api/auth/forgot-password",
       "POST /api/auth/refresh",
+      "POST /api/auth/reset-password",
       "POST /api/auth/sign-in",
       "POST /api/auth/verify-email",
       "POST /api/auth/verify-email/resend",

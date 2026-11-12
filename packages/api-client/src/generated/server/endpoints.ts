@@ -324,12 +324,17 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   CANNOT_DEACTIVATE_SELF: 'CANNOT_DEACTIVATE_SELF',
   CAPTCHA_EXPIRED: 'CAPTCHA_EXPIRED',
   CAPTCHA_INVALID: 'CAPTCHA_INVALID',
+  CERTIFICATE_NOT_READY: 'CERTIFICATE_NOT_READY',
+  CERTIFICATE_REVOKED: 'CERTIFICATE_REVOKED',
   CONTENT_LOCKED: 'CONTENT_LOCKED',
   COURSE_HAS_ENROLLMENTS: 'COURSE_HAS_ENROLLMENTS',
   COURSE_LOCKED: 'COURSE_LOCKED',
   COURSE_NOT_AVAILABLE: 'COURSE_NOT_AVAILABLE',
   COURSE_NOT_DRAFT: 'COURSE_NOT_DRAFT',
+  COURSE_NOT_PUBLISHED: 'COURSE_NOT_PUBLISHED',
   COURSE_PUBLISH_CHECKS_FAILED: 'COURSE_PUBLISH_CHECKS_FAILED',
+  COURSE_REVISION_DRAFT_EXISTS: 'COURSE_REVISION_DRAFT_EXISTS',
+  COURSE_REVISION_NOT_DRAFT: 'COURSE_REVISION_NOT_DRAFT',
   COURSE_SLUG_TAKEN: 'COURSE_SLUG_TAKEN',
   CSRF_TOKEN_INVALID: 'CSRF_TOKEN_INVALID',
   DIRECTORY_ARCHIVED: 'DIRECTORY_ARCHIVED',
@@ -338,7 +343,10 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   EMAIL_IN_USE: 'EMAIL_IN_USE',
   ENROLLMENT_ALREADY_DECIDED: 'ENROLLMENT_ALREADY_DECIDED',
   ENROLLMENT_NOT_ACTIVE: 'ENROLLMENT_NOT_ACTIVE',
+  ENROLLMENT_NOT_REMOVABLE: 'ENROLLMENT_NOT_REMOVABLE',
+  ENROLLMENT_NOT_REMOVED: 'ENROLLMENT_NOT_REMOVED',
   ENROLLMENT_NOT_VERIFIED: 'ENROLLMENT_NOT_VERIFIED',
+  ENROLLMENT_STATE_CHANGED: 'ENROLLMENT_STATE_CHANGED',
   FORBIDDEN: 'FORBIDDEN',
   INTERNAL: 'INTERNAL',
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
@@ -357,6 +365,9 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   QUIZ_ATTEMPT_WAIT: 'QUIZ_ATTEMPT_WAIT',
   QUIZ_NOT_UNLOCKED: 'QUIZ_NOT_UNLOCKED',
   RATE_LIMITED: 'RATE_LIMITED',
+  RESET_LINK_EXPIRED: 'RESET_LINK_EXPIRED',
+  RESET_LINK_INVALID: 'RESET_LINK_INVALID',
+  RESET_LINK_USED: 'RESET_LINK_USED',
   UNAUTHENTICATED: 'UNAUTHENTICATED',
   UPLOAD_EXPIRED: 'UPLOAD_EXPIRED',
   UPLOAD_OFFSET_MISMATCH: 'UPLOAD_OFFSET_MISMATCH',
@@ -392,12 +403,17 @@ export const BulkRejectionResponseDtoFailedItemCode = {
   CANNOT_DEACTIVATE_SELF: 'CANNOT_DEACTIVATE_SELF',
   CAPTCHA_EXPIRED: 'CAPTCHA_EXPIRED',
   CAPTCHA_INVALID: 'CAPTCHA_INVALID',
+  CERTIFICATE_NOT_READY: 'CERTIFICATE_NOT_READY',
+  CERTIFICATE_REVOKED: 'CERTIFICATE_REVOKED',
   CONTENT_LOCKED: 'CONTENT_LOCKED',
   COURSE_HAS_ENROLLMENTS: 'COURSE_HAS_ENROLLMENTS',
   COURSE_LOCKED: 'COURSE_LOCKED',
   COURSE_NOT_AVAILABLE: 'COURSE_NOT_AVAILABLE',
   COURSE_NOT_DRAFT: 'COURSE_NOT_DRAFT',
+  COURSE_NOT_PUBLISHED: 'COURSE_NOT_PUBLISHED',
   COURSE_PUBLISH_CHECKS_FAILED: 'COURSE_PUBLISH_CHECKS_FAILED',
+  COURSE_REVISION_DRAFT_EXISTS: 'COURSE_REVISION_DRAFT_EXISTS',
+  COURSE_REVISION_NOT_DRAFT: 'COURSE_REVISION_NOT_DRAFT',
   COURSE_SLUG_TAKEN: 'COURSE_SLUG_TAKEN',
   CSRF_TOKEN_INVALID: 'CSRF_TOKEN_INVALID',
   DIRECTORY_ARCHIVED: 'DIRECTORY_ARCHIVED',
@@ -406,7 +422,10 @@ export const BulkRejectionResponseDtoFailedItemCode = {
   EMAIL_IN_USE: 'EMAIL_IN_USE',
   ENROLLMENT_ALREADY_DECIDED: 'ENROLLMENT_ALREADY_DECIDED',
   ENROLLMENT_NOT_ACTIVE: 'ENROLLMENT_NOT_ACTIVE',
+  ENROLLMENT_NOT_REMOVABLE: 'ENROLLMENT_NOT_REMOVABLE',
+  ENROLLMENT_NOT_REMOVED: 'ENROLLMENT_NOT_REMOVED',
   ENROLLMENT_NOT_VERIFIED: 'ENROLLMENT_NOT_VERIFIED',
+  ENROLLMENT_STATE_CHANGED: 'ENROLLMENT_STATE_CHANGED',
   FORBIDDEN: 'FORBIDDEN',
   INTERNAL: 'INTERNAL',
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
@@ -425,6 +444,9 @@ export const BulkRejectionResponseDtoFailedItemCode = {
   QUIZ_ATTEMPT_WAIT: 'QUIZ_ATTEMPT_WAIT',
   QUIZ_NOT_UNLOCKED: 'QUIZ_NOT_UNLOCKED',
   RATE_LIMITED: 'RATE_LIMITED',
+  RESET_LINK_EXPIRED: 'RESET_LINK_EXPIRED',
+  RESET_LINK_INVALID: 'RESET_LINK_INVALID',
+  RESET_LINK_USED: 'RESET_LINK_USED',
   UNAUTHENTICATED: 'UNAUTHENTICATED',
   UPLOAD_EXPIRED: 'UPLOAD_EXPIRED',
   UPLOAD_OFFSET_MISMATCH: 'UPLOAD_OFFSET_MISMATCH',
@@ -502,6 +524,22 @@ export type CertificateListResponseDtoCertificatesItem = {
 
 export interface CertificateListResponseDto {
   certificates: CertificateListResponseDtoCertificatesItem[];
+}
+
+export type CertificateVerificationResponseDtoStatus = typeof CertificateVerificationResponseDtoStatus[keyof typeof CertificateVerificationResponseDtoStatus];
+
+
+export const CertificateVerificationResponseDtoStatus = {
+  VALID: 'VALID',
+  REVOKED: 'REVOKED',
+} as const;
+
+export interface CertificateVerificationResponseDto {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  completedAt: string;
+  courseTitle: string;
+  holderName: string;
+  status: CertificateVerificationResponseDtoStatus;
 }
 
 export interface ChangePasswordRequestDto {
@@ -599,6 +637,76 @@ export interface CourseListResponseDto {
      * @maximum 9007199254740991
      */
   total: number;
+}
+
+export type CourseRevisionItemDtoStatus = typeof CourseRevisionItemDtoStatus[keyof typeof CourseRevisionItemDtoStatus];
+
+
+export const CourseRevisionItemDtoStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+} as const;
+
+export interface CourseRevisionItemDto {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  current: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  enrollmentCount: number;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  locked: boolean;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  number: number;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  publishedAt: string | null;
+  status: CourseRevisionItemDtoStatus;
+}
+
+export type CourseRevisionListResponseDtoItemsItemStatus = typeof CourseRevisionListResponseDtoItemsItemStatus[keyof typeof CourseRevisionListResponseDtoItemsItemStatus];
+
+
+export const CourseRevisionListResponseDtoItemsItemStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+} as const;
+
+export type CourseRevisionListResponseDtoItemsItem = {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  current: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  enrollmentCount: number;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  locked: boolean;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  number: number;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  publishedAt: string | null;
+  status: CourseRevisionListResponseDtoItemsItemStatus;
+};
+
+export interface CourseRevisionListResponseDto {
+  items: CourseRevisionListResponseDtoItemsItem[];
 }
 
 /**
@@ -1036,6 +1144,21 @@ export interface FacultySummaryDto {
   universities: FacultySummaryDtoUniversitiesItem[];
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   updatedAt: string;
+}
+
+export interface ForgotPasswordAcceptedResponseDto {
+  accepted: true;
+}
+
+export interface ForgotPasswordRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 12
+     */
+  captchaAnswer: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  captchaId: string;
+  email: string;
 }
 
 export type HealthResponseDtoStatus = typeof HealthResponseDtoStatus[keyof typeof HealthResponseDtoStatus];
@@ -1958,6 +2081,46 @@ export interface QuizSummaryDto {
   rules: QuizSummaryDtoRules;
 }
 
+export interface ReinstateEnrollmentRequestDto {
+  /** @maxLength 500 */
+  reason?: string;
+}
+
+export type ReinstatedEnrollmentDtoStatus = typeof ReinstatedEnrollmentDtoStatus[keyof typeof ReinstatedEnrollmentDtoStatus];
+
+
+export const ReinstatedEnrollmentDtoStatus = {
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export interface ReinstatedEnrollmentDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  status: ReinstatedEnrollmentDtoStatus;
+}
+
+export interface ReissueCertificateRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  reason: string;
+}
+
+export type ReissuedCertificateDtoStatus = typeof ReissuedCertificateDtoStatus[keyof typeof ReissuedCertificateDtoStatus];
+
+
+export const ReissuedCertificateDtoStatus = {
+  PENDING: 'PENDING',
+} as const;
+
+export interface ReissuedCertificateDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  status: ReissuedCertificateDtoStatus;
+}
+
 export interface RejectEnrollmentRequestDto {
   /** @maxLength 500 */
   reason?: string;
@@ -1990,6 +2153,29 @@ export interface RejectedEnrollmentDto {
   status: RejectedEnrollmentDtoStatus;
 }
 
+export interface RemoveEnrollmentRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  reason: string;
+}
+
+export type RemovedEnrollmentDtoStatus = typeof RemovedEnrollmentDtoStatus[keyof typeof RemovedEnrollmentDtoStatus];
+
+
+export const RemovedEnrollmentDtoStatus = {
+  REMOVED: 'REMOVED',
+} as const;
+
+export interface RemovedEnrollmentDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  removedAt: string;
+  status: RemovedEnrollmentDtoStatus;
+}
+
 export interface ReorderRequestDto {
   /**
      * @maxItems 500
@@ -2003,6 +2189,42 @@ export interface ReorderRequestDto {
   previousIds: string[];
 }
 
+export interface ResetPasswordRequestDto {
+  /**
+     * @minLength 12
+     * @maxLength 256
+     */
+  password: string;
+  /**
+     * @minLength 1
+     * @maxLength 512
+     */
+  token: string;
+}
+
+export interface RevokeCertificateRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  reason: string;
+}
+
+export type RevokedCertificateDtoStatus = typeof RevokedCertificateDtoStatus[keyof typeof RevokedCertificateDtoStatus];
+
+
+export const RevokedCertificateDtoStatus = {
+  REVOKED: 'REVOKED',
+} as const;
+
+export interface RevokedCertificateDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  revokedAt: string;
+  status: RevokedCertificateDtoStatus;
+}
+
 export interface SignInRequestDto {
   email: string;
   /**
@@ -2010,6 +2232,197 @@ export interface SignInRequestDto {
      * @maxLength 256
      */
   password: string;
+}
+
+export type StudentDetailResponseDtoDepartment = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemCertificateStatus = typeof StudentDetailResponseDtoEnrollmentsItemCertificateStatus[keyof typeof StudentDetailResponseDtoEnrollmentsItemCertificateStatus];
+
+
+export const StudentDetailResponseDtoEnrollmentsItemCertificateStatus = {
+  READY: 'READY',
+  PENDING: 'PENDING',
+  REVOKED: 'REVOKED',
+} as const;
+
+/**
+ * @nullable
+ */
+export type StudentDetailResponseDtoEnrollmentsItemCertificate = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  issuedAt: string;
+  number: string;
+  status: StudentDetailResponseDtoEnrollmentsItemCertificateStatus;
+  verificationUrl: string;
+} | null;
+
+export type StudentDetailResponseDtoEnrollmentsItemCourse = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemDecisionsItemAction = typeof StudentDetailResponseDtoEnrollmentsItemDecisionsItemAction[keyof typeof StudentDetailResponseDtoEnrollmentsItemDecisionsItemAction];
+
+
+export const StudentDetailResponseDtoEnrollmentsItemDecisionsItemAction = {
+  APPROVE: 'APPROVE',
+  REJECT: 'REJECT',
+  REMOVE: 'REMOVE',
+  REINSTATE: 'REINSTATE',
+} as const;
+
+export type StudentDetailResponseDtoEnrollmentsItemDecisionsItemAdmin = {
+  email: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemDecisionsItem = {
+  action: StudentDetailResponseDtoEnrollmentsItemDecisionsItemAction;
+  admin: StudentDetailResponseDtoEnrollmentsItemDecisionsItemAdmin;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  decidedAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @maxLength 1000
+     * @nullable
+     */
+  reason: string | null;
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemModulesItemQuizAttemptsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  passMarkSnapshot: number;
+  passed: boolean;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  scorePercent: number | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  startedAt: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  submittedAt: string | null;
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemModulesItemStatus = typeof StudentDetailResponseDtoEnrollmentsItemModulesItemStatus[keyof typeof StudentDetailResponseDtoEnrollmentsItemModulesItemStatus];
+
+
+export const StudentDetailResponseDtoEnrollmentsItemModulesItemStatus = {
+  LOCKED: 'LOCKED',
+  UNLOCKED: 'UNLOCKED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  QUIZ_READY: 'QUIZ_READY',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export type StudentDetailResponseDtoEnrollmentsItemModulesItemVideosItem = {
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  coveragePercent: number;
+  meetsThreshold: boolean;
+  required: boolean;
+  title: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  videoId: string;
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemModulesItem = {
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  completedAt: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  moduleId: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  quizAttempts: StudentDetailResponseDtoEnrollmentsItemModulesItemQuizAttemptsItem[];
+  status: StudentDetailResponseDtoEnrollmentsItemModulesItemStatus;
+  title: string;
+  videos: StudentDetailResponseDtoEnrollmentsItemModulesItemVideosItem[];
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemStatus = typeof StudentDetailResponseDtoEnrollmentsItemStatus[keyof typeof StudentDetailResponseDtoEnrollmentsItemStatus];
+
+
+export const StudentDetailResponseDtoEnrollmentsItemStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
+export type StudentDetailResponseDtoEnrollmentsItem = {
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  approvedAt: string | null;
+  /** @nullable */
+  certificate: StudentDetailResponseDtoEnrollmentsItemCertificate;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  completedAt: string | null;
+  course: StudentDetailResponseDtoEnrollmentsItemCourse;
+  decisions: StudentDetailResponseDtoEnrollmentsItemDecisionsItem[];
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  modules: StudentDetailResponseDtoEnrollmentsItemModulesItem[];
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  requestedAt: string;
+  status: StudentDetailResponseDtoEnrollmentsItemStatus;
+};
+
+export type StudentDetailResponseDtoFaculty = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type StudentDetailResponseDtoUniversity = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export interface StudentDetailResponseDto {
+  department: StudentDetailResponseDtoDepartment;
+  email: string;
+  enrollments: StudentDetailResponseDtoEnrollmentsItem[];
+  faculty: StudentDetailResponseDtoFaculty;
+  name: string;
+  session: string;
+  university: StudentDetailResponseDtoUniversity;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  userId: string;
 }
 
 export type StudentListResponseDtoItemsItemCourse = {
@@ -3178,6 +3591,78 @@ export const adminCertificatesDownload = async (id: string, options?: Parameters
 
 
 
+export const getAdminCertificatesReissueUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/certificates/${id}/reissue`
+}
+
+export const adminCertificatesReissue = async (id: string,
+    reissueCertificateRequestDto: ReissueCertificateRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ReissuedCertificateDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ReissuedCertificateDto>(getAdminCertificatesReissueUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reissueCertificateRequestDto)
+  }
+);}
+
+
+
+export const getAdminCertificatesRevokeUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/certificates/${id}/revoke`
+}
+
+export const adminCertificatesRevoke = async (id: string,
+    revokeCertificateRequestDto: RevokeCertificateRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<RevokedCertificateDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<RevokedCertificateDto>(getAdminCertificatesRevokeUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(revokeCertificateRequestDto)
+  }
+);}
+
+
+
 export const getCoursesListUrl = (params?: CoursesListParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -4070,6 +4555,71 @@ export const coursesPublishChecks = async (id: string, options?: Parameters<type
 
 
 
+export const getRevisionsListUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/revisions`
+}
+
+export const revisionsList = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<CourseRevisionListResponseDto> => {
+
+  return serverFetch<CourseRevisionListResponseDto>(getRevisionsListUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getRevisionsCloneUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/revisions`
+}
+
+export const revisionsClone = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<CourseRevisionItemDto> => {
+
+  return serverFetch<CourseRevisionItemDto>(getRevisionsCloneUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getRevisionsPublishUrl = (id: string,
+    revisionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/revisions/${revisionId}/publish`
+}
+
+export const revisionsPublish = async (id: string,
+    revisionId: string, options?: Parameters<typeof serverFetch>[1]): Promise<CourseRevisionItemDto> => {
+
+  return serverFetch<CourseRevisionItemDto>(getRevisionsPublishUrl(id,revisionId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
 export const getDepartmentsListUrl = (params?: DepartmentsListParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -4799,6 +5349,42 @@ return serverFetch<ApprovedEnrollmentDto>(getEnrollmentApprovalApproveUrl(id),
 
 
 
+export const getEnrollmentRemovalReinstateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/enrollments/${id}/reinstate`
+}
+
+export const enrollmentRemovalReinstate = async (id: string,
+    reinstateEnrollmentRequestDto: ReinstateEnrollmentRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ReinstatedEnrollmentDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ReinstatedEnrollmentDto>(getEnrollmentRemovalReinstateUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reinstateEnrollmentRequestDto)
+  }
+);}
+
+
+
 export const getEnrollmentApprovalRejectUrl = (id: string,) => {
 
 
@@ -4830,6 +5416,42 @@ return serverFetch<RejectedEnrollmentDto>(getEnrollmentApprovalRejectUrl(id),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(rejectEnrollmentRequestDto)
+  }
+);}
+
+
+
+export const getEnrollmentRemovalRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/enrollments/${id}/remove`
+}
+
+export const enrollmentRemovalRemove = async (id: string,
+    removeEnrollmentRequestDto: RemoveEnrollmentRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<RemovedEnrollmentDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<RemovedEnrollmentDto>(getEnrollmentRemovalRemoveUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(removeEnrollmentRequestDto)
   }
 );}
 
@@ -4905,6 +5527,27 @@ export const studentListList = async (params?: StudentListListParams, options?: 
 
 
 
+export const getStudentDetailGetUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/students/${id}`
+}
+
+export const studentDetailGet = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<StudentDetailResponseDto> => {
+
+  return serverFetch<StudentDetailResponseDto>(getStudentDetailGetUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export const getVideoLibraryListUrl = (params?: VideoLibraryListParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -4954,6 +5597,41 @@ export const studentAuthCsrfToken = async ( options?: Parameters<typeof serverFe
 
 
 
+export const getPasswordResetForgotPasswordUrl = () => {
+
+
+
+
+  return `/api/auth/forgot-password`
+}
+
+export const passwordResetForgotPassword = async (forgotPasswordRequestDto: ForgotPasswordRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ForgotPasswordAcceptedResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ForgotPasswordAcceptedResponseDto>(getPasswordResetForgotPasswordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(forgotPasswordRequestDto)
+  }
+);}
+
+
+
 export const getStudentAuthRefreshUrl = () => {
 
 
@@ -4970,6 +5648,41 @@ export const studentAuthRefresh = async ( options?: Parameters<typeof serverFetc
     method: 'POST'
 
 
+  }
+);}
+
+
+
+export const getPasswordResetResetPasswordUrl = () => {
+
+
+
+
+  return `/api/auth/reset-password`
+}
+
+export const passwordResetResetPassword = async (resetPasswordRequestDto: ResetPasswordRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<void>(getPasswordResetResetPasswordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(resetPasswordRequestDto)
   }
 );}
 
@@ -5131,6 +5844,27 @@ return serverFetch<CaptchaResponseDto>(getCaptchaIssueUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(captchaRequestDto)
+  }
+);}
+
+
+
+export const getCertificateVerifyVerifyUrl = (number: string,) => {
+
+
+
+
+  return `/api/certificates/verify/${number}`
+}
+
+export const certificateVerifyVerify = async (number: string, options?: Parameters<typeof serverFetch>[1]): Promise<CertificateVerificationResponseDto> => {
+
+  return serverFetch<CertificateVerificationResponseDto>(getCertificateVerifyVerifyUrl(number),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 
