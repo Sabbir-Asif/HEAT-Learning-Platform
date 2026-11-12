@@ -14,7 +14,10 @@
             "type": "string"
           }
         },
-        "required": ["token", "password"],
+        "required": [
+          "token",
+          "password"
+        ],
         "type": "object"
       },
       "AdminContactSettingsResponseDto": {
@@ -41,7 +44,14 @@
             "type": "string"
           }
         },
-        "required": ["organisation", "address", "email", "phone", "officeHours", "updatedAt"],
+        "required": [
+          "organisation",
+          "address",
+          "email",
+          "phone",
+          "officeHours",
+          "updatedAt"
+        ],
         "type": "object"
       },
       "AdminCsrfTokenResponseDto": {
@@ -50,7 +60,9 @@
             "type": "string"
           }
         },
-        "required": ["token"],
+        "required": [
+          "token"
+        ],
         "type": "object"
       },
       "AdminFrontPageResponseDto": {
@@ -73,7 +85,12 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "slug", "title", "published"],
+              "required": [
+                "id",
+                "slug",
+                "title",
+                "published"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -101,13 +118,22 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "title", "courseId", "courseTitle", "published"],
+              "required": [
+                "id",
+                "title",
+                "courseId",
+                "courseTitle",
+                "published"
+              ],
               "type": "object"
             },
             "type": "array"
           }
         },
-        "required": ["courses", "modules"],
+        "required": [
+          "courses",
+          "modules"
+        ],
         "type": "object"
       },
       "AdminLandingOverviewResponseDto": {
@@ -134,7 +160,11 @@
                 "type": "string"
               }
             },
-            "required": ["assetId", "url", "alt"],
+            "required": [
+              "assetId",
+              "url",
+              "alt"
+            ],
             "type": "object"
           },
           "imageAssetId": {
@@ -158,7 +188,11 @@
                   "type": "string"
                 }
               },
-              "required": ["assetId", "url", "alt"],
+              "required": [
+                "assetId",
+                "url",
+                "alt"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -217,11 +251,20 @@
                   "type": "string"
                 },
                 "role": {
-                  "enum": ["SUPER_ADMIN", "ADMIN", "STUDENT"],
+                  "enum": [
+                    "SUPER_ADMIN",
+                    "ADMIN",
+                    "STUDENT"
+                  ],
                   "type": "string"
                 },
                 "status": {
-                  "enum": ["ACTIVE", "INVITED", "INVITE_EXPIRED", "DEACTIVATED"],
+                  "enum": [
+                    "ACTIVE",
+                    "INVITED",
+                    "INVITE_EXPIRED",
+                    "DEACTIVATED"
+                  ],
                   "type": "string"
                 }
               },
@@ -254,7 +297,12 @@
             "type": "integer"
           }
         },
-        "required": ["items", "total", "page", "pageSize"],
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
         "type": "object"
       },
       "AdminMeResponseDto": {
@@ -273,15 +321,26 @@
                 "type": "boolean"
               },
               "role": {
-                "enum": ["SUPER_ADMIN", "ADMIN", "STUDENT"],
+                "enum": [
+                  "SUPER_ADMIN",
+                  "ADMIN",
+                  "STUDENT"
+                ],
                 "type": "string"
               }
             },
-            "required": ["id", "email", "role", "mustChangePassword"],
+            "required": [
+              "id",
+              "email",
+              "role",
+              "mustChangePassword"
+            ],
             "type": "object"
           }
         },
-        "required": ["user"],
+        "required": [
+          "user"
+        ],
         "type": "object"
       },
       "AdminSignInRequestDto": {
@@ -295,7 +354,10 @@
             "type": "string"
           }
         },
-        "required": ["email", "password"],
+        "required": [
+          "email",
+          "password"
+        ],
         "type": "object"
       },
       "AdminSummaryDto": {
@@ -326,11 +388,20 @@
             "type": "string"
           },
           "role": {
-            "enum": ["SUPER_ADMIN", "ADMIN", "STUDENT"],
+            "enum": [
+              "SUPER_ADMIN",
+              "ADMIN",
+              "STUDENT"
+            ],
             "type": "string"
           },
           "status": {
-            "enum": ["ACTIVE", "INVITED", "INVITE_EXPIRED", "DEACTIVATED"],
+            "enum": [
+              "ACTIVE",
+              "INVITED",
+              "INVITE_EXPIRED",
+              "DEACTIVATED"
+            ],
             "type": "string"
           }
         },
@@ -361,7 +432,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "title"],
+                  "required": [
+                    "id",
+                    "title"
+                  ],
                   "type": "object"
                 },
                 "department": {
@@ -375,7 +449,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "name"],
+                  "required": [
+                    "id",
+                    "name"
+                  ],
                   "type": "object"
                 },
                 "faculty": {
@@ -389,7 +466,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "name"],
+                  "required": [
+                    "id",
+                    "name"
+                  ],
                   "type": "object"
                 },
                 "id": {
@@ -414,7 +494,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["name", "email"],
+                  "required": [
+                    "name",
+                    "email"
+                  ],
                   "type": "object"
                 },
                 "university": {
@@ -428,7 +511,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "name"],
+                  "required": [
+                    "id",
+                    "name"
+                  ],
                   "type": "object"
                 },
                 "verifiedAt": {
@@ -469,7 +555,12 @@
             "type": "integer"
           }
         },
-        "required": ["items", "total", "page", "pageSize"],
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
         "type": "object"
       },
       "ApproveEnrollmentRequestDto": {
@@ -498,7 +589,9 @@
             "type": "string"
           }
         },
-        "required": ["ids"],
+        "required": [
+          "ids"
+        ],
         "type": "object"
       },
       "ApprovedEnrollmentDto": {
@@ -519,11 +612,18 @@
             "type": "string"
           },
           "status": {
-            "enum": ["APPROVED"],
+            "enum": [
+              "APPROVED"
+            ],
             "type": "string"
           }
         },
-        "required": ["id", "status", "courseRevisionId", "approvedAt"],
+        "required": [
+          "id",
+          "status",
+          "courseRevisionId",
+          "approvedAt"
+        ],
         "type": "object"
       },
       "AuditLogListResponseDto": {
@@ -619,7 +719,12 @@
             "type": "integer"
           }
         },
-        "required": ["items", "total", "page", "pageSize"],
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
         "type": "object"
       },
       "BulkApprovalResponseDto": {
@@ -696,7 +801,10 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "code"],
+              "required": [
+                "id",
+                "code"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -710,7 +818,10 @@
             "type": "array"
           }
         },
-        "required": ["succeeded", "failed"],
+        "required": [
+          "succeeded",
+          "failed"
+        ],
         "type": "object"
       },
       "CaptchaRequestDto": {
@@ -740,7 +851,11 @@
             "type": "string"
           }
         },
-        "required": ["id", "svg", "expiresInSeconds"],
+        "required": [
+          "id",
+          "svg",
+          "expiresInSeconds"
+        ],
         "type": "object"
       },
       "CertificateListResponseDto": {
@@ -774,7 +889,11 @@
                   "type": "string"
                 },
                 "status": {
-                  "enum": ["READY", "PENDING", "REVOKED"],
+                  "enum": [
+                    "READY",
+                    "PENDING",
+                    "REVOKED"
+                  ],
                   "type": "string"
                 },
                 "verificationUrl": {
@@ -797,7 +916,9 @@
             "type": "array"
           }
         },
-        "required": ["certificates"],
+        "required": [
+          "certificates"
+        ],
         "type": "object"
       },
       "ChangePasswordRequestDto": {
@@ -813,7 +934,10 @@
             "type": "string"
           }
         },
-        "required": ["currentPassword", "newPassword"],
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
         "type": "object"
       },
       "ChangeStudentPasswordRequestDto": {
@@ -833,7 +957,11 @@
             "type": "string"
           }
         },
-        "required": ["currentPassword", "code", "newPassword"],
+        "required": [
+          "currentPassword",
+          "code",
+          "newPassword"
+        ],
         "type": "object"
       },
       "ContactSettingsRequestDto": {
@@ -857,7 +985,13 @@
             "type": "string"
           }
         },
-        "required": ["organisation", "address", "email", "phone", "officeHours"],
+        "required": [
+          "organisation",
+          "address",
+          "email",
+          "phone",
+          "officeHours"
+        ],
         "type": "object"
       },
       "CourseListResponseDto": {
@@ -890,7 +1024,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "number", "publishedAt"],
+                  "required": [
+                    "id",
+                    "number",
+                    "publishedAt"
+                  ],
                   "type": "object"
                 },
                 "description": {
@@ -924,7 +1062,10 @@
                   "type": "string"
                 },
                 "status": {
-                  "enum": ["DRAFT", "PUBLISHED"],
+                  "enum": [
+                    "DRAFT",
+                    "PUBLISHED"
+                  ],
                   "type": "string"
                 },
                 "thumbnailAssetId": {
@@ -976,7 +1117,12 @@
             "type": "integer"
           }
         },
-        "required": ["items", "total", "page", "pageSize"],
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
         "type": "object"
       },
       "CourseSummaryDto": {
@@ -1006,7 +1152,11 @@
                 "type": "string"
               }
             },
-            "required": ["id", "number", "publishedAt"],
+            "required": [
+              "id",
+              "number",
+              "publishedAt"
+            ],
             "type": "object"
           },
           "description": {
@@ -1040,7 +1190,10 @@
             "type": "string"
           },
           "status": {
-            "enum": ["DRAFT", "PUBLISHED"],
+            "enum": [
+              "DRAFT",
+              "PUBLISHED"
+            ],
             "type": "string"
           },
           "thumbnailAssetId": {
@@ -1098,7 +1251,10 @@
             "type": "string"
           }
         },
-        "required": ["title", "slug"],
+        "required": [
+          "title",
+          "slug"
+        ],
         "type": "object"
       },
       "CreateDepartmentRequestDto": {
@@ -1117,7 +1273,11 @@
             "type": "string"
           }
         },
-        "required": ["name", "universityId", "facultyId"],
+        "required": [
+          "name",
+          "universityId",
+          "facultyId"
+        ],
         "type": "object"
       },
       "CreateFacultyRequestDto": {
@@ -1126,7 +1286,9 @@
             "type": "string"
           }
         },
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "CreateModuleRequestDto": {
@@ -1142,7 +1304,9 @@
             "type": "string"
           }
         },
-        "required": ["title"],
+        "required": [
+          "title"
+        ],
         "type": "object"
       },
       "CreateTagRequestDto": {
@@ -1151,7 +1315,9 @@
             "type": "string"
           }
         },
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "CreateUniversityRequestDto": {
@@ -1160,7 +1326,9 @@
             "type": "string"
           }
         },
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "CreateVideoSlotRequestDto": {
@@ -1173,7 +1341,9 @@
             "type": "string"
           }
         },
-        "required": ["title"],
+        "required": [
+          "title"
+        ],
         "type": "object"
       },
       "CsrfTokenResponseDto": {
@@ -1182,7 +1352,9 @@
             "type": "string"
           }
         },
-        "required": ["token"],
+        "required": [
+          "token"
+        ],
         "type": "object"
       },
       "DashboardResponseDto": {
@@ -1200,11 +1372,18 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": ["READY", "PENDING", "REVOKED"],
+                      "enum": [
+                        "READY",
+                        "PENDING",
+                        "REVOKED"
+                      ],
                       "type": "string"
                     }
                   },
-                  "required": ["id", "status"],
+                  "required": [
+                    "id",
+                    "status"
+                  ],
                   "type": "object"
                 },
                 "courseId": {
@@ -1246,7 +1425,13 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "order", "title", "resumeVideoId", "resumePositionSeconds"],
+                  "required": [
+                    "id",
+                    "order",
+                    "title",
+                    "resumeVideoId",
+                    "resumePositionSeconds"
+                  ],
                   "type": "object"
                 },
                 "progress": {
@@ -1268,7 +1453,11 @@
                       "type": "integer"
                     }
                   },
-                  "required": ["modulesCompleted", "modulesTotal", "percent"],
+                  "required": [
+                    "modulesCompleted",
+                    "modulesTotal",
+                    "percent"
+                  ],
                   "type": "object"
                 },
                 "reason": {
@@ -1304,7 +1493,9 @@
             "type": "array"
           }
         },
-        "required": ["courses"],
+        "required": [
+          "courses"
+        ],
         "type": "object"
       },
       "DepartmentListResponseDto": {
@@ -1334,7 +1525,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "name"],
+                  "required": [
+                    "id",
+                    "name"
+                  ],
                   "type": "object"
                 },
                 "id": {
@@ -1364,7 +1558,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "name"],
+                  "required": [
+                    "id",
+                    "name"
+                  ],
                   "type": "object"
                 },
                 "updatedAt": {
@@ -1404,7 +1601,12 @@
             "type": "integer"
           }
         },
-        "required": ["items", "total", "page", "pageSize"],
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
         "type": "object"
       },
       "DepartmentSummaryDto": {
@@ -1431,7 +1633,10 @@
                 "type": "string"
               }
             },
-            "required": ["id", "name"],
+            "required": [
+              "id",
+              "name"
+            ],
             "type": "object"
           },
           "id": {
@@ -1461,7 +1666,10 @@
                 "type": "string"
               }
             },
-            "required": ["id", "name"],
+            "required": [
+              "id",
+              "name"
+            ],
             "type": "object"
           },
           "updatedAt": {
@@ -1497,23 +1705,32 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "name"],
+              "required": [
+                "id",
+                "name"
+              ],
               "type": "object"
             },
             "type": "array"
           }
         },
-        "required": ["items"],
+        "required": [
+          "items"
+        ],
         "type": "object"
       },
       "EnrollmentAcceptedResponseDto": {
         "properties": {
           "accepted": {
-            "enum": [true],
+            "enum": [
+              true
+            ],
             "type": "boolean"
           }
         },
-        "required": ["accepted"],
+        "required": [
+          "accepted"
+        ],
         "type": "object"
       },
       "EnrollmentRequestDto": {
@@ -1630,7 +1847,10 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "name"],
+                    "required": [
+                      "id",
+                      "name"
+                    ],
                     "type": "object"
                   },
                   "type": "array"
@@ -1671,7 +1891,12 @@
             "type": "integer"
           }
         },
-        "required": ["items", "total", "page", "pageSize"],
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
         "type": "object"
       },
       "FacultySummaryDto": {
@@ -1717,7 +1942,10 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "name"],
+              "required": [
+                "id",
+                "name"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -1743,11 +1971,15 @@
       "HealthResponseDto": {
         "properties": {
           "status": {
-            "enum": ["ok"],
+            "enum": [
+              "ok"
+            ],
             "type": "string"
           }
         },
-        "required": ["status"],
+        "required": [
+          "status"
+        ],
         "type": "object"
       },
       "InvitationLookupRequestDto": {
@@ -1758,7 +1990,9 @@
             "type": "string"
           }
         },
-        "required": ["token"],
+        "required": [
+          "token"
+        ],
         "type": "object"
       },
       "InvitationLookupResponseDto": {
@@ -1767,11 +2001,17 @@
             "type": "string"
           },
           "status": {
-            "enum": ["VALID", "EXPIRED", "INVALID"],
+            "enum": [
+              "VALID",
+              "EXPIRED",
+              "INVALID"
+            ],
             "type": "string"
           }
         },
-        "required": ["status"],
+        "required": [
+          "status"
+        ],
         "type": "object"
       },
       "InviteAdminRequestDto": {
@@ -1780,7 +2020,9 @@
             "type": "string"
           }
         },
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "type": "object"
       },
       "LandingOverviewRequestDto": {
@@ -1801,11 +2043,18 @@
             "type": "string"
           },
           "schemaVersion": {
-            "enum": [1],
+            "enum": [
+              1
+            ],
             "type": "number"
           }
         },
-        "required": ["heading", "schemaVersion", "body", "imageAssetId"],
+        "required": [
+          "heading",
+          "schemaVersion",
+          "body",
+          "imageAssetId"
+        ],
         "type": "object"
       },
       "LearningStructureResponseDto": {
@@ -1824,7 +2073,11 @@
                 "type": "string"
               }
             },
-            "required": ["id", "slug", "title"],
+            "required": [
+              "id",
+              "slug",
+              "title"
+            ],
             "type": "object"
           },
           "enrollment": {
@@ -1847,7 +2100,10 @@
                 "type": "string"
               }
             },
-            "required": ["status", "reason"],
+            "required": [
+              "status",
+              "reason"
+            ],
             "type": "object"
           },
           "learning": {
@@ -1878,7 +2134,11 @@
                             "type": "string"
                           }
                         },
-                        "required": ["id", "order", "title"],
+                        "required": [
+                          "id",
+                          "order",
+                          "title"
+                        ],
                         "type": "object"
                       },
                       "type": "array"
@@ -1909,7 +2169,13 @@
                           "type": "integer"
                         },
                         "availability": {
-                          "enum": ["UNAVAILABLE", "AVAILABLE", "WAITING", "EXHAUSTED", "PASSED"],
+                          "enum": [
+                            "UNAVAILABLE",
+                            "AVAILABLE",
+                            "WAITING",
+                            "EXHAUSTED",
+                            "PASSED"
+                          ],
                           "type": "string"
                         },
                         "id": {
@@ -1956,7 +2222,13 @@
                       "type": "integer"
                     },
                     "state": {
-                      "enum": ["LOCKED", "UNLOCKED", "IN_PROGRESS", "QUIZ_READY", "COMPLETED"],
+                      "enum": [
+                        "LOCKED",
+                        "UNLOCKED",
+                        "IN_PROGRESS",
+                        "QUIZ_READY",
+                        "COMPLETED"
+                      ],
                       "type": "string"
                     },
                     "title": {
@@ -1995,7 +2267,12 @@
                             "type": "integer"
                           },
                           "status": {
-                            "enum": ["UNAVAILABLE", "NOT_STARTED", "IN_PROGRESS", "COMPLETED"],
+                            "enum": [
+                              "UNAVAILABLE",
+                              "NOT_STARTED",
+                              "IN_PROGRESS",
+                              "COMPLETED"
+                            ],
                             "type": "string"
                           },
                           "title": {
@@ -2046,7 +2323,10 @@
                     "type": "integer"
                   }
                 },
-                "required": ["id", "number"],
+                "required": [
+                  "id",
+                  "number"
+                ],
                 "type": "object"
               },
               "summary": {
@@ -2082,11 +2362,19 @@
                 "type": "object"
               }
             },
-            "required": ["revision", "summary", "modules"],
+            "required": [
+              "revision",
+              "summary",
+              "modules"
+            ],
             "type": "object"
           }
         },
-        "required": ["course", "enrollment", "learning"],
+        "required": [
+          "course",
+          "enrollment",
+          "learning"
+        ],
         "type": "object"
       },
       "LessonBodyRequestDto": {
@@ -2096,11 +2384,16 @@
             "type": "object"
           },
           "schemaVersion": {
-            "enum": [1],
+            "enum": [
+              1
+            ],
             "type": "number"
           }
         },
-        "required": ["schemaVersion", "body"],
+        "required": [
+          "schemaVersion",
+          "body"
+        ],
         "type": "object"
       },
       "LessonBodyResponseDto": {
@@ -2129,7 +2422,11 @@
                   "type": "string"
                 }
               },
-              "required": ["assetId", "url", "alt"],
+              "required": [
+                "assetId",
+                "url",
+                "alt"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -2143,7 +2440,13 @@
             "type": "string"
           }
         },
-        "required": ["id", "title", "schemaVersion", "body", "images"],
+        "required": [
+          "id",
+          "title",
+          "schemaVersion",
+          "body",
+          "images"
+        ],
         "type": "object"
       },
       "LessonContentResponseDto": {
@@ -2165,7 +2468,11 @@
                 "type": "string"
               }
             },
-            "required": ["id", "title", "objectives"],
+            "required": [
+              "id",
+              "title",
+              "objectives"
+            ],
             "type": "object"
           },
           "sections": {
@@ -2195,7 +2502,11 @@
                         "type": "string"
                       }
                     },
-                    "required": ["assetId", "url", "alt"],
+                    "required": [
+                      "assetId",
+                      "url",
+                      "alt"
+                    ],
                     "type": "object"
                   },
                   "type": "array"
@@ -2214,13 +2525,23 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "order", "title", "schemaVersion", "body", "images"],
+              "required": [
+                "id",
+                "order",
+                "title",
+                "schemaVersion",
+                "body",
+                "images"
+              ],
               "type": "object"
             },
             "type": "array"
           }
         },
-        "required": ["module", "sections"],
+        "required": [
+          "module",
+          "sections"
+        ],
         "type": "object"
       },
       "LessonSectionRequestDto": {
@@ -2229,7 +2550,9 @@
             "type": "string"
           }
         },
-        "required": ["title"],
+        "required": [
+          "title"
+        ],
         "type": "object"
       },
       "MeResponseDto": {
@@ -2264,7 +2587,12 @@
                   "type": "string"
                 }
               },
-              "required": ["courseId", "courseSlug", "courseTitle", "status"],
+              "required": [
+                "courseId",
+                "courseSlug",
+                "courseTitle",
+                "status"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -2289,15 +2617,30 @@
                 "type": "string"
               },
               "role": {
-                "enum": ["SUPER_ADMIN", "ADMIN", "STUDENT"],
+                "enum": [
+                  "SUPER_ADMIN",
+                  "ADMIN",
+                  "STUDENT"
+                ],
                 "type": "string"
               }
             },
-            "required": ["id", "email", "role", "emailVerified", "mustChangePassword"],
+            "required": [
+              "id",
+              "email",
+              "role",
+              "emailVerified",
+              "mustChangePassword"
+            ],
             "type": "object"
           },
           "verificationEmail": {
-            "enum": ["ON_ITS_WAY", "SENT", "FAILED", null],
+            "enum": [
+              "ON_ITS_WAY",
+              "SENT",
+              "FAILED",
+              null
+            ],
             "nullable": true,
             "type": "string"
           },
@@ -2308,7 +2651,12 @@
             "type": "string"
           }
         },
-        "required": ["user", "enrollments", "verificationEmail", "verificationEmailSentAt"],
+        "required": [
+          "user",
+          "enrollments",
+          "verificationEmail",
+          "verificationEmailSentAt"
+        ],
         "type": "object"
       },
       "ModuleListResponseDto": {
@@ -2354,7 +2702,11 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "order", "title"],
+                    "required": [
+                      "id",
+                      "order",
+                      "title"
+                    ],
                     "type": "object"
                   },
                   "type": "array"
@@ -2385,7 +2737,10 @@
             "type": "boolean"
           }
         },
-        "required": ["items", "locked"],
+        "required": [
+          "items",
+          "locked"
+        ],
         "type": "object"
       },
       "ModuleSummaryDto": {
@@ -2428,7 +2783,11 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "order", "title"],
+              "required": [
+                "id",
+                "order",
+                "title"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -2442,7 +2801,15 @@
             "type": "string"
           }
         },
-        "required": ["id", "order", "title", "objectives", "sections", "createdAt", "updatedAt"],
+        "required": [
+          "id",
+          "order",
+          "title",
+          "objectives",
+          "sections",
+          "createdAt",
+          "updatedAt"
+        ],
         "type": "object"
       },
       "NewsAdminListResponseDto": {
@@ -2465,7 +2832,11 @@
                   "type": "string"
                 },
                 "status": {
-                  "enum": ["draft", "scheduled", "published"],
+                  "enum": [
+                    "draft",
+                    "scheduled",
+                    "published"
+                  ],
                   "type": "string"
                 },
                 "title": {
@@ -2477,7 +2848,14 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "slug", "title", "status", "publishedAt", "updatedAt"],
+              "required": [
+                "id",
+                "slug",
+                "title",
+                "status",
+                "publishedAt",
+                "updatedAt"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -2498,7 +2876,12 @@
             "type": "integer"
           }
         },
-        "required": ["items", "total", "page", "pageSize"],
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
         "type": "object"
       },
       "NewsAdminPostDto": {
@@ -2537,7 +2920,11 @@
                   "type": "string"
                 }
               },
-              "required": ["assetId", "url", "alt"],
+              "required": [
+                "assetId",
+                "url",
+                "alt"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -2557,7 +2944,11 @@
             "type": "string"
           },
           "status": {
-            "enum": ["draft", "scheduled", "published"],
+            "enum": [
+              "draft",
+              "scheduled",
+              "published"
+            ],
             "type": "string"
           },
           "title": {
@@ -2598,11 +2989,16 @@
             "type": "string"
           },
           "schemaVersion": {
-            "enum": [1],
+            "enum": [
+              1
+            ],
             "type": "number"
           },
           "status": {
-            "enum": ["draft", "published"],
+            "enum": [
+              "draft",
+              "published"
+            ],
             "type": "string"
           },
           "title": {
@@ -2611,7 +3007,12 @@
             "type": "string"
           }
         },
-        "required": ["title", "schemaVersion", "body", "status"],
+        "required": [
+          "title",
+          "schemaVersion",
+          "body",
+          "status"
+        ],
         "type": "object"
       },
       "NewsPublicListResponseDto": {
@@ -2634,7 +3035,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["assetId", "url", "alt"],
+                  "required": [
+                    "assetId",
+                    "url",
+                    "alt"
+                  ],
                   "type": "object"
                 },
                 "publishedAt": {
@@ -2652,7 +3057,13 @@
                   "type": "string"
                 }
               },
-              "required": ["slug", "title", "summary", "publishedAt", "cover"],
+              "required": [
+                "slug",
+                "title",
+                "summary",
+                "publishedAt",
+                "cover"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -2673,7 +3084,12 @@
             "type": "integer"
           }
         },
-        "required": ["items", "total", "page", "pageSize"],
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
         "type": "object"
       },
       "NewsPublicPostDto": {
@@ -2697,7 +3113,11 @@
                   "type": "string"
                 }
               },
-              "required": ["assetId", "url", "alt"],
+              "required": [
+                "assetId",
+                "url",
+                "alt"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -2719,7 +3139,14 @@
             "type": "string"
           }
         },
-        "required": ["slug", "title", "publishedAt", "schemaVersion", "body", "images"],
+        "required": [
+          "slug",
+          "title",
+          "publishedAt",
+          "schemaVersion",
+          "body",
+          "images"
+        ],
         "type": "object"
       },
       "PasswordCodeRequestedResponseDto": {
@@ -2731,7 +3158,9 @@
             "type": "integer"
           }
         },
-        "required": ["expiresInMinutes"],
+        "required": [
+          "expiresInMinutes"
+        ],
         "type": "object"
       },
       "PlaybackSessionResponseDto": {
@@ -2745,7 +3174,9 @@
                   "type": "string"
                 }
               },
-              "required": ["language"],
+              "required": [
+                "language"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -2770,7 +3201,13 @@
             "type": "string"
           }
         },
-        "required": ["expiresAt", "manifestPath", "sessionId", "resumePositionSeconds", "captions"],
+        "required": [
+          "expiresAt",
+          "manifestPath",
+          "sessionId",
+          "resumePositionSeconds",
+          "captions"
+        ],
         "type": "object"
       },
       "ProfileResponseDto": {
@@ -2792,7 +3229,10 @@
                 "type": "string"
               }
             },
-            "required": ["id", "name"],
+            "required": [
+              "id",
+              "name"
+            ],
             "type": "object"
           },
           "email": {
@@ -2812,7 +3252,10 @@
                 "type": "string"
               }
             },
-            "required": ["id", "name"],
+            "required": [
+              "id",
+              "name"
+            ],
             "type": "object"
           },
           "locked": {
@@ -2835,7 +3278,10 @@
                 "type": "string"
               }
             },
-            "required": ["id", "name"],
+            "required": [
+              "id",
+              "name"
+            ],
             "type": "object"
           }
         },
@@ -2873,7 +3319,10 @@
                   "type": "number"
                 }
               },
-              "required": ["start", "end"],
+              "required": [
+                "start",
+                "end"
+              ],
               "type": "object"
             },
             "maxItems": 64,
@@ -2895,7 +3344,12 @@
             "type": "string"
           }
         },
-        "required": ["sessionId", "sequence", "positionSeconds", "intervals"],
+        "required": [
+          "sessionId",
+          "sequence",
+          "positionSeconds",
+          "intervals"
+        ],
         "type": "object"
       },
       "ProgressResponseDto": {
@@ -2914,7 +3368,11 @@
             "type": "integer"
           }
         },
-        "required": ["coveragePercent", "resumePositionSeconds", "completed"],
+        "required": [
+          "coveragePercent",
+          "resumePositionSeconds",
+          "completed"
+        ],
         "type": "object"
       },
       "PublicContactSettingsResponseDto": {
@@ -2935,7 +3393,13 @@
             "type": "string"
           }
         },
-        "required": ["organisation", "address", "email", "phone", "officeHours"],
+        "required": [
+          "organisation",
+          "address",
+          "email",
+          "phone",
+          "officeHours"
+        ],
         "type": "object"
       },
       "PublicCourseResponseDto": {
@@ -2974,7 +3438,12 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "order", "title", "objectives"],
+              "required": [
+                "id",
+                "order",
+                "title",
+                "objectives"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -2997,14 +3466,25 @@
                 "type": "string"
               }
             },
-            "required": ["assetId", "url", "alt"],
+            "required": [
+              "assetId",
+              "url",
+              "alt"
+            ],
             "type": "object"
           },
           "title": {
             "type": "string"
           }
         },
-        "required": ["id", "slug", "title", "description", "thumbnail", "modules"],
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "description",
+          "thumbnail",
+          "modules"
+        ],
         "type": "object"
       },
       "PublicFrontPageResponseDto": {
@@ -3040,7 +3520,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["assetId", "url", "alt"],
+                  "required": [
+                    "assetId",
+                    "url",
+                    "alt"
+                  ],
                   "type": "object"
                 },
                 "thumbnailAssetId": {
@@ -3053,7 +3537,14 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "slug", "title", "description", "thumbnailAssetId", "thumbnail"],
+              "required": [
+                "id",
+                "slug",
+                "title",
+                "description",
+                "thumbnailAssetId",
+                "thumbnail"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -3076,13 +3567,21 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "title", "courseSlug", "courseTitle"],
+              "required": [
+                "id",
+                "title",
+                "courseSlug",
+                "courseTitle"
+              ],
               "type": "object"
             },
             "type": "array"
           }
         },
-        "required": ["courses", "modules"],
+        "required": [
+          "courses",
+          "modules"
+        ],
         "type": "object"
       },
       "PublicLandingOverviewResponseDto": {
@@ -3109,7 +3608,11 @@
                 "type": "string"
               }
             },
-            "required": ["assetId", "url", "alt"],
+            "required": [
+              "assetId",
+              "url",
+              "alt"
+            ],
             "type": "object"
           },
           "imageAssetId": {
@@ -3133,7 +3636,11 @@
                   "type": "string"
                 }
               },
-              "required": ["assetId", "url", "alt"],
+              "required": [
+                "assetId",
+                "url",
+                "alt"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -3144,17 +3651,32 @@
             "type": "integer"
           }
         },
-        "required": ["heading", "schemaVersion", "body", "imageAssetId", "image", "images"],
+        "required": [
+          "heading",
+          "schemaVersion",
+          "body",
+          "imageAssetId",
+          "image",
+          "images"
+        ],
         "type": "object"
       },
       "QuizAccessResponseDto": {
         "properties": {
           "moduleState": {
-            "enum": ["LOCKED", "UNLOCKED", "IN_PROGRESS", "QUIZ_READY", "COMPLETED"],
+            "enum": [
+              "LOCKED",
+              "UNLOCKED",
+              "IN_PROGRESS",
+              "QUIZ_READY",
+              "COMPLETED"
+            ],
             "type": "string"
           }
         },
-        "required": ["moduleState"],
+        "required": [
+          "moduleState"
+        ],
         "type": "object"
       },
       "QuizDeliveryResponseDto": {
@@ -3173,7 +3695,10 @@
                 "type": "string"
               }
             },
-            "required": ["id", "startedAt"],
+            "required": [
+              "id",
+              "startedAt"
+            ],
             "type": "object"
           },
           "attemptsAllowed": {
@@ -3209,7 +3734,12 @@
                 "type": "string"
               }
             },
-            "required": ["attemptId", "scorePercent", "passed", "submittedAt"],
+            "required": [
+              "attemptId",
+              "scorePercent",
+              "passed",
+              "submittedAt"
+            ],
             "type": "object"
           },
           "nextAttemptAt": {
@@ -3238,7 +3768,10 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "text"],
+                    "required": [
+                      "id",
+                      "text"
+                    ],
                     "type": "object"
                   },
                   "type": "array"
@@ -3252,7 +3785,12 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "order", "text", "options"],
+              "required": [
+                "id",
+                "order",
+                "text",
+                "options"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -3271,11 +3809,19 @@
                 "type": "integer"
               }
             },
-            "required": ["id", "passMarkPercent"],
+            "required": [
+              "id",
+              "passMarkPercent"
+            ],
             "type": "object"
           },
           "status": {
-            "enum": ["AVAILABLE", "WAITING", "EXHAUSTED", "PASSED"],
+            "enum": [
+              "AVAILABLE",
+              "WAITING",
+              "EXHAUSTED",
+              "PASSED"
+            ],
             "type": "string"
           }
         },
@@ -3310,7 +3856,10 @@
                   "type": "string"
                 }
               },
-              "required": ["text", "isCorrect"],
+              "required": [
+                "text",
+                "isCorrect"
+              ],
               "type": "object"
             },
             "maxItems": 6,
@@ -3324,11 +3873,16 @@
           },
           "type": {
             "default": "SINGLE_CHOICE",
-            "enum": ["SINGLE_CHOICE"],
+            "enum": [
+              "SINGLE_CHOICE"
+            ],
             "type": "string"
           }
         },
-        "required": ["text", "options"],
+        "required": [
+          "text",
+          "options"
+        ],
         "type": "object"
       },
       "QuizRulesRequestDto": {
@@ -3350,7 +3904,11 @@
             "type": "integer"
           }
         },
-        "required": ["passMarkPercent", "attemptLimit", "waitMinutes"],
+        "required": [
+          "passMarkPercent",
+          "attemptLimit",
+          "waitMinutes"
+        ],
         "type": "object"
       },
       "QuizSubmitRequestDto": {
@@ -3374,7 +3932,11 @@
             "type": "string"
           }
         },
-        "required": ["attemptId", "idempotencyKey", "answers"],
+        "required": [
+          "attemptId",
+          "idempotencyKey",
+          "answers"
+        ],
         "type": "object"
       },
       "QuizSubmitResponseDto": {
@@ -3462,7 +4024,12 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "order", "text", "isCorrect"],
+                    "required": [
+                      "id",
+                      "order",
+                      "text",
+                      "isCorrect"
+                    ],
                     "type": "object"
                   },
                   "type": "array"
@@ -3476,11 +4043,20 @@
                   "type": "string"
                 },
                 "type": {
-                  "enum": ["SINGLE_CHOICE"],
+                  "enum": [
+                    "SINGLE_CHOICE"
+                  ],
                   "type": "string"
                 }
               },
-              "required": ["id", "order", "type", "text", "explanation", "options"],
+              "required": [
+                "id",
+                "order",
+                "type",
+                "text",
+                "explanation",
+                "options"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -3504,11 +4080,20 @@
                 "type": "integer"
               }
             },
-            "required": ["passMarkPercent", "attemptLimit", "waitMinutes"],
+            "required": [
+              "passMarkPercent",
+              "attemptLimit",
+              "waitMinutes"
+            ],
             "type": "object"
           }
         },
-        "required": ["id", "rules", "questions", "locked"],
+        "required": [
+          "id",
+          "rules",
+          "questions",
+          "locked"
+        ],
         "type": "object"
       },
       "ReorderRequestDto": {
@@ -3532,7 +4117,10 @@
             "type": "array"
           }
         },
-        "required": ["previousIds", "orderedIds"],
+        "required": [
+          "previousIds",
+          "orderedIds"
+        ],
         "type": "object"
       },
       "ResourceAdminDto": {
@@ -3585,7 +4173,12 @@
                 "type": "string"
               }
             },
-            "required": ["assetId", "mimeType", "sizeBytes", "url"],
+            "required": [
+              "assetId",
+              "mimeType",
+              "sizeBytes",
+              "url"
+            ],
             "type": "object"
           },
           "id": {
@@ -3594,7 +4187,10 @@
             "type": "string"
           },
           "kind": {
-            "enum": ["file", "link"],
+            "enum": [
+              "file",
+              "link"
+            ],
             "type": "string"
           },
           "published": {
@@ -3684,7 +4280,12 @@
                       "type": "string"
                     }
                   },
-                  "required": ["assetId", "mimeType", "sizeBytes", "url"],
+                  "required": [
+                    "assetId",
+                    "mimeType",
+                    "sizeBytes",
+                    "url"
+                  ],
                   "type": "object"
                 },
                 "id": {
@@ -3693,7 +4294,10 @@
                   "type": "string"
                 },
                 "kind": {
-                  "enum": ["file", "link"],
+                  "enum": [
+                    "file",
+                    "link"
+                  ],
                   "type": "string"
                 },
                 "published": {
@@ -3748,7 +4352,12 @@
             "type": "integer"
           }
         },
-        "required": ["items", "total", "page", "pageSize"],
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
         "type": "object"
       },
       "ResourcePublicListResponseDto": {
@@ -3768,7 +4377,10 @@
                   "type": "string"
                 },
                 "kind": {
-                  "enum": ["file", "link"],
+                  "enum": [
+                    "file",
+                    "link"
+                  ],
                   "type": "string"
                 },
                 "mimeType": {
@@ -3790,13 +4402,23 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "kind", "title", "description", "url", "mimeType", "sizeBytes"],
+              "required": [
+                "id",
+                "kind",
+                "title",
+                "description",
+                "url",
+                "mimeType",
+                "sizeBytes"
+              ],
               "type": "object"
             },
             "type": "array"
           }
         },
-        "required": ["items"],
+        "required": [
+          "items"
+        ],
         "type": "object"
       },
       "ResourceRequestDto": {
@@ -3821,7 +4443,10 @@
             "type": "integer"
           },
           "kind": {
-            "enum": ["file", "link"],
+            "enum": [
+              "file",
+              "link"
+            ],
             "type": "string"
           },
           "mediaAssetId": {
@@ -3848,7 +4473,10 @@
             "type": "string"
           }
         },
-        "required": ["kind", "title"],
+        "required": [
+          "kind",
+          "title"
+        ],
         "type": "object"
       },
       "SetTagsRequestDto": {
@@ -3863,7 +4491,9 @@
             "type": "array"
           }
         },
-        "required": ["tagIds"],
+        "required": [
+          "tagIds"
+        ],
         "type": "object"
       },
       "SignInRequestDto": {
@@ -3877,7 +4507,10 @@
             "type": "string"
           }
         },
-        "required": ["email", "password"],
+        "required": [
+          "email",
+          "password"
+        ],
         "type": "object"
       },
       "SignedInEnrollmentRequestDto": {
@@ -3889,7 +4522,9 @@
             "type": "string"
           }
         },
-        "required": ["courseSlug"],
+        "required": [
+          "courseSlug"
+        ],
         "type": "object"
       },
       "SignedInEnrollmentResponseDto": {
@@ -3918,7 +4553,11 @@
             "type": "string"
           }
         },
-        "required": ["enrollmentId", "courseSlug", "status"],
+        "required": [
+          "enrollmentId",
+          "courseSlug",
+          "status"
+        ],
         "type": "object"
       },
       "TagDetailDto": {
@@ -3940,7 +4579,10 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "title"],
+              "required": [
+                "id",
+                "title"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -3983,7 +4625,12 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "title", "courseId", "courseTitle"],
+              "required": [
+                "id",
+                "title",
+                "courseId",
+                "courseTitle"
+              ],
               "type": "object"
             },
             "type": "array"
@@ -4069,7 +4716,9 @@
             "type": "array"
           }
         },
-        "required": ["items"],
+        "required": [
+          "items"
+        ],
         "type": "object"
       },
       "TagRefListResponseDto": {
@@ -4092,13 +4741,20 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "slug", "name", "isSystem"],
+              "required": [
+                "id",
+                "slug",
+                "name",
+                "isSystem"
+              ],
               "type": "object"
             },
             "type": "array"
           }
         },
-        "required": ["items"],
+        "required": [
+          "items"
+        ],
         "type": "object"
       },
       "TagSummaryDto": {
@@ -4225,7 +4881,12 @@
             "type": "integer"
           }
         },
-        "required": ["items", "total", "page", "pageSize"],
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
         "type": "object"
       },
       "UniversitySummaryDto": {
@@ -4306,7 +4967,10 @@
             "type": "string"
           }
         },
-        "required": ["title", "slug"],
+        "required": [
+          "title",
+          "slug"
+        ],
         "type": "object"
       },
       "UpdateDepartmentRequestDto": {
@@ -4325,7 +4989,11 @@
             "type": "string"
           }
         },
-        "required": ["name", "universityId", "facultyId"],
+        "required": [
+          "name",
+          "universityId",
+          "facultyId"
+        ],
         "type": "object"
       },
       "UpdateFacultyRequestDto": {
@@ -4334,7 +5002,9 @@
             "type": "string"
           }
         },
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "UpdateModuleRequestDto": {
@@ -4350,7 +5020,9 @@
             "type": "string"
           }
         },
-        "required": ["title"],
+        "required": [
+          "title"
+        ],
         "type": "object"
       },
       "UpdateProfileRequestDto": {
@@ -4378,7 +5050,13 @@
             "type": "string"
           }
         },
-        "required": ["name", "universityId", "facultyId", "departmentId", "session"],
+        "required": [
+          "name",
+          "universityId",
+          "facultyId",
+          "departmentId",
+          "session"
+        ],
         "type": "object"
       },
       "UpdateQuizQuestionRequestDto": {
@@ -4400,7 +5078,10 @@
                   "type": "string"
                 }
               },
-              "required": ["text", "isCorrect"],
+              "required": [
+                "text",
+                "isCorrect"
+              ],
               "type": "object"
             },
             "maxItems": 6,
@@ -4413,7 +5094,10 @@
             "type": "string"
           }
         },
-        "required": ["text", "options"],
+        "required": [
+          "text",
+          "options"
+        ],
         "type": "object"
       },
       "UpdateTagRequestDto": {
@@ -4422,7 +5106,9 @@
             "type": "string"
           }
         },
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "UpdateUniversityRequestDto": {
@@ -4431,7 +5117,9 @@
             "type": "string"
           }
         },
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "UpdateVideoSlotRequestDto": {
@@ -4443,17 +5131,24 @@
             "type": "string"
           }
         },
-        "required": ["title", "required"],
+        "required": [
+          "title",
+          "required"
+        ],
         "type": "object"
       },
       "VerificationAcceptedResponseDto": {
         "properties": {
           "accepted": {
-            "enum": [true],
+            "enum": [
+              true
+            ],
             "type": "boolean"
           }
         },
-        "required": ["accepted"],
+        "required": [
+          "accepted"
+        ],
         "type": "object"
       },
       "VerificationResendRequestDto": {
@@ -4472,7 +5167,11 @@
             "type": "string"
           }
         },
-        "required": ["email", "captchaId", "captchaAnswer"],
+        "required": [
+          "email",
+          "captchaId",
+          "captchaAnswer"
+        ],
         "type": "object"
       },
       "VerifyEmailRequestDto": {
@@ -4483,7 +5182,9 @@
             "type": "string"
           }
         },
-        "required": ["token"],
+        "required": [
+          "token"
+        ],
         "type": "object"
       },
       "VideoSlotListResponseDto": {
@@ -4498,7 +5199,9 @@
                 },
                 "captions": {
                   "items": {
-                    "enum": ["en"],
+                    "enum": [
+                      "en"
+                    ],
                     "type": "string"
                   },
                   "type": "array"
@@ -4576,7 +5279,10 @@
             "type": "boolean"
           }
         },
-        "required": ["items", "locked"],
+        "required": [
+          "items",
+          "locked"
+        ],
         "type": "object"
       }
     }
@@ -4608,7 +5314,9 @@
             "description": ""
           }
         },
-        "tags": ["admin-account"]
+        "tags": [
+          "admin-account"
+        ]
       }
     },
     "/api/admin/admins": {
@@ -4642,7 +5350,12 @@
             "name": "sort",
             "required": false,
             "schema": {
-              "enum": ["email", "-email", "createdAt", "-createdAt"],
+              "enum": [
+                "email",
+                "-email",
+                "createdAt",
+                "-createdAt"
+              ],
               "type": "string"
             }
           }
@@ -4659,7 +5372,9 @@
             "description": ""
           }
         },
-        "tags": ["admin-users"]
+        "tags": [
+          "admin-users"
+        ]
       },
       "post": {
         "operationId": "adminUsersInvite",
@@ -4686,7 +5401,9 @@
             "description": ""
           }
         },
-        "tags": ["admin-users"]
+        "tags": [
+          "admin-users"
+        ]
       }
     },
     "/api/admin/admins/{id}/deactivate": {
@@ -4716,7 +5433,9 @@
             "description": ""
           }
         },
-        "tags": ["admin-users"]
+        "tags": [
+          "admin-users"
+        ]
       }
     },
     "/api/admin/admins/{id}/reactivate": {
@@ -4746,7 +5465,9 @@
             "description": ""
           }
         },
-        "tags": ["admin-users"]
+        "tags": [
+          "admin-users"
+        ]
       }
     },
     "/api/admin/admins/{id}/resend-invitation": {
@@ -4776,7 +5497,9 @@
             "description": ""
           }
         },
-        "tags": ["admin-users"]
+        "tags": [
+          "admin-users"
+        ]
       }
     },
     "/api/admin/audit-log": {
@@ -4866,7 +5589,9 @@
             "description": ""
           }
         },
-        "tags": ["audit-log"]
+        "tags": [
+          "audit-log"
+        ]
       }
     },
     "/api/admin/auth/csrf": {
@@ -4885,7 +5610,9 @@
             "description": ""
           }
         },
-        "tags": ["admin-auth"]
+        "tags": [
+          "admin-auth"
+        ]
       }
     },
     "/api/admin/auth/invitations/accept": {
@@ -4907,7 +5634,9 @@
             "description": ""
           }
         },
-        "tags": ["admin-invitations"]
+        "tags": [
+          "admin-invitations"
+        ]
       }
     },
     "/api/admin/auth/invitations/lookup": {
@@ -4936,7 +5665,9 @@
             "description": ""
           }
         },
-        "tags": ["admin-invitations"]
+        "tags": [
+          "admin-invitations"
+        ]
       }
     },
     "/api/admin/auth/refresh": {
@@ -4948,7 +5679,9 @@
             "description": ""
           }
         },
-        "tags": ["admin-auth"]
+        "tags": [
+          "admin-auth"
+        ]
       }
     },
     "/api/admin/auth/sign-in": {
@@ -4977,7 +5710,9 @@
             "description": ""
           }
         },
-        "tags": ["admin-auth"]
+        "tags": [
+          "admin-auth"
+        ]
       }
     },
     "/api/admin/auth/sign-out": {
@@ -4989,7 +5724,9 @@
             "description": ""
           }
         },
-        "tags": ["admin-auth"]
+        "tags": [
+          "admin-auth"
+        ]
       }
     },
     "/api/admin/certificates/{id}/download": {
@@ -5020,7 +5757,9 @@
             "description": "Empty body; Nginx serves the PDF through X-Accel-Redirect"
           }
         },
-        "tags": ["certificates"]
+        "tags": [
+          "certificates"
+        ]
       }
     },
     "/api/admin/courses": {
@@ -5033,7 +5772,11 @@
             "required": false,
             "schema": {
               "default": "all",
-              "enum": ["all", "draft", "published"],
+              "enum": [
+                "all",
+                "draft",
+                "published"
+              ],
               "type": "string"
             }
           },
@@ -5064,7 +5807,14 @@
             "name": "sort",
             "required": false,
             "schema": {
-              "enum": ["title", "-title", "createdAt", "-createdAt", "updatedAt", "-updatedAt"],
+              "enum": [
+                "title",
+                "-title",
+                "createdAt",
+                "-createdAt",
+                "updatedAt",
+                "-updatedAt"
+              ],
               "type": "string"
             }
           },
@@ -5091,7 +5841,9 @@
             "description": ""
           }
         },
-        "tags": ["courses"]
+        "tags": [
+          "courses"
+        ]
       },
       "post": {
         "operationId": "coursesCreate",
@@ -5118,7 +5870,9 @@
             "description": ""
           }
         },
-        "tags": ["courses"]
+        "tags": [
+          "courses"
+        ]
       }
     },
     "/api/admin/courses/{id}": {
@@ -5141,7 +5895,9 @@
             "description": ""
           }
         },
-        "tags": ["courses"]
+        "tags": [
+          "courses"
+        ]
       },
       "get": {
         "operationId": "coursesGet",
@@ -5169,7 +5925,9 @@
             "description": ""
           }
         },
-        "tags": ["courses"]
+        "tags": [
+          "courses"
+        ]
       },
       "patch": {
         "operationId": "coursesUpdate",
@@ -5207,7 +5965,9 @@
             "description": ""
           }
         },
-        "tags": ["courses"]
+        "tags": [
+          "courses"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules": {
@@ -5237,7 +5997,9 @@
             "description": ""
           }
         },
-        "tags": ["modules"]
+        "tags": [
+          "modules"
+        ]
       },
       "post": {
         "operationId": "modulesCreate",
@@ -5275,7 +6037,9 @@
             "description": ""
           }
         },
-        "tags": ["modules"]
+        "tags": [
+          "modules"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/reorder": {
@@ -5315,7 +6079,9 @@
             "description": ""
           }
         },
-        "tags": ["modules"]
+        "tags": [
+          "modules"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}": {
@@ -5348,7 +6114,9 @@
             "description": ""
           }
         },
-        "tags": ["modules"]
+        "tags": [
+          "modules"
+        ]
       },
       "get": {
         "operationId": "modulesGet",
@@ -5386,7 +6154,9 @@
             "description": ""
           }
         },
-        "tags": ["modules"]
+        "tags": [
+          "modules"
+        ]
       },
       "patch": {
         "operationId": "modulesUpdate",
@@ -5434,7 +6204,9 @@
             "description": ""
           }
         },
-        "tags": ["modules"]
+        "tags": [
+          "modules"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/quiz": {
@@ -5474,7 +6246,9 @@
             "description": ""
           }
         },
-        "tags": ["quiz"]
+        "tags": [
+          "quiz"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/quiz/questions": {
@@ -5524,7 +6298,9 @@
             "description": ""
           }
         },
-        "tags": ["quiz"]
+        "tags": [
+          "quiz"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/quiz/questions/reorder": {
@@ -5574,7 +6350,9 @@
             "description": ""
           }
         },
-        "tags": ["quiz"]
+        "tags": [
+          "quiz"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/quiz/questions/{questionId}": {
@@ -5624,7 +6402,9 @@
             "description": ""
           }
         },
-        "tags": ["quiz"]
+        "tags": [
+          "quiz"
+        ]
       },
       "patch": {
         "operationId": "quizUpdateQuestion",
@@ -5682,7 +6462,9 @@
             "description": ""
           }
         },
-        "tags": ["quiz"]
+        "tags": [
+          "quiz"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/quiz/rules": {
@@ -5732,7 +6514,9 @@
             "description": ""
           }
         },
-        "tags": ["quiz"]
+        "tags": [
+          "quiz"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/sections": {
@@ -5782,7 +6566,9 @@
             "description": ""
           }
         },
-        "tags": ["lesson-sections"]
+        "tags": [
+          "lesson-sections"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/sections/reorder": {
@@ -5832,7 +6618,9 @@
             "description": ""
           }
         },
-        "tags": ["lesson-sections"]
+        "tags": [
+          "lesson-sections"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/sections/{sectionId}": {
@@ -5882,7 +6670,9 @@
             "description": ""
           }
         },
-        "tags": ["lesson-sections"]
+        "tags": [
+          "lesson-sections"
+        ]
       },
       "patch": {
         "operationId": "lessonSectionsUpdate",
@@ -5940,7 +6730,9 @@
             "description": ""
           }
         },
-        "tags": ["lesson-sections"]
+        "tags": [
+          "lesson-sections"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/sections/{sectionId}/body": {
@@ -5990,7 +6782,9 @@
             "description": ""
           }
         },
-        "tags": ["lesson-sections"]
+        "tags": [
+          "lesson-sections"
+        ]
       },
       "put": {
         "operationId": "lessonSectionsUpdateBody",
@@ -6048,7 +6842,9 @@
             "description": ""
           }
         },
-        "tags": ["lesson-sections"]
+        "tags": [
+          "lesson-sections"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/tags": {
@@ -6088,7 +6884,9 @@
             "description": ""
           }
         },
-        "tags": ["tags"]
+        "tags": [
+          "tags"
+        ]
       },
       "put": {
         "operationId": "tagAssignmentsSetModuleTags",
@@ -6136,7 +6934,9 @@
             "description": ""
           }
         },
-        "tags": ["tags"]
+        "tags": [
+          "tags"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/videos": {
@@ -6176,7 +6976,9 @@
             "description": ""
           }
         },
-        "tags": ["video-slots"]
+        "tags": [
+          "video-slots"
+        ]
       },
       "post": {
         "operationId": "videoSlotsCreate",
@@ -6224,7 +7026,9 @@
             "description": ""
           }
         },
-        "tags": ["video-slots"]
+        "tags": [
+          "video-slots"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/videos/reorder": {
@@ -6274,7 +7078,9 @@
             "description": ""
           }
         },
-        "tags": ["video-slots"]
+        "tags": [
+          "video-slots"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/videos/{videoId}": {
@@ -6324,7 +7130,9 @@
             "description": ""
           }
         },
-        "tags": ["video-slots"]
+        "tags": [
+          "video-slots"
+        ]
       },
       "patch": {
         "operationId": "videoSlotsUpdate",
@@ -6382,7 +7190,9 @@
             "description": ""
           }
         },
-        "tags": ["video-slots"]
+        "tags": [
+          "video-slots"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/videos/{videoId}/captions/{language}": {
@@ -6424,7 +7234,9 @@
             "name": "language",
             "required": true,
             "schema": {
-              "enum": ["en"],
+              "enum": [
+                "en"
+              ],
               "type": "string"
             }
           }
@@ -6434,7 +7246,9 @@
             "description": ""
           }
         },
-        "tags": ["video-slots"]
+        "tags": [
+          "video-slots"
+        ]
       }
     },
     "/api/admin/courses/{id}/modules/{moduleId}/videos/{videoId}/transcode/retry": {
@@ -6484,7 +7298,9 @@
             "description": ""
           }
         },
-        "tags": ["video-slots"]
+        "tags": [
+          "video-slots"
+        ]
       }
     },
     "/api/admin/courses/{id}/publish": {
@@ -6514,7 +7330,9 @@
             "description": ""
           }
         },
-        "tags": ["courses"]
+        "tags": [
+          "courses"
+        ]
       }
     },
     "/api/admin/courses/{id}/tags": {
@@ -6544,7 +7362,9 @@
             "description": ""
           }
         },
-        "tags": ["tags"]
+        "tags": [
+          "tags"
+        ]
       },
       "put": {
         "operationId": "tagAssignmentsSetCourseTags",
@@ -6582,7 +7402,9 @@
             "description": ""
           }
         },
-        "tags": ["tags"]
+        "tags": [
+          "tags"
+        ]
       }
     },
     "/api/admin/directory/departments": {
@@ -6595,7 +7417,11 @@
             "required": false,
             "schema": {
               "default": "active",
-              "enum": ["active", "archived", "all"],
+              "enum": [
+                "active",
+                "archived",
+                "all"
+              ],
               "type": "string"
             }
           },
@@ -6626,7 +7452,12 @@
             "name": "sort",
             "required": false,
             "schema": {
-              "enum": ["name", "-name", "createdAt", "-createdAt"],
+              "enum": [
+                "name",
+                "-name",
+                "createdAt",
+                "-createdAt"
+              ],
               "type": "string"
             }
           },
@@ -6673,7 +7504,9 @@
             "description": ""
           }
         },
-        "tags": ["departments"]
+        "tags": [
+          "departments"
+        ]
       },
       "post": {
         "operationId": "departmentsCreate",
@@ -6700,7 +7533,9 @@
             "description": ""
           }
         },
-        "tags": ["departments"]
+        "tags": [
+          "departments"
+        ]
       }
     },
     "/api/admin/directory/departments/{id}": {
@@ -6723,7 +7558,9 @@
             "description": ""
           }
         },
-        "tags": ["departments"]
+        "tags": [
+          "departments"
+        ]
       },
       "get": {
         "operationId": "departmentsGet",
@@ -6751,7 +7588,9 @@
             "description": ""
           }
         },
-        "tags": ["departments"]
+        "tags": [
+          "departments"
+        ]
       },
       "patch": {
         "operationId": "departmentsUpdate",
@@ -6789,7 +7628,9 @@
             "description": ""
           }
         },
-        "tags": ["departments"]
+        "tags": [
+          "departments"
+        ]
       }
     },
     "/api/admin/directory/departments/{id}/archive": {
@@ -6819,7 +7660,9 @@
             "description": ""
           }
         },
-        "tags": ["departments"]
+        "tags": [
+          "departments"
+        ]
       }
     },
     "/api/admin/directory/departments/{id}/restore": {
@@ -6849,7 +7692,9 @@
             "description": ""
           }
         },
-        "tags": ["departments"]
+        "tags": [
+          "departments"
+        ]
       }
     },
     "/api/admin/directory/faculties": {
@@ -6862,7 +7707,11 @@
             "required": false,
             "schema": {
               "default": "active",
-              "enum": ["active", "archived", "all"],
+              "enum": [
+                "active",
+                "archived",
+                "all"
+              ],
               "type": "string"
             }
           },
@@ -6893,7 +7742,12 @@
             "name": "sort",
             "required": false,
             "schema": {
-              "enum": ["name", "-name", "createdAt", "-createdAt"],
+              "enum": [
+                "name",
+                "-name",
+                "createdAt",
+                "-createdAt"
+              ],
               "type": "string"
             }
           },
@@ -6930,7 +7784,9 @@
             "description": ""
           }
         },
-        "tags": ["faculties"]
+        "tags": [
+          "faculties"
+        ]
       },
       "post": {
         "operationId": "facultiesCreate",
@@ -6957,7 +7813,9 @@
             "description": ""
           }
         },
-        "tags": ["faculties"]
+        "tags": [
+          "faculties"
+        ]
       }
     },
     "/api/admin/directory/faculties/{id}": {
@@ -6980,7 +7838,9 @@
             "description": ""
           }
         },
-        "tags": ["faculties"]
+        "tags": [
+          "faculties"
+        ]
       },
       "get": {
         "operationId": "facultiesGet",
@@ -7008,7 +7868,9 @@
             "description": ""
           }
         },
-        "tags": ["faculties"]
+        "tags": [
+          "faculties"
+        ]
       },
       "patch": {
         "operationId": "facultiesUpdate",
@@ -7046,7 +7908,9 @@
             "description": ""
           }
         },
-        "tags": ["faculties"]
+        "tags": [
+          "faculties"
+        ]
       }
     },
     "/api/admin/directory/faculties/{id}/archive": {
@@ -7076,7 +7940,9 @@
             "description": ""
           }
         },
-        "tags": ["faculties"]
+        "tags": [
+          "faculties"
+        ]
       }
     },
     "/api/admin/directory/faculties/{id}/restore": {
@@ -7106,7 +7972,9 @@
             "description": ""
           }
         },
-        "tags": ["faculties"]
+        "tags": [
+          "faculties"
+        ]
       }
     },
     "/api/admin/directory/faculties/{id}/universities/{universityId}": {
@@ -7146,7 +8014,9 @@
             "description": ""
           }
         },
-        "tags": ["faculties"]
+        "tags": [
+          "faculties"
+        ]
       },
       "put": {
         "operationId": "facultiesAssign",
@@ -7184,7 +8054,9 @@
             "description": ""
           }
         },
-        "tags": ["faculties"]
+        "tags": [
+          "faculties"
+        ]
       }
     },
     "/api/admin/directory/universities": {
@@ -7197,7 +8069,11 @@
             "required": false,
             "schema": {
               "default": "active",
-              "enum": ["active", "archived", "all"],
+              "enum": [
+                "active",
+                "archived",
+                "all"
+              ],
               "type": "string"
             }
           },
@@ -7228,7 +8104,12 @@
             "name": "sort",
             "required": false,
             "schema": {
-              "enum": ["name", "-name", "createdAt", "-createdAt"],
+              "enum": [
+                "name",
+                "-name",
+                "createdAt",
+                "-createdAt"
+              ],
               "type": "string"
             }
           },
@@ -7255,7 +8136,9 @@
             "description": ""
           }
         },
-        "tags": ["universities"]
+        "tags": [
+          "universities"
+        ]
       },
       "post": {
         "operationId": "universitiesCreate",
@@ -7282,7 +8165,9 @@
             "description": ""
           }
         },
-        "tags": ["universities"]
+        "tags": [
+          "universities"
+        ]
       }
     },
     "/api/admin/directory/universities/{id}": {
@@ -7305,7 +8190,9 @@
             "description": ""
           }
         },
-        "tags": ["universities"]
+        "tags": [
+          "universities"
+        ]
       },
       "get": {
         "operationId": "universitiesGet",
@@ -7333,7 +8220,9 @@
             "description": ""
           }
         },
-        "tags": ["universities"]
+        "tags": [
+          "universities"
+        ]
       },
       "patch": {
         "operationId": "universitiesUpdate",
@@ -7371,7 +8260,9 @@
             "description": ""
           }
         },
-        "tags": ["universities"]
+        "tags": [
+          "universities"
+        ]
       }
     },
     "/api/admin/directory/universities/{id}/archive": {
@@ -7401,7 +8292,9 @@
             "description": ""
           }
         },
-        "tags": ["universities"]
+        "tags": [
+          "universities"
+        ]
       }
     },
     "/api/admin/directory/universities/{id}/restore": {
@@ -7431,7 +8324,9 @@
             "description": ""
           }
         },
-        "tags": ["universities"]
+        "tags": [
+          "universities"
+        ]
       }
     },
     "/api/admin/enrollments/approve": {
@@ -7460,7 +8355,9 @@
             "description": ""
           }
         },
-        "tags": ["enrollment-approvals"]
+        "tags": [
+          "enrollment-approvals"
+        ]
       }
     },
     "/api/admin/enrollments/pending": {
@@ -7542,7 +8439,10 @@
             "required": false,
             "schema": {
               "default": "requestedAt",
-              "enum": ["requestedAt", "-requestedAt"],
+              "enum": [
+                "requestedAt",
+                "-requestedAt"
+              ],
               "type": "string"
             }
           },
@@ -7581,7 +8481,9 @@
             "description": ""
           }
         },
-        "tags": ["enrollment-approvals"]
+        "tags": [
+          "enrollment-approvals"
+        ]
       }
     },
     "/api/admin/enrollments/{id}/approve": {
@@ -7621,7 +8523,9 @@
             "description": ""
           }
         },
-        "tags": ["enrollment-approvals"]
+        "tags": [
+          "enrollment-approvals"
+        ]
       }
     },
     "/api/admin/front-page": {
@@ -7640,7 +8544,9 @@
             "description": ""
           }
         },
-        "tags": ["front-page"]
+        "tags": [
+          "front-page"
+        ]
       }
     },
     "/api/admin/front-page/courses/reorder": {
@@ -7669,7 +8575,9 @@
             "description": ""
           }
         },
-        "tags": ["front-page"]
+        "tags": [
+          "front-page"
+        ]
       }
     },
     "/api/admin/front-page/modules/reorder": {
@@ -7698,7 +8606,9 @@
             "description": ""
           }
         },
-        "tags": ["front-page"]
+        "tags": [
+          "front-page"
+        ]
       }
     },
     "/api/admin/me": {
@@ -7717,7 +8627,9 @@
             "description": ""
           }
         },
-        "tags": ["admin-me"]
+        "tags": [
+          "admin-me"
+        ]
       }
     },
     "/api/admin/news": {
@@ -7730,7 +8642,12 @@
             "required": false,
             "schema": {
               "default": "all",
-              "enum": ["all", "draft", "scheduled", "published"],
+              "enum": [
+                "all",
+                "draft",
+                "scheduled",
+                "published"
+              ],
               "type": "string"
             }
           },
@@ -7761,7 +8678,14 @@
             "name": "sort",
             "required": false,
             "schema": {
-              "enum": ["title", "-title", "publishedAt", "-publishedAt", "updatedAt", "-updatedAt"],
+              "enum": [
+                "title",
+                "-title",
+                "publishedAt",
+                "-publishedAt",
+                "updatedAt",
+                "-updatedAt"
+              ],
               "type": "string"
             }
           },
@@ -7788,7 +8712,9 @@
             "description": ""
           }
         },
-        "tags": ["news"]
+        "tags": [
+          "news"
+        ]
       },
       "post": {
         "operationId": "newsCreate",
@@ -7815,7 +8741,9 @@
             "description": ""
           }
         },
-        "tags": ["news"]
+        "tags": [
+          "news"
+        ]
       }
     },
     "/api/admin/news/{id}": {
@@ -7838,7 +8766,9 @@
             "description": ""
           }
         },
-        "tags": ["news"]
+        "tags": [
+          "news"
+        ]
       },
       "get": {
         "operationId": "newsGet",
@@ -7866,7 +8796,9 @@
             "description": ""
           }
         },
-        "tags": ["news"]
+        "tags": [
+          "news"
+        ]
       },
       "put": {
         "operationId": "newsUpdate",
@@ -7904,7 +8836,9 @@
             "description": ""
           }
         },
-        "tags": ["news"]
+        "tags": [
+          "news"
+        ]
       }
     },
     "/api/admin/playback-sessions/{videoId}": {
@@ -7934,7 +8868,9 @@
             "description": ""
           }
         },
-        "tags": ["playback"]
+        "tags": [
+          "playback"
+        ]
       }
     },
     "/api/admin/resources": {
@@ -7947,7 +8883,11 @@
             "required": false,
             "schema": {
               "default": "all",
-              "enum": ["all", "published", "unpublished"],
+              "enum": [
+                "all",
+                "published",
+                "unpublished"
+              ],
               "type": "string"
             }
           },
@@ -8012,7 +8952,9 @@
             "description": ""
           }
         },
-        "tags": ["resources"]
+        "tags": [
+          "resources"
+        ]
       },
       "post": {
         "operationId": "resourcesCreate",
@@ -8039,7 +8981,9 @@
             "description": ""
           }
         },
-        "tags": ["resources"]
+        "tags": [
+          "resources"
+        ]
       }
     },
     "/api/admin/resources/{id}": {
@@ -8062,7 +9006,9 @@
             "description": ""
           }
         },
-        "tags": ["resources"]
+        "tags": [
+          "resources"
+        ]
       },
       "get": {
         "operationId": "resourcesGet",
@@ -8090,7 +9036,9 @@
             "description": ""
           }
         },
-        "tags": ["resources"]
+        "tags": [
+          "resources"
+        ]
       },
       "put": {
         "operationId": "resourcesUpdate",
@@ -8128,7 +9076,9 @@
             "description": ""
           }
         },
-        "tags": ["resources"]
+        "tags": [
+          "resources"
+        ]
       }
     },
     "/api/admin/site-settings/contact": {
@@ -8147,7 +9097,9 @@
             "description": ""
           }
         },
-        "tags": ["site-settings"]
+        "tags": [
+          "site-settings"
+        ]
       },
       "put": {
         "operationId": "adminContactSettingsUpdate",
@@ -8174,7 +9126,9 @@
             "description": ""
           }
         },
-        "tags": ["site-settings"]
+        "tags": [
+          "site-settings"
+        ]
       }
     },
     "/api/admin/site-settings/landing-overview": {
@@ -8193,7 +9147,9 @@
             "description": ""
           }
         },
-        "tags": ["site-settings"]
+        "tags": [
+          "site-settings"
+        ]
       },
       "put": {
         "operationId": "adminSiteSettingsUpdate",
@@ -8220,7 +9176,9 @@
             "description": ""
           }
         },
-        "tags": ["site-settings"]
+        "tags": [
+          "site-settings"
+        ]
       }
     },
     "/api/admin/students/export": {
@@ -8317,7 +9275,9 @@
             "description": "The filtered student list as a streamed CSV file"
           }
         },
-        "tags": ["students"]
+        "tags": [
+          "students"
+        ]
       }
     },
     "/api/admin/tags": {
@@ -8336,7 +9296,9 @@
             "description": ""
           }
         },
-        "tags": ["tags"]
+        "tags": [
+          "tags"
+        ]
       },
       "post": {
         "operationId": "tagsCreate",
@@ -8363,7 +9325,9 @@
             "description": ""
           }
         },
-        "tags": ["tags"]
+        "tags": [
+          "tags"
+        ]
       }
     },
     "/api/admin/tags/{id}": {
@@ -8386,7 +9350,9 @@
             "description": ""
           }
         },
-        "tags": ["tags"]
+        "tags": [
+          "tags"
+        ]
       },
       "get": {
         "operationId": "tagsGet",
@@ -8414,7 +9380,9 @@
             "description": ""
           }
         },
-        "tags": ["tags"]
+        "tags": [
+          "tags"
+        ]
       },
       "patch": {
         "operationId": "tagsUpdate",
@@ -8452,7 +9420,9 @@
             "description": ""
           }
         },
-        "tags": ["tags"]
+        "tags": [
+          "tags"
+        ]
       }
     },
     "/api/auth/csrf": {
@@ -8471,7 +9441,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/auth/refresh": {
@@ -8483,7 +9455,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/auth/sign-in": {
@@ -8512,7 +9486,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/auth/sign-out": {
@@ -8524,7 +9500,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/auth/verify-email": {
@@ -8553,7 +9531,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/auth/verify-email/resend": {
@@ -8582,7 +9562,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/captcha": {
@@ -8611,7 +9593,9 @@
             "description": ""
           }
         },
-        "tags": ["captcha"]
+        "tags": [
+          "captcha"
+        ]
       }
     },
     "/api/certificates/{id}/download": {
@@ -8642,7 +9626,9 @@
             "description": "Empty body; Nginx serves the PDF through X-Accel-Redirect"
           }
         },
-        "tags": ["certificates"]
+        "tags": [
+          "certificates"
+        ]
       }
     },
     "/api/courses/{courseId}/learning-structure": {
@@ -8672,7 +9658,9 @@
             "description": ""
           }
         },
-        "tags": ["learning"]
+        "tags": [
+          "learning"
+        ]
       }
     },
     "/api/courses/{courseId}/modules/{moduleId}/lesson": {
@@ -8712,7 +9700,9 @@
             "description": ""
           }
         },
-        "tags": ["learning"]
+        "tags": [
+          "learning"
+        ]
       }
     },
     "/api/courses/{courseId}/modules/{moduleId}/quiz": {
@@ -8752,7 +9742,9 @@
             "description": ""
           }
         },
-        "tags": ["learning"]
+        "tags": [
+          "learning"
+        ]
       }
     },
     "/api/courses/{courseId}/modules/{moduleId}/quiz-access": {
@@ -8792,7 +9784,9 @@
             "description": ""
           }
         },
-        "tags": ["learning"]
+        "tags": [
+          "learning"
+        ]
       }
     },
     "/api/courses/{courseId}/modules/{moduleId}/quiz/attempts": {
@@ -8842,7 +9836,9 @@
             "description": ""
           }
         },
-        "tags": ["learning"]
+        "tags": [
+          "learning"
+        ]
       }
     },
     "/api/courses/{slug}": {
@@ -8872,7 +9868,9 @@
             "description": ""
           }
         },
-        "tags": ["courses"]
+        "tags": [
+          "courses"
+        ]
       }
     },
     "/api/directory/universities": {
@@ -8891,7 +9889,9 @@
             "description": ""
           }
         },
-        "tags": ["directory"]
+        "tags": [
+          "directory"
+        ]
       }
     },
     "/api/directory/universities/{universityId}/faculties": {
@@ -8921,7 +9921,9 @@
             "description": ""
           }
         },
-        "tags": ["directory"]
+        "tags": [
+          "directory"
+        ]
       }
     },
     "/api/directory/universities/{universityId}/faculties/{facultyId}/departments": {
@@ -8961,7 +9963,9 @@
             "description": ""
           }
         },
-        "tags": ["directory"]
+        "tags": [
+          "directory"
+        ]
       }
     },
     "/api/enrollment": {
@@ -8990,7 +9994,9 @@
             "description": ""
           }
         },
-        "tags": ["enrollment"]
+        "tags": [
+          "enrollment"
+        ]
       }
     },
     "/api/front-page": {
@@ -9009,7 +10015,9 @@
             "description": ""
           }
         },
-        "tags": ["front-page"]
+        "tags": [
+          "front-page"
+        ]
       }
     },
     "/api/health": {
@@ -9028,7 +10036,9 @@
             "description": ""
           }
         },
-        "tags": ["health"]
+        "tags": [
+          "health"
+        ]
       }
     },
     "/api/me": {
@@ -9047,7 +10057,9 @@
             "description": ""
           }
         },
-        "tags": ["me"]
+        "tags": [
+          "me"
+        ]
       }
     },
     "/api/me/certificates": {
@@ -9066,7 +10078,9 @@
             "description": ""
           }
         },
-        "tags": ["certificates"]
+        "tags": [
+          "certificates"
+        ]
       }
     },
     "/api/me/dashboard": {
@@ -9085,7 +10099,9 @@
             "description": ""
           }
         },
-        "tags": ["learning"]
+        "tags": [
+          "learning"
+        ]
       }
     },
     "/api/me/enrollments": {
@@ -9114,7 +10130,9 @@
             "description": ""
           }
         },
-        "tags": ["enrollment"]
+        "tags": [
+          "enrollment"
+        ]
       }
     },
     "/api/me/password": {
@@ -9136,7 +10154,9 @@
             "description": ""
           }
         },
-        "tags": ["me"]
+        "tags": [
+          "me"
+        ]
       }
     },
     "/api/me/password/code": {
@@ -9155,7 +10175,9 @@
             "description": ""
           }
         },
-        "tags": ["me"]
+        "tags": [
+          "me"
+        ]
       }
     },
     "/api/me/profile": {
@@ -9174,7 +10196,9 @@
             "description": ""
           }
         },
-        "tags": ["me"]
+        "tags": [
+          "me"
+        ]
       },
       "patch": {
         "operationId": "profileUpdate",
@@ -9201,7 +10225,9 @@
             "description": ""
           }
         },
-        "tags": ["me"]
+        "tags": [
+          "me"
+        ]
       }
     },
     "/api/news": {
@@ -9232,7 +10258,9 @@
             "description": ""
           }
         },
-        "tags": ["news"]
+        "tags": [
+          "news"
+        ]
       }
     },
     "/api/news/{slug}": {
@@ -9263,7 +10291,9 @@
             "description": ""
           }
         },
-        "tags": ["news"]
+        "tags": [
+          "news"
+        ]
       }
     },
     "/api/resources": {
@@ -9282,7 +10312,9 @@
             "description": ""
           }
         },
-        "tags": ["resources"]
+        "tags": [
+          "resources"
+        ]
       }
     },
     "/api/site-settings/contact": {
@@ -9301,7 +10333,9 @@
             "description": ""
           }
         },
-        "tags": ["site-settings"]
+        "tags": [
+          "site-settings"
+        ]
       }
     },
     "/api/site-settings/landing-overview": {
@@ -9320,7 +10354,9 @@
             "description": ""
           }
         },
-        "tags": ["site-settings"]
+        "tags": [
+          "site-settings"
+        ]
       }
     },
     "/api/videos/{id}/playback-session": {
@@ -9350,7 +10386,9 @@
             "description": ""
           }
         },
-        "tags": ["playback"]
+        "tags": [
+          "playback"
+        ]
       }
     },
     "/api/videos/{id}/playback-session/refresh": {
@@ -9380,7 +10418,9 @@
             "description": ""
           }
         },
-        "tags": ["playback"]
+        "tags": [
+          "playback"
+        ]
       }
     },
     "/api/videos/{id}/progress": {
@@ -9420,7 +10460,9 @@
             "description": ""
           }
         },
-        "tags": ["playback"]
+        "tags": [
+          "playback"
+        ]
       }
     }
   },
