@@ -29,6 +29,7 @@ import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui
 import type { DataTableColumn } from "@heat/ui/data";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { RotateCcwIcon, UserMinusIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { StudentRemovalSheet } from "./student-removal-sheet";
@@ -42,6 +43,7 @@ import {
   studentSortable,
   studentStatusFilterKey,
   studentStatusFilterOptions,
+  studentProfileHref,
   studentStatusLabels,
 } from "./student-copy";
 
@@ -139,7 +141,13 @@ export function StudentsView() {
         sortable: true,
         cell: (row) => (
           <div className="flex flex-col">
-            <strong>{row.student.name}</strong>
+            <Button
+              variant="link"
+              className="h-auto justify-start p-0"
+              render={<Link href={studentProfileHref(row.student.userId)} />}
+            >
+              {row.student.name}
+            </Button>
             <FieldDescription>{row.student.email}</FieldDescription>
           </div>
         ),

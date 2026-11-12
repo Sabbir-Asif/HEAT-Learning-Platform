@@ -99,6 +99,7 @@ import type {
   RemovedEnrollmentDto,
   ReorderRequestDto,
   SignInRequestDto,
+  StudentDetailResponseDto,
   StudentListListParams,
   StudentListResponseDto,
   UniversitiesListParams,
@@ -6438,6 +6439,101 @@ export function useStudentListList<TData = Awaited<ReturnType<typeof studentList
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getStudentListListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getStudentDetailGetUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/students/${id}`
+}
+
+export const studentDetailGet = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<StudentDetailResponseDto> => {
+
+  return customFetch<StudentDetailResponseDto>(getStudentDetailGetUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getStudentDetailGetQueryKey = (id: string,) => {
+    return [
+    `/api/admin/students/${id}`
+    ] as const;
+    }
+
+
+export const getStudentDetailGetQueryOptions = <TData = Awaited<ReturnType<typeof studentDetailGet>>, TError = ErrorType<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentDetailGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getStudentDetailGetQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentDetailGet>>> = ({ signal }) => studentDetailGet(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof studentDetailGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type StudentDetailGetQueryResult = NonNullable<Awaited<ReturnType<typeof studentDetailGet>>>
+export type StudentDetailGetQueryError = ErrorType<unknown>
+
+
+export function useStudentDetailGet<TData = Awaited<ReturnType<typeof studentDetailGet>>, TError = ErrorType<unknown>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentDetailGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof studentDetailGet>>,
+          TError,
+          Awaited<ReturnType<typeof studentDetailGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStudentDetailGet<TData = Awaited<ReturnType<typeof studentDetailGet>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentDetailGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof studentDetailGet>>,
+          TError,
+          Awaited<ReturnType<typeof studentDetailGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStudentDetailGet<TData = Awaited<ReturnType<typeof studentDetailGet>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentDetailGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useStudentDetailGet<TData = Awaited<ReturnType<typeof studentDetailGet>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentDetailGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getStudentDetailGetQueryOptions(id,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

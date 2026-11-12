@@ -1,6 +1,10 @@
 import { enrollmentStatuses } from "@heat/contracts";
 import { describe, expect, test } from "vitest";
 import {
+  attemptOutcomeLabel,
+  attemptScoreLabel,
+  certificateDownloadHref,
+  videoCoverageLabel,
   canReinstateStudent,
   canRemoveStudent,
   removalNotice,
@@ -41,5 +45,35 @@ describe("removal actions", () => {
   test("words the confirmation for each action", () => {
     expect(removalNotice("remove", "Amina")).toBe("Amina was removed from the course.");
     expect(removalNotice("reinstate", "Amina")).toBe("Amina was reinstated.");
+  });
+});
+
+describe("student detail copy", () => {
+  test("labels an attempt by whether it was submitted and passed", () => {
+    expect(attemptOutcomeLabel({ submittedAt: null, passed: false })).toBe("In progress");
+    expect(attemptOutcomeLabel({ submittedAt: "2026-11-01T00:00:00.000Z", passed: true })).toBe(
+      "Passed",
+    );
+    expect(attemptOutcomeLabel({ submittedAt: "2026-11-01T00:00:00.000Z", passed: false })).toBe(
+      "Failed",
+    );
+  });
+
+  test("shows the score beside the pass mark it was judged against", () => {
+    expect(attemptScoreLabel({ scorePercent: 60, passMarkSnapshot: 90 })).toBe(
+      "60% (pass mark 90%)",
+    );
+    expect(attemptScoreLabel({ scorePercent: null, passMarkSnapshot: 90 })).toBe("Not scored");
+  });
+
+  test("says when a video counts as complete under the 80 percent rule", () => {
+    expect(videoCoverageLabel({ coveragePercent: 85, meetsThreshold: true })).toBe(
+      "85% watched, counts as complete",
+    );
+    expect(videoCoverageLabel({ coveragePercent: 40, meetsThreshold: false })).toBe("40% watched");
+  });
+
+  test("downloads certificates through the admin route", () => {
+    expect(certificateDownloadHref("abc")).toBe("/api/admin/certificates/abc/download");
   });
 });
