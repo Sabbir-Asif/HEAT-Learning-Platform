@@ -7,9 +7,12 @@ const build = (user: unknown) => {
     enrollment: { findMany: vi.fn().mockResolvedValue([]) },
     module: { findMany: vi.fn().mockResolvedValue([]) },
   };
-  const service = new StudentDetailService(database as never, {
-    publicAppUrl: "https://heat.example",
-  } as never);
+  const service = new StudentDetailService(
+    database as never,
+    {
+      publicAppUrl: "https://heat.example",
+    } as never,
+  );
   return { database, service };
 };
 

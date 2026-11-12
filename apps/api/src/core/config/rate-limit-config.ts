@@ -47,10 +47,7 @@ export interface RateLimitConfig {
 
 export const ipWindowSeconds = 60;
 
-const ipOnlyProfiles: readonly RateLimitProfileName[] = [
-  "directoryLookup",
-  "certificateVerify",
-];
+const ipOnlyProfiles: readonly RateLimitProfileName[] = ["directoryLookup", "certificateVerify"];
 
 const defaults: Record<RateLimitProfileName, RateLimitProfile> = {
   signIn: { limit: 10, windowSeconds: 900, ipLimit: 1000 },

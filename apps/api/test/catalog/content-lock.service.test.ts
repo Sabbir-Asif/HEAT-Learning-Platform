@@ -5,12 +5,10 @@ const build = (lockedAt: Date | null, revisionPublishedAt: Date | null = new Dat
   const tx = {
     $queryRaw: vi.fn().mockResolvedValue([{ lockedAt }]),
     course: {
-      findUnique: vi
-        .fn()
-        .mockResolvedValue({
-          lockedAt,
-          revisions: [{ id: "revision-id", publishedAt: revisionPublishedAt }],
-        }),
+      findUnique: vi.fn().mockResolvedValue({
+        lockedAt,
+        revisions: [{ id: "revision-id", publishedAt: revisionPublishedAt }],
+      }),
       update: vi.fn().mockResolvedValue({}),
     },
   };
