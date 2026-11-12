@@ -20,6 +20,40 @@
         ],
         "type": "object"
       },
+      "AdminContactSettingsResponseDto": {
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "officeHours": {
+            "type": "string"
+          },
+          "organisation": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "nullable": true,
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organisation",
+          "address",
+          "email",
+          "phone",
+          "officeHours",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
       "AdminCsrfTokenResponseDto": {
         "properties": {
           "token": {
@@ -927,6 +961,36 @@
           "currentPassword",
           "code",
           "newPassword"
+        ],
+        "type": "object"
+      },
+      "ContactSettingsRequestDto": {
+        "properties": {
+          "address": {
+            "maxLength": 500,
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "officeHours": {
+            "maxLength": 300,
+            "type": "string"
+          },
+          "organisation": {
+            "maxLength": 160,
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "organisation",
+          "address",
+          "email",
+          "phone",
+          "officeHours"
         ],
         "type": "object"
       },
@@ -3308,6 +3372,33 @@
           "coveragePercent",
           "resumePositionSeconds",
           "completed"
+        ],
+        "type": "object"
+      },
+      "PublicContactSettingsResponseDto": {
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "officeHours": {
+            "type": "string"
+          },
+          "organisation": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "organisation",
+          "address",
+          "email",
+          "phone",
+          "officeHours"
         ],
         "type": "object"
       },
@@ -8426,6 +8517,56 @@
         ]
       }
     },
+    "/api/admin/site-settings/contact": {
+      "get": {
+        "operationId": "adminContactSettingsGet",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminContactSettingsResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "site-settings"
+        ]
+      },
+      "put": {
+        "operationId": "adminContactSettingsUpdate",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactSettingsRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminContactSettingsResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "site-settings"
+        ]
+      }
+    },
     "/api/admin/site-settings/landing-overview": {
       "get": {
         "operationId": "adminSiteSettingsGet",
@@ -9489,6 +9630,27 @@
         },
         "tags": [
           "news"
+        ]
+      }
+    },
+    "/api/site-settings/contact": {
+      "get": {
+        "operationId": "publicContactSettingsGet",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicContactSettingsResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "site-settings"
         ]
       }
     },

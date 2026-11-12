@@ -6,6 +6,7 @@
  */
 
 export * from './acceptInviteRequestDto';
+export * from './adminContactSettingsResponseDto';
 export * from './adminCsrfTokenResponseDto';
 export * from './adminFrontPageResponseDto';
 export * from './adminFrontPageResponseDtoCoursesItem';
@@ -53,6 +54,7 @@ export * from './certificateListResponseDtoCertificatesItem';
 export * from './certificateListResponseDtoCertificatesItemStatus';
 export * from './changePasswordRequestDto';
 export * from './changeStudentPasswordRequestDto';
+export * from './contactSettingsRequestDto';
 export * from './courseListResponseDto';
 export * from './courseListResponseDtoItemsItem';
 export * from './courseListResponseDtoItemsItemCurrentRevision';
@@ -178,6 +180,7 @@ export * from './profileResponseDtoUniversity';
 export * from './progressBatchDto';
 export * from './progressBatchDtoIntervalsItem';
 export * from './progressResponseDto';
+export * from './publicContactSettingsResponseDto';
 export * from './publicCourseResponseDto';
 export * from './publicCourseResponseDtoModulesItem';
 export * from './publicCourseResponseDtoThumbnail';

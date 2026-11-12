@@ -20,6 +20,7 @@ import type {
 
 import type {
   AcceptInviteRequestDto,
+  AdminContactSettingsResponseDto,
   AdminCsrfTokenResponseDto,
   AdminFrontPageResponseDto,
   AdminLandingOverviewResponseDto,
@@ -38,6 +39,7 @@ import type {
   CertificateListResponseDto,
   ChangePasswordRequestDto,
   ChangeStudentPasswordRequestDto,
+  ContactSettingsRequestDto,
   CourseListResponseDto,
   CourseSummaryDto,
   CreateCourseRequestDto,
@@ -79,6 +81,7 @@ import type {
   ProfileResponseDto,
   ProgressBatchDto,
   ProgressResponseDto,
+  PublicContactSettingsResponseDto,
   PublicCourseResponseDto,
   PublicFrontPageResponseDto,
   PublicLandingOverviewResponseDto,
@@ -274,6 +277,10 @@ export const getNewsUpdateResponseMock = (overrideResponse: Partial<Extract<News
 
 export const getAdminPlaybackPreviewResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({captions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({language: faker.string.alpha({length: {min: 1, max: 35}})})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', manifestPath: faker.string.alpha({length: {min: 10, max: 20}}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), sessionId: faker.helpers.arrayElement([faker.string.uuid(), null]), ...overrideResponse})
 
+export const getAdminContactSettingsGetResponseMock = (overrideResponse: Partial<Extract<AdminContactSettingsResponseDto, object>> = {}): AdminContactSettingsResponseDto => ({address: faker.string.alpha({length: {min: 10, max: 20}}), email: faker.string.alpha({length: {min: 10, max: 20}}), officeHours: faker.string.alpha({length: {min: 10, max: 20}}), organisation: faker.string.alpha({length: {min: 10, max: 20}}), phone: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), ...overrideResponse})
+
+export const getAdminContactSettingsUpdateResponseMock = (overrideResponse: Partial<Extract<AdminContactSettingsResponseDto, object>> = {}): AdminContactSettingsResponseDto => ({address: faker.string.alpha({length: {min: 10, max: 20}}), email: faker.string.alpha({length: {min: 10, max: 20}}), officeHours: faker.string.alpha({length: {min: 10, max: 20}}), organisation: faker.string.alpha({length: {min: 10, max: 20}}), phone: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), ...overrideResponse})
+
 export const getAdminSiteSettingsGetResponseMock = (overrideResponse: Partial<Extract<AdminLandingOverviewResponseDto, object>> = {}): AdminLandingOverviewResponseDto => ({body: {
         [faker.string.alphanumeric(5)]: {}
       }, heading: faker.string.alpha({length: {min: 10, max: 20}}), image: faker.helpers.arrayElement([{alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})},null,]), imageAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), updatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), ...overrideResponse})
@@ -347,6 +354,8 @@ export const getPublicNewsListResponseMock = (overrideResponse: Partial<Extract<
 export const getPublicNewsGetResponseMock = (overrideResponse: Partial<Extract<NewsPublicPostDto, object>> = {}): NewsPublicPostDto => ({body: {
         [faker.string.alphanumeric(5)]: {}
       }, images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), publishedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), slug: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
+
+export const getPublicContactSettingsGetResponseMock = (overrideResponse: Partial<Extract<PublicContactSettingsResponseDto, object>> = {}): PublicContactSettingsResponseDto => ({address: faker.string.alpha({length: {min: 10, max: 20}}), email: faker.string.alpha({length: {min: 10, max: 20}}), officeHours: faker.string.alpha({length: {min: 10, max: 20}}), organisation: faker.string.alpha({length: {min: 10, max: 20}}), phone: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
 export const getPublicSiteSettingsGetResponseMock = (overrideResponse: Partial<Extract<PublicLandingOverviewResponseDto, object>> = {}): PublicLandingOverviewResponseDto => ({body: {
         [faker.string.alphanumeric(5)]: {}
@@ -1358,6 +1367,30 @@ export const getAdminPlaybackPreviewMockHandler = (overrideResponse?: PlaybackSe
   }, options)
 }
 
+export const getAdminContactSettingsGetMockHandler = (overrideResponse?: AdminContactSettingsResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<AdminContactSettingsResponseDto> | AdminContactSettingsResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/site-settings/contact', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminContactSettingsGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getAdminContactSettingsUpdateMockHandler = (overrideResponse?: AdminContactSettingsResponseDto | ((info: Parameters<HttpResponseResolver<PathParams, ContactSettingsRequestDto>>[0]) => Promise<AdminContactSettingsResponseDto> | AdminContactSettingsResponseDto), options?: RequestHandlerOptions) => {
+  return http.put<PathParams, ContactSettingsRequestDto>('*/api/admin/site-settings/contact', async (info: Parameters<HttpResponseResolver<PathParams, ContactSettingsRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminContactSettingsUpdateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getAdminSiteSettingsGetMockHandler = (overrideResponse?: AdminLandingOverviewResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<AdminLandingOverviewResponseDto> | AdminLandingOverviewResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/admin/site-settings/landing-overview', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1795,6 +1828,18 @@ export const getPublicNewsGetMockHandler = (overrideResponse?: NewsPublicPostDto
   }, options)
 }
 
+export const getPublicContactSettingsGetMockHandler = (overrideResponse?: PublicContactSettingsResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<PublicContactSettingsResponseDto> | PublicContactSettingsResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/site-settings/contact', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPublicContactSettingsGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getPublicSiteSettingsGetMockHandler = (overrideResponse?: PublicLandingOverviewResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<PublicLandingOverviewResponseDto> | PublicLandingOverviewResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/site-settings/landing-overview', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1928,6 +1973,8 @@ export const getHeatLmsApiMock = () => [
   getNewsGetMockHandler(),
   getNewsUpdateMockHandler(),
   getAdminPlaybackPreviewMockHandler(),
+  getAdminContactSettingsGetMockHandler(),
+  getAdminContactSettingsUpdateMockHandler(),
   getAdminSiteSettingsGetMockHandler(),
   getAdminSiteSettingsUpdateMockHandler(),
   getTagsListMockHandler(),
@@ -1965,6 +2012,7 @@ export const getHeatLmsApiMock = () => [
   getProfileUpdateMockHandler(),
   getPublicNewsListMockHandler(),
   getPublicNewsGetMockHandler(),
+  getPublicContactSettingsGetMockHandler(),
   getPublicSiteSettingsGetMockHandler(),
   getStudentPlaybackStartMockHandler(),
   getStudentPlaybackRefreshMockHandler(),

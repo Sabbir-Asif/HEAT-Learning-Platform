@@ -3023,6 +3023,48 @@ export const AdminPlaybackPreviewResponse = zod.object({
 })
 
 
+export const adminContactSettingsGetResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const AdminContactSettingsGetResponse = zod.object({
+  "address": zod.string(),
+  "email": zod.string(),
+  "officeHours": zod.string(),
+  "organisation": zod.string(),
+  "phone": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(adminContactSettingsGetResponseUpdatedAtRegExp).nullable()
+})
+
+
+export const adminContactSettingsUpdateBodyAddressMax = 500;
+
+export const adminContactSettingsUpdateBodyOfficeHoursMax = 300;
+
+export const adminContactSettingsUpdateBodyOrganisationMax = 160;
+
+
+
+export const AdminContactSettingsUpdateBody = zod.object({
+  "address": zod.string().max(adminContactSettingsUpdateBodyAddressMax),
+  "email": zod.string(),
+  "officeHours": zod.string().max(adminContactSettingsUpdateBodyOfficeHoursMax),
+  "organisation": zod.string().max(adminContactSettingsUpdateBodyOrganisationMax),
+  "phone": zod.string()
+})
+
+export const adminContactSettingsUpdateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const AdminContactSettingsUpdateResponse = zod.object({
+  "address": zod.string(),
+  "email": zod.string(),
+  "officeHours": zod.string(),
+  "organisation": zod.string(),
+  "phone": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(adminContactSettingsUpdateResponseUpdatedAtRegExp).nullable()
+})
+
+
 export const adminSiteSettingsGetResponseImageAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const adminSiteSettingsGetResponseImageAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const adminSiteSettingsGetResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
@@ -4085,6 +4127,15 @@ export const PublicNewsGetResponse = zod.object({
   "schemaVersion": zod.int().min(1).max(publicNewsGetResponseSchemaVersionMax),
   "slug": zod.string(),
   "title": zod.string()
+})
+
+
+export const PublicContactSettingsGetResponse = zod.object({
+  "address": zod.string(),
+  "email": zod.string(),
+  "officeHours": zod.string(),
+  "organisation": zod.string(),
+  "phone": zod.string()
 })
 
 

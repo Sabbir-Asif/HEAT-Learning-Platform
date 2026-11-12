@@ -18,6 +18,19 @@ export interface AcceptInviteRequestDto {
   token: string;
 }
 
+export interface AdminContactSettingsResponseDto {
+  address: string;
+  email: string;
+  officeHours: string;
+  organisation: string;
+  phone: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  updatedAt: string | null;
+}
+
 export interface AdminCsrfTokenResponseDto {
   token: string;
 }
@@ -535,6 +548,17 @@ export interface ChangeStudentPasswordRequestDto {
      * @maxLength 256
      */
   newPassword: string;
+}
+
+export interface ContactSettingsRequestDto {
+  /** @maxLength 500 */
+  address: string;
+  email: string;
+  /** @maxLength 300 */
+  officeHours: string;
+  /** @maxLength 160 */
+  organisation: string;
+  phone: string;
 }
 
 /**
@@ -1837,6 +1861,14 @@ export interface ProgressResponseDto {
      * @maximum 9007199254740991
      */
   resumePositionSeconds: number;
+}
+
+export interface PublicContactSettingsResponseDto {
+  address: string;
+  email: string;
+  officeHours: string;
+  organisation: string;
+  phone: string;
 }
 
 export type PublicCourseResponseDtoModulesItem = {
@@ -5386,6 +5418,62 @@ export const adminPlaybackPreview = async (videoId: string, options?: Parameters
 
 
 
+export const getAdminContactSettingsGetUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/contact`
+}
+
+export const adminContactSettingsGet = async ( options?: Parameters<typeof serverFetch>[1]): Promise<AdminContactSettingsResponseDto> => {
+
+  return serverFetch<AdminContactSettingsResponseDto>(getAdminContactSettingsGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getAdminContactSettingsUpdateUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/contact`
+}
+
+export const adminContactSettingsUpdate = async (contactSettingsRequestDto: ContactSettingsRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminContactSettingsResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<AdminContactSettingsResponseDto>(getAdminContactSettingsUpdateUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(contactSettingsRequestDto)
+  }
+);}
+
+
+
 export const getAdminSiteSettingsGetUrl = () => {
 
 
@@ -6340,6 +6428,27 @@ export const getPublicNewsGetUrl = (slug: string,) => {
 export const publicNewsGet = async (slug: string, options?: Parameters<typeof serverFetch>[1]): Promise<NewsPublicPostDto> => {
 
   return serverFetch<NewsPublicPostDto>(getPublicNewsGetUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getPublicContactSettingsGetUrl = () => {
+
+
+
+
+  return `/api/site-settings/contact`
+}
+
+export const publicContactSettingsGet = async ( options?: Parameters<typeof serverFetch>[1]): Promise<PublicContactSettingsResponseDto> => {
+
+  return serverFetch<PublicContactSettingsResponseDto>(getPublicContactSettingsGetUrl(),
   {
     ...options,
     method: 'GET'

@@ -25,6 +25,7 @@ import type {
 
 import type {
   AcceptInviteRequestDto,
+  AdminContactSettingsResponseDto,
   AdminCsrfTokenResponseDto,
   AdminFrontPageResponseDto,
   AdminLandingOverviewResponseDto,
@@ -45,6 +46,7 @@ import type {
   CertificateListResponseDto,
   ChangePasswordRequestDto,
   ChangeStudentPasswordRequestDto,
+  ContactSettingsRequestDto,
   CourseListResponseDto,
   CourseSummaryDto,
   CoursesListParams,
@@ -91,6 +93,7 @@ import type {
   ProfileResponseDto,
   ProgressBatchDto,
   ProgressResponseDto,
+  PublicContactSettingsResponseDto,
   PublicCourseResponseDto,
   PublicFrontPageResponseDto,
   PublicLandingOverviewResponseDto,
@@ -7258,6 +7261,183 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getAdminPlaybackPreviewMutationOptions(options), queryClient);
     }
 
+export const getAdminContactSettingsGetUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/contact`
+}
+
+export const adminContactSettingsGet = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdminContactSettingsResponseDto> => {
+
+  return customFetch<AdminContactSettingsResponseDto>(getAdminContactSettingsGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminContactSettingsGetQueryKey = () => {
+    return [
+    `/api/admin/site-settings/contact`
+    ] as const;
+    }
+
+
+export const getAdminContactSettingsGetQueryOptions = <TData = Awaited<ReturnType<typeof adminContactSettingsGet>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminContactSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminContactSettingsGetQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminContactSettingsGet>>> = ({ signal }) => adminContactSettingsGet({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminContactSettingsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdminContactSettingsGetQueryResult = NonNullable<Awaited<ReturnType<typeof adminContactSettingsGet>>>
+export type AdminContactSettingsGetQueryError = ErrorType<unknown>
+
+
+export function useAdminContactSettingsGet<TData = Awaited<ReturnType<typeof adminContactSettingsGet>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminContactSettingsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminContactSettingsGet>>,
+          TError,
+          Awaited<ReturnType<typeof adminContactSettingsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminContactSettingsGet<TData = Awaited<ReturnType<typeof adminContactSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminContactSettingsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminContactSettingsGet>>,
+          TError,
+          Awaited<ReturnType<typeof adminContactSettingsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminContactSettingsGet<TData = Awaited<ReturnType<typeof adminContactSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminContactSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useAdminContactSettingsGet<TData = Awaited<ReturnType<typeof adminContactSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminContactSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdminContactSettingsGetQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getAdminContactSettingsUpdateUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/contact`
+}
+
+export const adminContactSettingsUpdate = async (contactSettingsRequestDto: ContactSettingsRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<AdminContactSettingsResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AdminContactSettingsResponseDto>(getAdminContactSettingsUpdateUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(contactSettingsRequestDto)
+  }
+);}
+
+
+
+
+
+export const getAdminContactSettingsUpdateMutationKey = () => ['adminContactSettingsUpdate'] as const;
+
+export const getAdminContactSettingsUpdateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminContactSettingsUpdate>>, TError,AdminContactSettingsUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminContactSettingsUpdate>>, TError,AdminContactSettingsUpdateMutationVariables, TContext> => {
+
+const mutationKey = getAdminContactSettingsUpdateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminContactSettingsUpdate>>, AdminContactSettingsUpdateMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminContactSettingsUpdate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminContactSettingsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof adminContactSettingsUpdate>>>
+    export type AdminContactSettingsUpdateMutationBody = ContactSettingsRequestDto
+    export type AdminContactSettingsUpdateMutationError = ErrorType<unknown>
+    export type AdminContactSettingsUpdateMutationVariables = {data: ContactSettingsRequestDto}
+
+    export const useAdminContactSettingsUpdate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminContactSettingsUpdate>>, TError,AdminContactSettingsUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminContactSettingsUpdate>>,
+        TError,
+        AdminContactSettingsUpdateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAdminContactSettingsUpdateMutationOptions(options), queryClient);
+    }
+
 export const getAdminSiteSettingsGetUrl = () => {
 
 
@@ -10540,6 +10720,101 @@ export function usePublicNewsGet<TData = Awaited<ReturnType<typeof publicNewsGet
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getPublicNewsGetQueryOptions(slug,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getPublicContactSettingsGetUrl = () => {
+
+
+
+
+  return `/api/site-settings/contact`
+}
+
+export const publicContactSettingsGet = async ( options?: Parameters<typeof customFetch>[1]): Promise<PublicContactSettingsResponseDto> => {
+
+  return customFetch<PublicContactSettingsResponseDto>(getPublicContactSettingsGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getPublicContactSettingsGetQueryKey = () => {
+    return [
+    `/api/site-settings/contact`
+    ] as const;
+    }
+
+
+export const getPublicContactSettingsGetQueryOptions = <TData = Awaited<ReturnType<typeof publicContactSettingsGet>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicContactSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPublicContactSettingsGetQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof publicContactSettingsGet>>> = ({ signal }) => publicContactSettingsGet({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof publicContactSettingsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PublicContactSettingsGetQueryResult = NonNullable<Awaited<ReturnType<typeof publicContactSettingsGet>>>
+export type PublicContactSettingsGetQueryError = ErrorType<unknown>
+
+
+export function usePublicContactSettingsGet<TData = Awaited<ReturnType<typeof publicContactSettingsGet>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicContactSettingsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof publicContactSettingsGet>>,
+          TError,
+          Awaited<ReturnType<typeof publicContactSettingsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePublicContactSettingsGet<TData = Awaited<ReturnType<typeof publicContactSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicContactSettingsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof publicContactSettingsGet>>,
+          TError,
+          Awaited<ReturnType<typeof publicContactSettingsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePublicContactSettingsGet<TData = Awaited<ReturnType<typeof publicContactSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicContactSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function usePublicContactSettingsGet<TData = Awaited<ReturnType<typeof publicContactSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicContactSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPublicContactSettingsGetQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
