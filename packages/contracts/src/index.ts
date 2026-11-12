@@ -19,6 +19,7 @@ export * from "./playback";
 export * from "./progress";
 export * from "./quiz-delivery";
 export * from "./quizzes";
+export * from "./rich-text";
 export * from "./tags";
 export * from "./verification";
 export * from "./videos";
