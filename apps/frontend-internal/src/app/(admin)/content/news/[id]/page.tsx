@@ -1,5 +1,6 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { NewsEditorView } from "@/news/news-editor-view";
 
-export default function Page() {
-  return <PlaceholderPage title="News article" />;
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <NewsEditorView id={id} />;
 }
