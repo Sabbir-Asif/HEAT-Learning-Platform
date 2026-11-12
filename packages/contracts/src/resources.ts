@@ -92,7 +92,10 @@ export const resourceFormSchema = z
     url: z.string().trim(),
     mediaAssetId: z.string(),
     courseId: z.string(),
-    displayOrder: z.string().trim().regex(/^\d{1,6}$/, "Enter a whole number, 0 or more."),
+    displayOrder: z
+      .string()
+      .trim()
+      .regex(/^\d{1,6}$/, "Enter a whole number, 0 or more."),
     published: z.boolean(),
   })
   .superRefine((value, context) => {
@@ -146,11 +149,11 @@ export const resourceAdminSchema = z.object({
   id: z.uuid(),
   kind: z.enum(resourceKinds),
   title: z.string(),
-  description: z.string().nullable(),
-  url: z.string().nullable(),
+  description: z.string().min(1).max(resourceDescriptionMaxLength).nullable(),
+  url: z.string().min(1).max(resourceUrlMaxLength).nullable(),
   file: resourceFileSchema.nullable(),
   courseId: z.uuid().nullable(),
-  courseTitle: z.string().nullable(),
+  courseTitle: z.string().min(1).max(200).nullable(),
   displayOrder: z.number().int(),
   published: z.boolean(),
   createdAt: z.iso.datetime(),
@@ -172,9 +175,9 @@ export const resourcePublicSchema = z.object({
   id: z.uuid(),
   kind: z.enum(resourceKinds),
   title: z.string(),
-  description: z.string().nullable(),
+  description: z.string().min(1).max(resourceDescriptionMaxLength).nullable(),
   url: z.string(),
-  mimeType: z.string().nullable(),
+  mimeType: z.string().min(1).max(200).nullable(),
   sizeBytes: z.number().int().nonnegative().nullable(),
 });
 
