@@ -1,3 +1,4 @@
+import { videoFailureReasonSchema, videoPollIntervalMs } from "@heat/contracts";
 import { describe, expect, test } from "vitest";
 import {
   moduleDeleteFailedMessage,
@@ -6,7 +7,11 @@ import {
   reorderFailedMessage,
   videoSlotDeleteFailedMessage,
   videoSlotLockedMessage,
+  videoFailureMessage,
   videoRejectionMessage,
+  videoRetryFailedMessage,
+  videoTimeLabel,
+  videoSlotsPollInterval,
   videoUploadFailedMessage,
 } from "../../src/modules/modules-copy";
 
@@ -84,5 +89,63 @@ describe("videoRejectionMessage", () => {
     expect(videoRejectionMessage("UNSUPPORTED_CODEC")).toContain("video codec is not supported");
     expect(videoRejectionMessage("TOO_LARGE")).toContain("limit");
     expect(videoRejectionMessage("NO_DURATION")).toContain("incomplete");
+  });
+});
+
+describe("videoFailureMessage", () => {
+  test("says why processing failed for every stored reason", () => {
+    for (const reason of videoFailureReasonSchema.options) {
+      expect(videoFailureMessage(reason)).toMatch(/^Processing failed/);
+    }
+    expect(videoFailureMessage("TIMED_OUT")).toContain("too long");
+  });
+
+  test("still reads sensibly when no reason was stored", () => {
+    expect(videoFailureMessage(null)).toBe("Processing failed.");
+  });
+});
+
+describe("videoRetryFailedMessage", () => {
+  test("explains a video that is no longer failed", () => {
+    expect(videoRetryFailedMessage("VIDEO_NOT_FAILED")).toContain("no longer failed");
+  });
+
+  test("falls back for any other error", () => {
+    expect(videoRetryFailedMessage(undefined)).toBe("The video could not be retried. Try again.");
+  });
+});
+
+describe("videoSlotsPollInterval", () => {
+  test("polls while any video is still being processed", () => {
+    expect(videoSlotsPollInterval([{ status: "READY" }, { status: "PROCESSING" }])).toBe(
+      videoPollIntervalMs,
+    );
+    expect(videoSlotsPollInterval([{ status: "QUEUED" }])).toBe(videoPollIntervalMs);
+  });
+
+  test("stops once every video is ready, failed, rejected or empty", () => {
+    expect(
+      videoSlotsPollInterval([
+        { status: "READY" },
+        { status: "FAILED" },
+        { status: "REJECTED" },
+        { status: "NOT_UPLOADED" },
+      ]),
+    ).toBe(false);
+  });
+
+  test("does not poll before the list has loaded or when it is empty", () => {
+    expect(videoSlotsPollInterval(undefined)).toBe(false);
+    expect(videoSlotsPollInterval([])).toBe(false);
+  });
+});
+
+describe("videoTimeLabel", () => {
+  test("shows the time in Asia/Dhaka", () => {
+    expect(videoTimeLabel("2026-11-11T06:00:00.000Z")).toBe("11 Nov 2026, 12:00 pm");
+  });
+
+  test("shows a dash when there is no time", () => {
+    expect(videoTimeLabel(null)).toBe("-");
   });
 });

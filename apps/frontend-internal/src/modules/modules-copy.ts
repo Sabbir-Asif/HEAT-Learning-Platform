@@ -1,4 +1,10 @@
-import type { ModuleFormValues, VideoRejectionReason } from "@heat/contracts";
+import { videoPollIntervalMs, videoStatusIsFinal } from "@heat/contracts";
+import type {
+  ModuleFormValues,
+  VideoFailureReason,
+  VideoRejectionReason,
+  VideoSlotStatus,
+} from "@heat/contracts";
 
 export const moduleLockedMessage =
   "This course is locked. Modules and sections cannot be added, removed or reordered. Wording changes to titles and objectives are logged.";
@@ -67,3 +73,40 @@ export const moduleRequestOf = (
   title: values.title,
   objectives: values.objectives.map((row) => row.text),
 });
+
+export const videoFailureMessage = (reason: VideoFailureReason | null): string => {
+  if (reason === "SOURCE_UNREADABLE")
+    return "Processing failed: the uploaded file could not be read.";
+  if (reason === "ENCODE_FAILED") return "Processing failed: the video could not be converted.";
+  if (reason === "TIMED_OUT") return "Processing failed: it took too long and was stopped.";
+  if (reason === "VALIDATION_FAILED")
+    return "Processing failed: the converted video did not pass its checks.";
+  if (reason === "PUBLISH_FAILED")
+    return "Processing failed: the converted video could not be saved.";
+  return "Processing failed.";
+};
+
+export const videoRetryFailedMessage = (code: string | undefined): string =>
+  code === "VIDEO_NOT_FAILED"
+    ? "This video is no longer failed, so it cannot be retried. The list has been refreshed."
+    : "The video could not be retried. Try again.";
+
+export const videoSlotsPollInterval = (
+  items: ReadonlyArray<{ status: VideoSlotStatus }> | undefined,
+): number | false =>
+  items !== undefined && items.some((item) => !videoStatusIsFinal(item.status))
+    ? videoPollIntervalMs
+    : false;
+
+const videoTimeFormat = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Asia/Dhaka",
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+  hour12: true,
+});
+
+export const videoTimeLabel = (value: string | null): string =>
+  value === null ? "-" : videoTimeFormat.format(new Date(value)).replace(" at ", ", ");
