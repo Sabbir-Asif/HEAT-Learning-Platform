@@ -23,6 +23,7 @@ export * from "./progress";
 export * from "./public-cache";
 export * from "./quiz-delivery";
 export * from "./quizzes";
+export * from "./resources";
 export * from "./rich-text";
 export * from "./site-settings";
 export * from "./students";

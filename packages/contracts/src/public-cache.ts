@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { courseSlugPattern } from "./courses";
 import { newsListCacheTag, newsPostTagPattern } from "./news";
+import { resourcesCacheTag } from "./resources";
 
 export const frontPageCacheTag = "front-page";
 export const landingCacheTag = "landing";
@@ -18,6 +19,7 @@ export const isKnownCacheTag = (tag: string): boolean =>
   tag === landingCacheTag ||
   tag === contactCacheTag ||
   tag === newsListCacheTag ||
+  tag === resourcesCacheTag ||
   courseTagPattern.test(tag) ||
   newsPostTagPattern.test(tag);
 
