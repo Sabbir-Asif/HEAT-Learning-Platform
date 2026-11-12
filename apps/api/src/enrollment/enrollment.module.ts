@@ -11,8 +11,10 @@ import { NotificationsModule } from "../notifications";
 import { RateLimitModule } from "../rate-limit";
 import { ApprovalQueueService } from "./approval-queue.service";
 import { EnrollmentApprovalController } from "./enrollment-approval.controller";
+import { EnrollmentRemovalController } from "./enrollment-removal.controller";
 import { EnrollmentApprovalService } from "./enrollment-approval.service";
 import { EnrollmentRejectionService } from "./enrollment-rejection.service";
+import { EnrollmentRemovalService } from "./enrollment-removal.service";
 import { EnrollmentController } from "./enrollment.controller";
 import { EnrollmentService } from "./enrollment.service";
 import { StudentListController } from "./student-list.controller";
@@ -31,11 +33,17 @@ import { StudentListService } from "./student-list.service";
     NotificationsModule,
     RateLimitModule,
   ],
-  controllers: [EnrollmentController, EnrollmentApprovalController, StudentListController],
+  controllers: [
+    EnrollmentController,
+    EnrollmentApprovalController,
+    EnrollmentRemovalController,
+    StudentListController,
+  ],
   providers: [
     EnrollmentService,
     EnrollmentApprovalService,
     EnrollmentRejectionService,
+    EnrollmentRemovalService,
     ApprovalQueueService,
     StudentListService,
   ],
