@@ -1,5 +1,5 @@
-import { LandingOverviewView } from "@/site-pages/landing-overview-view";
+import { ContentPagesView } from "@/site-pages/content-pages-view";
 
 export default function Page() {
-  return <LandingOverviewView />;
+  return <ContentPagesView />;
 }
