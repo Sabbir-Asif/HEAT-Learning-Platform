@@ -13,6 +13,8 @@ const scanned = [
   "shell",
   "upload",
   "player",
+  "content",
+  "editor",
 ];
 
 const allowedPackages = [
@@ -35,6 +37,7 @@ const folderPackages: Record<string, string[]> = {
   data: ["@tanstack/react-table", "nuqs"],
   upload: ["@uppy/core"],
   player: ["@videojs/react", "@videojs/hlsjs-video"],
+  editor: ["@tiptap/react", "@tiptap/starter-kit"],
 };
 
 const forbiddenPackagePrefixes = ["@radix-ui/", "@headlessui/", "@mui/", "@chakra-ui/", "antd"];
