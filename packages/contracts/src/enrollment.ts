@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { academicSessionSchema } from "./academic-session";
-import { emailAddressSchema, passwordMaxLength, passwordMinLength } from "./auth";
+import {
+  emailAddressSchema,
+  enrollmentStatusSchema,
+  passwordMaxLength,
+  passwordMinLength,
+} from "./auth";
 import { captchaFieldsShape } from "./captcha";
 import { courseSlugSchema } from "./courses";
 
@@ -74,3 +79,15 @@ export const enrollmentAcceptedResponseSchema = z.object({
 });
 
 export type EnrollmentAcceptedResponse = z.infer<typeof enrollmentAcceptedResponseSchema>;
+
+export const signedInEnrollmentRequestSchema = z.object({ courseSlug: courseSlugSchema });
+
+export type SignedInEnrollmentRequest = z.infer<typeof signedInEnrollmentRequestSchema>;
+
+export const signedInEnrollmentResponseSchema = z.object({
+  enrollmentId: z.uuid(),
+  courseSlug: courseSlugSchema,
+  status: enrollmentStatusSchema,
+});
+
+export type SignedInEnrollmentResponse = z.infer<typeof signedInEnrollmentResponseSchema>;
