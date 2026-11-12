@@ -1,8 +1,10 @@
-import { Body, Controller, Delete, HttpCode, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put } from "@nestjs/common";
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { Audience, Roles } from "../access";
 import { Audited } from "../audit";
 import {
+  LessonBodyRequestDto,
+  LessonBodyResponseDto,
   LessonSectionParamsDto,
   LessonSectionRequestDto,
   ModuleParamsDto,
@@ -55,5 +57,21 @@ export class LessonSectionsController {
   @ApiOkResponse({ type: ModuleSummaryDto })
   remove(@Param() params: LessonSectionParamsDto): Promise<ModuleSummaryDto> {
     return this.sections.remove(params.id, params.moduleId, params.sectionId);
+  }
+
+  @Get(":sectionId/body")
+  @ApiOkResponse({ type: LessonBodyResponseDto })
+  readBody(@Param() params: LessonSectionParamsDto): Promise<LessonBodyResponseDto> {
+    return this.sections.readBody(params.id, params.moduleId, params.sectionId);
+  }
+
+  @Put(":sectionId/body")
+  @Audited({ action: "lesson-section.body", entity: "LessonSection" })
+  @ApiOkResponse({ type: LessonBodyResponseDto })
+  updateBody(
+    @Param() params: LessonSectionParamsDto,
+    @Body() body: LessonBodyRequestDto,
+  ): Promise<LessonBodyResponseDto> {
+    return this.sections.updateBody(params.id, params.moduleId, params.sectionId, body);
   }
 }
