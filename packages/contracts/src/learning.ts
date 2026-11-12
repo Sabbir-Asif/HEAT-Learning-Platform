@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { approvalReasonMaxLength } from "./approvals";
+import { lessonBodyImageSchema } from "./rich-text";
 
 export const videoCompletionThreshold = 0.8;
 
@@ -117,6 +118,7 @@ export const lessonContentSectionSchema = z.object({
   title: z.string(),
   schemaVersion: z.number().int(),
   body: z.record(z.string(), z.unknown()),
+  images: z.array(lessonBodyImageSchema),
 });
 
 export const lessonContentResponseSchema = z.object({

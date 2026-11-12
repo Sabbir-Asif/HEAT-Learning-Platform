@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { AuthModule } from "../auth";
 import { CoreModule } from "../core";
+import { MediaModule } from "../media";
 import { RateLimitModule } from "../rate-limit";
 import { DashboardController } from "./dashboard.controller";
 import { DashboardService } from "./dashboard.service";
@@ -18,7 +19,7 @@ import { QUIZ_SCORED_HANDLERS } from "./quiz-scored-handler";
 import { LearningStructureService } from "./learning-structure.service";
 
 @Module({
-  imports: [CoreModule, AuthModule, RateLimitModule],
+  imports: [CoreModule, AuthModule, MediaModule, RateLimitModule],
   controllers: [
     DashboardController,
     LearningController,

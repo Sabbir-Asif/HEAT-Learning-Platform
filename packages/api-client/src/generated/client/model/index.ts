@@ -127,6 +127,7 @@ export * from './lessonContentResponseDto';
 export * from './lessonContentResponseDtoModule';
 export * from './lessonContentResponseDtoSectionsItem';
 export * from './lessonContentResponseDtoSectionsItemBody';
+export * from './lessonContentResponseDtoSectionsItemImagesItem';
 export * from './lessonSectionRequestDto';
 export * from './meResponseDto';
 export * from './meResponseDtoEnrollmentsItem';
