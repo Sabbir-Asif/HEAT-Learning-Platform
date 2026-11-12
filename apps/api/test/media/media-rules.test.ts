@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { ApiException } from "../../src/http/api-exception";
 import {
   assertAltText,
+  assertCaptionFile,
   assertPixelLimit,
   assertTypeMatchesKind,
   assertWithinSize,
@@ -123,5 +124,54 @@ describe("mediaKey and private access", () => {
     expect(canReadPrivate({ userId: "u1", admin: false }, "u1")).toBe(true);
     expect(canReadPrivate({ userId: "u2", admin: false }, "u1")).toBe(false);
     expect(canReadPrivate({ userId: "u2", admin: true }, "u1")).toBe(true);
+  });
+});
+
+describe("assertCaptionFile", () => {
+  const valid = Buffer.from("WEBVTT\n\n00:00.000 --> 00:01.000\nHello\n", "utf8");
+
+  test("accepts WebVTT content", () => {
+    expect(codeOf(() => assertCaptionFile(valid))).toBeUndefined();
+  });
+
+  test("accepts a UTF-8 byte order mark before the header", () => {
+    const withMark = Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), valid]);
+    expect(codeOf(() => assertCaptionFile(withMark))).toBeUndefined();
+  });
+
+  test("rejects a file without the WEBVTT header, whatever its name", () => {
+    const text = Buffer.from("1\n00:00:00,000 --> 00:00:01,000\nHello\n", "utf8");
+    expect(codeOf(() => assertCaptionFile(text))).toEqual({
+      status: 415,
+      code: "UPLOAD_TYPE_NOT_ALLOWED",
+    });
+  });
+
+  test("rejects a header that is only a prefix of another word", () => {
+    expect(codeOf(() => assertCaptionFile(Buffer.from("WEBVTTX\n", "utf8")))).toEqual({
+      status: 415,
+      code: "UPLOAD_TYPE_NOT_ALLOWED",
+    });
+  });
+
+  test("rejects content that is not valid UTF-8", () => {
+    const broken = Buffer.concat([valid, Buffer.from([0xff, 0xfe, 0xfd])]);
+    expect(codeOf(() => assertCaptionFile(broken))).toEqual({
+      status: 415,
+      code: "UPLOAD_TYPE_NOT_ALLOWED",
+    });
+  });
+
+  test("rejects a file over one mebibyte", () => {
+    const oversized = Buffer.concat([valid, Buffer.alloc(mebibyte, 0x61)]);
+    expect(codeOf(() => assertCaptionFile(oversized))).toEqual({
+      status: 413,
+      code: "UPLOAD_TOO_LARGE",
+    });
+  });
+
+  test("accepts a file of exactly one mebibyte", () => {
+    const exact = Buffer.concat([valid, Buffer.alloc(mebibyte - valid.length, 0x61)]);
+    expect(codeOf(() => assertCaptionFile(exact))).toBeUndefined();
   });
 });

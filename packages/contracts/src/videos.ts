@@ -48,6 +48,12 @@ export const updateVideoSlotRequestSchema = z.object({
 
 export type UpdateVideoSlotRequest = z.infer<typeof updateVideoSlotRequestSchema>;
 
+export const captionLanguages = ["en"] as const;
+
+export const captionLanguageSchema = z.enum(captionLanguages);
+
+export type CaptionLanguage = z.infer<typeof captionLanguageSchema>;
+
 export const videoSlotSummarySchema = z.object({
   id: z.uuid(),
   order: z.number().int().min(1),
@@ -57,6 +63,7 @@ export const videoSlotSummarySchema = z.object({
   assetKey: z.string().max(128).nullable(),
   rejectionReason: videoRejectionReasonSchema.nullable(),
   failureReason: videoFailureReasonSchema.nullable(),
+  captions: z.array(captionLanguageSchema),
 });
 
 export type VideoSlotSummary = z.infer<typeof videoSlotSummarySchema>;
@@ -72,6 +79,10 @@ export const videoSlotParamsSchema = z.object({
   id: z.uuid(),
   moduleId: z.uuid(),
   videoId: z.uuid(),
+});
+
+export const videoCaptionParamsSchema = videoSlotParamsSchema.extend({
+  language: captionLanguageSchema,
 });
 
 const gibibyte = 1024 ** 3;

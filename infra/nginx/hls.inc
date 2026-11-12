@@ -17,6 +17,7 @@ location /hls/ {
         video/mp2t ts;
         video/iso.segment m4s;
         video/mp4 mp4;
+        text/vtt vtt;
     }
 
     add_header Cache-Control $hls_cache_control always;
