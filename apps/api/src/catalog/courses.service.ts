@@ -208,7 +208,7 @@ export class CoursesService {
     const before = await this.existing(id, client);
     assertCanPublish(before.status);
     const failures = (
-      await Promise.all(this.publishChecks.map((check) => check.failures(id)))
+      await Promise.all(this.publishChecks.map((check) => check.failures(id, client)))
     ).flat();
     if (failures.length > 0) throw publishChecksFailed(failures);
     const now = new Date();

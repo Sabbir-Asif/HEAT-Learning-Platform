@@ -8,16 +8,21 @@ import {
   CourseListResponseDto,
   CourseSummaryDto,
   CreateCourseRequestDto,
+  PublishChecklistDto,
   UpdateCourseRequestDto,
 } from "./catalog.dto";
 import { CoursesService } from "./courses.service";
+import { ModulePublishCheck } from "./module-publish-check";
 
 @ApiTags("courses")
 @Controller("admin/courses")
 @Audience("admin")
 @Roles("ADMIN", "SUPER_ADMIN")
 export class CoursesController {
-  constructor(private readonly courses: CoursesService) {}
+  constructor(
+    private readonly courses: CoursesService,
+    private readonly publishCheck: ModulePublishCheck,
+  ) {}
 
   @Get()
   @ApiOkResponse({ type: CourseListResponseDto })
@@ -29,6 +34,12 @@ export class CoursesController {
   @ApiOkResponse({ type: CourseSummaryDto })
   get(@Param() params: CourseIdParamsDto): Promise<CourseSummaryDto> {
     return this.courses.get(params.id);
+  }
+
+  @Get(":id/publish-checks")
+  @ApiOkResponse({ type: PublishChecklistDto })
+  publishChecks(@Param() params: CourseIdParamsDto): Promise<PublishChecklistDto> {
+    return this.publishCheck.checklist(params.id);
   }
 
   @Post()

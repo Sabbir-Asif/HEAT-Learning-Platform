@@ -128,3 +128,32 @@ export const courseListResponseSchema = z.object({
 export type CourseListResponse = z.infer<typeof courseListResponseSchema>;
 
 export const courseIdParamsSchema = z.object({ id: z.uuid() });
+
+export const publishFailureCodes = [
+  "COURSE_NO_MODULES",
+  "MODULE_NO_REQUIRED_VIDEO",
+  "MODULE_VIDEO_NOT_READY",
+  "MODULE_NO_QUIZ",
+  "MODULE_QUIZ_EMPTY",
+  "QUESTION_OPTION_COUNT",
+  "QUESTION_CORRECT_COUNT",
+] as const;
+
+export const publishFailureCodeSchema = z.enum(publishFailureCodes);
+
+export type PublishFailureCode = z.infer<typeof publishFailureCodeSchema>;
+
+export const publishFailureSchema = z.object({
+  code: publishFailureCodeSchema,
+  moduleId: z.uuid().nullable(),
+  questionId: z.uuid().nullable(),
+  message: z.string(),
+});
+
+export type PublishFailure = z.infer<typeof publishFailureSchema>;
+
+export const publishChecklistSchema = z.object({
+  failures: z.array(publishFailureSchema),
+});
+
+export type PublishChecklist = z.infer<typeof publishChecklistSchema>;

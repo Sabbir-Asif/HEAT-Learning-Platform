@@ -69,6 +69,7 @@ import type {
   PlaybackSessionResponseDto,
   ProgressBatchDto,
   ProgressResponseDto,
+  PublishChecklistDto,
   QuizAccessResponseDto,
   QuizDeliveryResponseDto,
   QuizQuestionRequestDto,
@@ -170,6 +171,8 @@ export const getVideoSlotsUpdateResponseMock = (overrideResponse: Partial<Extrac
 export const getVideoSlotsRetryTranscodeResponseMock = (overrideResponse: Partial<Extract<VideoSlotListResponseDto, object>> = {}): VideoSlotListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({assetKey: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 128}}), null]), failureReason: faker.helpers.arrayElement([faker.helpers.arrayElement(['SOURCE_UNREADABLE','ENCODE_FAILED','TIMED_OUT','VALIDATION_FAILED','PUBLISH_FAILED'] as const), null]), id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), rejectionReason: faker.helpers.arrayElement([faker.helpers.arrayElement(['NOT_A_VIDEO','UNSUPPORTED_CONTAINER','UNSUPPORTED_CODEC','TOO_LARGE','NO_DURATION'] as const), null]), required: faker.datatype.boolean(), status: faker.helpers.arrayElement(['NOT_UPLOADED','UPLOADING','UPLOADED','QUEUED','PROCESSING','READY','FAILED','REJECTED'] as const), title: faker.string.alpha({length: {min: 10, max: 20}})})), locked: faker.datatype.boolean(), ...overrideResponse})
 
 export const getCoursesPublishResponseMock = (overrideResponse: Partial<Extract<CourseSummaryDto, object>> = {}): CourseSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', currentRevision: faker.helpers.arrayElement([{id: faker.string.uuid(), number: faker.number.int({min: 1, max: 9007199254740991}), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])},null,]), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 5000}}), null]), enrollmentCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), lockedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), slug: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['DRAFT','PUBLISHED'] as const), thumbnailAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getCoursesPublishChecksResponseMock = (overrideResponse: Partial<Extract<PublishChecklistDto, object>> = {}): PublishChecklistDto => ({failures: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement(['COURSE_NO_MODULES','MODULE_NO_REQUIRED_VIDEO','MODULE_VIDEO_NOT_READY','MODULE_NO_QUIZ','MODULE_QUIZ_EMPTY','QUESTION_OPTION_COUNT','QUESTION_CORRECT_COUNT'] as const), message: faker.string.alpha({length: {min: 10, max: 20}}), moduleId: faker.helpers.arrayElement([faker.string.uuid(), null]), questionId: faker.helpers.arrayElement([faker.string.uuid(), null])})), ...overrideResponse})
 
 export const getDepartmentsListResponseMock = (overrideResponse: Partial<Extract<DepartmentListResponseDto, object>> = {}): DepartmentListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({archivedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), parentArchived: faker.datatype.boolean(), studentCount: faker.number.int({min: 0, max: 9007199254740991}), university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
 
@@ -774,6 +777,18 @@ export const getCoursesPublishMockHandler = (overrideResponse?: CourseSummaryDto
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getCoursesPublishResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getCoursesPublishChecksMockHandler = (overrideResponse?: PublishChecklistDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<PublishChecklistDto> | PublishChecklistDto), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string }>('*/api/admin/courses/:id/publish-checks', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCoursesPublishChecksResponseMock(),
       { status: 200
       })
   }, options)
@@ -1520,6 +1535,7 @@ export const getHeatLmsApiMock = () => [
   getVideoSlotsUpdateMockHandler(),
   getVideoSlotsRetryTranscodeMockHandler(),
   getCoursesPublishMockHandler(),
+  getCoursesPublishChecksMockHandler(),
   getDepartmentsListMockHandler(),
   getDepartmentsCreateMockHandler(),
   getDepartmentsRemoveMockHandler(),

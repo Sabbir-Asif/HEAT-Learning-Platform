@@ -2768,6 +2768,55 @@
         ],
         "type": "object"
       },
+      "PublishChecklistDto": {
+        "properties": {
+          "failures": {
+            "items": {
+              "properties": {
+                "code": {
+                  "enum": [
+                    "COURSE_NO_MODULES",
+                    "MODULE_NO_REQUIRED_VIDEO",
+                    "MODULE_VIDEO_NOT_READY",
+                    "MODULE_NO_QUIZ",
+                    "MODULE_QUIZ_EMPTY",
+                    "QUESTION_OPTION_COUNT",
+                    "QUESTION_CORRECT_COUNT"
+                  ],
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "moduleId": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "questionId": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code",
+                "moduleId",
+                "questionId",
+                "message"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "failures"
+        ],
+        "type": "object"
+      },
       "QuizAccessResponseDto": {
         "properties": {
           "moduleState": {
@@ -5683,6 +5732,38 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CourseSummaryDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "courses"
+        ]
+      }
+    },
+    "/api/admin/courses/{id}/publish-checks": {
+      "get": {
+        "operationId": "coursesPublishChecks",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishChecklistDto"
                 }
               }
             },

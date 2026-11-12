@@ -81,6 +81,7 @@ import type {
   PlaybackSessionResponseDto,
   ProgressBatchDto,
   ProgressResponseDto,
+  PublishChecklistDto,
   QuizAccessResponseDto,
   QuizDeliveryResponseDto,
   QuizQuestionRequestDto,
@@ -3645,6 +3646,101 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCoursesPublishMutationOptions(options), queryClient);
     }
+
+export const getCoursesPublishChecksUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/publish-checks`
+}
+
+export const coursesPublishChecks = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<PublishChecklistDto> => {
+
+  return customFetch<PublishChecklistDto>(getCoursesPublishChecksUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getCoursesPublishChecksQueryKey = (id: string,) => {
+    return [
+    `/api/admin/courses/${id}/publish-checks`
+    ] as const;
+    }
+
+
+export const getCoursesPublishChecksQueryOptions = <TData = Awaited<ReturnType<typeof coursesPublishChecks>>, TError = ErrorType<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesPublishChecks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCoursesPublishChecksQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof coursesPublishChecks>>> = ({ signal }) => coursesPublishChecks(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof coursesPublishChecks>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CoursesPublishChecksQueryResult = NonNullable<Awaited<ReturnType<typeof coursesPublishChecks>>>
+export type CoursesPublishChecksQueryError = ErrorType<unknown>
+
+
+export function useCoursesPublishChecks<TData = Awaited<ReturnType<typeof coursesPublishChecks>>, TError = ErrorType<unknown>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesPublishChecks>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof coursesPublishChecks>>,
+          TError,
+          Awaited<ReturnType<typeof coursesPublishChecks>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCoursesPublishChecks<TData = Awaited<ReturnType<typeof coursesPublishChecks>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesPublishChecks>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof coursesPublishChecks>>,
+          TError,
+          Awaited<ReturnType<typeof coursesPublishChecks>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCoursesPublishChecks<TData = Awaited<ReturnType<typeof coursesPublishChecks>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesPublishChecks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useCoursesPublishChecks<TData = Awaited<ReturnType<typeof coursesPublishChecks>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesPublishChecks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCoursesPublishChecksQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getDepartmentsListUrl = (params?: DepartmentsListParams,) => {
   const normalizedParams = new URLSearchParams();

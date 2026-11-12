@@ -1605,6 +1605,38 @@ export interface ProgressResponseDto {
   resumePositionSeconds: number;
 }
 
+export type PublishChecklistDtoFailuresItemCode = typeof PublishChecklistDtoFailuresItemCode[keyof typeof PublishChecklistDtoFailuresItemCode];
+
+
+export const PublishChecklistDtoFailuresItemCode = {
+  COURSE_NO_MODULES: 'COURSE_NO_MODULES',
+  MODULE_NO_REQUIRED_VIDEO: 'MODULE_NO_REQUIRED_VIDEO',
+  MODULE_VIDEO_NOT_READY: 'MODULE_VIDEO_NOT_READY',
+  MODULE_NO_QUIZ: 'MODULE_NO_QUIZ',
+  MODULE_QUIZ_EMPTY: 'MODULE_QUIZ_EMPTY',
+  QUESTION_OPTION_COUNT: 'QUESTION_OPTION_COUNT',
+  QUESTION_CORRECT_COUNT: 'QUESTION_CORRECT_COUNT',
+} as const;
+
+export type PublishChecklistDtoFailuresItem = {
+  code: PublishChecklistDtoFailuresItemCode;
+  message: string;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  moduleId: string | null;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  questionId: string | null;
+};
+
+export interface PublishChecklistDto {
+  failures: PublishChecklistDtoFailuresItem[];
+}
+
 export type QuizAccessResponseDtoModuleState = typeof QuizAccessResponseDtoModuleState[keyof typeof QuizAccessResponseDtoModuleState];
 
 
@@ -3816,6 +3848,27 @@ export const coursesPublish = async (id: string, options?: Parameters<typeof ser
   {
     ...options,
     method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getCoursesPublishChecksUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/publish-checks`
+}
+
+export const coursesPublishChecks = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<PublishChecklistDto> => {
+
+  return serverFetch<PublishChecklistDto>(getCoursesPublishChecksUrl(id),
+  {
+    ...options,
+    method: 'GET'
 
 
   }
