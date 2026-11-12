@@ -18,6 +18,7 @@ export * from "./playback";
 export * from "./progress";
 export * from "./quiz-delivery";
 export * from "./quizzes";
+export * from "./students";
 export * from "./verification";
 export * from "./videos";
 
