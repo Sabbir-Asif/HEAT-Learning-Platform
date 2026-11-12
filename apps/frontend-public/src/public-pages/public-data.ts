@@ -6,6 +6,7 @@ import {
   publicFrontPageGet,
   publicNewsGet,
   publicNewsList,
+  publicResourcesList,
   publicSiteSettingsGet,
 } from "@heat/api-client/server";
 import {
@@ -15,6 +16,7 @@ import {
   landingCacheTag,
   newsListCacheTag,
   newsPostCacheTag,
+  resourcesCacheTag,
 } from "@heat/contracts";
 import type {
   NewsPublicListResponse,
@@ -22,6 +24,7 @@ import type {
   PublicCourseResponse,
   PublicFrontPageResponse,
   PublicContactSettingsResponse,
+  ResourcePublicListResponse,
   PublicLandingOverviewResponse,
 } from "@heat/contracts";
 import { cacheLife, cacheTag } from "next/cache";
@@ -76,4 +79,11 @@ export async function cachedNewsPost(slug: string): Promise<NewsPublicPost | nul
     if (isApiError(error) && error.status === 404) return null;
     throw error;
   }
+}
+
+export async function cachedResources(): Promise<ResourcePublicListResponse> {
+  "use cache";
+  cacheTag(resourcesCacheTag);
+  cacheLife({ stale: 30, revalidate: 60, expire: 3600 });
+  return publicResourcesList({ forwardCookies: false });
 }
