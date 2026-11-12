@@ -3,6 +3,10 @@ import { describe, expect, test, vi } from "vitest";
 import { CourseOverview } from "../../src/public-pages/course-overview";
 import { mount } from "../learn/mount";
 
+vi.mock("../../src/auth/use-student-session", () => ({
+  useStudentSession: () => ({ kind: "anonymous" }),
+}));
+
 vi.mock("next/image", () => ({
   default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
 }));

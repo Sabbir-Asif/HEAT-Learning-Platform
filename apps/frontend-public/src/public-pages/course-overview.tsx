@@ -11,7 +11,7 @@ import {
 import { ShellContent } from "@heat/ui/shell";
 import { ListChecksIcon } from "lucide-react";
 import { CatalogImage } from "./catalog-image";
-import { EnrollButton } from "./enroll-button";
+import { CourseEnrollAction } from "./course-enroll-action";
 import { descriptionParagraphs } from "./links";
 
 export function CourseOverview({ course }: { course: PublicCourseResponse }) {
@@ -19,7 +19,7 @@ export function CourseOverview({ course }: { course: PublicCourseResponse }) {
     <ShellContent>
       <PageHeader
         title={course.title}
-        action={<EnrollButton courseSlug={course.slug} courseTitle={course.title} />}
+        action={<CourseEnrollAction courseSlug={course.slug} courseTitle={course.title} />}
       />
       {course.thumbnail === null ? null : (
         <CatalogImage image={course.thumbnail} sizes="(min-width: 1024px) 960px, 100vw" priority />
