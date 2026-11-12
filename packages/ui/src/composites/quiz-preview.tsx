@@ -44,7 +44,9 @@ function QuizPreview({ questions, className, ...props }: QuizPreviewProps) {
                   option.isCorrect ? "border-primary bg-accent" : "border-input",
                 )}
               >
-                {option.isCorrect ? <CheckIcon aria-hidden="true" className="mt-0.5 size-4" /> : null}
+                {option.isCorrect ? (
+                  <CheckIcon aria-hidden="true" className="mt-0.5 size-4" />
+                ) : null}
                 <span className="flex-1">{option.text}</span>
                 {option.isCorrect ? <Badge>Correct answer</Badge> : null}
               </li>

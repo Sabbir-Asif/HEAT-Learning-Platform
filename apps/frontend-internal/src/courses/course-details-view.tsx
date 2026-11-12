@@ -26,7 +26,8 @@ import {
 } from "@heat/ui";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
-import { GlobeIcon, SearchXIcon } from "lucide-react";
+import { EyeIcon, GlobeIcon, SearchXIcon } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
 import { ModulesTab } from "../modules/modules-tab";
@@ -93,34 +94,44 @@ export function CourseDetailsView({ id }: { id: string }) {
       <PageHeader
         title={current.title}
         action={
-          current.status === "DRAFT" ? (
-            <ConfirmDialog
-              trigger={
-                <Button>
-                  <GlobeIcon data-icon="inline-start" />
-                  Publish
-                </Button>
-              }
-              title="Publish this course?"
-              itemName={current.title}
-              description="Students can enroll once it is published. A published course cannot be deleted."
-              confirmLabel="Publish course"
-              errorMessage={publishFailedMessage(current.title, failures)}
-              onConfirm={async () => {
-                setNotice(null);
-                setFailures([]);
-                try {
-                  await publish.mutateAsync({ id });
-                } catch (error) {
-                  if (isApiError(error)) setFailures(error.failures);
-                  void checklist.refetch();
-                  throw error;
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={<Link href={`/courses/${id}/preview`} />}
+            >
+              <EyeIcon data-icon="inline-start" />
+              Preview
+            </Button>
+            {current.status === "DRAFT" ? (
+              <ConfirmDialog
+                trigger={
+                  <Button>
+                    <GlobeIcon data-icon="inline-start" />
+                    Publish
+                  </Button>
                 }
-                await refresh();
-                setNotice(`${current.title} was published.`);
-              }}
-            />
-          ) : null
+                title="Publish this course?"
+                itemName={current.title}
+                description="Students can enroll once it is published. A published course cannot be deleted."
+                confirmLabel="Publish course"
+                errorMessage={publishFailedMessage(current.title, failures)}
+                onConfirm={async () => {
+                  setNotice(null);
+                  setFailures([]);
+                  try {
+                    await publish.mutateAsync({ id });
+                  } catch (error) {
+                    if (isApiError(error)) setFailures(error.failures);
+                    void checklist.refetch();
+                    throw error;
+                  }
+                  await refresh();
+                  setNotice(`${current.title} was published.`);
+                }}
+              />
+            ) : null}
+          </div>
         }
       />
       <div className="flex flex-wrap items-center gap-2">
