@@ -9,6 +9,7 @@ import type { AppConfig } from "./config";
 import { DATABASE, REDIS } from "./tokens";
 import { MAIL_TRANSPORT } from "./mail/mail-transport";
 import { createSmtpClient, SmtpMailTransport } from "./mail/smtp-mail-transport";
+import { LocalMediaStorage, MEDIA_STORAGE } from "./media-storage";
 import { SecretBox } from "./secret-box";
 
 @Module({
@@ -31,6 +32,11 @@ import { SecretBox } from "./secret-box";
       useFactory: (config: AppConfig) => new SecretBox(config.auth.encryptionKey),
     },
     {
+      provide: MEDIA_STORAGE,
+      inject: [APP_CONFIG],
+      useFactory: (config: AppConfig) => new LocalMediaStorage(config.media.directory),
+    },
+    {
       provide: MAIL_TRANSPORT,
       inject: [APP_CONFIG],
       useFactory: (config: AppConfig) =>
@@ -41,7 +47,7 @@ import { SecretBox } from "./secret-box";
         ),
     },
   ],
-  exports: [APP_CONFIG, CLOCK, DATABASE, REDIS, SecretBox, MAIL_TRANSPORT],
+  exports: [APP_CONFIG, CLOCK, DATABASE, REDIS, SecretBox, MAIL_TRANSPORT, MEDIA_STORAGE],
 })
 export class CoreModule implements OnApplicationShutdown {
   constructor(

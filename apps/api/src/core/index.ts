@@ -6,6 +6,7 @@ export {
   loadConfig,
   rateLimitProfileNames,
   type AppConfig,
+  type MediaConfig,
   type LockoutPolicy,
   type RateLimitConfig,
   type RateLimitProfile,
@@ -23,5 +24,12 @@ export {
   type MailTransport,
   type MailVerifyResult,
 } from "./mail";
+export {
+  LocalMediaStorage,
+  MEDIA_STORAGE,
+  isMediaFileName,
+  isMediaKey,
+  type MediaStorage,
+} from "./media-storage";
 export { SecretBox } from "./secret-box";
 export { DATABASE, REDIS } from "./tokens";
