@@ -11,6 +11,7 @@ import type {
 type RichTextRendererProps = Omit<React.ComponentProps<"div">, "children"> & {
   document: RichTextDocument;
   images?: readonly RichTextImage[];
+  title?: string;
 };
 
 const headingTags = { 2: "h3", 3: "h4", 4: "h5" } as const;
@@ -116,7 +117,13 @@ function Node({
   }
 }
 
-function RichTextRenderer({ document, images = [], className, ...props }: RichTextRendererProps) {
+function RichTextRenderer({
+  document,
+  images = [],
+  title,
+  className,
+  ...props
+}: RichTextRendererProps) {
   const byId = new Map(images.map((image) => [image.assetId, image]));
   return (
     <div
@@ -124,6 +131,9 @@ function RichTextRenderer({ document, images = [], className, ...props }: RichTe
       className={cn("flex flex-col gap-4 text-base leading-relaxed break-words", className)}
       {...props}
     >
+      {title === undefined || title === "" ? null : (
+        <h2 className="font-heading text-xl font-semibold">{title}</h2>
+      )}
       <Children nodes={document.content} images={byId} />
     </div>
   );

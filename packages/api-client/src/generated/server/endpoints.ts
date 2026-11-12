@@ -1440,10 +1440,18 @@ export type LessonContentResponseDtoModule = {
 
 export type LessonContentResponseDtoSectionsItemBody = {[key: string]: unknown};
 
+export type LessonContentResponseDtoSectionsItemImagesItem = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+};
+
 export type LessonContentResponseDtoSectionsItem = {
   body: LessonContentResponseDtoSectionsItemBody;
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
+  images: LessonContentResponseDtoSectionsItemImagesItem[];
   /**
      * @minimum -9007199254740991
      * @maximum 9007199254740991

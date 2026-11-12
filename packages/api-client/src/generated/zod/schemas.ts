@@ -3452,6 +3452,7 @@ export const LessonContentReadParams = zod.object({
 
 export const lessonContentReadResponseModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const lessonContentReadResponseSectionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonContentReadResponseSectionsItemImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const lessonContentReadResponseSectionsItemOrderMin = -9007199254740991;
 export const lessonContentReadResponseSectionsItemOrderMax = 9007199254740991;
 
@@ -3469,6 +3470,11 @@ export const LessonContentReadResponse = zod.object({
   "sections": zod.array(zod.object({
   "body": zod.record(zod.string(), zod.unknown()),
   "id": zod.uuid().regex(lessonContentReadResponseSectionsItemIdRegExp),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(lessonContentReadResponseSectionsItemImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
   "order": zod.int().min(lessonContentReadResponseSectionsItemOrderMin).max(lessonContentReadResponseSectionsItemOrderMax),
   "schemaVersion": zod.int().min(lessonContentReadResponseSectionsItemSchemaVersionMin).max(lessonContentReadResponseSectionsItemSchemaVersionMax),
   "title": zod.string()
