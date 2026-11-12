@@ -72,9 +72,12 @@ const messages: Record<ErrorCode, string> = {
   PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
   PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
   QUIZ_ANSWER_INVALID: "One of the answers does not belong to this quiz.",
+  QUIZ_ATTEMPTS_UNLIMITED: "This quiz has no attempt limit, so there is nothing to grant.",
   QUIZ_ATTEMPT_LIMIT_REACHED: "All attempts for this quiz have been used.",
   QUIZ_ATTEMPT_NOT_OPEN: "This attempt was already submitted or is no longer open.",
   QUIZ_ATTEMPT_WAIT: "Wait before submitting another attempt.",
+  QUIZ_GRANT_NOT_NEEDED:
+    "The student still has attempts left or has already passed, so no extra attempt is needed.",
   QUIZ_NOT_UNLOCKED: "Watch the required videos in this module to unlock the quiz.",
   RATE_LIMITED: "Too many requests. Try again later.",
   RESET_LINK_EXPIRED: "This reset link has expired. Request a new one.",

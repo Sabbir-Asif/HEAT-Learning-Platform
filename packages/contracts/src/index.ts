@@ -19,6 +19,7 @@ export * from "./playback";
 export * from "./progress";
 export * from "./quiz-delivery";
 export * from "./quizzes";
+export * from "./attempt-grants";
 export * from "./removals";
 export * from "./students";
 export * from "./password-reset";

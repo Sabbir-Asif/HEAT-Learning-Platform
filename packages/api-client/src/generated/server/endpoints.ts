@@ -360,9 +360,11 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   PASSWORD_BREACHED: 'PASSWORD_BREACHED',
   PASSWORD_CHANGE_REQUIRED: 'PASSWORD_CHANGE_REQUIRED',
   QUIZ_ANSWER_INVALID: 'QUIZ_ANSWER_INVALID',
+  QUIZ_ATTEMPTS_UNLIMITED: 'QUIZ_ATTEMPTS_UNLIMITED',
   QUIZ_ATTEMPT_LIMIT_REACHED: 'QUIZ_ATTEMPT_LIMIT_REACHED',
   QUIZ_ATTEMPT_NOT_OPEN: 'QUIZ_ATTEMPT_NOT_OPEN',
   QUIZ_ATTEMPT_WAIT: 'QUIZ_ATTEMPT_WAIT',
+  QUIZ_GRANT_NOT_NEEDED: 'QUIZ_GRANT_NOT_NEEDED',
   QUIZ_NOT_UNLOCKED: 'QUIZ_NOT_UNLOCKED',
   RATE_LIMITED: 'RATE_LIMITED',
   RESET_LINK_EXPIRED: 'RESET_LINK_EXPIRED',
@@ -439,9 +441,11 @@ export const BulkRejectionResponseDtoFailedItemCode = {
   PASSWORD_BREACHED: 'PASSWORD_BREACHED',
   PASSWORD_CHANGE_REQUIRED: 'PASSWORD_CHANGE_REQUIRED',
   QUIZ_ANSWER_INVALID: 'QUIZ_ANSWER_INVALID',
+  QUIZ_ATTEMPTS_UNLIMITED: 'QUIZ_ATTEMPTS_UNLIMITED',
   QUIZ_ATTEMPT_LIMIT_REACHED: 'QUIZ_ATTEMPT_LIMIT_REACHED',
   QUIZ_ATTEMPT_NOT_OPEN: 'QUIZ_ATTEMPT_NOT_OPEN',
   QUIZ_ATTEMPT_WAIT: 'QUIZ_ATTEMPT_WAIT',
+  QUIZ_GRANT_NOT_NEEDED: 'QUIZ_GRANT_NOT_NEEDED',
   QUIZ_NOT_UNLOCKED: 'QUIZ_NOT_UNLOCKED',
   RATE_LIMITED: 'RATE_LIMITED',
   RESET_LINK_EXPIRED: 'RESET_LINK_EXPIRED',
@@ -1159,6 +1163,23 @@ export interface ForgotPasswordRequestDto {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   captchaId: string;
   email: string;
+}
+
+export interface GrantAttemptRequestDto {
+  /** @maxLength 500 */
+  reason?: string;
+}
+
+export interface GrantedAttemptDto {
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  grantedAttempts: number;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  quizId: string;
 }
 
 export type HealthResponseDtoStatus = typeof HealthResponseDtoStatus[keyof typeof HealthResponseDtoStatus];
@@ -2298,6 +2319,26 @@ export type StudentDetailResponseDtoEnrollmentsItemDecisionsItem = {
   reason: string | null;
 };
 
+/**
+ * @nullable
+ */
+export type StudentDetailResponseDtoEnrollmentsItemModulesItemQuiz = {
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attemptLimit: number | null;
+  canGrantAttempt: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  grantedAttempts: number;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+} | null;
+
 export type StudentDetailResponseDtoEnrollmentsItemModulesItemQuizAttemptsItem = {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
@@ -2359,6 +2400,8 @@ export type StudentDetailResponseDtoEnrollmentsItemModulesItem = {
      * @maximum 9007199254740991
      */
   order: number;
+  /** @nullable */
+  quiz: StudentDetailResponseDtoEnrollmentsItemModulesItemQuiz;
   quizAttempts: StudentDetailResponseDtoEnrollmentsItemModulesItemQuizAttemptsItem[];
   status: StudentDetailResponseDtoEnrollmentsItemModulesItemStatus;
   title: string;
@@ -5344,6 +5387,44 @@ return serverFetch<ApprovedEnrollmentDto>(getEnrollmentApprovalApproveUrl(id),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(approveEnrollmentRequestDto)
+  }
+);}
+
+
+
+export const getAttemptGrantGrantUrl = (id: string,
+    quizId: string,) => {
+
+
+
+
+  return `/api/admin/enrollments/${id}/quizzes/${quizId}/attempt-grants`
+}
+
+export const attemptGrantGrant = async (id: string,
+    quizId: string,
+    grantAttemptRequestDto: GrantAttemptRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<GrantedAttemptDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<GrantedAttemptDto>(getAttemptGrantGrantUrl(id,quizId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(grantAttemptRequestDto)
   }
 );}
 

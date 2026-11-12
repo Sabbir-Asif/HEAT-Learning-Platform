@@ -5,13 +5,25 @@ import { AuditService } from "../audit";
 import { CLOCK, DATABASE } from "../core";
 import type { Clock } from "../core";
 import { ApiException } from "../http/api-exception";
+import { NotificationsService } from "../notifications";
+import type { NotificationWriter } from "../notifications";
 import type { AdminActor } from "./enrollment-approval.service";
+import {
+  decisionEmailPayload,
+  ENROLLMENT_REINSTATED_TEMPLATE,
+  ENROLLMENT_REMOVED_TEMPLATE,
+  readDecisionEmailSnapshot,
+} from "./decision-email";
 import { reinstatementTarget, removalRefusal } from "./removal-rules";
 
 export const ENROLLMENT_REMOVED_EVENT_TYPE = "EnrollmentRemoved";
 export const ENROLLMENT_REINSTATED_EVENT_TYPE = "EnrollmentReinstated";
 
-type RemovalTransaction = Pick<HeatClient, "enrollment" | "enrollmentDecision" | "outbox">;
+type RemovalTransaction = Pick<
+  HeatClient,
+  "enrollment" | "enrollmentDecision" | "outbox" | "user" | "course"
+> &
+  NotificationWriter;
 
 const enrollmentSelect = {
   id: true,
@@ -27,6 +39,7 @@ export class EnrollmentRemovalService {
     @Inject(DATABASE) private readonly database: HeatClient,
     @Inject(CLOCK) private readonly clock: Clock,
     private readonly audit: AuditService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   remove(id: string, actor: AdminActor, reason: string): Promise<RemovedEnrollment> {
@@ -45,16 +58,23 @@ export class EnrollmentRemovalService {
       });
       if (claimed.count === 0) await this.refuseLostClaim(tx, id);
       await this.recordDecision(tx, id, actor, "REMOVE", now, reason);
+      const snapshot = await readDecisionEmailSnapshot(tx, enrollment.userId, enrollment.courseId);
       await tx.outbox.create({
         data: {
           eventType: ENROLLMENT_REMOVED_EVENT_TYPE,
           payload: {
+            ...decisionEmailPayload(ENROLLMENT_REMOVED_TEMPLATE, snapshot),
             enrollmentId: id,
             userId: enrollment.userId,
             courseId: enrollment.courseId,
             reason,
           },
         },
+      });
+      await this.notifications.createWithin(tx, {
+        userId: enrollment.userId,
+        type: "ENROLLMENT_REMOVED",
+        data: { enrollmentId: id, courseId: enrollment.courseId },
       });
       await this.audit.record(tx, actor, {
         action: "enrollment.remove",
@@ -82,10 +102,12 @@ export class EnrollmentRemovalService {
       });
       if (claimed.count === 0) await this.refuseLostClaim(tx, id);
       await this.recordDecision(tx, id, actor, "REINSTATE", now, reason);
+      const snapshot = await readDecisionEmailSnapshot(tx, enrollment.userId, enrollment.courseId);
       await tx.outbox.create({
         data: {
           eventType: ENROLLMENT_REINSTATED_EVENT_TYPE,
           payload: {
+            ...decisionEmailPayload(ENROLLMENT_REINSTATED_TEMPLATE, snapshot),
             enrollmentId: id,
             userId: enrollment.userId,
             courseId: enrollment.courseId,
@@ -93,6 +115,11 @@ export class EnrollmentRemovalService {
             ...(reason === undefined ? {} : { reason }),
           },
         },
+      });
+      await this.notifications.createWithin(tx, {
+        userId: enrollment.userId,
+        type: "ENROLLMENT_REINSTATED",
+        data: { enrollmentId: id, courseId: enrollment.courseId },
       });
       await this.audit.record(tx, actor, {
         action: "enrollment.reinstate",

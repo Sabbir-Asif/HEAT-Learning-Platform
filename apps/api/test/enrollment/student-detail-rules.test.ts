@@ -9,6 +9,8 @@ import type {
   StudentDetailUserRow,
 } from "../../src/enrollment/student-detail-rules";
 
+const now = new Date("2026-11-12T10:00:00.000Z");
+
 const user: StudentDetailUserRow = {
   id: "user-id",
   email: "anne@example.com",
@@ -70,6 +72,7 @@ const enrollment = (
       passed: false,
     },
   ],
+  attemptGrants: [],
   revisionModules: [
     { id: "m2", order: 2, title: "Second", videos: [], quiz: null },
     {
@@ -80,7 +83,7 @@ const enrollment = (
         { id: "v2", order: 2, title: "Two", required: true },
         { id: "v1", order: 1, title: "One", required: true },
       ],
-      quiz: { id: "q1" },
+      quiz: { id: "q1", attemptLimit: 2, waitMinutes: 10 },
     },
   ],
   ...overrides,
@@ -102,11 +105,11 @@ describe("video coverage", () => {
 
 describe("toStudentDetail", () => {
   test("refuses a user without a profile", () => {
-    expect(toStudentDetail({ ...user, profile: null }, [], "https://heat.example")).toBeNull();
+    expect(toStudentDetail({ ...user, profile: null }, [], "https://heat.example", now)).toBeNull();
   });
 
   test("orders modules, videos and attempts and keeps each attempt's own pass mark", () => {
-    const detail = toStudentDetail(user, [enrollment()], "https://heat.example");
+    const detail = toStudentDetail(user, [enrollment()], "https://heat.example", now);
     const modules = detail?.enrollments[0]?.modules ?? [];
 
     expect(modules.map((module) => module.title)).toEqual(["First", "Second"]);
@@ -135,6 +138,7 @@ describe("toStudentDetail", () => {
       user,
       [enrollment({ videoProgress: [] })],
       "https://heat.example",
+      now,
     );
 
     expect(detail?.enrollments[0]?.modules[0]?.videos[0]).toMatchObject({
@@ -158,6 +162,7 @@ describe("toStudentDetail", () => {
         }),
       ],
       "https://heat.example/app",
+      now,
     );
 
     expect(detail?.enrollments[0]?.certificate).toEqual({
@@ -184,6 +189,7 @@ describe("toStudentDetail", () => {
         }),
       ],
       "https://heat.example",
+      now,
     );
 
     expect(detail?.enrollments[0]?.certificate?.status).toBe("REVOKED");
@@ -191,5 +197,79 @@ describe("toStudentDetail", () => {
       action: "APPROVE",
       admin: { email: "admin@example.com" },
     });
+  });
+});
+
+describe("toStudentDetail quiz grants", () => {
+  const modulesOf = (overrides: Partial<StudentDetailEnrollmentRow>) =>
+    toStudentDetail(user, [enrollment(overrides)], "https://heat.example", now)?.enrollments[0]
+      ?.modules ?? [];
+
+  const failedAttempt = (id: string, hour: number) => ({
+    id,
+    quizId: "q1",
+    startedAt: new Date(`2026-11-04T0${hour}:00:00.000Z`),
+    submittedAt: new Date(`2026-11-04T0${hour}:10:00.000Z`),
+    scorePercent: 10,
+    passMarkSnapshot: 70,
+    passed: false,
+  });
+
+  test("reports the limit, the granted total and that a grant is possible once the limit is used up", () => {
+    const [first, second] = modulesOf({
+      quizAttempts: [failedAttempt("a", 1), failedAttempt("b", 2)],
+      attemptGrants: [
+        { quizId: "q1", extraAttempts: 0 },
+        { quizId: "other", extraAttempts: 5 },
+      ],
+    });
+
+    expect(first?.quiz).toEqual({
+      id: "q1",
+      attemptLimit: 2,
+      grantedAttempts: 0,
+      canGrantAttempt: true,
+    });
+    expect(second?.quiz).toBeNull();
+  });
+
+  test("adds up grants and no longer offers one while a granted attempt is unused", () => {
+    const [first] = modulesOf({
+      quizAttempts: [failedAttempt("a", 1), failedAttempt("b", 2)],
+      attemptGrants: [
+        { quizId: "q1", extraAttempts: 1 },
+        { quizId: "q1", extraAttempts: 1 },
+      ],
+    });
+
+    expect(first?.quiz).toMatchObject({ grantedAttempts: 2, canGrantAttempt: false });
+  });
+
+  test("does not count an attempt that was never submitted", () => {
+    const open = { ...failedAttempt("a", 1), submittedAt: null, passed: null };
+    const [first] = modulesOf({ quizAttempts: [open, failedAttempt("b", 2)] });
+
+    expect(first?.quiz?.canGrantAttempt).toBe(false);
+  });
+
+  test("offers no grant on an approved enrollment's unlimited quiz or a removed enrollment", () => {
+    const unlimited = modulesOf({
+      revisionModules: [
+        {
+          id: "m1",
+          order: 1,
+          title: "First",
+          videos: [],
+          quiz: { id: "q1", attemptLimit: null, waitMinutes: 10 },
+        },
+      ],
+    });
+    const removed = modulesOf({
+      status: "REMOVED",
+      quizAttempts: [failedAttempt("a", 1), failedAttempt("b", 2)],
+    });
+
+    expect(unlimited[0]?.quiz?.canGrantAttempt).toBe(false);
+    expect(removed[0]?.quiz?.canGrantAttempt).toBe(false);
   });
 });

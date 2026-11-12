@@ -127,4 +127,34 @@ describe("routeOutboxEvent", () => {
       reason: "invalid certificate payload",
     });
   });
+
+  test.each([
+    ["EnrollmentApproved", "enrollment-approved"],
+    ["EnrollmentRejected", "enrollment-rejected"],
+    ["EnrollmentRemoved", "enrollment-removed"],
+    ["EnrollmentReinstated", "enrollment-reinstated"],
+  ])("routes %s to the enrollment email and carries the stored address", (eventType, template) => {
+    expect(
+      routeOutboxEvent(eventType, {
+        template,
+        userId,
+        enrollmentId,
+        courseId: enrollmentId,
+        courseTitle: "HEAT Basics",
+        recipientAddress: "amina@du.ac.bd",
+        reason: "Duplicate",
+      }),
+    ).toEqual({
+      outcome: "routed",
+      actions: [
+        {
+          kind: "email",
+          template,
+          category: "ENROLLMENT",
+          userId,
+          recipientAddress: "amina@du.ac.bd",
+        },
+      ],
+    });
+  });
 });

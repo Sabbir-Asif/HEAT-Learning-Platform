@@ -119,7 +119,8 @@ export class OutboxRelay {
       await this.queues[action.kind].add(event.id, { outboxId: event.id, assetId: action.assetId });
       return;
     }
-    const recipientAddress = await transaction.findRecipientAddress(action.userId);
+    const recipientAddress =
+      action.recipientAddress ?? (await transaction.findRecipientAddress(action.userId));
     if (recipientAddress === null) {
       this.logger.warn(`Outbox ${event.id} has no recipient, email skipped`);
       return;

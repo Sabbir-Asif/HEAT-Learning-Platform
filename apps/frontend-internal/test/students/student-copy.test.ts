@@ -1,6 +1,9 @@
 import { enrollmentStatuses } from "@heat/contracts";
 import { describe, expect, test } from "vitest";
 import {
+  attemptGrantDescription,
+  attemptGrantNotice,
+  attemptLimitLabel,
   attemptOutcomeLabel,
   attemptScoreLabel,
   certificateDownloadHref,
@@ -101,5 +104,25 @@ describe("certificate actions", () => {
   test("the notice says what happened to which certificate", () => {
     expect(certificateActionNotice("revoke", "ABCD")).toBe("Certificate ABCD was revoked.");
     expect(certificateActionNotice("reissue", "ABCD")).toContain("being reissued");
+  });
+});
+
+describe("attempt grant copy", () => {
+  test("names the student and the module", () => {
+    expect(attemptGrantDescription("Anne", "Consent")).toContain("Anne gets exactly one more");
+    expect(attemptGrantDescription("Anne", "Consent")).toContain("quiz in Consent");
+    expect(attemptGrantNotice("Anne", "Consent")).toBe(
+      "Anne can submit one more attempt in Consent.",
+    );
+  });
+
+  test("describes the attempt limit with any granted attempts", () => {
+    expect(attemptLimitLabel({ attemptLimit: null, grantedAttempts: 0 })).toBe(
+      "Unlimited attempts",
+    );
+    expect(attemptLimitLabel({ attemptLimit: 3, grantedAttempts: 0 })).toBe("3 attempts allowed");
+    expect(attemptLimitLabel({ attemptLimit: 3, grantedAttempts: 2 })).toBe(
+      "5 attempts allowed (2 granted by an admin)",
+    );
   });
 });

@@ -12,6 +12,7 @@ const build = (user: unknown) => {
     {
       publicAppUrl: "https://heat.example",
     } as never,
+    { now: () => new Date("2026-11-12T10:00:00.000Z") },
   );
   return { database, service };
 };

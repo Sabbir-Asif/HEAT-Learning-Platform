@@ -1,5 +1,6 @@
 import { videoCompletionThreshold } from "@heat/contracts";
 import type { StudentDetail } from "@heat/contracts";
+import { canGrantAttempt } from "./attempt-grant-rules";
 import { certificateStatusOf, verificationUrlOf } from "../certificates/certificate-rules";
 
 export const coveragePercent = (coverage: number): number =>
@@ -63,12 +64,13 @@ export interface StudentDetailEnrollmentRow {
     passMarkSnapshot: number;
     passed: boolean | null;
   }[];
+  attemptGrants: { quizId: string; extraAttempts: number }[];
   revisionModules: {
     id: string;
     order: number;
     title: string;
     videos: { id: string; order: number; title: string; required: boolean }[];
-    quiz: { id: string } | null;
+    quiz: { id: string; attemptLimit: number | null; waitMinutes: number } | null;
   }[];
 }
 
@@ -77,6 +79,7 @@ const iso = (value: Date | null): string | null => (value === null ? null : valu
 const toEnrollment = (
   row: StudentDetailEnrollmentRow,
   publicAppUrl: string,
+  now: Date,
 ): StudentDetail["enrollments"][number] => {
   const coverageByVideo = new Map(row.videoProgress.map((entry) => [entry.videoId, entry]));
   const progressByModule = new Map(row.moduleProgress.map((entry) => [entry.moduleId, entry]));
@@ -100,6 +103,15 @@ const toEnrollment = (
       .sort((a, b) => a.order - b.order)
       .map((module) => {
         const progress = progressByModule.get(module.id);
+        const quiz = module.quiz;
+        const quizAttempts =
+          quiz === null ? [] : row.quizAttempts.filter((attempt) => attempt.quizId === quiz.id);
+        const grantedAttempts =
+          quiz === null
+            ? 0
+            : row.attemptGrants
+                .filter((grant) => grant.quizId === quiz.id)
+                .reduce((sum, grant) => sum + grant.extraAttempts, 0);
         return {
           moduleId: module.id,
           order: module.order,
@@ -118,20 +130,38 @@ const toEnrollment = (
                 meetsThreshold: meetsVideoThreshold(watched),
               };
             }),
-          quizAttempts:
-            module.quiz === null
-              ? []
-              : row.quizAttempts
-                  .filter((attempt) => attempt.quizId === module.quiz?.id)
-                  .sort((a, b) => a.startedAt.getTime() - b.startedAt.getTime())
-                  .map((attempt) => ({
-                    id: attempt.id,
-                    startedAt: attempt.startedAt.toISOString(),
-                    submittedAt: iso(attempt.submittedAt),
-                    scorePercent: attempt.scorePercent,
-                    passMarkSnapshot: attempt.passMarkSnapshot,
-                    passed: attempt.passed === true,
-                  })),
+          quiz:
+            quiz === null
+              ? null
+              : {
+                  id: quiz.id,
+                  attemptLimit: quiz.attemptLimit,
+                  grantedAttempts,
+                  canGrantAttempt: canGrantAttempt(
+                    {
+                      enrollmentStatus: row.status,
+                      attemptLimit: quiz.attemptLimit,
+                      waitMinutes: quiz.waitMinutes,
+                      extraAttempts: grantedAttempts,
+                      attempts: quizAttempts.flatMap((attempt) =>
+                        attempt.submittedAt === null
+                          ? []
+                          : [{ passed: attempt.passed, submittedAt: attempt.submittedAt }],
+                      ),
+                    },
+                    now,
+                  ),
+                },
+          quizAttempts: [...quizAttempts]
+            .sort((a, b) => a.startedAt.getTime() - b.startedAt.getTime())
+            .map((attempt) => ({
+              id: attempt.id,
+              startedAt: attempt.startedAt.toISOString(),
+              submittedAt: iso(attempt.submittedAt),
+              scorePercent: attempt.scorePercent,
+              passMarkSnapshot: attempt.passMarkSnapshot,
+              passed: attempt.passed === true,
+            })),
         };
       }),
     certificate:
@@ -151,6 +181,7 @@ export const toStudentDetail = (
   user: StudentDetailUserRow,
   enrollments: readonly StudentDetailEnrollmentRow[],
   publicAppUrl: string,
+  now: Date,
 ): StudentDetail | null => {
   if (user.profile === null) return null;
   const { university, faculty } = user.profile.department.universityFaculty;
@@ -162,6 +193,6 @@ export const toStudentDetail = (
     university,
     faculty,
     department: { id: user.profile.department.id, name: user.profile.department.name },
-    enrollments: enrollments.map((row) => toEnrollment(row, publicAppUrl)),
+    enrollments: enrollments.map((row) => toEnrollment(row, publicAppUrl, now)),
   };
 };

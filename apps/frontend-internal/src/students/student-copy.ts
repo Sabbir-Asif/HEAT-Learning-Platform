@@ -122,3 +122,20 @@ export const certificateActionNotice = (action: CertificateAction, number: strin
   action === "revoke"
     ? `Certificate ${number} was revoked.`
     : `Certificate ${number} is being reissued. Refresh in a moment to see the new file.`;
+
+export const attemptGrantDescription = (studentName: string, moduleTitle: string): string =>
+  `${studentName} gets exactly one more attempt at the quiz in ${moduleTitle}. The wait time after their last attempt still applies. The grant is saved in the audit log with your name.`;
+
+export const attemptGrantNotice = (studentName: string, moduleTitle: string): string =>
+  `${studentName} can submit one more attempt in ${moduleTitle}.`;
+
+export const attemptLimitLabel = (quiz: {
+  attemptLimit: number | null;
+  grantedAttempts: number;
+}): string => {
+  if (quiz.attemptLimit === null) return "Unlimited attempts";
+  const total = quiz.attemptLimit + quiz.grantedAttempts;
+  return quiz.grantedAttempts === 0
+    ? `${total} attempts allowed`
+    : `${total} attempts allowed (${quiz.grantedAttempts} granted by an admin)`;
+};
