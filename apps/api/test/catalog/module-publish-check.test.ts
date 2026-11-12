@@ -101,7 +101,7 @@ describe("ModulePublishCheck", () => {
   });
 
   test("checklist reads through the database without locking", async () => {
-    const { check, client, order } = build([moduleRow({ quiz: null })]);
+    const { check, order } = build([moduleRow({ quiz: null })]);
 
     const checklist = await check.checklist(courseId);
 
