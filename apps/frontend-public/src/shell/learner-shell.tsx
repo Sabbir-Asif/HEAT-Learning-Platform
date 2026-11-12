@@ -16,6 +16,7 @@ import { UserIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { useUnreadCount } from "../notifications/use-unread-count";
 import { heatLogo } from "./brand";
 import { learnerNavigation } from "./navigation";
 
@@ -24,6 +25,7 @@ const brandName = "Gender Safety Training";
 
 export function LearnerShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const unreadCount = useUnreadCount();
   return (
     <SidebarProvider>
       <SkipLink />
@@ -45,7 +47,7 @@ export function LearnerShell({ children }: { children: ReactNode }) {
             className="md:hidden"
           />
           <div className="ml-auto flex items-center gap-1">
-            <NotificationsLink href="/notifications" link={Link} />
+            <NotificationsLink href="/notifications" count={unreadCount} link={Link} />
             <ThemeSwitch />
             <UserMenu
               name="Student account"

@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 const pathname = vi.hoisted(() => ({ value: "/dashboard" }));
 
 vi.mock("next/navigation", () => ({ usePathname: () => pathname.value }));
+vi.mock("../src/notifications/use-unread-count", () => ({ useUnreadCount: () => 3 }));
 
 import { AuthShell } from "../src/shell/auth-shell";
 import { LearnerShell } from "../src/shell/learner-shell";
@@ -55,6 +56,17 @@ describe("learner shell", () => {
     const current = bar.querySelectorAll('[aria-current="page"]');
     expect(current).toHaveLength(1);
     expect(current[0]?.textContent).toBe("My Learning");
+  });
+
+  test("shows the unread count on the notifications bell", async () => {
+    pathname.value = "/dashboard";
+    const view = await mount(
+      <LearnerShell>
+        <p>content</p>
+      </LearnerShell>,
+    );
+    const bell = view.querySelector('[data-slot="notifications-link"]') as HTMLAnchorElement;
+    expect(bell.getAttribute("aria-label")).toBe("Notifications, 3 unread");
   });
 
   test("renders one main landmark and a skip link to it", async () => {

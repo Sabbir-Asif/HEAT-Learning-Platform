@@ -34,6 +34,7 @@ export * from "./composites/empty-state";
 export * from "./composites/error-state";
 export * from "./composites/form";
 export * from "./composites/lesson-text";
+export * from "./composites/notification-row";
 export * from "./composites/page-header";
 export * from "./composites/quiz-question";
 export * from "./composites/quiz-review-question";
