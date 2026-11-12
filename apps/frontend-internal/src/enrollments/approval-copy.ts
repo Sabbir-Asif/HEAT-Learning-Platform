@@ -23,3 +23,11 @@ export const queueSortValue = (sort: SortState | null): "requestedAt" | "-reques
 
 export const approveLabel = (count: number): string =>
   count === 1 ? "Approve 1 request" : `Approve ${count} requests`;
+
+export const rejectLabel = (count: number): string =>
+  count === 1 ? "Reject 1 request" : `Reject ${count} requests`;
+
+export const rejectionSummaryText = (succeeded: number, failed: number): string => {
+  if (failed === 0) return `${succeeded} rejected.`;
+  return `${succeeded === 0 ? "None" : succeeded} rejected, ${failed} not rejected.`;
+};
