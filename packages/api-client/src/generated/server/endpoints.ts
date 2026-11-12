@@ -22,6 +22,29 @@ export interface AdminCsrfTokenResponseDto {
   token: string;
 }
 
+export type AdminFrontPageResponseDtoCoursesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  published: boolean;
+  slug: string;
+  title: string;
+};
+
+export type AdminFrontPageResponseDtoModulesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId: string;
+  courseTitle: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  published: boolean;
+  title: string;
+};
+
+export interface AdminFrontPageResponseDto {
+  courses: AdminFrontPageResponseDtoCoursesItem[];
+  modules: AdminFrontPageResponseDtoModulesItem[];
+}
+
 export type AdminListResponseDtoItemsItemRole = typeof AdminListResponseDtoItemsItemRole[keyof typeof AdminListResponseDtoItemsItemRole];
 
 
@@ -357,7 +380,10 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   QUIZ_ATTEMPT_WAIT: 'QUIZ_ATTEMPT_WAIT',
   QUIZ_NOT_UNLOCKED: 'QUIZ_NOT_UNLOCKED',
   RATE_LIMITED: 'RATE_LIMITED',
+  TAG_NAME_TAKEN: 'TAG_NAME_TAKEN',
+  TAG_RESERVED: 'TAG_RESERVED',
   UNAUTHENTICATED: 'UNAUTHENTICATED',
+  UPLOAD_DIMENSIONS_TOO_LARGE: 'UPLOAD_DIMENSIONS_TOO_LARGE',
   UPLOAD_EXPIRED: 'UPLOAD_EXPIRED',
   UPLOAD_OFFSET_MISMATCH: 'UPLOAD_OFFSET_MISMATCH',
   UPLOAD_TOO_LARGE: 'UPLOAD_TOO_LARGE',
@@ -634,6 +660,10 @@ export interface CreateModuleRequestDto {
   /** @maxItems 10 */
   objectives?: string[];
   title: string;
+}
+
+export interface CreateTagRequestDto {
+  name: string;
 }
 
 export interface CreateUniversityRequestDto {
@@ -1454,6 +1484,36 @@ export interface ProgressResponseDto {
   resumePositionSeconds: number;
 }
 
+export type PublicFrontPageResponseDtoCoursesItem = {
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  description: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  slug: string;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  thumbnailAssetId: string | null;
+  title: string;
+};
+
+export type PublicFrontPageResponseDtoModulesItem = {
+  courseSlug: string;
+  courseTitle: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+export interface PublicFrontPageResponseDto {
+  courses: PublicFrontPageResponseDtoCoursesItem[];
+  modules: PublicFrontPageResponseDtoModulesItem[];
+}
+
 export type QuizAccessResponseDtoModuleState = typeof QuizAccessResponseDtoModuleState[keyof typeof QuizAccessResponseDtoModuleState];
 
 
@@ -1733,6 +1793,14 @@ export interface ReorderRequestDto {
   previousIds: string[];
 }
 
+export interface SetTagsRequestDto {
+  /**
+     * @maxItems 50
+     * @items.pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  tagIds: string[];
+}
+
 export interface SignInRequestDto {
   email: string;
   /**
@@ -1740,6 +1808,105 @@ export interface SignInRequestDto {
      * @maxLength 256
      */
   password: string;
+}
+
+export type TagDetailDtoCoursesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+export type TagDetailDtoModulesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId: string;
+  courseTitle: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+export interface TagDetailDto {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  courseCount: number;
+  courses: TagDetailDtoCoursesItem[];
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  isSystem: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  moduleCount: number;
+  modules: TagDetailDtoModulesItem[];
+  name: string;
+  slug: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+}
+
+export type TagListResponseDtoItemsItem = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  courseCount: number;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  isSystem: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  moduleCount: number;
+  name: string;
+  slug: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+};
+
+export interface TagListResponseDto {
+  items: TagListResponseDtoItemsItem[];
+}
+
+export type TagRefListResponseDtoItemsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  isSystem: boolean;
+  name: string;
+  slug: string;
+};
+
+export interface TagRefListResponseDto {
+  items: TagRefListResponseDtoItemsItem[];
+}
+
+export interface TagSummaryDto {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  courseCount: number;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  isSystem: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  moduleCount: number;
+  name: string;
+  slug: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
 }
 
 export type UniversityListResponseDtoItemsItem = {
@@ -1884,6 +2051,10 @@ export interface UpdateQuizQuestionRequestDto {
      * @maxLength 1000
      */
   text: string;
+}
+
+export interface UpdateTagRequestDto {
+  name: string;
 }
 
 export interface UpdateUniversityRequestDto {
@@ -3282,6 +3453,67 @@ return serverFetch<ModuleSummaryDto>(getLessonSectionsUpdateUrl(id,moduleId,sect
 
 
 
+export const getTagAssignmentsModuleTagsUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/tags`
+}
+
+export const tagAssignmentsModuleTags = async (id: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<TagRefListResponseDto> => {
+
+  return serverFetch<TagRefListResponseDto>(getTagAssignmentsModuleTagsUrl(id,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getTagAssignmentsSetModuleTagsUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/tags`
+}
+
+export const tagAssignmentsSetModuleTags = async (id: string,
+    moduleId: string,
+    setTagsRequestDto: SetTagsRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<TagRefListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<TagRefListResponseDto>(getTagAssignmentsSetModuleTagsUrl(id,moduleId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(setTagsRequestDto)
+  }
+);}
+
+
+
 export const getVideoSlotsListUrl = (id: string,
     moduleId: string,) => {
 
@@ -3487,6 +3719,63 @@ export const coursesPublish = async (id: string, options?: Parameters<typeof ser
     method: 'POST'
 
 
+  }
+);}
+
+
+
+export const getTagAssignmentsCourseTagsUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/tags`
+}
+
+export const tagAssignmentsCourseTags = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<TagRefListResponseDto> => {
+
+  return serverFetch<TagRefListResponseDto>(getTagAssignmentsCourseTagsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getTagAssignmentsSetCourseTagsUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/tags`
+}
+
+export const tagAssignmentsSetCourseTags = async (id: string,
+    setTagsRequestDto: SetTagsRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<TagRefListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<TagRefListResponseDto>(getTagAssignmentsSetCourseTagsUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(setTagsRequestDto)
   }
 );}
 
@@ -4186,6 +4475,97 @@ return serverFetch<ApprovedEnrollmentDto>(getEnrollmentApprovalApproveUrl(id),
 
 
 
+export const getAdminFrontPageGetUrl = () => {
+
+
+
+
+  return `/api/admin/front-page`
+}
+
+export const adminFrontPageGet = async ( options?: Parameters<typeof serverFetch>[1]): Promise<AdminFrontPageResponseDto> => {
+
+  return serverFetch<AdminFrontPageResponseDto>(getAdminFrontPageGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getAdminFrontPageReorderCoursesUrl = () => {
+
+
+
+
+  return `/api/admin/front-page/courses/reorder`
+}
+
+export const adminFrontPageReorderCourses = async (reorderRequestDto: ReorderRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminFrontPageResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<AdminFrontPageResponseDto>(getAdminFrontPageReorderCoursesUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reorderRequestDto)
+  }
+);}
+
+
+
+export const getAdminFrontPageReorderModulesUrl = () => {
+
+
+
+
+  return `/api/admin/front-page/modules/reorder`
+}
+
+export const adminFrontPageReorderModules = async (reorderRequestDto: ReorderRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminFrontPageResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<AdminFrontPageResponseDto>(getAdminFrontPageReorderModulesUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reorderRequestDto)
+  }
+);}
+
+
+
 export const getAdminMeDescribeUrl = () => {
 
 
@@ -4223,6 +4603,140 @@ export const adminPlaybackPreview = async (videoId: string, options?: Parameters
     method: 'POST'
 
 
+  }
+);}
+
+
+
+export const getTagsListUrl = () => {
+
+
+
+
+  return `/api/admin/tags`
+}
+
+export const tagsList = async ( options?: Parameters<typeof serverFetch>[1]): Promise<TagListResponseDto> => {
+
+  return serverFetch<TagListResponseDto>(getTagsListUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getTagsCreateUrl = () => {
+
+
+
+
+  return `/api/admin/tags`
+}
+
+export const tagsCreate = async (createTagRequestDto: CreateTagRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<TagSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<TagSummaryDto>(getTagsCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createTagRequestDto)
+  }
+);}
+
+
+
+export const getTagsRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/tags/${id}`
+}
+
+export const tagsRemove = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getTagsRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getTagsGetUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/tags/${id}`
+}
+
+export const tagsGet = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<TagDetailDto> => {
+
+  return serverFetch<TagDetailDto>(getTagsGetUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getTagsUpdateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/tags/${id}`
+}
+
+export const tagsUpdate = async (id: string,
+    updateTagRequestDto: UpdateTagRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<TagSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<TagSummaryDto>(getTagsUpdateUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateTagRequestDto)
   }
 );}
 
@@ -4675,6 +5189,27 @@ return serverFetch<EnrollmentAcceptedResponseDto>(getEnrollmentSubmitUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(enrollmentRequestDto)
+  }
+);}
+
+
+
+export const getPublicFrontPageGetUrl = () => {
+
+
+
+
+  return `/api/front-page`
+}
+
+export const publicFrontPageGet = async ( options?: Parameters<typeof serverFetch>[1]): Promise<PublicFrontPageResponseDto> => {
+
+  return serverFetch<PublicFrontPageResponseDto>(getPublicFrontPageGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 

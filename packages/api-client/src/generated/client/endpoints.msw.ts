@@ -21,6 +21,7 @@ import type {
 import type {
   AcceptInviteRequestDto,
   AdminCsrfTokenResponseDto,
+  AdminFrontPageResponseDto,
   AdminListResponseDto,
   AdminMeResponseDto,
   AdminSignInRequestDto,
@@ -41,6 +42,7 @@ import type {
   CreateDepartmentRequestDto,
   CreateFacultyRequestDto,
   CreateModuleRequestDto,
+  CreateTagRequestDto,
   CreateUniversityRequestDto,
   CreateVideoSlotRequestDto,
   CsrfTokenResponseDto,
@@ -65,6 +67,7 @@ import type {
   PlaybackSessionResponseDto,
   ProgressBatchDto,
   ProgressResponseDto,
+  PublicFrontPageResponseDto,
   QuizAccessResponseDto,
   QuizDeliveryResponseDto,
   QuizQuestionRequestDto,
@@ -73,7 +76,12 @@ import type {
   QuizSubmitResponseDto,
   QuizSummaryDto,
   ReorderRequestDto,
+  SetTagsRequestDto,
   SignInRequestDto,
+  TagDetailDto,
+  TagListResponseDto,
+  TagRefListResponseDto,
+  TagSummaryDto,
   UniversityListResponseDto,
   UniversitySummaryDto,
   UpdateCourseRequestDto,
@@ -81,6 +89,7 @@ import type {
   UpdateFacultyRequestDto,
   UpdateModuleRequestDto,
   UpdateQuizQuestionRequestDto,
+  UpdateTagRequestDto,
   UpdateUniversityRequestDto,
   UpdateVideoSlotRequestDto,
   VerificationAcceptedResponseDto,
@@ -148,6 +157,10 @@ export const getLessonSectionsRemoveResponseMock = (overrideResponse: Partial<Ex
 
 export const getLessonSectionsUpdateResponseMock = (overrideResponse: Partial<Extract<ModuleSummaryDto, object>> = {}): ModuleSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
+export const getTagAssignmentsModuleTagsResponseMock = (overrideResponse: Partial<Extract<TagRefListResponseDto, object>> = {}): TagRefListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), isSystem: faker.datatype.boolean(), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
+
+export const getTagAssignmentsSetModuleTagsResponseMock = (overrideResponse: Partial<Extract<TagRefListResponseDto, object>> = {}): TagRefListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), isSystem: faker.datatype.boolean(), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
+
 export const getVideoSlotsListResponseMock = (overrideResponse: Partial<Extract<VideoSlotListResponseDto, object>> = {}): VideoSlotListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({assetKey: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 128}}), null]), failureReason: faker.helpers.arrayElement([faker.helpers.arrayElement(['SOURCE_UNREADABLE','ENCODE_FAILED','TIMED_OUT','VALIDATION_FAILED','PUBLISH_FAILED'] as const), null]), id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), rejectionReason: faker.helpers.arrayElement([faker.helpers.arrayElement(['NOT_A_VIDEO','UNSUPPORTED_CONTAINER','UNSUPPORTED_CODEC','TOO_LARGE','NO_DURATION'] as const), null]), required: faker.datatype.boolean(), status: faker.helpers.arrayElement(['NOT_UPLOADED','UPLOADING','UPLOADED','QUEUED','PROCESSING','READY','FAILED','REJECTED'] as const), title: faker.string.alpha({length: {min: 10, max: 20}})})), locked: faker.datatype.boolean(), ...overrideResponse})
 
 export const getVideoSlotsCreateResponseMock = (overrideResponse: Partial<Extract<VideoSlotListResponseDto, object>> = {}): VideoSlotListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({assetKey: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 128}}), null]), failureReason: faker.helpers.arrayElement([faker.helpers.arrayElement(['SOURCE_UNREADABLE','ENCODE_FAILED','TIMED_OUT','VALIDATION_FAILED','PUBLISH_FAILED'] as const), null]), id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), rejectionReason: faker.helpers.arrayElement([faker.helpers.arrayElement(['NOT_A_VIDEO','UNSUPPORTED_CONTAINER','UNSUPPORTED_CODEC','TOO_LARGE','NO_DURATION'] as const), null]), required: faker.datatype.boolean(), status: faker.helpers.arrayElement(['NOT_UPLOADED','UPLOADING','UPLOADED','QUEUED','PROCESSING','READY','FAILED','REJECTED'] as const), title: faker.string.alpha({length: {min: 10, max: 20}})})), locked: faker.datatype.boolean(), ...overrideResponse})
@@ -161,6 +174,10 @@ export const getVideoSlotsUpdateResponseMock = (overrideResponse: Partial<Extrac
 export const getVideoSlotsRetryTranscodeResponseMock = (overrideResponse: Partial<Extract<VideoSlotListResponseDto, object>> = {}): VideoSlotListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({assetKey: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 128}}), null]), failureReason: faker.helpers.arrayElement([faker.helpers.arrayElement(['SOURCE_UNREADABLE','ENCODE_FAILED','TIMED_OUT','VALIDATION_FAILED','PUBLISH_FAILED'] as const), null]), id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), rejectionReason: faker.helpers.arrayElement([faker.helpers.arrayElement(['NOT_A_VIDEO','UNSUPPORTED_CONTAINER','UNSUPPORTED_CODEC','TOO_LARGE','NO_DURATION'] as const), null]), required: faker.datatype.boolean(), status: faker.helpers.arrayElement(['NOT_UPLOADED','UPLOADING','UPLOADED','QUEUED','PROCESSING','READY','FAILED','REJECTED'] as const), title: faker.string.alpha({length: {min: 10, max: 20}})})), locked: faker.datatype.boolean(), ...overrideResponse})
 
 export const getCoursesPublishResponseMock = (overrideResponse: Partial<Extract<CourseSummaryDto, object>> = {}): CourseSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', currentRevision: faker.helpers.arrayElement([{id: faker.string.uuid(), number: faker.number.int({min: 1, max: 9007199254740991}), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])},null,]), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 5000}}), null]), enrollmentCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), lockedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), slug: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['DRAFT','PUBLISHED'] as const), thumbnailAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getTagAssignmentsCourseTagsResponseMock = (overrideResponse: Partial<Extract<TagRefListResponseDto, object>> = {}): TagRefListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), isSystem: faker.datatype.boolean(), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
+
+export const getTagAssignmentsSetCourseTagsResponseMock = (overrideResponse: Partial<Extract<TagRefListResponseDto, object>> = {}): TagRefListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), isSystem: faker.datatype.boolean(), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
 export const getDepartmentsListResponseMock = (overrideResponse: Partial<Extract<DepartmentListResponseDto, object>> = {}): DepartmentListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({archivedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), parentArchived: faker.datatype.boolean(), studentCount: faker.number.int({min: 0, max: 9007199254740991}), university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
 
@@ -202,15 +219,29 @@ export const getUniversitiesArchiveResponseMock = (overrideResponse: Partial<Ext
 
 export const getUniversitiesRestoreResponseMock = (overrideResponse: Partial<Extract<UniversitySummaryDto, object>> = {}): UniversitySummaryDto => ({archivedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', departmentCount: faker.number.int({min: 0, max: 9007199254740991}), facultyCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), studentCount: faker.number.int({min: 0, max: 9007199254740991}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
-export const getEnrollmentApprovalApproveManyResponseMock = (overrideResponse: Partial<Extract<BulkApprovalResponseDto, object>> = {}): BulkApprovalResponseDto => ({failed: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement(['AUDIT_ACTOR_FILTER_TOO_BROAD','BAD_REQUEST','CANNOT_DEACTIVATE_SELF','CAPTCHA_EXPIRED','CAPTCHA_INVALID','CONTENT_LOCKED','COURSE_HAS_ENROLLMENTS','COURSE_LOCKED','COURSE_NOT_AVAILABLE','COURSE_NOT_DRAFT','COURSE_PUBLISH_CHECKS_FAILED','COURSE_SLUG_TAKEN','CSRF_TOKEN_INVALID','DIRECTORY_ARCHIVED','DIRECTORY_IN_USE','DIRECTORY_NAME_TAKEN','EMAIL_IN_USE','ENROLLMENT_ALREADY_DECIDED','ENROLLMENT_NOT_ACTIVE','ENROLLMENT_NOT_VERIFIED','FORBIDDEN','INTERNAL','INVALID_CREDENTIALS','INVITATION_EXPIRED','INVITATION_INVALID','INVITATION_NOT_PENDING','MODULE_LOCKED','NOT_FOUND','ORDER_CONFLICT','ORIGIN_NOT_ALLOWED','PASSWORD_BREACHED','PASSWORD_CHANGE_REQUIRED','QUIZ_ANSWER_INVALID','QUIZ_ATTEMPT_LIMIT_REACHED','QUIZ_ATTEMPT_NOT_OPEN','QUIZ_ATTEMPT_WAIT','QUIZ_NOT_UNLOCKED','RATE_LIMITED','UNAUTHENTICATED','UPLOAD_EXPIRED','UPLOAD_OFFSET_MISMATCH','UPLOAD_TOO_LARGE','UPLOAD_TYPE_NOT_ALLOWED','VALIDATION_FAILED','VERIFICATION_LINK_EXPIRED','VERIFICATION_LINK_INVALID','VERIFICATION_LINK_USED','VERIFICATION_RESEND_LIMIT','VIDEO_NOT_FAILED','VIDEO_NOT_READY'] as const), id: faker.string.uuid()})), succeeded: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), ...overrideResponse})
+export const getEnrollmentApprovalApproveManyResponseMock = (overrideResponse: Partial<Extract<BulkApprovalResponseDto, object>> = {}): BulkApprovalResponseDto => ({failed: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement(['AUDIT_ACTOR_FILTER_TOO_BROAD','BAD_REQUEST','CANNOT_DEACTIVATE_SELF','CAPTCHA_EXPIRED','CAPTCHA_INVALID','CONTENT_LOCKED','COURSE_HAS_ENROLLMENTS','COURSE_LOCKED','COURSE_NOT_AVAILABLE','COURSE_NOT_DRAFT','COURSE_PUBLISH_CHECKS_FAILED','COURSE_SLUG_TAKEN','CSRF_TOKEN_INVALID','DIRECTORY_ARCHIVED','DIRECTORY_IN_USE','DIRECTORY_NAME_TAKEN','EMAIL_IN_USE','ENROLLMENT_ALREADY_DECIDED','ENROLLMENT_NOT_ACTIVE','ENROLLMENT_NOT_VERIFIED','FORBIDDEN','INTERNAL','INVALID_CREDENTIALS','INVITATION_EXPIRED','INVITATION_INVALID','INVITATION_NOT_PENDING','MODULE_LOCKED','NOT_FOUND','ORDER_CONFLICT','ORIGIN_NOT_ALLOWED','PASSWORD_BREACHED','PASSWORD_CHANGE_REQUIRED','QUIZ_ANSWER_INVALID','QUIZ_ATTEMPT_LIMIT_REACHED','QUIZ_ATTEMPT_NOT_OPEN','QUIZ_ATTEMPT_WAIT','QUIZ_NOT_UNLOCKED','RATE_LIMITED','TAG_NAME_TAKEN','TAG_RESERVED','UNAUTHENTICATED','UPLOAD_DIMENSIONS_TOO_LARGE','UPLOAD_EXPIRED','UPLOAD_OFFSET_MISMATCH','UPLOAD_TOO_LARGE','UPLOAD_TYPE_NOT_ALLOWED','VALIDATION_FAILED','VERIFICATION_LINK_EXPIRED','VERIFICATION_LINK_INVALID','VERIFICATION_LINK_USED','VERIFICATION_RESEND_LIMIT','VIDEO_NOT_FAILED','VIDEO_NOT_READY'] as const), id: faker.string.uuid()})), succeeded: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), ...overrideResponse})
 
 export const getEnrollmentApprovalListPendingResponseMock = (overrideResponse: Partial<Extract<ApprovalQueueResponseDto, object>> = {}): ApprovalQueueResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({course: {id: faker.string.uuid(), title: faker.string.alpha({length: {min: 10, max: 20}})}, department: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, id: faker.string.uuid(), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', session: faker.string.alpha({length: {min: 10, max: 20}}), student: {email: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}})}, university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, verifiedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
 
 export const getEnrollmentApprovalApproveResponseMock = (overrideResponse: Partial<Extract<ApprovedEnrollmentDto, object>> = {}): ApprovedEnrollmentDto => ({approvedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', courseRevisionId: faker.string.uuid(), id: faker.string.uuid(), status: faker.helpers.arrayElement(['APPROVED'] as const), ...overrideResponse})
 
+export const getAdminFrontPageGetResponseMock = (overrideResponse: Partial<Extract<AdminFrontPageResponseDto, object>> = {}): AdminFrontPageResponseDto => ({courses: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), published: faker.datatype.boolean(), slug: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}})})), modules: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), published: faker.datatype.boolean(), title: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
+
+export const getAdminFrontPageReorderCoursesResponseMock = (overrideResponse: Partial<Extract<AdminFrontPageResponseDto, object>> = {}): AdminFrontPageResponseDto => ({courses: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), published: faker.datatype.boolean(), slug: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}})})), modules: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), published: faker.datatype.boolean(), title: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
+
+export const getAdminFrontPageReorderModulesResponseMock = (overrideResponse: Partial<Extract<AdminFrontPageResponseDto, object>> = {}): AdminFrontPageResponseDto => ({courses: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), published: faker.datatype.boolean(), slug: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}})})), modules: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), published: faker.datatype.boolean(), title: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
+
 export const getAdminMeDescribeResponseMock = (overrideResponse: Partial<Extract<AdminMeResponseDto, object>> = {}): AdminMeResponseDto => ({user: {email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
 
 export const getAdminPlaybackPreviewResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({captions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({language: faker.string.alpha({length: {min: 1, max: 35}})})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', manifestPath: faker.string.alpha({length: {min: 10, max: 20}}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), sessionId: faker.helpers.arrayElement([faker.string.uuid(), null]), ...overrideResponse})
+
+export const getTagsListResponseMock = (overrideResponse: Partial<Extract<TagListResponseDto, object>> = {}): TagListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseCount: faker.number.int({min: 0, max: 9007199254740991}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), isSystem: faker.datatype.boolean(), moduleCount: faker.number.int({min: 0, max: 9007199254740991}), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
+
+export const getTagsCreateResponseMock = (overrideResponse: Partial<Extract<TagSummaryDto, object>> = {}): TagSummaryDto => ({courseCount: faker.number.int({min: 0, max: 9007199254740991}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), isSystem: faker.datatype.boolean(), moduleCount: faker.number.int({min: 0, max: 9007199254740991}), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getTagsGetResponseMock = (overrideResponse: Partial<Extract<TagDetailDto, object>> = {}): TagDetailDto => ({courseCount: faker.number.int({min: 0, max: 9007199254740991}), courses: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), title: faker.string.alpha({length: {min: 10, max: 20}})})), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), isSystem: faker.datatype.boolean(), moduleCount: faker.number.int({min: 0, max: 9007199254740991}), modules: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.string.uuid(), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), title: faker.string.alpha({length: {min: 10, max: 20}})})), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getTagsUpdateResponseMock = (overrideResponse: Partial<Extract<TagSummaryDto, object>> = {}): TagSummaryDto => ({courseCount: faker.number.int({min: 0, max: 9007199254740991}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), isSystem: faker.datatype.boolean(), moduleCount: faker.number.int({min: 0, max: 9007199254740991}), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 export const getStudentAuthCsrfTokenResponseMock = (overrideResponse: Partial<Extract<CsrfTokenResponseDto, object>> = {}): CsrfTokenResponseDto => ({token: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
@@ -243,6 +274,8 @@ export const getDirectoryLookupsListFacultiesResponseMock = (overrideResponse: P
 export const getDirectoryLookupsListDepartmentsResponseMock = (overrideResponse: Partial<Extract<DirectoryOptionListResponseDto, object>> = {}): DirectoryOptionListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
 export const getEnrollmentSubmitResponseMock = (overrideResponse: Partial<Extract<EnrollmentAcceptedResponseDto, object>> = {}): EnrollmentAcceptedResponseDto => ({accepted: faker.helpers.arrayElement([true] as const), ...overrideResponse})
+
+export const getPublicFrontPageGetResponseMock = (overrideResponse: Partial<Extract<PublicFrontPageResponseDto, object>> = {}): PublicFrontPageResponseDto => ({courses: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 5000}}), null]), id: faker.string.uuid(), slug: faker.string.alpha({length: {min: 10, max: 20}}), thumbnailAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), title: faker.string.alpha({length: {min: 10, max: 20}})})), modules: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseSlug: faker.string.alpha({length: {min: 10, max: 20}}), courseTitle: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), title: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
 export const getHealthCheckResponseMock = (overrideResponse: Partial<Extract<HealthResponseDto, object>> = {}): HealthResponseDto => ({status: faker.helpers.arrayElement(['ok'] as const), ...overrideResponse})
 
@@ -668,6 +701,30 @@ export const getLessonSectionsUpdateMockHandler = (overrideResponse?: ModuleSumm
   }, options)
 }
 
+export const getTagAssignmentsModuleTagsMockHandler = (overrideResponse?: TagRefListResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }>>[0]) => Promise<TagRefListResponseDto> | TagRefListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string; moduleId: string }>('*/api/admin/courses/:id/modules/:moduleId/tags', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getTagAssignmentsModuleTagsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getTagAssignmentsSetModuleTagsMockHandler = (overrideResponse?: TagRefListResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, SetTagsRequestDto>>[0]) => Promise<TagRefListResponseDto> | TagRefListResponseDto), options?: RequestHandlerOptions) => {
+  return http.put<{ id: string; moduleId: string }, SetTagsRequestDto>('*/api/admin/courses/:id/modules/:moduleId/tags', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }, SetTagsRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getTagAssignmentsSetModuleTagsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getVideoSlotsListMockHandler = (overrideResponse?: VideoSlotListResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }>>[0]) => Promise<VideoSlotListResponseDto> | VideoSlotListResponseDto), options?: RequestHandlerOptions) => {
   return http.get<{ id: string; moduleId: string }>('*/api/admin/courses/:id/modules/:moduleId/videos', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string }>>[0]) => {
 
@@ -747,6 +804,30 @@ export const getCoursesPublishMockHandler = (overrideResponse?: CourseSummaryDto
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getCoursesPublishResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getTagAssignmentsCourseTagsMockHandler = (overrideResponse?: TagRefListResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<TagRefListResponseDto> | TagRefListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string }>('*/api/admin/courses/:id/tags', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getTagAssignmentsCourseTagsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getTagAssignmentsSetCourseTagsMockHandler = (overrideResponse?: TagRefListResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string }, SetTagsRequestDto>>[0]) => Promise<TagRefListResponseDto> | TagRefListResponseDto), options?: RequestHandlerOptions) => {
+  return http.put<{ id: string }, SetTagsRequestDto>('*/api/admin/courses/:id/tags', async (info: Parameters<HttpResponseResolver<{ id: string }, SetTagsRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getTagAssignmentsSetCourseTagsResponseMock(),
       { status: 200
       })
   }, options)
@@ -1058,6 +1139,42 @@ export const getEnrollmentApprovalApproveMockHandler = (overrideResponse?: Appro
   }, options)
 }
 
+export const getAdminFrontPageGetMockHandler = (overrideResponse?: AdminFrontPageResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<AdminFrontPageResponseDto> | AdminFrontPageResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/front-page', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminFrontPageGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getAdminFrontPageReorderCoursesMockHandler = (overrideResponse?: AdminFrontPageResponseDto | ((info: Parameters<HttpResponseResolver<PathParams, ReorderRequestDto>>[0]) => Promise<AdminFrontPageResponseDto> | AdminFrontPageResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, ReorderRequestDto>('*/api/admin/front-page/courses/reorder', async (info: Parameters<HttpResponseResolver<PathParams, ReorderRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminFrontPageReorderCoursesResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getAdminFrontPageReorderModulesMockHandler = (overrideResponse?: AdminFrontPageResponseDto | ((info: Parameters<HttpResponseResolver<PathParams, ReorderRequestDto>>[0]) => Promise<AdminFrontPageResponseDto> | AdminFrontPageResponseDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, ReorderRequestDto>('*/api/admin/front-page/modules/reorder', async (info: Parameters<HttpResponseResolver<PathParams, ReorderRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminFrontPageReorderModulesResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getAdminMeDescribeMockHandler = (overrideResponse?: AdminMeResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<AdminMeResponseDto> | AdminMeResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/admin/me', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1077,6 +1194,64 @@ export const getAdminPlaybackPreviewMockHandler = (overrideResponse?: PlaybackSe
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getAdminPlaybackPreviewResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getTagsListMockHandler = (overrideResponse?: TagListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<TagListResponseDto> | TagListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/tags', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getTagsListResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getTagsCreateMockHandler = (overrideResponse?: TagSummaryDto | ((info: Parameters<HttpResponseResolver<PathParams, CreateTagRequestDto>>[0]) => Promise<TagSummaryDto> | TagSummaryDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, CreateTagRequestDto>('*/api/admin/tags', async (info: Parameters<HttpResponseResolver<PathParams, CreateTagRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getTagsCreateResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getTagsRemoveMockHandler = (overrideResponse?: void | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.delete<{ id: string }>('*/api/admin/tags/:id', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
+
+export const getTagsGetMockHandler = (overrideResponse?: TagDetailDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<TagDetailDto> | TagDetailDto), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string }>('*/api/admin/tags/:id', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getTagsGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getTagsUpdateMockHandler = (overrideResponse?: TagSummaryDto | ((info: Parameters<HttpResponseResolver<{ id: string }, UpdateTagRequestDto>>[0]) => Promise<TagSummaryDto> | TagSummaryDto), options?: RequestHandlerOptions) => {
+  return http.patch<{ id: string }, UpdateTagRequestDto>('*/api/admin/tags/:id', async (info: Parameters<HttpResponseResolver<{ id: string }, UpdateTagRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getTagsUpdateResponseMock(),
       { status: 200
       })
   }, options)
@@ -1283,6 +1458,18 @@ export const getEnrollmentSubmitMockHandler = (overrideResponse?: EnrollmentAcce
   }, options)
 }
 
+export const getPublicFrontPageGetMockHandler = (overrideResponse?: PublicFrontPageResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<PublicFrontPageResponseDto> | PublicFrontPageResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/front-page', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPublicFrontPageGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getHealthCheckMockHandler = (overrideResponse?: HealthResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<HealthResponseDto> | HealthResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/health', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1402,6 +1589,8 @@ export const getHeatLmsApiMock = () => [
   getLessonSectionsReorderMockHandler(),
   getLessonSectionsRemoveMockHandler(),
   getLessonSectionsUpdateMockHandler(),
+  getTagAssignmentsModuleTagsMockHandler(),
+  getTagAssignmentsSetModuleTagsMockHandler(),
   getVideoSlotsListMockHandler(),
   getVideoSlotsCreateMockHandler(),
   getVideoSlotsReorderMockHandler(),
@@ -1409,6 +1598,8 @@ export const getHeatLmsApiMock = () => [
   getVideoSlotsUpdateMockHandler(),
   getVideoSlotsRetryTranscodeMockHandler(),
   getCoursesPublishMockHandler(),
+  getTagAssignmentsCourseTagsMockHandler(),
+  getTagAssignmentsSetCourseTagsMockHandler(),
   getDepartmentsListMockHandler(),
   getDepartmentsCreateMockHandler(),
   getDepartmentsRemoveMockHandler(),
@@ -1435,8 +1626,16 @@ export const getHeatLmsApiMock = () => [
   getEnrollmentApprovalApproveManyMockHandler(),
   getEnrollmentApprovalListPendingMockHandler(),
   getEnrollmentApprovalApproveMockHandler(),
+  getAdminFrontPageGetMockHandler(),
+  getAdminFrontPageReorderCoursesMockHandler(),
+  getAdminFrontPageReorderModulesMockHandler(),
   getAdminMeDescribeMockHandler(),
   getAdminPlaybackPreviewMockHandler(),
+  getTagsListMockHandler(),
+  getTagsCreateMockHandler(),
+  getTagsRemoveMockHandler(),
+  getTagsGetMockHandler(),
+  getTagsUpdateMockHandler(),
   getStudentAuthCsrfTokenMockHandler(),
   getStudentAuthRefreshMockHandler(),
   getStudentAuthSignInMockHandler(),
@@ -1454,6 +1653,7 @@ export const getHeatLmsApiMock = () => [
   getDirectoryLookupsListFacultiesMockHandler(),
   getDirectoryLookupsListDepartmentsMockHandler(),
   getEnrollmentSubmitMockHandler(),
+  getPublicFrontPageGetMockHandler(),
   getHealthCheckMockHandler(),
   getMeDescribeMockHandler(),
   getMeCertificatesListMockHandler(),
