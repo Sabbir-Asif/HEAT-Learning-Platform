@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
+  contactCacheTag,
   courseCacheTag,
   frontPageCacheTag,
   isKnownCacheTag,
@@ -16,6 +17,7 @@ describe("public cache tags", () => {
   test("knows the landing, front page and course tags", () => {
     expect(isKnownCacheTag(frontPageCacheTag)).toBe(true);
     expect(isKnownCacheTag(landingCacheTag)).toBe(true);
+    expect(isKnownCacheTag(contactCacheTag)).toBe(true);
     expect(isKnownCacheTag("course:gender-safety")).toBe(true);
   });
 
