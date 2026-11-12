@@ -110,7 +110,6 @@ export const toVerification = (
   certificate: VerifiableCertificate | null,
 ): CertificateVerificationResponse | null => {
   if (certificate === null) return null;
-  if (certificate.fileKey === null && certificate.revokedAt === null) return null;
   return {
     status: certificate.revokedAt === null ? "VALID" : "REVOKED",
     holderName: certificate.recipientName,

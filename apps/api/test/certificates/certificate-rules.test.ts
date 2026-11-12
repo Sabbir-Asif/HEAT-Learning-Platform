@@ -208,9 +208,12 @@ describe("certificate verification and admin refusals", () => {
     );
   });
 
-  test("an unknown or not yet rendered certificate is not found", () => {
+  test("an unknown certificate is not found", () => {
     expect(toVerification(null)).toBeNull();
-    expect(toVerification(verifiable({ fileKey: null }))).toBeNull();
+  });
+
+  test("an issued certificate stays valid while a reissue regenerates its file", () => {
+    expect(toVerification(verifiable({ fileKey: null }))?.status).toBe("VALID");
   });
 
   test("the completion date falls back to the enrollment update time", () => {
