@@ -1,24 +1,22 @@
 "use client";
 
 import { getAdminSiteSettingsGetQueryKey, useAdminSiteSettingsGet } from "@heat/api-client";
-import { ConfirmDialog, ErrorState, FieldDescription, PageHeader, Skeleton } from "@heat/ui";
-import { ShellContent } from "@heat/ui/shell";
+import { ErrorState, FieldDescription, SectionHeading, Skeleton } from "@heat/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { landingOverviewLeaveMessage, landingOverviewSavedMessage } from "./landing-overview-copy";
+import { landingOverviewSavedMessage } from "./landing-overview-copy";
 import { LandingOverviewForm } from "./landing-overview-form";
-import { useUnsavedChangesGuard } from "./use-unsaved-changes-guard";
 
-export function LandingOverviewView() {
+type LandingOverviewSectionProps = { onDirtyChange: (dirty: boolean) => void };
+
+export function LandingOverviewSection({ onDirtyChange }: LandingOverviewSectionProps) {
   const queryClient = useQueryClient();
   const overview = useAdminSiteSettingsGet();
-  const [dirty, setDirty] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
-  const guard = useUnsavedChangesGuard(dirty);
 
   return (
-    <ShellContent>
-      <PageHeader title="Landing page overview" />
+    <section aria-labelledby="landing-overview-heading" className="flex flex-col gap-4">
+      <SectionHeading id="landing-overview-heading">Landing page overview</SectionHeading>
       {notice === null ? null : <FieldDescription role="status">{notice}</FieldDescription>}
       {overview.isPending ? <Skeleton className="h-64 w-full" /> : null}
       {overview.isError ? (
@@ -32,23 +30,13 @@ export function LandingOverviewView() {
         <LandingOverviewForm
           key={overview.data.updatedAt ?? "new"}
           overview={overview.data}
-          onDirtyChange={setDirty}
+          onDirtyChange={onDirtyChange}
           onSaved={async () => {
             setNotice(landingOverviewSavedMessage);
             await queryClient.invalidateQueries({ queryKey: getAdminSiteSettingsGetQueryKey() });
           }}
         />
       )}
-      <ConfirmDialog
-        open={guard.confirming}
-        onOpenChange={(open) => (open ? undefined : guard.stay())}
-        title="Leave this page?"
-        itemName="Overview"
-        description={landingOverviewLeaveMessage}
-        confirmLabel="Leave page"
-        destructive
-        onConfirm={guard.leave}
-      />
-    </ShellContent>
+    </section>
   );
 }
