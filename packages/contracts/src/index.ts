@@ -25,6 +25,7 @@ export * from "./removals";
 export * from "./students";
 export * from "./password-reset";
 export * from "./rich-text";
+export * from "./site-settings";
 export * from "./tags";
 export * from "./verification";
 export * from "./videos";
