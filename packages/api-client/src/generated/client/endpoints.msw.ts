@@ -69,6 +69,11 @@ import type {
   MeResponseDto,
   ModuleListResponseDto,
   ModuleSummaryDto,
+  NewsAdminListResponseDto,
+  NewsAdminPostDto,
+  NewsPostRequestDto,
+  NewsPublicListResponseDto,
+  NewsPublicPostDto,
   PasswordCodeRequestedResponseDto,
   PlaybackSessionResponseDto,
   ProfileResponseDto,
@@ -253,6 +258,20 @@ export const getAdminFrontPageReorderModulesResponseMock = (overrideResponse: Pa
 
 export const getAdminMeDescribeResponseMock = (overrideResponse: Partial<Extract<AdminMeResponseDto, object>> = {}): AdminMeResponseDto => ({user: {email: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.uuid(), mustChangePassword: faker.datatype.boolean(), role: faker.helpers.arrayElement(['SUPER_ADMIN','ADMIN','STUDENT'] as const)}, ...overrideResponse})
 
+export const getNewsListResponseMock = (overrideResponse: Partial<Extract<NewsAdminListResponseDto, object>> = {}): NewsAdminListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), slug: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['draft','scheduled','published'] as const), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
+
+export const getNewsCreateResponseMock = (overrideResponse: Partial<Extract<NewsAdminPostDto, object>> = {}): NewsAdminPostDto => ({authorId: faker.string.uuid(), body: {
+        [faker.string.alphanumeric(5)]: {}
+      }, createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), slug: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['draft','scheduled','published'] as const), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getNewsGetResponseMock = (overrideResponse: Partial<Extract<NewsAdminPostDto, object>> = {}): NewsAdminPostDto => ({authorId: faker.string.uuid(), body: {
+        [faker.string.alphanumeric(5)]: {}
+      }, createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), slug: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['draft','scheduled','published'] as const), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getNewsUpdateResponseMock = (overrideResponse: Partial<Extract<NewsAdminPostDto, object>> = {}): NewsAdminPostDto => ({authorId: faker.string.uuid(), body: {
+        [faker.string.alphanumeric(5)]: {}
+      }, createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), slug: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['draft','scheduled','published'] as const), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
 export const getAdminPlaybackPreviewResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({captions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({language: faker.string.alpha({length: {min: 1, max: 35}})})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', manifestPath: faker.string.alpha({length: {min: 10, max: 20}}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), sessionId: faker.helpers.arrayElement([faker.string.uuid(), null]), ...overrideResponse})
 
 export const getAdminSiteSettingsGetResponseMock = (overrideResponse: Partial<Extract<AdminLandingOverviewResponseDto, object>> = {}): AdminLandingOverviewResponseDto => ({body: {
@@ -322,6 +341,12 @@ export const getPasswordChangeRequestCodeResponseMock = (overrideResponse: Parti
 export const getProfileDescribeResponseMock = (overrideResponse: Partial<Extract<ProfileResponseDto, object>> = {}): ProfileResponseDto => ({avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 2048}}), null]), department: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, email: faker.string.alpha({length: {min: 10, max: 20}}), emailVerified: faker.datatype.boolean(), faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, locked: faker.datatype.boolean(), name: faker.string.alpha({length: {min: 10, max: 20}}), session: faker.string.alpha({length: {min: 10, max: 20}}), university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, ...overrideResponse})
 
 export const getProfileUpdateResponseMock = (overrideResponse: Partial<Extract<ProfileResponseDto, object>> = {}): ProfileResponseDto => ({avatarUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 2048}}), null]), department: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, email: faker.string.alpha({length: {min: 10, max: 20}}), emailVerified: faker.datatype.boolean(), faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, locked: faker.datatype.boolean(), name: faker.string.alpha({length: {min: 10, max: 20}}), session: faker.string.alpha({length: {min: 10, max: 20}}), university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, ...overrideResponse})
+
+export const getPublicNewsListResponseMock = (overrideResponse: Partial<Extract<NewsPublicListResponseDto, object>> = {}): NewsPublicListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({cover: faker.helpers.arrayElement([{alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})},null,]), publishedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', slug: faker.string.alpha({length: {min: 10, max: 20}}), summary: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}})})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
+
+export const getPublicNewsGetResponseMock = (overrideResponse: Partial<Extract<NewsPublicPostDto, object>> = {}): NewsPublicPostDto => ({body: {
+        [faker.string.alphanumeric(5)]: {}
+      }, images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), publishedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), slug: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
 export const getPublicSiteSettingsGetResponseMock = (overrideResponse: Partial<Extract<PublicLandingOverviewResponseDto, object>> = {}): PublicLandingOverviewResponseDto => ({body: {
         [faker.string.alphanumeric(5)]: {}
@@ -1263,6 +1288,64 @@ export const getAdminMeDescribeMockHandler = (overrideResponse?: AdminMeResponse
   }, options)
 }
 
+export const getNewsListMockHandler = (overrideResponse?: NewsAdminListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<NewsAdminListResponseDto> | NewsAdminListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/news', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getNewsListResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getNewsCreateMockHandler = (overrideResponse?: NewsAdminPostDto | ((info: Parameters<HttpResponseResolver<PathParams, NewsPostRequestDto>>[0]) => Promise<NewsAdminPostDto> | NewsAdminPostDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, NewsPostRequestDto>('*/api/admin/news', async (info: Parameters<HttpResponseResolver<PathParams, NewsPostRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getNewsCreateResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getNewsRemoveMockHandler = (overrideResponse?: void | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.delete<{ id: string }>('*/api/admin/news/:id', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
+
+export const getNewsGetMockHandler = (overrideResponse?: NewsAdminPostDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<NewsAdminPostDto> | NewsAdminPostDto), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string }>('*/api/admin/news/:id', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getNewsGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getNewsUpdateMockHandler = (overrideResponse?: NewsAdminPostDto | ((info: Parameters<HttpResponseResolver<{ id: string }, NewsPostRequestDto>>[0]) => Promise<NewsAdminPostDto> | NewsAdminPostDto), options?: RequestHandlerOptions) => {
+  return http.put<{ id: string }, NewsPostRequestDto>('*/api/admin/news/:id', async (info: Parameters<HttpResponseResolver<{ id: string }, NewsPostRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getNewsUpdateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getAdminPlaybackPreviewMockHandler = (overrideResponse?: PlaybackSessionResponseDto | ((info: Parameters<HttpResponseResolver<{ videoId: string }>>[0]) => Promise<PlaybackSessionResponseDto> | PlaybackSessionResponseDto), options?: RequestHandlerOptions) => {
   return http.post<{ videoId: string }>('*/api/admin/playback-sessions/:videoId', async (info: Parameters<HttpResponseResolver<{ videoId: string }>>[0]) => {
 
@@ -1688,6 +1771,30 @@ export const getProfileUpdateMockHandler = (overrideResponse?: ProfileResponseDt
   }, options)
 }
 
+export const getPublicNewsListMockHandler = (overrideResponse?: NewsPublicListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<NewsPublicListResponseDto> | NewsPublicListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/news', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPublicNewsListResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getPublicNewsGetMockHandler = (overrideResponse?: NewsPublicPostDto | ((info: Parameters<HttpResponseResolver<{ slug: string }>>[0]) => Promise<NewsPublicPostDto> | NewsPublicPostDto), options?: RequestHandlerOptions) => {
+  return http.get<{ slug: string }>('*/api/news/:slug', async (info: Parameters<HttpResponseResolver<{ slug: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPublicNewsGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getPublicSiteSettingsGetMockHandler = (overrideResponse?: PublicLandingOverviewResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<PublicLandingOverviewResponseDto> | PublicLandingOverviewResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/site-settings/landing-overview', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1815,6 +1922,11 @@ export const getHeatLmsApiMock = () => [
   getAdminFrontPageReorderCoursesMockHandler(),
   getAdminFrontPageReorderModulesMockHandler(),
   getAdminMeDescribeMockHandler(),
+  getNewsListMockHandler(),
+  getNewsCreateMockHandler(),
+  getNewsRemoveMockHandler(),
+  getNewsGetMockHandler(),
+  getNewsUpdateMockHandler(),
   getAdminPlaybackPreviewMockHandler(),
   getAdminSiteSettingsGetMockHandler(),
   getAdminSiteSettingsUpdateMockHandler(),
@@ -1851,6 +1963,8 @@ export const getHeatLmsApiMock = () => [
   getPasswordChangeRequestCodeMockHandler(),
   getProfileDescribeMockHandler(),
   getProfileUpdateMockHandler(),
+  getPublicNewsListMockHandler(),
+  getPublicNewsGetMockHandler(),
   getPublicSiteSettingsGetMockHandler(),
   getStudentPlaybackStartMockHandler(),
   getStudentPlaybackRefreshMockHandler(),

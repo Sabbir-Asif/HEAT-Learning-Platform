@@ -1540,6 +1540,188 @@ export interface ModuleSummaryDto {
   updatedAt: string;
 }
 
+export type NewsAdminListResponseDtoItemsItemStatus = typeof NewsAdminListResponseDtoItemsItemStatus[keyof typeof NewsAdminListResponseDtoItemsItemStatus];
+
+
+export const NewsAdminListResponseDtoItemsItemStatus = {
+  draft: 'draft',
+  scheduled: 'scheduled',
+  published: 'published',
+} as const;
+
+export type NewsAdminListResponseDtoItemsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  publishedAt: string | null;
+  slug: string;
+  status: NewsAdminListResponseDtoItemsItemStatus;
+  title: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+};
+
+export interface NewsAdminListResponseDto {
+  items: NewsAdminListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+}
+
+export type NewsAdminPostDtoBody = {[key: string]: unknown};
+
+export type NewsAdminPostDtoImagesItem = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+};
+
+export type NewsAdminPostDtoStatus = typeof NewsAdminPostDtoStatus[keyof typeof NewsAdminPostDtoStatus];
+
+
+export const NewsAdminPostDtoStatus = {
+  draft: 'draft',
+  scheduled: 'scheduled',
+  published: 'published',
+} as const;
+
+export interface NewsAdminPostDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  authorId: string;
+  body: NewsAdminPostDtoBody;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  images: NewsAdminPostDtoImagesItem[];
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  publishedAt: string | null;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  schemaVersion: number;
+  slug: string;
+  status: NewsAdminPostDtoStatus;
+  title: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+}
+
+export type NewsPostRequestDtoBody = {[key: string]: unknown};
+
+export type NewsPostRequestDtoSchemaVersion = typeof NewsPostRequestDtoSchemaVersion[keyof typeof NewsPostRequestDtoSchemaVersion];
+
+
+export const NewsPostRequestDtoSchemaVersion = {
+  NUMBER_1: 1,
+} as const;
+
+export type NewsPostRequestDtoStatus = typeof NewsPostRequestDtoStatus[keyof typeof NewsPostRequestDtoStatus];
+
+
+export const NewsPostRequestDtoStatus = {
+  draft: 'draft',
+  published: 'published',
+} as const;
+
+export interface NewsPostRequestDto {
+  body: NewsPostRequestDtoBody;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+     */
+  publishedAt?: string | null;
+  schemaVersion: NewsPostRequestDtoSchemaVersion;
+  status: NewsPostRequestDtoStatus;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title: string;
+}
+
+/**
+ * @nullable
+ */
+export type NewsPublicListResponseDtoItemsItemCover = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+} | null;
+
+export type NewsPublicListResponseDtoItemsItem = {
+  /** @nullable */
+  cover: NewsPublicListResponseDtoItemsItemCover;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  publishedAt: string;
+  slug: string;
+  summary: string;
+  title: string;
+};
+
+export interface NewsPublicListResponseDto {
+  items: NewsPublicListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+}
+
+export type NewsPublicPostDtoBody = {[key: string]: unknown};
+
+export type NewsPublicPostDtoImagesItem = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+};
+
+export interface NewsPublicPostDto {
+  body: NewsPublicPostDtoBody;
+  images: NewsPublicPostDtoImagesItem[];
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  publishedAt: string;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  schemaVersion: number;
+  slug: string;
+  title: string;
+}
+
 export interface PasswordCodeRequestedResponseDto {
   /**
      * @maximum 9007199254740991
@@ -2726,6 +2908,56 @@ export const EnrollmentApprovalListPendingSort = {
   requestedAt: 'requestedAt',
   '-requestedAt': '-requestedAt',
 } as const;
+
+export type NewsListParams = {
+  status?: NewsListStatus;
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  pageSize?: number;
+  sort?: NewsListSort;
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  q?: string;
+};
+
+export type NewsListStatus = typeof NewsListStatus[keyof typeof NewsListStatus];
+
+
+export const NewsListStatus = {
+  all: 'all',
+  draft: 'draft',
+  scheduled: 'scheduled',
+  published: 'published',
+} as const;
+
+export type NewsListSort = typeof NewsListSort[keyof typeof NewsListSort];
+
+
+export const NewsListSort = {
+  title: 'title',
+  '-title': '-title',
+  publishedAt: 'publishedAt',
+  '-publishedAt': '-publishedAt',
+  updatedAt: 'updatedAt',
+  '-updatedAt': '-updatedAt',
+} as const;
+
+export type PublicNewsListParams = {
+  /**
+   * @minimum 1
+   * @maximum 1000
+   */
+  page?: number;
+};
 
 export const getAdminAccountChangePasswordUrl = () => {
 
@@ -4992,6 +5224,147 @@ export const adminMeDescribe = async ( options?: Parameters<typeof serverFetch>[
 
 
 
+export const getNewsListUrl = (params?: NewsListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/news?${stringifiedParams}` : `/api/admin/news`
+}
+
+export const newsList = async (params?: NewsListParams, options?: Parameters<typeof serverFetch>[1]): Promise<NewsAdminListResponseDto> => {
+
+  return serverFetch<NewsAdminListResponseDto>(getNewsListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getNewsCreateUrl = () => {
+
+
+
+
+  return `/api/admin/news`
+}
+
+export const newsCreate = async (newsPostRequestDto: NewsPostRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<NewsAdminPostDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<NewsAdminPostDto>(getNewsCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(newsPostRequestDto)
+  }
+);}
+
+
+
+export const getNewsRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/news/${id}`
+}
+
+export const newsRemove = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getNewsRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getNewsGetUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/news/${id}`
+}
+
+export const newsGet = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<NewsAdminPostDto> => {
+
+  return serverFetch<NewsAdminPostDto>(getNewsGetUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getNewsUpdateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/news/${id}`
+}
+
+export const newsUpdate = async (id: string,
+    newsPostRequestDto: NewsPostRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<NewsAdminPostDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<NewsAdminPostDto>(getNewsUpdateUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(newsPostRequestDto)
+  }
+);}
+
+
+
 export const getAdminPlaybackPreviewUrl = (videoId: string,) => {
 
 
@@ -5923,6 +6296,55 @@ return serverFetch<ProfileResponseDto>(getProfileUpdateUrl(),
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(updateProfileRequestDto)
+  }
+);}
+
+
+
+export const getPublicNewsListUrl = (params?: PublicNewsListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/news?${stringifiedParams}` : `/api/news`
+}
+
+export const publicNewsList = async (params?: PublicNewsListParams, options?: Parameters<typeof serverFetch>[1]): Promise<NewsPublicListResponseDto> => {
+
+  return serverFetch<NewsPublicListResponseDto>(getPublicNewsListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getPublicNewsGetUrl = (slug: string,) => {
+
+
+
+
+  return `/api/news/${slug}`
+}
+
+export const publicNewsGet = async (slug: string, options?: Parameters<typeof serverFetch>[1]): Promise<NewsPublicPostDto> => {
+
+  return serverFetch<NewsPublicPostDto>(getPublicNewsGetUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 

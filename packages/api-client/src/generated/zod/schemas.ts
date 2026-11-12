@@ -2810,6 +2810,192 @@ export const AdminMeDescribeResponse = zod.object({
 })
 
 
+export const newsListQueryStatusDefault = `all`;
+export const newsListQueryPageDefault = 1;
+export const newsListQueryPageMax = 9007199254740991;
+
+export const newsListQueryPageSizeDefault = 25;
+export const newsListQueryPageSizeMin = -9007199254740991;
+export const newsListQueryPageSizeMax = 9007199254740991;
+
+export const newsListQueryQMax = 120;
+
+
+
+export const NewsListQueryParams = zod.object({
+  "status": zod.enum(['all', 'draft', 'scheduled', 'published']).default(newsListQueryStatusDefault),
+  "page": zod.int().min(1).max(newsListQueryPageMax).default(newsListQueryPageDefault),
+  "pageSize": zod.int().min(newsListQueryPageSizeMin).max(newsListQueryPageSizeMax).default(newsListQueryPageSizeDefault),
+  "sort": zod.enum(['title', '-title', 'publishedAt', '-publishedAt', 'updatedAt', '-updatedAt']).optional(),
+  "q": zod.string().min(1).max(newsListQueryQMax).optional()
+})
+
+export const newsListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsListResponseItemsItemPublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsListResponseItemsItemUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsListResponsePageMax = 9007199254740991;
+
+export const newsListResponsePageSizeMax = 9007199254740991;
+
+export const newsListResponseTotalMin = 0;
+export const newsListResponseTotalMax = 9007199254740991;
+
+
+
+export const NewsListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.uuid().regex(newsListResponseItemsItemIdRegExp),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(newsListResponseItemsItemPublishedAtRegExp).nullable(),
+  "slug": zod.string(),
+  "status": zod.enum(['draft', 'scheduled', 'published']),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(newsListResponseItemsItemUpdatedAtRegExp)
+})),
+  "page": zod.int().min(1).max(newsListResponsePageMax),
+  "pageSize": zod.int().min(1).max(newsListResponsePageSizeMax),
+  "total": zod.int().min(newsListResponseTotalMin).max(newsListResponseTotalMax)
+})
+
+
+export const newsCreateBodyPublishedAtDefault = null;
+export const newsCreateBodyPublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const newsCreateBodyTitleMax = 200;
+
+
+
+export const NewsCreateBody = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(newsCreateBodyPublishedAtRegExp).nullish().default(newsCreateBodyPublishedAtDefault),
+  "schemaVersion": zod.literal(1),
+  "status": zod.enum(['draft', 'published']),
+  "title": zod.string().min(1).max(newsCreateBodyTitleMax)
+})
+
+export const newsCreateResponseAuthorIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsCreateResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsCreateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsCreateResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsCreateResponsePublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsCreateResponseSchemaVersionMax = 9007199254740991;
+
+export const newsCreateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const NewsCreateResponse = zod.object({
+  "authorId": zod.uuid().regex(newsCreateResponseAuthorIdRegExp),
+  "body": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(newsCreateResponseCreatedAtRegExp),
+  "id": zod.uuid().regex(newsCreateResponseIdRegExp),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(newsCreateResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(newsCreateResponsePublishedAtRegExp).nullable(),
+  "schemaVersion": zod.int().min(1).max(newsCreateResponseSchemaVersionMax),
+  "slug": zod.string(),
+  "status": zod.enum(['draft', 'scheduled', 'published']),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(newsCreateResponseUpdatedAtRegExp)
+})
+
+
+export const newsRemovePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const NewsRemoveParams = zod.object({
+  "id": zod.uuid().regex(newsRemovePathIdRegExp)
+})
+
+export const NewsRemoveResponse = zod.void()
+
+
+export const newsGetPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const NewsGetParams = zod.object({
+  "id": zod.uuid().regex(newsGetPathIdRegExp)
+})
+
+export const newsGetResponseAuthorIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsGetResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsGetResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsGetResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsGetResponsePublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsGetResponseSchemaVersionMax = 9007199254740991;
+
+export const newsGetResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const NewsGetResponse = zod.object({
+  "authorId": zod.uuid().regex(newsGetResponseAuthorIdRegExp),
+  "body": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(newsGetResponseCreatedAtRegExp),
+  "id": zod.uuid().regex(newsGetResponseIdRegExp),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(newsGetResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(newsGetResponsePublishedAtRegExp).nullable(),
+  "schemaVersion": zod.int().min(1).max(newsGetResponseSchemaVersionMax),
+  "slug": zod.string(),
+  "status": zod.enum(['draft', 'scheduled', 'published']),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(newsGetResponseUpdatedAtRegExp)
+})
+
+
+export const newsUpdatePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const NewsUpdateParams = zod.object({
+  "id": zod.uuid().regex(newsUpdatePathIdRegExp)
+})
+
+export const newsUpdateBodyPublishedAtDefault = null;
+export const newsUpdateBodyPublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const newsUpdateBodyTitleMax = 200;
+
+
+
+export const NewsUpdateBody = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(newsUpdateBodyPublishedAtRegExp).nullish().default(newsUpdateBodyPublishedAtDefault),
+  "schemaVersion": zod.literal(1),
+  "status": zod.enum(['draft', 'published']),
+  "title": zod.string().min(1).max(newsUpdateBodyTitleMax)
+})
+
+export const newsUpdateResponseAuthorIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsUpdateResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsUpdateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsUpdateResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsUpdateResponsePublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsUpdateResponseSchemaVersionMax = 9007199254740991;
+
+export const newsUpdateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const NewsUpdateResponse = zod.object({
+  "authorId": zod.uuid().regex(newsUpdateResponseAuthorIdRegExp),
+  "body": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(newsUpdateResponseCreatedAtRegExp),
+  "id": zod.uuid().regex(newsUpdateResponseIdRegExp),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(newsUpdateResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(newsUpdateResponsePublishedAtRegExp).nullable(),
+  "schemaVersion": zod.int().min(1).max(newsUpdateResponseSchemaVersionMax),
+  "slug": zod.string(),
+  "status": zod.enum(['draft', 'scheduled', 'published']),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(newsUpdateResponseUpdatedAtRegExp)
+})
+
+
 export const adminPlaybackPreviewPathVideoIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 
@@ -3831,6 +4017,74 @@ export const ProfileUpdateResponse = zod.object({
   "id": zod.uuid().regex(profileUpdateResponseUniversityIdRegExp),
   "name": zod.string()
 })
+})
+
+
+export const publicNewsListQueryPageDefault = 1;
+export const publicNewsListQueryPageMax = 1000;
+
+
+
+export const PublicNewsListQueryParams = zod.object({
+  "page": zod.int().min(1).max(publicNewsListQueryPageMax).default(publicNewsListQueryPageDefault)
+})
+
+export const publicNewsListResponseItemsItemCoverAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicNewsListResponseItemsItemPublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const publicNewsListResponsePageMax = 9007199254740991;
+
+export const publicNewsListResponsePageSizeMax = 9007199254740991;
+
+export const publicNewsListResponseTotalMin = 0;
+export const publicNewsListResponseTotalMax = 9007199254740991;
+
+
+
+export const PublicNewsListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "cover": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(publicNewsListResponseItemsItemCoverAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(publicNewsListResponseItemsItemPublishedAtRegExp),
+  "slug": zod.string(),
+  "summary": zod.string(),
+  "title": zod.string()
+})),
+  "page": zod.int().min(1).max(publicNewsListResponsePageMax),
+  "pageSize": zod.int().min(1).max(publicNewsListResponsePageSizeMax),
+  "total": zod.int().min(publicNewsListResponseTotalMin).max(publicNewsListResponseTotalMax)
+})
+
+
+export const publicNewsGetPathSlugMax = 80;
+
+
+export const publicNewsGetPathSlugRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+export const PublicNewsGetParams = zod.object({
+  "slug": zod.string().min(1).max(publicNewsGetPathSlugMax).regex(publicNewsGetPathSlugRegExp)
+})
+
+export const publicNewsGetResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicNewsGetResponsePublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const publicNewsGetResponseSchemaVersionMax = 9007199254740991;
+
+
+
+export const PublicNewsGetResponse = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(publicNewsGetResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(publicNewsGetResponsePublishedAtRegExp),
+  "schemaVersion": zod.int().min(1).max(publicNewsGetResponseSchemaVersionMax),
+  "slug": zod.string(),
+  "title": zod.string()
 })
 
 

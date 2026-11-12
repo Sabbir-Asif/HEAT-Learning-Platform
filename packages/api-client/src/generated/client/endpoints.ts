@@ -80,6 +80,12 @@ import type {
   MeResponseDto,
   ModuleListResponseDto,
   ModuleSummaryDto,
+  NewsAdminListResponseDto,
+  NewsAdminPostDto,
+  NewsListParams,
+  NewsPostRequestDto,
+  NewsPublicListResponseDto,
+  NewsPublicPostDto,
   PasswordCodeRequestedResponseDto,
   PlaybackSessionResponseDto,
   ProfileResponseDto,
@@ -88,6 +94,7 @@ import type {
   PublicCourseResponseDto,
   PublicFrontPageResponseDto,
   PublicLandingOverviewResponseDto,
+  PublicNewsListParams,
   QuizAccessResponseDto,
   QuizDeliveryResponseDto,
   QuizQuestionRequestDto,
@@ -6753,6 +6760,436 @@ export function useAdminMeDescribe<TData = Awaited<ReturnType<typeof adminMeDesc
 
 
 
+export const getNewsListUrl = (params?: NewsListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/news?${stringifiedParams}` : `/api/admin/news`
+}
+
+export const newsList = async (params?: NewsListParams, options?: Parameters<typeof customFetch>[1]): Promise<NewsAdminListResponseDto> => {
+
+  return customFetch<NewsAdminListResponseDto>(getNewsListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getNewsListQueryKey = (params?: NewsListParams,) => {
+    return [
+    `/api/admin/news`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getNewsListQueryOptions = <TData = Awaited<ReturnType<typeof newsList>>, TError = ErrorType<unknown>>(params?: NewsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof newsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getNewsListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof newsList>>> = ({ signal }) => newsList(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof newsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type NewsListQueryResult = NonNullable<Awaited<ReturnType<typeof newsList>>>
+export type NewsListQueryError = ErrorType<unknown>
+
+
+export function useNewsList<TData = Awaited<ReturnType<typeof newsList>>, TError = ErrorType<unknown>>(
+ params: undefined |  NewsListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof newsList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof newsList>>,
+          TError,
+          Awaited<ReturnType<typeof newsList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNewsList<TData = Awaited<ReturnType<typeof newsList>>, TError = ErrorType<unknown>>(
+ params?: NewsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof newsList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof newsList>>,
+          TError,
+          Awaited<ReturnType<typeof newsList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNewsList<TData = Awaited<ReturnType<typeof newsList>>, TError = ErrorType<unknown>>(
+ params?: NewsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof newsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useNewsList<TData = Awaited<ReturnType<typeof newsList>>, TError = ErrorType<unknown>>(
+ params?: NewsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof newsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getNewsListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getNewsCreateUrl = () => {
+
+
+
+
+  return `/api/admin/news`
+}
+
+export const newsCreate = async (newsPostRequestDto: NewsPostRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<NewsAdminPostDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<NewsAdminPostDto>(getNewsCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(newsPostRequestDto)
+  }
+);}
+
+
+
+
+
+export const getNewsCreateMutationKey = () => ['newsCreate'] as const;
+
+export const getNewsCreateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof newsCreate>>, TError,NewsCreateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof newsCreate>>, TError,NewsCreateMutationVariables, TContext> => {
+
+const mutationKey = getNewsCreateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof newsCreate>>, NewsCreateMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  newsCreate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type NewsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof newsCreate>>>
+    export type NewsCreateMutationBody = NewsPostRequestDto
+    export type NewsCreateMutationError = ErrorType<unknown>
+    export type NewsCreateMutationVariables = {data: NewsPostRequestDto}
+
+    export const useNewsCreate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof newsCreate>>, TError,NewsCreateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof newsCreate>>,
+        TError,
+        NewsCreateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getNewsCreateMutationOptions(options), queryClient);
+    }
+
+export const getNewsRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/news/${id}`
+}
+
+export const newsRemove = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getNewsRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getNewsRemoveMutationKey = () => ['newsRemove'] as const;
+
+export const getNewsRemoveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof newsRemove>>, TError,NewsRemoveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof newsRemove>>, TError,NewsRemoveMutationVariables, TContext> => {
+
+const mutationKey = getNewsRemoveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof newsRemove>>, NewsRemoveMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  newsRemove(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type NewsRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof newsRemove>>>
+
+    export type NewsRemoveMutationError = ErrorType<unknown>
+    export type NewsRemoveMutationVariables = {id: string}
+
+    export const useNewsRemove = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof newsRemove>>, TError,NewsRemoveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof newsRemove>>,
+        TError,
+        NewsRemoveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getNewsRemoveMutationOptions(options), queryClient);
+    }
+
+export const getNewsGetUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/news/${id}`
+}
+
+export const newsGet = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<NewsAdminPostDto> => {
+
+  return customFetch<NewsAdminPostDto>(getNewsGetUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getNewsGetQueryKey = (id: string,) => {
+    return [
+    `/api/admin/news/${id}`
+    ] as const;
+    }
+
+
+export const getNewsGetQueryOptions = <TData = Awaited<ReturnType<typeof newsGet>>, TError = ErrorType<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof newsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getNewsGetQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof newsGet>>> = ({ signal }) => newsGet(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof newsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type NewsGetQueryResult = NonNullable<Awaited<ReturnType<typeof newsGet>>>
+export type NewsGetQueryError = ErrorType<unknown>
+
+
+export function useNewsGet<TData = Awaited<ReturnType<typeof newsGet>>, TError = ErrorType<unknown>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof newsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof newsGet>>,
+          TError,
+          Awaited<ReturnType<typeof newsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNewsGet<TData = Awaited<ReturnType<typeof newsGet>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof newsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof newsGet>>,
+          TError,
+          Awaited<ReturnType<typeof newsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNewsGet<TData = Awaited<ReturnType<typeof newsGet>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof newsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useNewsGet<TData = Awaited<ReturnType<typeof newsGet>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof newsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getNewsGetQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getNewsUpdateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/news/${id}`
+}
+
+export const newsUpdate = async (id: string,
+    newsPostRequestDto: NewsPostRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<NewsAdminPostDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<NewsAdminPostDto>(getNewsUpdateUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(newsPostRequestDto)
+  }
+);}
+
+
+
+
+
+export const getNewsUpdateMutationKey = () => ['newsUpdate'] as const;
+
+export const getNewsUpdateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof newsUpdate>>, TError,NewsUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof newsUpdate>>, TError,NewsUpdateMutationVariables, TContext> => {
+
+const mutationKey = getNewsUpdateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof newsUpdate>>, NewsUpdateMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  newsUpdate(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type NewsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof newsUpdate>>>
+    export type NewsUpdateMutationBody = NewsPostRequestDto
+    export type NewsUpdateMutationError = ErrorType<unknown>
+    export type NewsUpdateMutationVariables = {id: string;data: NewsPostRequestDto}
+
+    export const useNewsUpdate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof newsUpdate>>, TError,NewsUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof newsUpdate>>,
+        TError,
+        NewsUpdateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getNewsUpdateMutationOptions(options), queryClient);
+    }
+
 export const getAdminPlaybackPreviewUrl = (videoId: string,) => {
 
 
@@ -9917,6 +10354,203 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getProfileUpdateMutationOptions(options), queryClient);
     }
+
+export const getPublicNewsListUrl = (params?: PublicNewsListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/news?${stringifiedParams}` : `/api/news`
+}
+
+export const publicNewsList = async (params?: PublicNewsListParams, options?: Parameters<typeof customFetch>[1]): Promise<NewsPublicListResponseDto> => {
+
+  return customFetch<NewsPublicListResponseDto>(getPublicNewsListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getPublicNewsListQueryKey = (params?: PublicNewsListParams,) => {
+    return [
+    `/api/news`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getPublicNewsListQueryOptions = <TData = Awaited<ReturnType<typeof publicNewsList>>, TError = ErrorType<unknown>>(params?: PublicNewsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicNewsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPublicNewsListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof publicNewsList>>> = ({ signal }) => publicNewsList(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof publicNewsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PublicNewsListQueryResult = NonNullable<Awaited<ReturnType<typeof publicNewsList>>>
+export type PublicNewsListQueryError = ErrorType<unknown>
+
+
+export function usePublicNewsList<TData = Awaited<ReturnType<typeof publicNewsList>>, TError = ErrorType<unknown>>(
+ params: undefined |  PublicNewsListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicNewsList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof publicNewsList>>,
+          TError,
+          Awaited<ReturnType<typeof publicNewsList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePublicNewsList<TData = Awaited<ReturnType<typeof publicNewsList>>, TError = ErrorType<unknown>>(
+ params?: PublicNewsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicNewsList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof publicNewsList>>,
+          TError,
+          Awaited<ReturnType<typeof publicNewsList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePublicNewsList<TData = Awaited<ReturnType<typeof publicNewsList>>, TError = ErrorType<unknown>>(
+ params?: PublicNewsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicNewsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function usePublicNewsList<TData = Awaited<ReturnType<typeof publicNewsList>>, TError = ErrorType<unknown>>(
+ params?: PublicNewsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicNewsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPublicNewsListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getPublicNewsGetUrl = (slug: string,) => {
+
+
+
+
+  return `/api/news/${slug}`
+}
+
+export const publicNewsGet = async (slug: string, options?: Parameters<typeof customFetch>[1]): Promise<NewsPublicPostDto> => {
+
+  return customFetch<NewsPublicPostDto>(getPublicNewsGetUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getPublicNewsGetQueryKey = (slug: string,) => {
+    return [
+    `/api/news/${slug}`
+    ] as const;
+    }
+
+
+export const getPublicNewsGetQueryOptions = <TData = Awaited<ReturnType<typeof publicNewsGet>>, TError = ErrorType<unknown>>(slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicNewsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPublicNewsGetQueryKey(slug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof publicNewsGet>>> = ({ signal }) => publicNewsGet(slug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: slug !== null && slug !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof publicNewsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PublicNewsGetQueryResult = NonNullable<Awaited<ReturnType<typeof publicNewsGet>>>
+export type PublicNewsGetQueryError = ErrorType<unknown>
+
+
+export function usePublicNewsGet<TData = Awaited<ReturnType<typeof publicNewsGet>>, TError = ErrorType<unknown>>(
+ slug: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicNewsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof publicNewsGet>>,
+          TError,
+          Awaited<ReturnType<typeof publicNewsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePublicNewsGet<TData = Awaited<ReturnType<typeof publicNewsGet>>, TError = ErrorType<unknown>>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicNewsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof publicNewsGet>>,
+          TError,
+          Awaited<ReturnType<typeof publicNewsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePublicNewsGet<TData = Awaited<ReturnType<typeof publicNewsGet>>, TError = ErrorType<unknown>>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicNewsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function usePublicNewsGet<TData = Awaited<ReturnType<typeof publicNewsGet>>, TError = ErrorType<unknown>>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicNewsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPublicNewsGetQueryOptions(slug,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getPublicSiteSettingsGetUrl = () => {
 
