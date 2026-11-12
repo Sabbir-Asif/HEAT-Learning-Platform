@@ -1359,6 +1359,7 @@ export const videoSlotsListResponseItemsItemUploadedAtRegExp = new RegExp('^(?:(
 export const VideoSlotsListResponse = zod.object({
   "items": zod.array(zod.object({
   "assetKey": zod.string().max(videoSlotsListResponseItemsItemAssetKeyMax).nullable(),
+  "captions": zod.array(zod.enum(['en'])),
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsListResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsListResponseItemsItemOrderMax),
@@ -1401,6 +1402,7 @@ export const videoSlotsCreateResponseItemsItemUploadedAtRegExp = new RegExp('^(?
 export const VideoSlotsCreateResponse = zod.object({
   "items": zod.array(zod.object({
   "assetKey": zod.string().max(videoSlotsCreateResponseItemsItemAssetKeyMax).nullable(),
+  "captions": zod.array(zod.enum(['en'])),
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsCreateResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsCreateResponseItemsItemOrderMax),
@@ -1449,6 +1451,7 @@ export const videoSlotsReorderResponseItemsItemUploadedAtRegExp = new RegExp('^(
 export const VideoSlotsReorderResponse = zod.object({
   "items": zod.array(zod.object({
   "assetKey": zod.string().max(videoSlotsReorderResponseItemsItemAssetKeyMax).nullable(),
+  "captions": zod.array(zod.enum(['en'])),
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsReorderResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsReorderResponseItemsItemOrderMax),
@@ -1486,6 +1489,7 @@ export const videoSlotsRemoveResponseItemsItemUploadedAtRegExp = new RegExp('^(?
 export const VideoSlotsRemoveResponse = zod.object({
   "items": zod.array(zod.object({
   "assetKey": zod.string().max(videoSlotsRemoveResponseItemsItemAssetKeyMax).nullable(),
+  "captions": zod.array(zod.enum(['en'])),
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsRemoveResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsRemoveResponseItemsItemOrderMax),
@@ -1528,6 +1532,7 @@ export const videoSlotsUpdateResponseItemsItemUploadedAtRegExp = new RegExp('^(?
 export const VideoSlotsUpdateResponse = zod.object({
   "items": zod.array(zod.object({
   "assetKey": zod.string().max(videoSlotsUpdateResponseItemsItemAssetKeyMax).nullable(),
+  "captions": zod.array(zod.enum(['en'])),
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsUpdateResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsUpdateResponseItemsItemOrderMax),
@@ -1540,6 +1545,21 @@ export const VideoSlotsUpdateResponse = zod.object({
 })),
   "locked": zod.boolean()
 })
+
+
+export const videoCaptionsRemovePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoCaptionsRemovePathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoCaptionsRemovePathVideoIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const VideoCaptionsRemoveParams = zod.object({
+  "id": zod.uuid().regex(videoCaptionsRemovePathIdRegExp),
+  "moduleId": zod.uuid().regex(videoCaptionsRemovePathModuleIdRegExp),
+  "videoId": zod.uuid().regex(videoCaptionsRemovePathVideoIdRegExp),
+  "language": zod.enum(['en'])
+})
+
+export const VideoCaptionsRemoveResponse = zod.void()
 
 
 export const videoSlotsRetryTranscodePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
@@ -1565,6 +1585,7 @@ export const videoSlotsRetryTranscodeResponseItemsItemUploadedAtRegExp = new Reg
 export const VideoSlotsRetryTranscodeResponse = zod.object({
   "items": zod.array(zod.object({
   "assetKey": zod.string().max(videoSlotsRetryTranscodeResponseItemsItemAssetKeyMax).nullable(),
+  "captions": zod.array(zod.enum(['en'])),
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsRetryTranscodeResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsRetryTranscodeResponseItemsItemOrderMax),
