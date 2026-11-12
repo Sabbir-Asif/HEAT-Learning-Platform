@@ -1,7 +1,10 @@
 import { describe, expect, test } from "vitest";
 import { landingOverviewRequestSchema } from "../src/index";
 
-const body = { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "Hi" }] }] };
+const body = {
+  type: "doc",
+  content: [{ type: "paragraph", content: [{ type: "text", text: "Hi" }] }],
+};
 
 const request = (overrides: Record<string, unknown> = {}) => ({
   heading: "About the project",
