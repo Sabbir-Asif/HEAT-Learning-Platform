@@ -3,6 +3,7 @@ export {
   loadConfig,
   type AppConfig,
   type HlsConfig,
+  type MediaConfig,
   type VideoUploadConfig,
 } from "./app-config";
 export {

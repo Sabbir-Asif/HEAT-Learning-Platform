@@ -14,6 +14,7 @@ import { EmailVerificationModule } from "./email-verification";
 import { EnrollmentModule } from "./enrollment/enrollment.module";
 import { HealthController } from "./health/health.controller";
 import { HttpApiModule } from "./http/http.module";
+import { MediaModule } from "./media";
 import { MeModule } from "./me/me.module";
 import { LearningModule } from "./learning";
 import { PlaybackModule } from "./playback";
@@ -38,6 +39,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     EmailVerificationModule,
     EnrollmentModule,
     LearningModule,
+    MediaModule,
     PlaybackModule,
   ],
   controllers: [HealthController],
