@@ -324,6 +324,8 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   CANNOT_DEACTIVATE_SELF: 'CANNOT_DEACTIVATE_SELF',
   CAPTCHA_EXPIRED: 'CAPTCHA_EXPIRED',
   CAPTCHA_INVALID: 'CAPTCHA_INVALID',
+  CERTIFICATE_NOT_READY: 'CERTIFICATE_NOT_READY',
+  CERTIFICATE_REVOKED: 'CERTIFICATE_REVOKED',
   CONTENT_LOCKED: 'CONTENT_LOCKED',
   COURSE_HAS_ENROLLMENTS: 'COURSE_HAS_ENROLLMENTS',
   COURSE_LOCKED: 'COURSE_LOCKED',
@@ -401,6 +403,8 @@ export const BulkRejectionResponseDtoFailedItemCode = {
   CANNOT_DEACTIVATE_SELF: 'CANNOT_DEACTIVATE_SELF',
   CAPTCHA_EXPIRED: 'CAPTCHA_EXPIRED',
   CAPTCHA_INVALID: 'CAPTCHA_INVALID',
+  CERTIFICATE_NOT_READY: 'CERTIFICATE_NOT_READY',
+  CERTIFICATE_REVOKED: 'CERTIFICATE_REVOKED',
   CONTENT_LOCKED: 'CONTENT_LOCKED',
   COURSE_HAS_ENROLLMENTS: 'COURSE_HAS_ENROLLMENTS',
   COURSE_LOCKED: 'COURSE_LOCKED',
@@ -520,6 +524,22 @@ export type CertificateListResponseDtoCertificatesItem = {
 
 export interface CertificateListResponseDto {
   certificates: CertificateListResponseDtoCertificatesItem[];
+}
+
+export type CertificateVerificationResponseDtoStatus = typeof CertificateVerificationResponseDtoStatus[keyof typeof CertificateVerificationResponseDtoStatus];
+
+
+export const CertificateVerificationResponseDtoStatus = {
+  VALID: 'VALID',
+  REVOKED: 'REVOKED',
+} as const;
+
+export interface CertificateVerificationResponseDto {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  completedAt: string;
+  courseTitle: string;
+  holderName: string;
+  status: CertificateVerificationResponseDtoStatus;
 }
 
 export interface ChangePasswordRequestDto {
@@ -2080,6 +2100,27 @@ export interface ReinstatedEnrollmentDto {
   status: ReinstatedEnrollmentDtoStatus;
 }
 
+export interface ReissueCertificateRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  reason: string;
+}
+
+export type ReissuedCertificateDtoStatus = typeof ReissuedCertificateDtoStatus[keyof typeof ReissuedCertificateDtoStatus];
+
+
+export const ReissuedCertificateDtoStatus = {
+  PENDING: 'PENDING',
+} as const;
+
+export interface ReissuedCertificateDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  status: ReissuedCertificateDtoStatus;
+}
+
 export interface RejectEnrollmentRequestDto {
   /** @maxLength 500 */
   reason?: string;
@@ -2159,6 +2200,29 @@ export interface ResetPasswordRequestDto {
      * @maxLength 512
      */
   token: string;
+}
+
+export interface RevokeCertificateRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  reason: string;
+}
+
+export type RevokedCertificateDtoStatus = typeof RevokedCertificateDtoStatus[keyof typeof RevokedCertificateDtoStatus];
+
+
+export const RevokedCertificateDtoStatus = {
+  REVOKED: 'REVOKED',
+} as const;
+
+export interface RevokedCertificateDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  revokedAt: string;
+  status: RevokedCertificateDtoStatus;
 }
 
 export interface SignInRequestDto {
@@ -3522,6 +3586,78 @@ export const adminCertificatesDownload = async (id: string, options?: Parameters
     method: 'GET'
 
 
+  }
+);}
+
+
+
+export const getAdminCertificatesReissueUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/certificates/${id}/reissue`
+}
+
+export const adminCertificatesReissue = async (id: string,
+    reissueCertificateRequestDto: ReissueCertificateRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ReissuedCertificateDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ReissuedCertificateDto>(getAdminCertificatesReissueUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reissueCertificateRequestDto)
+  }
+);}
+
+
+
+export const getAdminCertificatesRevokeUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/certificates/${id}/revoke`
+}
+
+export const adminCertificatesRevoke = async (id: string,
+    revokeCertificateRequestDto: RevokeCertificateRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<RevokedCertificateDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<RevokedCertificateDto>(getAdminCertificatesRevokeUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(revokeCertificateRequestDto)
   }
 );}
 
@@ -5708,6 +5844,27 @@ return serverFetch<CaptchaResponseDto>(getCaptchaIssueUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(captchaRequestDto)
+  }
+);}
+
+
+
+export const getCertificateVerifyVerifyUrl = (number: string,) => {
+
+
+
+
+  return `/api/certificates/verify/${number}`
+}
+
+export const certificateVerifyVerify = async (number: string, options?: Parameters<typeof serverFetch>[1]): Promise<CertificateVerificationResponseDto> => {
+
+  return serverFetch<CertificateVerificationResponseDto>(getCertificateVerifyVerifyUrl(number),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 

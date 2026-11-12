@@ -28,15 +28,28 @@ import {
 } from "@heat/ui";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
-import { DownloadIcon, RotateCcwIcon, SearchXIcon, UserMinusIcon, UsersIcon } from "lucide-react";
+import {
+  BanIcon,
+  DownloadIcon,
+  RefreshCwIcon,
+  RotateCcwIcon,
+  SearchXIcon,
+  UserMinusIcon,
+  UsersIcon,
+} from "lucide-react";
 import { useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
+import { StudentCertificateSheet } from "./student-certificate-sheet";
+import type { StudentCertificateTarget } from "./student-certificate-sheet";
 import { StudentRemovalSheet } from "./student-removal-sheet";
 import type { StudentRemovalTarget } from "./student-removal-sheet";
 import {
   attemptOutcomeLabel,
   attemptScoreLabel,
   canReinstateStudent,
+  canReissueCertificate,
+  canRevokeCertificate,
+  certificateActionNotice,
   canRemoveStudent,
   certificateDownloadHref,
   certificateStatusLabels,
@@ -135,7 +148,13 @@ function Modules({ enrollment }: { enrollment: Enrollment }) {
   );
 }
 
-function Certificate({ enrollment }: { enrollment: Enrollment }) {
+function Certificate({
+  enrollment,
+  onAction,
+}: {
+  enrollment: Enrollment;
+  onAction: (target: NonNullable<StudentCertificateTarget>) => void;
+}) {
   const certificate = enrollment.certificate;
   if (certificate === null) return <FieldDescription>No certificate yet.</FieldDescription>;
   return (
@@ -159,6 +178,30 @@ function Certificate({ enrollment }: { enrollment: Enrollment }) {
           Download PDF
         </Button>
       ) : null}
+      {canReissueCertificate(certificate.status) ? (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            onAction({ action: "reissue", id: certificate.id, number: certificate.number })
+          }
+        >
+          <RefreshCwIcon data-icon="inline-start" />
+          Reissue
+        </Button>
+      ) : null}
+      {canRevokeCertificate(certificate.status) ? (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() =>
+            onAction({ action: "revoke", id: certificate.id, number: certificate.number })
+          }
+        >
+          <BanIcon data-icon="inline-start" />
+          Revoke
+        </Button>
+      ) : null}
     </div>
   );
 }
@@ -167,6 +210,7 @@ export function StudentDetailView({ id }: { id: string }) {
   const queryClient = useQueryClient();
   const student = useStudentDetailGet(id);
   const [removalTarget, setRemovalTarget] = useState<StudentRemovalTarget>(null);
+  const [certificateTarget, setCertificateTarget] = useState<StudentCertificateTarget>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   if (student.isPending) {
@@ -255,7 +299,13 @@ export function StudentDetailView({ id }: { id: string }) {
           <FieldDescription>{`Requested ${formatDhakaTime(enrollment.requestedAt)}`}</FieldDescription>
           <Decisions enrollment={enrollment} />
           <Modules enrollment={enrollment} />
-          <Certificate enrollment={enrollment} />
+          <Certificate
+            enrollment={enrollment}
+            onAction={(target) => {
+              setNotice(null);
+              setCertificateTarget(target);
+            }}
+          />
         </section>
       ))}
       <StudentRemovalSheet
@@ -267,6 +317,14 @@ export function StudentDetailView({ id }: { id: string }) {
           void queryClient.invalidateQueries({
             queryKey: getStudentListListQueryKey().slice(0, 1),
           });
+        }}
+      />
+      <StudentCertificateSheet
+        target={certificateTarget}
+        onClose={() => setCertificateTarget(null)}
+        onFinished={(action, number) => {
+          setNotice(certificateActionNotice(action, number));
+          void queryClient.invalidateQueries({ queryKey: getStudentDetailGetQueryKey(id) });
         }}
       />
     </ShellContent>

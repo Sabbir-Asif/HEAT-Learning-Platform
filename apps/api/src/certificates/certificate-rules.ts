@@ -1,4 +1,9 @@
-import type { CertificateItem, CertificateStatus } from "@heat/contracts";
+import type {
+  CertificateItem,
+  CertificateStatus,
+  CertificateVerificationResponse,
+} from "@heat/contracts";
+import { ApiException } from "../http/api-exception";
 
 export const certificateFileKeyPattern = /^[0-9a-f]{64}\.pdf$/;
 
@@ -94,3 +99,38 @@ export const toCertificateItems = (
       },
     ];
   });
+
+export interface VerifiableCertificate extends CertificateFileState {
+  recipientName: string;
+  issuedAt: Date;
+  enrollment: { completedAt: Date | null; updatedAt: Date; course: { title: string } };
+}
+
+export const toVerification = (
+  certificate: VerifiableCertificate | null,
+): CertificateVerificationResponse | null => {
+  if (certificate === null) return null;
+  if (certificate.fileKey === null && certificate.revokedAt === null) return null;
+  return {
+    status: certificate.revokedAt === null ? "VALID" : "REVOKED",
+    holderName: certificate.recipientName,
+    courseTitle: certificate.enrollment.course.title,
+    completedAt: (
+      certificate.enrollment.completedAt ?? certificate.enrollment.updatedAt
+    ).toISOString(),
+  };
+};
+
+export const revokeRefusal = (certificate: CertificateFileState): ApiException | null =>
+  certificate.revokedAt === null ? null : new ApiException(409, "CERTIFICATE_REVOKED");
+
+export const reissueRefusal = (certificate: CertificateFileState): ApiException | null => {
+  if (certificate.revokedAt !== null) return new ApiException(409, "CERTIFICATE_REVOKED");
+  if (certificate.fileKey === null) return new ApiException(409, "CERTIFICATE_NOT_READY");
+  return null;
+};
+
+export const reissuedRecipientName = (current: string, profileName: string | null): string => {
+  const trimmed = profileName?.trim() ?? "";
+  return trimmed === "" ? current : trimmed;
+};

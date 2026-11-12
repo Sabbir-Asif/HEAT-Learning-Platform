@@ -114,3 +114,42 @@ describe("CertificatesService.listFor", () => {
     );
   });
 });
+
+describe("CertificatesService.verify", () => {
+  const verifiable = (overrides: object = {}) => ({
+    recipientName: "Rahim Uddin",
+    issuedAt: new Date("2026-11-12T10:00:00.000Z"),
+    fileKey: key,
+    revokedAt: null,
+    enrollment: {
+      completedAt: new Date("2026-11-10T00:00:00.000Z"),
+      updatedAt: new Date("2026-11-11T00:00:00.000Z"),
+      course: { title: "HEAT" },
+    },
+    ...overrides,
+  });
+
+  test("looks the certificate up by number and returns the public fields only", async () => {
+    const { service, database } = build(verifiable());
+
+    await expect(service.verify("ABCD-EFGH-JKMN")).resolves.toEqual({
+      status: "VALID",
+      holderName: "Rahim Uddin",
+      courseTitle: "HEAT",
+      completedAt: "2026-11-10T00:00:00.000Z",
+    });
+    expect(database.certificate.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { number: "ABCD-EFGH-JKMN" } }),
+    );
+  });
+
+  test("a revoked certificate is reported as revoked", async () => {
+    const { service } = build(verifiable({ revokedAt: new Date() }));
+
+    await expect(service.verify("ABCD-EFGH-JKMN")).resolves.toMatchObject({ status: "REVOKED" });
+  });
+
+  test("an unknown number is not found", async () => {
+    await expect(build(null).service.verify("NOPE")).rejects.toBeInstanceOf(NotFoundException);
+  });
+});

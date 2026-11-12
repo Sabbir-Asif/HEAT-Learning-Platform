@@ -6,6 +6,10 @@ import {
   certificateDownloadHref,
   videoCoverageLabel,
   canReinstateStudent,
+  canReissueCertificate,
+  canRevokeCertificate,
+  certificateActionCopy,
+  certificateActionNotice,
   canRemoveStudent,
   removalNotice,
   studentBadgeStatus,
@@ -75,5 +79,27 @@ describe("student detail copy", () => {
 
   test("downloads certificates through the admin route", () => {
     expect(certificateDownloadHref("abc")).toBe("/api/admin/certificates/abc/download");
+  });
+});
+
+describe("certificate actions", () => {
+  test("only a ready certificate can be revoked or reissued", () => {
+    expect(canRevokeCertificate("READY")).toBe(true);
+    expect(canReissueCertificate("READY")).toBe(true);
+    for (const status of ["PENDING", "REVOKED"] as const) {
+      expect(canRevokeCertificate(status)).toBe(false);
+      expect(canReissueCertificate(status)).toBe(false);
+    }
+  });
+
+  test("the confirmation names the certificate number", () => {
+    expect(certificateActionCopy.revoke.description("ABCD-EFGH-JKMN")).toContain("ABCD-EFGH-JKMN");
+    expect(certificateActionCopy.reissue.description("ABCD-EFGH-JKMN")).toContain("ABCD-EFGH-JKMN");
+    expect(certificateActionCopy.revoke.destructive).toBe(true);
+  });
+
+  test("the notice says what happened to which certificate", () => {
+    expect(certificateActionNotice("revoke", "ABCD")).toBe("Certificate ABCD was revoked.");
+    expect(certificateActionNotice("reissue", "ABCD")).toContain("being reissued");
   });
 });

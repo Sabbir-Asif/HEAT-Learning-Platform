@@ -20,6 +20,7 @@ export const rateLimitProfileNames = [
   "learningRead",
   "quizSubmit",
   "certificateDownload",
+  "certificateVerify",
 ] as const;
 
 export type RateLimitProfileName = (typeof rateLimitProfileNames)[number];
@@ -46,7 +47,10 @@ export interface RateLimitConfig {
 
 export const ipWindowSeconds = 60;
 
-const ipOnlyProfiles: readonly RateLimitProfileName[] = ["directoryLookup"];
+const ipOnlyProfiles: readonly RateLimitProfileName[] = [
+  "directoryLookup",
+  "certificateVerify",
+];
 
 const defaults: Record<RateLimitProfileName, RateLimitProfile> = {
   signIn: { limit: 10, windowSeconds: 900, ipLimit: 1000 },
@@ -68,6 +72,7 @@ const defaults: Record<RateLimitProfileName, RateLimitProfile> = {
   learningRead: { limit: 120, windowSeconds: 60, ipLimit: 6000 },
   quizSubmit: { limit: 20, windowSeconds: 60, ipLimit: 3000 },
   certificateDownload: { limit: 30, windowSeconds: 60, ipLimit: 3000 },
+  certificateVerify: { limit: 600, windowSeconds: 60, ipLimit: 1200 },
 };
 
 const lockoutDefaults: LockoutPolicy = {

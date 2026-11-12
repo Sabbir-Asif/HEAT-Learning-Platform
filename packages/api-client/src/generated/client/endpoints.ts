@@ -42,6 +42,7 @@ import type {
   CaptchaRequestDto,
   CaptchaResponseDto,
   CertificateListResponseDto,
+  CertificateVerificationResponseDto,
   ChangePasswordRequestDto,
   CourseListResponseDto,
   CourseRevisionItemDto,
@@ -96,6 +97,8 @@ import type {
   QuizSummaryDto,
   ReinstateEnrollmentRequestDto,
   ReinstatedEnrollmentDto,
+  ReissueCertificateRequestDto,
+  ReissuedCertificateDto,
   RejectEnrollmentRequestDto,
   RejectEnrollmentsRequestDto,
   RejectedEnrollmentDto,
@@ -103,6 +106,8 @@ import type {
   RemovedEnrollmentDto,
   ReorderRequestDto,
   ResetPasswordRequestDto,
+  RevokeCertificateRequestDto,
+  RevokedCertificateDto,
   SignInRequestDto,
   StudentDetailResponseDto,
   StudentListListParams,
@@ -1292,6 +1297,172 @@ export function useAdminCertificatesDownload<TData = Awaited<ReturnType<typeof a
 
 
 
+
+export const getAdminCertificatesReissueUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/certificates/${id}/reissue`
+}
+
+export const adminCertificatesReissue = async (id: string,
+    reissueCertificateRequestDto: ReissueCertificateRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<ReissuedCertificateDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ReissuedCertificateDto>(getAdminCertificatesReissueUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reissueCertificateRequestDto)
+  }
+);}
+
+
+
+
+
+export const getAdminCertificatesReissueMutationKey = () => ['adminCertificatesReissue'] as const;
+
+export const getAdminCertificatesReissueMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminCertificatesReissue>>, TError,AdminCertificatesReissueMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminCertificatesReissue>>, TError,AdminCertificatesReissueMutationVariables, TContext> => {
+
+const mutationKey = getAdminCertificatesReissueMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminCertificatesReissue>>, AdminCertificatesReissueMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  adminCertificatesReissue(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminCertificatesReissueMutationResult = NonNullable<Awaited<ReturnType<typeof adminCertificatesReissue>>>
+    export type AdminCertificatesReissueMutationBody = ReissueCertificateRequestDto
+    export type AdminCertificatesReissueMutationError = ErrorType<unknown>
+    export type AdminCertificatesReissueMutationVariables = {id: string;data: ReissueCertificateRequestDto}
+
+    export const useAdminCertificatesReissue = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminCertificatesReissue>>, TError,AdminCertificatesReissueMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminCertificatesReissue>>,
+        TError,
+        AdminCertificatesReissueMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAdminCertificatesReissueMutationOptions(options), queryClient);
+    }
+
+export const getAdminCertificatesRevokeUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/certificates/${id}/revoke`
+}
+
+export const adminCertificatesRevoke = async (id: string,
+    revokeCertificateRequestDto: RevokeCertificateRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<RevokedCertificateDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<RevokedCertificateDto>(getAdminCertificatesRevokeUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(revokeCertificateRequestDto)
+  }
+);}
+
+
+
+
+
+export const getAdminCertificatesRevokeMutationKey = () => ['adminCertificatesRevoke'] as const;
+
+export const getAdminCertificatesRevokeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminCertificatesRevoke>>, TError,AdminCertificatesRevokeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminCertificatesRevoke>>, TError,AdminCertificatesRevokeMutationVariables, TContext> => {
+
+const mutationKey = getAdminCertificatesRevokeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminCertificatesRevoke>>, AdminCertificatesRevokeMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  adminCertificatesRevoke(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminCertificatesRevokeMutationResult = NonNullable<Awaited<ReturnType<typeof adminCertificatesRevoke>>>
+    export type AdminCertificatesRevokeMutationBody = RevokeCertificateRequestDto
+    export type AdminCertificatesRevokeMutationError = ErrorType<unknown>
+    export type AdminCertificatesRevokeMutationVariables = {id: string;data: RevokeCertificateRequestDto}
+
+    export const useAdminCertificatesRevoke = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminCertificatesRevoke>>, TError,AdminCertificatesRevokeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminCertificatesRevoke>>,
+        TError,
+        AdminCertificatesRevokeMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAdminCertificatesRevokeMutationOptions(options), queryClient);
+    }
 
 export const getCoursesListUrl = (params?: CoursesListParams,) => {
   const normalizedParams = new URLSearchParams();
@@ -7608,6 +7779,101 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getCaptchaIssueMutationOptions(options), queryClient);
     }
+
+export const getCertificateVerifyVerifyUrl = (number: string,) => {
+
+
+
+
+  return `/api/certificates/verify/${number}`
+}
+
+export const certificateVerifyVerify = async (number: string, options?: Parameters<typeof customFetch>[1]): Promise<CertificateVerificationResponseDto> => {
+
+  return customFetch<CertificateVerificationResponseDto>(getCertificateVerifyVerifyUrl(number),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getCertificateVerifyVerifyQueryKey = (number: string,) => {
+    return [
+    `/api/certificates/verify/${number}`
+    ] as const;
+    }
+
+
+export const getCertificateVerifyVerifyQueryOptions = <TData = Awaited<ReturnType<typeof certificateVerifyVerify>>, TError = ErrorType<unknown>>(number: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof certificateVerifyVerify>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCertificateVerifyVerifyQueryKey(number);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof certificateVerifyVerify>>> = ({ signal }) => certificateVerifyVerify(number, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: number !== null && number !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof certificateVerifyVerify>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CertificateVerifyVerifyQueryResult = NonNullable<Awaited<ReturnType<typeof certificateVerifyVerify>>>
+export type CertificateVerifyVerifyQueryError = ErrorType<unknown>
+
+
+export function useCertificateVerifyVerify<TData = Awaited<ReturnType<typeof certificateVerifyVerify>>, TError = ErrorType<unknown>>(
+ number: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof certificateVerifyVerify>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof certificateVerifyVerify>>,
+          TError,
+          Awaited<ReturnType<typeof certificateVerifyVerify>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCertificateVerifyVerify<TData = Awaited<ReturnType<typeof certificateVerifyVerify>>, TError = ErrorType<unknown>>(
+ number: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof certificateVerifyVerify>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof certificateVerifyVerify>>,
+          TError,
+          Awaited<ReturnType<typeof certificateVerifyVerify>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCertificateVerifyVerify<TData = Awaited<ReturnType<typeof certificateVerifyVerify>>, TError = ErrorType<unknown>>(
+ number: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof certificateVerifyVerify>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useCertificateVerifyVerify<TData = Awaited<ReturnType<typeof certificateVerifyVerify>>, TError = ErrorType<unknown>>(
+ number: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof certificateVerifyVerify>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCertificateVerifyVerifyQueryOptions(number,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getCertificatesDownloadUrl = (id: string,) => {
 

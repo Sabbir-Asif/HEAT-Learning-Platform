@@ -4,8 +4,12 @@ import {
   decideDownload,
   downloadHeaders,
   isCertificateFileKey,
+  reissueRefusal,
+  reissuedRecipientName,
+  revokeRefusal,
   safeFilenameNumber,
   toCertificateItems,
+  toVerification,
   verificationUrlOf,
 } from "../../src/certificates/certificate-rules";
 
@@ -168,5 +172,72 @@ describe("toCertificateItems", () => {
     expect(
       toCertificateItems([enrollment({ status: "APPROVED" })], "https://learn.example"),
     ).toEqual([]);
+  });
+});
+
+describe("certificate verification and admin refusals", () => {
+  const verifiable = (overrides: object = {}) => ({
+    recipientName: "Rahim Uddin",
+    issuedAt,
+    fileKey: key,
+    revokedAt: null,
+    enrollment: {
+      completedAt: new Date("2026-11-10T00:00:00.000Z"),
+      updatedAt: new Date("2026-11-11T00:00:00.000Z"),
+      course: { title: "HEAT" },
+    },
+    ...overrides,
+  });
+
+  test("a valid certificate exposes status, name, course and completion date only", () => {
+    expect(toVerification(verifiable())).toEqual({
+      status: "VALID",
+      holderName: "Rahim Uddin",
+      courseTitle: "HEAT",
+      completedAt: "2026-11-10T00:00:00.000Z",
+    });
+  });
+
+  test("a revoked certificate is reported as revoked", () => {
+    expect(toVerification(verifiable({ revokedAt: issuedAt }))?.status).toBe("REVOKED");
+  });
+
+  test("a certificate revoked before its file was rendered is still reported as revoked", () => {
+    expect(toVerification(verifiable({ fileKey: null, revokedAt: issuedAt }))?.status).toBe(
+      "REVOKED",
+    );
+  });
+
+  test("an unknown or not yet rendered certificate is not found", () => {
+    expect(toVerification(null)).toBeNull();
+    expect(toVerification(verifiable({ fileKey: null }))).toBeNull();
+  });
+
+  test("the completion date falls back to the enrollment update time", () => {
+    const fallback = verifiable({
+      enrollment: {
+        completedAt: null,
+        updatedAt: new Date("2026-11-11T00:00:00.000Z"),
+        course: { title: "HEAT" },
+      },
+    });
+    expect(toVerification(fallback)?.completedAt).toBe("2026-11-11T00:00:00.000Z");
+  });
+
+  test("a revoked certificate cannot be revoked again", () => {
+    expect(revokeRefusal({ fileKey: key, revokedAt: null })).toBeNull();
+    expect(revokeRefusal({ fileKey: key, revokedAt: issuedAt })?.code).toBe("CERTIFICATE_REVOKED");
+  });
+
+  test("only a rendered, unrevoked certificate can be reissued", () => {
+    expect(reissueRefusal({ fileKey: key, revokedAt: null })).toBeNull();
+    expect(reissueRefusal({ fileKey: key, revokedAt: issuedAt })?.code).toBe("CERTIFICATE_REVOKED");
+    expect(reissueRefusal({ fileKey: null, revokedAt: null })?.code).toBe("CERTIFICATE_NOT_READY");
+  });
+
+  test("a reissue takes the current profile name and keeps the old one when it is blank", () => {
+    expect(reissuedRecipientName("Old Name", " New Name ")).toBe("New Name");
+    expect(reissuedRecipientName("Old Name", "  ")).toBe("Old Name");
+    expect(reissuedRecipientName("Old Name", null)).toBe("Old Name");
   });
 });

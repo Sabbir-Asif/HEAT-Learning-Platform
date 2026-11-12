@@ -550,6 +550,8 @@
                     "CANNOT_DEACTIVATE_SELF",
                     "CAPTCHA_EXPIRED",
                     "CAPTCHA_INVALID",
+                    "CERTIFICATE_NOT_READY",
+                    "CERTIFICATE_REVOKED",
                     "CONTENT_LOCKED",
                     "COURSE_HAS_ENROLLMENTS",
                     "COURSE_LOCKED",
@@ -648,6 +650,8 @@
                     "CANNOT_DEACTIVATE_SELF",
                     "CAPTCHA_EXPIRED",
                     "CAPTCHA_INVALID",
+                    "CERTIFICATE_NOT_READY",
+                    "CERTIFICATE_REVOKED",
                     "CONTENT_LOCKED",
                     "COURSE_HAS_ENROLLMENTS",
                     "COURSE_LOCKED",
@@ -828,6 +832,35 @@
         },
         "required": [
           "certificates"
+        ],
+        "type": "object"
+      },
+      "CertificateVerificationResponseDto": {
+        "properties": {
+          "completedAt": {
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "type": "string"
+          },
+          "courseTitle": {
+            "type": "string"
+          },
+          "holderName": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "VALID",
+              "REVOKED"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "holderName",
+          "courseTitle",
+          "completedAt"
         ],
         "type": "object"
       },
@@ -3565,6 +3598,39 @@
         ],
         "type": "object"
       },
+      "ReissueCertificateRequestDto": {
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      },
+      "ReissuedCertificateDto": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PENDING"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "type": "object"
+      },
       "RejectEnrollmentRequestDto": {
         "properties": {
           "reason": {
@@ -3708,6 +3774,45 @@
         "required": [
           "token",
           "password"
+        ],
+        "type": "object"
+      },
+      "RevokeCertificateRequestDto": {
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      },
+      "RevokedCertificateDto": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "revokedAt": {
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "REVOKED"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "revokedAt"
         ],
         "type": "object"
       },
@@ -5311,6 +5416,90 @@
               }
             },
             "description": "Empty body; Nginx serves the PDF through X-Accel-Redirect"
+          }
+        },
+        "tags": [
+          "certificates"
+        ]
+      }
+    },
+    "/api/admin/certificates/{id}/reissue": {
+      "post": {
+        "operationId": "adminCertificatesReissue",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReissueCertificateRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReissuedCertificateDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "certificates"
+        ]
+      }
+    },
+    "/api/admin/certificates/{id}/revoke": {
+      "post": {
+        "operationId": "adminCertificatesRevoke",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeCertificateRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevokedCertificateDto"
+                }
+              }
+            },
+            "description": ""
           }
         },
         "tags": [
@@ -8575,6 +8764,39 @@
         },
         "tags": [
           "captcha"
+        ]
+      }
+    },
+    "/api/certificates/verify/{number}": {
+      "get": {
+        "operationId": "certificateVerifyVerify",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "number",
+            "required": true,
+            "schema": {
+              "maxLength": 64,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9-]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateVerificationResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "certificates"
         ]
       }
     },
