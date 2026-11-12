@@ -2609,6 +2609,86 @@ export const AdminPlaybackPreviewResponse = zod.object({
 })
 
 
+export const studentListListQueryCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentListListQueryUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentListListQueryFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentListListQueryDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentListListQuerySessionRegExp = new RegExp('^(\\d{4})-(\\d{2})$');
+export const studentListListQueryQMax = 100;
+
+export const studentListListQuerySortDefault = `name`;
+export const studentListListQueryPageDefault = 1;
+export const studentListListQueryPageMax = 9007199254740991;
+
+export const studentListListQueryPageSizeDefault = 25;
+export const studentListListQueryPageSizeMin = -9007199254740991;
+export const studentListListQueryPageSizeMax = 9007199254740991;
+
+
+
+export const StudentListListQueryParams = zod.object({
+  "courseId": zod.uuid().regex(studentListListQueryCourseIdRegExp).optional(),
+  "universityId": zod.uuid().regex(studentListListQueryUniversityIdRegExp).optional(),
+  "facultyId": zod.uuid().regex(studentListListQueryFacultyIdRegExp).optional(),
+  "departmentId": zod.uuid().regex(studentListListQueryDepartmentIdRegExp).optional(),
+  "session": zod.string().regex(studentListListQuerySessionRegExp).optional(),
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED']).optional(),
+  "q": zod.string().max(studentListListQueryQMax).optional(),
+  "sort": zod.enum(['name', '-name', 'requestedAt', '-requestedAt']).default(studentListListQuerySortDefault),
+  "page": zod.int().min(1).max(studentListListQueryPageMax).default(studentListListQueryPageDefault),
+  "pageSize": zod.int().min(studentListListQueryPageSizeMin).max(studentListListQueryPageSizeMax).default(studentListListQueryPageSizeDefault)
+})
+
+export const studentListListResponseItemsItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentListListResponseItemsItemDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentListListResponseItemsItemFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentListListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentListListResponseItemsItemRequestedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const studentListListResponseItemsItemStudentUserIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentListListResponseItemsItemUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentListListResponsePageMax = 9007199254740991;
+
+export const studentListListResponsePageSizeMax = 9007199254740991;
+
+export const studentListListResponseTotalMin = 0;
+export const studentListListResponseTotalMax = 9007199254740991;
+
+
+
+export const StudentListListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "course": zod.object({
+  "id": zod.uuid().regex(studentListListResponseItemsItemCourseIdRegExp),
+  "title": zod.string()
+}),
+  "department": zod.object({
+  "id": zod.uuid().regex(studentListListResponseItemsItemDepartmentIdRegExp),
+  "name": zod.string()
+}),
+  "faculty": zod.object({
+  "id": zod.uuid().regex(studentListListResponseItemsItemFacultyIdRegExp),
+  "name": zod.string()
+}),
+  "id": zod.uuid().regex(studentListListResponseItemsItemIdRegExp),
+  "requestedAt": zod.iso.datetime({"offset":true}).regex(studentListListResponseItemsItemRequestedAtRegExp),
+  "session": zod.string(),
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED']),
+  "student": zod.object({
+  "email": zod.string(),
+  "name": zod.string(),
+  "userId": zod.uuid().regex(studentListListResponseItemsItemStudentUserIdRegExp)
+}),
+  "university": zod.object({
+  "id": zod.uuid().regex(studentListListResponseItemsItemUniversityIdRegExp),
+  "name": zod.string()
+})
+})),
+  "page": zod.int().min(1).max(studentListListResponsePageMax),
+  "pageSize": zod.int().min(1).max(studentListListResponsePageSizeMax),
+  "total": zod.int().min(studentListListResponseTotalMin).max(studentListListResponseTotalMax)
+})
+
+
 export const StudentAuthCsrfTokenResponse = zod.object({
   "token": zod.string()
 })

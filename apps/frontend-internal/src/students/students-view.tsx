@@ -1,0 +1,282 @@
+"use client";
+
+import {
+  useCoursesList,
+  useDepartmentsList,
+  useFacultiesList,
+  useStudentListList,
+  useUniversitiesList,
+} from "@heat/api-client";
+import type { StudentListListParams, StudentListResponseDtoItemsItem } from "@heat/api-client";
+import { academicSessionSchema, enrollmentStatuses } from "@heat/contracts";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+  Input,
+  PageHeader,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  StatusBadge,
+} from "@heat/ui";
+import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui/data";
+import type { DataTableColumn } from "@heat/ui/data";
+import { ShellContent } from "@heat/ui/shell";
+import { useMemo } from "react";
+import {
+  studentBadgeStatus,
+  studentSortValue,
+  studentSortable,
+  studentStatusFilterKey,
+  studentStatusFilterOptions,
+  studentStatusLabels,
+} from "./student-copy";
+
+type StudentRow = StudentListResponseDtoItemsItem;
+
+const filterKeys = [
+  "course",
+  "university",
+  "faculty",
+  "department",
+  "session",
+  studentStatusFilterKey,
+] as const;
+const optionLimit = 50;
+const all = "all";
+
+export function StudentsView() {
+  const url = useTableUrlState({
+    sortable: studentSortable,
+    filters: filterKeys,
+    filterOptions: studentStatusFilterOptions,
+  });
+  const filter = (key: (typeof filterKeys)[number]): string => url.filters[key] ?? "";
+  const course = filter("course");
+  const university = filter("university");
+  const faculty = filter("faculty");
+  const department = filter("department");
+  const session = filter("session");
+  const status = filter(studentStatusFilterKey);
+  const sessionValid = session === "" || academicSessionSchema.safeParse(session).success;
+
+  const params: StudentListListParams = {
+    page: url.page,
+    pageSize: url.pageSize,
+    sort: studentSortValue(url.sort),
+    ...(course ? { courseId: course } : {}),
+    ...(university ? { universityId: university } : {}),
+    ...(university && faculty ? { facultyId: faculty } : {}),
+    ...(university && faculty && department ? { departmentId: department } : {}),
+    ...(session && sessionValid ? { session } : {}),
+    ...(status ? { status: status as (typeof enrollmentStatuses)[number] } : {}),
+    ...(url.query ? { q: url.query } : {}),
+  };
+  const list = useStudentListList(params);
+  const courses = useCoursesList({ page: 1, pageSize: optionLimit, status: "published" });
+  const universities = useUniversitiesList({
+    page: 1,
+    pageSize: optionLimit,
+    sort: "name",
+    status: "all",
+  });
+  const faculties = useFacultiesList(
+    { page: 1, pageSize: optionLimit, sort: "name", status: "all", universityId: university },
+    { query: { enabled: Boolean(university) } },
+  );
+  const departments = useDepartmentsList(
+    {
+      page: 1,
+      pageSize: optionLimit,
+      sort: "name",
+      status: "all",
+      universityId: university,
+      facultyId: faculty,
+    },
+    { query: { enabled: Boolean(university && faculty) } },
+  );
+  const total = list.data?.total ?? 0;
+  const page = useClampedPage(url.page, url.pageSize, total, url.setPage);
+  const items = list.data?.items;
+  const rows = useMemo(() => items ?? [], [items]);
+
+  const options = (
+    placeholder: string,
+    entries: ReadonlyArray<{ id: string; name?: string; title?: string }> | undefined,
+  ) => [
+    { value: all, label: placeholder },
+    ...(entries ?? []).map((entry) => ({
+      value: entry.id,
+      label: entry.title ?? entry.name ?? entry.id,
+    })),
+  ];
+  const statusItems = [
+    { value: all, label: "All statuses" },
+    ...enrollmentStatuses.map((value) => ({ value, label: studentStatusLabels[value] })),
+  ];
+
+  const columns = useMemo<DataTableColumn<StudentRow>[]>(
+    () => [
+      {
+        id: "name",
+        header: "Student",
+        sortable: true,
+        cell: (row) => (
+          <div className="flex flex-col">
+            <strong>{row.student.name}</strong>
+            <FieldDescription>{row.student.email}</FieldDescription>
+          </div>
+        ),
+      },
+      { id: "course", header: "Course", cell: (row) => row.course.title },
+      { id: "university", header: "University", cell: (row) => row.university.name },
+      { id: "faculty", header: "Faculty", cell: (row) => row.faculty.name },
+      { id: "department", header: "Department", cell: (row) => row.department.name },
+      { id: "session", header: "Session", cell: (row) => row.session },
+      {
+        id: "status",
+        header: "Status",
+        cell: (row) => <StatusBadge kind="enrollment" status={studentBadgeStatus(row.status)} />,
+      },
+    ],
+    [],
+  );
+
+  const selectFilter = (
+    id: string,
+    label: string,
+    entries: Array<{ value: string; label: string }>,
+    value: string,
+    onChange: (next: string | null) => void,
+    disabled = false,
+    truncated = false,
+  ) => (
+    <Field>
+      <FieldLabel id={`student-filter-${id}`}>{label}</FieldLabel>
+      <Select
+        items={entries}
+        value={value || all}
+        disabled={disabled}
+        onValueChange={(next) => onChange(next === all ? null : next)}
+      >
+        <SelectTrigger aria-labelledby={`student-filter-${id}`} className="w-full">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {entries.map((entry) => (
+            <SelectItem key={entry.value} value={entry.value}>
+              {entry.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {truncated ? (
+        <FieldDescription>{`Showing the first ${optionLimit}. Narrow with the other filters.`}</FieldDescription>
+      ) : null}
+    </Field>
+  );
+
+  return (
+    <ShellContent>
+      <PageHeader title="Students" />
+      <FilterBar
+        activeCount={url.activeFilterCount}
+        onClear={url.clearFilters}
+        search={
+          <Input
+            type="search"
+            aria-label="Search students"
+            placeholder="Search by name or email"
+            defaultValue={url.query}
+            onChange={(event) => url.setQuery(event.target.value.trim())}
+          />
+        }
+      >
+        {selectFilter(
+          "course",
+          "Course",
+          options("All courses", courses.data?.items),
+          course,
+          (next) => url.setFilter("course", next),
+          false,
+          (courses.data?.total ?? 0) > optionLimit,
+        )}
+        {selectFilter(
+          "university",
+          "University",
+          options("All universities", universities.data?.items),
+          university,
+          (next) => url.setFilters({ university: next, faculty: null, department: null }),
+          false,
+          (universities.data?.total ?? 0) > optionLimit,
+        )}
+        {selectFilter(
+          "faculty",
+          "Faculty",
+          options("All faculties", faculties.data?.items),
+          faculty,
+          (next) => url.setFilters({ faculty: next, department: null }),
+          !university,
+          (faculties.data?.total ?? 0) > optionLimit,
+        )}
+        {selectFilter(
+          "department",
+          "Department",
+          options("All departments", departments.data?.items),
+          department,
+          (next) => url.setFilter("department", next),
+          !university || !faculty,
+          (departments.data?.total ?? 0) > optionLimit,
+        )}
+        <Field>
+          <FieldLabel htmlFor="student-session">Session</FieldLabel>
+          <Input
+            id="student-session"
+            key={session}
+            defaultValue={session}
+            placeholder="2020-21"
+            aria-invalid={sessionValid ? undefined : true}
+            onBlur={(event) => {
+              const next = event.target.value.trim();
+              if (next !== session) url.setFilter("session", next);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") event.currentTarget.blur();
+            }}
+          />
+          {sessionValid ? null : (
+            <FieldError>Use the format 2020-21, where the second part is the next year.</FieldError>
+          )}
+        </Field>
+        {selectFilter(studentStatusFilterKey, "Status", statusItems, status, (next) =>
+          url.setFilter(studentStatusFilterKey, next),
+        )}
+      </FilterBar>
+      <DataTable
+        label="Students"
+        columns={columns}
+        rows={rows}
+        getRowId={(row) => row.id}
+        total={total}
+        page={page}
+        pageSize={url.pageSize}
+        sort={url.sort ?? { id: "name", desc: false }}
+        onToggleSort={url.toggleSort}
+        onSortChange={url.setSort}
+        onPageChange={url.setPage}
+        onPageSizeChange={url.setPageSize}
+        status={list.isError ? "error" : list.isPending ? "loading" : "ready"}
+        fetching={list.isFetching && !list.isPending}
+        onRetry={() => void list.refetch()}
+        filtersActive={url.activeFilterCount > 0 || url.query !== ""}
+        onClearFilters={url.clearFilters}
+        emptyTitle="No students found"
+        emptyDescription="Students appear here after they request enrollment."
+      />
+    </ShellContent>
+  );
+}

@@ -20,7 +20,9 @@ const submittedRange = (query: ApprovalQueueQuery) => {
   };
 };
 
-const profileFilter = (query: ApprovalQueueQuery) => {
+export const profileFilter = (
+  query: Pick<ApprovalQueueQuery, "universityId" | "facultyId" | "departmentId" | "session">,
+) => {
   const department = {
     ...(query.universityId === undefined ? {} : { universityId: query.universityId }),
     ...(query.facultyId === undefined ? {} : { facultyId: query.facultyId }),
