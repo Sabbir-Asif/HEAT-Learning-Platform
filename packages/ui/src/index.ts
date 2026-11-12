@@ -38,6 +38,7 @@ export * from "./composites/notification-row";
 export * from "./composites/page-header";
 export * from "./composites/quiz-question";
 export * from "./composites/quiz-review-question";
+export * from "./composites/quiz-preview";
 export * from "./composites/section-heading";
 export * from "./composites/sortable-list";
 export * from "./composites/stat-card";
