@@ -3735,13 +3735,15 @@ export const SignedInEnrollmentRequestResponse = zod.object({
 })
 
 
+export const profileDescribeResponseAvatarUrlMax = 2048;
+
 export const profileDescribeResponseDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const profileDescribeResponseFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const profileDescribeResponseUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 
 export const ProfileDescribeResponse = zod.object({
-  "avatarUrl": zod.array(zod.string()),
+  "avatarUrl": zod.string().min(1).max(profileDescribeResponseAvatarUrlMax).nullable(),
   "department": zod.object({
   "id": zod.uuid().regex(profileDescribeResponseDepartmentIdRegExp),
   "name": zod.string()
@@ -3776,13 +3778,15 @@ export const ProfileUpdateBody = zod.object({
   "universityId": zod.uuid().regex(profileUpdateBodyUniversityIdRegExp)
 })
 
+export const profileUpdateResponseAvatarUrlMax = 2048;
+
 export const profileUpdateResponseDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const profileUpdateResponseFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const profileUpdateResponseUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 
 export const ProfileUpdateResponse = zod.object({
-  "avatarUrl": zod.array(zod.string()),
+  "avatarUrl": zod.string().min(1).max(profileUpdateResponseAvatarUrlMax).nullable(),
   "department": zod.object({
   "id": zod.uuid().regex(profileUpdateResponseDepartmentIdRegExp),
   "name": zod.string()

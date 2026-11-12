@@ -1566,7 +1566,12 @@ export type ProfileResponseDtoUniversity = {
 };
 
 export interface ProfileResponseDto {
-  avatarUrl: string[];
+  /**
+     * @minLength 1
+     * @maxLength 2048
+     * @nullable
+     */
+  avatarUrl: string | null;
   department: ProfileResponseDtoDepartment;
   email: string;
   emailVerified: boolean;
