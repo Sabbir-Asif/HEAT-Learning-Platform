@@ -46,6 +46,7 @@
     "@types/node": "catalog:",
     "@types/nodemailer": "^8.0.2",
     "eslint": "catalog:",
+    "fast-check": "3.23.2",
     "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
