@@ -338,7 +338,10 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   EMAIL_IN_USE: 'EMAIL_IN_USE',
   ENROLLMENT_ALREADY_DECIDED: 'ENROLLMENT_ALREADY_DECIDED',
   ENROLLMENT_NOT_ACTIVE: 'ENROLLMENT_NOT_ACTIVE',
+  ENROLLMENT_NOT_REMOVABLE: 'ENROLLMENT_NOT_REMOVABLE',
+  ENROLLMENT_NOT_REMOVED: 'ENROLLMENT_NOT_REMOVED',
   ENROLLMENT_NOT_VERIFIED: 'ENROLLMENT_NOT_VERIFIED',
+  ENROLLMENT_STATE_CHANGED: 'ENROLLMENT_STATE_CHANGED',
   FORBIDDEN: 'FORBIDDEN',
   INTERNAL: 'INTERNAL',
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
@@ -406,7 +409,10 @@ export const BulkRejectionResponseDtoFailedItemCode = {
   EMAIL_IN_USE: 'EMAIL_IN_USE',
   ENROLLMENT_ALREADY_DECIDED: 'ENROLLMENT_ALREADY_DECIDED',
   ENROLLMENT_NOT_ACTIVE: 'ENROLLMENT_NOT_ACTIVE',
+  ENROLLMENT_NOT_REMOVABLE: 'ENROLLMENT_NOT_REMOVABLE',
+  ENROLLMENT_NOT_REMOVED: 'ENROLLMENT_NOT_REMOVED',
   ENROLLMENT_NOT_VERIFIED: 'ENROLLMENT_NOT_VERIFIED',
+  ENROLLMENT_STATE_CHANGED: 'ENROLLMENT_STATE_CHANGED',
   FORBIDDEN: 'FORBIDDEN',
   INTERNAL: 'INTERNAL',
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
@@ -1958,6 +1964,25 @@ export interface QuizSummaryDto {
   rules: QuizSummaryDtoRules;
 }
 
+export interface ReinstateEnrollmentRequestDto {
+  /** @maxLength 500 */
+  reason?: string;
+}
+
+export type ReinstatedEnrollmentDtoStatus = typeof ReinstatedEnrollmentDtoStatus[keyof typeof ReinstatedEnrollmentDtoStatus];
+
+
+export const ReinstatedEnrollmentDtoStatus = {
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export interface ReinstatedEnrollmentDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  status: ReinstatedEnrollmentDtoStatus;
+}
+
 export interface RejectEnrollmentRequestDto {
   /** @maxLength 500 */
   reason?: string;
@@ -1988,6 +2013,29 @@ export interface RejectedEnrollmentDto {
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   rejectedAt: string;
   status: RejectedEnrollmentDtoStatus;
+}
+
+export interface RemoveEnrollmentRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  reason: string;
+}
+
+export type RemovedEnrollmentDtoStatus = typeof RemovedEnrollmentDtoStatus[keyof typeof RemovedEnrollmentDtoStatus];
+
+
+export const RemovedEnrollmentDtoStatus = {
+  REMOVED: 'REMOVED',
+} as const;
+
+export interface RemovedEnrollmentDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  removedAt: string;
+  status: RemovedEnrollmentDtoStatus;
 }
 
 export interface ReorderRequestDto {
@@ -4799,6 +4847,42 @@ return serverFetch<ApprovedEnrollmentDto>(getEnrollmentApprovalApproveUrl(id),
 
 
 
+export const getEnrollmentRemovalReinstateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/enrollments/${id}/reinstate`
+}
+
+export const enrollmentRemovalReinstate = async (id: string,
+    reinstateEnrollmentRequestDto: ReinstateEnrollmentRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ReinstatedEnrollmentDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ReinstatedEnrollmentDto>(getEnrollmentRemovalReinstateUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reinstateEnrollmentRequestDto)
+  }
+);}
+
+
+
 export const getEnrollmentApprovalRejectUrl = (id: string,) => {
 
 
@@ -4830,6 +4914,42 @@ return serverFetch<RejectedEnrollmentDto>(getEnrollmentApprovalRejectUrl(id),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(rejectEnrollmentRequestDto)
+  }
+);}
+
+
+
+export const getEnrollmentRemovalRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/enrollments/${id}/remove`
+}
+
+export const enrollmentRemovalRemove = async (id: string,
+    removeEnrollmentRequestDto: RemoveEnrollmentRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<RemovedEnrollmentDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<RemovedEnrollmentDto>(getEnrollmentRemovalRemoveUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(removeEnrollmentRequestDto)
   }
 );}
 

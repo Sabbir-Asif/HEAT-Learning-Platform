@@ -564,7 +564,10 @@
                     "EMAIL_IN_USE",
                     "ENROLLMENT_ALREADY_DECIDED",
                     "ENROLLMENT_NOT_ACTIVE",
+                    "ENROLLMENT_NOT_REMOVABLE",
+                    "ENROLLMENT_NOT_REMOVED",
                     "ENROLLMENT_NOT_VERIFIED",
+                    "ENROLLMENT_STATE_CHANGED",
                     "FORBIDDEN",
                     "INTERNAL",
                     "INVALID_CREDENTIALS",
@@ -653,7 +656,10 @@
                     "EMAIL_IN_USE",
                     "ENROLLMENT_ALREADY_DECIDED",
                     "ENROLLMENT_NOT_ACTIVE",
+                    "ENROLLMENT_NOT_REMOVABLE",
+                    "ENROLLMENT_NOT_REMOVED",
                     "ENROLLMENT_NOT_VERIFIED",
+                    "ENROLLMENT_STATE_CHANGED",
                     "FORBIDDEN",
                     "INTERNAL",
                     "INVALID_CREDENTIALS",
@@ -3361,6 +3367,36 @@
         ],
         "type": "object"
       },
+      "ReinstateEnrollmentRequestDto": {
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ReinstatedEnrollmentDto": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "APPROVED",
+              "COMPLETED"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "type": "object"
+      },
       "RejectEnrollmentRequestDto": {
         "properties": {
           "reason": {
@@ -3419,6 +3455,45 @@
           "status",
           "rejectedAt",
           "accountDeleted"
+        ],
+        "type": "object"
+      },
+      "RemoveEnrollmentRequestDto": {
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      },
+      "RemovedEnrollmentDto": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "removedAt": {
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "REMOVED"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "removedAt"
         ],
         "type": "object"
       },
@@ -7183,6 +7258,48 @@
         ]
       }
     },
+    "/api/admin/enrollments/{id}/reinstate": {
+      "post": {
+        "operationId": "enrollmentRemovalReinstate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReinstateEnrollmentRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReinstatedEnrollmentDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "enrollment-removals"
+        ]
+      }
+    },
     "/api/admin/enrollments/{id}/reject": {
       "post": {
         "operationId": "enrollmentApprovalReject",
@@ -7222,6 +7339,48 @@
         },
         "tags": [
           "enrollment-approvals"
+        ]
+      }
+    },
+    "/api/admin/enrollments/{id}/remove": {
+      "post": {
+        "operationId": "enrollmentRemovalRemove",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveEnrollmentRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemovedEnrollmentDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "enrollment-removals"
         ]
       }
     },

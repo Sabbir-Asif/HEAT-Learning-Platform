@@ -90,9 +90,13 @@ import type {
   QuizSubmitRequestDto,
   QuizSubmitResponseDto,
   QuizSummaryDto,
+  ReinstateEnrollmentRequestDto,
+  ReinstatedEnrollmentDto,
   RejectEnrollmentRequestDto,
   RejectEnrollmentsRequestDto,
   RejectedEnrollmentDto,
+  RemoveEnrollmentRequestDto,
+  RemovedEnrollmentDto,
   ReorderRequestDto,
   SignInRequestDto,
   StudentListListParams,
@@ -5932,6 +5936,89 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getEnrollmentApprovalApproveMutationOptions(options), queryClient);
     }
 
+export const getEnrollmentRemovalReinstateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/enrollments/${id}/reinstate`
+}
+
+export const enrollmentRemovalReinstate = async (id: string,
+    reinstateEnrollmentRequestDto: ReinstateEnrollmentRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<ReinstatedEnrollmentDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ReinstatedEnrollmentDto>(getEnrollmentRemovalReinstateUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reinstateEnrollmentRequestDto)
+  }
+);}
+
+
+
+
+
+export const getEnrollmentRemovalReinstateMutationKey = () => ['enrollmentRemovalReinstate'] as const;
+
+export const getEnrollmentRemovalReinstateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentRemovalReinstate>>, TError,EnrollmentRemovalReinstateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof enrollmentRemovalReinstate>>, TError,EnrollmentRemovalReinstateMutationVariables, TContext> => {
+
+const mutationKey = getEnrollmentRemovalReinstateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof enrollmentRemovalReinstate>>, EnrollmentRemovalReinstateMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  enrollmentRemovalReinstate(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EnrollmentRemovalReinstateMutationResult = NonNullable<Awaited<ReturnType<typeof enrollmentRemovalReinstate>>>
+    export type EnrollmentRemovalReinstateMutationBody = ReinstateEnrollmentRequestDto
+    export type EnrollmentRemovalReinstateMutationError = ErrorType<unknown>
+    export type EnrollmentRemovalReinstateMutationVariables = {id: string;data: ReinstateEnrollmentRequestDto}
+
+    export const useEnrollmentRemovalReinstate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentRemovalReinstate>>, TError,EnrollmentRemovalReinstateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof enrollmentRemovalReinstate>>,
+        TError,
+        EnrollmentRemovalReinstateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getEnrollmentRemovalReinstateMutationOptions(options), queryClient);
+    }
+
 export const getEnrollmentApprovalRejectUrl = (id: string,) => {
 
 
@@ -6013,6 +6100,89 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getEnrollmentApprovalRejectMutationOptions(options), queryClient);
+    }
+
+export const getEnrollmentRemovalRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/enrollments/${id}/remove`
+}
+
+export const enrollmentRemovalRemove = async (id: string,
+    removeEnrollmentRequestDto: RemoveEnrollmentRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<RemovedEnrollmentDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<RemovedEnrollmentDto>(getEnrollmentRemovalRemoveUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(removeEnrollmentRequestDto)
+  }
+);}
+
+
+
+
+
+export const getEnrollmentRemovalRemoveMutationKey = () => ['enrollmentRemovalRemove'] as const;
+
+export const getEnrollmentRemovalRemoveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentRemovalRemove>>, TError,EnrollmentRemovalRemoveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof enrollmentRemovalRemove>>, TError,EnrollmentRemovalRemoveMutationVariables, TContext> => {
+
+const mutationKey = getEnrollmentRemovalRemoveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof enrollmentRemovalRemove>>, EnrollmentRemovalRemoveMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  enrollmentRemovalRemove(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EnrollmentRemovalRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof enrollmentRemovalRemove>>>
+    export type EnrollmentRemovalRemoveMutationBody = RemoveEnrollmentRequestDto
+    export type EnrollmentRemovalRemoveMutationError = ErrorType<unknown>
+    export type EnrollmentRemovalRemoveMutationVariables = {id: string;data: RemoveEnrollmentRequestDto}
+
+    export const useEnrollmentRemovalRemove = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof enrollmentRemovalRemove>>, TError,EnrollmentRemovalRemoveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof enrollmentRemovalRemove>>,
+        TError,
+        EnrollmentRemovalRemoveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getEnrollmentRemovalRemoveMutationOptions(options), queryClient);
     }
 
 export const getAdminMeDescribeUrl = () => {
