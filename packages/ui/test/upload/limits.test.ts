@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   checkFile,
+  avatarRules,
   captionRules,
   documentRules,
   formatBytes,
@@ -17,6 +18,11 @@ const png = (overrides: Partial<CandidateFile> = {}): CandidateFile => ({
 });
 
 describe("presets", () => {
+  test("avatar takes a single image and refuses SVG", () => {
+    expect(avatarRules.maxFiles).toBe(1);
+    expect(avatarRules.extensions).not.toContain("svg");
+  });
+
   test("images are capped at 5 MB and refuse SVG", () => {
     expect(imageRules.maxBytes).toBe(5 * 1024 * 1024);
     expect(imageRules.extensions).not.toContain("svg");
