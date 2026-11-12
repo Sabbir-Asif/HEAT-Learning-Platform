@@ -110,6 +110,7 @@ import type {
   SignInRequestDto,
   SignedInEnrollmentRequestDto,
   SignedInEnrollmentResponseDto,
+  StudentExportDownloadParams,
   TagDetailDto,
   TagListResponseDto,
   TagRefListResponseDto,
@@ -7614,6 +7615,108 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAdminSiteSettingsUpdateMutationOptions(options), queryClient);
     }
+
+export const getStudentExportDownloadUrl = (params?: StudentExportDownloadParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/students/export?${stringifiedParams}` : `/api/admin/students/export`
+}
+
+export const studentExportDownload = async (params?: StudentExportDownloadParams, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getStudentExportDownloadUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getStudentExportDownloadQueryKey = (params?: StudentExportDownloadParams,) => {
+    return [
+    `/api/admin/students/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getStudentExportDownloadQueryOptions = <TData = Awaited<ReturnType<typeof studentExportDownload>>, TError = ErrorType<unknown>>(params?: StudentExportDownloadParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentExportDownload>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getStudentExportDownloadQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentExportDownload>>> = ({ signal }) => studentExportDownload(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof studentExportDownload>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type StudentExportDownloadQueryResult = NonNullable<Awaited<ReturnType<typeof studentExportDownload>>>
+export type StudentExportDownloadQueryError = ErrorType<unknown>
+
+
+export function useStudentExportDownload<TData = Awaited<ReturnType<typeof studentExportDownload>>, TError = ErrorType<unknown>>(
+ params: undefined |  StudentExportDownloadParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentExportDownload>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof studentExportDownload>>,
+          TError,
+          Awaited<ReturnType<typeof studentExportDownload>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStudentExportDownload<TData = Awaited<ReturnType<typeof studentExportDownload>>, TError = ErrorType<unknown>>(
+ params?: StudentExportDownloadParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentExportDownload>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof studentExportDownload>>,
+          TError,
+          Awaited<ReturnType<typeof studentExportDownload>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStudentExportDownload<TData = Awaited<ReturnType<typeof studentExportDownload>>, TError = ErrorType<unknown>>(
+ params?: StudentExportDownloadParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentExportDownload>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useStudentExportDownload<TData = Awaited<ReturnType<typeof studentExportDownload>>, TError = ErrorType<unknown>>(
+ params?: StudentExportDownloadParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentExportDownload>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getStudentExportDownloadQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getTagsListUrl = () => {
 

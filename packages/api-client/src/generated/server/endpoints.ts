@@ -2983,6 +2983,38 @@ export const NewsListSort = {
   '-updatedAt': '-updatedAt',
 } as const;
 
+export type StudentExportDownloadParams = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId?: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session?: string;
+  status?: StudentExportDownloadStatus;
+  /**
+   * @minLength 1
+   * @maxLength 100
+   */
+  search?: string;
+};
+
+export type StudentExportDownloadStatus = typeof StudentExportDownloadStatus[keyof typeof StudentExportDownloadStatus];
+
+
+export const StudentExportDownloadStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
 export type PublicNewsListParams = {
   /**
    * @minimum 1
@@ -5525,6 +5557,34 @@ return serverFetch<AdminLandingOverviewResponseDto>(getAdminSiteSettingsUpdateUr
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(landingOverviewRequestDto)
+  }
+);}
+
+
+
+export const getStudentExportDownloadUrl = (params?: StudentExportDownloadParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/students/export?${stringifiedParams}` : `/api/admin/students/export`
+}
+
+export const studentExportDownload = async (params?: StudentExportDownloadParams, options?: Parameters<typeof serverFetch>[1]): Promise<Blob> => {
+
+  return serverFetch<Blob>(getStudentExportDownloadUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 

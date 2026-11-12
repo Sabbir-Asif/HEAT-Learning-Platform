@@ -3131,6 +3131,28 @@ export const AdminSiteSettingsUpdateResponse = zod.object({
 })
 
 
+export const studentExportDownloadQueryCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentExportDownloadQueryUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentExportDownloadQueryFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentExportDownloadQueryDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentExportDownloadQuerySessionRegExp = new RegExp('^(\\d{4})-(\\d{2})$');
+export const studentExportDownloadQuerySearchMax = 100;
+
+
+
+export const StudentExportDownloadQueryParams = zod.object({
+  "courseId": zod.uuid().regex(studentExportDownloadQueryCourseIdRegExp).optional(),
+  "universityId": zod.uuid().regex(studentExportDownloadQueryUniversityIdRegExp).optional(),
+  "facultyId": zod.uuid().regex(studentExportDownloadQueryFacultyIdRegExp).optional(),
+  "departmentId": zod.uuid().regex(studentExportDownloadQueryDepartmentIdRegExp).optional(),
+  "session": zod.string().regex(studentExportDownloadQuerySessionRegExp).optional(),
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED']).optional(),
+  "search": zod.string().min(1).max(studentExportDownloadQuerySearchMax).optional()
+})
+
+export const StudentExportDownloadResponse = zod.unknown()
+
+
 export const tagsListResponseItemsItemCourseCountMin = 0;
 export const tagsListResponseItemsItemCourseCountMax = 9007199254740991;
 

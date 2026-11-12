@@ -289,6 +289,8 @@ export const getAdminSiteSettingsUpdateResponseMock = (overrideResponse: Partial
         [faker.string.alphanumeric(5)]: {}
       }, heading: faker.string.alpha({length: {min: 10, max: 20}}), image: faker.helpers.arrayElement([{alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})},null,]), imageAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), updatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), ...overrideResponse})
 
+export const getStudentExportDownloadResponseMock = (): Blob => (new Blob([new Uint8Array(faker.number.int({ min: 1, max: 64 }))]))
+
 export const getTagsListResponseMock = (overrideResponse: Partial<Extract<TagListResponseDto, object>> = {}): TagListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseCount: faker.number.int({min: 0, max: 9007199254740991}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), isSystem: faker.datatype.boolean(), moduleCount: faker.number.int({min: 0, max: 9007199254740991}), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z'})), ...overrideResponse})
 
 export const getTagsCreateResponseMock = (overrideResponse: Partial<Extract<TagSummaryDto, object>> = {}): TagSummaryDto => ({courseCount: faker.number.int({min: 0, max: 9007199254740991}), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), isSystem: faker.datatype.boolean(), moduleCount: faker.number.int({min: 0, max: 9007199254740991}), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
@@ -1415,6 +1417,19 @@ export const getAdminSiteSettingsUpdateMockHandler = (overrideResponse?: AdminLa
   }, options)
 }
 
+export const getStudentExportDownloadMockHandler = (overrideResponse?: Blob | ((info: Parameters<HttpResponseResolver>[0]) => Promise<Blob> | Blob), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/students/export', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+  const binaryBody = overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getStudentExportDownloadResponseMock();
+    return new HttpResponse(binaryBody,
+      { status: 200,
+        headers: { 'Content-Type': 'application/octet-stream' }
+      })
+  }, options)
+}
+
 export const getTagsListMockHandler = (overrideResponse?: TagListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<TagListResponseDto> | TagListResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/admin/tags', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1977,6 +1992,7 @@ export const getHeatLmsApiMock = () => [
   getAdminContactSettingsUpdateMockHandler(),
   getAdminSiteSettingsGetMockHandler(),
   getAdminSiteSettingsUpdateMockHandler(),
+  getStudentExportDownloadMockHandler(),
   getTagsListMockHandler(),
   getTagsCreateMockHandler(),
   getTagsRemoveMockHandler(),

@@ -220,6 +220,8 @@ export * from './signedInEnrollmentRequestDto';
 export * from './signedInEnrollmentResponseDto';
 export * from './signedInEnrollmentResponseDtoStatus';
 export * from './signInRequestDto';
+export * from './studentExportDownloadParams';
+export * from './studentExportDownloadStatus';
 export * from './tagDetailDto';
 export * from './tagDetailDtoCoursesItem';
 export * from './tagDetailDtoModulesItem';
