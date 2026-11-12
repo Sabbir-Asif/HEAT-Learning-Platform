@@ -35,6 +35,7 @@ const build = (
     user: {
       findFirst: vi.fn().mockResolvedValue("user" in options ? options.user : { id: "user-id" }),
       updateMany: vi.fn().mockResolvedValue({ count: options.updated ?? 1 }),
+      findUnique: vi.fn().mockResolvedValue({ email: "anne@example.com" }),
     },
     session: { updateMany: vi.fn().mockResolvedValue({ count: 2 }) },
     outbox: { create: vi.fn().mockResolvedValue({}) },
@@ -47,6 +48,7 @@ const build = (
   const captcha = { verify: vi.fn().mockResolvedValue(undefined) };
   const timing = { equalise: vi.fn().mockImplementation((work: () => unknown) => work()) };
   const passwords = { hashChecked: vi.fn().mockResolvedValue("new-digest") };
+  const lockout = { clearAccount: vi.fn().mockResolvedValue(undefined) };
   const secretBox = { encrypt: vi.fn().mockReturnValue("sealed") };
   const audit = { record: vi.fn().mockResolvedValue(undefined) };
   const service = new PasswordResetService(
@@ -58,8 +60,9 @@ const build = (
     passwords as never,
     secretBox as never,
     audit as never,
+    lockout as never,
   );
-  return { service, tx, database, captcha, timing, passwords, audit };
+  return { service, tx, database, captcha, timing, passwords, audit, lockout };
 };
 
 const forgot = {
@@ -166,6 +169,29 @@ describe("PasswordResetService.reset", () => {
       expect.objectContaining({ actorId: "user-id" }),
       expect.objectContaining({ action: "student.password.reset", entityId: "user-id" }),
     );
+  });
+
+  test("clears the sign-in lockout for the account once the reset has committed", async () => {
+    const { service, lockout } = build();
+
+    await service.reset("plain-token", "a-new-long-password", {});
+
+    expect(lockout.clearAccount).toHaveBeenCalledWith("student", "anne@example.com");
+  });
+
+  test("a reset that is refused leaves the lockout alone", async () => {
+    const { service, lockout } = build({ claimCount: 0 });
+
+    await service.reset("t", "a-new-long-password", {}).catch(() => undefined);
+
+    expect(lockout.clearAccount).not.toHaveBeenCalled();
+  });
+
+  test("a lockout store failure does not fail a committed reset", async () => {
+    const { service, lockout } = build();
+    lockout.clearAccount.mockRejectedValue(new Error("redis down"));
+
+    await expect(service.reset("t", "a-new-long-password", {})).resolves.toBeUndefined();
   });
 
   test("rejects a link that was already used", async () => {

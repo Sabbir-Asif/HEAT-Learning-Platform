@@ -1,6 +1,6 @@
 import { findUserIdsByEmail } from "@heat/db";
 import type { HeatClient } from "@heat/db";
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import type { EnrollmentAcceptedResponse, ForgotPasswordRequest } from "@heat/contracts";
 import { ResponseTiming } from "../account-protection";
 import { AuditService } from "../audit";
@@ -9,6 +9,7 @@ import { CaptchaService } from "../captcha";
 import { APP_CONFIG, CLOCK, DATABASE, SecretBox } from "../core";
 import type { AppConfig, Clock } from "../core";
 import { ApiException } from "../http/api-exception";
+import { SignInLockout } from "../rate-limit";
 import {
   PASSWORD_RESET_AUDIT_ACTION,
   PASSWORD_RESET_EMAIL_TEMPLATE,
@@ -36,6 +37,8 @@ type RequestTransaction = Pick<
 
 @Injectable()
 export class PasswordResetService {
+  private readonly logger = new Logger(PasswordResetService.name);
+
   constructor(
     @Inject(DATABASE) private readonly database: HeatClient,
     @Inject(CLOCK) private readonly clock: Clock,
@@ -45,6 +48,7 @@ export class PasswordResetService {
     private readonly passwords: PasswordService,
     private readonly secretBox: SecretBox,
     private readonly audit: AuditService,
+    private readonly lockout: SignInLockout,
   ) {}
 
   async request(request: ForgotPasswordRequest): Promise<EnrollmentAcceptedResponse> {
@@ -62,7 +66,7 @@ export class PasswordResetService {
   ): Promise<void> {
     const passwordHash = await this.passwords.hashChecked(password);
     const tokenHash = hashOpaqueToken(token);
-    await this.database.$transaction(async (tx) => {
+    const email = await this.database.$transaction(async (tx) => {
       const now = this.clock.now();
       const claimed = await tx.authToken.updateMany({
         where: { tokenHash, purpose: PASSWORD_RESET_PURPOSE, usedAt: null, expiresAt: { gt: now } },
@@ -101,7 +105,17 @@ export class PasswordResetService {
           entityId: row.userId,
         },
       );
+      const owner = await tx.user.findUnique({
+        where: { id: row.userId },
+        select: { email: true },
+      });
+      return owner?.email ?? null;
     });
+    if (email !== null) {
+      await this.lockout.clearAccount("student", email).catch(() => {
+        this.logger.warn("Sign-in lockout could not be cleared after a password reset");
+      });
+    }
   }
 
   private async queueReset(tx: RequestTransaction, email: string): Promise<void> {
