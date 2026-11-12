@@ -31,12 +31,21 @@ import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui
 import type { DataTableColumn } from "@heat/ui/data";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, XIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
-import { approvalSummaryText, approveLabel, queueSortValue, selectionLabel } from "./approval-copy";
+import {
+  approvalSummaryText,
+  approveLabel,
+  queueSortValue,
+  rejectLabel,
+  rejectionSummaryText,
+  selectionLabel,
+} from "./approval-copy";
 import { ApproveSheet } from "./approve-sheet";
 import type { ApproveTarget } from "./approve-sheet";
+import { RejectSheet } from "./reject-sheet";
+import type { RejectTarget } from "./reject-sheet";
 
 type QueueRow = ApprovalQueueResponseDtoItemsItem;
 
@@ -58,6 +67,7 @@ export function ApprovalQueueView() {
   const url = useTableUrlState({ sortable, filters: filterKeys });
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
   const [target, setTarget] = useState<ApproveTarget>(null);
+  const [rejectTarget, setRejectTarget] = useState<RejectTarget>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const labels = useRef(new Map<string, string>());
   const filter = (key: (typeof filterKeys)[number]): string => url.filters[key] ?? "";
@@ -216,6 +226,14 @@ export function ApprovalQueueView() {
     });
   }
 
+  function openReject(ids: string[]) {
+    setNotice(null);
+    setRejectTarget({
+      ids,
+      labels: Object.fromEntries(ids.map((id) => [id, labels.current.get(id) ?? id])),
+    });
+  }
+
   const selectedCount = selected.size;
 
   return (
@@ -224,10 +242,16 @@ export function ApprovalQueueView() {
         title="Enrollments"
         action={
           selectedCount > 0 ? (
-            <Button onClick={() => openApprove([...selected])}>
-              <CheckIcon data-icon="inline-start" />
-              {approveLabel(selectedCount)}
-            </Button>
+            <>
+              <Button variant="outline" onClick={() => openReject([...selected])}>
+                <XIcon data-icon="inline-start" />
+                {rejectLabel(selectedCount)}
+              </Button>
+              <Button onClick={() => openApprove([...selected])}>
+                <CheckIcon data-icon="inline-start" />
+                {approveLabel(selectedCount)}
+              </Button>
+            </>
           ) : undefined
         }
       />
@@ -326,10 +350,16 @@ export function ApprovalQueueView() {
           rowLabel: (row) => `Select ${row.student.name}`,
         }}
         actions={(row) => (
-          <Button size="sm" onClick={() => openApprove([row.id])}>
-            <CheckIcon data-icon="inline-start" />
-            Approve
-          </Button>
+          <>
+            <Button size="sm" variant="outline" onClick={() => openReject([row.id])}>
+              <XIcon data-icon="inline-start" />
+              Reject
+            </Button>
+            <Button size="sm" onClick={() => openApprove([row.id])}>
+              <CheckIcon data-icon="inline-start" />
+              Approve
+            </Button>
+          </>
         )}
       />
       <ApproveSheet
@@ -342,6 +372,21 @@ export function ApprovalQueueView() {
             return next;
           });
           setNotice(approvalSummaryText(summary.succeeded.length, summary.failed.length));
+          void queryClient.invalidateQueries({
+            queryKey: getEnrollmentApprovalListPendingQueryKey().slice(0, 1),
+          });
+        }}
+      />
+      <RejectSheet
+        target={rejectTarget}
+        onClose={() => setRejectTarget(null)}
+        onFinished={(summary) => {
+          setSelected((current) => {
+            const next = new Set(current);
+            for (const id of summary.succeeded) next.delete(id);
+            return next;
+          });
+          setNotice(rejectionSummaryText(summary.succeeded.length, summary.failed.length));
           void queryClient.invalidateQueries({
             queryKey: getEnrollmentApprovalListPendingQueryKey().slice(0, 1),
           });

@@ -13,10 +13,15 @@ import {
   ApproveEnrollmentsRequestDto,
   ApprovedEnrollmentDto,
   BulkApprovalResponseDto,
+  BulkRejectionResponseDto,
   EnrollmentIdParamsDto,
+  RejectEnrollmentRequestDto,
+  RejectEnrollmentsRequestDto,
+  RejectedEnrollmentDto,
 } from "./enrollment-approval.dto";
 import { EnrollmentApprovalService } from "./enrollment-approval.service";
 import type { AdminActor } from "./enrollment-approval.service";
+import { EnrollmentRejectionService } from "./enrollment-rejection.service";
 
 const adminActor = (request: AuditableRequest, session: AuthenticatedSession): AdminActor => ({
   ...actorOf(request, session.userId),
@@ -31,6 +36,7 @@ export class EnrollmentApprovalController {
   constructor(
     private readonly queue: ApprovalQueueService,
     private readonly approvals: EnrollmentApprovalService,
+    private readonly rejections: EnrollmentRejectionService,
   ) {}
 
   @Get("pending")
@@ -60,5 +66,28 @@ export class EnrollmentApprovalController {
     @Req() request: AuditableRequest,
   ): Promise<ApprovedEnrollmentDto> {
     return this.approvals.approve(params.id, adminActor(request, session), body.reason);
+  }
+
+  @Post("reject")
+  @HttpCode(200)
+  @ApiOkResponse({ type: BulkRejectionResponseDto })
+  rejectMany(
+    @Body() body: RejectEnrollmentsRequestDto,
+    @CurrentSession() session: AuthenticatedSession,
+    @Req() request: AuditableRequest,
+  ): Promise<BulkRejectionResponseDto> {
+    return this.rejections.rejectMany(body.ids, adminActor(request, session), body.reason);
+  }
+
+  @Post(":id/reject")
+  @HttpCode(200)
+  @ApiOkResponse({ type: RejectedEnrollmentDto })
+  reject(
+    @Param() params: EnrollmentIdParamsDto,
+    @Body() body: RejectEnrollmentRequestDto,
+    @CurrentSession() session: AuthenticatedSession,
+    @Req() request: AuditableRequest,
+  ): Promise<RejectedEnrollmentDto> {
+    return this.rejections.reject(params.id, adminActor(request, session), body.reason);
   }
 }

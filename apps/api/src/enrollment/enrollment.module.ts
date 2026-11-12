@@ -11,6 +11,7 @@ import { RateLimitModule } from "../rate-limit";
 import { ApprovalQueueService } from "./approval-queue.service";
 import { EnrollmentApprovalController } from "./enrollment-approval.controller";
 import { EnrollmentApprovalService } from "./enrollment-approval.service";
+import { EnrollmentRejectionService } from "./enrollment-rejection.service";
 import { EnrollmentController } from "./enrollment.controller";
 import { EnrollmentService } from "./enrollment.service";
 
@@ -27,6 +28,6 @@ import { EnrollmentService } from "./enrollment.service";
     RateLimitModule,
   ],
   controllers: [EnrollmentController, EnrollmentApprovalController],
-  providers: [EnrollmentService, EnrollmentApprovalService, ApprovalQueueService],
+  providers: [EnrollmentService, EnrollmentApprovalService, EnrollmentRejectionService, ApprovalQueueService],
 })
 export class EnrollmentModule {}

@@ -627,6 +627,95 @@
         ],
         "type": "object"
       },
+      "BulkRejectionResponseDto": {
+        "properties": {
+          "failed": {
+            "items": {
+              "properties": {
+                "code": {
+                  "enum": [
+                    "AUDIT_ACTOR_FILTER_TOO_BROAD",
+                    "BAD_REQUEST",
+                    "CANNOT_DEACTIVATE_SELF",
+                    "CAPTCHA_EXPIRED",
+                    "CAPTCHA_INVALID",
+                    "CONTENT_LOCKED",
+                    "COURSE_HAS_ENROLLMENTS",
+                    "COURSE_LOCKED",
+                    "COURSE_NOT_AVAILABLE",
+                    "COURSE_NOT_DRAFT",
+                    "COURSE_PUBLISH_CHECKS_FAILED",
+                    "COURSE_SLUG_TAKEN",
+                    "CSRF_TOKEN_INVALID",
+                    "DIRECTORY_ARCHIVED",
+                    "DIRECTORY_IN_USE",
+                    "DIRECTORY_NAME_TAKEN",
+                    "EMAIL_IN_USE",
+                    "ENROLLMENT_ALREADY_DECIDED",
+                    "ENROLLMENT_NOT_ACTIVE",
+                    "ENROLLMENT_NOT_VERIFIED",
+                    "FORBIDDEN",
+                    "INTERNAL",
+                    "INVALID_CREDENTIALS",
+                    "INVITATION_EXPIRED",
+                    "INVITATION_INVALID",
+                    "INVITATION_NOT_PENDING",
+                    "MODULE_LOCKED",
+                    "NOT_FOUND",
+                    "ORDER_CONFLICT",
+                    "ORIGIN_NOT_ALLOWED",
+                    "PASSWORD_BREACHED",
+                    "PASSWORD_CHANGE_REQUIRED",
+                    "QUIZ_ANSWER_INVALID",
+                    "QUIZ_ATTEMPT_LIMIT_REACHED",
+                    "QUIZ_ATTEMPT_NOT_OPEN",
+                    "QUIZ_ATTEMPT_WAIT",
+                    "QUIZ_NOT_UNLOCKED",
+                    "RATE_LIMITED",
+                    "UNAUTHENTICATED",
+                    "UPLOAD_EXPIRED",
+                    "UPLOAD_OFFSET_MISMATCH",
+                    "UPLOAD_TOO_LARGE",
+                    "UPLOAD_TYPE_NOT_ALLOWED",
+                    "VALIDATION_FAILED",
+                    "VERIFICATION_LINK_EXPIRED",
+                    "VERIFICATION_LINK_INVALID",
+                    "VERIFICATION_LINK_USED",
+                    "VERIFICATION_RESEND_LIMIT",
+                    "VIDEO_NOT_FAILED",
+                    "VIDEO_NOT_READY"
+                  ],
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "code"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "succeeded": {
+            "items": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "succeeded",
+          "failed"
+        ],
+        "type": "object"
+      },
       "CaptchaRequestDto": {
         "properties": {
           "replaces": {
@@ -2977,6 +3066,67 @@
           "rules",
           "questions",
           "locked"
+        ],
+        "type": "object"
+      },
+      "RejectEnrollmentRequestDto": {
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RejectEnrollmentsRequestDto": {
+        "properties": {
+          "ids": {
+            "items": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array"
+          },
+          "reason": {
+            "maxLength": 500,
+            "type": "string"
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "type": "object"
+      },
+      "RejectedEnrollmentDto": {
+        "properties": {
+          "accountDeleted": {
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "rejectedAt": {
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "REJECTED"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "rejectedAt",
+          "accountDeleted"
         ],
         "type": "object"
       },
@@ -6317,6 +6467,37 @@
         ]
       }
     },
+    "/api/admin/enrollments/reject": {
+      "post": {
+        "operationId": "enrollmentApprovalRejectMany",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectEnrollmentsRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkRejectionResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "enrollment-approvals"
+        ]
+      }
+    },
     "/api/admin/enrollments/{id}/approve": {
       "post": {
         "operationId": "enrollmentApprovalApprove",
@@ -6348,6 +6529,48 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ApprovedEnrollmentDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "enrollment-approvals"
+        ]
+      }
+    },
+    "/api/admin/enrollments/{id}/reject": {
+      "post": {
+        "operationId": "enrollmentApprovalReject",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectEnrollmentRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RejectedEnrollmentDto"
                 }
               }
             },
