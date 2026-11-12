@@ -87,13 +87,15 @@ const toEnrollment = (
     approvedAt: iso(row.approvedAt),
     completedAt: iso(row.completedAt),
     course: row.course,
-    decisions: row.decisions.map((decision) => ({
-      id: decision.id,
-      action: decision.action,
-      reason: decision.reason,
-      decidedAt: decision.decidedAt.toISOString(),
-      admin: decision.admin,
-    })),
+    decisions: [...row.decisions]
+      .sort((a, b) => a.decidedAt.getTime() - b.decidedAt.getTime())
+      .map((decision) => ({
+        id: decision.id,
+        action: decision.action,
+        reason: decision.reason,
+        decidedAt: decision.decidedAt.toISOString(),
+        admin: decision.admin,
+      })),
     modules: [...row.revisionModules]
       .sort((a, b) => a.order - b.order)
       .map((module) => {
@@ -128,7 +130,7 @@ const toEnrollment = (
                     submittedAt: iso(attempt.submittedAt),
                     scorePercent: attempt.scorePercent,
                     passMarkSnapshot: attempt.passMarkSnapshot,
-                    passed: attempt.passed,
+                    passed: attempt.passed === true,
                   })),
         };
       }),

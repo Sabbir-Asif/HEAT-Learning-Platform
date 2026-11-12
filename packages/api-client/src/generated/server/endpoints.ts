@@ -2060,6 +2060,197 @@ export interface SignInRequestDto {
   password: string;
 }
 
+export type StudentDetailResponseDtoDepartment = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemCertificateStatus = typeof StudentDetailResponseDtoEnrollmentsItemCertificateStatus[keyof typeof StudentDetailResponseDtoEnrollmentsItemCertificateStatus];
+
+
+export const StudentDetailResponseDtoEnrollmentsItemCertificateStatus = {
+  READY: 'READY',
+  PENDING: 'PENDING',
+  REVOKED: 'REVOKED',
+} as const;
+
+/**
+ * @nullable
+ */
+export type StudentDetailResponseDtoEnrollmentsItemCertificate = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  issuedAt: string;
+  number: string;
+  status: StudentDetailResponseDtoEnrollmentsItemCertificateStatus;
+  verificationUrl: string;
+} | null;
+
+export type StudentDetailResponseDtoEnrollmentsItemCourse = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemDecisionsItemAction = typeof StudentDetailResponseDtoEnrollmentsItemDecisionsItemAction[keyof typeof StudentDetailResponseDtoEnrollmentsItemDecisionsItemAction];
+
+
+export const StudentDetailResponseDtoEnrollmentsItemDecisionsItemAction = {
+  APPROVE: 'APPROVE',
+  REJECT: 'REJECT',
+  REMOVE: 'REMOVE',
+  REINSTATE: 'REINSTATE',
+} as const;
+
+export type StudentDetailResponseDtoEnrollmentsItemDecisionsItemAdmin = {
+  email: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemDecisionsItem = {
+  action: StudentDetailResponseDtoEnrollmentsItemDecisionsItemAction;
+  admin: StudentDetailResponseDtoEnrollmentsItemDecisionsItemAdmin;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  decidedAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @maxLength 1000
+     * @nullable
+     */
+  reason: string | null;
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemModulesItemQuizAttemptsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  passMarkSnapshot: number;
+  passed: boolean;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  scorePercent: number | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  startedAt: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  submittedAt: string | null;
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemModulesItemStatus = typeof StudentDetailResponseDtoEnrollmentsItemModulesItemStatus[keyof typeof StudentDetailResponseDtoEnrollmentsItemModulesItemStatus];
+
+
+export const StudentDetailResponseDtoEnrollmentsItemModulesItemStatus = {
+  LOCKED: 'LOCKED',
+  UNLOCKED: 'UNLOCKED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  QUIZ_READY: 'QUIZ_READY',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export type StudentDetailResponseDtoEnrollmentsItemModulesItemVideosItem = {
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  coveragePercent: number;
+  meetsThreshold: boolean;
+  required: boolean;
+  title: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  videoId: string;
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemModulesItem = {
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  completedAt: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  moduleId: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  quizAttempts: StudentDetailResponseDtoEnrollmentsItemModulesItemQuizAttemptsItem[];
+  status: StudentDetailResponseDtoEnrollmentsItemModulesItemStatus;
+  title: string;
+  videos: StudentDetailResponseDtoEnrollmentsItemModulesItemVideosItem[];
+};
+
+export type StudentDetailResponseDtoEnrollmentsItemStatus = typeof StudentDetailResponseDtoEnrollmentsItemStatus[keyof typeof StudentDetailResponseDtoEnrollmentsItemStatus];
+
+
+export const StudentDetailResponseDtoEnrollmentsItemStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
+export type StudentDetailResponseDtoEnrollmentsItem = {
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  approvedAt: string | null;
+  /** @nullable */
+  certificate: StudentDetailResponseDtoEnrollmentsItemCertificate;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  completedAt: string | null;
+  course: StudentDetailResponseDtoEnrollmentsItemCourse;
+  decisions: StudentDetailResponseDtoEnrollmentsItemDecisionsItem[];
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  modules: StudentDetailResponseDtoEnrollmentsItemModulesItem[];
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  requestedAt: string;
+  status: StudentDetailResponseDtoEnrollmentsItemStatus;
+};
+
+export type StudentDetailResponseDtoFaculty = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type StudentDetailResponseDtoUniversity = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export interface StudentDetailResponseDto {
+  department: StudentDetailResponseDtoDepartment;
+  email: string;
+  enrollments: StudentDetailResponseDtoEnrollmentsItem[];
+  faculty: StudentDetailResponseDtoFaculty;
+  name: string;
+  session: string;
+  university: StudentDetailResponseDtoUniversity;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  userId: string;
+}
+
 export type StudentListResponseDtoItemsItemCourse = {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
@@ -5015,6 +5206,27 @@ export const getStudentListListUrl = (params?: StudentListListParams,) => {
 export const studentListList = async (params?: StudentListListParams, options?: Parameters<typeof serverFetch>[1]): Promise<StudentListResponseDto> => {
 
   return serverFetch<StudentListResponseDto>(getStudentListListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getStudentDetailGetUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/students/${id}`
+}
+
+export const studentDetailGet = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<StudentDetailResponseDto> => {
+
+  return serverFetch<StudentDetailResponseDto>(getStudentDetailGetUrl(id),
   {
     ...options,
     method: 'GET'

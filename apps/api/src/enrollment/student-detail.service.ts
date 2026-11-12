@@ -38,7 +38,6 @@ const enrollmentSelect = {
   courseRevisionId: true,
   course: { select: { id: true, title: true } },
   decisions: {
-    orderBy: [{ decidedAt: "asc" as const }, { id: "asc" as const }],
     select: {
       id: true,
       action: true,

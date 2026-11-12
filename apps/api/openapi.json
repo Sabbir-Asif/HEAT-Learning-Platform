@@ -3541,6 +3541,376 @@
         ],
         "type": "object"
       },
+      "StudentDetailResponseDto": {
+        "properties": {
+          "department": {
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "type": "object"
+          },
+          "email": {
+            "type": "string"
+          },
+          "enrollments": {
+            "items": {
+              "properties": {
+                "approvedAt": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                  "type": "string"
+                },
+                "certificate": {
+                  "nullable": true,
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                      "type": "string"
+                    },
+                    "issuedAt": {
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                      "type": "string"
+                    },
+                    "number": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "READY",
+                        "PENDING",
+                        "REVOKED"
+                      ],
+                      "type": "string"
+                    },
+                    "verificationUrl": {
+                      "format": "uri",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "number",
+                    "status",
+                    "issuedAt",
+                    "verificationUrl"
+                  ],
+                  "type": "object"
+                },
+                "completedAt": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                  "type": "string"
+                },
+                "course": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title"
+                  ],
+                  "type": "object"
+                },
+                "decisions": {
+                  "items": {
+                    "properties": {
+                      "action": {
+                        "enum": [
+                          "APPROVE",
+                          "REJECT",
+                          "REMOVE",
+                          "REINSTATE"
+                        ],
+                        "type": "string"
+                      },
+                      "admin": {
+                        "properties": {
+                          "email": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "email"
+                        ],
+                        "type": "object"
+                      },
+                      "decidedAt": {
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "reason": {
+                        "maxLength": 1000,
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "action",
+                      "reason",
+                      "decidedAt",
+                      "admin"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "id": {
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                  "type": "string"
+                },
+                "modules": {
+                  "items": {
+                    "properties": {
+                      "completedAt": {
+                        "format": "date-time",
+                        "nullable": true,
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                        "type": "string"
+                      },
+                      "moduleId": {
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                        "type": "string"
+                      },
+                      "order": {
+                        "maximum": 9007199254740991,
+                        "minimum": -9007199254740991,
+                        "type": "integer"
+                      },
+                      "quizAttempts": {
+                        "items": {
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            },
+                            "passMarkSnapshot": {
+                              "maximum": 9007199254740991,
+                              "minimum": -9007199254740991,
+                              "type": "integer"
+                            },
+                            "passed": {
+                              "type": "boolean"
+                            },
+                            "scorePercent": {
+                              "maximum": 9007199254740991,
+                              "minimum": -9007199254740991,
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "startedAt": {
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "type": "string"
+                            },
+                            "submittedAt": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "startedAt",
+                            "submittedAt",
+                            "scorePercent",
+                            "passMarkSnapshot",
+                            "passed"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "status": {
+                        "enum": [
+                          "LOCKED",
+                          "UNLOCKED",
+                          "IN_PROGRESS",
+                          "QUIZ_READY",
+                          "COMPLETED"
+                        ],
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "videos": {
+                        "items": {
+                          "properties": {
+                            "coveragePercent": {
+                              "maximum": 100,
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "meetsThreshold": {
+                              "type": "boolean"
+                            },
+                            "required": {
+                              "type": "boolean"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "videoId": {
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "videoId",
+                            "title",
+                            "required",
+                            "coveragePercent",
+                            "meetsThreshold"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "moduleId",
+                      "order",
+                      "title",
+                      "status",
+                      "completedAt",
+                      "videos",
+                      "quizAttempts"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "requestedAt": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "PENDING_VERIFICATION",
+                    "PENDING_APPROVAL",
+                    "APPROVED",
+                    "COMPLETED",
+                    "REJECTED",
+                    "EXPIRED",
+                    "REMOVED"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "status",
+                "requestedAt",
+                "approvedAt",
+                "completedAt",
+                "course",
+                "decisions",
+                "modules",
+                "certificate"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "faculty": {
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          },
+          "session": {
+            "type": "string"
+          },
+          "university": {
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "type": "object"
+          },
+          "userId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "name",
+          "email",
+          "session",
+          "university",
+          "faculty",
+          "department",
+          "enrollments"
+        ],
+        "type": "object"
+      },
       "StudentListResponseDto": {
         "properties": {
           "items": {
@@ -7560,6 +7930,38 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StudentListResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "students"
+        ]
+      }
+    },
+    "/api/admin/students/{id}": {
+      "get": {
+        "operationId": "studentDetailGet",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentDetailResponseDto"
                 }
               }
             },

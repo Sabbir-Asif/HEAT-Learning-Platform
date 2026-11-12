@@ -76,7 +76,7 @@ export type StudentDetailParams = z.infer<typeof studentDetailParamsSchema>;
 export const studentDecisionSchema = z.object({
   id: z.uuid(),
   action: studentDecisionActionSchema,
-  reason: z.string().nullable(),
+  reason: z.string().max(1000).nullable(),
   decidedAt: z.iso.datetime(),
   admin: z.object({ id: z.uuid(), email: z.string() }),
 });
@@ -95,7 +95,7 @@ export const studentQuizAttemptSchema = z.object({
   submittedAt: z.iso.datetime().nullable(),
   scorePercent: z.number().int().nullable(),
   passMarkSnapshot: z.number().int(),
-  passed: z.boolean().nullable(),
+  passed: z.boolean(),
 });
 
 export const studentModuleProgressSchema = z.object({
