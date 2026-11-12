@@ -1,6 +1,7 @@
 import "server-only";
 import { isApiError } from "@heat/api-client";
 import {
+  publicContactSettingsGet,
   publicCoursesGet,
   publicFrontPageGet,
   publicNewsGet,
@@ -8,6 +9,7 @@ import {
   publicSiteSettingsGet,
 } from "@heat/api-client/server";
 import {
+  contactCacheTag,
   courseCacheTag,
   frontPageCacheTag,
   landingCacheTag,
@@ -19,6 +21,7 @@ import type {
   NewsPublicPost,
   PublicCourseResponse,
   PublicFrontPageResponse,
+  PublicContactSettingsResponse,
   PublicLandingOverviewResponse,
 } from "@heat/contracts";
 import { cacheLife, cacheTag } from "next/cache";
@@ -28,6 +31,13 @@ export async function cachedLandingOverview(): Promise<PublicLandingOverviewResp
   cacheTag(landingCacheTag);
   cacheLife("hours");
   return publicSiteSettingsGet({ forwardCookies: false });
+}
+
+export async function cachedContactSettings(): Promise<PublicContactSettingsResponse> {
+  "use cache";
+  cacheTag(contactCacheTag);
+  cacheLife("hours");
+  return publicContactSettingsGet({ forwardCookies: false });
 }
 
 export async function cachedFrontPage(): Promise<PublicFrontPageResponse> {
