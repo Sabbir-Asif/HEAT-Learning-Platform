@@ -1,5 +1,13 @@
 import { describe, expect, test } from "vitest";
-import { isNotFoundFailure, toVerificationModel } from "../../src/verify/verification-view";
+import {
+  decodeCertificateNumber,
+  isNotFoundFailure,
+  isRateLimitedFailure,
+  toVerificationModel,
+  visitorAddressHeaders,
+} from "../../src/verify/verification-view";
+
+const headersOf = (entries: Record<string, string>) => new Headers(entries);
 
 const verification = {
   status: "VALID" as const,
@@ -34,5 +42,48 @@ describe("verification view model", () => {
     expect(isNotFoundFailure({ code: "RATE_LIMITED" })).toBe(false);
     expect(isNotFoundFailure(new Error("x"))).toBe(false);
     expect(isNotFoundFailure(null)).toBe(false);
+  });
+});
+
+describe("visitorAddressHeaders", () => {
+  test("forwards the address the proxy reported as the single hop the API trusts", () => {
+    expect(visitorAddressHeaders(headersOf({ "x-real-ip": "203.0.113.7" }))).toEqual({
+      "x-forwarded-for": "203.0.113.7",
+    });
+  });
+
+  test("falls back to the last forwarded address, which the proxy wrote", () => {
+    expect(
+      visitorAddressHeaders(headersOf({ "x-forwarded-for": "198.51.100.1, 203.0.113.9" })),
+    ).toEqual({ "x-forwarded-for": "203.0.113.9" });
+  });
+
+  test("accepts an IPv6 address", () => {
+    expect(visitorAddressHeaders(headersOf({ "x-real-ip": "2001:db8::1" }))).toEqual({
+      "x-forwarded-for": "2001:db8::1",
+    });
+  });
+
+  test("forwards nothing when there is no usable address", () => {
+    expect(visitorAddressHeaders(headersOf({}))).toEqual({});
+    expect(visitorAddressHeaders(headersOf({ "x-real-ip": "not-an-ip" }))).toEqual({});
+  });
+});
+
+describe("decodeCertificateNumber", () => {
+  test("decodes, trims and upper-cases the number", () => {
+    expect(decodeCertificateNumber(" abcd-efgh%20")).toBe("ABCD-EFGH");
+  });
+
+  test("returns null for a malformed escape", () => {
+    expect(decodeCertificateNumber("%E0%A4%A")).toBeNull();
+  });
+});
+
+describe("isRateLimitedFailure", () => {
+  test("recognises the rate limited error code only", () => {
+    expect(isRateLimitedFailure({ code: "RATE_LIMITED" })).toBe(true);
+    expect(isRateLimitedFailure({ code: "NOT_FOUND" })).toBe(false);
+    expect(isRateLimitedFailure(new Error("x"))).toBe(false);
   });
 });

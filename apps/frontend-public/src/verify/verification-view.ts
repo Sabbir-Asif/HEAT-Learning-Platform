@@ -1,3 +1,4 @@
+import { isIP } from "node:net";
 import type { CertificateVerificationResponse } from "@heat/contracts";
 
 export interface VerificationModel {
@@ -35,3 +36,21 @@ export const toVerificationModel = (
 
 export const isNotFoundFailure = (error: unknown): boolean =>
   typeof error === "object" && error !== null && "code" in error && error.code === "NOT_FOUND";
+
+export const isRateLimitedFailure = (error: unknown): boolean =>
+  typeof error === "object" && error !== null && "code" in error && error.code === "RATE_LIMITED";
+
+export const decodeCertificateNumber = (raw: string): string | null => {
+  try {
+    return decodeURIComponent(raw).trim().toUpperCase();
+  } catch {
+    return null;
+  }
+};
+
+export const visitorAddressHeaders = (incoming: Headers): Record<string, string> => {
+  const real = incoming.get("x-real-ip")?.trim() ?? "";
+  const forwarded = incoming.get("x-forwarded-for")?.split(",").at(-1)?.trim() ?? "";
+  const address = isIP(real) !== 0 ? real : forwarded;
+  return isIP(address) !== 0 ? { "x-forwarded-for": address } : {};
+};
