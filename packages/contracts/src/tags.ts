@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { courseDescriptionMaxLength } from "./courses";
+import { lessonBodyImageSchema } from "./rich-text";
 
 export const tagNameMaxLength = 60;
 export const tagTagsMaxCount = 50;
@@ -124,6 +125,7 @@ export const publicFrontPageResponseSchema = z.object({
       title: z.string(),
       description: z.string().max(courseDescriptionMaxLength).nullable(),
       thumbnailAssetId: z.uuid().nullable(),
+      thumbnail: lessonBodyImageSchema.nullable(),
     }),
   ),
   modules: z.array(

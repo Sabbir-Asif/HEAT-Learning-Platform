@@ -17,6 +17,7 @@ export * from "./media";
 export * from "./modules";
 export * from "./playback";
 export * from "./progress";
+export * from "./public-cache";
 export * from "./quiz-delivery";
 export * from "./quizzes";
 export * from "./rich-text";

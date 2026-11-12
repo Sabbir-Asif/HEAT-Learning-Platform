@@ -77,3 +77,12 @@ describe("errorResponseSchema failures", () => {
     expect(errorResponseSchema.parse(body).error.failures).toHaveLength(1);
   });
 });
+
+describe("courseSlugParamsSchema", () => {
+  test("accepts a lowercase slug and rejects anything else", async () => {
+    const { courseSlugParamsSchema } = await import("../src");
+    expect(courseSlugParamsSchema.safeParse({ slug: "gender-safety" }).success).toBe(true);
+    expect(courseSlugParamsSchema.safeParse({ slug: "Gender Safety" }).success).toBe(false);
+    expect(courseSlugParamsSchema.safeParse({ slug: "a".repeat(81) }).success).toBe(false);
+  });
+});
