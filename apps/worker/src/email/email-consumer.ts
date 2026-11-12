@@ -5,7 +5,11 @@ import type { AppConfig, Clock, MailTransport } from "api/core";
 import type { HeatClient } from "@heat/db";
 import { DelayedError, Worker } from "bullmq";
 import type { Redis } from "ioredis";
+import { LocalCertificateStorage } from "../certificate/local-certificate-storage";
+import { loadCertificateRuntimeConfig } from "../certificate/certificate-runtime-config";
 import { EMAIL_QUEUE } from "../queues";
+import { CertificateAttachmentSource } from "./certificate-attachment";
+import { PrismaCertificateFileLookup } from "./prisma-certificate-file-lookup";
 import { EmailCapacityWait, EmailDelivery, EmailQuotaPause } from "./email-delivery";
 import { EmailQuota } from "./email-quota";
 import { loadEmailQuotaConfig } from "./email-quota-config";
@@ -44,6 +48,11 @@ export class EmailConsumer implements OnApplicationBootstrap, OnApplicationShutd
       (sealed) => secretBox.decrypt(sealed),
       new EmailQuota(new RedisQuotaLedger(redis), loadEmailQuotaConfig(process.env)),
       clock,
+      new CertificateAttachmentSource(
+        new PrismaCertificateFileLookup(database),
+        new LocalCertificateStorage(loadCertificateRuntimeConfig(process.env).storageDirectory),
+      ),
+      { error: (event, fields) => this.logger.error(`${event} ${JSON.stringify(fields)}`) },
     );
   }
 

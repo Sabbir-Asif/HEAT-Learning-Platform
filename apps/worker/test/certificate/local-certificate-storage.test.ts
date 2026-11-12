@@ -25,6 +25,14 @@ afterEach(async () => {
 const bytes = new TextEncoder().encode("%PDF-1.7 certificate bytes");
 
 describe("LocalCertificateStorage", () => {
+  test("reads back a stored file and rejects a key outside the pattern", async () => {
+    const storage = new LocalCertificateStorage(directory);
+    const stored = await storage.save(bytes);
+
+    expect(Buffer.compare(Buffer.from(await storage.read(stored.key)), Buffer.from(bytes))).toBe(0);
+    await expect(storage.read("../secret")).rejects.toThrow("Invalid certificate storage key");
+  });
+
   test("writes the file under a random key with a matching hash and size", async () => {
     const storage = new LocalCertificateStorage(directory);
     const stored = await storage.save(bytes);
