@@ -89,6 +89,8 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/admin/auth/sign-in": "adminSignIn",
       "POST /api/admin/auth/refresh": "sessionRefresh",
       "POST /api/admin/account/change-password": "passwordChange",
+      "POST /api/me/password/code": "passwordCode",
+      "POST /api/me/password": "passwordChange",
       "POST /api/captcha": "captcha",
       "GET /api/directory/universities": "directoryLookup",
       "GET /api/directory/universities/:universityId/faculties": "directoryLookup",
