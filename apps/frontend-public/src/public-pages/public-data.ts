@@ -3,10 +3,20 @@ import { isApiError } from "@heat/api-client";
 import {
   publicCoursesGet,
   publicFrontPageGet,
+  publicNewsGet,
+  publicNewsList,
   publicSiteSettingsGet,
 } from "@heat/api-client/server";
-import { courseCacheTag, frontPageCacheTag, landingCacheTag } from "@heat/contracts";
+import {
+  courseCacheTag,
+  frontPageCacheTag,
+  landingCacheTag,
+  newsListCacheTag,
+  newsPostCacheTag,
+} from "@heat/contracts";
 import type {
+  NewsPublicListResponse,
+  NewsPublicPost,
   PublicCourseResponse,
   PublicFrontPageResponse,
   PublicLandingOverviewResponse,
@@ -33,6 +43,25 @@ export async function cachedCourse(slug: string): Promise<PublicCourseResponse |
   cacheLife("hours");
   try {
     return await publicCoursesGet(slug, { forwardCookies: false });
+  } catch (error) {
+    if (isApiError(error) && error.status === 404) return null;
+    throw error;
+  }
+}
+
+export async function cachedNewsList(page: number): Promise<NewsPublicListResponse> {
+  "use cache";
+  cacheTag(newsListCacheTag);
+  cacheLife({ stale: 30, revalidate: 60, expire: 3600 });
+  return publicNewsList({ page }, { forwardCookies: false });
+}
+
+export async function cachedNewsPost(slug: string): Promise<NewsPublicPost | null> {
+  "use cache";
+  cacheTag(newsPostCacheTag(slug), newsListCacheTag);
+  cacheLife({ stale: 30, revalidate: 60, expire: 3600 });
+  try {
+    return await publicNewsGet(slug, { forwardCookies: false });
   } catch (error) {
     if (isApiError(error) && error.status === 404) return null;
     throw error;
