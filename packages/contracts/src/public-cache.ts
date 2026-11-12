@@ -4,6 +4,7 @@ import { newsListCacheTag, newsPostTagPattern } from "./news";
 
 export const frontPageCacheTag = "front-page";
 export const landingCacheTag = "landing";
+export const contactCacheTag = "contact";
 export const courseCacheTag = (slug: string): string => `course:${slug}`;
 
 export const revalidateSecretHeader = "x-revalidate-secret";
@@ -15,6 +16,7 @@ const courseTagPattern = new RegExp(`^course:${courseSlugPattern.source.slice(1)
 export const isKnownCacheTag = (tag: string): boolean =>
   tag === frontPageCacheTag ||
   tag === landingCacheTag ||
+  tag === contactCacheTag ||
   tag === newsListCacheTag ||
   courseTagPattern.test(tag) ||
   newsPostTagPattern.test(tag);
