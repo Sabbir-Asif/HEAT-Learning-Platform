@@ -30,6 +30,7 @@ import { GlobeIcon, SearchXIcon } from "lucide-react";
 import { useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
 import { ModulesTab } from "../modules/modules-tab";
+import { FrontPageTab } from "../tags/front-page-tab";
 import { CourseForm } from "./course-form";
 import { RevisionsTab } from "./revisions-tab";
 import {
@@ -163,6 +164,7 @@ export function CourseDetailsView({ id }: { id: string }) {
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="modules">Modules</TabsTrigger>
           <TabsTrigger value="revisions">Revisions</TabsTrigger>
+          <TabsTrigger value="front-page">Front page</TabsTrigger>
         </TabsList>
         <TabsContent value="details" className="max-w-2xl">
           <CourseForm
@@ -178,6 +180,9 @@ export function CourseDetailsView({ id }: { id: string }) {
         </TabsContent>
         <TabsContent value="revisions">
           <RevisionsTab courseId={id} />
+        </TabsContent>
+        <TabsContent value="front-page">
+          <FrontPageTab courseId={id} />
         </TabsContent>
       </Tabs>
     </ShellContent>

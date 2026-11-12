@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { TagsView } from "@/tags/tags-view";
 
 export default function Page() {
-  return <PlaceholderPage title="Tags" />;
+  return <TagsView />;
 }
