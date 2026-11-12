@@ -31,6 +31,7 @@ import { useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
 import { ModulesTab } from "../modules/modules-tab";
 import { CourseForm } from "./course-form";
+import { RevisionsTab } from "./revisions-tab";
 import {
   publishBlockersTitle,
   publishChecklistClearMessage,
@@ -161,6 +162,7 @@ export function CourseDetailsView({ id }: { id: string }) {
         <TabsList variant="line">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="modules">Modules</TabsTrigger>
+          <TabsTrigger value="revisions">Revisions</TabsTrigger>
         </TabsList>
         <TabsContent value="details" className="max-w-2xl">
           <CourseForm
@@ -173,6 +175,9 @@ export function CourseDetailsView({ id }: { id: string }) {
         </TabsContent>
         <TabsContent value="modules">
           <ModulesTab courseId={id} />
+        </TabsContent>
+        <TabsContent value="revisions">
+          <RevisionsTab courseId={id} />
         </TabsContent>
       </Tabs>
     </ShellContent>
