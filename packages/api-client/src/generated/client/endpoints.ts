@@ -89,6 +89,8 @@ import type {
   RejectedEnrollmentDto,
   ReorderRequestDto,
   SignInRequestDto,
+  StudentListListParams,
+  StudentListResponseDto,
   UniversitiesListParams,
   UniversityListResponseDto,
   UniversitySummaryDto,
@@ -6071,6 +6073,108 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAdminPlaybackPreviewMutationOptions(options), queryClient);
     }
+
+export const getStudentListListUrl = (params?: StudentListListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/students?${stringifiedParams}` : `/api/admin/students`
+}
+
+export const studentListList = async (params?: StudentListListParams, options?: Parameters<typeof customFetch>[1]): Promise<StudentListResponseDto> => {
+
+  return customFetch<StudentListResponseDto>(getStudentListListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getStudentListListQueryKey = (params?: StudentListListParams,) => {
+    return [
+    `/api/admin/students`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getStudentListListQueryOptions = <TData = Awaited<ReturnType<typeof studentListList>>, TError = ErrorType<unknown>>(params?: StudentListListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentListList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getStudentListListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof studentListList>>> = ({ signal }) => studentListList(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof studentListList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type StudentListListQueryResult = NonNullable<Awaited<ReturnType<typeof studentListList>>>
+export type StudentListListQueryError = ErrorType<unknown>
+
+
+export function useStudentListList<TData = Awaited<ReturnType<typeof studentListList>>, TError = ErrorType<unknown>>(
+ params: undefined |  StudentListListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentListList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof studentListList>>,
+          TError,
+          Awaited<ReturnType<typeof studentListList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStudentListList<TData = Awaited<ReturnType<typeof studentListList>>, TError = ErrorType<unknown>>(
+ params?: StudentListListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentListList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof studentListList>>,
+          TError,
+          Awaited<ReturnType<typeof studentListList>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStudentListList<TData = Awaited<ReturnType<typeof studentListList>>, TError = ErrorType<unknown>>(
+ params?: StudentListListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentListList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useStudentListList<TData = Awaited<ReturnType<typeof studentListList>>, TError = ErrorType<unknown>>(
+ params?: StudentListListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof studentListList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getStudentListListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getStudentAuthCsrfTokenUrl = () => {
 
