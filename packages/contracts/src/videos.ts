@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { adminPageSizes } from "./admins";
 import { courseTitleSchema } from "./courses";
 
 export const videoSlotStatusSchema = z.enum([
@@ -13,6 +14,18 @@ export const videoSlotStatusSchema = z.enum([
 ]);
 
 export type VideoSlotStatus = z.infer<typeof videoSlotStatusSchema>;
+
+export const videoPollIntervalMs = 5000;
+
+const finalVideoStatuses: readonly VideoSlotStatus[] = [
+  "NOT_UPLOADED",
+  "READY",
+  "FAILED",
+  "REJECTED",
+];
+
+export const videoStatusIsFinal = (status: VideoSlotStatus): boolean =>
+  finalVideoStatuses.includes(status);
 
 export const videoRejectionReasonSchema = z.enum([
   "NOT_A_VIDEO",
@@ -57,6 +70,8 @@ export const videoSlotSummarySchema = z.object({
   assetKey: z.string().max(128).nullable(),
   rejectionReason: videoRejectionReasonSchema.nullable(),
   failureReason: videoFailureReasonSchema.nullable(),
+  uploadedAt: z.iso.datetime().nullable(),
+  statusChangedAt: z.iso.datetime().nullable(),
 });
 
 export type VideoSlotSummary = z.infer<typeof videoSlotSummarySchema>;
@@ -102,3 +117,51 @@ export const assetKeySchema = z.string().regex(/^[A-Za-z0-9_-]{32}$/);
 export const videoUploadParamsSchema = videoSlotParamsSchema.extend({
   assetKey: assetKeySchema,
 });
+
+export const videoLibrarySortFields = [
+  "title",
+  "-title",
+  "statusChangedAt",
+  "-statusChangedAt",
+] as const;
+
+export const videoLibraryStatusSchema = videoSlotStatusSchema.exclude(["NOT_UPLOADED"]);
+
+export type VideoLibraryStatus = z.infer<typeof videoLibraryStatusSchema>;
+
+export const videoLibraryListQuerySchema = z.object({
+  status: videoLibraryStatusSchema.optional(),
+  courseId: z.uuid().optional(),
+  sort: z.enum(videoLibrarySortFields).default("-statusChangedAt"),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce
+    .number()
+    .int()
+    .refine((value) => (adminPageSizes as readonly number[]).includes(value), "Invalid page size")
+    .default(25),
+});
+
+export type VideoLibraryListQuery = z.infer<typeof videoLibraryListQuerySchema>;
+
+export const videoLibraryItemSchema = z.object({
+  id: z.uuid(),
+  title: z.string(),
+  status: videoLibraryStatusSchema,
+  rejectionReason: videoRejectionReasonSchema.nullable(),
+  failureReason: videoFailureReasonSchema.nullable(),
+  uploadedAt: z.iso.datetime(),
+  statusChangedAt: z.iso.datetime(),
+  course: z.object({ id: z.uuid(), title: z.string() }),
+  module: z.object({ id: z.uuid(), title: z.string() }),
+});
+
+export type VideoLibraryItem = z.infer<typeof videoLibraryItemSchema>;
+
+export const videoLibraryListResponseSchema = z.object({
+  items: z.array(videoLibraryItemSchema),
+  total: z.number().int().min(0),
+  page: z.number().int().min(1),
+  pageSize: z.number().int().min(1),
+});
+
+export type VideoLibraryListResponse = z.infer<typeof videoLibraryListResponseSchema>;
