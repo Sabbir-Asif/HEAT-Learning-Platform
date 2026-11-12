@@ -7,6 +7,7 @@ import { SignOutButton } from "../auth/sign-out-button";
 import { ResendVerificationForm } from "../awaiting/resend-verification-form";
 import { AvatarSection } from "./avatar-section";
 import { DetailsForm } from "./details-form";
+import { PasswordSection } from "./password-section";
 
 export function ProfileScreen() {
   const profile = useProfileDescribe();
@@ -48,6 +49,7 @@ export function ProfileScreen() {
           </>
         )}
       </section>
+      <PasswordSection emailVerified={data.emailVerified} />
     </ShellContent>
   );
 }
