@@ -14,3 +14,7 @@ test("keeps the verification token out of the referrer", async () => {
     headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
   });
 });
+
+test("enables the use cache directive for tagged public data", () => {
+  expect(nextConfig.experimental?.useCache).toBe(true);
+});
