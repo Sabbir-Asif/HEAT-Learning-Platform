@@ -59,6 +59,8 @@ import type {
   InvitationLookupResponseDto,
   InviteAdminRequestDto,
   LearningStructureResponseDto,
+  LessonBodyRequestDto,
+  LessonBodyResponseDto,
   LessonContentResponseDto,
   LessonSectionRequestDto,
   MeResponseDto,
@@ -156,6 +158,14 @@ export const getLessonSectionsReorderResponseMock = (overrideResponse: Partial<E
 export const getLessonSectionsRemoveResponseMock = (overrideResponse: Partial<Extract<ModuleSummaryDto, object>> = {}): ModuleSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 export const getLessonSectionsUpdateResponseMock = (overrideResponse: Partial<Extract<ModuleSummaryDto, object>> = {}): ModuleSummaryDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getLessonSectionsReadBodyResponseMock = (overrideResponse: Partial<Extract<LessonBodyResponseDto, object>> = {}): LessonBodyResponseDto => ({body: {
+        [faker.string.alphanumeric(5)]: {}
+      }, id: faker.string.uuid(), images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
+
+export const getLessonSectionsUpdateBodyResponseMock = (overrideResponse: Partial<Extract<LessonBodyResponseDto, object>> = {}): LessonBodyResponseDto => ({body: {
+        [faker.string.alphanumeric(5)]: {}
+      }, id: faker.string.uuid(), images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
 export const getTagAssignmentsModuleTagsResponseMock = (overrideResponse: Partial<Extract<TagRefListResponseDto, object>> = {}): TagRefListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), isSystem: faker.datatype.boolean(), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
@@ -696,6 +706,30 @@ export const getLessonSectionsUpdateMockHandler = (overrideResponse?: ModuleSumm
     return HttpResponse.json(overrideResponse !== undefined
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getLessonSectionsUpdateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getLessonSectionsReadBodyMockHandler = (overrideResponse?: LessonBodyResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string; sectionId: string }>>[0]) => Promise<LessonBodyResponseDto> | LessonBodyResponseDto), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string; moduleId: string; sectionId: string }>('*/api/admin/courses/:id/modules/:moduleId/sections/:sectionId/body', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string; sectionId: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getLessonSectionsReadBodyResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getLessonSectionsUpdateBodyMockHandler = (overrideResponse?: LessonBodyResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string; moduleId: string; sectionId: string }, LessonBodyRequestDto>>[0]) => Promise<LessonBodyResponseDto> | LessonBodyResponseDto), options?: RequestHandlerOptions) => {
+  return http.put<{ id: string; moduleId: string; sectionId: string }, LessonBodyRequestDto>('*/api/admin/courses/:id/modules/:moduleId/sections/:sectionId/body', async (info: Parameters<HttpResponseResolver<{ id: string; moduleId: string; sectionId: string }, LessonBodyRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getLessonSectionsUpdateBodyResponseMock(),
       { status: 200
       })
   }, options)
@@ -1589,6 +1623,8 @@ export const getHeatLmsApiMock = () => [
   getLessonSectionsReorderMockHandler(),
   getLessonSectionsRemoveMockHandler(),
   getLessonSectionsUpdateMockHandler(),
+  getLessonSectionsReadBodyMockHandler(),
+  getLessonSectionsUpdateBodyMockHandler(),
   getTagAssignmentsModuleTagsMockHandler(),
   getTagAssignmentsSetModuleTagsMockHandler(),
   getVideoSlotsListMockHandler(),

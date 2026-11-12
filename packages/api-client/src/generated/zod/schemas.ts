@@ -1288,6 +1288,71 @@ export const LessonSectionsUpdateResponse = zod.object({
 })
 
 
+export const lessonSectionsReadBodyPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsReadBodyPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsReadBodyPathSectionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const LessonSectionsReadBodyParams = zod.object({
+  "id": zod.uuid().regex(lessonSectionsReadBodyPathIdRegExp),
+  "moduleId": zod.uuid().regex(lessonSectionsReadBodyPathModuleIdRegExp),
+  "sectionId": zod.uuid().regex(lessonSectionsReadBodyPathSectionIdRegExp)
+})
+
+export const lessonSectionsReadBodyResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsReadBodyResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsReadBodyResponseSchemaVersionMax = 9007199254740991;
+
+
+
+export const LessonSectionsReadBodyResponse = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "id": zod.uuid().regex(lessonSectionsReadBodyResponseIdRegExp),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(lessonSectionsReadBodyResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "schemaVersion": zod.int().min(1).max(lessonSectionsReadBodyResponseSchemaVersionMax),
+  "title": zod.string()
+})
+
+
+export const lessonSectionsUpdateBodyPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsUpdateBodyPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsUpdateBodyPathSectionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const LessonSectionsUpdateBodyParams = zod.object({
+  "id": zod.uuid().regex(lessonSectionsUpdateBodyPathIdRegExp),
+  "moduleId": zod.uuid().regex(lessonSectionsUpdateBodyPathModuleIdRegExp),
+  "sectionId": zod.uuid().regex(lessonSectionsUpdateBodyPathSectionIdRegExp)
+})
+
+export const LessonSectionsUpdateBodyBody = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "schemaVersion": zod.literal(1)
+})
+
+export const lessonSectionsUpdateBodyResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsUpdateBodyResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsUpdateBodyResponseSchemaVersionMax = 9007199254740991;
+
+
+
+export const LessonSectionsUpdateBodyResponse = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "id": zod.uuid().regex(lessonSectionsUpdateBodyResponseIdRegExp),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(lessonSectionsUpdateBodyResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "schemaVersion": zod.int().min(1).max(lessonSectionsUpdateBodyResponseSchemaVersionMax),
+  "title": zod.string()
+})
+
+
 export const tagAssignmentsModuleTagsPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const tagAssignmentsModuleTagsPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 

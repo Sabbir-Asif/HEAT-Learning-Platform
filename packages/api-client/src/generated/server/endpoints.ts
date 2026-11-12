@@ -1249,6 +1249,42 @@ export interface LearningStructureResponseDto {
   learning: LearningStructureResponseDtoLearning;
 }
 
+export type LessonBodyRequestDtoBody = {[key: string]: unknown};
+
+export type LessonBodyRequestDtoSchemaVersion = typeof LessonBodyRequestDtoSchemaVersion[keyof typeof LessonBodyRequestDtoSchemaVersion];
+
+
+export const LessonBodyRequestDtoSchemaVersion = {
+  NUMBER_1: 1,
+} as const;
+
+export interface LessonBodyRequestDto {
+  body: LessonBodyRequestDtoBody;
+  schemaVersion: LessonBodyRequestDtoSchemaVersion;
+}
+
+export type LessonBodyResponseDtoBody = {[key: string]: unknown};
+
+export type LessonBodyResponseDtoImagesItem = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+};
+
+export interface LessonBodyResponseDto {
+  body: LessonBodyResponseDtoBody;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  images: LessonBodyResponseDtoImagesItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  schemaVersion: number;
+  title: string;
+}
+
 export type LessonContentResponseDtoModule = {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
@@ -3448,6 +3484,71 @@ return serverFetch<ModuleSummaryDto>(getLessonSectionsUpdateUrl(id,moduleId,sect
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(lessonSectionRequestDto)
+  }
+);}
+
+
+
+export const getLessonSectionsReadBodyUrl = (id: string,
+    moduleId: string,
+    sectionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/sections/${sectionId}/body`
+}
+
+export const lessonSectionsReadBody = async (id: string,
+    moduleId: string,
+    sectionId: string, options?: Parameters<typeof serverFetch>[1]): Promise<LessonBodyResponseDto> => {
+
+  return serverFetch<LessonBodyResponseDto>(getLessonSectionsReadBodyUrl(id,moduleId,sectionId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getLessonSectionsUpdateBodyUrl = (id: string,
+    moduleId: string,
+    sectionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/sections/${sectionId}/body`
+}
+
+export const lessonSectionsUpdateBody = async (id: string,
+    moduleId: string,
+    sectionId: string,
+    lessonBodyRequestDto: LessonBodyRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<LessonBodyResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<LessonBodyResponseDto>(getLessonSectionsUpdateBodyUrl(id,moduleId,sectionId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(lessonBodyRequestDto)
   }
 );}
 
