@@ -30,6 +30,7 @@ import {
   videoSlotLockedMessage,
 } from "./modules-copy";
 import { VideoSlotForm } from "./video-slot-form";
+import { VideoSlotCaptions } from "./video-slot-captions";
 import { VideoSlotUpload } from "./video-slot-upload";
 
 type EditingSlot = { id: string; title: string; required: boolean } | "new" | null;
@@ -160,6 +161,15 @@ export function VideoSlotsPanel({ courseId, moduleId, courseLocked }: VideoSlots
                     disabled={locked}
                     rejectionReason={slot.rejectionReason}
                     onFinished={() => void queryClient.invalidateQueries({ queryKey: listKey })}
+                  />
+                  <VideoSlotCaptions
+                    courseId={courseId}
+                    moduleId={moduleId}
+                    videoId={slot.id}
+                    title={slot.title}
+                    hasEnglishCaption={slot.captions.includes("en")}
+                    ready={slot.status === "READY"}
+                    onChanged={() => void queryClient.invalidateQueries({ queryKey: listKey })}
                   />
                 </div>
               ),
