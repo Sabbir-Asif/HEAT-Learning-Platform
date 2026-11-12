@@ -13,7 +13,7 @@ export const certificateReady = defineEmailTemplate({
   body: ({ name, courseTitle, certificateCode }, context) => (
     <EmailLayout preview="Your certificate is ready" supportAddress={context.supportAddress}>
       <Paragraph>Hello {name},</Paragraph>
-      <Paragraph>{`Congratulations on completing ${courseTitle}. Your certificate is ready.`}</Paragraph>
+      <Paragraph>{`Congratulations on completing ${courseTitle}. Your certificate is attached as a PDF.`}</Paragraph>
       <ActionLink
         label="Verify your certificate"
         href={buildLink(

@@ -1,4 +1,5 @@
 import type { MailMessage, MailTransport } from "api/core";
+import { AttachmentUnavailable, type EmailAttachmentSource } from "./certificate-attachment";
 import type { EmailQuota } from "./email-quota";
 import type { EmailCategory, RenderedEmail } from "./email-template";
 
@@ -25,6 +26,10 @@ export interface EmailDeliveryStore {
 export type EmailRenderer = (template: string, variables: unknown) => Promise<RenderedEmail>;
 
 export type DeliveryOutcome = "sent" | "failed" | "delayed" | "skipped";
+
+export interface EmailDeliveryLog {
+  error(event: string, fields: Record<string, string>): void;
+}
 
 export class EmailCapacityWait extends Error {
   constructor(readonly retryAt: Date) {
@@ -55,6 +60,8 @@ export class EmailDelivery {
     private readonly unseal: (sealed: string) => string,
     private readonly quota: EmailQuota,
     private readonly clock: { now(): Date },
+    private readonly attachments?: EmailAttachmentSource,
+    private readonly log?: EmailDeliveryLog,
   ) {}
 
   async deliver(emailJobId: string, finalAttempt: boolean): Promise<DeliveryOutcome> {
@@ -106,8 +113,19 @@ export class EmailDelivery {
       const sealed = payload["encryptedToken"];
       if (typeof sealed === "string") variables["token"] = this.unseal(sealed);
       const rendered = await this.render(job.template, variables);
-      return { to: job.recipientAddress, ...rendered };
-    } catch {
+      const attachments = (await this.attachments?.load(job.template, job.payload)) ?? [];
+      return {
+        to: job.recipientAddress,
+        ...rendered,
+        ...(attachments.length === 0 ? {} : { attachments }),
+      };
+    } catch (error) {
+      if (error instanceof AttachmentUnavailable) {
+        this.log?.error("email.attachment-unavailable", {
+          emailJobId: job.id,
+          reason: error.message,
+        });
+      }
       return null;
     }
   }
