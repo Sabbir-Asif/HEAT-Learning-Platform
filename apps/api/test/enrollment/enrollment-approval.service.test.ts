@@ -39,6 +39,8 @@ const build = (options: Options = {}) => {
         return { count: options.claimed ?? 1 };
       }),
     },
+    user: { findFirst: vi.fn().mockResolvedValue({ email: "student@du.ac.bd" }) },
+    course: { findFirst: vi.fn().mockResolvedValue({ title: "HEAT Basics" }) },
     moduleProgress: {
       createMany: vi.fn().mockImplementation(async () => {
         order.push("progress");
@@ -135,7 +137,14 @@ describe("EnrollmentApprovalService.approve", () => {
     expect(tx.outbox.create).toHaveBeenCalledWith({
       data: {
         eventType: ENROLLMENT_APPROVED_EVENT_TYPE,
-        payload: { enrollmentId: "enrollment-id", userId: "user-id", courseId: "course-id" },
+        payload: {
+          template: "enrollment-approved",
+          recipientAddress: "student@du.ac.bd",
+          courseTitle: "HEAT Basics",
+          enrollmentId: "enrollment-id",
+          userId: "user-id",
+          courseId: "course-id",
+        },
       },
     });
     expect(audit.record).toHaveBeenCalledWith(

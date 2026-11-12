@@ -10,6 +10,11 @@ import type { Clock } from "../core";
 import { ApiException } from "../http/api-exception";
 import { NotificationsService } from "../notifications";
 import type { NotificationWriter } from "../notifications";
+import {
+  decisionEmailPayload,
+  ENROLLMENT_APPROVED_TEMPLATE,
+  readDecisionEmailSnapshot,
+} from "./decision-email";
 import { approvalRefusal } from "./approval-rules";
 import type { EnrollmentStatusName } from "./approval-rules";
 
@@ -26,6 +31,8 @@ type ApprovalTransaction = ContentLockTransaction &
     | "outbox"
     | "auditLog"
     | "courseRevision"
+    | "user"
+    | "course"
   > &
   NotificationWriter;
 
@@ -98,10 +105,12 @@ export class EnrollmentApprovalService {
         decidedAt: now,
       },
     });
+    const snapshot = await readDecisionEmailSnapshot(tx, enrollment.userId, enrollment.courseId);
     await tx.outbox.create({
       data: {
         eventType: ENROLLMENT_APPROVED_EVENT_TYPE,
         payload: {
+          ...decisionEmailPayload(ENROLLMENT_APPROVED_TEMPLATE, snapshot),
           enrollmentId: id,
           userId: enrollment.userId,
           courseId: enrollment.courseId,
