@@ -52,6 +52,7 @@ const presetItems = [
 export function RejectSheet({ target, onClose, onFinished }: RejectSheetProps) {
   const reject = useEnrollmentApprovalRejectMany();
   const [summary, setSummary] = useState<BulkRejectionResponse | null>(null);
+  const [preset, setPreset] = useState(noPreset);
   const form = useForm<RejectEnrollmentRequest>({
     resolver: zodResolver(rejectEnrollmentRequestSchema),
     defaultValues: { reason: "" },
@@ -59,6 +60,7 @@ export function RejectSheet({ target, onClose, onFinished }: RejectSheetProps) {
 
   function close() {
     setSummary(null);
+    setPreset(noPreset);
     form.reset();
     onClose();
   }
@@ -99,12 +101,12 @@ export function RejectSheet({ target, onClose, onFinished }: RejectSheetProps) {
               <FieldLabel id="rejection-preset">Preset reason</FieldLabel>
               <Select
                 items={presetItems}
-                value={noPreset}
-                onValueChange={(value) =>
-                  form.setValue("reason", value === null || value === noPreset ? "" : value, {
-                    shouldDirty: true,
-                  })
-                }
+                value={preset}
+                onValueChange={(value) => {
+                  const next = value ?? noPreset;
+                  setPreset(next);
+                  form.setValue("reason", next === noPreset ? "" : next, { shouldDirty: true });
+                }}
               >
                 <SelectTrigger aria-labelledby="rejection-preset" className="w-full">
                   <SelectValue />
