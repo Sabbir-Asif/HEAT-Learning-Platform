@@ -1,5 +1,5 @@
 import { enrollmentStatuses } from "@heat/contracts";
-import type { EnrollmentStatusName } from "@heat/contracts";
+import type { CertificateStatus, EnrollmentStatusName } from "@heat/contracts";
 import type { SortState } from "@heat/ui/data";
 
 export const studentStatusFilterKey = "status";
@@ -86,3 +86,39 @@ export const certificateDownloadHref = (id: string): string =>
 
 export const studentProfileHref = (userId: string): string =>
   `/students/${encodeURIComponent(userId)}`;
+
+export type CertificateAction = "revoke" | "reissue";
+
+export const canRevokeCertificate = (status: CertificateStatus): boolean => status === "READY";
+
+export const canReissueCertificate = (status: CertificateStatus): boolean => status === "READY";
+
+export const certificateActionCopy: Record<
+  CertificateAction,
+  {
+    title: string;
+    confirm: string;
+    destructive: boolean;
+    description: (number: string) => string;
+  }
+> = {
+  revoke: {
+    title: "Revoke certificate",
+    confirm: "Revoke certificate",
+    destructive: true,
+    description: (number) =>
+      `Certificate ${number} stops verifying as valid and the student can no longer download it. This cannot be undone.`,
+  },
+  reissue: {
+    title: "Reissue certificate",
+    confirm: "Reissue certificate",
+    destructive: false,
+    description: (number) =>
+      `Certificate ${number} is rendered again with the student's current name. The number stays the same and the student gets a new ready email.`,
+  },
+};
+
+export const certificateActionNotice = (action: CertificateAction, number: string): string =>
+  action === "revoke"
+    ? `Certificate ${number} was revoked.`
+    : `Certificate ${number} is being reissued. Refresh in a moment to see the new file.`;
