@@ -67,3 +67,11 @@ export const moduleRequestOf = (
   title: values.title,
   objectives: values.objectives.map((row) => row.text),
 });
+
+export const sectionBodyFailedMessage = (code: string | undefined): string => {
+  if (code === "CONTENT_LOCKED") {
+    return "This course is locked, so only wording can change. Images, links and headings must stay as they are.";
+  }
+  if (code === "VALIDATION_FAILED") return "The text contains content that is not allowed.";
+  return "The text could not be saved. Try again.";
+};

@@ -21,9 +21,12 @@ import { FileTextIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { FormSheet } from "./form-sheet";
 import { reorderFailedMessage, sectionDeleteFailedMessage } from "./modules-copy";
+import { SectionBodyForm } from "./section-body-form";
 import { SectionForm } from "./section-form";
 
 type EditingSection = { id: string; title: string } | "new" | null;
+
+type EditingText = { id: string; title: string } | null;
 
 type SectionsPanelProps = {
   courseId: string;
@@ -36,6 +39,7 @@ export function SectionsPanel({ courseId, module, locked }: SectionsPanelProps) 
   const reorder = useLessonSectionsReorder();
   const remove = useLessonSectionsRemove();
   const [editing, setEditing] = useState<EditingSection>(null);
+  const [editingText, setEditingText] = useState<EditingText>(null);
   const [problem, setProblem] = useState<string | null>(null);
   const detailKey = getModulesGetQueryKey(courseId, module.id);
 
@@ -102,6 +106,15 @@ export function SectionsPanel({ courseId, module, locked }: SectionsPanelProps) 
                     <PencilIcon data-icon="inline-start" />
                     Rename
                   </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEditingText({ id: section.id, title: section.title })}
+                  >
+                    <FileTextIcon data-icon="inline-start" />
+                    Edit text
+                  </Button>
                   <ConfirmDialog
                     trigger={
                       <Button type="button" variant="outline" size="sm" disabled={locked}>
@@ -134,7 +147,7 @@ export function SectionsPanel({ courseId, module, locked }: SectionsPanelProps) 
       <FormSheet
         open={editing !== null}
         title={editing === "new" ? "Add a section" : "Rename the section"}
-        description="The written content is added with the lesson editor later."
+        description="Give the section a short title."
         onClose={() => setEditing(null)}
       >
         {({ onDirtyChange, requestClose, close }) => (
@@ -150,6 +163,25 @@ export function SectionsPanel({ courseId, module, locked }: SectionsPanelProps) 
             }}
           />
         )}
+      </FormSheet>
+      <FormSheet
+        open={editingText !== null}
+        title={editingText === null ? "Edit text" : `Edit text: ${editingText.title}`}
+        description="Write the lesson text that learners read."
+        onClose={() => setEditingText(null)}
+      >
+        {({ onDirtyChange, requestClose, close }) =>
+          editingText === null ? null : (
+            <SectionBodyForm
+              courseId={courseId}
+              moduleId={module.id}
+              sectionId={editingText.id}
+              onDirtyChange={onDirtyChange}
+              onCancel={requestClose}
+              onSaved={close}
+            />
+          )
+        }
       </FormSheet>
     </div>
   );
