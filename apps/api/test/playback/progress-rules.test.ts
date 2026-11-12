@@ -4,11 +4,13 @@ import {
   coverageFraction,
   coveredSeconds,
   decideSequence,
+  holdsPosition,
   mergeWithinBudget,
   normaliseIntervals,
   reachesCompletion,
   remainingBudgetSeconds,
   resumePositionOf,
+  startPositionOf,
 } from "../../src/playback/progress-rules";
 
 const start = new Date("2026-11-11T10:00:00.000Z");
@@ -292,5 +294,30 @@ describe("sequence and resume position", () => {
     expect(resumePositionOf(12.9, 100)).toBe(12);
     expect(resumePositionOf(500, 100)).toBe(100);
     expect(resumePositionOf(-3, 100)).toBe(0);
+  });
+});
+
+describe("startPositionOf", () => {
+  test("starts at the stored position inside the video", () => {
+    expect(startPositionOf(270, 600)).toBe(270);
+    expect(startPositionOf(0, 600)).toBe(0);
+  });
+
+  test("restarts at zero when the stored position is within the last seconds", () => {
+    expect(startPositionOf(595, 600)).toBe(0);
+    expect(startPositionOf(600, 600)).toBe(0);
+    expect(startPositionOf(594, 600)).toBe(594);
+  });
+
+  test("restarts at zero for a video without a known duration", () => {
+    expect(startPositionOf(30, 0)).toBe(0);
+  });
+});
+
+describe("holdsPosition", () => {
+  test("the position moves only when the sequence advances and no newer session claimed it", () => {
+    expect(holdsPosition(true, 0)).toBe(true);
+    expect(holdsPosition(true, 1)).toBe(false);
+    expect(holdsPosition(false, 0)).toBe(false);
   });
 });

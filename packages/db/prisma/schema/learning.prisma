@@ -7,16 +7,17 @@ enum ModuleProgressStatus {
 }
 
 model PlaybackSession {
-  id              String    @id @default(uuid(7)) @db.Uuid
-  enrollmentId    String    @db.Uuid
-  videoId         String    @db.Uuid
-  startedAt       DateTime  @default(now())
-  lastSeenAt      DateTime?
-  endedAt         DateTime?
-  acceptedSeconds Float     @default(0)
-  lastSequence    Int       @default(0)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id                String    @id @default(uuid(7)) @db.Uuid
+  enrollmentId      String    @db.Uuid
+  videoId           String    @db.Uuid
+  startedAt         DateTime  @default(now())
+  lastSeenAt        DateTime?
+  positionClaimedAt DateTime  @default(now())
+  endedAt           DateTime?
+  acceptedSeconds   Float     @default(0)
+  lastSequence      Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
   video      Video      @relation(fields: [videoId], references: [id], onDelete: Restrict)

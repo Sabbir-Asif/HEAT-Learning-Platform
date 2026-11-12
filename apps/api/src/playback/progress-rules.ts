@@ -129,6 +129,13 @@ export const mergeWithinBudget = (input: MergeInput): MergeResult => {
 export const resumePositionOf = (positionSeconds: number, durationSeconds: number): number =>
   Math.floor(Math.min(Math.max(0, positionSeconds), durationSeconds));
 
+export const restartWindowSeconds = 5;
+
+export const startPositionOf = (resumeSeconds: number, durationSeconds: number): number =>
+  durationSeconds <= 0 || resumeSeconds >= durationSeconds - restartWindowSeconds
+    ? 0
+    : resumeSeconds;
+
 export interface SequenceDecision {
   advancesPosition: boolean;
   lastSequence: number;
@@ -138,6 +145,9 @@ export const decideSequence = (sequence: number, lastSequence: number): Sequence
   sequence > lastSequence
     ? { advancesPosition: true, lastSequence: sequence }
     : { advancesPosition: false, lastSequence };
+
+export const holdsPosition = (sequenceAdvances: boolean, newerClaims: number): boolean =>
+  sequenceAdvances && newerClaims === 0;
 
 export const reachesCompletion = (coverage: number): boolean =>
   coverage >= videoCompletionThreshold;

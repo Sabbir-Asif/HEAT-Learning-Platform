@@ -20,7 +20,12 @@ const build = (options: Options = {}) => {
       ? {
           moduleId: "m1",
           module: { revisionId: "rev1", revision: { courseId: "c1" } },
-          asset: { assetKey, status: "READY", captions: [{ language: "en" }] },
+          asset: {
+            assetKey,
+            status: "READY",
+            durationSeconds: 600,
+            captions: [{ language: "en" }],
+          },
         }
       : options.video;
   const enrollment =
@@ -81,12 +86,17 @@ describe("StudentPlaybackService.start", () => {
       captions: [{ language: "en" }],
     });
     expect(database.playbackSession.create).toHaveBeenCalledWith({
-      data: { enrollmentId: "e1", videoId },
+      data: { enrollmentId: "e1", videoId, positionClaimedAt: now },
       select: { id: true },
     });
     expect(database.enrollment.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({ where: { userId: "u1", courseId: "c1", deletedAt: null } }),
     );
+  });
+
+  test("restarts at zero when the stored position is at the end of the video", async () => {
+    const { service } = build({ resume: 598 });
+    expect((await service.start("u1", videoId)).body.resumePositionSeconds).toBe(0);
   });
 
   test("resumes at zero when there is no progress", async () => {
@@ -172,7 +182,7 @@ describe("StudentPlaybackService.refresh", () => {
     expect(grant.body.sessionId).toBe("s-open");
     expect(database.playbackSession.update).toHaveBeenCalledWith({
       where: { id: "s-open" },
-      data: { lastSeenAt: now },
+      data: { lastSeenAt: now, positionClaimedAt: now },
       select: { id: true },
     });
     expect(database.playbackSession.create).not.toHaveBeenCalled();

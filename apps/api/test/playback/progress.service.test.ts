@@ -21,6 +21,7 @@ interface Options {
   locked?: boolean;
   requiredVideos?: string[];
   otherProgress?: object[];
+  newerClaims?: number;
   spent?: { earliest: Date | null; accepted: number | null };
 }
 
@@ -49,9 +50,11 @@ const build = (options: Options = {}) => {
   const tx = {
     $queryRaw: vi.fn().mockResolvedValue(options.locked === false ? [] : [{ id: sessionId }]),
     playbackSession: {
-      findUniqueOrThrow: vi
-        .fn()
-        .mockResolvedValue(options.counters ?? { acceptedSeconds: 0, lastSequence: 0 }),
+      findUniqueOrThrow: vi.fn().mockResolvedValue({
+        ...(options.counters ?? { acceptedSeconds: 0, lastSequence: 0 }),
+        positionClaimedAt: started,
+      }),
+      count: vi.fn().mockResolvedValue(options.newerClaims ?? 0),
       update: vi.fn().mockResolvedValue({}),
       aggregate: vi.fn().mockResolvedValue(
         options.spent === undefined
@@ -231,6 +234,36 @@ describe("ProgressService.record", () => {
     expect(tx.playbackSession.update.mock.calls[0]?.[0].data.acceptedSeconds).toBe(30);
     expect(result.coveragePercent).toBe(30);
     expect(savedProgress(tx).firstWatchedAt).toEqual(started);
+  });
+
+  test("a late heartbeat from a session that a newer device replaced keeps the stored position", async () => {
+    const { service, tx } = build({
+      now: after(120),
+      newerClaims: 1,
+      counters: { acceptedSeconds: 30, lastSequence: 3 },
+      progress: {
+        watchedIntervals: [{ start: 0, end: 30 }],
+        resumePositionSeconds: 270,
+        firstWatchedAt: started,
+        completedAt: null,
+      },
+    });
+    const result = await service.record(
+      "u1",
+      videoId,
+      batch({ sequence: 4, positionSeconds: 20, intervals: [{ start: 30, end: 40 }] }),
+    );
+    expect(result.resumePositionSeconds).toBe(270);
+    expect(savedProgress(tx).resumePositionSeconds).toBe(270);
+    expect(tx.playbackSession.count).toHaveBeenCalledWith({
+      where: {
+        enrollmentId: "e1",
+        videoId,
+        id: { not: sessionId },
+        positionClaimedAt: { gt: started },
+      },
+    });
+    expect(savedProgress(tx).watchedIntervals).toEqual([{ start: 0, end: 40 }]);
   });
 
   test("a stale sequence never moves the resume position back but still merges within budget", async () => {
