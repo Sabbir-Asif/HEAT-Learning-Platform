@@ -8,6 +8,11 @@ import { RateLimitModule } from "../rate-limit";
 import { AdminFrontPageController, PublicFrontPageController } from "./front-page.controller";
 import { FrontPageService } from "./front-page.service";
 import { NoopPublicRevalidation, PUBLIC_REVALIDATION } from "./public-revalidation";
+import {
+  AdminSiteSettingsController,
+  PublicSiteSettingsController,
+} from "./site-settings.controller";
+import { SiteSettingsService } from "./site-settings.service";
 import { TagAssignmentsService } from "./tag-assignments.service";
 import { TagAssignmentsController, TagsController } from "./tags.controller";
 import { TagsService } from "./tags.service";
@@ -41,6 +46,8 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     TagAssignmentsController,
     AdminFrontPageController,
     PublicFrontPageController,
+    AdminSiteSettingsController,
+    PublicSiteSettingsController,
   ],
   providers: [
     CoursesService,
@@ -60,6 +67,7 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     TagsService,
     TagAssignmentsService,
     FrontPageService,
+    SiteSettingsService,
     { provide: PUBLIC_REVALIDATION, useClass: NoopPublicRevalidation },
     { provide: COURSE_PUBLISH_CHECKS, useValue: [] },
   ],

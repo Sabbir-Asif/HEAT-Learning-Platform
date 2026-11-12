@@ -1,5 +1,8 @@
 import {
   adminFrontPageResponseSchema,
+  adminLandingOverviewResponseSchema,
+  landingOverviewRequestSchema,
+  publicLandingOverviewResponseSchema,
   courseIdParamsSchema,
   courseListQuerySchema,
   courseListResponseSchema,
@@ -109,3 +112,13 @@ export class PublicFrontPageResponseDto extends createZodDto(publicFrontPageResp
 export class LessonBodyRequestDto extends createZodDto(lessonBodyRequestSchema) {}
 
 export class LessonBodyResponseDto extends createZodDto(lessonBodyResponseSchema) {}
+
+export class LandingOverviewRequestDto extends createZodDto(landingOverviewRequestSchema) {}
+
+export class AdminLandingOverviewResponseDto extends createZodDto(
+  adminLandingOverviewResponseSchema,
+) {}
+
+export class PublicLandingOverviewResponseDto extends createZodDto(
+  publicLandingOverviewResponseSchema,
+) {}
