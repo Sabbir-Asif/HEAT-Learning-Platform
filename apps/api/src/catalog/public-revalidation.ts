@@ -11,3 +11,5 @@ export class NoopPublicRevalidation implements PublicRevalidation {
     return Promise.resolve();
   }
 }
+
+export const landingCacheTag = "landing";
