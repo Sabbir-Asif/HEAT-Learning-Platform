@@ -2266,6 +2266,232 @@ export interface ReorderRequestDto {
   previousIds: string[];
 }
 
+/**
+ * @nullable
+ */
+export type ResourceAdminDtoFile = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  mimeType: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  sizeBytes: number;
+  url: string;
+} | null;
+
+export type ResourceAdminDtoKind = typeof ResourceAdminDtoKind[keyof typeof ResourceAdminDtoKind];
+
+
+export const ResourceAdminDtoKind = {
+  file: 'file',
+  link: 'link',
+} as const;
+
+export interface ResourceAdminDto {
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  courseId: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     * @nullable
+     */
+  courseTitle: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /**
+     * @minLength 1
+     * @maxLength 1000
+     * @nullable
+     */
+  description: string | null;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  displayOrder: number;
+  /** @nullable */
+  file: ResourceAdminDtoFile;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  kind: ResourceAdminDtoKind;
+  published: boolean;
+  title: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     * @nullable
+     */
+  url: string | null;
+}
+
+/**
+ * @nullable
+ */
+export type ResourceAdminListResponseDtoItemsItemFile = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  mimeType: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  sizeBytes: number;
+  url: string;
+} | null;
+
+export type ResourceAdminListResponseDtoItemsItemKind = typeof ResourceAdminListResponseDtoItemsItemKind[keyof typeof ResourceAdminListResponseDtoItemsItemKind];
+
+
+export const ResourceAdminListResponseDtoItemsItemKind = {
+  file: 'file',
+  link: 'link',
+} as const;
+
+export type ResourceAdminListResponseDtoItemsItem = {
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  courseId: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     * @nullable
+     */
+  courseTitle: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /**
+     * @minLength 1
+     * @maxLength 1000
+     * @nullable
+     */
+  description: string | null;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  displayOrder: number;
+  /** @nullable */
+  file: ResourceAdminListResponseDtoItemsItemFile;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  kind: ResourceAdminListResponseDtoItemsItemKind;
+  published: boolean;
+  title: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     * @nullable
+     */
+  url: string | null;
+};
+
+export interface ResourceAdminListResponseDto {
+  items: ResourceAdminListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+}
+
+export type ResourcePublicListResponseDtoItemsItemKind = typeof ResourcePublicListResponseDtoItemsItemKind[keyof typeof ResourcePublicListResponseDtoItemsItemKind];
+
+
+export const ResourcePublicListResponseDtoItemsItemKind = {
+  file: 'file',
+  link: 'link',
+} as const;
+
+export type ResourcePublicListResponseDtoItemsItem = {
+  /**
+     * @minLength 1
+     * @maxLength 1000
+     * @nullable
+     */
+  description: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  kind: ResourcePublicListResponseDtoItemsItemKind;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     * @nullable
+     */
+  mimeType: string | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  sizeBytes: number | null;
+  title: string;
+  url: string;
+};
+
+export interface ResourcePublicListResponseDto {
+  items: ResourcePublicListResponseDtoItemsItem[];
+}
+
+export type ResourceRequestDtoKind = typeof ResourceRequestDtoKind[keyof typeof ResourceRequestDtoKind];
+
+
+export const ResourceRequestDtoKind = {
+  file: 'file',
+  link: 'link',
+} as const;
+
+export interface ResourceRequestDto {
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  courseId?: string | null;
+  /**
+     * @maxLength 1000
+     * @nullable
+     */
+  description?: string | null;
+  /**
+     * @minimum 0
+     * @maximum 100000
+     */
+  displayOrder?: number;
+  kind: ResourceRequestDtoKind;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  mediaAssetId?: string | null;
+  published?: boolean;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title: string;
+  url?: string[];
+}
+
 export interface SetTagsRequestDto {
   /**
      * @maxItems 50
@@ -2979,6 +3205,47 @@ export const NewsListSort = {
   '-title': '-title',
   publishedAt: 'publishedAt',
   '-publishedAt': '-publishedAt',
+  updatedAt: 'updatedAt',
+  '-updatedAt': '-updatedAt',
+} as const;
+
+export type ResourcesListParams = {
+  status?: ResourcesListStatus;
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  pageSize?: number;
+  sort?: ResourcesListSort;
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  q?: string;
+};
+
+export type ResourcesListStatus = typeof ResourcesListStatus[keyof typeof ResourcesListStatus];
+
+
+export const ResourcesListStatus = {
+  all: 'all',
+  published: 'published',
+  unpublished: 'unpublished',
+} as const;
+
+export type ResourcesListSort = typeof ResourcesListSort[keyof typeof ResourcesListSort];
+
+
+export const ResourcesListSort = {
+  title: 'title',
+  '-title': '-title',
+  displayOrder: 'displayOrder',
+  '-displayOrder': '-displayOrder',
   updatedAt: 'updatedAt',
   '-updatedAt': '-updatedAt',
 } as const;
@@ -5450,6 +5717,147 @@ export const adminPlaybackPreview = async (videoId: string, options?: Parameters
 
 
 
+export const getResourcesListUrl = (params?: ResourcesListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/resources?${stringifiedParams}` : `/api/admin/resources`
+}
+
+export const resourcesList = async (params?: ResourcesListParams, options?: Parameters<typeof serverFetch>[1]): Promise<ResourceAdminListResponseDto> => {
+
+  return serverFetch<ResourceAdminListResponseDto>(getResourcesListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getResourcesCreateUrl = () => {
+
+
+
+
+  return `/api/admin/resources`
+}
+
+export const resourcesCreate = async (resourceRequestDto: ResourceRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ResourceAdminDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ResourceAdminDto>(getResourcesCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(resourceRequestDto)
+  }
+);}
+
+
+
+export const getResourcesRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/resources/${id}`
+}
+
+export const resourcesRemove = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getResourcesRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getResourcesGetUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/resources/${id}`
+}
+
+export const resourcesGet = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<ResourceAdminDto> => {
+
+  return serverFetch<ResourceAdminDto>(getResourcesGetUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getResourcesUpdateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/resources/${id}`
+}
+
+export const resourcesUpdate = async (id: string,
+    resourceRequestDto: ResourceRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ResourceAdminDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ResourceAdminDto>(getResourcesUpdateUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(resourceRequestDto)
+  }
+);}
+
+
+
 export const getAdminContactSettingsGetUrl = () => {
 
 
@@ -6488,6 +6896,27 @@ export const getPublicNewsGetUrl = (slug: string,) => {
 export const publicNewsGet = async (slug: string, options?: Parameters<typeof serverFetch>[1]): Promise<NewsPublicPostDto> => {
 
   return serverFetch<NewsPublicPostDto>(getPublicNewsGetUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getPublicResourcesListUrl = () => {
+
+
+
+
+  return `/api/resources`
+}
+
+export const publicResourcesList = async ( options?: Parameters<typeof serverFetch>[1]): Promise<ResourcePublicListResponseDto> => {
+
+  return serverFetch<ResourcePublicListResponseDto>(getPublicResourcesListUrl(),
   {
     ...options,
     method: 'GET'

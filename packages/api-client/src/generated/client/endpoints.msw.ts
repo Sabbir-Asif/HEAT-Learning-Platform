@@ -93,6 +93,10 @@ import type {
   QuizSubmitResponseDto,
   QuizSummaryDto,
   ReorderRequestDto,
+  ResourceAdminDto,
+  ResourceAdminListResponseDto,
+  ResourcePublicListResponseDto,
+  ResourceRequestDto,
   SetTagsRequestDto,
   SignInRequestDto,
   SignedInEnrollmentRequestDto,
@@ -277,6 +281,14 @@ export const getNewsUpdateResponseMock = (overrideResponse: Partial<Extract<News
 
 export const getAdminPlaybackPreviewResponseMock = (overrideResponse: Partial<Extract<PlaybackSessionResponseDto, object>> = {}): PlaybackSessionResponseDto => ({captions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({language: faker.string.alpha({length: {min: 1, max: 35}})})), expiresAt: faker.date.past().toISOString().slice(0, 19) + 'Z', manifestPath: faker.string.alpha({length: {min: 10, max: 20}}), resumePositionSeconds: faker.number.int({min: 0, max: 9007199254740991}), sessionId: faker.helpers.arrayElement([faker.string.uuid(), null]), ...overrideResponse})
 
+export const getResourcesListResponseMock = (overrideResponse: Partial<Extract<ResourceAdminListResponseDto, object>> = {}): ResourceAdminListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({courseId: faker.helpers.arrayElement([faker.string.uuid(), null]), courseTitle: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 200}}), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 1000}}), null]), displayOrder: faker.number.int({min: -9007199254740991, max: 9007199254740991}), file: faker.helpers.arrayElement([{assetId: faker.string.uuid(), mimeType: faker.string.alpha({length: {min: 10, max: 20}}), sizeBytes: faker.number.int({min: 0, max: 9007199254740991}), url: faker.string.alpha({length: {min: 10, max: 20}})},null,]), id: faker.string.uuid(), kind: faker.helpers.arrayElement(['file','link'] as const), published: faker.datatype.boolean(), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', url: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 2000}}), null])})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
+
+export const getResourcesCreateResponseMock = (overrideResponse: Partial<Extract<ResourceAdminDto, object>> = {}): ResourceAdminDto => ({courseId: faker.helpers.arrayElement([faker.string.uuid(), null]), courseTitle: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 200}}), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 1000}}), null]), displayOrder: faker.number.int({min: -9007199254740991, max: 9007199254740991}), file: faker.helpers.arrayElement([{assetId: faker.string.uuid(), mimeType: faker.string.alpha({length: {min: 10, max: 20}}), sizeBytes: faker.number.int({min: 0, max: 9007199254740991}), url: faker.string.alpha({length: {min: 10, max: 20}})},null,]), id: faker.string.uuid(), kind: faker.helpers.arrayElement(['file','link'] as const), published: faker.datatype.boolean(), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', url: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 2000}}), null]), ...overrideResponse})
+
+export const getResourcesGetResponseMock = (overrideResponse: Partial<Extract<ResourceAdminDto, object>> = {}): ResourceAdminDto => ({courseId: faker.helpers.arrayElement([faker.string.uuid(), null]), courseTitle: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 200}}), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 1000}}), null]), displayOrder: faker.number.int({min: -9007199254740991, max: 9007199254740991}), file: faker.helpers.arrayElement([{assetId: faker.string.uuid(), mimeType: faker.string.alpha({length: {min: 10, max: 20}}), sizeBytes: faker.number.int({min: 0, max: 9007199254740991}), url: faker.string.alpha({length: {min: 10, max: 20}})},null,]), id: faker.string.uuid(), kind: faker.helpers.arrayElement(['file','link'] as const), published: faker.datatype.boolean(), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', url: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 2000}}), null]), ...overrideResponse})
+
+export const getResourcesUpdateResponseMock = (overrideResponse: Partial<Extract<ResourceAdminDto, object>> = {}): ResourceAdminDto => ({courseId: faker.helpers.arrayElement([faker.string.uuid(), null]), courseTitle: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 200}}), null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 1000}}), null]), displayOrder: faker.number.int({min: -9007199254740991, max: 9007199254740991}), file: faker.helpers.arrayElement([{assetId: faker.string.uuid(), mimeType: faker.string.alpha({length: {min: 10, max: 20}}), sizeBytes: faker.number.int({min: 0, max: 9007199254740991}), url: faker.string.alpha({length: {min: 10, max: 20}})},null,]), id: faker.string.uuid(), kind: faker.helpers.arrayElement(['file','link'] as const), published: faker.datatype.boolean(), title: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', url: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 2000}}), null]), ...overrideResponse})
+
 export const getAdminContactSettingsGetResponseMock = (overrideResponse: Partial<Extract<AdminContactSettingsResponseDto, object>> = {}): AdminContactSettingsResponseDto => ({address: faker.string.alpha({length: {min: 10, max: 20}}), email: faker.string.alpha({length: {min: 10, max: 20}}), officeHours: faker.string.alpha({length: {min: 10, max: 20}}), organisation: faker.string.alpha({length: {min: 10, max: 20}}), phone: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), ...overrideResponse})
 
 export const getAdminContactSettingsUpdateResponseMock = (overrideResponse: Partial<Extract<AdminContactSettingsResponseDto, object>> = {}): AdminContactSettingsResponseDto => ({address: faker.string.alpha({length: {min: 10, max: 20}}), email: faker.string.alpha({length: {min: 10, max: 20}}), officeHours: faker.string.alpha({length: {min: 10, max: 20}}), organisation: faker.string.alpha({length: {min: 10, max: 20}}), phone: faker.string.alpha({length: {min: 10, max: 20}}), updatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), ...overrideResponse})
@@ -356,6 +368,8 @@ export const getPublicNewsListResponseMock = (overrideResponse: Partial<Extract<
 export const getPublicNewsGetResponseMock = (overrideResponse: Partial<Extract<NewsPublicPostDto, object>> = {}): NewsPublicPostDto => ({body: {
         [faker.string.alphanumeric(5)]: {}
       }, images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), publishedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), slug: faker.string.alpha({length: {min: 10, max: 20}}), title: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
+
+export const getPublicResourcesListResponseMock = (overrideResponse: Partial<Extract<ResourcePublicListResponseDto, object>> = {}): ResourcePublicListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 1000}}), null]), id: faker.string.uuid(), kind: faker.helpers.arrayElement(['file','link'] as const), mimeType: faker.helpers.arrayElement([faker.string.alpha({length: {min: 1, max: 200}}), null]), sizeBytes: faker.helpers.arrayElement([faker.number.int({min: 0, max: 9007199254740991}), null]), title: faker.string.alpha({length: {min: 10, max: 20}}), url: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
 
 export const getPublicContactSettingsGetResponseMock = (overrideResponse: Partial<Extract<PublicContactSettingsResponseDto, object>> = {}): PublicContactSettingsResponseDto => ({address: faker.string.alpha({length: {min: 10, max: 20}}), email: faker.string.alpha({length: {min: 10, max: 20}}), officeHours: faker.string.alpha({length: {min: 10, max: 20}}), organisation: faker.string.alpha({length: {min: 10, max: 20}}), phone: faker.string.alpha({length: {min: 10, max: 20}}), ...overrideResponse})
 
@@ -1369,6 +1383,64 @@ export const getAdminPlaybackPreviewMockHandler = (overrideResponse?: PlaybackSe
   }, options)
 }
 
+export const getResourcesListMockHandler = (overrideResponse?: ResourceAdminListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<ResourceAdminListResponseDto> | ResourceAdminListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/resources', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getResourcesListResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getResourcesCreateMockHandler = (overrideResponse?: ResourceAdminDto | ((info: Parameters<HttpResponseResolver<PathParams, ResourceRequestDto>>[0]) => Promise<ResourceAdminDto> | ResourceAdminDto), options?: RequestHandlerOptions) => {
+  return http.post<PathParams, ResourceRequestDto>('*/api/admin/resources', async (info: Parameters<HttpResponseResolver<PathParams, ResourceRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getResourcesCreateResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getResourcesRemoveMockHandler = (overrideResponse?: void | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.delete<{ id: string }>('*/api/admin/resources/:id', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
+
+export const getResourcesGetMockHandler = (overrideResponse?: ResourceAdminDto | ((info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => Promise<ResourceAdminDto> | ResourceAdminDto), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string }>('*/api/admin/resources/:id', async (info: Parameters<HttpResponseResolver<{ id: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getResourcesGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getResourcesUpdateMockHandler = (overrideResponse?: ResourceAdminDto | ((info: Parameters<HttpResponseResolver<{ id: string }, ResourceRequestDto>>[0]) => Promise<ResourceAdminDto> | ResourceAdminDto), options?: RequestHandlerOptions) => {
+  return http.put<{ id: string }, ResourceRequestDto>('*/api/admin/resources/:id', async (info: Parameters<HttpResponseResolver<{ id: string }, ResourceRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getResourcesUpdateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getAdminContactSettingsGetMockHandler = (overrideResponse?: AdminContactSettingsResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<AdminContactSettingsResponseDto> | AdminContactSettingsResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/admin/site-settings/contact', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1843,6 +1915,18 @@ export const getPublicNewsGetMockHandler = (overrideResponse?: NewsPublicPostDto
   }, options)
 }
 
+export const getPublicResourcesListMockHandler = (overrideResponse?: ResourcePublicListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<ResourcePublicListResponseDto> | ResourcePublicListResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/resources', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getPublicResourcesListResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getPublicContactSettingsGetMockHandler = (overrideResponse?: PublicContactSettingsResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<PublicContactSettingsResponseDto> | PublicContactSettingsResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/site-settings/contact', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -1988,6 +2072,11 @@ export const getHeatLmsApiMock = () => [
   getNewsGetMockHandler(),
   getNewsUpdateMockHandler(),
   getAdminPlaybackPreviewMockHandler(),
+  getResourcesListMockHandler(),
+  getResourcesCreateMockHandler(),
+  getResourcesRemoveMockHandler(),
+  getResourcesGetMockHandler(),
+  getResourcesUpdateMockHandler(),
   getAdminContactSettingsGetMockHandler(),
   getAdminContactSettingsUpdateMockHandler(),
   getAdminSiteSettingsGetMockHandler(),
@@ -2028,6 +2117,7 @@ export const getHeatLmsApiMock = () => [
   getProfileUpdateMockHandler(),
   getPublicNewsListMockHandler(),
   getPublicNewsGetMockHandler(),
+  getPublicResourcesListMockHandler(),
   getPublicContactSettingsGetMockHandler(),
   getPublicSiteSettingsGetMockHandler(),
   getStudentPlaybackStartMockHandler(),

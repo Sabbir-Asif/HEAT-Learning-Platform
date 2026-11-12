@@ -3023,6 +3023,276 @@ export const AdminPlaybackPreviewResponse = zod.object({
 })
 
 
+export const resourcesListQueryStatusDefault = `all`;
+export const resourcesListQueryPageDefault = 1;
+export const resourcesListQueryPageMax = 9007199254740991;
+
+export const resourcesListQueryPageSizeDefault = 25;
+export const resourcesListQueryPageSizeMin = -9007199254740991;
+export const resourcesListQueryPageSizeMax = 9007199254740991;
+
+export const resourcesListQueryQMax = 120;
+
+
+
+export const ResourcesListQueryParams = zod.object({
+  "status": zod.enum(['all', 'published', 'unpublished']).default(resourcesListQueryStatusDefault),
+  "page": zod.int().min(1).max(resourcesListQueryPageMax).default(resourcesListQueryPageDefault),
+  "pageSize": zod.int().min(resourcesListQueryPageSizeMin).max(resourcesListQueryPageSizeMax).default(resourcesListQueryPageSizeDefault),
+  "sort": zod.enum(['title', '-title', 'displayOrder', '-displayOrder', 'updatedAt', '-updatedAt']).optional(),
+  "q": zod.string().min(1).max(resourcesListQueryQMax).optional()
+})
+
+export const resourcesListResponseItemsItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesListResponseItemsItemCourseTitleMax = 200;
+
+export const resourcesListResponseItemsItemCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesListResponseItemsItemDescriptionMax = 1000;
+
+export const resourcesListResponseItemsItemDisplayOrderMin = -9007199254740991;
+export const resourcesListResponseItemsItemDisplayOrderMax = 9007199254740991;
+
+export const resourcesListResponseItemsItemFileAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesListResponseItemsItemFileSizeBytesMin = 0;
+export const resourcesListResponseItemsItemFileSizeBytesMax = 9007199254740991;
+
+export const resourcesListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesListResponseItemsItemUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesListResponseItemsItemUrlMax = 2000;
+
+export const resourcesListResponsePageMax = 9007199254740991;
+
+export const resourcesListResponsePageSizeMax = 9007199254740991;
+
+export const resourcesListResponseTotalMin = 0;
+export const resourcesListResponseTotalMax = 9007199254740991;
+
+
+
+export const ResourcesListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "courseId": zod.uuid().regex(resourcesListResponseItemsItemCourseIdRegExp).nullable(),
+  "courseTitle": zod.string().min(1).max(resourcesListResponseItemsItemCourseTitleMax).nullable(),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(resourcesListResponseItemsItemCreatedAtRegExp),
+  "description": zod.string().min(1).max(resourcesListResponseItemsItemDescriptionMax).nullable(),
+  "displayOrder": zod.int().min(resourcesListResponseItemsItemDisplayOrderMin).max(resourcesListResponseItemsItemDisplayOrderMax),
+  "file": zod.object({
+  "assetId": zod.uuid().regex(resourcesListResponseItemsItemFileAssetIdRegExp),
+  "mimeType": zod.string(),
+  "sizeBytes": zod.int().min(resourcesListResponseItemsItemFileSizeBytesMin).max(resourcesListResponseItemsItemFileSizeBytesMax),
+  "url": zod.string()
+}).nullable(),
+  "id": zod.uuid().regex(resourcesListResponseItemsItemIdRegExp),
+  "kind": zod.enum(['file', 'link']),
+  "published": zod.boolean(),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(resourcesListResponseItemsItemUpdatedAtRegExp),
+  "url": zod.string().min(1).max(resourcesListResponseItemsItemUrlMax).nullable()
+})),
+  "page": zod.int().min(1).max(resourcesListResponsePageMax),
+  "pageSize": zod.int().min(1).max(resourcesListResponsePageSizeMax),
+  "total": zod.int().min(resourcesListResponseTotalMin).max(resourcesListResponseTotalMax)
+})
+
+
+export const resourcesCreateBodyCourseIdDefault = null;
+export const resourcesCreateBodyCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesCreateBodyDescriptionDefault = null;
+export const resourcesCreateBodyDescriptionMax = 1000;
+
+export const resourcesCreateBodyDisplayOrderDefault = 0;
+export const resourcesCreateBodyDisplayOrderMin = 0;
+export const resourcesCreateBodyDisplayOrderMax = 100000;
+
+export const resourcesCreateBodyMediaAssetIdDefault = null;
+export const resourcesCreateBodyMediaAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesCreateBodyPublishedDefault = false;
+export const resourcesCreateBodyTitleMax = 200;
+
+export const resourcesCreateBodyUrlDefault = null;
+
+export const ResourcesCreateBody = zod.object({
+  "courseId": zod.uuid().regex(resourcesCreateBodyCourseIdRegExp).nullish().default(resourcesCreateBodyCourseIdDefault),
+  "description": zod.string().max(resourcesCreateBodyDescriptionMax).nullish().default(resourcesCreateBodyDescriptionDefault),
+  "displayOrder": zod.int().min(resourcesCreateBodyDisplayOrderMin).max(resourcesCreateBodyDisplayOrderMax).default(resourcesCreateBodyDisplayOrderDefault),
+  "kind": zod.enum(['file', 'link']),
+  "mediaAssetId": zod.uuid().regex(resourcesCreateBodyMediaAssetIdRegExp).nullish().default(resourcesCreateBodyMediaAssetIdDefault),
+  "published": zod.boolean().default(resourcesCreateBodyPublishedDefault),
+  "title": zod.string().min(1).max(resourcesCreateBodyTitleMax),
+  "url": zod.array(zod.string()).default(resourcesCreateBodyUrlDefault)
+})
+
+export const resourcesCreateResponseCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesCreateResponseCourseTitleMax = 200;
+
+export const resourcesCreateResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesCreateResponseDescriptionMax = 1000;
+
+export const resourcesCreateResponseDisplayOrderMin = -9007199254740991;
+export const resourcesCreateResponseDisplayOrderMax = 9007199254740991;
+
+export const resourcesCreateResponseFileAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesCreateResponseFileSizeBytesMin = 0;
+export const resourcesCreateResponseFileSizeBytesMax = 9007199254740991;
+
+export const resourcesCreateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesCreateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesCreateResponseUrlMax = 2000;
+
+
+
+export const ResourcesCreateResponse = zod.object({
+  "courseId": zod.uuid().regex(resourcesCreateResponseCourseIdRegExp).nullable(),
+  "courseTitle": zod.string().min(1).max(resourcesCreateResponseCourseTitleMax).nullable(),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(resourcesCreateResponseCreatedAtRegExp),
+  "description": zod.string().min(1).max(resourcesCreateResponseDescriptionMax).nullable(),
+  "displayOrder": zod.int().min(resourcesCreateResponseDisplayOrderMin).max(resourcesCreateResponseDisplayOrderMax),
+  "file": zod.object({
+  "assetId": zod.uuid().regex(resourcesCreateResponseFileAssetIdRegExp),
+  "mimeType": zod.string(),
+  "sizeBytes": zod.int().min(resourcesCreateResponseFileSizeBytesMin).max(resourcesCreateResponseFileSizeBytesMax),
+  "url": zod.string()
+}).nullable(),
+  "id": zod.uuid().regex(resourcesCreateResponseIdRegExp),
+  "kind": zod.enum(['file', 'link']),
+  "published": zod.boolean(),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(resourcesCreateResponseUpdatedAtRegExp),
+  "url": zod.string().min(1).max(resourcesCreateResponseUrlMax).nullable()
+})
+
+
+export const resourcesRemovePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ResourcesRemoveParams = zod.object({
+  "id": zod.uuid().regex(resourcesRemovePathIdRegExp)
+})
+
+export const ResourcesRemoveResponse = zod.void()
+
+
+export const resourcesGetPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ResourcesGetParams = zod.object({
+  "id": zod.uuid().regex(resourcesGetPathIdRegExp)
+})
+
+export const resourcesGetResponseCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesGetResponseCourseTitleMax = 200;
+
+export const resourcesGetResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesGetResponseDescriptionMax = 1000;
+
+export const resourcesGetResponseDisplayOrderMin = -9007199254740991;
+export const resourcesGetResponseDisplayOrderMax = 9007199254740991;
+
+export const resourcesGetResponseFileAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesGetResponseFileSizeBytesMin = 0;
+export const resourcesGetResponseFileSizeBytesMax = 9007199254740991;
+
+export const resourcesGetResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesGetResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesGetResponseUrlMax = 2000;
+
+
+
+export const ResourcesGetResponse = zod.object({
+  "courseId": zod.uuid().regex(resourcesGetResponseCourseIdRegExp).nullable(),
+  "courseTitle": zod.string().min(1).max(resourcesGetResponseCourseTitleMax).nullable(),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(resourcesGetResponseCreatedAtRegExp),
+  "description": zod.string().min(1).max(resourcesGetResponseDescriptionMax).nullable(),
+  "displayOrder": zod.int().min(resourcesGetResponseDisplayOrderMin).max(resourcesGetResponseDisplayOrderMax),
+  "file": zod.object({
+  "assetId": zod.uuid().regex(resourcesGetResponseFileAssetIdRegExp),
+  "mimeType": zod.string(),
+  "sizeBytes": zod.int().min(resourcesGetResponseFileSizeBytesMin).max(resourcesGetResponseFileSizeBytesMax),
+  "url": zod.string()
+}).nullable(),
+  "id": zod.uuid().regex(resourcesGetResponseIdRegExp),
+  "kind": zod.enum(['file', 'link']),
+  "published": zod.boolean(),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(resourcesGetResponseUpdatedAtRegExp),
+  "url": zod.string().min(1).max(resourcesGetResponseUrlMax).nullable()
+})
+
+
+export const resourcesUpdatePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ResourcesUpdateParams = zod.object({
+  "id": zod.uuid().regex(resourcesUpdatePathIdRegExp)
+})
+
+export const resourcesUpdateBodyCourseIdDefault = null;
+export const resourcesUpdateBodyCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesUpdateBodyDescriptionDefault = null;
+export const resourcesUpdateBodyDescriptionMax = 1000;
+
+export const resourcesUpdateBodyDisplayOrderDefault = 0;
+export const resourcesUpdateBodyDisplayOrderMin = 0;
+export const resourcesUpdateBodyDisplayOrderMax = 100000;
+
+export const resourcesUpdateBodyMediaAssetIdDefault = null;
+export const resourcesUpdateBodyMediaAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesUpdateBodyPublishedDefault = false;
+export const resourcesUpdateBodyTitleMax = 200;
+
+export const resourcesUpdateBodyUrlDefault = null;
+
+export const ResourcesUpdateBody = zod.object({
+  "courseId": zod.uuid().regex(resourcesUpdateBodyCourseIdRegExp).nullish().default(resourcesUpdateBodyCourseIdDefault),
+  "description": zod.string().max(resourcesUpdateBodyDescriptionMax).nullish().default(resourcesUpdateBodyDescriptionDefault),
+  "displayOrder": zod.int().min(resourcesUpdateBodyDisplayOrderMin).max(resourcesUpdateBodyDisplayOrderMax).default(resourcesUpdateBodyDisplayOrderDefault),
+  "kind": zod.enum(['file', 'link']),
+  "mediaAssetId": zod.uuid().regex(resourcesUpdateBodyMediaAssetIdRegExp).nullish().default(resourcesUpdateBodyMediaAssetIdDefault),
+  "published": zod.boolean().default(resourcesUpdateBodyPublishedDefault),
+  "title": zod.string().min(1).max(resourcesUpdateBodyTitleMax),
+  "url": zod.array(zod.string()).default(resourcesUpdateBodyUrlDefault)
+})
+
+export const resourcesUpdateResponseCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesUpdateResponseCourseTitleMax = 200;
+
+export const resourcesUpdateResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesUpdateResponseDescriptionMax = 1000;
+
+export const resourcesUpdateResponseDisplayOrderMin = -9007199254740991;
+export const resourcesUpdateResponseDisplayOrderMax = 9007199254740991;
+
+export const resourcesUpdateResponseFileAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesUpdateResponseFileSizeBytesMin = 0;
+export const resourcesUpdateResponseFileSizeBytesMax = 9007199254740991;
+
+export const resourcesUpdateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesUpdateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesUpdateResponseUrlMax = 2000;
+
+
+
+export const ResourcesUpdateResponse = zod.object({
+  "courseId": zod.uuid().regex(resourcesUpdateResponseCourseIdRegExp).nullable(),
+  "courseTitle": zod.string().min(1).max(resourcesUpdateResponseCourseTitleMax).nullable(),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(resourcesUpdateResponseCreatedAtRegExp),
+  "description": zod.string().min(1).max(resourcesUpdateResponseDescriptionMax).nullable(),
+  "displayOrder": zod.int().min(resourcesUpdateResponseDisplayOrderMin).max(resourcesUpdateResponseDisplayOrderMax),
+  "file": zod.object({
+  "assetId": zod.uuid().regex(resourcesUpdateResponseFileAssetIdRegExp),
+  "mimeType": zod.string(),
+  "sizeBytes": zod.int().min(resourcesUpdateResponseFileSizeBytesMin).max(resourcesUpdateResponseFileSizeBytesMax),
+  "url": zod.string()
+}).nullable(),
+  "id": zod.uuid().regex(resourcesUpdateResponseIdRegExp),
+  "kind": zod.enum(['file', 'link']),
+  "published": zod.boolean(),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(resourcesUpdateResponseUpdatedAtRegExp),
+  "url": zod.string().min(1).max(resourcesUpdateResponseUrlMax).nullable()
+})
+
+
 export const adminContactSettingsGetResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 
 
@@ -4149,6 +4419,29 @@ export const PublicNewsGetResponse = zod.object({
   "schemaVersion": zod.int().min(1).max(publicNewsGetResponseSchemaVersionMax),
   "slug": zod.string(),
   "title": zod.string()
+})
+
+
+export const publicResourcesListResponseItemsItemDescriptionMax = 1000;
+
+export const publicResourcesListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicResourcesListResponseItemsItemMimeTypeMax = 200;
+
+export const publicResourcesListResponseItemsItemSizeBytesMin = 0;
+export const publicResourcesListResponseItemsItemSizeBytesMax = 9007199254740991;
+
+
+
+export const PublicResourcesListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "description": zod.string().min(1).max(publicResourcesListResponseItemsItemDescriptionMax).nullable(),
+  "id": zod.uuid().regex(publicResourcesListResponseItemsItemIdRegExp),
+  "kind": zod.enum(['file', 'link']),
+  "mimeType": zod.string().min(1).max(publicResourcesListResponseItemsItemMimeTypeMax).nullable(),
+  "sizeBytes": zod.int().min(publicResourcesListResponseItemsItemSizeBytesMin).max(publicResourcesListResponseItemsItemSizeBytesMax).nullable(),
+  "title": zod.string(),
+  "url": zod.string()
+}))
 })
 
 
