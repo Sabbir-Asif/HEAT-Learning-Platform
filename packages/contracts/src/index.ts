@@ -20,6 +20,7 @@ export * from "./progress";
 export * from "./quiz-delivery";
 export * from "./quizzes";
 export * from "./rich-text";
+export * from "./site-settings";
 export * from "./tags";
 export * from "./verification";
 export * from "./videos";
