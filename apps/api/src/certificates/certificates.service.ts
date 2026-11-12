@@ -1,11 +1,16 @@
-import type { CertificateListResponse } from "@heat/contracts";
+import type { CertificateListResponse, CertificateVerificationResponse } from "@heat/contracts";
 import type { HeatClient } from "@heat/db";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { AuditService } from "../audit";
 import type { AuditActor } from "../audit";
 import { APP_CONFIG, DATABASE } from "../core";
 import type { AppConfig } from "../core";
-import { decideDownload, downloadHeaders, toCertificateItems } from "./certificate-rules";
+import {
+  decideDownload,
+  downloadHeaders,
+  toCertificateItems,
+  toVerification,
+} from "./certificate-rules";
 import type { DownloadViewer } from "./certificate-rules";
 
 @Injectable()
@@ -34,6 +39,24 @@ export class CertificatesService {
       },
     });
     return { certificates: toCertificateItems(rows, this.config.publicAppUrl) };
+  }
+
+  async verify(number: string): Promise<CertificateVerificationResponse> {
+    const row = await this.database.certificate.findUnique({
+      where: { number },
+      select: {
+        recipientName: true,
+        issuedAt: true,
+        fileKey: true,
+        revokedAt: true,
+        enrollment: {
+          select: { completedAt: true, updatedAt: true, course: { select: { title: true } } },
+        },
+      },
+    });
+    const verification = toVerification(row);
+    if (verification === null) throw new NotFoundException();
+    return verification;
   }
 
   async prepareDownload(

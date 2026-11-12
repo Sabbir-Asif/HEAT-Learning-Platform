@@ -243,7 +243,9 @@ describe("loadConfig rate limits", () => {
     const example = readFileSync(join(__dirname, "../../.env.example"), "utf8");
     for (const profile of rateLimitProfileNames) {
       for (const field of ["LIMIT", "WINDOW_SECONDS", "IP_LIMIT"]) {
-        const ipOnly = profile === "directoryLookup" && field !== "IP_LIMIT";
+        const ipOnly =
+          (profile === "directoryLookup" || profile === "certificateVerify") &&
+          field !== "IP_LIMIT";
         const name = `${rateLimitEnvName(profile, field)}=`;
         if (ipOnly) expect(example).not.toContain(name);
         else expect(example).toContain(name);
