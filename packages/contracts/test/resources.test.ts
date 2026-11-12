@@ -59,9 +59,7 @@ describe("resourceRequestSchema", () => {
 
   test("rejects a link without an address or with a file", () => {
     expect(resourceRequestSchema.safeParse({ kind: "link", title: "Guide" }).success).toBe(false);
-    expect(resourceRequestSchema.safeParse({ ...link, mediaAssetId: assetId }).success).toBe(
-      false,
-    );
+    expect(resourceRequestSchema.safeParse({ ...link, mediaAssetId: assetId }).success).toBe(false);
   });
 
   test("accepts a file with an asset and rejects a file without one or with an address", () => {
