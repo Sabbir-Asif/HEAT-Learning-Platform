@@ -14,6 +14,7 @@ interface Options {
 
 const build = (options: Options = {}) => {
   const tx = {
+    $queryRaw: vi.fn().mockResolvedValue([]),
     enrollment: {
       findFirst: vi
         .fn()
@@ -80,6 +81,17 @@ describe("AttemptGrantService.grant", () => {
       entityId: "grant-id",
       after: { enrollmentId: "e", studentId: "student-id", quizId: "q", reason: "Power cut" },
     });
+  });
+
+  test("locks the enrollment row before reading attempts and grants", async () => {
+    const { service, tx } = build();
+
+    await service.grant("e", "q", actor, undefined);
+
+    const lockOrder = tx.$queryRaw.mock.invocationCallOrder[0] ?? 0;
+    const readOrder = tx.quizAttempt.findMany.mock.invocationCallOrder[0] ?? 0;
+    expect(lockOrder).toBeGreaterThan(0);
+    expect(lockOrder).toBeLessThan(readOrder);
   });
 
   test("omits the reason when none is given", async () => {

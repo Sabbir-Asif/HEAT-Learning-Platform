@@ -30,6 +30,7 @@ export class AttemptGrantService {
       if (enrollment === null || enrollment.courseRevisionId === null) {
         throw new ApiException(404, "NOT_FOUND");
       }
+      await tx.$queryRaw`SELECT id FROM "Enrollment" WHERE id = ${enrollment.id}::uuid FOR UPDATE`;
       const quiz = await tx.quiz.findFirst({
         where: {
           id: quizId,
