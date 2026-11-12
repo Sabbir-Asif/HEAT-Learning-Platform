@@ -15,6 +15,8 @@ export type FormErrorCopyKey =
   | "CANNOT_DEACTIVATE_SELF"
   | "CAPTCHA_EXPIRED"
   | "CAPTCHA_INVALID"
+  | "CERTIFICATE_NOT_READY"
+  | "CERTIFICATE_REVOKED"
   | "CONTENT_LOCKED"
   | "COURSE_HAS_ENROLLMENTS"
   | "COURSE_LOCKED"
@@ -95,6 +97,8 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   CANNOT_DEACTIVATE_SELF: "You cannot deactivate your own account.",
   CAPTCHA_EXPIRED: "This security check can no longer be used. Request a new one.",
   CAPTCHA_INVALID: "The characters do not match. Try again.",
+  CERTIFICATE_NOT_READY: "This certificate is still being prepared.",
+  CERTIFICATE_REVOKED: "This certificate is revoked.",
   CONTENT_LOCKED:
     "This course is locked. Modules and sections cannot be added, removed or reordered.",
   COURSE_HAS_ENROLLMENTS: "This course has enrollments, so it cannot be deleted.",
