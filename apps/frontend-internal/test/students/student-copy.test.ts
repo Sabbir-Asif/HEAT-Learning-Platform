@@ -1,6 +1,9 @@
 import { enrollmentStatuses } from "@heat/contracts";
 import { describe, expect, test } from "vitest";
 import {
+  canReinstateStudent,
+  canRemoveStudent,
+  removalNotice,
   studentBadgeStatus,
   studentSortValue,
   studentStatusFilterOptions,
@@ -22,5 +25,21 @@ describe("student copy", () => {
 
   test("offers every enrollment status as a URL filter value", () => {
     expect(studentStatusFilterOptions.status).toEqual(enrollmentStatuses);
+  });
+});
+
+describe("removal actions", () => {
+  test("offers removal only for approved and completed students", () => {
+    const removable = enrollmentStatuses.filter(canRemoveStudent);
+    expect(removable).toEqual(["APPROVED", "COMPLETED"]);
+  });
+
+  test("offers reinstatement only for removed students", () => {
+    expect(enrollmentStatuses.filter(canReinstateStudent)).toEqual(["REMOVED"]);
+  });
+
+  test("words the confirmation for each action", () => {
+    expect(removalNotice("remove", "Amina")).toBe("Amina was removed from the course.");
+    expect(removalNotice("reinstate", "Amina")).toBe("Amina was reinstated.");
   });
 });
