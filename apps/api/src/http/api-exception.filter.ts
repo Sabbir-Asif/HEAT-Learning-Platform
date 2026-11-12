@@ -86,6 +86,7 @@ const messages: Record<ErrorCode, string> = {
   TAG_NAME_TAKEN: "A tag with this name already exists.",
   TAG_RESERVED: "The front page tag is built in and cannot be renamed or deleted.",
   UNAUTHENTICATED: "Sign in to continue.",
+  UPLOAD_DIMENSIONS_TOO_LARGE: "This image has more pixels than the upload limit.",
   UPLOAD_EXPIRED: "This upload expired before it finished. Start it again.",
   UPLOAD_OFFSET_MISMATCH:
     "The upload offset does not match the server. Resume from the server offset.",

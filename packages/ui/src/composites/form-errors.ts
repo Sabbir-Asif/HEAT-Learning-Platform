@@ -64,6 +64,7 @@ export type FormErrorCopyKey =
   | "TAG_NAME_TAKEN"
   | "TAG_RESERVED"
   | "UNAUTHENTICATED"
+  | "UPLOAD_DIMENSIONS_TOO_LARGE"
   | "UPLOAD_EXPIRED"
   | "UPLOAD_OFFSET_MISMATCH"
   | "UPLOAD_TOO_LARGE"
@@ -157,6 +158,7 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   TAG_NAME_TAKEN: "A tag with this name already exists.",
   TAG_RESERVED: "The front page tag is built in and cannot be renamed or deleted.",
   UNAUTHENTICATED: "Your session has ended. Sign in again to continue.",
+  UPLOAD_DIMENSIONS_TOO_LARGE: "This image has more pixels than the upload limit.",
   UPLOAD_EXPIRED: "This upload expired before it finished. Start it again.",
   UPLOAD_OFFSET_MISMATCH: "The upload got out of step with the server. Start it again.",
   UPLOAD_TOO_LARGE: "This file is larger than the upload limit.",
