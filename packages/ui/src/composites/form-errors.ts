@@ -51,6 +51,9 @@ export type FormErrorCopyKey =
   | "ORIGIN_NOT_ALLOWED"
   | "PASSWORD_BREACHED"
   | "PASSWORD_CHANGE_REQUIRED"
+  | "PASSWORD_CODE_EMAIL_UNVERIFIED"
+  | "PASSWORD_CODE_EXPIRED"
+  | "PASSWORD_CODE_INVALID"
   | "PROFILE_LOCKED"
   | "QUIZ_ANSWER_INVALID"
   | "QUIZ_ATTEMPTS_UNLIMITED"
@@ -144,6 +147,9 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   ORIGIN_NOT_ALLOWED: "This request did not come from an allowed site.",
   PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
   PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
+  PASSWORD_CODE_EMAIL_UNVERIFIED: "Verify your email address to change your password.",
+  PASSWORD_CODE_EXPIRED: "This code is no longer valid. Request a new one.",
+  PASSWORD_CODE_INVALID: "The code is not correct.",
   PROFILE_LOCKED:
     "Your name and academic details are locked. Send a change request to update them.",
   QUIZ_ANSWER_INVALID:

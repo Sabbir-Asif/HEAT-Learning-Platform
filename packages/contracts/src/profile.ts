@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { passwordMaxLength, passwordMinLength } from "./auth";
 import { enrollmentStepOneSchema } from "./enrollment";
 
 export const profileLockedMessage =
@@ -30,3 +31,35 @@ export const avatarResponseSchema = z.object({ avatarUrl: z.string() });
 export type AvatarResponse = z.infer<typeof avatarResponseSchema>;
 
 export const avatarDisplayWidth = 320;
+
+export const passwordCodeLength = 6;
+export const passwordCodeLifetimeMinutes = 15;
+export const passwordCodeMaxAttempts = 5;
+
+export const passwordCodeRequestedResponseSchema = z.object({
+  expiresInMinutes: z.number().int().positive(),
+});
+
+export type PasswordCodeRequestedResponse = z.infer<typeof passwordCodeRequestedResponseSchema>;
+
+export const changeStudentPasswordRequestSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Enter your current password.").max(passwordMaxLength),
+    code: z
+      .string()
+      .trim()
+      .regex(
+        new RegExp(`^\\d{${passwordCodeLength}}$`),
+        `Enter the ${passwordCodeLength}-digit code.`,
+      ),
+    newPassword: z
+      .string()
+      .min(passwordMinLength, `Use at least ${passwordMinLength} characters.`)
+      .max(passwordMaxLength, `Use at most ${passwordMaxLength} characters.`),
+  })
+  .refine((value) => value.currentPassword !== value.newPassword, {
+    path: ["newPassword"],
+    message: "Choose a password you have not used here before.",
+  });
+
+export type ChangeStudentPasswordRequest = z.infer<typeof changeStudentPasswordRequestSchema>;
