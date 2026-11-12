@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { ApiException } from "../../src/http/api-exception";
 import {
   assertContentUnlocked,
+  assertObjectivesWording,
   nextOrder,
   planReorder,
   planResequence,
@@ -94,5 +95,26 @@ describe("planResequence", () => {
 
   test("plans nothing for an empty list", () => {
     expect(planResequence([])).toEqual({ parking: [], final: [] });
+  });
+});
+
+describe("assertObjectivesWording", () => {
+  const lockedAt = new Date("2026-11-11T06:00:00.000Z");
+
+  test("allows any objectives on an unlocked course", () => {
+    expect(() => assertObjectivesWording(null, ["a"], ["a", "b"])).not.toThrow();
+  });
+
+  test("allows rewording with the same number of objectives on a locked course", () => {
+    expect(() => assertObjectivesWording(lockedAt, ["a", "b"], ["a", "c"])).not.toThrow();
+  });
+
+  test("refuses adding or removing an objective on a locked course", () => {
+    expect(failureOf(() => assertObjectivesWording(lockedAt, ["a"], ["a", "b"]))).toMatchObject({
+      code: "CONTENT_LOCKED",
+    });
+    expect(failureOf(() => assertObjectivesWording(lockedAt, ["a", "b"], ["a"]))).toMatchObject({
+      code: "CONTENT_LOCKED",
+    });
   });
 });
