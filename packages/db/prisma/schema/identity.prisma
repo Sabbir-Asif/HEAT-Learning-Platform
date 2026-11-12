@@ -67,6 +67,7 @@ model StudentProfile {
   department Department @relation(fields: [departmentId], references: [id], onDelete: Restrict)
 
   @@index([departmentId])
+  @@index([departmentId, session])
 }
 
 model Session {
