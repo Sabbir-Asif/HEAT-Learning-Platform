@@ -36,6 +36,10 @@ class FakeStore implements OutboxStore {
         stagedNotifications.push(notification);
         return Promise.resolve();
       },
+      notifyStudents: (notification) => {
+        stagedNotifications.push({ userId: "all-students", type: notification.type });
+        return Promise.resolve();
+      },
     });
     this.emailJobs.push(...stagedJobs);
     this.notifications.push(...stagedNotifications);
@@ -93,6 +97,25 @@ const setup = () => {
 };
 
 describe("OutboxRelay", () => {
+  test("turns a news published event into student notifications and queues no job", async () => {
+    const { store, email, certificate, relay } = setup();
+    store.unrelayed.push(
+      event("news-1", "news.published", {
+        postId: enrollmentId,
+        slug: "orientation",
+        title: "Orientation",
+      }),
+    );
+
+    await relay.relayBatch(10);
+
+    expect(store.notifications).toEqual([{ userId: "all-students", type: "NEWS_PUBLISHED" }]);
+    expect(store.emailJobs).toEqual([]);
+    expect(email.adds).toBe(0);
+    expect(certificate.adds).toBe(0);
+    expect(store.relayedIds).toEqual(["news-1"]);
+  });
+
   test("enqueues an email job with the outbox id as job id and keeps a recipient copy", async () => {
     const { store, email, relay } = setup();
     store.unrelayed.push(alreadyRegistered("job-1"));

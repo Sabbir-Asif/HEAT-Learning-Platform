@@ -10,6 +10,8 @@ interface ClaimedRow {
 
 const transactionTimeoutMs = 15000;
 
+const notifyChunkSize = 1000;
+
 export class PrismaOutboxStore implements OutboxStore {
   constructor(private readonly database: HeatClient) {}
 
@@ -60,6 +62,22 @@ export class PrismaOutboxStore implements OutboxStore {
                 data: notification.data,
               },
             });
+          },
+          notifyStudents: async (notification) => {
+            const students = await tx.user.findMany({
+              where: { role: "STUDENT", deletedAt: null, deactivatedAt: null },
+              select: { id: true },
+              orderBy: { id: "asc" },
+            });
+            for (let start = 0; start < students.length; start += notifyChunkSize) {
+              await tx.notification.createMany({
+                data: students.slice(start, start + notifyChunkSize).map((student) => ({
+                  userId: student.id,
+                  type: notification.type,
+                  data: notification.data,
+                })),
+              });
+            }
           },
         });
 

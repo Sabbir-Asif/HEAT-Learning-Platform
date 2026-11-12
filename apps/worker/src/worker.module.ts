@@ -6,6 +6,7 @@ import { TranscodeConsumer } from "./transcode/transcode-consumer";
 import { VideoProbeConsumer } from "./transcode/video-probe-consumer";
 import { MediaCleanupRunner } from "./media/media-cleanup.runner";
 import { StorageCleanupRunner } from "./media/storage-cleanup.runner";
+import { NewsPublicationRunner } from "./news/news-publication.runner";
 import { OutboxRelayRunner } from "./outbox/outbox-relay.runner";
 
 @Module({
@@ -13,6 +14,7 @@ import { OutboxRelayRunner } from "./outbox/outbox-relay.runner";
   providers: [
     WorkerMailConnectionCheck,
     OutboxRelayRunner,
+    NewsPublicationRunner,
     MediaCleanupRunner,
     StorageCleanupRunner,
     EmailConsumer,
