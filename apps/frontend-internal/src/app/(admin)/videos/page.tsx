@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { VideosView } from "@/video-library/videos-view";
 
 export default function Page() {
-  return <PlaceholderPage title="Videos" />;
+  return <VideosView />;
 }

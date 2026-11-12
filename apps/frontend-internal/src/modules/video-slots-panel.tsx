@@ -6,6 +6,7 @@ import {
   useVideoSlotsList,
   useVideoSlotsRemove,
   useVideoSlotsReorder,
+  useVideoSlotsRetryTranscode,
 } from "@heat/api-client";
 import type { VideoSlotListResponseDto } from "@heat/api-client";
 import {
@@ -21,13 +22,17 @@ import {
   StatusBadge,
 } from "@heat/ui";
 import { useQueryClient } from "@tanstack/react-query";
-import { PencilIcon, PlusIcon, Trash2Icon, VideoIcon } from "lucide-react";
+import { PencilIcon, PlusIcon, RotateCcwIcon, Trash2Icon, VideoIcon } from "lucide-react";
 import { useState } from "react";
 import { FormSheet } from "./form-sheet";
 import {
   reorderFailedMessage,
+  videoFailureMessage,
+  videoRetryFailedMessage,
   videoSlotDeleteFailedMessage,
   videoSlotLockedMessage,
+  videoSlotsPollInterval,
+  videoTimeLabel,
 } from "./modules-copy";
 import { VideoSlotForm } from "./video-slot-form";
 import { VideoSlotUpload } from "./video-slot-upload";
@@ -42,9 +47,12 @@ type VideoSlotsPanelProps = {
 
 export function VideoSlotsPanel({ courseId, moduleId, courseLocked }: VideoSlotsPanelProps) {
   const queryClient = useQueryClient();
-  const slots = useVideoSlotsList(courseId, moduleId);
+  const slots = useVideoSlotsList(courseId, moduleId, {
+    query: { refetchInterval: (query) => videoSlotsPollInterval(query.state.data?.items) },
+  });
   const reorder = useVideoSlotsReorder();
   const remove = useVideoSlotsRemove();
+  const retry = useVideoSlotsRetryTranscode();
   const [editing, setEditing] = useState<EditingSlot>(null);
   const [problem, setProblem] = useState<string | null>(null);
   const listKey = getVideoSlotsListQueryKey(courseId, moduleId);
@@ -151,6 +159,50 @@ export function VideoSlotsPanel({ courseId, moduleId, courseLocked }: VideoSlots
                       }}
                     />
                   </div>
+                  {slot.status === "NOT_UPLOADED" ? null : (
+                    <FieldDescription>
+                      Uploaded {videoTimeLabel(slot.uploadedAt)}. Status changed{" "}
+                      {videoTimeLabel(slot.statusChangedAt)}.
+                    </FieldDescription>
+                  )}
+                  {slot.status === "FAILED" ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <FieldDescription role="alert" className="mr-auto">
+                        {videoFailureMessage(slot.failureReason)}
+                      </FieldDescription>
+                      <ConfirmDialog
+                        trigger={
+                          <Button type="button" variant="outline" size="sm">
+                            <RotateCcwIcon data-icon="inline-start" />
+                            Retry
+                          </Button>
+                        }
+                        title="Retry processing this video?"
+                        itemName={slot.title}
+                        description="The uploaded file is processed again from the start."
+                        confirmLabel="Retry processing"
+                        errorMessage={videoRetryFailedMessage(undefined)}
+                        onConfirm={async () => {
+                          try {
+                            refresh(
+                              await retry.mutateAsync({
+                                id: courseId,
+                                moduleId,
+                                videoId: slot.id,
+                              }),
+                            );
+                          } catch (error) {
+                            if (isApiError(error) && error.code === "VIDEO_NOT_FAILED") {
+                              await queryClient.invalidateQueries({ queryKey: listKey });
+                              setProblem(videoRetryFailedMessage(error.code));
+                              return;
+                            }
+                            throw error;
+                          }
+                        }}
+                      />
+                    </div>
+                  ) : null}
                   <VideoSlotUpload
                     courseId={courseId}
                     moduleId={moduleId}

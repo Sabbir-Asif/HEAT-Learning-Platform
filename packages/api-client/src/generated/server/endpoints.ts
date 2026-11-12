@@ -2218,6 +2218,95 @@ export interface VerifyEmailRequestDto {
   token: string;
 }
 
+export type VideoLibraryListResponseDtoItemsItemCourse = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+/**
+ * @nullable
+ */
+export type VideoLibraryListResponseDtoItemsItemFailureReason = typeof VideoLibraryListResponseDtoItemsItemFailureReason[keyof typeof VideoLibraryListResponseDtoItemsItemFailureReason] | null;
+
+
+export const VideoLibraryListResponseDtoItemsItemFailureReason = {
+  SOURCE_UNREADABLE: 'SOURCE_UNREADABLE',
+  ENCODE_FAILED: 'ENCODE_FAILED',
+  TIMED_OUT: 'TIMED_OUT',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+  PUBLISH_FAILED: 'PUBLISH_FAILED',
+} as const;
+
+export type VideoLibraryListResponseDtoItemsItemModule = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+/**
+ * @nullable
+ */
+export type VideoLibraryListResponseDtoItemsItemRejectionReason = typeof VideoLibraryListResponseDtoItemsItemRejectionReason[keyof typeof VideoLibraryListResponseDtoItemsItemRejectionReason] | null;
+
+
+export const VideoLibraryListResponseDtoItemsItemRejectionReason = {
+  NOT_A_VIDEO: 'NOT_A_VIDEO',
+  UNSUPPORTED_CONTAINER: 'UNSUPPORTED_CONTAINER',
+  UNSUPPORTED_CODEC: 'UNSUPPORTED_CODEC',
+  TOO_LARGE: 'TOO_LARGE',
+  NO_DURATION: 'NO_DURATION',
+} as const;
+
+export type VideoLibraryListResponseDtoItemsItemStatus = typeof VideoLibraryListResponseDtoItemsItemStatus[keyof typeof VideoLibraryListResponseDtoItemsItemStatus];
+
+
+export const VideoLibraryListResponseDtoItemsItemStatus = {
+  UPLOADING: 'UPLOADING',
+  UPLOADED: 'UPLOADED',
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  READY: 'READY',
+  FAILED: 'FAILED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type VideoLibraryListResponseDtoItemsItem = {
+  course: VideoLibraryListResponseDtoItemsItemCourse;
+  /** @nullable */
+  failureReason: VideoLibraryListResponseDtoItemsItemFailureReason;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  module: VideoLibraryListResponseDtoItemsItemModule;
+  /** @nullable */
+  rejectionReason: VideoLibraryListResponseDtoItemsItemRejectionReason;
+  status: VideoLibraryListResponseDtoItemsItemStatus;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  statusChangedAt: string;
+  title: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  uploadedAt: string;
+};
+
+export interface VideoLibraryListResponseDto {
+  items: VideoLibraryListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+}
+
 /**
  * @nullable
  */
@@ -2279,7 +2368,17 @@ export type VideoSlotListResponseDtoItemsItem = {
   rejectionReason: VideoSlotListResponseDtoItemsItemRejectionReason;
   required: boolean;
   status: VideoSlotListResponseDtoItemsItemStatus;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  statusChangedAt: string | null;
   title: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  uploadedAt: string | null;
 };
 
 export interface VideoSlotListResponseDto {
@@ -2591,6 +2690,46 @@ export const StudentListListSort = {
   '-name': '-name',
   requestedAt: 'requestedAt',
   '-requestedAt': '-requestedAt',
+} as const;
+
+export type VideoLibraryListParams = {
+  status?: VideoLibraryListStatus;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+  sort?: VideoLibraryListSort;
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  pageSize?: number;
+};
+
+export type VideoLibraryListStatus = typeof VideoLibraryListStatus[keyof typeof VideoLibraryListStatus];
+
+
+export const VideoLibraryListStatus = {
+  UPLOADING: 'UPLOADING',
+  UPLOADED: 'UPLOADED',
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  READY: 'READY',
+  FAILED: 'FAILED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type VideoLibraryListSort = typeof VideoLibraryListSort[keyof typeof VideoLibraryListSort];
+
+
+export const VideoLibraryListSort = {
+  title: 'title',
+  '-title': '-title',
+  statusChangedAt: 'statusChangedAt',
+  '-statusChangedAt': '-statusChangedAt',
 } as const;
 
 export type NotificationsListParams = {
@@ -4701,6 +4840,34 @@ export const getStudentListListUrl = (params?: StudentListListParams,) => {
 export const studentListList = async (params?: StudentListListParams, options?: Parameters<typeof serverFetch>[1]): Promise<StudentListResponseDto> => {
 
   return serverFetch<StudentListResponseDto>(getStudentListListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getVideoLibraryListUrl = (params?: VideoLibraryListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/videos?${stringifiedParams}` : `/api/admin/videos`
+}
+
+export const videoLibraryList = async (params?: VideoLibraryListParams, options?: Parameters<typeof serverFetch>[1]): Promise<VideoLibraryListResponseDto> => {
+
+  return serverFetch<VideoLibraryListResponseDto>(getVideoLibraryListUrl(params),
   {
     ...options,
     method: 'GET'
