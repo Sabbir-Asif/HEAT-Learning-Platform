@@ -1549,6 +1549,27 @@ export const CoursesPublishResponse = zod.object({
 })
 
 
+export const coursesPublishChecksPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const CoursesPublishChecksParams = zod.object({
+  "id": zod.uuid().regex(coursesPublishChecksPathIdRegExp)
+})
+
+export const coursesPublishChecksResponseFailuresItemModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const coursesPublishChecksResponseFailuresItemQuestionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const CoursesPublishChecksResponse = zod.object({
+  "failures": zod.array(zod.object({
+  "code": zod.enum(['COURSE_NO_MODULES', 'MODULE_NO_REQUIRED_VIDEO', 'MODULE_VIDEO_NOT_READY', 'MODULE_NO_QUIZ', 'MODULE_QUIZ_EMPTY', 'QUESTION_OPTION_COUNT', 'QUESTION_CORRECT_COUNT']),
+  "message": zod.string(),
+  "moduleId": zod.uuid().regex(coursesPublishChecksResponseFailuresItemModuleIdRegExp).nullable(),
+  "questionId": zod.uuid().regex(coursesPublishChecksResponseFailuresItemQuestionIdRegExp).nullable()
+}))
+})
+
+
 export const departmentsListQueryStatusDefault = `active`;
 export const departmentsListQueryPageDefault = 1;
 export const departmentsListQueryPageMax = 9007199254740991;
