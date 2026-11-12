@@ -110,3 +110,11 @@ const videoTimeFormat = new Intl.DateTimeFormat("en-GB", {
 
 export const videoTimeLabel = (value: string | null): string =>
   value === null ? "-" : videoTimeFormat.format(new Date(value)).replace(" at ", ", ");
+
+export const sectionBodyFailedMessage = (code: string | undefined): string => {
+  if (code === "CONTENT_LOCKED") {
+    return "This course is locked, so only wording can change. Images, links and headings must stay as they are.";
+  }
+  if (code === "VALIDATION_FAILED") return "The text contains content that is not allowed.";
+  return "The text could not be saved. Try again.";
+};
