@@ -146,5 +146,8 @@ export const decideSequence = (sequence: number, lastSequence: number): Sequence
     ? { advancesPosition: true, lastSequence: sequence }
     : { advancesPosition: false, lastSequence };
 
+export const holdsPosition = (sequenceAdvances: boolean, newerClaims: number): boolean =>
+  sequenceAdvances && newerClaims === 0;
+
 export const reachesCompletion = (coverage: number): boolean =>
   coverage >= videoCompletionThreshold;

@@ -4,6 +4,7 @@ import {
   coverageFraction,
   coveredSeconds,
   decideSequence,
+  holdsPosition,
   mergeWithinBudget,
   normaliseIntervals,
   reachesCompletion,
@@ -310,5 +311,13 @@ describe("startPositionOf", () => {
 
   test("restarts at zero for a video without a known duration", () => {
     expect(startPositionOf(30, 0)).toBe(0);
+  });
+});
+
+describe("holdsPosition", () => {
+  test("the position moves only when the sequence advances and no newer session claimed it", () => {
+    expect(holdsPosition(true, 0)).toBe(true);
+    expect(holdsPosition(true, 1)).toBe(false);
+    expect(holdsPosition(false, 0)).toBe(false);
   });
 });

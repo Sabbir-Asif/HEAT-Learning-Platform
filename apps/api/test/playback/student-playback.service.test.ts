@@ -86,7 +86,7 @@ describe("StudentPlaybackService.start", () => {
       captions: [{ language: "en" }],
     });
     expect(database.playbackSession.create).toHaveBeenCalledWith({
-      data: { enrollmentId: "e1", videoId },
+      data: { enrollmentId: "e1", videoId, positionClaimedAt: now },
       select: { id: true },
     });
     expect(database.enrollment.findFirst).toHaveBeenCalledWith(
@@ -182,7 +182,7 @@ describe("StudentPlaybackService.refresh", () => {
     expect(grant.body.sessionId).toBe("s-open");
     expect(database.playbackSession.update).toHaveBeenCalledWith({
       where: { id: "s-open" },
-      data: { lastSeenAt: now },
+      data: { lastSeenAt: now, positionClaimedAt: now },
       select: { id: true },
     });
     expect(database.playbackSession.create).not.toHaveBeenCalled();

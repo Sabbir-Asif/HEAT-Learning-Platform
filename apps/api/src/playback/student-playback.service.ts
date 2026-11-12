@@ -96,6 +96,7 @@ export class StudentPlaybackService {
     videoId: string,
     reuse: boolean,
   ): Promise<string> {
+    const now = this.clock.now();
     if (reuse) {
       const open = await this.database.playbackSession.findFirst({
         where: { enrollmentId, videoId, endedAt: null },
@@ -105,14 +106,14 @@ export class StudentPlaybackService {
       if (open !== null) {
         const touched = await this.database.playbackSession.update({
           where: { id: open.id },
-          data: { lastSeenAt: this.clock.now() },
+          data: { lastSeenAt: now, positionClaimedAt: now },
           select: { id: true },
         });
         return touched.id;
       }
     }
     const created = await this.database.playbackSession.create({
-      data: { enrollmentId, videoId },
+      data: { enrollmentId, videoId, positionClaimedAt: now },
       select: { id: true },
     });
     return created.id;
