@@ -4,6 +4,7 @@ export { MailConnectionCheck, WorkerMailConnectionCheck } from "./mail-connectio
 export { maskAddress } from "./mask-address";
 export {
   MAIL_TRANSPORT,
+  type MailAttachment,
   type MailFailureKind,
   type MailMessage,
   type MailSendResult,

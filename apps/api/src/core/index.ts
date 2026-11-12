@@ -15,6 +15,7 @@ export {
   FakeMailTransport,
   MAIL_TRANSPORT,
   WorkerMailConnectionCheck,
+  type MailAttachment,
   type MailConfig,
   type MailFailureKind,
   type MailMessage,

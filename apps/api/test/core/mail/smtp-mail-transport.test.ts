@@ -62,6 +62,15 @@ describe("SmtpMailTransport.send", () => {
     ]);
   });
 
+  test("passes attachments to the client", async () => {
+    const client = new FakeClient(accepted);
+    const attachments = [
+      { filename: "a.pdf", content: Buffer.from([1]), contentType: "application/pdf" },
+    ];
+    await new SmtpMailTransport(client, config, logger()).send({ ...message, attachments });
+    expect(client.sent[0]?.attachments).toEqual(attachments);
+  });
+
   test("reports 250 when the server response has no code", async () => {
     const client = new FakeClient(() => Promise.resolve({ response: "queued", rejected: [] }));
     await expect(new SmtpMailTransport(client, config, logger()).send(message)).resolves.toEqual({
