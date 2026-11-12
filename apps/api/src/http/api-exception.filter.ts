@@ -72,6 +72,7 @@ const messages: Record<ErrorCode, string> = {
   ORIGIN_NOT_ALLOWED: "This request did not come from an allowed site.",
   PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
   PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
+  PROFILE_LOCKED: "The name and academic details are locked after the first approval.",
   QUIZ_ANSWER_INVALID: "One of the answers does not belong to this quiz.",
   QUIZ_ATTEMPTS_UNLIMITED: "This quiz has no attempt limit, so there is nothing to grant.",
   QUIZ_ATTEMPT_LIMIT_REACHED: "All attempts for this quiz have been used.",
