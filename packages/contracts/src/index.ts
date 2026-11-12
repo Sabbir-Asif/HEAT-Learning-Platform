@@ -24,6 +24,7 @@ export * from "./attempt-grants";
 export * from "./removals";
 export * from "./students";
 export * from "./password-reset";
+export * from "./tags";
 export * from "./verification";
 export * from "./videos";
 

@@ -61,6 +61,8 @@ export type FormErrorCopyKey =
   | "RESET_LINK_EXPIRED"
   | "RESET_LINK_INVALID"
   | "RESET_LINK_USED"
+  | "TAG_NAME_TAKEN"
+  | "TAG_RESERVED"
   | "UNAUTHENTICATED"
   | "UPLOAD_EXPIRED"
   | "UPLOAD_OFFSET_MISMATCH"
@@ -152,6 +154,8 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   RESET_LINK_EXPIRED: "This reset link has expired. Request a new one.",
   RESET_LINK_INVALID: "This reset link is not valid.",
   RESET_LINK_USED: "This reset link has already been used or replaced.",
+  TAG_NAME_TAKEN: "A tag with this name already exists.",
+  TAG_RESERVED: "The front page tag is built in and cannot be renamed or deleted.",
   UNAUTHENTICATED: "Your session has ended. Sign in again to continue.",
   UPLOAD_EXPIRED: "This upload expired before it finished. Start it again.",
   UPLOAD_OFFSET_MISMATCH: "The upload got out of step with the server. Start it again.",
