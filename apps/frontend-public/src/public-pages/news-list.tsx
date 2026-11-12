@@ -40,9 +40,7 @@ export function NewsList({ news }: { news: NewsPublicListResponse }) {
                   <CardDescription>
                     <time dateTime={item.publishedAt}>{formatNewsDate(item.publishedAt)}</time>
                   </CardDescription>
-                  {item.summary === "" ? null : (
-                    <CardDescription className="break-words">{item.summary}</CardDescription>
-                  )}
+                  {item.summary === "" ? null : <CardDescription>{item.summary}</CardDescription>}
                 </CardHeader>
               </Card>
             </li>
