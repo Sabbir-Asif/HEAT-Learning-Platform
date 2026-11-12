@@ -75,6 +75,9 @@ const messages: Record<ErrorCode, string> = {
   QUIZ_ATTEMPT_WAIT: "Wait before submitting another attempt.",
   QUIZ_NOT_UNLOCKED: "Watch the required videos in this module to unlock the quiz.",
   RATE_LIMITED: "Too many requests. Try again later.",
+  RESET_LINK_EXPIRED: "This reset link has expired. Request a new one.",
+  RESET_LINK_INVALID: "This reset link is not valid.",
+  RESET_LINK_USED: "This reset link has already been used or replaced.",
   UNAUTHENTICATED: "Sign in to continue.",
   UPLOAD_EXPIRED: "This upload expired before it finished. Start it again.",
   UPLOAD_OFFSET_MISMATCH:

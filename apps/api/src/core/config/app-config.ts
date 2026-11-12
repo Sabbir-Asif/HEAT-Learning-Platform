@@ -81,6 +81,7 @@ const envSchema = z
       ),
     ADMIN_INVITE_TTL_HOURS: positiveInt.default(72),
     VERIFICATION_TOKEN_TTL_HOURS: positiveInt.default(48),
+    PASSWORD_RESET_TTL_MINUTES: positiveInt.default(60),
     ADMIN_APP_URL: z
       .url()
       .optional()
@@ -201,6 +202,7 @@ export interface AppConfig {
   invitations: { ttlHours: number; adminAppUrl: string };
   publicAppUrl: string;
   verification: { tokenTtlHours: number };
+  passwordReset: { ttlMinutes: number };
   audit: { transactionMaxWaitMs: number; transactionTimeoutMs: number };
   accountProtection: { responseFloorMs: number };
   rateLimit: RateLimitConfig;
@@ -259,6 +261,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
     },
     publicAppUrl: values.PUBLIC_APP_URL ?? localPublicAppUrl,
     verification: { tokenTtlHours: values.VERIFICATION_TOKEN_TTL_HOURS },
+    passwordReset: { ttlMinutes: values.PASSWORD_RESET_TTL_MINUTES },
     audit: {
       transactionMaxWaitMs: values.AUDIT_TRANSACTION_MAX_WAIT_MS,
       transactionTimeoutMs: values.AUDIT_TRANSACTION_TIMEOUT_MS,
