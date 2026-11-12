@@ -226,6 +226,7 @@ erDiagram
     String url
     String mediaAssetId FK
     Int displayOrder
+    Boolean published
     DateTime deletedAt
     DateTime createdAt
     DateTime updatedAt
