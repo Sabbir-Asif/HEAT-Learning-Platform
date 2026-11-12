@@ -16,6 +16,7 @@
   },
   "scripts": {
     "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
     "build": "tsc -p tsconfig.build.json",
     "lint": "eslint .",
     "format:check": "prettier --check . --ignore-path ../../.gitignore",

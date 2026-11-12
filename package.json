@@ -29,6 +29,8 @@
     "design:check": "node packages/config/bin/design-check.mjs",
     "ticket": "node packages/config/bin/ticket.mjs",
     "verify": "node packages/config/bin/verify.mjs",
+    "db:generate": "pnpm --filter @heat/db prisma:generate",
+    "db:migrate": "pnpm --filter @heat/db prisma:migrate",
     "dev:up": "node infra/scripts/dev.mjs up",
     "dev:down": "node infra/scripts/dev.mjs down",
     "dev:reset": "node infra/scripts/dev.mjs reset"
