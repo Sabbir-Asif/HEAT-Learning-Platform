@@ -88,6 +88,13 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     { provide: PUBLIC_REVALIDATION, useClass: HttpPublicRevalidation },
     { provide: COURSE_PUBLISH_CHECKS, useValue: [] },
   ],
-  exports: [CoursesService, CourseLookupService, ContentLockService, COURSE_PUBLISH_CHECKS],
+  exports: [
+    CoursesService,
+    CourseLookupService,
+    ContentLockService,
+    COURSE_PUBLISH_CHECKS,
+    PublicImagesService,
+    PUBLIC_REVALIDATION,
+  ],
 })
 export class CatalogModule {}
