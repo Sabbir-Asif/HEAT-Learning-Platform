@@ -17,7 +17,7 @@ const keys = Object.keys(statusEntries) as StatusKey[];
 const all = () => (
   <div className="flex flex-wrap gap-2 p-4">
     {keys.map((key) => {
-      const [kind, status] = key.split(".") as ["enrollment" | "video" | "course" | "news", string];
+      const [kind, status] = key.split(".") as ["enrollment" | "video" | "course" | "news" | "resource", string];
       return <StatusBadge key={key} kind={kind} status={status} />;
     })}
     <StatusBadge kind="enrollment" status="SOMETHING_NEW" />
