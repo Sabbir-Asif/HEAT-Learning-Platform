@@ -3,6 +3,7 @@ import { randomBytes } from "node:crypto";
 import { AuditModule } from "../audit";
 import { APP_CONFIG, CoreModule } from "../core";
 import type { AppConfig } from "../core";
+import { MediaModule } from "../media";
 import { RateLimitModule } from "../rate-limit";
 import { AdminFrontPageController, PublicFrontPageController } from "./front-page.controller";
 import { FrontPageService } from "./front-page.service";
@@ -33,7 +34,7 @@ import { FileUploadStore, UPLOAD_STORE } from "./video-upload-store";
 import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
 
 @Module({
-  imports: [CoreModule, AuditModule, RateLimitModule],
+  imports: [CoreModule, AuditModule, RateLimitModule, MediaModule],
   controllers: [
     CoursesController,
     RevisionsController,

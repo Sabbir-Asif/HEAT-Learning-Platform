@@ -11,6 +11,8 @@ import {
   createModuleRequestSchema,
   createTagRequestSchema,
   createVideoSlotRequestSchema,
+  lessonBodyRequestSchema,
+  lessonBodyResponseSchema,
   lessonSectionParamsSchema,
   lessonSectionRequestSchema,
   moduleListResponseSchema,
@@ -114,3 +116,7 @@ export class SetTagsRequestDto extends createZodDto(setTagsRequestSchema) {}
 export class AdminFrontPageResponseDto extends createZodDto(adminFrontPageResponseSchema) {}
 
 export class PublicFrontPageResponseDto extends createZodDto(publicFrontPageResponseSchema) {}
+
+export class LessonBodyRequestDto extends createZodDto(lessonBodyRequestSchema) {}
+
+export class LessonBodyResponseDto extends createZodDto(lessonBodyResponseSchema) {}
