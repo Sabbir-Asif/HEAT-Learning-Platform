@@ -150,3 +150,14 @@ export const studentDetailSchema = z.object({
 export type StudentDetail = z.infer<typeof studentDetailSchema>;
 export type StudentEnrollmentDetail = z.infer<typeof studentEnrollmentDetailSchema>;
 export type StudentModuleProgress = z.infer<typeof studentModuleProgressSchema>;
+
+export const studentExportQuerySchema = studentListQuerySchema.omit({
+  sort: true,
+  page: true,
+  pageSize: true,
+});
+
+export type StudentExportQuery = z.infer<typeof studentExportQuerySchema>;
+export type StudentFilter = StudentExportQuery;
+
+export const studentExportFileName = "students.csv";
