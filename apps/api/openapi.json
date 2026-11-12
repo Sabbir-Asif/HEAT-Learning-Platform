@@ -589,6 +589,9 @@
                     "QUIZ_ATTEMPT_WAIT",
                     "QUIZ_NOT_UNLOCKED",
                     "RATE_LIMITED",
+                    "RESET_LINK_EXPIRED",
+                    "RESET_LINK_INVALID",
+                    "RESET_LINK_USED",
                     "UNAUTHENTICATED",
                     "UPLOAD_EXPIRED",
                     "UPLOAD_OFFSET_MISMATCH",
@@ -684,6 +687,9 @@
                     "QUIZ_ATTEMPT_WAIT",
                     "QUIZ_NOT_UNLOCKED",
                     "RATE_LIMITED",
+                    "RESET_LINK_EXPIRED",
+                    "RESET_LINK_INVALID",
+                    "RESET_LINK_USED",
                     "UNAUTHENTICATED",
                     "UPLOAD_EXPIRED",
                     "UPLOAD_OFFSET_MISMATCH",
@@ -1923,6 +1929,43 @@
           "studentCount",
           "departmentCount",
           "universities"
+        ],
+        "type": "object"
+      },
+      "ForgotPasswordAcceptedResponseDto": {
+        "properties": {
+          "accepted": {
+            "enum": [
+              true
+            ],
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accepted"
+        ],
+        "type": "object"
+      },
+      "ForgotPasswordRequestDto": {
+        "properties": {
+          "captchaAnswer": {
+            "maxLength": 12,
+            "minLength": 1,
+            "type": "string"
+          },
+          "captchaId": {
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "captchaId",
+          "captchaAnswer"
         ],
         "type": "object"
       },
@@ -3646,6 +3689,25 @@
         "required": [
           "previousIds",
           "orderedIds"
+        ],
+        "type": "object"
+      },
+      "ResetPasswordRequestDto": {
+        "properties": {
+          "password": {
+            "maxLength": 256,
+            "minLength": 12,
+            "type": "string"
+          },
+          "token": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "password"
         ],
         "type": "object"
       },
@@ -8309,10 +8371,65 @@
         ]
       }
     },
+    "/api/auth/forgot-password": {
+      "post": {
+        "operationId": "passwordResetForgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForgotPasswordAcceptedResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/auth/refresh": {
       "post": {
         "operationId": "studentAuthRefresh",
         "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "operationId": "passwordResetResetPassword",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "204": {
             "description": ""
