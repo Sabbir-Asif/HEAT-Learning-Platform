@@ -5,6 +5,7 @@ import type { OrderPlan, OrderStep } from "./module-rules";
 export interface ContentScope {
   revisionId: string;
   lockedAt: Date | null;
+  courseLockedAt: Date | null;
 }
 
 export type ContentReader = Pick<HeatClient, "course">;
@@ -16,12 +17,16 @@ export const readScope = async (client: ContentReader, courseId: string): Promis
     where: { id: courseId },
     select: {
       lockedAt: true,
-      revisions: { select: { id: true }, orderBy: { number: "desc" }, take: 1 },
+      revisions: { select: { id: true, publishedAt: true }, orderBy: { number: "desc" }, take: 1 },
     },
   });
   const revision = course?.revisions[0];
   if (course === null || revision === undefined) throw new ApiException(404, "NOT_FOUND");
-  return { revisionId: revision.id, lockedAt: course.lockedAt };
+  return {
+    revisionId: revision.id,
+    lockedAt: revision.publishedAt === null ? null : course.lockedAt,
+    courseLockedAt: course.lockedAt,
+  };
 };
 
 export const lockScope = async (client: ContentLocker, courseId: string): Promise<ContentScope> => {
@@ -30,7 +35,11 @@ export const lockScope = async (client: ContentLocker, courseId: string): Promis
   const row = locked[0];
   if (row === undefined) throw new ApiException(404, "NOT_FOUND");
   const scope = await readScope(client, courseId);
-  return { revisionId: scope.revisionId, lockedAt: row.lockedAt };
+  return {
+    revisionId: scope.revisionId,
+    lockedAt: scope.lockedAt === null ? null : row.lockedAt,
+    courseLockedAt: row.lockedAt,
+  };
 };
 
 export const applyOrderPlan = async (
