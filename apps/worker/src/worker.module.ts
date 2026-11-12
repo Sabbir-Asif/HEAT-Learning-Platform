@@ -6,6 +6,7 @@ import { EmailConsumer } from "./email/email-consumer";
 import { TranscodeConsumer } from "./transcode/transcode-consumer";
 import { VideoProbeConsumer } from "./transcode/video-probe-consumer";
 import { MediaCleanupRunner } from "./media/media-cleanup.runner";
+import { StorageCleanupRunner } from "./media/storage-cleanup.runner";
 import { OutboxRelayRunner } from "./outbox/outbox-relay.runner";
 
 @Module({
@@ -15,6 +16,7 @@ import { OutboxRelayRunner } from "./outbox/outbox-relay.runner";
     OutboxRelayRunner,
     ExpiryRunner,
     MediaCleanupRunner,
+    StorageCleanupRunner,
     EmailConsumer,
     CertificateConsumer,
     VideoProbeConsumer,
