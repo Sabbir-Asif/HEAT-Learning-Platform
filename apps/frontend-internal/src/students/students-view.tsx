@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  getStudentExportDownloadUrl,
   getStudentListListQueryKey,
   useCoursesList,
   useDepartmentsList,
@@ -30,8 +31,9 @@ import type { DataTableColumn } from "@heat/ui/data";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { RotateCcwIcon, UserMinusIcon } from "lucide-react";
+import { DownloadIcon, RotateCcwIcon, UserMinusIcon } from "lucide-react";
 import { useMemo, useState } from "react";
+import { exportButtonLabel, exportDescription } from "./students-copy";
 import { StudentRemovalSheet } from "./student-removal-sheet";
 import type { StudentRemovalTarget } from "./student-removal-sheet";
 import {
@@ -78,10 +80,7 @@ export function StudentsView() {
   const status = filter(studentStatusFilterKey);
   const sessionValid = session === "" || academicSessionSchema.safeParse(session).success;
 
-  const params: StudentListListParams = {
-    page: url.page,
-    pageSize: url.pageSize,
-    sort: studentSortValue(url.sort),
+  const filters = {
     ...(course ? { courseId: course } : {}),
     ...(university ? { universityId: university } : {}),
     ...(university && faculty ? { facultyId: faculty } : {}),
@@ -90,6 +89,13 @@ export function StudentsView() {
     ...(status ? { status: status as (typeof enrollmentStatuses)[number] } : {}),
     ...(url.query ? { q: url.query } : {}),
   };
+  const params: StudentListListParams = {
+    page: url.page,
+    pageSize: url.pageSize,
+    sort: studentSortValue(url.sort),
+    ...filters,
+  };
+  const exportUrl = getStudentExportDownloadUrl(filters);
   const list = useStudentListList(params);
   const courses = useCoursesList({ page: 1, pageSize: optionLimit, status: "published" });
   const universities = useUniversitiesList({
@@ -202,7 +208,16 @@ export function StudentsView() {
 
   return (
     <ShellContent>
-      <PageHeader title="Students" />
+      <PageHeader
+        title="Students"
+        action={
+          <Button nativeButton={false} render={<a href={exportUrl} download="students.csv" />}>
+            <DownloadIcon data-icon="inline-start" />
+            {exportButtonLabel}
+          </Button>
+        }
+      />
+      <FieldDescription>{exportDescription}</FieldDescription>
       {notice !== null ? <FieldDescription role="status">{notice}</FieldDescription> : null}
       <FilterBar
         activeCount={url.activeFilterCount}
