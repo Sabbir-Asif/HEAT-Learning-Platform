@@ -1,24 +1,34 @@
 import {
+  adminFrontPageResponseSchema,
   courseIdParamsSchema,
   courseListQuerySchema,
   courseListResponseSchema,
   courseSummarySchema,
   createCourseRequestSchema,
   createModuleRequestSchema,
+  createTagRequestSchema,
   createVideoSlotRequestSchema,
   lessonSectionParamsSchema,
   lessonSectionRequestSchema,
   moduleListResponseSchema,
   moduleParamsSchema,
   moduleSummarySchema,
+  publicFrontPageResponseSchema,
   quizQuestionParamsSchema,
   quizQuestionRequestSchema,
   quizRulesRequestSchema,
   quizSummarySchema,
   reorderRequestSchema,
+  setTagsRequestSchema,
+  tagDetailSchema,
+  tagIdParamsSchema,
+  tagListResponseSchema,
+  tagRefListResponseSchema,
+  tagSummarySchema,
   updateCourseRequestSchema,
   updateModuleRequestSchema,
   updateQuizQuestionRequestSchema,
+  updateTagRequestSchema,
   updateVideoSlotRequestSchema,
   videoSlotListResponseSchema,
   videoSlotParamsSchema,
@@ -73,3 +83,23 @@ export class QuizQuestionRequestDto extends createZodDto(quizQuestionRequestSche
 export class UpdateQuizQuestionRequestDto extends createZodDto(updateQuizQuestionRequestSchema) {}
 
 export class QuizQuestionParamsDto extends createZodDto(quizQuestionParamsSchema) {}
+
+export class CreateTagRequestDto extends createZodDto(createTagRequestSchema) {}
+
+export class UpdateTagRequestDto extends createZodDto(updateTagRequestSchema) {}
+
+export class TagSummaryDto extends createZodDto(tagSummarySchema) {}
+
+export class TagListResponseDto extends createZodDto(tagListResponseSchema) {}
+
+export class TagDetailDto extends createZodDto(tagDetailSchema) {}
+
+export class TagIdParamsDto extends createZodDto(tagIdParamsSchema) {}
+
+export class TagRefListResponseDto extends createZodDto(tagRefListResponseSchema) {}
+
+export class SetTagsRequestDto extends createZodDto(setTagsRequestSchema) {}
+
+export class AdminFrontPageResponseDto extends createZodDto(adminFrontPageResponseSchema) {}
+
+export class PublicFrontPageResponseDto extends createZodDto(publicFrontPageResponseSchema) {}

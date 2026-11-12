@@ -4,6 +4,12 @@ import { AuditModule } from "../audit";
 import { APP_CONFIG, CoreModule } from "../core";
 import type { AppConfig } from "../core";
 import { RateLimitModule } from "../rate-limit";
+import { AdminFrontPageController, PublicFrontPageController } from "./front-page.controller";
+import { FrontPageService } from "./front-page.service";
+import { NoopPublicRevalidation, PUBLIC_REVALIDATION } from "./public-revalidation";
+import { TagAssignmentsService } from "./tag-assignments.service";
+import { TagAssignmentsController, TagsController } from "./tags.controller";
+import { TagsService } from "./tags.service";
 import { ContentLockService } from "./content-lock.service";
 import { CourseLookupService } from "./course-lookup.service";
 import { CoursesController } from "./courses.controller";
@@ -30,6 +36,10 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     VideoSlotsController,
     VideoUploadController,
     QuizController,
+    TagsController,
+    TagAssignmentsController,
+    AdminFrontPageController,
+    PublicFrontPageController,
   ],
   providers: [
     CoursesService,
@@ -46,6 +56,10 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
       useFactory: (config: AppConfig) => new FileUploadStore(config.videoUploads.directory),
     },
     QuizService,
+    TagsService,
+    TagAssignmentsService,
+    FrontPageService,
+    { provide: PUBLIC_REVALIDATION, useClass: NoopPublicRevalidation },
     { provide: COURSE_PUBLISH_CHECKS, useValue: [] },
   ],
   exports: [CoursesService, CourseLookupService, ContentLockService, COURSE_PUBLISH_CHECKS],
