@@ -21,6 +21,7 @@ import { NotificationsModule } from "./notifications/notifications.module";
 import { LearningModule } from "./learning";
 import { PasswordResetModule } from "./password-reset";
 import { PlaybackModule } from "./playback";
+import { ResourcesModule } from "./resources";
 import { StudentsModule } from "./students";
 import { StudentAuthModule } from "./student-auth/student-auth.module";
 
@@ -48,6 +49,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     MediaModule,
     PasswordResetModule,
     PlaybackModule,
+    ResourcesModule,
     StudentsModule,
   ],
   controllers: [HealthController],
