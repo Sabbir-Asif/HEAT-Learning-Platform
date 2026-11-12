@@ -15,6 +15,14 @@ export const assertContentUnlocked = (lockedAt: Date | null): void => {
   if (lockedAt !== null) throw new ApiException(409, "CONTENT_LOCKED");
 };
 
+export const assertObjectivesWording = (
+  lockedAt: Date | null,
+  current: string[],
+  next: string[],
+): void => {
+  if (current.length !== next.length) assertContentUnlocked(lockedAt);
+};
+
 export const nextOrder = (highest: number | null): number => (highest ?? 0) + 1;
 
 export const planResequence = (orderedIds: string[]): OrderPlan => ({

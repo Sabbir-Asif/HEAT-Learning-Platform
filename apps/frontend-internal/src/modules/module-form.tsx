@@ -126,7 +126,7 @@ export function ModuleForm({
                 variant="outline"
                 size="icon-sm"
                 aria-label={`Move objective ${index + 1} up`}
-                disabled={index === 0}
+                disabled={locked || index === 0}
                 onClick={() => rows.move(index, index - 1)}
               >
                 <ArrowUpIcon />
@@ -136,7 +136,7 @@ export function ModuleForm({
                 variant="outline"
                 size="icon-sm"
                 aria-label={`Move objective ${index + 1} down`}
-                disabled={index === rows.fields.length - 1}
+                disabled={locked || index === rows.fields.length - 1}
                 onClick={() => rows.move(index, index + 1)}
               >
                 <ArrowDownIcon />
@@ -146,6 +146,7 @@ export function ModuleForm({
                 variant="outline"
                 size="icon-sm"
                 aria-label={`Remove objective ${index + 1}`}
+                disabled={locked}
                 onClick={() => rows.remove(index)}
               >
                 <Trash2Icon />
@@ -157,7 +158,7 @@ export function ModuleForm({
           <Button
             type="button"
             variant="outline"
-            disabled={rows.fields.length >= moduleObjectiveMaxCount}
+            disabled={locked || rows.fields.length >= moduleObjectiveMaxCount}
             onClick={() => rows.append({ text: "" })}
           >
             <PlusIcon data-icon="inline-start" />
