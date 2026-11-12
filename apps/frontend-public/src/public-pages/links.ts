@@ -25,3 +25,9 @@ const dhakaDate = new Intl.DateTimeFormat("en-GB", {
 });
 
 export const formatNewsDate = (iso: string): string => dhakaDate.format(new Date(iso));
+
+export const contactLines = (value: string): string[] =>
+  value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line !== "");
