@@ -401,6 +401,7 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   DIRECTORY_IN_USE: 'DIRECTORY_IN_USE',
   DIRECTORY_NAME_TAKEN: 'DIRECTORY_NAME_TAKEN',
   EMAIL_IN_USE: 'EMAIL_IN_USE',
+  EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
   ENROLLMENT_ALREADY_DECIDED: 'ENROLLMENT_ALREADY_DECIDED',
   ENROLLMENT_NOT_ACTIVE: 'ENROLLMENT_NOT_ACTIVE',
   ENROLLMENT_NOT_VERIFIED: 'ENROLLMENT_NOT_VERIFIED',
@@ -2004,6 +2005,40 @@ export interface SignInRequestDto {
      * @maxLength 256
      */
   password: string;
+}
+
+export interface SignedInEnrollmentRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     * @pattern ^[a-z0-9]+(?:-[a-z0-9]+)*$
+     */
+  courseSlug: string;
+}
+
+export type SignedInEnrollmentResponseDtoStatus = typeof SignedInEnrollmentResponseDtoStatus[keyof typeof SignedInEnrollmentResponseDtoStatus];
+
+
+export const SignedInEnrollmentResponseDtoStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
+export interface SignedInEnrollmentResponseDto {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     * @pattern ^[a-z0-9]+(?:-[a-z0-9]+)*$
+     */
+  courseSlug: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  enrollmentId: string;
+  status: SignedInEnrollmentResponseDtoStatus;
 }
 
 export type TagDetailDtoCoursesItem = {
@@ -5632,6 +5667,41 @@ export const dashboardDescribe = async ( options?: Parameters<typeof serverFetch
     method: 'GET'
 
 
+  }
+);}
+
+
+
+export const getSignedInEnrollmentRequestUrl = () => {
+
+
+
+
+  return `/api/me/enrollments`
+}
+
+export const signedInEnrollmentRequest = async (signedInEnrollmentRequestDto: SignedInEnrollmentRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<SignedInEnrollmentResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<SignedInEnrollmentResponseDto>(getSignedInEnrollmentRequestUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(signedInEnrollmentRequestDto)
   }
 );}
 
