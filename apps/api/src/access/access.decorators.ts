@@ -4,6 +4,7 @@ import type { AuthRealm, UserRoleName } from "../auth";
 export const AUDIENCE_KEY = "access:audience";
 export const ROLES_KEY = "access:roles";
 export const COURSE_ACCESS_KEY = "access:courseParam";
+export const CSRF_BODY_TOKEN_KEY = "access:csrfBodyToken";
 export const ALLOW_PASSWORD_CHANGE_KEY = "access:allowWhilePasswordChangeRequired";
 
 export const Audience = (audience: AuthRealm): MethodDecorator & ClassDecorator =>
@@ -17,3 +18,6 @@ export const RequireCourseAccess = (courseParam = "courseId"): MethodDecorator &
 
 export const AllowWhilePasswordChangeRequired = (): MethodDecorator & ClassDecorator =>
   SetMetadata(ALLOW_PASSWORD_CHANGE_KEY, true);
+
+export const CsrfTokenInBody = (): MethodDecorator & ClassDecorator =>
+  SetMetadata(CSRF_BODY_TOKEN_KEY, true);

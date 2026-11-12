@@ -125,6 +125,8 @@ erDiagram
     VideoAssetStatus status
     Int referenceCount
     Int durationSeconds
+    String rejectionReason
+    String failureReason
     DateTime createdAt
     DateTime updatedAt
   }
@@ -133,6 +135,7 @@ erDiagram
     String moduleId FK
     Int order
     String title
+    Boolean required
     String assetId FK
     DateTime deletedAt
     DateTime createdAt
@@ -189,6 +192,7 @@ erDiagram
     String recipientName
     String fileKey
     String fileSha256
+    Int fileSizeBytes
     DateTime issuedAt
     DateTime revokedAt
     DateTime createdAt
@@ -375,6 +379,8 @@ erDiagram
     DateTime startedAt
     DateTime lastSeenAt
     DateTime endedAt
+    Float acceptedSeconds
+    Int lastSequence
     DateTime createdAt
     DateTime updatedAt
   }
@@ -451,7 +457,7 @@ erDiagram
   CourseRevision ||--o{ Module : revision
   Module ||--o{ LessonSection : module
   Module ||--o{ Video : module
-  VideoAsset ||--o{ Video : asset
+  VideoAsset |o--o{ Video : asset
   VideoAsset ||--o{ VideoRendition : asset
   VideoAsset ||--o{ VideoCaption : asset
   Course ||--o{ CourseTag : course

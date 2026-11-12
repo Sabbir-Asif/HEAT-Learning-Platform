@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { z } from "zod";
 import { loadMailConfig } from "../mail/mail-config";
 import type { MailConfig } from "../mail/mail-config";
@@ -20,6 +21,32 @@ const encryptionKey = z
   .string()
   .transform((value) => Buffer.from(value, "base64"))
   .refine((key) => key.length === 32, "AUTH_ENCRYPTION_KEY must be 32 bytes, base64 encoded");
+
+const hlsKeyId = /^[A-Za-z0-9_-]{1,32}$/;
+
+const hlsSigningKeys = z
+  .string()
+  .transform((value, context) => {
+    const keys = new Map<string, string>();
+    for (const entry of value.split(",")) {
+      const text = entry.trim();
+      if (text === "") continue;
+      const separator = text.indexOf(":");
+      const id = separator < 0 ? "" : text.slice(0, separator);
+      const keySecret = separator < 0 ? "" : text.slice(separator + 1);
+      if (!hlsKeyId.test(id) || keySecret.length < 32 || keys.has(id)) {
+        context.addIssue({ code: "custom", message: "HLS_SIGNING_KEYS entry is invalid" });
+        return z.NEVER;
+      }
+      keys.set(id, keySecret);
+    }
+    if (keys.size === 0) {
+      context.addIssue({ code: "custom", message: "HLS_SIGNING_KEYS has no keys" });
+      return z.NEVER;
+    }
+    return keys;
+  })
+  .optional();
 
 const envSchema = z
   .object({
@@ -61,12 +88,58 @@ const envSchema = z
         (value) => value === undefined || new URL(value).origin === value,
         "ADMIN_APP_URL must be an origin",
       ),
+    PUBLIC_APP_URL: z
+      .url()
+      .optional()
+      .refine(
+        (value) => value === undefined || new URL(value).origin === value,
+        "PUBLIC_APP_URL must be an origin",
+      ),
     AUDIT_TRANSACTION_MAX_WAIT_MS: positiveInt.default(5000),
     AUDIT_TRANSACTION_TIMEOUT_MS: positiveInt.default(15000),
     RESPONSE_FLOOR_MS: positiveInt.default(1000),
+    VIDEO_UPLOAD_DIR: z.string().min(1).optional(),
+    VIDEO_UPLOAD_EXPIRY_HOURS: positiveInt.default(24),
+    HLS_MEDIA_DIR: z.string().min(1).optional(),
+    TRANSCODE_TIMEOUT_FACTOR: positiveInt.default(8),
+    TRANSCODE_TIMEOUT_MIN_SECONDS: positiveInt.default(600),
+    TRANSCODE_TIMEOUT_MAX_SECONDS: positiveInt.default(14400),
+    HLS_SIGNING_KEYS: hlsSigningKeys,
+    HLS_ACTIVE_KEY_ID: z.string().regex(hlsKeyId).optional(),
     BREACHED_PASSWORD_RANGE_URL: z.url().default("https://api.pwnedpasswords.com/range/"),
   })
   .superRefine((env, context) => {
+    if (
+      env.HLS_ACTIVE_KEY_ID !== undefined &&
+      !(env.HLS_SIGNING_KEYS?.has(env.HLS_ACTIVE_KEY_ID) ?? false)
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["HLS_ACTIVE_KEY_ID"],
+        message: "HLS_ACTIVE_KEY_ID must be one of the HLS_SIGNING_KEYS ids",
+      });
+    }
+    if (env.NODE_ENV === "production" && env.VIDEO_UPLOAD_DIR === undefined) {
+      context.addIssue({
+        code: "custom",
+        path: ["VIDEO_UPLOAD_DIR"],
+        message: "VIDEO_UPLOAD_DIR is required in production",
+      });
+    }
+    if (env.NODE_ENV === "production" && env.HLS_MEDIA_DIR === undefined) {
+      context.addIssue({
+        code: "custom",
+        path: ["HLS_MEDIA_DIR"],
+        message: "HLS_MEDIA_DIR is required in production",
+      });
+    }
+    if (env.TRANSCODE_TIMEOUT_MIN_SECONDS > env.TRANSCODE_TIMEOUT_MAX_SECONDS) {
+      context.addIssue({
+        code: "custom",
+        path: ["TRANSCODE_TIMEOUT_MIN_SECONDS"],
+        message: "TRANSCODE_TIMEOUT_MIN_SECONDS must not exceed TRANSCODE_TIMEOUT_MAX_SECONDS",
+      });
+    }
     if (env.NODE_ENV === "production" && env.ADMIN_APP_URL === undefined) {
       context.addIssue({
         code: "custom",
@@ -83,13 +156,31 @@ const envSchema = z
     }
   });
 
+const localVideoUploadDirectory = "../../.data/uploads";
+const localHlsMediaDirectory = "../../.data/hls";
 const localAdminAppUrl = "http://localhost:3001";
+const localPublicAppUrl = "http://localhost:3000";
 const localTrustedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "http://learn.localhost",
   "http://admin.localhost",
 ];
+
+export interface HlsConfig {
+  keys: ReadonlyMap<string, string>;
+  activeKeyId: string;
+}
+
+export interface VideoUploadConfig {
+  directory: string;
+  expiryHours: number;
+}
+
+export interface TranscodeConfig {
+  hlsDirectory: string;
+  timeout: { factor: number; minSeconds: number; maxSeconds: number };
+}
 
 export interface AppConfig {
   databaseUrl: string;
@@ -108,12 +199,25 @@ export interface AppConfig {
   argon2: { memoryCost: number; timeCost: number; parallelism: number };
   breachedPasswordRangeUrl: string;
   invitations: { ttlHours: number; adminAppUrl: string };
+  publicAppUrl: string;
   verification: { tokenTtlHours: number };
   audit: { transactionMaxWaitMs: number; transactionTimeoutMs: number };
   accountProtection: { responseFloorMs: number };
   rateLimit: RateLimitConfig;
+  hls: HlsConfig | undefined;
+  videoUploads: VideoUploadConfig;
+  transcode: TranscodeConfig;
   mail: MailConfig;
 }
+
+const hlsOf = (
+  keys: ReadonlyMap<string, string> | undefined,
+  activeKeyId: string | undefined,
+): HlsConfig | undefined => {
+  if (keys === undefined) return undefined;
+  const first = keys.keys().next().value;
+  return { keys, activeKeyId: activeKeyId ?? String(first) };
+};
 
 export const APP_CONFIG = Symbol("APP_CONFIG");
 
@@ -153,6 +257,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
       ttlHours: values.ADMIN_INVITE_TTL_HOURS,
       adminAppUrl: values.ADMIN_APP_URL ?? localAdminAppUrl,
     },
+    publicAppUrl: values.PUBLIC_APP_URL ?? localPublicAppUrl,
     verification: { tokenTtlHours: values.VERIFICATION_TOKEN_TTL_HOURS },
     audit: {
       transactionMaxWaitMs: values.AUDIT_TRANSACTION_MAX_WAIT_MS,
@@ -160,6 +265,19 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
     },
     accountProtection: { responseFloorMs: values.RESPONSE_FLOOR_MS },
     rateLimit,
+    hls: hlsOf(values.HLS_SIGNING_KEYS, values.HLS_ACTIVE_KEY_ID),
+    videoUploads: {
+      directory: values.VIDEO_UPLOAD_DIR ?? resolve(localVideoUploadDirectory),
+      expiryHours: values.VIDEO_UPLOAD_EXPIRY_HOURS,
+    },
+    transcode: {
+      hlsDirectory: values.HLS_MEDIA_DIR ?? resolve(localHlsMediaDirectory),
+      timeout: {
+        factor: values.TRANSCODE_TIMEOUT_FACTOR,
+        minSeconds: values.TRANSCODE_TIMEOUT_MIN_SECONDS,
+        maxSeconds: values.TRANSCODE_TIMEOUT_MAX_SECONDS,
+      },
+    },
     mail: loadMailConfig(env),
   };
 };

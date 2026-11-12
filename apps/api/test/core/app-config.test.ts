@@ -140,8 +140,20 @@ describe("loadConfig", () => {
         NODE_ENV: "production",
         TRUSTED_ORIGINS: "https://learn.example.test",
         ADMIN_APP_URL: "https://admin.example.test",
+        VIDEO_UPLOAD_DIR: "/srv/heat/uploads",
+        HLS_MEDIA_DIR: "/srv/heat/media/hls",
       }).csrf.trustedOrigins,
     ).toEqual(["https://learn.example.test"]);
+  });
+
+  test("exposes the public app origin with a local default and rejects a path", () => {
+    expect(loadConfig(valid).publicAppUrl).toBe("http://localhost:3000");
+    expect(
+      loadConfig({ ...valid, PUBLIC_APP_URL: "https://learn.example.test" }).publicAppUrl,
+    ).toBe("https://learn.example.test");
+    expect(() =>
+      loadConfig({ ...valid, PUBLIC_APP_URL: "https://learn.example.test/app" }),
+    ).toThrow(/PUBLIC_APP_URL/);
   });
 
   test("exposes the mail configuration and defaults it to the local Mailpit", () => {
@@ -233,5 +245,162 @@ describe("loadConfig rate limits", () => {
     expect(example).toContain("LOCKOUT_THRESHOLD=");
     expect(example).toContain("CSRF_SECRET=");
     expect(example).toContain("TRUSTED_ORIGINS=");
+  });
+});
+
+describe("HLS signing keys", () => {
+  const keyOne = "dev-hls-key-one-0123456789abcdefgh";
+  const keyTwo = "dev-hls-key-two-0123456789abcdefgh";
+
+  test("are absent by default", () => {
+    expect(loadConfig(valid).hls).toBeUndefined();
+  });
+
+  test("parse a list of id:secret pairs, active key defaults to the first", () => {
+    const config = loadConfig({ ...valid, HLS_SIGNING_KEYS: `k1:${keyOne},k2:${keyTwo}` });
+    expect(config.hls?.activeKeyId).toBe("k1");
+    expect([...(config.hls?.keys ?? new Map())]).toEqual([
+      ["k1", keyOne],
+      ["k2", keyTwo],
+    ]);
+  });
+
+  test("a chosen active key must be in the list", () => {
+    const keys = `k1:${keyOne},k2:${keyTwo}`;
+    expect(
+      loadConfig({ ...valid, HLS_SIGNING_KEYS: keys, HLS_ACTIVE_KEY_ID: "k2" }).hls,
+    ).toMatchObject({
+      activeKeyId: "k2",
+    });
+    expect(() => loadConfig({ ...valid, HLS_SIGNING_KEYS: keys, HLS_ACTIVE_KEY_ID: "k3" })).toThrow(
+      /HLS_ACTIVE_KEY_ID/,
+    );
+  });
+
+  test.each([
+    ["a short secret", "k1:short"],
+    ["a missing secret", "k1:"],
+    ["a missing id", `:${keyOne}`],
+    ["an id with a dot", `k.1:${keyOne}`],
+    ["a duplicate id", `k1:${keyOne},k1:${keyTwo}`],
+    ["no separator", keyOne],
+    ["an empty list", " , "],
+  ])("refuses %s", (_name, keys) => {
+    expect(() => loadConfig({ ...valid, HLS_SIGNING_KEYS: keys })).toThrow(/HLS_SIGNING_KEYS/);
+  });
+
+  test("the example environment declares valid keys", () => {
+    const example = readFileSync(join(__dirname, "../../.env.example"), "utf8");
+    const keys = example.match(/^HLS_SIGNING_KEYS=(.*)$/m)?.[1];
+    expect(keys).toBeDefined();
+    expect(loadConfig({ ...valid, HLS_SIGNING_KEYS: keys }).hls?.keys.size).toBe(2);
+  });
+});
+
+describe("video uploads", () => {
+  test("default to a local directory and a 24 hour expiry", () => {
+    const { videoUploads } = loadConfig(valid);
+    expect(videoUploads.expiryHours).toBe(24);
+    expect(videoUploads.directory).toMatch(/\.data[\\/]uploads$/);
+  });
+
+  test("take the directory and expiry from the environment", () => {
+    const { videoUploads } = loadConfig({
+      ...valid,
+      VIDEO_UPLOAD_DIR: "/srv/heat/uploads",
+      VIDEO_UPLOAD_EXPIRY_HOURS: "6",
+    });
+    expect(videoUploads).toEqual({ directory: "/srv/heat/uploads", expiryHours: 6 });
+  });
+
+  test("require the directory in production", () => {
+    const production = {
+      ...valid,
+      ...productionMail,
+      NODE_ENV: "production",
+      ADMIN_APP_URL: "https://admin.example.test",
+      TRUSTED_ORIGINS: "https://admin.example.test",
+    };
+    expect(() => loadConfig(production)).toThrow("VIDEO_UPLOAD_DIR");
+    expect(
+      loadConfig({
+        ...production,
+        VIDEO_UPLOAD_DIR: "/srv/heat/uploads",
+        HLS_MEDIA_DIR: "/srv/heat/media/hls",
+      }).videoUploads.directory,
+    ).toBe("/srv/heat/uploads");
+  });
+
+  test("refuses a zero expiry", () => {
+    expect(() => loadConfig({ ...valid, VIDEO_UPLOAD_EXPIRY_HOURS: "0" })).toThrow(
+      "VIDEO_UPLOAD_EXPIRY_HOURS",
+    );
+  });
+});
+
+describe("transcode config", () => {
+  test("defaults to a local HLS directory and a timeout of eight times the source", () => {
+    const { transcode } = loadConfig(valid);
+    expect(transcode.hlsDirectory).toMatch(/\.data[\\/]hls$/);
+    expect(transcode.timeout).toEqual({ factor: 8, minSeconds: 600, maxSeconds: 14400 });
+  });
+
+  test("takes the directory and timeout from the environment", () => {
+    const { transcode } = loadConfig({
+      ...valid,
+      HLS_MEDIA_DIR: "/srv/heat/media/hls",
+      TRANSCODE_TIMEOUT_FACTOR: "4",
+      TRANSCODE_TIMEOUT_MIN_SECONDS: "60",
+      TRANSCODE_TIMEOUT_MAX_SECONDS: "3600",
+    });
+    expect(transcode).toEqual({
+      hlsDirectory: "/srv/heat/media/hls",
+      timeout: { factor: 4, minSeconds: 60, maxSeconds: 3600 },
+    });
+  });
+
+  test("requires the directory in production", () => {
+    const production = {
+      ...valid,
+      ...productionMail,
+      NODE_ENV: "production",
+      ADMIN_APP_URL: "https://admin.example.test",
+      TRUSTED_ORIGINS: "https://admin.example.test",
+      VIDEO_UPLOAD_DIR: "/srv/heat/uploads",
+    };
+    expect(() => loadConfig(production)).toThrow("HLS_MEDIA_DIR");
+    expect(
+      loadConfig({ ...production, HLS_MEDIA_DIR: "/srv/heat/media/hls" }).transcode.hlsDirectory,
+    ).toBe("/srv/heat/media/hls");
+  });
+
+  test("refuses a minimum above the maximum and a zero factor", () => {
+    expect(() =>
+      loadConfig({
+        ...valid,
+        TRANSCODE_TIMEOUT_MIN_SECONDS: "900",
+        TRANSCODE_TIMEOUT_MAX_SECONDS: "600",
+      }),
+    ).toThrow("TRANSCODE_TIMEOUT_MIN_SECONDS");
+    expect(() => loadConfig({ ...valid, TRANSCODE_TIMEOUT_FACTOR: "0" })).toThrow(
+      "TRANSCODE_TIMEOUT_FACTOR",
+    );
+  });
+});
+
+describe("video upload rate limit profiles", () => {
+  test("keep the start tight and give chunk traffic room for a long upload", () => {
+    const { profiles } = loadConfig(valid).rateLimit;
+    expect(profiles.videoUploadStart.limit).toBeLessThanOrEqual(60);
+    expect(profiles.videoUploadChunk.limit).toBeGreaterThanOrEqual(3000);
+    expect(profiles.videoUploadChunk.ipLimit).toBeGreaterThan(profiles.videoUploadChunk.limit);
+  });
+
+  test("can be tuned from the environment", () => {
+    const { profiles } = loadConfig({
+      ...valid,
+      RATE_LIMIT_VIDEO_UPLOAD_CHUNK_LIMIT: "9000",
+    }).rateLimit;
+    expect(profiles.videoUploadChunk.limit).toBe(9000);
   });
 });

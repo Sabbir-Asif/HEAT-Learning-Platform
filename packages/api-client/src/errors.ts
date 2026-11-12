@@ -1,5 +1,5 @@
 import { errorResponseSchema } from "@heat/contracts";
-import type { ClientErrorCode, ErrorCode, FieldError } from "@heat/contracts";
+import type { ClientErrorCode, ErrorCode, ErrorDetails, FieldError } from "@heat/contracts";
 
 export type ApiErrorCode = ErrorCode | ClientErrorCode;
 
@@ -10,6 +10,7 @@ export interface ApiErrorInit {
   failures?: readonly string[];
   requestId?: string;
   retryAfterSeconds?: number;
+  details?: ErrorDetails;
 }
 
 export class ApiError extends Error {
@@ -19,6 +20,7 @@ export class ApiError extends Error {
   readonly failures: readonly string[];
   readonly requestId?: string;
   readonly retryAfterSeconds?: number;
+  readonly details?: ErrorDetails;
 
   constructor(init: ApiErrorInit) {
     super(init.code);
@@ -29,6 +31,7 @@ export class ApiError extends Error {
     this.failures = init.failures ?? [];
     this.requestId = init.requestId;
     this.retryAfterSeconds = init.retryAfterSeconds;
+    this.details = init.details;
   }
 }
 
@@ -65,13 +68,14 @@ export async function parseErrorResponse(response: Response): Promise<ApiError> 
   }
   const envelope = errorResponseSchema.safeParse(json);
   if (!envelope.success) return unexpectedResponseError(response.status);
-  const { code, fields, failures, requestId } = envelope.data.error;
+  const { code, fields, failures, requestId, details } = envelope.data.error;
   return new ApiError({
     status: response.status,
     code,
     fields,
     failures,
     requestId,
+    details,
     retryAfterSeconds: retryAfterSeconds(response.headers.get("retry-after")),
   });
 }

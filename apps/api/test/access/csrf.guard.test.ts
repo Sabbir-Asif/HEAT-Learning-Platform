@@ -1,7 +1,7 @@
 import type { ExecutionContext } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { describe, expect, test } from "vitest";
-import { Audience, Roles } from "../../src/access/access.decorators";
+import { Audience, CsrfTokenInBody, Roles } from "../../src/access/access.decorators";
 import { CsrfGuard } from "../../src/access/csrf.guard";
 import type { AuthenticatedSession, AuthRealm } from "../../src/auth/auth.types";
 import { CsrfTokenService } from "../../src/auth/csrf-token.service";
@@ -20,6 +20,12 @@ class Open {
 
 class StudentRoute {
   @Audience("student")
+  handler(): void {}
+}
+
+class BeaconRoute {
+  @Audience("student")
+  @CsrfTokenInBody()
   handler(): void {}
 }
 
@@ -54,6 +60,7 @@ interface Setup {
   method?: string;
   headers?: Record<string, string | string[]>;
   authSession?: AuthenticatedSession;
+  body?: unknown;
 }
 
 const run = (setup: Setup) => {
@@ -61,6 +68,7 @@ const run = (setup: Setup) => {
     method: setup.method ?? "POST",
     headers: setup.headers ?? {},
     authSession: setup.authSession,
+    body: setup.body,
   };
   const context = {
     getHandler: () => setup.target.prototype.handler,
@@ -104,6 +112,52 @@ describe("CsrfGuard", () => {
     expect(
       run({ target: AdminRoute, headers: withToken("admin"), authSession: session("admin") }),
     ).toBe(true);
+  });
+
+  test("a body-token route accepts the token in the body when the cookie matches", () => {
+    const token = csrf.issue("student", familyId);
+    expect(
+      run({
+        target: BeaconRoute,
+        headers: { cookie: `${cookieNames.student}=${token}` },
+        body: { csrfToken: token },
+        authSession: session("student"),
+      }),
+    ).toBe(true);
+  });
+
+  test("a body-token route refuses a missing, forged or foreign body token", () => {
+    const token = csrf.issue("student", familyId);
+    const headers = { cookie: `${cookieNames.student}=${token}` };
+    for (const body of [undefined, {}, { csrfToken: 5 }, { csrfToken: "x".repeat(43) }]) {
+      rejectsWith(
+        { target: BeaconRoute, headers, body, authSession: session("student") },
+        "CSRF_TOKEN_INVALID",
+      );
+    }
+    const foreign = csrf.issue("student", otherFamily);
+    rejectsWith(
+      {
+        target: BeaconRoute,
+        headers: { cookie: `${cookieNames.student}=${foreign}` },
+        body: { csrfToken: foreign },
+        authSession: session("student"),
+      },
+      "CSRF_TOKEN_INVALID",
+    );
+  });
+
+  test("a route without the marker ignores a body token", () => {
+    const token = csrf.issue("student", familyId);
+    rejectsWith(
+      {
+        target: StudentRoute,
+        headers: { cookie: `${cookieNames.student}=${token}` },
+        body: { csrfToken: token },
+        authSession: session("student"),
+      },
+      "CSRF_TOKEN_INVALID",
+    );
   });
 
   test("refuses a token issued for another session", () => {

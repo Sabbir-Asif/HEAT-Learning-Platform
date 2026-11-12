@@ -15,6 +15,7 @@ test.each([
   "FormMessage",
   "PageHeader",
   "PageHeaderAction",
+  "SectionHeading",
   "SortableList",
   "StatCard",
   "StatusBadge",

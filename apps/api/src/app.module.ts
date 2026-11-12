@@ -7,6 +7,7 @@ import { AuditModule } from "./audit";
 import { AuthModule } from "./auth";
 import { CaptchaModule } from "./captcha";
 import { CatalogModule } from "./catalog";
+import { CertificatesModule } from "./certificates";
 import { CoreModule } from "./core";
 import { DirectoryModule } from "./directory";
 import { EmailVerificationModule } from "./email-verification";
@@ -14,6 +15,8 @@ import { EnrollmentModule } from "./enrollment/enrollment.module";
 import { HealthController } from "./health/health.controller";
 import { HttpApiModule } from "./http/http.module";
 import { MeModule } from "./me/me.module";
+import { LearningModule } from "./learning";
+import { PlaybackModule } from "./playback";
 import { StudentAuthModule } from "./student-auth/student-auth.module";
 
 @Module({
@@ -30,9 +33,12 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     AdminManagementModule,
     CaptchaModule,
     CatalogModule,
+    CertificatesModule,
     DirectoryModule,
     EmailVerificationModule,
     EnrollmentModule,
+    LearningModule,
+    PlaybackModule,
   ],
   controllers: [HealthController],
 })

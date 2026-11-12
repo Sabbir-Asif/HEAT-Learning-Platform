@@ -149,6 +149,105 @@ export interface AdminSummaryDto {
   status: AdminSummaryDtoStatus;
 }
 
+export type ApprovalQueueResponseDtoItemsItemCourse = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+export type ApprovalQueueResponseDtoItemsItemDepartment = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type ApprovalQueueResponseDtoItemsItemFaculty = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type ApprovalQueueResponseDtoItemsItemStudent = {
+  email: string;
+  name: string;
+};
+
+export type ApprovalQueueResponseDtoItemsItemUniversity = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type ApprovalQueueResponseDtoItemsItem = {
+  course: ApprovalQueueResponseDtoItemsItemCourse;
+  department: ApprovalQueueResponseDtoItemsItemDepartment;
+  faculty: ApprovalQueueResponseDtoItemsItemFaculty;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  requestedAt: string;
+  session: string;
+  student: ApprovalQueueResponseDtoItemsItemStudent;
+  university: ApprovalQueueResponseDtoItemsItemUniversity;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  verifiedAt: string | null;
+};
+
+export interface ApprovalQueueResponseDto {
+  items: ApprovalQueueResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+}
+
+export interface ApproveEnrollmentRequestDto {
+  /** @maxLength 500 */
+  reason?: string;
+}
+
+export interface ApproveEnrollmentsRequestDto {
+  /**
+     * @minItems 1
+     * @maxItems 100
+     * @items.pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  ids: string[];
+  /** @maxLength 500 */
+  reason?: string;
+}
+
+export type ApprovedEnrollmentDtoStatus = typeof ApprovedEnrollmentDtoStatus[keyof typeof ApprovedEnrollmentDtoStatus];
+
+
+export const ApprovedEnrollmentDtoStatus = {
+  APPROVED: 'APPROVED',
+} as const;
+
+export interface ApprovedEnrollmentDto {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  approvedAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseRevisionId: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  status: ApprovedEnrollmentDtoStatus;
+}
+
 /**
  * @nullable
  */
@@ -216,6 +315,74 @@ export interface AuditLogListResponseDto {
   total: number;
 }
 
+export type BulkApprovalResponseDtoFailedItemCode = typeof BulkApprovalResponseDtoFailedItemCode[keyof typeof BulkApprovalResponseDtoFailedItemCode];
+
+
+export const BulkApprovalResponseDtoFailedItemCode = {
+  AUDIT_ACTOR_FILTER_TOO_BROAD: 'AUDIT_ACTOR_FILTER_TOO_BROAD',
+  BAD_REQUEST: 'BAD_REQUEST',
+  CANNOT_DEACTIVATE_SELF: 'CANNOT_DEACTIVATE_SELF',
+  CAPTCHA_EXPIRED: 'CAPTCHA_EXPIRED',
+  CAPTCHA_INVALID: 'CAPTCHA_INVALID',
+  CONTENT_LOCKED: 'CONTENT_LOCKED',
+  COURSE_HAS_ENROLLMENTS: 'COURSE_HAS_ENROLLMENTS',
+  COURSE_LOCKED: 'COURSE_LOCKED',
+  COURSE_NOT_AVAILABLE: 'COURSE_NOT_AVAILABLE',
+  COURSE_NOT_DRAFT: 'COURSE_NOT_DRAFT',
+  COURSE_PUBLISH_CHECKS_FAILED: 'COURSE_PUBLISH_CHECKS_FAILED',
+  COURSE_SLUG_TAKEN: 'COURSE_SLUG_TAKEN',
+  CSRF_TOKEN_INVALID: 'CSRF_TOKEN_INVALID',
+  DIRECTORY_ARCHIVED: 'DIRECTORY_ARCHIVED',
+  DIRECTORY_IN_USE: 'DIRECTORY_IN_USE',
+  DIRECTORY_NAME_TAKEN: 'DIRECTORY_NAME_TAKEN',
+  EMAIL_IN_USE: 'EMAIL_IN_USE',
+  ENROLLMENT_ALREADY_DECIDED: 'ENROLLMENT_ALREADY_DECIDED',
+  ENROLLMENT_NOT_ACTIVE: 'ENROLLMENT_NOT_ACTIVE',
+  ENROLLMENT_NOT_VERIFIED: 'ENROLLMENT_NOT_VERIFIED',
+  FORBIDDEN: 'FORBIDDEN',
+  INTERNAL: 'INTERNAL',
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  INVITATION_EXPIRED: 'INVITATION_EXPIRED',
+  INVITATION_INVALID: 'INVITATION_INVALID',
+  INVITATION_NOT_PENDING: 'INVITATION_NOT_PENDING',
+  MODULE_LOCKED: 'MODULE_LOCKED',
+  NOT_FOUND: 'NOT_FOUND',
+  ORDER_CONFLICT: 'ORDER_CONFLICT',
+  ORIGIN_NOT_ALLOWED: 'ORIGIN_NOT_ALLOWED',
+  PASSWORD_BREACHED: 'PASSWORD_BREACHED',
+  PASSWORD_CHANGE_REQUIRED: 'PASSWORD_CHANGE_REQUIRED',
+  QUIZ_ANSWER_INVALID: 'QUIZ_ANSWER_INVALID',
+  QUIZ_ATTEMPT_LIMIT_REACHED: 'QUIZ_ATTEMPT_LIMIT_REACHED',
+  QUIZ_ATTEMPT_NOT_OPEN: 'QUIZ_ATTEMPT_NOT_OPEN',
+  QUIZ_ATTEMPT_WAIT: 'QUIZ_ATTEMPT_WAIT',
+  QUIZ_NOT_UNLOCKED: 'QUIZ_NOT_UNLOCKED',
+  RATE_LIMITED: 'RATE_LIMITED',
+  UNAUTHENTICATED: 'UNAUTHENTICATED',
+  UPLOAD_EXPIRED: 'UPLOAD_EXPIRED',
+  UPLOAD_OFFSET_MISMATCH: 'UPLOAD_OFFSET_MISMATCH',
+  UPLOAD_TOO_LARGE: 'UPLOAD_TOO_LARGE',
+  UPLOAD_TYPE_NOT_ALLOWED: 'UPLOAD_TYPE_NOT_ALLOWED',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+  VERIFICATION_LINK_EXPIRED: 'VERIFICATION_LINK_EXPIRED',
+  VERIFICATION_LINK_INVALID: 'VERIFICATION_LINK_INVALID',
+  VERIFICATION_LINK_USED: 'VERIFICATION_LINK_USED',
+  VERIFICATION_RESEND_LIMIT: 'VERIFICATION_RESEND_LIMIT',
+  VIDEO_NOT_FAILED: 'VIDEO_NOT_FAILED',
+  VIDEO_NOT_READY: 'VIDEO_NOT_READY',
+} as const;
+
+export type BulkApprovalResponseDtoFailedItem = {
+  code: BulkApprovalResponseDtoFailedItemCode;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+};
+
+export interface BulkApprovalResponseDto {
+  failed: BulkApprovalResponseDtoFailedItem[];
+  /** @items.pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  succeeded: string[];
+}
+
 export interface CaptchaRequestDto {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   replaces?: string;
@@ -230,6 +397,43 @@ export interface CaptchaResponseDto {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
   svg: string;
+}
+
+export type CertificateListResponseDtoCertificatesItemStatus = typeof CertificateListResponseDtoCertificatesItemStatus[keyof typeof CertificateListResponseDtoCertificatesItemStatus];
+
+
+export const CertificateListResponseDtoCertificatesItemStatus = {
+  READY: 'READY',
+  PENDING: 'PENDING',
+  REVOKED: 'REVOKED',
+} as const;
+
+export type CertificateListResponseDtoCertificatesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId: string;
+  courseTitle: string;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  id: string | null;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  issuedAt: string | null;
+  /**
+     * @maxLength 64
+     * @nullable
+     */
+  number: string | null;
+  status: CertificateListResponseDtoCertificatesItemStatus;
+  /** @nullable */
+  verificationUrl: string | null;
+};
+
+export interface CertificateListResponseDto {
+  certificates: CertificateListResponseDtoCertificatesItem[];
 }
 
 export interface ChangePasswordRequestDto {
@@ -436,8 +640,115 @@ export interface CreateUniversityRequestDto {
   name: string;
 }
 
+export interface CreateVideoSlotRequestDto {
+  required?: boolean;
+  title: string;
+}
+
 export interface CsrfTokenResponseDto {
   token: string;
+}
+
+export type DashboardResponseDtoCoursesItemCertificateStatus = typeof DashboardResponseDtoCoursesItemCertificateStatus[keyof typeof DashboardResponseDtoCoursesItemCertificateStatus];
+
+
+export const DashboardResponseDtoCoursesItemCertificateStatus = {
+  READY: 'READY',
+  PENDING: 'PENDING',
+  REVOKED: 'REVOKED',
+} as const;
+
+/**
+ * @nullable
+ */
+export type DashboardResponseDtoCoursesItemCertificate = {
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  id: string | null;
+  status: DashboardResponseDtoCoursesItemCertificateStatus;
+} | null;
+
+/**
+ * @nullable
+ */
+export type DashboardResponseDtoCoursesItemNextModule = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  resumePositionSeconds: number;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  resumeVideoId: string | null;
+  title: string;
+} | null;
+
+/**
+ * @nullable
+ */
+export type DashboardResponseDtoCoursesItemProgress = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  modulesCompleted: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  modulesTotal: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  percent: number;
+} | null;
+
+export type DashboardResponseDtoCoursesItemStatus = typeof DashboardResponseDtoCoursesItemStatus[keyof typeof DashboardResponseDtoCoursesItemStatus];
+
+
+export const DashboardResponseDtoCoursesItemStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
+export type DashboardResponseDtoCoursesItem = {
+  /** @nullable */
+  certificate: DashboardResponseDtoCoursesItemCertificate;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId: string;
+  courseSlug: string;
+  courseTitle: string;
+  /** @nullable */
+  nextModule: DashboardResponseDtoCoursesItemNextModule;
+  /** @nullable */
+  progress: DashboardResponseDtoCoursesItemProgress;
+  /**
+     * @maxLength 500
+     * @nullable
+     */
+  reason: string | null;
+  status: DashboardResponseDtoCoursesItemStatus;
+};
+
+export interface DashboardResponseDto {
+  courses: DashboardResponseDtoCoursesItem[];
 }
 
 export type DepartmentListResponseDtoItemsItemFaculty = {
@@ -696,6 +1007,249 @@ export interface InviteAdminRequestDto {
   email: string;
 }
 
+export type LearningStructureResponseDtoCourse = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  slug: string;
+  title: string;
+};
+
+export type LearningStructureResponseDtoEnrollmentStatus = typeof LearningStructureResponseDtoEnrollmentStatus[keyof typeof LearningStructureResponseDtoEnrollmentStatus];
+
+
+export const LearningStructureResponseDtoEnrollmentStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
+export type LearningStructureResponseDtoEnrollment = {
+  /**
+     * @maxLength 500
+     * @nullable
+     */
+  reason: string | null;
+  status: LearningStructureResponseDtoEnrollmentStatus;
+};
+
+export type LearningStructureResponseDtoLearningModulesItemLessonSectionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  title: string;
+};
+
+export type LearningStructureResponseDtoLearningModulesItemQuizAvailability = typeof LearningStructureResponseDtoLearningModulesItemQuizAvailability[keyof typeof LearningStructureResponseDtoLearningModulesItemQuizAvailability];
+
+
+export const LearningStructureResponseDtoLearningModulesItemQuizAvailability = {
+  UNAVAILABLE: 'UNAVAILABLE',
+  AVAILABLE: 'AVAILABLE',
+  WAITING: 'WAITING',
+  EXHAUSTED: 'EXHAUSTED',
+  PASSED: 'PASSED',
+} as const;
+
+/**
+ * @nullable
+ */
+export type LearningStructureResponseDtoLearningModulesItemQuiz = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attemptsAllowed: number | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  attemptsUsed: number;
+  availability: LearningStructureResponseDtoLearningModulesItemQuizAvailability;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  nextAttemptAt: string | null;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  passMarkPercent: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  questionCount: number;
+} | null;
+
+export type LearningStructureResponseDtoLearningModulesItemState = typeof LearningStructureResponseDtoLearningModulesItemState[keyof typeof LearningStructureResponseDtoLearningModulesItemState];
+
+
+export const LearningStructureResponseDtoLearningModulesItemState = {
+  LOCKED: 'LOCKED',
+  UNLOCKED: 'UNLOCKED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  QUIZ_READY: 'QUIZ_READY',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export type LearningStructureResponseDtoLearningModulesItemVideosItemStatus = typeof LearningStructureResponseDtoLearningModulesItemVideosItemStatus[keyof typeof LearningStructureResponseDtoLearningModulesItemVideosItemStatus];
+
+
+export const LearningStructureResponseDtoLearningModulesItemVideosItemStatus = {
+  UNAVAILABLE: 'UNAVAILABLE',
+  NOT_STARTED: 'NOT_STARTED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export type LearningStructureResponseDtoLearningModulesItemVideosItem = {
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  coveragePercent: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  durationSeconds: number | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  required: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  resumePositionSeconds: number;
+  status: LearningStructureResponseDtoLearningModulesItemVideosItemStatus;
+  title: string;
+};
+
+export type LearningStructureResponseDtoLearningModulesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  lessonSections: LearningStructureResponseDtoLearningModulesItemLessonSectionsItem[];
+  objectives: string[];
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  /** @nullable */
+  quiz: LearningStructureResponseDtoLearningModulesItemQuiz;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  requiredVideosCompleted: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  requiredVideosTotal: number;
+  state: LearningStructureResponseDtoLearningModulesItemState;
+  title: string;
+  videos: LearningStructureResponseDtoLearningModulesItemVideosItem[];
+};
+
+export type LearningStructureResponseDtoLearningRevision = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  number: number;
+};
+
+export type LearningStructureResponseDtoLearningSummary = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  modulesCompleted: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  modulesTotal: number;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  nextModuleId: string | null;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  overallProgressPercent: number;
+};
+
+/**
+ * @nullable
+ */
+export type LearningStructureResponseDtoLearning = {
+  modules: LearningStructureResponseDtoLearningModulesItem[];
+  revision: LearningStructureResponseDtoLearningRevision;
+  summary: LearningStructureResponseDtoLearningSummary;
+} | null;
+
+export interface LearningStructureResponseDto {
+  course: LearningStructureResponseDtoCourse;
+  enrollment: LearningStructureResponseDtoEnrollment;
+  /** @nullable */
+  learning: LearningStructureResponseDtoLearning;
+}
+
+export type LessonContentResponseDtoModule = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  objectives: string[];
+  title: string;
+};
+
+export type LessonContentResponseDtoSectionsItemBody = {[key: string]: unknown};
+
+export type LessonContentResponseDtoSectionsItem = {
+  body: LessonContentResponseDtoSectionsItemBody;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  schemaVersion: number;
+  title: string;
+};
+
+export interface LessonContentResponseDto {
+  module: LessonContentResponseDtoModule;
+  sections: LessonContentResponseDtoSectionsItem[];
+}
+
 export interface LessonSectionRequestDto {
   title: string;
 }
@@ -824,6 +1378,346 @@ export interface ModuleSummaryDto {
   title: string;
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   updatedAt: string;
+}
+
+export type PlaybackSessionResponseDtoCaptionsItem = {
+  /**
+     * @minLength 1
+     * @maxLength 35
+     */
+  language: string;
+};
+
+export interface PlaybackSessionResponseDto {
+  captions: PlaybackSessionResponseDtoCaptionsItem[];
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  expiresAt: string;
+  manifestPath: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  resumePositionSeconds: number;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  sessionId: string | null;
+}
+
+export type ProgressBatchDtoIntervalsItem = {
+  /**
+     * @minimum 0
+     * @maximum 86400
+     */
+  end: number;
+  /**
+     * @minimum 0
+     * @maximum 86400
+     */
+  start: number;
+};
+
+export interface ProgressBatchDto {
+  /**
+     * @minLength 1
+     * @maxLength 512
+     */
+  csrfToken?: string;
+  /** @maxItems 64 */
+  intervals: ProgressBatchDtoIntervalsItem[];
+  /**
+     * @minimum 0
+     * @maximum 86400
+     */
+  positionSeconds: number;
+  /**
+     * @minimum 1
+     * @maximum 2147483647
+     */
+  sequence: number;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  sessionId: string;
+}
+
+export interface ProgressResponseDto {
+  completed: boolean;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  coveragePercent: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  resumePositionSeconds: number;
+}
+
+export type QuizAccessResponseDtoModuleState = typeof QuizAccessResponseDtoModuleState[keyof typeof QuizAccessResponseDtoModuleState];
+
+
+export const QuizAccessResponseDtoModuleState = {
+  LOCKED: 'LOCKED',
+  UNLOCKED: 'UNLOCKED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  QUIZ_READY: 'QUIZ_READY',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export interface QuizAccessResponseDto {
+  moduleState: QuizAccessResponseDtoModuleState;
+}
+
+/**
+ * @nullable
+ */
+export type QuizDeliveryResponseDtoAttempt = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  startedAt: string;
+} | null;
+
+/**
+ * @nullable
+ */
+export type QuizDeliveryResponseDtoBestResult = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  attemptId: string;
+  passed: boolean;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  scorePercent: number;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  submittedAt: string;
+} | null;
+
+export type QuizDeliveryResponseDtoQuestionsItemOptionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  text: string;
+};
+
+export type QuizDeliveryResponseDtoQuestionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  options: QuizDeliveryResponseDtoQuestionsItemOptionsItem[];
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  order: number;
+  text: string;
+};
+
+/**
+ * @nullable
+ */
+export type QuizDeliveryResponseDtoQuiz = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  passMarkPercent: number;
+} | null;
+
+export type QuizDeliveryResponseDtoStatus = typeof QuizDeliveryResponseDtoStatus[keyof typeof QuizDeliveryResponseDtoStatus];
+
+
+export const QuizDeliveryResponseDtoStatus = {
+  AVAILABLE: 'AVAILABLE',
+  WAITING: 'WAITING',
+  EXHAUSTED: 'EXHAUSTED',
+  PASSED: 'PASSED',
+} as const;
+
+export interface QuizDeliveryResponseDto {
+  /** @nullable */
+  attempt: QuizDeliveryResponseDtoAttempt;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attemptsAllowed: number | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  attemptsUsed: number;
+  /** @nullable */
+  bestResult: QuizDeliveryResponseDtoBestResult;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  nextAttemptAt: string | null;
+  questions: QuizDeliveryResponseDtoQuestionsItem[];
+  /** @nullable */
+  quiz: QuizDeliveryResponseDtoQuiz;
+  status: QuizDeliveryResponseDtoStatus;
+}
+
+export type QuizQuestionRequestDtoOptionsItem = {
+  isCorrect: boolean;
+  /**
+     * @minLength 1
+     * @maxLength 300
+     */
+  text: string;
+};
+
+export type QuizQuestionRequestDtoType = typeof QuizQuestionRequestDtoType[keyof typeof QuizQuestionRequestDtoType];
+
+
+export const QuizQuestionRequestDtoType = {
+  SINGLE_CHOICE: 'SINGLE_CHOICE',
+} as const;
+
+export interface QuizQuestionRequestDto {
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  explanation?: string | null;
+  /**
+     * @minItems 2
+     * @maxItems 6
+     */
+  options: QuizQuestionRequestDtoOptionsItem[];
+  /**
+     * @minLength 1
+     * @maxLength 1000
+     */
+  text: string;
+  type?: QuizQuestionRequestDtoType;
+}
+
+export interface QuizRulesRequestDto {
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attemptLimit: number | null;
+  /**
+     * @minimum 1
+     * @maximum 100
+     */
+  passMarkPercent: number;
+  /**
+     * @minimum 0
+     * @maximum 10080
+     */
+  waitMinutes: number;
+}
+
+export type QuizSubmitRequestDtoAnswers = {[key: string]: string};
+
+export interface QuizSubmitRequestDto {
+  answers: QuizSubmitRequestDtoAnswers;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  attemptId: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  idempotencyKey: string;
+}
+
+export interface QuizSubmitResponseDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  attemptId: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  correctCount: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  passMarkPercent: number;
+  passed: boolean;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  scorePercent: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  totalQuestions: number;
+}
+
+export type QuizSummaryDtoQuestionsItemOptionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  isCorrect: boolean;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  text: string;
+};
+
+export type QuizSummaryDtoQuestionsItemType = typeof QuizSummaryDtoQuestionsItemType[keyof typeof QuizSummaryDtoQuestionsItemType];
+
+
+export const QuizSummaryDtoQuestionsItemType = {
+  SINGLE_CHOICE: 'SINGLE_CHOICE',
+} as const;
+
+export type QuizSummaryDtoQuestionsItem = {
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  explanation: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  options: QuizSummaryDtoQuestionsItemOptionsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  text: string;
+  type: QuizSummaryDtoQuestionsItemType;
+};
+
+export type QuizSummaryDtoRules = {
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attemptLimit: number | null;
+  /**
+     * @minimum 1
+     * @maximum 100
+     */
+  passMarkPercent: number;
+  /**
+     * @minimum 0
+     * @maximum 10080
+     */
+  waitMinutes: number;
+};
+
+export interface QuizSummaryDto {
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  id: string | null;
+  locked: boolean;
+  questions: QuizSummaryDtoQuestionsItem[];
+  rules: QuizSummaryDtoRules;
 }
 
 export interface ReorderRequestDto {
@@ -965,8 +1859,40 @@ export interface UpdateModuleRequestDto {
   title: string;
 }
 
+export type UpdateQuizQuestionRequestDtoOptionsItem = {
+  isCorrect: boolean;
+  /**
+     * @minLength 1
+     * @maxLength 300
+     */
+  text: string;
+};
+
+export interface UpdateQuizQuestionRequestDto {
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  explanation?: string | null;
+  /**
+     * @minItems 2
+     * @maxItems 6
+     */
+  options: UpdateQuizQuestionRequestDtoOptionsItem[];
+  /**
+     * @minLength 1
+     * @maxLength 1000
+     */
+  text: string;
+}
+
 export interface UpdateUniversityRequestDto {
   name: string;
+}
+
+export interface UpdateVideoSlotRequestDto {
+  required: boolean;
+  title: string;
 }
 
 export interface VerificationAcceptedResponseDto {
@@ -990,6 +1916,75 @@ export interface VerifyEmailRequestDto {
      * @maxLength 512
      */
   token: string;
+}
+
+/**
+ * @nullable
+ */
+export type VideoSlotListResponseDtoItemsItemFailureReason = typeof VideoSlotListResponseDtoItemsItemFailureReason[keyof typeof VideoSlotListResponseDtoItemsItemFailureReason] | null;
+
+
+export const VideoSlotListResponseDtoItemsItemFailureReason = {
+  SOURCE_UNREADABLE: 'SOURCE_UNREADABLE',
+  ENCODE_FAILED: 'ENCODE_FAILED',
+  TIMED_OUT: 'TIMED_OUT',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+  PUBLISH_FAILED: 'PUBLISH_FAILED',
+} as const;
+
+/**
+ * @nullable
+ */
+export type VideoSlotListResponseDtoItemsItemRejectionReason = typeof VideoSlotListResponseDtoItemsItemRejectionReason[keyof typeof VideoSlotListResponseDtoItemsItemRejectionReason] | null;
+
+
+export const VideoSlotListResponseDtoItemsItemRejectionReason = {
+  NOT_A_VIDEO: 'NOT_A_VIDEO',
+  UNSUPPORTED_CONTAINER: 'UNSUPPORTED_CONTAINER',
+  UNSUPPORTED_CODEC: 'UNSUPPORTED_CODEC',
+  TOO_LARGE: 'TOO_LARGE',
+  NO_DURATION: 'NO_DURATION',
+} as const;
+
+export type VideoSlotListResponseDtoItemsItemStatus = typeof VideoSlotListResponseDtoItemsItemStatus[keyof typeof VideoSlotListResponseDtoItemsItemStatus];
+
+
+export const VideoSlotListResponseDtoItemsItemStatus = {
+  NOT_UPLOADED: 'NOT_UPLOADED',
+  UPLOADING: 'UPLOADING',
+  UPLOADED: 'UPLOADED',
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  READY: 'READY',
+  FAILED: 'FAILED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type VideoSlotListResponseDtoItemsItem = {
+  /**
+     * @maxLength 128
+     * @nullable
+     */
+  assetKey: string | null;
+  /** @nullable */
+  failureReason: VideoSlotListResponseDtoItemsItemFailureReason;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  /** @nullable */
+  rejectionReason: VideoSlotListResponseDtoItemsItemRejectionReason;
+  required: boolean;
+  status: VideoSlotListResponseDtoItemsItemStatus;
+  title: string;
+};
+
+export interface VideoSlotListResponseDto {
+  items: VideoSlotListResponseDtoItemsItem[];
+  locked: boolean;
 }
 
 export type AdminUsersListParams = {
@@ -1210,6 +2205,42 @@ export const UniversitiesListSort = {
   '-name': '-name',
   createdAt: 'createdAt',
   '-createdAt': '-createdAt',
+} as const;
+
+export type EnrollmentApprovalListPendingParams = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId?: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session?: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$ */
+  submittedFrom?: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$ */
+  submittedTo?: string;
+  sort?: EnrollmentApprovalListPendingSort;
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  pageSize?: number;
+};
+
+export type EnrollmentApprovalListPendingSort = typeof EnrollmentApprovalListPendingSort[keyof typeof EnrollmentApprovalListPendingSort];
+
+
+export const EnrollmentApprovalListPendingSort = {
+  requestedAt: 'requestedAt',
+  '-requestedAt': '-requestedAt',
 } as const;
 
 export const getAdminAccountChangePasswordUrl = () => {
@@ -1569,6 +2600,27 @@ export const adminAuthSignOut = async ( options?: Parameters<typeof serverFetch>
 
 
 
+export const getAdminCertificatesDownloadUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/certificates/${id}/download`
+}
+
+export const adminCertificatesDownload = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<Blob> => {
+
+  return serverFetch<Blob>(getAdminCertificatesDownloadUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export const getCoursesListUrl = (params?: CoursesListParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -1887,6 +2939,208 @@ return serverFetch<ModuleSummaryDto>(getModulesUpdateUrl(id,moduleId),
 
 
 
+export const getQuizGetUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz`
+}
+
+export const quizGet = async (id: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSummaryDto> => {
+
+  return serverFetch<QuizSummaryDto>(getQuizGetUrl(id,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getQuizCreateQuestionUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/questions`
+}
+
+export const quizCreateQuestion = async (id: string,
+    moduleId: string,
+    quizQuestionRequestDto: QuizQuestionRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<QuizSummaryDto>(getQuizCreateQuestionUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quizQuestionRequestDto)
+  }
+);}
+
+
+
+export const getQuizReorderQuestionsUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/questions/reorder`
+}
+
+export const quizReorderQuestions = async (id: string,
+    moduleId: string,
+    reorderRequestDto: ReorderRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<QuizSummaryDto>(getQuizReorderQuestionsUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reorderRequestDto)
+  }
+);}
+
+
+
+export const getQuizRemoveQuestionUrl = (id: string,
+    moduleId: string,
+    questionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/questions/${questionId}`
+}
+
+export const quizRemoveQuestion = async (id: string,
+    moduleId: string,
+    questionId: string, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSummaryDto> => {
+
+  return serverFetch<QuizSummaryDto>(getQuizRemoveQuestionUrl(id,moduleId,questionId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getQuizUpdateQuestionUrl = (id: string,
+    moduleId: string,
+    questionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/questions/${questionId}`
+}
+
+export const quizUpdateQuestion = async (id: string,
+    moduleId: string,
+    questionId: string,
+    updateQuizQuestionRequestDto: UpdateQuizQuestionRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<QuizSummaryDto>(getQuizUpdateQuestionUrl(id,moduleId,questionId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateQuizQuestionRequestDto)
+  }
+);}
+
+
+
+export const getQuizUpdateRulesUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/quiz/rules`
+}
+
+export const quizUpdateRules = async (id: string,
+    moduleId: string,
+    quizRulesRequestDto: QuizRulesRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<QuizSummaryDto>(getQuizUpdateRulesUrl(id,moduleId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quizRulesRequestDto)
+  }
+);}
+
+
+
 export const getLessonSectionsCreateUrl = (id: string,
     moduleId: string,) => {
 
@@ -2023,6 +3277,195 @@ return serverFetch<ModuleSummaryDto>(getLessonSectionsUpdateUrl(id,moduleId,sect
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(lessonSectionRequestDto)
+  }
+);}
+
+
+
+export const getVideoSlotsListUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos`
+}
+
+export const videoSlotsList = async (id: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+  return serverFetch<VideoSlotListResponseDto>(getVideoSlotsListUrl(id,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getVideoSlotsCreateUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos`
+}
+
+export const videoSlotsCreate = async (id: string,
+    moduleId: string,
+    createVideoSlotRequestDto: CreateVideoSlotRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<VideoSlotListResponseDto>(getVideoSlotsCreateUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createVideoSlotRequestDto)
+  }
+);}
+
+
+
+export const getVideoSlotsReorderUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/reorder`
+}
+
+export const videoSlotsReorder = async (id: string,
+    moduleId: string,
+    reorderRequestDto: ReorderRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<VideoSlotListResponseDto>(getVideoSlotsReorderUrl(id,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reorderRequestDto)
+  }
+);}
+
+
+
+export const getVideoSlotsRemoveUrl = (id: string,
+    moduleId: string,
+    videoId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/${videoId}`
+}
+
+export const videoSlotsRemove = async (id: string,
+    moduleId: string,
+    videoId: string, options?: Parameters<typeof serverFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+  return serverFetch<VideoSlotListResponseDto>(getVideoSlotsRemoveUrl(id,moduleId,videoId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getVideoSlotsUpdateUrl = (id: string,
+    moduleId: string,
+    videoId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/${videoId}`
+}
+
+export const videoSlotsUpdate = async (id: string,
+    moduleId: string,
+    videoId: string,
+    updateVideoSlotRequestDto: UpdateVideoSlotRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<VideoSlotListResponseDto>(getVideoSlotsUpdateUrl(id,moduleId,videoId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateVideoSlotRequestDto)
+  }
+);}
+
+
+
+export const getVideoSlotsRetryTranscodeUrl = (id: string,
+    moduleId: string,
+    videoId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/${videoId}/transcode/retry`
+}
+
+export const videoSlotsRetryTranscode = async (id: string,
+    moduleId: string,
+    videoId: string, options?: Parameters<typeof serverFetch>[1]): Promise<VideoSlotListResponseDto> => {
+
+  return serverFetch<VideoSlotListResponseDto>(getVideoSlotsRetryTranscodeUrl(id,moduleId,videoId),
+  {
+    ...options,
+    method: 'POST'
+
+
   }
 );}
 
@@ -2644,6 +4087,105 @@ export const universitiesRestore = async (id: string, options?: Parameters<typeo
 
 
 
+export const getEnrollmentApprovalApproveManyUrl = () => {
+
+
+
+
+  return `/api/admin/enrollments/approve`
+}
+
+export const enrollmentApprovalApproveMany = async (approveEnrollmentsRequestDto: ApproveEnrollmentsRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<BulkApprovalResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<BulkApprovalResponseDto>(getEnrollmentApprovalApproveManyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(approveEnrollmentsRequestDto)
+  }
+);}
+
+
+
+export const getEnrollmentApprovalListPendingUrl = (params?: EnrollmentApprovalListPendingParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/enrollments/pending?${stringifiedParams}` : `/api/admin/enrollments/pending`
+}
+
+export const enrollmentApprovalListPending = async (params?: EnrollmentApprovalListPendingParams, options?: Parameters<typeof serverFetch>[1]): Promise<ApprovalQueueResponseDto> => {
+
+  return serverFetch<ApprovalQueueResponseDto>(getEnrollmentApprovalListPendingUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getEnrollmentApprovalApproveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/enrollments/${id}/approve`
+}
+
+export const enrollmentApprovalApprove = async (id: string,
+    approveEnrollmentRequestDto: ApproveEnrollmentRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ApprovedEnrollmentDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ApprovedEnrollmentDto>(getEnrollmentApprovalApproveUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(approveEnrollmentRequestDto)
+  }
+);}
+
+
+
 export const getAdminMeDescribeUrl = () => {
 
 
@@ -2658,6 +4200,27 @@ export const adminMeDescribe = async ( options?: Parameters<typeof serverFetch>[
   {
     ...options,
     method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getAdminPlaybackPreviewUrl = (videoId: string,) => {
+
+
+
+
+  return `/api/admin/playback-sessions/${videoId}`
+}
+
+export const adminPlaybackPreview = async (videoId: string, options?: Parameters<typeof serverFetch>[1]): Promise<PlaybackSessionResponseDto> => {
+
+  return serverFetch<PlaybackSessionResponseDto>(getAdminPlaybackPreviewUrl(videoId),
+  {
+    ...options,
+    method: 'POST'
 
 
   }
@@ -2868,6 +4431,155 @@ return serverFetch<CaptchaResponseDto>(getCaptchaIssueUrl(),
 
 
 
+export const getCertificatesDownloadUrl = (id: string,) => {
+
+
+
+
+  return `/api/certificates/${id}/download`
+}
+
+export const certificatesDownload = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<Blob> => {
+
+  return serverFetch<Blob>(getCertificatesDownloadUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getLearningStructureUrl = (courseId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/learning-structure`
+}
+
+export const learningStructure = async (courseId: string, options?: Parameters<typeof serverFetch>[1]): Promise<LearningStructureResponseDto> => {
+
+  return serverFetch<LearningStructureResponseDto>(getLearningStructureUrl(courseId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getLessonContentReadUrl = (courseId: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/lesson`
+}
+
+export const lessonContentRead = async (courseId: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<LessonContentResponseDto> => {
+
+  return serverFetch<LessonContentResponseDto>(getLessonContentReadUrl(courseId,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getQuizDeliveryGetUrl = (courseId: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/quiz`
+}
+
+export const quizDeliveryGet = async (courseId: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<QuizDeliveryResponseDto> => {
+
+  return serverFetch<QuizDeliveryResponseDto>(getQuizDeliveryGetUrl(courseId,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getQuizAccessCheckUrl = (courseId: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/quiz-access`
+}
+
+export const quizAccessCheck = async (courseId: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<QuizAccessResponseDto> => {
+
+  return serverFetch<QuizAccessResponseDto>(getQuizAccessCheckUrl(courseId,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getQuizSubmissionSubmitUrl = (courseId: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/courses/${courseId}/modules/${moduleId}/quiz/attempts`
+}
+
+export const quizSubmissionSubmit = async (courseId: string,
+    moduleId: string,
+    quizSubmitRequestDto: QuizSubmitRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<QuizSubmitResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<QuizSubmitResponseDto>(getQuizSubmissionSubmitUrl(courseId,moduleId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quizSubmitRequestDto)
+  }
+);}
+
+
+
 export const getDirectoryLookupsListUniversitiesUrl = () => {
 
 
@@ -3005,5 +4717,125 @@ export const meDescribe = async ( options?: Parameters<typeof serverFetch>[1]): 
     method: 'GET'
 
 
+  }
+);}
+
+
+
+export const getMeCertificatesListUrl = () => {
+
+
+
+
+  return `/api/me/certificates`
+}
+
+export const meCertificatesList = async ( options?: Parameters<typeof serverFetch>[1]): Promise<CertificateListResponseDto> => {
+
+  return serverFetch<CertificateListResponseDto>(getMeCertificatesListUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getDashboardDescribeUrl = () => {
+
+
+
+
+  return `/api/me/dashboard`
+}
+
+export const dashboardDescribe = async ( options?: Parameters<typeof serverFetch>[1]): Promise<DashboardResponseDto> => {
+
+  return serverFetch<DashboardResponseDto>(getDashboardDescribeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getStudentPlaybackStartUrl = (id: string,) => {
+
+
+
+
+  return `/api/videos/${id}/playback-session`
+}
+
+export const studentPlaybackStart = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<PlaybackSessionResponseDto> => {
+
+  return serverFetch<PlaybackSessionResponseDto>(getStudentPlaybackStartUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getStudentPlaybackRefreshUrl = (id: string,) => {
+
+
+
+
+  return `/api/videos/${id}/playback-session/refresh`
+}
+
+export const studentPlaybackRefresh = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<PlaybackSessionResponseDto> => {
+
+  return serverFetch<PlaybackSessionResponseDto>(getStudentPlaybackRefreshUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getProgressRecordUrl = (id: string,) => {
+
+
+
+
+  return `/api/videos/${id}/progress`
+}
+
+export const progressRecord = async (id: string,
+    progressBatchDto: ProgressBatchDto, options?: Parameters<typeof serverFetch>[1]): Promise<ProgressResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ProgressResponseDto>(getProgressRecordUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(progressBatchDto)
   }
 );}

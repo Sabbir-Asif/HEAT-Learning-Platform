@@ -4,6 +4,7 @@ import {
   documentRules,
   formatBytes,
   imageRules,
+  videoRules,
   type CandidateFile,
 } from "../../src/upload/limits";
 
@@ -130,5 +131,33 @@ describe("formatBytes", () => {
     expect(formatBytes(2048)).toBe("2 KB");
     expect(formatBytes(5 * 1024 * 1024)).toBe("5 MB");
     expect(formatBytes(1536 * 1024)).toBe("1.5 MB");
+  });
+});
+
+describe("videoRules", () => {
+  const rules = videoRules(2 * 1024 * 1024 * 1024);
+  const mp4 = (overrides: Partial<CandidateFile> = {}): CandidateFile => ({
+    name: "welcome.mp4",
+    size: 1000,
+    type: "video/mp4",
+    ...overrides,
+  });
+
+  test("accepts the four containers the server accepts", () => {
+    for (const [name, type] of [
+      ["a.mp4", "video/mp4"],
+      ["a.mov", "video/quicktime"],
+      ["a.webm", "video/webm"],
+      ["a.mkv", "video/x-matroska"],
+    ] as const) {
+      expect(checkFile(mp4({ name, type }), rules, []).ok).toBe(true);
+    }
+  });
+
+  test("refuses other types and anything over the cap", () => {
+    expect(checkFile(mp4({ name: "a.avi", type: "video/x-msvideo" }), rules, []).ok).toBe(false);
+    expect(checkFile(mp4({ name: "a.pdf", type: "application/pdf" }), rules, []).ok).toBe(false);
+    const big = checkFile(mp4({ size: rules.maxBytes + 1 }), rules, []);
+    expect(big.ok ? "" : big.message).toBe("Files can be at most 2048 MB.");
   });
 });

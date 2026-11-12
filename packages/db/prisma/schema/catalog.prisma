@@ -95,6 +95,8 @@ model VideoAsset {
   status          VideoAssetStatus @default(UPLOADING)
   referenceCount  Int              @default(0)
   durationSeconds Int?
+  rejectionReason String?
+  failureReason   String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -108,13 +110,14 @@ model Video {
   moduleId  String    @db.Uuid
   order     Int
   title     String
-  assetId   String    @db.Uuid
+  required  Boolean   @default(true)
+  assetId   String?   @db.Uuid
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  module Module     @relation(fields: [moduleId], references: [id], onDelete: Restrict)
-  asset  VideoAsset @relation(fields: [assetId], references: [id], onDelete: Restrict)
+  module Module      @relation(fields: [moduleId], references: [id], onDelete: Restrict)
+  asset  VideoAsset? @relation(fields: [assetId], references: [id], onDelete: Restrict)
 
   playbackSessions PlaybackSession[]
   progress         VideoProgress[]

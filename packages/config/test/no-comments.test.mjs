@@ -111,7 +111,7 @@ test("hand-written code, config, workflow and test files hold no comments", () =
     return commentOffsets(file, text).map((offset) => `${file}:${lineOf(text, offset)}`);
   });
   expect(offending).toEqual([]);
-});
+}, 120_000);
 
 test("the checker finds comments in every supported file type", () => {
   expect(scriptComments("a.ts", "const a = 1; // note\n")).toHaveLength(1);

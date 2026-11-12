@@ -18,25 +18,39 @@ export const errorCodes = [
   "DIRECTORY_IN_USE",
   "DIRECTORY_NAME_TAKEN",
   "EMAIL_IN_USE",
+  "ENROLLMENT_ALREADY_DECIDED",
   "ENROLLMENT_NOT_ACTIVE",
+  "ENROLLMENT_NOT_VERIFIED",
   "FORBIDDEN",
   "INTERNAL",
   "INVALID_CREDENTIALS",
   "INVITATION_EXPIRED",
   "INVITATION_INVALID",
   "INVITATION_NOT_PENDING",
+  "MODULE_LOCKED",
   "NOT_FOUND",
   "ORDER_CONFLICT",
   "ORIGIN_NOT_ALLOWED",
   "PASSWORD_BREACHED",
   "PASSWORD_CHANGE_REQUIRED",
+  "QUIZ_ANSWER_INVALID",
+  "QUIZ_ATTEMPT_LIMIT_REACHED",
+  "QUIZ_ATTEMPT_NOT_OPEN",
+  "QUIZ_ATTEMPT_WAIT",
+  "QUIZ_NOT_UNLOCKED",
   "RATE_LIMITED",
   "UNAUTHENTICATED",
+  "UPLOAD_EXPIRED",
+  "UPLOAD_OFFSET_MISMATCH",
+  "UPLOAD_TOO_LARGE",
+  "UPLOAD_TYPE_NOT_ALLOWED",
   "VALIDATION_FAILED",
   "VERIFICATION_LINK_EXPIRED",
   "VERIFICATION_LINK_INVALID",
   "VERIFICATION_LINK_USED",
   "VERIFICATION_RESEND_LIMIT",
+  "VIDEO_NOT_FAILED",
+  "VIDEO_NOT_READY",
 ] as const;
 
 export const clientErrorCodes = [
@@ -69,6 +83,10 @@ export const fieldErrorSchema = z.object({
   code: z.enum(fieldErrorCodes),
 });
 
+export const errorDetailsSchema = z.object({
+  nextAttemptAt: z.iso.datetime().optional(),
+});
+
 export const errorResponseSchema = z.object({
   error: z.object({
     code: errorCodeSchema,
@@ -76,8 +94,10 @@ export const errorResponseSchema = z.object({
     requestId: z.string(),
     fields: z.array(fieldErrorSchema).optional(),
     failures: z.array(z.string()).optional(),
+    details: errorDetailsSchema.optional(),
   }),
 });
 
+export type ErrorDetails = z.infer<typeof errorDetailsSchema>;
 export type FieldError = z.infer<typeof fieldErrorSchema>;
 export type ErrorResponse = z.infer<typeof errorResponseSchema>;

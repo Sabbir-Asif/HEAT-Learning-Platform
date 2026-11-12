@@ -96,8 +96,22 @@ describe("deny-by-default route enumeration", () => {
         "directoryLookup",
       "POST /api/admin/admins": "adminInvite",
       "POST /api/admin/admins/:id/resend-invitation": "adminInvite",
+      "POST /api/admin/courses/:id/modules/:moduleId/videos/:videoId/transcode/retry":
+        "videoTranscodeRetry",
       "POST /api/admin/auth/invitations/lookup": "verify",
       "POST /api/admin/auth/invitations/accept": "verify",
+      "POST /api/admin/playback-sessions/:videoId": "playbackSession",
+      "POST /api/videos/:id/playback-session": "playbackSession",
+      "POST /api/videos/:id/playback-session/refresh": "playbackSession",
+      "POST /api/videos/:id/progress": "playbackProgress",
+      "GET /api/courses/:courseId/learning-structure": "learningRead",
+      "GET /api/courses/:courseId/modules/:moduleId/lesson": "learningRead",
+      "GET /api/courses/:courseId/modules/:moduleId/quiz-access": "learningRead",
+      "GET /api/courses/:courseId/modules/:moduleId/quiz": "learningRead",
+      "POST /api/courses/:courseId/modules/:moduleId/quiz/attempts": "quizSubmit",
+      "GET /api/certificates/:id/download": "certificateDownload",
+      "GET /api/admin/certificates/:id/download": "certificateDownload",
+      "GET /api/me/certificates": "learningRead",
     });
   });
 
@@ -151,6 +165,10 @@ describe("deny-by-default route enumeration", () => {
       "POST /api/admin/admins/:id/deactivate": "token",
       "POST /api/admin/admins/:id/reactivate": "token",
       "POST /api/admin/admins/:id/resend-invitation": "token",
+      "POST /api/admin/playback-sessions/:videoId": "token",
+      "POST /api/videos/:id/playback-session": "token",
+      "POST /api/videos/:id/playback-session/refresh": "token",
+      "POST /api/videos/:id/progress": "token",
     });
     expect(Object.keys(modes).some((route) => route.startsWith("GET "))).toBe(false);
   });

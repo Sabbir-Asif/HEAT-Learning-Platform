@@ -14,6 +14,7 @@ const build = (
     user?: unknown;
     exhausted?: boolean;
     issued?: unknown;
+    held?: unknown[];
   } = {},
 ) => {
   const order: string[] = [];
@@ -44,7 +45,10 @@ const build = (
           "user" in options ? options.user : { id: "user-id", createdAt: registeredAt },
         ),
     },
-    enrollment: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
+    enrollment: {
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+      findMany: vi.fn().mockResolvedValue(options.held ?? []),
+    },
     outbox: {
       create: vi.fn().mockImplementation(async () => {
         order.push("outbox");
@@ -131,6 +135,35 @@ describe("EmailVerificationService.confirm", () => {
     );
     expect(result).toEqual({ userId: "user-id", tokens: { accessToken: "a", refreshToken: "r" } });
     expect(order).toEqual(["revoke", "session"]);
+  });
+
+  test("requests a certificate for each completed enrollment that has none, in the same transaction", async () => {
+    const { service, tx } = build({
+      held: [
+        { id: "enrollment-1", courseId: "course-1" },
+        { id: "enrollment-2", courseId: "course-2" },
+      ],
+    });
+
+    await service.confirm("plain-token", { ipAddress: "203.0.113.4" });
+
+    expect(tx.enrollment.findMany).toHaveBeenCalledWith({
+      where: { userId: "user-id", status: "COMPLETED", deletedAt: null, certificate: null },
+      select: { id: true, courseId: true },
+    });
+    expect(tx.outbox.create).toHaveBeenCalledTimes(2);
+    expect(tx.outbox.create).toHaveBeenCalledWith({
+      data: {
+        eventType: "certificate.requested",
+        payload: { enrollmentId: "enrollment-1", userId: "user-id", courseId: "course-1" },
+      },
+    });
+  });
+
+  test("requests no certificate when nothing is held", async () => {
+    const { service, tx } = build();
+    await service.confirm("plain-token", { ipAddress: "203.0.113.4" });
+    expect(tx.outbox.create).not.toHaveBeenCalled();
   });
 
   test("signs the student in on a fresh session only after the transaction", async () => {

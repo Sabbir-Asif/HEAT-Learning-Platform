@@ -72,3 +72,21 @@ describe("ApiExceptionFilter with an exception detail", () => {
     });
   });
 });
+
+describe("ApiExceptionFilter with exception details", () => {
+  test("the details are returned beside the code", () => {
+    const { status, json } = reply(
+      new ApiException(409, "QUIZ_ATTEMPT_WAIT", 30, undefined, undefined, undefined, {
+        nextAttemptAt: "2026-11-12T10:05:00.000Z",
+      }),
+    );
+
+    expect(status).toHaveBeenCalledWith(409);
+    expect(json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        code: "QUIZ_ATTEMPT_WAIT",
+        details: { nextAttemptAt: "2026-11-12T10:05:00.000Z" },
+      }),
+    });
+  });
+});

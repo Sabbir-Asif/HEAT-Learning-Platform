@@ -27,25 +27,39 @@ export type FormErrorCopyKey =
   | "DIRECTORY_IN_USE"
   | "DIRECTORY_NAME_TAKEN"
   | "EMAIL_IN_USE"
+  | "ENROLLMENT_ALREADY_DECIDED"
   | "ENROLLMENT_NOT_ACTIVE"
+  | "ENROLLMENT_NOT_VERIFIED"
   | "FORBIDDEN"
   | "INTERNAL"
   | "INVALID_CREDENTIALS"
   | "INVITATION_EXPIRED"
   | "INVITATION_INVALID"
   | "INVITATION_NOT_PENDING"
+  | "MODULE_LOCKED"
   | "NOT_FOUND"
   | "ORDER_CONFLICT"
   | "ORIGIN_NOT_ALLOWED"
   | "PASSWORD_BREACHED"
   | "PASSWORD_CHANGE_REQUIRED"
+  | "QUIZ_ANSWER_INVALID"
+  | "QUIZ_ATTEMPT_LIMIT_REACHED"
+  | "QUIZ_ATTEMPT_NOT_OPEN"
+  | "QUIZ_ATTEMPT_WAIT"
+  | "QUIZ_NOT_UNLOCKED"
   | "RATE_LIMITED"
   | "UNAUTHENTICATED"
+  | "UPLOAD_EXPIRED"
+  | "UPLOAD_OFFSET_MISMATCH"
+  | "UPLOAD_TOO_LARGE"
+  | "UPLOAD_TYPE_NOT_ALLOWED"
   | "VALIDATION_FAILED"
   | "VERIFICATION_LINK_EXPIRED"
   | "VERIFICATION_LINK_INVALID"
   | "VERIFICATION_LINK_USED"
   | "VERIFICATION_RESEND_LIMIT"
+  | "VIDEO_NOT_FAILED"
+  | "VIDEO_NOT_READY"
   | "NETWORK_ERROR"
   | "REQUEST_ABORTED"
   | "UNEXPECTED_RESPONSE";
@@ -86,26 +100,43 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   DIRECTORY_IN_USE: "This record is still in use, so it cannot be deleted.",
   DIRECTORY_NAME_TAKEN: "A record with this name already exists.",
   EMAIL_IN_USE: "An account with this email address already exists.",
+  ENROLLMENT_ALREADY_DECIDED: "This request was already decided or was withdrawn.",
   ENROLLMENT_NOT_ACTIVE: "Your enrollment in this course is not active.",
+  ENROLLMENT_NOT_VERIFIED:
+    "The student has not verified their email yet, so it cannot be approved.",
   FORBIDDEN: "You do not have permission to do this.",
   INTERNAL: "Something went wrong on our side. Try again in a moment.",
   INVALID_CREDENTIALS: "The email or password is not correct.",
   INVITATION_EXPIRED: "This invitation has expired. Ask the super admin to send a new one.",
   INVITATION_INVALID: "This invitation link is not valid.",
   INVITATION_NOT_PENDING: "This admin has no pending invitation.",
+  MODULE_LOCKED: "This module is locked until you finish the previous one.",
   NOT_FOUND: "This item could not be found. It may have been removed.",
   ORDER_CONFLICT: "Someone else changed this order. Reload the list and try again.",
   ORIGIN_NOT_ALLOWED: "This request did not come from an allowed site.",
   PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
   PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
+  QUIZ_ANSWER_INVALID:
+    "One of the answers does not belong to this quiz. Reload the quiz and try again.",
+  QUIZ_ATTEMPT_LIMIT_REACHED: "You have used all your attempts for this quiz.",
+  QUIZ_ATTEMPT_NOT_OPEN:
+    "This attempt was already submitted or is no longer open. Reload the quiz.",
+  QUIZ_ATTEMPT_WAIT: "You need to wait before you can submit another attempt.",
+  QUIZ_NOT_UNLOCKED: "Watch the required videos in this module to unlock the quiz.",
   RATE_LIMITED: "Too many attempts. Wait a little and try again.",
   UNAUTHENTICATED: "Your session has ended. Sign in again to continue.",
+  UPLOAD_EXPIRED: "This upload expired before it finished. Start it again.",
+  UPLOAD_OFFSET_MISMATCH: "The upload got out of step with the server. Start it again.",
+  UPLOAD_TOO_LARGE: "This file is larger than the upload limit.",
+  UPLOAD_TYPE_NOT_ALLOWED: "This file is not a supported video. Use MP4, MOV, WebM or MKV.",
   VALIDATION_FAILED: genericFormMessage,
   VERIFICATION_LINK_EXPIRED: "This verification link has expired. Request a new one.",
   VERIFICATION_LINK_INVALID: "This verification link is not valid.",
   VERIFICATION_LINK_USED: "This verification link has already been used or replaced.",
   VERIFICATION_RESEND_LIMIT:
     "Too many verification emails were requested. Contact support if you still need help.",
+  VIDEO_NOT_FAILED: "Only a video whose processing failed can be retried.",
+  VIDEO_NOT_READY: "This video is not ready to play yet.",
   NETWORK_ERROR: "The connection failed. Check your network and try again.",
   REQUEST_ABORTED: "The request was cancelled. Try again.",
   UNEXPECTED_RESPONSE: "The server sent an unexpected reply. Try again in a moment.",

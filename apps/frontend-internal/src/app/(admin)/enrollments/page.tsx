@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { ApprovalQueueView } from "@/enrollments/approval-queue-view";
 
 export default function Page() {
-  return <PlaceholderPage title="Enrollments" />;
+  return <ApprovalQueueView />;
 }

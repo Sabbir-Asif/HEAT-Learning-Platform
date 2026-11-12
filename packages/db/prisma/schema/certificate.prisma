@@ -3,8 +3,9 @@ model Certificate {
   enrollmentId  String    @unique @db.Uuid
   number        String    @unique @default(dbgenerated("upper(substr(replace((gen_random_uuid())::text, '-'::text, ''::text), 1, 16))"))
   recipientName String
-  fileKey       String    @unique
-  fileSha256    String
+  fileKey       String?   @unique
+  fileSha256    String?
+  fileSizeBytes Int?
   issuedAt      DateTime  @default(now())
   revokedAt     DateTime?
   createdAt     DateTime  @default(now())
