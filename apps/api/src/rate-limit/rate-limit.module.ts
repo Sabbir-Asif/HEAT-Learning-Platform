@@ -27,7 +27,7 @@ import { SignInLockout } from "./sign-in-lockout.service";
     { provide: RateLimitStore, useClass: RedisRateLimitStore },
     { provide: LockoutStore, useClass: RedisLockoutStore },
   ],
-  exports: [AccountKeyHasher, RateLimiter, SignInLockout],
+  exports: [AccountKeyHasher, RateLimiter, RateLimitStore, SignInLockout],
 })
 export class RateLimitModule implements OnApplicationShutdown {
   constructor(@Inject(RATE_LIMIT_REDIS) private readonly redis: Redis) {}
