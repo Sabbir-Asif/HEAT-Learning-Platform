@@ -16,7 +16,7 @@ import { UserIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { useUnreadCount } from "@/notifications/use-unread-count";
+import { useUnreadCount } from "../notifications/use-unread-count";
 import { heatLogo } from "./brand";
 import { learnerNavigation } from "./navigation";
 
