@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@heat/contracts": "workspace:*",
-    "@tanstack/react-query": "5.106.1",
+    "@tanstack/react-query": "5.107.1",
     "server-only": "0.0.1",
     "zod": "catalog:"
   }
