@@ -31,5 +31,6 @@ export {
   isMediaKey,
   type MediaStorage,
 } from "./media-storage";
+export * from "./insights";
 export { SecretBox } from "./secret-box";
 export { DATABASE, REDIS } from "./tokens";
