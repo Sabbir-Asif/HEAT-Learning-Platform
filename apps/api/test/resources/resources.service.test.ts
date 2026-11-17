@@ -56,7 +56,7 @@ const request = (overrides: Record<string, unknown> = {}) => ({
 const build = (options: { existing?: unknown; courseActive?: boolean; assetOk?: boolean } = {}) => {
   const database = {
     resource: {
-      findFirst: vi.fn().mockResolvedValue(options.existing ?? row()),
+      findFirst: vi.fn().mockResolvedValue("existing" in options ? options.existing : row()),
       findMany: vi.fn().mockResolvedValue([]),
       count: vi.fn().mockResolvedValue(0),
       create: vi.fn().mockResolvedValue({ id: resourceId }),
