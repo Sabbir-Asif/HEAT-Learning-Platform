@@ -1,7 +1,7 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { meDescribe, setUnauthorizedHandler, studentAuthSignOut } from "@heat/api-client";
+import { meCertificatesList, setUnauthorizedHandler, studentAuthSignOut } from "@heat/api-client";
 import { Providers } from "../src/shell/providers";
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
@@ -41,7 +41,7 @@ describe("Providers", () => {
     root = createRoot(container);
     await act(async () => root?.render(<Providers>content</Providers>));
 
-    await expect(meDescribe()).rejects.toMatchObject({ status: 401 });
+    await expect(meCertificatesList()).rejects.toMatchObject({ status: 401 });
 
     expect(assign).toHaveBeenCalledWith("/sign-in?next=%2Flearn%2Fa%3Fx%3D1");
     expect(container.textContent).toBe("content");
