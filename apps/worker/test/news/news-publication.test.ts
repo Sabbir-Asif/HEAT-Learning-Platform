@@ -34,12 +34,22 @@ class FakeStore implements NewsPublicationStore {
 const setup = () => {
   const store = new FakeStore();
   const errors: string[] = [];
+  const revalidated: string[][] = [];
+  const revalidation = {
+    failing: false,
+    revalidate(tags: string[]): Promise<void> {
+      if (this.failing) return Promise.reject(new Error("frontend down"));
+      revalidated.push(tags);
+      return Promise.resolve();
+    },
+  };
   const publication = new NewsPublication(
     store,
     { now: () => now },
     { info: () => undefined, error: (line) => errors.push(line) },
+    revalidation,
   );
-  return { store, publication, errors };
+  return { store, publication, errors, revalidated, revalidation };
 };
 
 describe("NewsPublication", () => {
@@ -85,5 +95,32 @@ describe("NewsPublication", () => {
 
     expect(store.events).toHaveLength(1);
     expect(errors[0]).toContain("a was not announced");
+  });
+
+  test("refreshes the news list and each article once posts go live", async () => {
+    const { store, publication, revalidated } = setup();
+    store.due = [post("a"), post("b")];
+
+    await publication.announceDue();
+
+    expect(revalidated).toEqual([["news", "news:post-a", "news:post-b"]]);
+  });
+
+  test("does not refresh anything when no post went live", async () => {
+    const { publication, revalidated } = setup();
+
+    await publication.announceDue();
+
+    expect(revalidated).toEqual([]);
+  });
+
+  test("reports a failed refresh without losing the announcement count", async () => {
+    const { store, publication, errors, revalidation } = setup();
+    store.due = [post("a")];
+    revalidation.failing = true;
+
+    expect(await publication.announceDue()).toBe(1);
+
+    expect(errors[0]).toContain("Public pages were not refreshed");
   });
 });
