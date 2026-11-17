@@ -18,6 +18,7 @@ import { HttpApiModule } from "./http/http.module";
 import { MediaModule } from "./media";
 import { MeModule } from "./me/me.module";
 import { NotificationsModule } from "./notifications/notifications.module";
+import { InsightsModule } from "./insights";
 import { LearningModule } from "./learning";
 import { PasswordResetModule } from "./password-reset";
 import { PlaybackModule } from "./playback";
@@ -45,6 +46,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     DirectoryModule,
     EmailVerificationModule,
     EnrollmentModule,
+    InsightsModule,
     LearningModule,
     MediaModule,
     PasswordResetModule,
