@@ -14,6 +14,7 @@
     "build": "nest build",
     "start": "node dist/main.js",
     "recover-super-admin": "node dist/cli/main.js recover-super-admin",
+    "insights-backfill": "node dist/cli/insights-backfill.main.js insights-backfill",
     "lint": "eslint .",
     "format:check": "prettier --check . --ignore-path ../../.gitignore --ignore-path .prettierignore",
     "typecheck": "tsc --noEmit",
