@@ -60,6 +60,8 @@ const blockTypes = new Set([
 
 const inlineTypes = new Set(["text", "hardBreak"]);
 
+const knownTypes = new Set([...blockTypes, ...inlineTypes, "listItem"]);
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
@@ -129,6 +131,7 @@ const readChildren = (
   if (required && value.length === 0) reject("bad-content");
   return value.map((child) => {
     if (!isRecord(child) || typeof child.type !== "string") return reject("unknown-node");
+    if (!knownTypes.has(child.type)) return reject("unknown-node");
     if (!allowed(child.type)) return reject("bad-content");
     return readNode(child, depth, budget);
   });
