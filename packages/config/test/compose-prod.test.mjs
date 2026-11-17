@@ -88,8 +88,16 @@ describe("production compose stack", () => {
   test("nginx drops all capabilities except the ones it needs", () => {
     expect(services.nginx.cap_drop).toEqual(["ALL"]);
     expect(services.nginx.cap_add.sort()).toEqual(
-      ["CHOWN", "NET_BIND_SERVICE", "SETGID", "SETUID"].sort(),
+      ["CHOWN", "DAC_READ_SEARCH", "NET_BIND_SERVICE", "SETGID", "SETUID"].sort(),
     );
+  });
+
+  test("nginx can read the deploy-owned TLS and site config mounts without write bypass", () => {
+    expect(services.nginx.user).toBeUndefined();
+    expect(services.nginx.cap_add).toContain("DAC_READ_SEARCH");
+    expect(services.nginx.cap_add).not.toContain("DAC_OVERRIDE");
+    const tls = services.nginx.volumes.find((volume) => volume.includes(":/etc/nginx/tls"));
+    expect(tls.endsWith(":ro")).toBe(true);
   });
 
   test.each(names)("%s cannot gain privileges", (name) => {

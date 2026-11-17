@@ -37,6 +37,7 @@ services:
       - SETGID
       - SETUID
       - NET_BIND_SERVICE
+      - DAC_READ_SEARCH
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ${NGINX_SITE_CONF:?set NGINX_SITE_CONF in compose.env}:/etc/nginx/conf.d/default.conf:ro
