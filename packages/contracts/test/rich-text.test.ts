@@ -84,6 +84,56 @@ describe("parseRichText", () => {
       "bad-content",
     ],
     ["empty text", doc(paragraph({ type: "text", text: "" })), "bad-content"],
+    [
+      "a mark that is not an object",
+      doc(paragraph({ ...text("x"), marks: ["bold"] })),
+      "unknown-mark",
+    ],
+    ["marks that are not a list", doc(paragraph({ ...text("x"), marks: "bold" })), "unknown-mark"],
+    [
+      "a bold mark with a stray key",
+      doc(paragraph({ ...text("x"), marks: [{ type: "bold", a: 1 }] })),
+      "unknown-key",
+    ],
+    [
+      "a link without attrs",
+      doc(paragraph({ ...text("x"), marks: [{ type: "link" }] })),
+      "bad-link",
+    ],
+    [
+      "a link with a stray attr",
+      doc(
+        paragraph({
+          ...text("x"),
+          marks: [{ type: "link", attrs: { href: "https://a.co", rel: "x" } }],
+        }),
+      ),
+      "unknown-key",
+    ],
+    [
+      "a link with a non-string href",
+      doc(paragraph({ ...text("x"), marks: [{ type: "link", attrs: { href: 1 } }] })),
+      "bad-link",
+    ],
+    ["a list without content", doc({ type: "bulletList" }), "bad-content"],
+    ["an empty list", doc({ type: "orderedList", content: [] }), "bad-content"],
+    ["content that is not a list", doc({ type: "paragraph", content: "x" }), "bad-content"],
+    ["a child that is not an object", doc({ type: "paragraph", content: ["x"] }), "unknown-node"],
+    ["a heading without attrs", doc({ type: "heading", content: [text("x")] }), "bad-attrs"],
+    [
+      "a heading with a stray attr",
+      doc({ type: "heading", attrs: { level: 2, id: "x" }, content: [] }),
+      "unknown-key",
+    ],
+    ["an image without attrs", doc({ type: "image" }), "bad-attrs"],
+    [
+      "an image with a very long alt",
+      doc({ type: "image", attrs: { assetId, alt: "a".repeat(301) } }),
+      "bad-attrs",
+    ],
+    ["a hard break with a stray key", doc(paragraph({ type: "hardBreak", a: 1 })), "unknown-key"],
+    ["a doc type that is not doc", { type: "page", content: [] }, "unknown-node"],
+    ["a hard break at the top level", doc({ type: "hardBreak" }), "bad-content"],
   ])("rejects %s", (_name, value, issue) => {
     expect(parseRichText(value)).toEqual({ ok: false, issue });
   });
@@ -196,5 +246,24 @@ describe("richTextImageIds", () => {
       }),
     );
     expect(richTextImageIds(value)).toEqual([assetId]);
+  });
+
+  test("counts hard breaks, lists and missing blocks", () => {
+    const before = parsed(
+      doc(
+        paragraph(text("a"), { type: "hardBreak" }, text("b")),
+        { type: "image", attrs: { assetId, alt: "a" } },
+        {
+          type: "bulletList",
+          content: [{ type: "listItem", content: [paragraph(text("item"))] }],
+        },
+        { type: "paragraph" },
+      ),
+    );
+    const after = parsed(doc(paragraph(text("a"))));
+    expect(richTextTextChanges(before, after)).toEqual([
+      { block: 1, before: "a\nb", after: "a" },
+      { block: 2, before: "item", after: "" },
+    ]);
   });
 });
