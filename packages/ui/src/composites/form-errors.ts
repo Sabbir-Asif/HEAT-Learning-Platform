@@ -54,6 +54,9 @@ export type FormErrorCopyKey =
   | "PASSWORD_CODE_EMAIL_UNVERIFIED"
   | "PASSWORD_CODE_EXPIRED"
   | "PASSWORD_CODE_INVALID"
+  | "PROFILE_CHANGE_NOT_PENDING"
+  | "PROFILE_CHANGE_PENDING"
+  | "PROFILE_CHANGE_UNCHANGED"
   | "PROFILE_LOCKED"
   | "QUIZ_ANSWER_INVALID"
   | "QUIZ_ATTEMPTS_UNLIMITED"
@@ -150,6 +153,9 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   PASSWORD_CODE_EMAIL_UNVERIFIED: "Verify your email address to change your password.",
   PASSWORD_CODE_EXPIRED: "This code is no longer valid. Request a new one.",
   PASSWORD_CODE_INVALID: "The code is not correct.",
+  PROFILE_CHANGE_NOT_PENDING: "This change request was already decided. Reload the list.",
+  PROFILE_CHANGE_PENDING: "You already have a change request waiting for a decision.",
+  PROFILE_CHANGE_UNCHANGED: "Change at least one detail to send a request.",
   PROFILE_LOCKED:
     "Your name and academic details are locked. Send a change request to update them.",
   QUIZ_ANSWER_INVALID:
