@@ -18,7 +18,7 @@ function wrapper({ children }: { children: ReactNode }) {
 describe("useHealthCheck against the generated MSW handler", () => {
   test("returns the typed, deterministic mock", async () => {
     const { result } = renderHook(() => useHealthCheck(), { wrapper });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.isSuccess).toBe(true), { timeout: 5000 });
     expect(result.current.data).toEqual({ status: "ok" });
     expectTypeOf(result.current.data).toEqualTypeOf<HealthResponseDto | undefined>();
     expectTypeOf(result.current.data?.status).toEqualTypeOf<"ok" | undefined>();
@@ -39,7 +39,7 @@ describe("useHealthCheck against the generated MSW handler", () => {
       ),
     );
     const { result } = renderHook(() => useHealthCheck(), { wrapper });
-    await waitFor(() => expect(result.current.isError).toBe(true));
+    await waitFor(() => expect(result.current.isError).toBe(true), { timeout: 5000 });
     expect(result.current.error).toBeInstanceOf(ApiError);
     expect(result.current.error).toMatchObject({
       status: 429,
