@@ -25,6 +25,9 @@ expect_ssh passwordauthentication no "ssh password login disabled"
 expect_ssh kbdinteractiveauthentication no "ssh keyboard-interactive disabled"
 check "ssh limited to $DEPLOY_USER" "sshd -T | grep -qx 'allowusers $DEPLOY_USER'"
 
+check "$DEPLOY_USER reads the journal through the systemd-journal group" "id -nG $DEPLOY_USER | tr ' ' '\\n' | grep -qx systemd-journal"
+check "sudo for $DEPLOY_USER has no wildcard and no journalctl" "! grep -E '\\*|journalctl' /etc/sudoers.d/heat-deploy"
+
 check "ufw active" "ufw status | grep -q '^Status: active'"
 check "ufw denies incoming by default" "ufw status verbose | grep -q 'deny (incoming)'"
 for port in 22 80 443; do

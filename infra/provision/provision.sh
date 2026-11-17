@@ -68,6 +68,10 @@ ensure_deploy_user() {
   home="$(getent passwd "$DEPLOY_USER" | cut -d: -f6)"
   ssh_dir="$home/.ssh"
   keys="$ssh_dir/authorized_keys"
+  if ! id -nG "$DEPLOY_USER" | tr ' ' '\n' | grep -qx systemd-journal; then
+    usermod -aG systemd-journal "$DEPLOY_USER"
+    note "$DEPLOY_USER in systemd-journal"
+  fi
   if [ ! -d "$ssh_dir" ]; then
     install -d -m 700 -o "$DEPLOY_USER" -g "$DEPLOY_USER" "$ssh_dir"
     note "$ssh_dir"
