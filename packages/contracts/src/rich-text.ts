@@ -65,8 +65,18 @@ const knownTypes = new Set([...blockTypes, ...inlineTypes, "listItem"]);
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+const hasControlOrSpace = (value: string): boolean => {
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code <= 0x20 || (code >= 0x7f && code <= 0x9f)) {
+      return true;
+    }
+  }
+  return false;
+};
+
 export const isSafeRichTextHref = (href: string): boolean => {
-  if (href.length === 0 || href.length > 2048 || /[\u0000- \u007f-\u009f]/.test(href)) {
+  if (href.length === 0 || href.length > 2048 || hasControlOrSpace(href)) {
     return false;
   }
   try {

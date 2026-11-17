@@ -1,5 +1,5 @@
 import { mediaLimits } from "@heat/contracts";
-import { Body, Controller, Post, Req, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiExcludeController } from "@nestjs/swagger";
 import { Audience, Roles } from "../access";
