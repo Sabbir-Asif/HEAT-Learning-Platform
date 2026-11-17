@@ -14,6 +14,8 @@ const productionMail = {
   SMTP_PASSWORD: "app-password-value",
 };
 
+const productionMedia = { MEDIA_STORAGE_DIR: "/srv/heat/media" };
+
 const valid = {
   DATABASE_URL: "postgresql://u:p@localhost:5432/db",
   REDIS_URL: "redis://localhost:6379",
@@ -137,13 +139,14 @@ describe("loadConfig", () => {
   });
 
   test("requires trusted origins in production instead of defaulting to local apps", () => {
-    const production = { ...valid, ...productionMail, NODE_ENV: "production" };
+    const production = { ...valid, ...productionMail, ...productionMedia, NODE_ENV: "production" };
     expect(() => loadConfig(production)).toThrow(/TRUSTED_ORIGINS/);
     expect(() => loadConfig({ ...production, TRUSTED_ORIGINS: " , " })).toThrow(/TRUSTED_ORIGINS/);
     expect(
       loadConfig({
         ...valid,
         ...productionMail,
+        ...productionMedia,
         NODE_ENV: "production",
         TRUSTED_ORIGINS: "https://learn.example.test",
         ADMIN_APP_URL: "https://admin.example.test",
@@ -345,6 +348,7 @@ describe("video uploads", () => {
     const production = {
       ...valid,
       ...productionMail,
+      ...productionMedia,
       NODE_ENV: "production",
       ADMIN_APP_URL: "https://admin.example.test",
       TRUSTED_ORIGINS: "https://admin.example.test",
@@ -391,6 +395,7 @@ describe("transcode config", () => {
     const production = {
       ...valid,
       ...productionMail,
+      ...productionMedia,
       NODE_ENV: "production",
       ADMIN_APP_URL: "https://admin.example.test",
       TRUSTED_ORIGINS: "https://admin.example.test",
