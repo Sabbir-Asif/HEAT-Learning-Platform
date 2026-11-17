@@ -73,12 +73,18 @@ import type {
   GrantedAttemptDto,
   HealthResponseDto,
   InsightFunnelResultDto,
+  InsightMissedQuestionsDto,
+  InsightModuleResultsDto,
+  InsightQuizResultsDto,
   InsightRefreshResponseDto,
   InsightResultDto,
   InsightStatusResponseDto,
   InsightsCsvParams,
   InsightsFunnelParams,
+  InsightsMissedQuestionsParams,
+  InsightsModuleResultsParams,
   InsightsQueryParams,
+  InsightsQuizResultsParams,
   InvitationLookupRequestDto,
   InvitationLookupResponseDto,
   InviteAdminRequestDto,
@@ -6853,6 +6859,312 @@ export function useInsightsFunnel<TData = Awaited<ReturnType<typeof insightsFunn
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getInsightsFunnelQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getInsightsMissedQuestionsUrl = (params: InsightsMissedQuestionsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/insights/missed-questions?${stringifiedParams}` : `/api/admin/insights/missed-questions`
+}
+
+export const insightsMissedQuestions = async (params: InsightsMissedQuestionsParams, options?: Parameters<typeof customFetch>[1]): Promise<InsightMissedQuestionsDto> => {
+
+  return customFetch<InsightMissedQuestionsDto>(getInsightsMissedQuestionsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getInsightsMissedQuestionsQueryKey = (params?: InsightsMissedQuestionsParams,) => {
+    return [
+    `/api/admin/insights/missed-questions`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getInsightsMissedQuestionsQueryOptions = <TData = Awaited<ReturnType<typeof insightsMissedQuestions>>, TError = ErrorType<unknown>>(params: InsightsMissedQuestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsMissedQuestions>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getInsightsMissedQuestionsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof insightsMissedQuestions>>> = ({ signal }) => insightsMissedQuestions(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof insightsMissedQuestions>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type InsightsMissedQuestionsQueryResult = NonNullable<Awaited<ReturnType<typeof insightsMissedQuestions>>>
+export type InsightsMissedQuestionsQueryError = ErrorType<unknown>
+
+
+export function useInsightsMissedQuestions<TData = Awaited<ReturnType<typeof insightsMissedQuestions>>, TError = ErrorType<unknown>>(
+ params: InsightsMissedQuestionsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsMissedQuestions>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsMissedQuestions>>,
+          TError,
+          Awaited<ReturnType<typeof insightsMissedQuestions>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsMissedQuestions<TData = Awaited<ReturnType<typeof insightsMissedQuestions>>, TError = ErrorType<unknown>>(
+ params: InsightsMissedQuestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsMissedQuestions>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsMissedQuestions>>,
+          TError,
+          Awaited<ReturnType<typeof insightsMissedQuestions>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsMissedQuestions<TData = Awaited<ReturnType<typeof insightsMissedQuestions>>, TError = ErrorType<unknown>>(
+ params: InsightsMissedQuestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsMissedQuestions>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useInsightsMissedQuestions<TData = Awaited<ReturnType<typeof insightsMissedQuestions>>, TError = ErrorType<unknown>>(
+ params: InsightsMissedQuestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsMissedQuestions>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getInsightsMissedQuestionsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getInsightsModuleResultsUrl = (params?: InsightsModuleResultsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/insights/module-results?${stringifiedParams}` : `/api/admin/insights/module-results`
+}
+
+export const insightsModuleResults = async (params?: InsightsModuleResultsParams, options?: Parameters<typeof customFetch>[1]): Promise<InsightModuleResultsDto> => {
+
+  return customFetch<InsightModuleResultsDto>(getInsightsModuleResultsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getInsightsModuleResultsQueryKey = (params?: InsightsModuleResultsParams,) => {
+    return [
+    `/api/admin/insights/module-results`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getInsightsModuleResultsQueryOptions = <TData = Awaited<ReturnType<typeof insightsModuleResults>>, TError = ErrorType<unknown>>(params?: InsightsModuleResultsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsModuleResults>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getInsightsModuleResultsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof insightsModuleResults>>> = ({ signal }) => insightsModuleResults(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof insightsModuleResults>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type InsightsModuleResultsQueryResult = NonNullable<Awaited<ReturnType<typeof insightsModuleResults>>>
+export type InsightsModuleResultsQueryError = ErrorType<unknown>
+
+
+export function useInsightsModuleResults<TData = Awaited<ReturnType<typeof insightsModuleResults>>, TError = ErrorType<unknown>>(
+ params: undefined |  InsightsModuleResultsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsModuleResults>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsModuleResults>>,
+          TError,
+          Awaited<ReturnType<typeof insightsModuleResults>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsModuleResults<TData = Awaited<ReturnType<typeof insightsModuleResults>>, TError = ErrorType<unknown>>(
+ params?: InsightsModuleResultsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsModuleResults>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsModuleResults>>,
+          TError,
+          Awaited<ReturnType<typeof insightsModuleResults>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsModuleResults<TData = Awaited<ReturnType<typeof insightsModuleResults>>, TError = ErrorType<unknown>>(
+ params?: InsightsModuleResultsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsModuleResults>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useInsightsModuleResults<TData = Awaited<ReturnType<typeof insightsModuleResults>>, TError = ErrorType<unknown>>(
+ params?: InsightsModuleResultsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsModuleResults>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getInsightsModuleResultsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getInsightsQuizResultsUrl = (params?: InsightsQuizResultsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/insights/quiz-results?${stringifiedParams}` : `/api/admin/insights/quiz-results`
+}
+
+export const insightsQuizResults = async (params?: InsightsQuizResultsParams, options?: Parameters<typeof customFetch>[1]): Promise<InsightQuizResultsDto> => {
+
+  return customFetch<InsightQuizResultsDto>(getInsightsQuizResultsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getInsightsQuizResultsQueryKey = (params?: InsightsQuizResultsParams,) => {
+    return [
+    `/api/admin/insights/quiz-results`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getInsightsQuizResultsQueryOptions = <TData = Awaited<ReturnType<typeof insightsQuizResults>>, TError = ErrorType<unknown>>(params?: InsightsQuizResultsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsQuizResults>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getInsightsQuizResultsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof insightsQuizResults>>> = ({ signal }) => insightsQuizResults(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof insightsQuizResults>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type InsightsQuizResultsQueryResult = NonNullable<Awaited<ReturnType<typeof insightsQuizResults>>>
+export type InsightsQuizResultsQueryError = ErrorType<unknown>
+
+
+export function useInsightsQuizResults<TData = Awaited<ReturnType<typeof insightsQuizResults>>, TError = ErrorType<unknown>>(
+ params: undefined |  InsightsQuizResultsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsQuizResults>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsQuizResults>>,
+          TError,
+          Awaited<ReturnType<typeof insightsQuizResults>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsQuizResults<TData = Awaited<ReturnType<typeof insightsQuizResults>>, TError = ErrorType<unknown>>(
+ params?: InsightsQuizResultsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsQuizResults>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsQuizResults>>,
+          TError,
+          Awaited<ReturnType<typeof insightsQuizResults>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsQuizResults<TData = Awaited<ReturnType<typeof insightsQuizResults>>, TError = ErrorType<unknown>>(
+ params?: InsightsQuizResultsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsQuizResults>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useInsightsQuizResults<TData = Awaited<ReturnType<typeof insightsQuizResults>>, TError = ErrorType<unknown>>(
+ params?: InsightsQuizResultsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsQuizResults>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getInsightsQuizResultsQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
