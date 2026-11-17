@@ -51,4 +51,15 @@ describe("NodeStorageCleanupFiles", () => {
     expect(entries.map((entry) => [entry.name, entry.isDirectory])).toEqual([["dir", true]]);
     expect(await files.list(join(root, "missing"))).toEqual([]);
   });
+
+  test("reads a file as text and answers null for a missing file or a directory", async () => {
+    const files = new NodeStorageCleanupFiles([root]);
+    await writeFile(join(root, "note.txt"), "hello");
+    await mkdir(join(root, "dir"));
+
+    expect(await files.readText(join(root, "note.txt"))).toBe("hello");
+    expect(await files.readText(join(root, "missing.txt"))).toBeNull();
+    expect(await files.readText(join(root, "dir"))).toBeNull();
+    await expect(files.readText(join(outside, "note.txt"))).rejects.toThrow();
+  });
 });
