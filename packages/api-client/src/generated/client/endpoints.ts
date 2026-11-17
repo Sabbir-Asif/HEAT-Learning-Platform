@@ -72,6 +72,11 @@ import type {
   GrantAttemptRequestDto,
   GrantedAttemptDto,
   HealthResponseDto,
+  InsightRefreshResponseDto,
+  InsightResultDto,
+  InsightStatusResponseDto,
+  InsightsCsvParams,
+  InsightsQueryParams,
   InvitationLookupRequestDto,
   InvitationLookupResponseDto,
   InviteAdminRequestDto,
@@ -6755,6 +6760,389 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getEnrollmentRemovalRemoveMutationOptions(options), queryClient);
     }
+
+export const getInsightsRefreshUrl = () => {
+
+
+
+
+  return `/api/admin/insights/refresh`
+}
+
+export const insightsRefresh = async ( options?: Parameters<typeof customFetch>[1]): Promise<InsightRefreshResponseDto> => {
+
+  return customFetch<InsightRefreshResponseDto>(getInsightsRefreshUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getInsightsRefreshMutationKey = () => ['insightsRefresh'] as const;
+
+export const getInsightsRefreshMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof insightsRefresh>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof insightsRefresh>>, TError,void, TContext> => {
+
+const mutationKey = getInsightsRefreshMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof insightsRefresh>>, void> = () => {
+
+
+          return  insightsRefresh(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InsightsRefreshMutationResult = NonNullable<Awaited<ReturnType<typeof insightsRefresh>>>
+
+    export type InsightsRefreshMutationError = ErrorType<unknown>
+
+
+    export const useInsightsRefresh = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof insightsRefresh>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof insightsRefresh>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getInsightsRefreshMutationOptions(options), queryClient);
+    }
+
+export const getInsightsStatusUrl = () => {
+
+
+
+
+  return `/api/admin/insights/status`
+}
+
+export const insightsStatus = async ( options?: Parameters<typeof customFetch>[1]): Promise<InsightStatusResponseDto> => {
+
+  return customFetch<InsightStatusResponseDto>(getInsightsStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getInsightsStatusQueryKey = () => {
+    return [
+    `/api/admin/insights/status`
+    ] as const;
+    }
+
+
+export const getInsightsStatusQueryOptions = <TData = Awaited<ReturnType<typeof insightsStatus>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsStatus>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getInsightsStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof insightsStatus>>> = ({ signal }) => insightsStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof insightsStatus>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type InsightsStatusQueryResult = NonNullable<Awaited<ReturnType<typeof insightsStatus>>>
+export type InsightsStatusQueryError = ErrorType<unknown>
+
+
+export function useInsightsStatus<TData = Awaited<ReturnType<typeof insightsStatus>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsStatus>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsStatus>>,
+          TError,
+          Awaited<ReturnType<typeof insightsStatus>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsStatus<TData = Awaited<ReturnType<typeof insightsStatus>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsStatus>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsStatus>>,
+          TError,
+          Awaited<ReturnType<typeof insightsStatus>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsStatus<TData = Awaited<ReturnType<typeof insightsStatus>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsStatus>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useInsightsStatus<TData = Awaited<ReturnType<typeof insightsStatus>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsStatus>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getInsightsStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getInsightsQueryUrl = (series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsQueryParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/insights/${series}?${stringifiedParams}` : `/api/admin/insights/${series}`
+}
+
+export const insightsQuery = async (series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsQueryParams, options?: Parameters<typeof customFetch>[1]): Promise<InsightResultDto> => {
+
+  return customFetch<InsightResultDto>(getInsightsQueryUrl(series,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getInsightsQueryQueryKey = (series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsQueryParams,) => {
+    return [
+    `/api/admin/insights/${series}`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getInsightsQueryQueryOptions = <TData = Awaited<ReturnType<typeof insightsQuery>>, TError = ErrorType<unknown>>(series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsQueryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsQuery>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getInsightsQueryQueryKey(series,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof insightsQuery>>> = ({ signal }) => insightsQuery(series,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: series !== null && series !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof insightsQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type InsightsQueryQueryResult = NonNullable<Awaited<ReturnType<typeof insightsQuery>>>
+export type InsightsQueryQueryError = ErrorType<unknown>
+
+
+export function useInsightsQuery<TData = Awaited<ReturnType<typeof insightsQuery>>, TError = ErrorType<unknown>>(
+ series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params: undefined |  InsightsQueryParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsQuery>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsQuery>>,
+          TError,
+          Awaited<ReturnType<typeof insightsQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsQuery<TData = Awaited<ReturnType<typeof insightsQuery>>, TError = ErrorType<unknown>>(
+ series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsQueryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsQuery>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsQuery>>,
+          TError,
+          Awaited<ReturnType<typeof insightsQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsQuery<TData = Awaited<ReturnType<typeof insightsQuery>>, TError = ErrorType<unknown>>(
+ series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsQueryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsQuery>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useInsightsQuery<TData = Awaited<ReturnType<typeof insightsQuery>>, TError = ErrorType<unknown>>(
+ series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsQueryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsQuery>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getInsightsQueryQueryOptions(series,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getInsightsCsvUrl = (series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsCsvParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/insights/${series}/csv?${stringifiedParams}` : `/api/admin/insights/${series}/csv`
+}
+
+export const insightsCsv = async (series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsCsvParams, options?: Parameters<typeof customFetch>[1]): Promise<string> => {
+
+  return customFetch<string>(getInsightsCsvUrl(series,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getInsightsCsvQueryKey = (series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsCsvParams,) => {
+    return [
+    `/api/admin/insights/${series}/csv`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getInsightsCsvQueryOptions = <TData = Awaited<ReturnType<typeof insightsCsv>>, TError = ErrorType<unknown>>(series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsCsvParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsCsv>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getInsightsCsvQueryKey(series,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof insightsCsv>>> = ({ signal }) => insightsCsv(series,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: series !== null && series !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof insightsCsv>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type InsightsCsvQueryResult = NonNullable<Awaited<ReturnType<typeof insightsCsv>>>
+export type InsightsCsvQueryError = ErrorType<unknown>
+
+
+export function useInsightsCsv<TData = Awaited<ReturnType<typeof insightsCsv>>, TError = ErrorType<unknown>>(
+ series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params: undefined |  InsightsCsvParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsCsv>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsCsv>>,
+          TError,
+          Awaited<ReturnType<typeof insightsCsv>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsCsv<TData = Awaited<ReturnType<typeof insightsCsv>>, TError = ErrorType<unknown>>(
+ series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsCsvParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsCsv>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsCsv>>,
+          TError,
+          Awaited<ReturnType<typeof insightsCsv>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsCsv<TData = Awaited<ReturnType<typeof insightsCsv>>, TError = ErrorType<unknown>>(
+ series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsCsvParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsCsv>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useInsightsCsv<TData = Awaited<ReturnType<typeof insightsCsv>>, TError = ErrorType<unknown>>(
+ series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsCsvParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsCsv>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getInsightsCsvQueryOptions(series,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getAdminMeDescribeUrl = () => {
 
