@@ -1,6 +1,7 @@
 export interface ExistingCertificate {
   id: string;
   number: string;
+  recipientName: string;
   fileKey: string | null;
   fileSha256: string | null;
   fileSizeBytes: number | null;

@@ -5,6 +5,7 @@ import type { ExistingCertificate, IssueFacts } from "../../src/certificate/issu
 const complete: ExistingCertificate = {
   id: "certificate-id",
   number: "ABCD-EFGH-JKMN",
+  recipientName: "Amina Rahman",
   fileKey: "key.pdf",
   fileSha256: "sha",
   fileSizeBytes: 10,
