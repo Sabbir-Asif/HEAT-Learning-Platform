@@ -18,9 +18,6 @@ export type StudentExportDownloadParams = {
   /** @pattern ^(\d{4})-(\d{2})$ */
   session?: string;
   status?: StudentExportDownloadStatus;
-  /**
-   * @minLength 1
-   * @maxLength 100
-   */
-  search?: string;
+  /** @maxLength 100 */
+  q?: string;
 };
