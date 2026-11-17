@@ -127,3 +127,48 @@ describe("labels and tags", () => {
     expect(isKnownCacheTag(resourcesCacheTag)).toBe(true);
   });
 });
+
+describe("resource edge rules", () => {
+  test("rejects a web address longer than the limit", () => {
+    expect(isHttpsUrl(`https://example.org/${"a".repeat(3000)}`)).toBe(false);
+  });
+
+  test("turns filled form values into a request", () => {
+    expect(
+      resourceRequestFromForm({
+        ...formValues,
+        kind: "file",
+        description: "Notes",
+        mediaAssetId: assetId,
+        courseId: assetId,
+        displayOrder: "4",
+        published: true,
+      }),
+    ).toEqual({
+      kind: "file",
+      title: "Guide",
+      description: "Notes",
+      url: null,
+      mediaAssetId: assetId,
+      courseId: assetId,
+      displayOrder: 4,
+      published: true,
+    });
+  });
+
+  test("requires an uploaded file for the file kind", () => {
+    const result = resourceFormSchema.safeParse({ ...formValues, kind: "file" });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path).toEqual(["mediaAssetId"]);
+  });
+
+  test("labels a file with no known mime type", () => {
+    expect(resourceTypeLabel("file", null)).toBe("File");
+    expect(
+      resourceTypeLabel(
+        "file",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      ),
+    ).toBe("PowerPoint");
+  });
+});

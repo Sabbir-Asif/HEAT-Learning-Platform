@@ -84,3 +84,14 @@ describe("news cache tags", () => {
     expect(isKnownCacheTag("news:Bad Slug")).toBe(false);
   });
 });
+
+describe("dhaka date edge cases", () => {
+  test("rejects a well-formed but impossible local date", () => {
+    expect(dhakaLocalToIso("2026-13-45T10:00")).toBeNull();
+  });
+
+  test("returns an empty string for null and for an unparsable instant", () => {
+    expect(isoToDhakaLocal(null)).toBe("");
+    expect(isoToDhakaLocal("not a date")).toBe("");
+  });
+});

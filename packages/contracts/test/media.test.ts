@@ -42,3 +42,16 @@ describe("mediaUploadFieldsSchema", () => {
     );
   });
 });
+
+describe("mediaImageUrl query handling", () => {
+  test("keeps a query string and rewrites the width and format", () => {
+    expect(mediaImageUrl("/media/public/a/w320.webp?v=2", 700)).toBe(
+      "/media/public/a/w1280.webp?v=2",
+    );
+    expect(mediaImageUrl("/media/public/a/w320.avif", 5000)).toBe("/media/public/a/w1920.avif");
+  });
+
+  test("leaves a url without a variant file untouched", () => {
+    expect(mediaImageUrl("/media/public/a/original.png", 640)).toBe("/media/public/a/original.png");
+  });
+});
