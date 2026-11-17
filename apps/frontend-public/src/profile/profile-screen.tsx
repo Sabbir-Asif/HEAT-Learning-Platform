@@ -6,6 +6,7 @@ import { ShellContent } from "@heat/ui/shell";
 import { SignOutButton } from "../auth/sign-out-button";
 import { ResendVerificationForm } from "../awaiting/resend-verification-form";
 import { AvatarSection } from "./avatar-section";
+import { ChangeRequestSection } from "./change-request-section";
 import { DetailsForm } from "./details-form";
 import { PasswordSection } from "./password-section";
 
@@ -37,6 +38,7 @@ export function ProfileScreen() {
       <PageHeader title="Profile" action={<SignOutButton />} />
       <AvatarSection profile={data} />
       <DetailsForm key={`${data.name}-${data.session}-${data.department.id}`} profile={data} />
+      {data.locked ? <ChangeRequestSection profile={data} /> : null}
       <section aria-labelledby="profile-email" className="flex flex-col gap-3">
         <FieldTitle id="profile-email">Email</FieldTitle>
         <FieldDescription>{data.email}</FieldDescription>

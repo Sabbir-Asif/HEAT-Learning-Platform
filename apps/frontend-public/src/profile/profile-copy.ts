@@ -9,4 +9,14 @@ export const avatarUploadFailedMessage = (code: string | undefined): string => {
 export const lockedExplanation =
   "Your name and academic details are locked because your enrollment was approved. The name is printed on your certificate.";
 
-export const requestChangeLabel = "Request a change";
+export const changeRequestHeading = "Request a change";
+
+export const changeRequestIntro =
+  "Change the details below and send them with a note. An admin reviews every request and you get a notification with the decision.";
+
+export const changeRequestPendingMessage =
+  "Your change request is waiting for an admin. You can send another one after it is decided.";
+
+export const changeRequestRejectedMessage = "Your last change request was not approved.";
+
+export const changeRequestSubmitLabel = "Send request";
