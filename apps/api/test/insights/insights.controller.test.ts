@@ -31,6 +31,13 @@ describe("InsightsController", () => {
     );
   });
 
+  test("the funnel route passes the filters to the query service", async () => {
+    const funnel = vi.fn().mockResolvedValue({ stages: [] });
+    const controller = new InsightsController({ funnel } as never, {} as never);
+    await controller.funnel({ courseId: "c" });
+    expect(funnel).toHaveBeenCalledWith({ courseId: "c" });
+  });
+
   test("the refresh passes the signed in admin", async () => {
     const refresh = vi.fn().mockResolvedValue({ run: {} });
     const controller = new InsightsController({} as never, { refresh } as never);

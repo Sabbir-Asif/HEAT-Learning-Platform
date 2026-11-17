@@ -4,7 +4,14 @@ import {
   insightSeriesColumns,
   insightSuppressionThreshold,
 } from "@heat/contracts";
-import type { InsightGroupBy, InsightQuery, InsightResult, InsightSeries } from "@heat/contracts";
+import type {
+  InsightFilters,
+  InsightGroupBy,
+  InsightQuery,
+  InsightResult,
+  InsightSeries,
+  InsightFunnelResult,
+} from "@heat/contracts";
 import type { HeatClient } from "@heat/db";
 import { DATABASE, dayFromDate } from "../core";
 import type { RollupMetrics } from "../core";
@@ -14,9 +21,10 @@ import {
   buildRollupWhere,
   isGroupByAllowed,
   toCsv,
+  toFunnel,
   toInsightGroup,
 } from "./insights-query";
-import type { QueryRow } from "./insights-query";
+import type { InsightGroupKind, QueryRow } from "./insights-query";
 
 const readBatchSize = 2000;
 const questionLabelLength = 120;
@@ -54,12 +62,21 @@ export class InsightsQueryService {
     };
   }
 
+  async funnel(filters: InsightFilters): Promise<InsightFunnelResult> {
+    const totals = await this.totalsByGroup("enrollments", filters, "all");
+    return toFunnel(totals, await this.refreshedAt());
+  }
+
   async csv(series: InsightSeries, query: InsightQuery): Promise<string> {
     const result = await this.query(series, query);
     return toCsv(result.columns, result.groups);
   }
 
-  private async totalsByGroup(series: InsightSeries, query: InsightQuery, groupBy: InsightGroupBy) {
+  private async totalsByGroup(
+    series: InsightSeries,
+    query: InsightFilters,
+    groupBy: InsightGroupKind,
+  ) {
     const where = buildRollupWhere(series, query);
     const accumulator = new GroupAccumulator(groupBy);
     let cursor: string | undefined;

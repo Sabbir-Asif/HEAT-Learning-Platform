@@ -1,4 +1,6 @@
 import {
+  insightFunnelQuerySchema,
+  insightFunnelResultSchema,
   insightQuerySchema,
   insightRefreshResponseSchema,
   insightResultSchema,
@@ -12,3 +14,5 @@ export class InsightSeriesParamsDto extends createZodDto(insightSeriesParamsSche
 export class InsightResultDto extends createZodDto(insightResultSchema) {}
 export class InsightStatusResponseDto extends createZodDto(insightStatusResponseSchema) {}
 export class InsightRefreshResponseDto extends createZodDto(insightRefreshResponseSchema) {}
+export class InsightFunnelQueryDto extends createZodDto(insightFunnelQuerySchema) {}
+export class InsightFunnelResultDto extends createZodDto(insightFunnelResultSchema) {}

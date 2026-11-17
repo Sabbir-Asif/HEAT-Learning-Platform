@@ -1,9 +1,16 @@
 import {
+  insightFunnelStages,
   insightSeriesColumns,
   insightSeriesGroupBy,
   insightSuppressionThreshold,
 } from "@heat/contracts";
-import type { InsightFilters, InsightGroup, InsightGroupBy, InsightSeries } from "@heat/contracts";
+import type {
+  InsightFilters,
+  InsightFunnelResult,
+  InsightGroup,
+  InsightGroupBy,
+  InsightSeries,
+} from "@heat/contracts";
 import type { Prisma } from "@heat/db";
 import { dayAsDate, emptyMetrics, rollupMetrics } from "../core";
 import type { RollupKind, RollupMetric, RollupMetrics } from "../core";
@@ -48,8 +55,12 @@ export const buildRollupWhere = (
   };
 };
 
-export const groupKeyOf = (row: QueryRow, groupBy: InsightGroupBy): string => {
+export type InsightGroupKind = InsightGroupBy | "all";
+
+export const groupKeyOf = (row: QueryRow, groupBy: InsightGroupKind): string => {
   switch (groupBy) {
+    case "all":
+      return "all";
     case "day":
       return row.day;
     case "month":
@@ -98,7 +109,7 @@ export interface GroupTotals {
 export class GroupAccumulator {
   private readonly groups = new Map<string, RollupMetrics>();
 
-  constructor(private readonly groupBy: InsightGroupBy) {}
+  constructor(private readonly groupBy: InsightGroupKind) {}
 
   add(row: QueryRow): void {
     const key = groupKeyOf(row, this.groupBy);
@@ -158,4 +169,24 @@ export const toCsv = (columns: readonly string[], groups: readonly InsightGroup[
     lines.push(cells.map(csvCell).join(","));
   }
   return `${lines.join("\r\n")}\r\n`;
+};
+
+export const toFunnel = (
+  groups: readonly GroupTotals[],
+  refreshedAt: string | null,
+  threshold: number = insightSuppressionThreshold,
+): InsightFunnelResult => {
+  const totals = groups[0]?.totals ?? emptyMetrics();
+  const group = toInsightGroup("enrollments", { key: "all", totals }, "All students", threshold);
+  const empty = studentsIn("enrollments", totals) === 0;
+  const suppressed = group.suppressed && !empty;
+  return {
+    stages: insightFunnelStages.map((key) => ({
+      key,
+      value: suppressed ? null : (group.values[key] ?? 0),
+    })),
+    suppressed,
+    suppressionThreshold: threshold,
+    refreshedAt,
+  };
 };

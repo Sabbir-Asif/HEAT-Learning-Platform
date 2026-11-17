@@ -5,6 +5,8 @@ import { CurrentSession } from "../auth";
 import type { AuthenticatedSession } from "../auth";
 import { Audited } from "../audit";
 import {
+  InsightFunnelQueryDto,
+  InsightFunnelResultDto,
   InsightQueryDto,
   InsightRefreshResponseDto,
   InsightResultDto,
@@ -40,6 +42,12 @@ export class InsightsController {
   @ApiAcceptedResponse({ type: InsightRefreshResponseDto })
   refresh(@CurrentSession() session: AuthenticatedSession): Promise<InsightRefreshResponseDto> {
     return this.refreshes.refresh(session.userId);
+  }
+
+  @Get("funnel")
+  @ApiOkResponse({ type: InsightFunnelResultDto })
+  funnel(@Query() query: InsightFunnelQueryDto): Promise<InsightFunnelResultDto> {
+    return this.queries.funnel(query);
   }
 
   @Get(":series")

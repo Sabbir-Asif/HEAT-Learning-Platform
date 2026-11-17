@@ -84,4 +84,53 @@ describe("InsightsQueryService", () => {
     const result = await service.query("enrollments", { groupBy: "session" });
     expect(JSON.stringify(result)).not.toMatch(/userId|email|enrollmentId/);
   });
+
+  test("the funnel sums every day into one set of stage totals", async () => {
+    const { service, findMany } = build([
+      rollupRow({
+        id: "1",
+        day: new Date("2026-11-13T00:00:00.000Z"),
+        registered: 4,
+        verified: 3,
+        approved: 2,
+      }),
+      rollupRow({
+        id: "2",
+        day: new Date("2026-11-14T00:00:00.000Z"),
+        registered: 6,
+        verified: 5,
+        approved: 4,
+        started: 3,
+        completed: 1,
+      }),
+    ]);
+    const result = await service.funnel({ departmentId: "dept-1" });
+    expect(findMany.mock.calls[0]?.[0].where).toMatchObject({
+      kind: "ENROLLMENT",
+      departmentId: "dept-1",
+    });
+    expect(result.suppressed).toBe(false);
+    expect(result.stages).toEqual([
+      { key: "registered", value: 10 },
+      { key: "verified", value: 8 },
+      { key: "approved", value: 6 },
+      { key: "started", value: 3 },
+      { key: "completed", value: 1 },
+    ]);
+    expect(result.refreshedAt).toBe("2026-11-13T02:00:00.000Z");
+  });
+
+  test("the funnel withholds every stage when the group is under the threshold", async () => {
+    const { service } = build([rollupRow({ id: "1", registered: 3, verified: 2 })]);
+    const result = await service.funnel({});
+    expect(result.suppressed).toBe(true);
+    expect(result.stages.every((stage) => stage.value === null)).toBe(true);
+  });
+
+  test("the funnel with no rows is zero and not suppressed", async () => {
+    const { service } = build([]);
+    const result = await service.funnel({});
+    expect(result.suppressed).toBe(false);
+    expect(result.stages.map((stage) => stage.value)).toEqual([0, 0, 0, 0, 0]);
+  });
 });
