@@ -4,6 +4,10 @@ import {
   insightDefaultGroupBy,
   insightFunnelQuerySchema,
   insightFunnelStages,
+  insightMissedMaxLimit,
+  insightMissedQuestionsQuerySchema,
+  insightModuleResultsQuerySchema,
+  insightQuizResultsQuerySchema,
   insightQuerySchema,
   insightSeriesGroupBy,
   insightSeriesParamsSchema,
@@ -82,5 +86,42 @@ describe("insight funnel", () => {
     expect(
       insightFunnelQuerySchema.safeParse({ from: "2026-01-01", to: "2026-02-01" }).success,
     ).toBe(true);
+  });
+});
+
+describe("insight module and quiz result queries", () => {
+  const quizId = "0198b3f0-0000-7000-8000-000000000009";
+
+  test("the missed questions query needs a quiz and caps the limit", () => {
+    expect(insightMissedQuestionsQuerySchema.safeParse({}).success).toBe(false);
+    expect(insightMissedQuestionsQuerySchema.parse({ quizId, limit: "5" })).toEqual({
+      quizId,
+      limit: 5,
+    });
+    expect(insightMissedQuestionsQuerySchema.safeParse({ quizId, limit: "0" }).success).toBe(false);
+    expect(
+      insightMissedQuestionsQuerySchema.safeParse({
+        quizId,
+        limit: String(insightMissedMaxLimit + 1),
+      }).success,
+    ).toBe(false);
+  });
+
+  test("the missed questions query shares the date range rule", () => {
+    const result = insightMissedQuestionsQuerySchema.safeParse({
+      quizId,
+      from: "2026-11-10",
+      to: "2026-11-01",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  test("module and quiz results take the shared filters", () => {
+    expect(insightModuleResultsQuerySchema.parse({ session: "2020-21" })).toEqual({
+      session: "2020-21",
+    });
+    expect(
+      insightQuizResultsQuerySchema.safeParse({ from: "2026-11-10", to: "2026-11-01" }).success,
+    ).toBe(false);
   });
 });

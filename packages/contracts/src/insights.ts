@@ -142,6 +142,94 @@ export const insightFunnelResultSchema = z.object({
 
 export type InsightFunnelResult = z.infer<typeof insightFunnelResultSchema>;
 
+export const insightModuleResultsQuerySchema = insightFunnelQuerySchema;
+
+export const insightQuizResultsQuerySchema = insightFunnelQuerySchema;
+
+export const insightMissedDefaultLimit = 10;
+
+export const insightMissedMaxLimit = 25;
+
+export const insightMissedQuestionsQuerySchema = z
+  .object({
+    ...insightFilterShape,
+    quizId: z.uuid(),
+    limit: z.coerce.number().int().min(1).max(insightMissedMaxLimit).optional(),
+  })
+  .refine(dateRangeIsOrdered, dateRangeMessage);
+
+export type InsightMissedQuestionsQuery = z.infer<typeof insightMissedQuestionsQuerySchema>;
+
+const countOrNull = z.number().int().nonnegative().nullable();
+
+const percentOrNull = z.number().nonnegative().nullable();
+
+export const insightModuleResultRowSchema = z.object({
+  moduleId: z.string(),
+  label: z.string(),
+  suppressed: z.boolean(),
+  students: countOrNull,
+  started: countOrNull,
+  quizReady: countOrNull,
+  completed: countOrNull,
+  completionRate: percentOrNull,
+  dropOff: countOrNull,
+});
+
+export type InsightModuleResultRow = z.infer<typeof insightModuleResultRowSchema>;
+
+export const insightModuleResultsSchema = z.object({
+  rows: z.array(insightModuleResultRowSchema),
+  suppressionThreshold: z.number().int().positive(),
+  refreshedAt: z.iso.datetime().nullable(),
+});
+
+export type InsightModuleResults = z.infer<typeof insightModuleResultsSchema>;
+
+export const insightQuizResultRowSchema = z.object({
+  quizId: z.string(),
+  moduleId: z.string(),
+  label: z.string(),
+  suppressed: z.boolean(),
+  attemptedStudents: countOrNull,
+  passedStudents: countOrNull,
+  attempts: countOrNull,
+  passRate: percentOrNull,
+  averageAttempts: percentOrNull,
+});
+
+export type InsightQuizResultRow = z.infer<typeof insightQuizResultRowSchema>;
+
+export const insightQuizResultsSchema = z.object({
+  rows: z.array(insightQuizResultRowSchema),
+  suppressionThreshold: z.number().int().positive(),
+  refreshedAt: z.iso.datetime().nullable(),
+});
+
+export type InsightQuizResults = z.infer<typeof insightQuizResultsSchema>;
+
+export const insightMissedQuestionRowSchema = z.object({
+  questionId: z.string(),
+  order: z.number().int().nonnegative(),
+  text: z.string(),
+  answered: z.number().int().nonnegative(),
+  missed: z.number().int().nonnegative(),
+  missPercent: z.number().nonnegative(),
+});
+
+export type InsightMissedQuestionRow = z.infer<typeof insightMissedQuestionRowSchema>;
+
+export const insightMissedQuestionsSchema = z.object({
+  quizId: z.string(),
+  label: z.string(),
+  rows: z.array(insightMissedQuestionRowSchema),
+  suppressedCount: z.number().int().nonnegative(),
+  suppressionThreshold: z.number().int().positive(),
+  refreshedAt: z.iso.datetime().nullable(),
+});
+
+export type InsightMissedQuestions = z.infer<typeof insightMissedQuestionsSchema>;
+
 export const insightRunStatusSchema = z.enum(["PENDING", "RUNNING", "SUCCEEDED", "FAILED"]);
 
 export const insightRunTriggerSchema = z.enum(["NIGHTLY", "MANUAL", "BACKFILL"]);
