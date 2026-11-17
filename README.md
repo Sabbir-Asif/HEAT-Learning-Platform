@@ -169,6 +169,16 @@ The seed creates the super admin (who must change the password at first sign-in)
 
 `docs/data-inventory.md` lists the personal data columns; a schema change that adds one updates it in the same pull request.
 
+### Insights rollups
+
+The worker rebuilds the insight rollup tables every night at 02:00 Asia/Dhaka for yesterday and today, and an admin refresh (`POST /api/admin/insights/refresh`) queues the same rebuild. Days are Asia/Dhaka days, so the boundary is midnight in Dhaka, not UTC. Only one run can be active at a time; a second refresh answers 409 `INSIGHTS_REFRESH_RUNNING`. To rebuild history for a date range, build the API and run it with the database settings of the target environment:
+
+```sh
+pnpm --filter api insights-backfill --from 2026-11-01 --to 2026-11-30
+```
+
+The command refuses to start while another run is active. Rebuilding a day is idempotent, so a range can be rerun safely.
+
 ### Integration tests
 
 Integration tests run on real Postgres 17 and Redis 7 in Testcontainers, with no Docker Compose stack, in `packages/db` and `apps/api` (`pnpm -r --if-present run test:integration`; needs Docker, and set `DOCKER_HOST=unix:///var/run/docker.sock` when the Docker Desktop socket is missing). The harness is `packages/db/src/testing`, exported as `@heat/db/testing`.
