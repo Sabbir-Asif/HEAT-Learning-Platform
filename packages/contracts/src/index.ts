@@ -22,6 +22,7 @@ export * from "./notifications";
 export * from "./news";
 export * from "./playback";
 export * from "./profile";
+export * from "./profile-change";
 export * from "./progress";
 export * from "./public-cache";
 export * from "./quiz-delivery";
