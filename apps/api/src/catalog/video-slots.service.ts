@@ -1,5 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import {
+  captionLanguageSchema,
   videoFailureReasonSchema,
   videoQueuedEventType,
   videoRejectionReasonSchema,
@@ -39,6 +40,7 @@ const slotSelect = {
       failureReason: true,
       createdAt: true,
       updatedAt: true,
+      captions: { select: { language: true }, orderBy: { language: "asc" as const } },
     },
   },
 };
@@ -56,6 +58,7 @@ interface SlotRow {
     failureReason: string | null;
     createdAt: Date;
     updatedAt: Date;
+    captions: Array<{ language: string }>;
   } | null;
 }
 
@@ -80,6 +83,10 @@ const toSlotSummary = (row: SlotRow): VideoSlotSummary => ({
   failureReason: failureOf(row.asset?.failureReason ?? null),
   uploadedAt: row.asset?.createdAt.toISOString() ?? null,
   statusChangedAt: row.asset?.updatedAt.toISOString() ?? null,
+  captions: (row.asset?.captions ?? []).flatMap((caption) => {
+    const parsed = captionLanguageSchema.safeParse(caption.language);
+    return parsed.success ? [parsed.data] : [];
+  }),
 });
 
 const auditedFields = (moduleId: string, row: SlotRow) => ({

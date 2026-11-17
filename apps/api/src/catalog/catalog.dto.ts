@@ -1,5 +1,14 @@
 import {
+  adminContactSettingsResponseSchema,
+  contactSettingsRequestSchema,
+  publicContactSettingsResponseSchema,
+  adminFrontPageResponseSchema,
+  adminLandingOverviewResponseSchema,
+  landingOverviewRequestSchema,
+  publicLandingOverviewResponseSchema,
   courseIdParamsSchema,
+  courseSlugParamsSchema,
+  publicCourseResponseSchema,
   courseListQuerySchema,
   courseListResponseSchema,
   courseRevisionItemSchema,
@@ -8,25 +17,37 @@ import {
   courseSummarySchema,
   createCourseRequestSchema,
   createModuleRequestSchema,
+  createTagRequestSchema,
   createVideoSlotRequestSchema,
+  lessonBodyRequestSchema,
+  lessonBodyResponseSchema,
   lessonSectionParamsSchema,
   lessonSectionRequestSchema,
   moduleListResponseSchema,
   moduleParamsSchema,
   moduleSummarySchema,
   publishChecklistSchema,
+  publicFrontPageResponseSchema,
   quizQuestionParamsSchema,
   quizQuestionRequestSchema,
   quizRulesRequestSchema,
   quizSummarySchema,
   reorderRequestSchema,
+  setTagsRequestSchema,
+  tagDetailSchema,
+  tagIdParamsSchema,
+  tagListResponseSchema,
+  tagRefListResponseSchema,
+  tagSummarySchema,
   updateCourseRequestSchema,
   updateModuleRequestSchema,
   updateQuizQuestionRequestSchema,
+  updateTagRequestSchema,
   updateVideoSlotRequestSchema,
   videoSlotListResponseSchema,
   videoSlotParamsSchema,
   videoUploadParamsSchema,
+  videoCaptionParamsSchema,
 } from "@heat/contracts";
 import { createZodDto } from "nestjs-zod";
 
@@ -43,6 +64,10 @@ export class CourseSummaryDto extends createZodDto(courseSummarySchema) {}
 export class PublishChecklistDto extends createZodDto(publishChecklistSchema) {}
 
 export class CourseIdParamsDto extends createZodDto(courseIdParamsSchema) {}
+
+export class CourseSlugParamsDto extends createZodDto(courseSlugParamsSchema) {}
+
+export class PublicCourseResponseDto extends createZodDto(publicCourseResponseSchema) {}
 
 export class CreateModuleRequestDto extends createZodDto(createModuleRequestSchema) {}
 
@@ -68,6 +93,8 @@ export class VideoSlotListResponseDto extends createZodDto(videoSlotListResponse
 
 export class VideoSlotParamsDto extends createZodDto(videoSlotParamsSchema) {}
 
+export class VideoCaptionParamsDto extends createZodDto(videoCaptionParamsSchema) {}
+
 export class VideoUploadParamsDto extends createZodDto(videoUploadParamsSchema) {}
 
 export class QuizSummaryDto extends createZodDto(quizSummarySchema) {}
@@ -85,3 +112,46 @@ export class CourseRevisionItemDto extends createZodDto(courseRevisionItemSchema
 export class CourseRevisionListResponseDto extends createZodDto(courseRevisionListResponseSchema) {}
 
 export class CourseRevisionParamsDto extends createZodDto(courseRevisionParamsSchema) {}
+export class CreateTagRequestDto extends createZodDto(createTagRequestSchema) {}
+
+export class UpdateTagRequestDto extends createZodDto(updateTagRequestSchema) {}
+
+export class TagSummaryDto extends createZodDto(tagSummarySchema) {}
+
+export class TagListResponseDto extends createZodDto(tagListResponseSchema) {}
+
+export class TagDetailDto extends createZodDto(tagDetailSchema) {}
+
+export class TagIdParamsDto extends createZodDto(tagIdParamsSchema) {}
+
+export class TagRefListResponseDto extends createZodDto(tagRefListResponseSchema) {}
+
+export class SetTagsRequestDto extends createZodDto(setTagsRequestSchema) {}
+
+export class AdminFrontPageResponseDto extends createZodDto(adminFrontPageResponseSchema) {}
+
+export class PublicFrontPageResponseDto extends createZodDto(publicFrontPageResponseSchema) {}
+
+export class LessonBodyRequestDto extends createZodDto(lessonBodyRequestSchema) {}
+
+export class LessonBodyResponseDto extends createZodDto(lessonBodyResponseSchema) {}
+
+export class LandingOverviewRequestDto extends createZodDto(landingOverviewRequestSchema) {}
+
+export class AdminLandingOverviewResponseDto extends createZodDto(
+  adminLandingOverviewResponseSchema,
+) {}
+
+export class PublicLandingOverviewResponseDto extends createZodDto(
+  publicLandingOverviewResponseSchema,
+) {}
+
+export class ContactSettingsRequestDto extends createZodDto(contactSettingsRequestSchema) {}
+
+export class AdminContactSettingsResponseDto extends createZodDto(
+  adminContactSettingsResponseSchema,
+) {}
+
+export class PublicContactSettingsResponseDto extends createZodDto(
+  publicContactSettingsResponseSchema,
+) {}

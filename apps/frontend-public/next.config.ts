@@ -4,6 +4,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   reactCompiler: true,
+  experimental: { useCache: true },
+  images: { loader: "custom", loaderFile: "./src/media-image-loader.ts" },
   outputFileTracingRoot: path.join(__dirname, "../.."),
   transpilePackages: ["@heat/ui", "@heat/api-client", "@heat/contracts"],
   async headers() {

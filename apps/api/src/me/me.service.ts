@@ -22,7 +22,7 @@ export class MeService {
     });
     if (user === null) throw new UnauthorizedException();
     const enrollments = await this.database.enrollment.findMany({
-      where: { userId },
+      where: { userId, deletedAt: null },
       orderBy: { requestedAt: "asc" },
       select: {
         status: true,

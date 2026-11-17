@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   courseFormSchema,
   courseListQuerySchema,
+  courseSlugParamsSchema,
   createCourseRequestSchema,
   errorResponseSchema,
 } from "../src/index";
@@ -75,5 +76,13 @@ describe("errorResponseSchema failures", () => {
       },
     };
     expect(errorResponseSchema.parse(body).error.failures).toHaveLength(1);
+  });
+});
+
+describe("courseSlugParamsSchema", () => {
+  test("accepts a slug up to the maximum length and rejects an empty or longer one", () => {
+    expect(courseSlugParamsSchema.safeParse({ slug: "gender-safety" }).success).toBe(true);
+    expect(courseSlugParamsSchema.safeParse({ slug: "" }).success).toBe(false);
+    expect(courseSlugParamsSchema.safeParse({ slug: "a".repeat(81) }).success).toBe(false);
   });
 });

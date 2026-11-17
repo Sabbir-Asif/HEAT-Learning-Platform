@@ -28,6 +28,24 @@ afterEach(() => {
 
 const download = () => screen.getByRole("button", { name: "Download CSV" }) as HTMLButtonElement;
 
+describe("ChartCard long labels", () => {
+  test("the data table keeps the full label when tick labels are shortened", () => {
+    const label = "Which of these is a form of consent that can be withdrawn?";
+    render(
+      <ChartCard
+        {...props}
+        kind="bar"
+        xKey="question"
+        xLabel="Question"
+        xTickMaxLength={12}
+        series={[{ key: "missPercent", label: "Missed (%)" }]}
+        data={[{ question: label, missPercent: 62 }]}
+      />,
+    );
+    expect(screen.getByRole("rowheader", { hidden: true }).textContent).toBe(label);
+  });
+});
+
 describe("ChartCard states", () => {
   test("ready shows the summary, the data table and an enabled download", () => {
     render(<ChartCard {...props} />);

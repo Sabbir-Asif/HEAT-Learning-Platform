@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { ContentPagesView } from "@/site-pages/content-pages-view";
 
 export default function Page() {
-  return <PlaceholderPage title="Pages" />;
+  return <ContentPagesView />;
 }

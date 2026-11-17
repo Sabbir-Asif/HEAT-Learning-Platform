@@ -1,4 +1,6 @@
 import {
+  newsPublishedEventType,
+  newsPublishedPayloadSchema,
   videoQueuedEventType,
   videoUploadedEventType,
   videoUploadedPayloadSchema,
@@ -32,6 +34,7 @@ export type RoutedAction =
   | { kind: "certificate"; enrollmentId: string }
   | { kind: "probe"; assetId: string }
   | { kind: "transcode"; assetId: string }
+  | { kind: "news-notification"; data: JsonObject }
   | { kind: "notification"; userId: string; type: NotificationKind; data: JsonObject };
 
 export type Routing =
@@ -71,6 +74,12 @@ export const routeOutboxEvent = (eventType: string, payload: unknown): Routing =
       kind: eventType === videoUploadedEventType ? "probe" : "transcode",
       assetId: video.data.assetId,
     });
+  }
+
+  if (eventType === newsPublishedEventType) {
+    const news = newsPublishedPayloadSchema.safeParse(payload);
+    if (!news.success) return { outcome: "skipped", reason: "invalid news payload" };
+    actions.push({ kind: "news-notification", data: news.data });
   }
 
   const email = emailEnvelope.safeParse(payload);

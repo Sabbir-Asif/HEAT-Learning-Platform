@@ -15,6 +15,7 @@ export const CERTIFICATE_READY_NOTIFICATION = "CERTIFICATE_READY";
 const certificateSelect = {
   id: true,
   number: true,
+  recipientName: true,
   fileKey: true,
   fileSha256: true,
   fileSizeBytes: true,

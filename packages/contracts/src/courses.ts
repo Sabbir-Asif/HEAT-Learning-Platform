@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { lessonBodyImageSchema } from "./rich-text";
 import { adminPageSizes } from "./admins";
 
 export const courseTitleMaxLength = 200;
@@ -184,3 +185,25 @@ export const courseRevisionListResponseSchema = z.object({
 export type CourseRevisionListResponse = z.infer<typeof courseRevisionListResponseSchema>;
 
 export const courseRevisionParamsSchema = z.object({ id: z.uuid(), revisionId: z.uuid() });
+
+export const courseSlugParamsSchema = z.object({
+  slug: z.string().min(1).max(courseSlugMaxLength),
+});
+
+export const publicCourseModuleSchema = z.object({
+  id: z.uuid(),
+  order: z.number().int().positive(),
+  title: z.string(),
+  objectives: z.array(z.string()),
+});
+
+export const publicCourseResponseSchema = z.object({
+  id: z.uuid(),
+  slug: z.string(),
+  title: z.string(),
+  description: z.string().max(courseDescriptionMaxLength).nullable(),
+  thumbnail: lessonBodyImageSchema.nullable(),
+  modules: z.array(publicCourseModuleSchema),
+});
+
+export type PublicCourseResponse = z.infer<typeof publicCourseResponseSchema>;

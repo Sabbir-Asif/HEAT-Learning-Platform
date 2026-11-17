@@ -33,6 +33,14 @@ const copy: Record<NotificationTypeName, { title: string; description: string }>
     title: "New announcement",
     description: "A new post was published.",
   },
+  PROFILE_CHANGE_APPROVED: {
+    title: "Your profile change was approved",
+    description: "Your profile now shows the new details.",
+  },
+  PROFILE_CHANGE_REJECTED: {
+    title: "Your profile change was not approved",
+    description: "Your profile keeps its current details.",
+  },
 };
 
 const timeFormat = new Intl.DateTimeFormat("en-GB", {

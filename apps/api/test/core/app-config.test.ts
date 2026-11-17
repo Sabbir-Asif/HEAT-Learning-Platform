@@ -14,6 +14,8 @@ const productionMail = {
   SMTP_PASSWORD: "app-password-value",
 };
 
+const productionMedia = { MEDIA_STORAGE_DIR: "/srv/heat/media" };
+
 const valid = {
   DATABASE_URL: "postgresql://u:p@localhost:5432/db",
   REDIS_URL: "redis://localhost:6379",
@@ -137,13 +139,14 @@ describe("loadConfig", () => {
   });
 
   test("requires trusted origins in production instead of defaulting to local apps", () => {
-    const production = { ...valid, ...productionMail, NODE_ENV: "production" };
+    const production = { ...valid, ...productionMail, ...productionMedia, NODE_ENV: "production" };
     expect(() => loadConfig(production)).toThrow(/TRUSTED_ORIGINS/);
     expect(() => loadConfig({ ...production, TRUSTED_ORIGINS: " , " })).toThrow(/TRUSTED_ORIGINS/);
     expect(
       loadConfig({
         ...valid,
         ...productionMail,
+        ...productionMedia,
         NODE_ENV: "production",
         TRUSTED_ORIGINS: "https://learn.example.test",
         ADMIN_APP_URL: "https://admin.example.test",
@@ -161,6 +164,25 @@ describe("loadConfig", () => {
     expect(() =>
       loadConfig({ ...valid, PUBLIC_APP_URL: "https://learn.example.test/app" }),
     ).toThrow(/PUBLIC_APP_URL/);
+  });
+
+  test("exposes the revalidation target with a local default, an optional secret and rejects a path", () => {
+    expect(loadConfig(valid).revalidation).toEqual({
+      url: "http://localhost:3000",
+      secret: undefined,
+    });
+    const secretValue = "revalidate-secret-0123456789-abcdefghijkl";
+    expect(
+      loadConfig({
+        ...valid,
+        PUBLIC_APP_INTERNAL_URL: "http://frontend-public:3000",
+        REVALIDATE_SECRET: secretValue,
+      }).revalidation,
+    ).toEqual({ url: "http://frontend-public:3000", secret: secretValue });
+    expect(() =>
+      loadConfig({ ...valid, PUBLIC_APP_INTERNAL_URL: "http://frontend-public:3000/app" }),
+    ).toThrow(/PUBLIC_APP_INTERNAL_URL/);
+    expect(() => loadConfig({ ...valid, REVALIDATE_SECRET: "short" })).toThrow(/REVALIDATE_SECRET/);
   });
 
   test("exposes the mail configuration and defaults it to the local Mailpit", () => {
@@ -326,6 +348,7 @@ describe("video uploads", () => {
     const production = {
       ...valid,
       ...productionMail,
+      ...productionMedia,
       NODE_ENV: "production",
       ADMIN_APP_URL: "https://admin.example.test",
       TRUSTED_ORIGINS: "https://admin.example.test",
@@ -372,6 +395,7 @@ describe("transcode config", () => {
     const production = {
       ...valid,
       ...productionMail,
+      ...productionMedia,
       NODE_ENV: "production",
       ADMIN_APP_URL: "https://admin.example.test",
       TRUSTED_ORIGINS: "https://admin.example.test",

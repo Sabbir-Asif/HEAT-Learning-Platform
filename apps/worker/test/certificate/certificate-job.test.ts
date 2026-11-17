@@ -145,6 +145,28 @@ describe("CertificateJob issuing", () => {
     expect(html).toContain(store.certificate?.number ?? "missing");
   });
 
+  test("renders an unfinished certificate under the name it was issued with after a name change", async () => {
+    const render = vi.fn().mockResolvedValue(pdfBytes);
+    const { store, job } = setup({ renderer: { render } });
+    store.certificate = {
+      id: "certificate-id",
+      number: "ABCD-EFGH-JKMN",
+      recipientName: holderName,
+      fileKey: null,
+      fileSha256: null,
+      fileSizeBytes: null,
+      revokedAt: null,
+    };
+    store.source = { ...store.source, holderName: "Amina Chowdhury" };
+
+    await job.run(enrollmentId, false);
+
+    const html = render.mock.calls[0]?.[0] as string;
+    expect(html).toContain(holderName);
+    expect(html).not.toContain("Amina Chowdhury");
+    expect(store.certificate.recipientName).toBe(holderName);
+  });
+
   test("emits the issued event with ids and the number only after the file is stored", async () => {
     const { store, job } = setup();
     await job.run(enrollmentId, false);

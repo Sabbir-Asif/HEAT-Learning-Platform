@@ -6,29 +6,14 @@ import {
   useDirectoryLookupsListUniversities,
 } from "@heat/api-client";
 import { enrollmentStepOneSchema } from "@heat/contracts";
-import {
-  Button,
-  EmptyState,
-  ErrorState,
-  FieldDescription,
-  Form,
-  FormField,
-  Input,
-  PageHeader,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@heat/ui";
-import type { FormControlProps } from "@heat/ui";
+import { Button, FieldDescription, Form, FormField, Input, PageHeader } from "@heat/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRightIcon, BuildingIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { Ref } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { chooseFaculty, chooseUniversity, dropStaleSelections } from "./cascade";
 import { EnrollSuccess } from "./enroll-success";
+import { LookupSelect, LookupState, noOptions } from "./lookup-fields";
 import {
   clearStepOne,
   emptyStepOne,
@@ -37,75 +22,6 @@ import {
   type StepOneValues,
 } from "./step-one-store";
 import { StepTwo } from "./step-two";
-
-interface LookupOption {
-  id: string;
-  name: string;
-}
-
-const noOptions: LookupOption[] = [];
-
-interface LookupSelectProps {
-  label: string;
-  placeholder: string;
-  options: readonly LookupOption[];
-  disabled: boolean;
-  value: string;
-  triggerProps: FormControlProps & { ref: Ref<HTMLButtonElement>; onBlur: () => void };
-  onChange: (value: string) => void;
-}
-
-function LookupSelect({
-  label,
-  placeholder,
-  options,
-  disabled,
-  value,
-  triggerProps,
-  onChange,
-}: LookupSelectProps) {
-  const items = options.map((option) => ({ value: option.id, label: option.name }));
-  return (
-    <Select
-      items={items}
-      value={value === "" ? null : value}
-      onValueChange={(value) => onChange(value ?? "")}
-      disabled={disabled}
-    >
-      <SelectTrigger {...triggerProps} aria-label={label} className="w-full">
-        <SelectValue placeholder={placeholder} />
-      </SelectTrigger>
-      <SelectContent>
-        {items.map((item) => (
-          <SelectItem key={item.value} value={item.value}>
-            {item.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
-}
-
-interface LookupStateProps {
-  failed: boolean;
-  empty: boolean;
-  emptyTitle: string;
-  onRetry: () => void;
-}
-
-function LookupState({ failed, empty, emptyTitle, onRetry }: LookupStateProps) {
-  if (failed) {
-    return (
-      <ErrorState
-        title="The list could not be loaded"
-        description="Check your connection and try again."
-        onRetry={onRetry}
-      />
-    );
-  }
-  if (empty) return <EmptyState icon={BuildingIcon} title={emptyTitle} />;
-  return null;
-}
 
 interface EnrollWizardProps {
   courseSlug: string;

@@ -1,6 +1,8 @@
 import { describe, expect, test } from "vitest";
 import {
   checkFile,
+  avatarRules,
+  captionRules,
   documentRules,
   formatBytes,
   imageRules,
@@ -16,6 +18,11 @@ const png = (overrides: Partial<CandidateFile> = {}): CandidateFile => ({
 });
 
 describe("presets", () => {
+  test("avatar takes a single image and refuses SVG", () => {
+    expect(avatarRules.maxFiles).toBe(1);
+    expect(avatarRules.extensions).not.toContain("svg");
+  });
+
   test("images are capped at 5 MB and refuse SVG", () => {
     expect(imageRules.maxBytes).toBe(5 * 1024 * 1024);
     expect(imageRules.extensions).not.toContain("svg");
@@ -159,5 +166,14 @@ describe("videoRules", () => {
     expect(checkFile(mp4({ name: "a.pdf", type: "application/pdf" }), rules, []).ok).toBe(false);
     const big = checkFile(mp4({ size: rules.maxBytes + 1 }), rules, []);
     expect(big.ok ? "" : big.message).toBe("Files can be at most 2048 MB.");
+  });
+});
+
+describe("captionRules", () => {
+  test("accepts one small vtt file and rejects other types", () => {
+    const vtt = { name: "talk.vtt", size: 2048, type: "text/vtt" };
+    expect(checkFile(vtt, captionRules, []).ok).toBe(true);
+    expect(checkFile({ ...vtt, name: "talk.srt" }, captionRules, []).ok).toBe(false);
+    expect(checkFile({ ...vtt, size: 1024 * 1024 + 1 }, captionRules, []).ok).toBe(false);
   });
 });

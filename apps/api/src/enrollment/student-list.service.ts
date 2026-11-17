@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import type { StudentListQuery, StudentListResponse } from "@heat/contracts";
+import type { StudentFilter, StudentListQuery, StudentListResponse } from "@heat/contracts";
 import type { HeatClient } from "@heat/db";
 import { DATABASE } from "../core";
 import { profileFilter } from "./approval-queue.service";
@@ -14,7 +14,7 @@ const searchFilter = (q: string | undefined) =>
         ],
       };
 
-export const studentWhere = (query: StudentListQuery) => ({
+export const studentWhere = (query: StudentFilter) => ({
   deletedAt: null,
   ...(query.courseId === undefined ? {} : { courseId: query.courseId }),
   ...(query.status === undefined ? {} : { status: query.status }),

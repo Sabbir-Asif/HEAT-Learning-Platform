@@ -5,6 +5,7 @@ export const rateLimitProfileNames = [
   "adminSignIn",
   "sessionRefresh",
   "passwordChange",
+  "passwordCode",
   "captcha",
   "enrollment",
   "reset",
@@ -16,11 +17,13 @@ export const rateLimitProfileNames = [
   "videoUploadStart",
   "videoUploadChunk",
   "videoTranscodeRetry",
+  "mediaUpload",
   "directoryLookup",
   "learningRead",
   "quizSubmit",
   "certificateDownload",
   "certificateVerify",
+  "studentExport",
 ] as const;
 
 export type RateLimitProfileName = (typeof rateLimitProfileNames)[number];
@@ -54,6 +57,7 @@ const defaults: Record<RateLimitProfileName, RateLimitProfile> = {
   adminSignIn: { limit: 5, windowSeconds: 900, ipLimit: 120 },
   sessionRefresh: { limit: 60, windowSeconds: 60, ipLimit: 600 },
   passwordChange: { limit: 5, windowSeconds: 900, ipLimit: 120 },
+  passwordCode: { limit: 3, windowSeconds: 3600, ipLimit: 300 },
   captcha: { limit: 60, windowSeconds: 60, ipLimit: 600 },
   enrollment: { limit: 5, windowSeconds: 3600, ipLimit: 300 },
   reset: { limit: 5, windowSeconds: 3600, ipLimit: 300 },
@@ -65,11 +69,13 @@ const defaults: Record<RateLimitProfileName, RateLimitProfile> = {
   videoUploadStart: { limit: 30, windowSeconds: 60, ipLimit: 3000 },
   videoUploadChunk: { limit: 6000, windowSeconds: 60, ipLimit: 30000 },
   videoTranscodeRetry: { limit: 10, windowSeconds: 60, ipLimit: 1000 },
+  mediaUpload: { limit: 60, windowSeconds: 60, ipLimit: 3000 },
   directoryLookup: { limit: 600, windowSeconds: 60, ipLimit: 3000 },
   learningRead: { limit: 120, windowSeconds: 60, ipLimit: 6000 },
   quizSubmit: { limit: 20, windowSeconds: 60, ipLimit: 3000 },
   certificateDownload: { limit: 30, windowSeconds: 60, ipLimit: 3000 },
   certificateVerify: { limit: 600, windowSeconds: 60, ipLimit: 1200 },
+  studentExport: { limit: 10, windowSeconds: 3600, ipLimit: 300 },
 };
 
 const lockoutDefaults: LockoutPolicy = {

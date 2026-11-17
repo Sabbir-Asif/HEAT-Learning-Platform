@@ -21,6 +21,11 @@ export const imageRules: UploadRules = {
   maxFiles: 5,
 };
 
+export const avatarRules: UploadRules = {
+  ...imageRules,
+  maxFiles: 1,
+};
+
 export const documentRules: UploadRules = {
   extensions: ["pdf", "doc", "docx"],
   mimeTypes: [
@@ -30,6 +35,13 @@ export const documentRules: UploadRules = {
   ],
   maxBytes: 10 * mebibyte,
   maxFiles: 5,
+};
+
+export const captionRules: UploadRules = {
+  extensions: ["vtt"],
+  mimeTypes: ["text/vtt"],
+  maxBytes: mebibyte,
+  maxFiles: 1,
 };
 
 export const videoRules = (maxBytes: number): UploadRules => ({

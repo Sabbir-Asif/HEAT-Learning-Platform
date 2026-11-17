@@ -24,6 +24,17 @@ export class CourseLookupService {
     return course;
   }
 
+  async isActive(
+    courseId: string,
+    client: Pick<HeatClient, "course"> = this.database,
+  ): Promise<boolean> {
+    const course = await client.course.findFirst({
+      where: { id: courseId, deletedAt: null },
+      select: { id: true },
+    });
+    return course !== null;
+  }
+
   async resolveApprovalTarget(
     courseId: string,
     client: Pick<HeatClient, "courseRevision">,

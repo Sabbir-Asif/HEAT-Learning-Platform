@@ -105,7 +105,7 @@ export class CertificateJob {
     const { renderer, storage, store, log, config } = this.dependencies;
     const html = renderCertificateHtml(
       {
-        holderName: source.holderName,
+        holderName: certificate.recipientName,
         courseTitle: source.courseTitle,
         completedAt: source.completedAt,
         number: certificate.number,

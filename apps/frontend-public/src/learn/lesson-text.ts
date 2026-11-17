@@ -1,4 +1,7 @@
+import { parseRichText } from "@heat/contracts";
+import type { LessonContentSection } from "@heat/contracts";
 import type { LessonBlock, LessonInline } from "@heat/ui";
+import type { RichTextDocument, RichTextImage } from "@heat/ui/content";
 
 const allowedProtocols: readonly string[] = ["https:", "mailto:"];
 
@@ -88,4 +91,14 @@ export const sanitizeLessonBody = (body: unknown): LessonBlock[] => {
   const root = asNode(body);
   if (root === null || root.type !== "doc") return [];
   return childrenOf(root).flatMap((child) => blockOf(child) ?? []);
+};
+
+export interface RichSection {
+  document: RichTextDocument;
+  images: RichTextImage[];
+}
+
+export const richSectionOf = (section: LessonContentSection): RichSection | null => {
+  const parsed = parseRichText(section.body);
+  return parsed.ok ? { document: parsed.doc, images: section.images } : null;
 };

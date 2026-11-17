@@ -1,0 +1,72 @@
+enum InsightRollupKind {
+  ENROLLMENT
+  MODULE
+  QUIZ
+  QUESTION
+}
+
+enum InsightRunTrigger {
+  NIGHTLY
+  MANUAL
+  BACKFILL
+}
+
+enum InsightRunStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+model InsightRollup {
+  id                String            @id @default(uuid(7)) @db.Uuid
+  day               DateTime          @db.Date
+  kind              InsightRollupKind
+  key               String
+  courseId          String            @db.Uuid
+  moduleId          String?           @db.Uuid
+  questionId        String?           @db.Uuid
+  universityId      String            @db.Uuid
+  facultyId         String            @db.Uuid
+  departmentId      String            @db.Uuid
+  session           String
+  registered        Int               @default(0)
+  verified          Int               @default(0)
+  approved          Int               @default(0)
+  started           Int               @default(0)
+  quizReady         Int               @default(0)
+  completed         Int               @default(0)
+  attempts          Int               @default(0)
+  passedAttempts    Int               @default(0)
+  attemptedStudents Int               @default(0)
+  passedStudents    Int               @default(0)
+  answered          Int               @default(0)
+  missed            Int               @default(0)
+  askedStudents     Int               @default(0)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@unique([day, key])
+  @@index([kind, day])
+  @@index([courseId, day])
+}
+
+model InsightRun {
+  id            String            @id @default(uuid(7)) @db.Uuid
+  trigger       InsightRunTrigger
+  status        InsightRunStatus  @default(PENDING)
+  fromDay       DateTime          @db.Date
+  toDay         DateTime          @db.Date
+  requestedById String?           @db.Uuid
+  requestedAt   DateTime          @default(now())
+  startedAt     DateTime?
+  heartbeatAt   DateTime?
+  finishedAt    DateTime?
+  rowsWritten   Int               @default(0)
+  error         String?
+  createdAt     DateTime          @default(now())
+
+  @@index([status])
+  @@index([trigger, requestedAt])
+  @@index([finishedAt])
+}

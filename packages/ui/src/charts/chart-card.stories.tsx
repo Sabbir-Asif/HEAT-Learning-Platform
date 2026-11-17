@@ -62,6 +62,21 @@ export const Dark: Story = { ...Default, globals: { theme: "dark" } };
 
 export const Bars: Story = { args: { kind: "bar" } };
 
+export const LongLabels: Story = {
+  args: {
+    kind: "bar",
+    xKey: "question",
+    xLabel: "Question",
+    xTickMaxLength: 18,
+    series: [{ key: "missPercent", label: "Missed (%)" }],
+    data: [
+      { question: "Which of these is a form of consent that can be withdrawn?", missPercent: 62 },
+      { question: "Who may report an incident on behalf of a student?", missPercent: 41 },
+    ],
+    summary: "Missed percentage per question.",
+  },
+};
+
 export const FiveSeries: Story = {
   args: {
     series: [

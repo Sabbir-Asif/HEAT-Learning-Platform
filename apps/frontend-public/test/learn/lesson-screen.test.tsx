@@ -41,6 +41,7 @@ const lessonOk = {
           type: "doc",
           content: [{ type: "paragraph", content: [{ type: "text", text: "Hello lesson" }] }],
         },
+        images: [],
       },
     ],
   },

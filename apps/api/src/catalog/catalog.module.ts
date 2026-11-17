@@ -3,7 +3,27 @@ import { randomBytes } from "node:crypto";
 import { AuditModule } from "../audit";
 import { APP_CONFIG, CoreModule } from "../core";
 import type { AppConfig } from "../core";
+import { MediaModule } from "../media";
 import { RateLimitModule } from "../rate-limit";
+import { AdminFrontPageController, PublicFrontPageController } from "./front-page.controller";
+import { FrontPageService } from "./front-page.service";
+import { PublicCoursesController } from "./public-courses.controller";
+import { PublicCoursesService } from "./public-courses.service";
+import { PublicImagesService } from "./public-images.service";
+import { HttpPublicRevalidation, PUBLIC_REVALIDATION } from "./public-revalidation";
+import {
+  AdminContactSettingsController,
+  PublicContactSettingsController,
+} from "./contact-settings.controller";
+import { ContactSettingsService } from "./contact-settings.service";
+import {
+  AdminSiteSettingsController,
+  PublicSiteSettingsController,
+} from "./site-settings.controller";
+import { SiteSettingsService } from "./site-settings.service";
+import { TagAssignmentsService } from "./tag-assignments.service";
+import { TagAssignmentsController, TagsController } from "./tags.controller";
+import { TagsService } from "./tags.service";
 import { ContentLockService } from "./content-lock.service";
 import { CourseLookupService } from "./course-lookup.service";
 import { CoursesController } from "./courses.controller";
@@ -19,6 +39,9 @@ import { QuizController } from "./quiz.controller";
 import { QuizService } from "./quiz.service";
 import { VideoLibraryController } from "./video-library.controller";
 import { VideoLibraryService } from "./video-library.service";
+import { VideoCaptionsController, VideoCaptionUploadController } from "./video-captions.controller";
+import { VideoCaptionsService } from "./video-captions.service";
+import { CAPTION_STORE, FileCaptionStore } from "./video-caption-store";
 import { VideoSlotsController } from "./video-slots.controller";
 import { VideoSlotsService } from "./video-slots.service";
 import { VideoUploadController } from "./video-upload.controller";
@@ -27,7 +50,7 @@ import { FileUploadStore, UPLOAD_STORE } from "./video-upload-store";
 import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
 
 @Module({
-  imports: [CoreModule, AuditModule, RateLimitModule],
+  imports: [CoreModule, AuditModule, RateLimitModule, MediaModule],
   controllers: [
     CoursesController,
     RevisionsController,
@@ -36,7 +59,18 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     VideoSlotsController,
     VideoLibraryController,
     VideoUploadController,
+    VideoCaptionUploadController,
+    VideoCaptionsController,
     QuizController,
+    TagsController,
+    TagAssignmentsController,
+    AdminFrontPageController,
+    PublicFrontPageController,
+    PublicCoursesController,
+    AdminSiteSettingsController,
+    PublicSiteSettingsController,
+    AdminContactSettingsController,
+    PublicContactSettingsController,
   ],
   providers: [
     CoursesService,
@@ -48,6 +82,12 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     VideoSlotsService,
     VideoLibraryService,
     VideoUploadService,
+    VideoCaptionsService,
+    {
+      provide: CAPTION_STORE,
+      inject: [APP_CONFIG],
+      useFactory: (config: AppConfig) => new FileCaptionStore(config.transcode.hlsDirectory),
+    },
     { provide: UPLOAD_RANDOM, useValue: randomBytes },
     {
       provide: UPLOAD_STORE,
@@ -61,6 +101,14 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
       inject: [ModulePublishCheck],
       useFactory: (moduleCheck: ModulePublishCheck) => [moduleCheck],
     },
+    TagsService,
+    TagAssignmentsService,
+    FrontPageService,
+    SiteSettingsService,
+    ContactSettingsService,
+    PublicImagesService,
+    PublicCoursesService,
+    { provide: PUBLIC_REVALIDATION, useClass: HttpPublicRevalidation },
   ],
   exports: [
     CoursesService,
@@ -68,6 +116,8 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     ContentLockService,
     ModulePublishCheck,
     COURSE_PUBLISH_CHECKS,
+    PublicImagesService,
+    PUBLIC_REVALIDATION,
   ],
 })
 export class CatalogModule {}

@@ -19,7 +19,7 @@ import {
 
 export type StatusTone = "neutral" | "info" | "success" | "warning" | "danger" | "brand";
 
-export type StatusKind = "enrollment" | "video" | "course";
+export type StatusKind = "enrollment" | "video" | "course" | "news" | "resource";
 
 export type StatusEntry = {
   label: string;
@@ -53,6 +53,11 @@ export const statusEntries = {
   "course.draft": { label: "Draft", icon: FileEditIcon, tone: "neutral" },
   "course.published": { label: "Published", icon: GlobeIcon, tone: "success" },
   "course.locked": { label: "Locked", icon: LockIcon, tone: "warning" },
+  "news.draft": { label: "Draft", icon: FileEditIcon, tone: "neutral" },
+  "news.scheduled": { label: "Scheduled", icon: ClockIcon, tone: "info" },
+  "news.published": { label: "Published", icon: GlobeIcon, tone: "success" },
+  "resource.draft": { label: "Draft", icon: FileEditIcon, tone: "neutral" },
+  "resource.published": { label: "Published", icon: GlobeIcon, tone: "success" },
 } as const satisfies Record<string, StatusEntry>;
 
 export type StatusKey = keyof typeof statusEntries;

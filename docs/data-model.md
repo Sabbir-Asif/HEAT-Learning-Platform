@@ -226,6 +226,7 @@ erDiagram
     String url
     String mediaAssetId FK
     Int displayOrder
+    Boolean published
     DateTime deletedAt
     DateTime createdAt
     DateTime updatedAt
@@ -365,12 +366,56 @@ erDiagram
     String requestedName
     String requestedDepartmentId FK
     String requestedSession
+    String note
     ProfileChangeStatus status
     String decidedById FK
     DateTime decidedAt
     String reason
     DateTime createdAt
     DateTime updatedAt
+  }
+  InsightRollup {
+    String id PK
+    DateTime day
+    InsightRollupKind kind
+    String key
+    String courseId
+    String moduleId
+    String questionId
+    String universityId
+    String facultyId
+    String departmentId
+    String session
+    Int registered
+    Int verified
+    Int approved
+    Int started
+    Int quizReady
+    Int completed
+    Int attempts
+    Int passedAttempts
+    Int attemptedStudents
+    Int passedStudents
+    Int answered
+    Int missed
+    Int askedStudents
+    DateTime createdAt
+    DateTime updatedAt
+  }
+  InsightRun {
+    String id PK
+    InsightRunTrigger trigger
+    InsightRunStatus status
+    DateTime fromDay
+    DateTime toDay
+    String requestedById
+    DateTime requestedAt
+    DateTime startedAt
+    DateTime heartbeatAt
+    DateTime finishedAt
+    Int rowsWritten
+    String error
+    DateTime createdAt
   }
   PlaybackSession {
     String id PK

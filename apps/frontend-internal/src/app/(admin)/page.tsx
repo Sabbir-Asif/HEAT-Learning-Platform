@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/shell/placeholder-page";
+import { OverviewView } from "@/overview/overview-view";
 
 export default function Page() {
-  return <PlaceholderPage title="Overview" />;
+  return <OverviewView />;
 }

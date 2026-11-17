@@ -63,7 +63,9 @@ const build = (options: { lockedAt?: Date | null } = {}) => {
       delete: vi.fn().mockResolvedValue({}),
     },
   };
-  const service = new LessonSectionsService(database as never, new AuditService({} as never));
+  const service = new LessonSectionsService(database as never, new AuditService({} as never), {
+    describe: vi.fn(),
+  } as never);
   const changes: AuditChange[] = [];
   const scope = { tx: database as never, changes, afterCommit: [], skipped: false };
   const inAuditScope = <T>(run: () => Promise<T>): Promise<T> => auditScopeStorage.run(scope, run);

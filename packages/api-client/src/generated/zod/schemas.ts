@@ -1338,6 +1338,124 @@ export const LessonSectionsUpdateResponse = zod.object({
 })
 
 
+export const lessonSectionsReadBodyPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsReadBodyPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsReadBodyPathSectionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const LessonSectionsReadBodyParams = zod.object({
+  "id": zod.uuid().regex(lessonSectionsReadBodyPathIdRegExp),
+  "moduleId": zod.uuid().regex(lessonSectionsReadBodyPathModuleIdRegExp),
+  "sectionId": zod.uuid().regex(lessonSectionsReadBodyPathSectionIdRegExp)
+})
+
+export const lessonSectionsReadBodyResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsReadBodyResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsReadBodyResponseSchemaVersionMax = 9007199254740991;
+
+
+
+export const LessonSectionsReadBodyResponse = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "id": zod.uuid().regex(lessonSectionsReadBodyResponseIdRegExp),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(lessonSectionsReadBodyResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "schemaVersion": zod.int().min(1).max(lessonSectionsReadBodyResponseSchemaVersionMax),
+  "title": zod.string()
+})
+
+
+export const lessonSectionsUpdateBodyPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsUpdateBodyPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsUpdateBodyPathSectionIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const LessonSectionsUpdateBodyParams = zod.object({
+  "id": zod.uuid().regex(lessonSectionsUpdateBodyPathIdRegExp),
+  "moduleId": zod.uuid().regex(lessonSectionsUpdateBodyPathModuleIdRegExp),
+  "sectionId": zod.uuid().regex(lessonSectionsUpdateBodyPathSectionIdRegExp)
+})
+
+export const LessonSectionsUpdateBodyBody = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "schemaVersion": zod.literal(1)
+})
+
+export const lessonSectionsUpdateBodyResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsUpdateBodyResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonSectionsUpdateBodyResponseSchemaVersionMax = 9007199254740991;
+
+
+
+export const LessonSectionsUpdateBodyResponse = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "id": zod.uuid().regex(lessonSectionsUpdateBodyResponseIdRegExp),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(lessonSectionsUpdateBodyResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "schemaVersion": zod.int().min(1).max(lessonSectionsUpdateBodyResponseSchemaVersionMax),
+  "title": zod.string()
+})
+
+
+export const tagAssignmentsModuleTagsPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const tagAssignmentsModuleTagsPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const TagAssignmentsModuleTagsParams = zod.object({
+  "id": zod.uuid().regex(tagAssignmentsModuleTagsPathIdRegExp),
+  "moduleId": zod.uuid().regex(tagAssignmentsModuleTagsPathModuleIdRegExp)
+})
+
+export const tagAssignmentsModuleTagsResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const TagAssignmentsModuleTagsResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.uuid().regex(tagAssignmentsModuleTagsResponseItemsItemIdRegExp),
+  "isSystem": zod.boolean(),
+  "name": zod.string(),
+  "slug": zod.string()
+}))
+})
+
+
+export const tagAssignmentsSetModuleTagsPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const tagAssignmentsSetModuleTagsPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const TagAssignmentsSetModuleTagsParams = zod.object({
+  "id": zod.uuid().regex(tagAssignmentsSetModuleTagsPathIdRegExp),
+  "moduleId": zod.uuid().regex(tagAssignmentsSetModuleTagsPathModuleIdRegExp)
+})
+
+export const tagAssignmentsSetModuleTagsBodyTagIdsItemRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const tagAssignmentsSetModuleTagsBodyTagIdsMax = 50;
+
+
+
+export const TagAssignmentsSetModuleTagsBody = zod.object({
+  "tagIds": zod.array(zod.uuid().regex(tagAssignmentsSetModuleTagsBodyTagIdsItemRegExp)).max(tagAssignmentsSetModuleTagsBodyTagIdsMax)
+})
+
+export const tagAssignmentsSetModuleTagsResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const TagAssignmentsSetModuleTagsResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.uuid().regex(tagAssignmentsSetModuleTagsResponseItemsItemIdRegExp),
+  "isSystem": zod.boolean(),
+  "name": zod.string(),
+  "slug": zod.string()
+}))
+})
+
+
 export const videoSlotsListPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const videoSlotsListPathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
@@ -1359,6 +1477,7 @@ export const videoSlotsListResponseItemsItemUploadedAtRegExp = new RegExp('^(?:(
 export const VideoSlotsListResponse = zod.object({
   "items": zod.array(zod.object({
   "assetKey": zod.string().max(videoSlotsListResponseItemsItemAssetKeyMax).nullable(),
+  "captions": zod.array(zod.enum(['en'])),
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsListResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsListResponseItemsItemOrderMax),
@@ -1401,6 +1520,7 @@ export const videoSlotsCreateResponseItemsItemUploadedAtRegExp = new RegExp('^(?
 export const VideoSlotsCreateResponse = zod.object({
   "items": zod.array(zod.object({
   "assetKey": zod.string().max(videoSlotsCreateResponseItemsItemAssetKeyMax).nullable(),
+  "captions": zod.array(zod.enum(['en'])),
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsCreateResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsCreateResponseItemsItemOrderMax),
@@ -1449,6 +1569,7 @@ export const videoSlotsReorderResponseItemsItemUploadedAtRegExp = new RegExp('^(
 export const VideoSlotsReorderResponse = zod.object({
   "items": zod.array(zod.object({
   "assetKey": zod.string().max(videoSlotsReorderResponseItemsItemAssetKeyMax).nullable(),
+  "captions": zod.array(zod.enum(['en'])),
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsReorderResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsReorderResponseItemsItemOrderMax),
@@ -1486,6 +1607,7 @@ export const videoSlotsRemoveResponseItemsItemUploadedAtRegExp = new RegExp('^(?
 export const VideoSlotsRemoveResponse = zod.object({
   "items": zod.array(zod.object({
   "assetKey": zod.string().max(videoSlotsRemoveResponseItemsItemAssetKeyMax).nullable(),
+  "captions": zod.array(zod.enum(['en'])),
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsRemoveResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsRemoveResponseItemsItemOrderMax),
@@ -1528,6 +1650,7 @@ export const videoSlotsUpdateResponseItemsItemUploadedAtRegExp = new RegExp('^(?
 export const VideoSlotsUpdateResponse = zod.object({
   "items": zod.array(zod.object({
   "assetKey": zod.string().max(videoSlotsUpdateResponseItemsItemAssetKeyMax).nullable(),
+  "captions": zod.array(zod.enum(['en'])),
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsUpdateResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsUpdateResponseItemsItemOrderMax),
@@ -1540,6 +1663,21 @@ export const VideoSlotsUpdateResponse = zod.object({
 })),
   "locked": zod.boolean()
 })
+
+
+export const videoCaptionsRemovePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoCaptionsRemovePathModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const videoCaptionsRemovePathVideoIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const VideoCaptionsRemoveParams = zod.object({
+  "id": zod.uuid().regex(videoCaptionsRemovePathIdRegExp),
+  "moduleId": zod.uuid().regex(videoCaptionsRemovePathModuleIdRegExp),
+  "videoId": zod.uuid().regex(videoCaptionsRemovePathVideoIdRegExp),
+  "language": zod.enum(['en'])
+})
+
+export const VideoCaptionsRemoveResponse = zod.void()
 
 
 export const videoSlotsRetryTranscodePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
@@ -1565,6 +1703,7 @@ export const videoSlotsRetryTranscodeResponseItemsItemUploadedAtRegExp = new Reg
 export const VideoSlotsRetryTranscodeResponse = zod.object({
   "items": zod.array(zod.object({
   "assetKey": zod.string().max(videoSlotsRetryTranscodeResponseItemsItemAssetKeyMax).nullable(),
+  "captions": zod.array(zod.enum(['en'])),
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsRetryTranscodeResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsRetryTranscodeResponseItemsItemOrderMax),
@@ -1732,6 +1871,55 @@ export const RevisionsPublishResponse = zod.object({
   "number": zod.int().min(1).max(revisionsPublishResponseNumberMax),
   "publishedAt": zod.iso.datetime({"offset":true}).regex(revisionsPublishResponsePublishedAtRegExp).nullable(),
   "status": zod.enum(['DRAFT', 'PUBLISHED'])
+})
+
+
+export const tagAssignmentsCourseTagsPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const TagAssignmentsCourseTagsParams = zod.object({
+  "id": zod.uuid().regex(tagAssignmentsCourseTagsPathIdRegExp)
+})
+
+export const tagAssignmentsCourseTagsResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const TagAssignmentsCourseTagsResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.uuid().regex(tagAssignmentsCourseTagsResponseItemsItemIdRegExp),
+  "isSystem": zod.boolean(),
+  "name": zod.string(),
+  "slug": zod.string()
+}))
+})
+
+
+export const tagAssignmentsSetCourseTagsPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const TagAssignmentsSetCourseTagsParams = zod.object({
+  "id": zod.uuid().regex(tagAssignmentsSetCourseTagsPathIdRegExp)
+})
+
+export const tagAssignmentsSetCourseTagsBodyTagIdsItemRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const tagAssignmentsSetCourseTagsBodyTagIdsMax = 50;
+
+
+
+export const TagAssignmentsSetCourseTagsBody = zod.object({
+  "tagIds": zod.array(zod.uuid().regex(tagAssignmentsSetCourseTagsBodyTagIdsItemRegExp)).max(tagAssignmentsSetCourseTagsBodyTagIdsMax)
+})
+
+export const tagAssignmentsSetCourseTagsResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const TagAssignmentsSetCourseTagsResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.uuid().regex(tagAssignmentsSetCourseTagsResponseItemsItemIdRegExp),
+  "isSystem": zod.boolean(),
+  "name": zod.string(),
+  "slug": zod.string()
+}))
 })
 
 
@@ -2589,7 +2777,7 @@ export const enrollmentApprovalApproveManyResponseSucceededItemRegExp = new RegE
 
 export const EnrollmentApprovalApproveManyResponse = zod.object({
   "failed": zod.array(zod.object({
-  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CERTIFICATE_NOT_READY', 'CERTIFICATE_REVOKED', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_NOT_PUBLISHED', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_REVISION_DRAFT_EXISTS', 'COURSE_REVISION_NOT_DRAFT', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_REMOVABLE', 'ENROLLMENT_NOT_REMOVED', 'ENROLLMENT_NOT_VERIFIED', 'ENROLLMENT_STATE_CHANGED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'MODULE_LOCKED', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'QUIZ_ANSWER_INVALID', 'QUIZ_ATTEMPTS_UNLIMITED', 'QUIZ_ATTEMPT_LIMIT_REACHED', 'QUIZ_ATTEMPT_NOT_OPEN', 'QUIZ_ATTEMPT_WAIT', 'QUIZ_GRANT_NOT_NEEDED', 'QUIZ_NOT_UNLOCKED', 'RATE_LIMITED', 'RESET_LINK_EXPIRED', 'RESET_LINK_INVALID', 'RESET_LINK_USED', 'UNAUTHENTICATED', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED', 'VIDEO_NOT_READY']),
+  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CERTIFICATE_NOT_READY', 'CERTIFICATE_REVOKED', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_NOT_PUBLISHED', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_REVISION_DRAFT_EXISTS', 'COURSE_REVISION_NOT_DRAFT', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'EMAIL_NOT_VERIFIED', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_REMOVABLE', 'ENROLLMENT_NOT_REMOVED', 'ENROLLMENT_NOT_VERIFIED', 'ENROLLMENT_STATE_CHANGED', 'FORBIDDEN', 'INSIGHTS_REFRESH_RUNNING', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'MODULE_LOCKED', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'PASSWORD_CODE_EMAIL_UNVERIFIED', 'PASSWORD_CODE_EXPIRED', 'PASSWORD_CODE_INVALID', 'PROFILE_CHANGE_NOT_PENDING', 'PROFILE_CHANGE_PENDING', 'PROFILE_CHANGE_UNCHANGED', 'PROFILE_LOCKED', 'QUIZ_ANSWER_INVALID', 'QUIZ_ATTEMPTS_UNLIMITED', 'QUIZ_ATTEMPT_LIMIT_REACHED', 'QUIZ_ATTEMPT_NOT_OPEN', 'QUIZ_ATTEMPT_WAIT', 'QUIZ_GRANT_NOT_NEEDED', 'QUIZ_NOT_UNLOCKED', 'RATE_LIMITED', 'RESET_LINK_EXPIRED', 'RESET_LINK_INVALID', 'RESET_LINK_USED', 'TAG_NAME_TAKEN', 'TAG_RESERVED', 'UNAUTHENTICATED', 'UPLOAD_DIMENSIONS_TOO_LARGE', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED', 'VIDEO_NOT_READY']),
   "id": zod.uuid().regex(enrollmentApprovalApproveManyResponseFailedItemIdRegExp)
 })),
   "succeeded": zod.array(zod.uuid().regex(enrollmentApprovalApproveManyResponseSucceededItemRegExp))
@@ -2693,7 +2881,7 @@ export const enrollmentApprovalRejectManyResponseSucceededItemRegExp = new RegEx
 
 export const EnrollmentApprovalRejectManyResponse = zod.object({
   "failed": zod.array(zod.object({
-  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CERTIFICATE_NOT_READY', 'CERTIFICATE_REVOKED', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_NOT_PUBLISHED', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_REVISION_DRAFT_EXISTS', 'COURSE_REVISION_NOT_DRAFT', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_REMOVABLE', 'ENROLLMENT_NOT_REMOVED', 'ENROLLMENT_NOT_VERIFIED', 'ENROLLMENT_STATE_CHANGED', 'FORBIDDEN', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'MODULE_LOCKED', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'QUIZ_ANSWER_INVALID', 'QUIZ_ATTEMPTS_UNLIMITED', 'QUIZ_ATTEMPT_LIMIT_REACHED', 'QUIZ_ATTEMPT_NOT_OPEN', 'QUIZ_ATTEMPT_WAIT', 'QUIZ_GRANT_NOT_NEEDED', 'QUIZ_NOT_UNLOCKED', 'RATE_LIMITED', 'RESET_LINK_EXPIRED', 'RESET_LINK_INVALID', 'RESET_LINK_USED', 'UNAUTHENTICATED', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED', 'VIDEO_NOT_READY']),
+  "code": zod.enum(['AUDIT_ACTOR_FILTER_TOO_BROAD', 'BAD_REQUEST', 'CANNOT_DEACTIVATE_SELF', 'CAPTCHA_EXPIRED', 'CAPTCHA_INVALID', 'CERTIFICATE_NOT_READY', 'CERTIFICATE_REVOKED', 'CONTENT_LOCKED', 'COURSE_HAS_ENROLLMENTS', 'COURSE_LOCKED', 'COURSE_NOT_AVAILABLE', 'COURSE_NOT_DRAFT', 'COURSE_NOT_PUBLISHED', 'COURSE_PUBLISH_CHECKS_FAILED', 'COURSE_REVISION_DRAFT_EXISTS', 'COURSE_REVISION_NOT_DRAFT', 'COURSE_SLUG_TAKEN', 'CSRF_TOKEN_INVALID', 'DIRECTORY_ARCHIVED', 'DIRECTORY_IN_USE', 'DIRECTORY_NAME_TAKEN', 'EMAIL_IN_USE', 'EMAIL_NOT_VERIFIED', 'ENROLLMENT_ALREADY_DECIDED', 'ENROLLMENT_NOT_ACTIVE', 'ENROLLMENT_NOT_REMOVABLE', 'ENROLLMENT_NOT_REMOVED', 'ENROLLMENT_NOT_VERIFIED', 'ENROLLMENT_STATE_CHANGED', 'FORBIDDEN', 'INSIGHTS_REFRESH_RUNNING', 'INTERNAL', 'INVALID_CREDENTIALS', 'INVITATION_EXPIRED', 'INVITATION_INVALID', 'INVITATION_NOT_PENDING', 'MODULE_LOCKED', 'NOT_FOUND', 'ORDER_CONFLICT', 'ORIGIN_NOT_ALLOWED', 'PASSWORD_BREACHED', 'PASSWORD_CHANGE_REQUIRED', 'PASSWORD_CODE_EMAIL_UNVERIFIED', 'PASSWORD_CODE_EXPIRED', 'PASSWORD_CODE_INVALID', 'PROFILE_CHANGE_NOT_PENDING', 'PROFILE_CHANGE_PENDING', 'PROFILE_CHANGE_UNCHANGED', 'PROFILE_LOCKED', 'QUIZ_ANSWER_INVALID', 'QUIZ_ATTEMPTS_UNLIMITED', 'QUIZ_ATTEMPT_LIMIT_REACHED', 'QUIZ_ATTEMPT_NOT_OPEN', 'QUIZ_ATTEMPT_WAIT', 'QUIZ_GRANT_NOT_NEEDED', 'QUIZ_NOT_UNLOCKED', 'RATE_LIMITED', 'RESET_LINK_EXPIRED', 'RESET_LINK_INVALID', 'RESET_LINK_USED', 'TAG_NAME_TAKEN', 'TAG_RESERVED', 'UNAUTHENTICATED', 'UPLOAD_DIMENSIONS_TOO_LARGE', 'UPLOAD_EXPIRED', 'UPLOAD_OFFSET_MISMATCH', 'UPLOAD_TOO_LARGE', 'UPLOAD_TYPE_NOT_ALLOWED', 'VALIDATION_FAILED', 'VERIFICATION_LINK_EXPIRED', 'VERIFICATION_LINK_INVALID', 'VERIFICATION_LINK_USED', 'VERIFICATION_RESEND_LIMIT', 'VIDEO_NOT_FAILED', 'VIDEO_NOT_READY']),
   "id": zod.uuid().regex(enrollmentApprovalRejectManyResponseFailedItemIdRegExp)
 })),
   "succeeded": zod.array(zod.uuid().regex(enrollmentApprovalRejectManyResponseSucceededItemRegExp))
@@ -2835,6 +3023,469 @@ export const EnrollmentRemovalRemoveResponse = zod.object({
 })
 
 
+export const adminFrontPageGetResponseCoursesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminFrontPageGetResponseModulesItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminFrontPageGetResponseModulesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminFrontPageGetResponse = zod.object({
+  "courses": zod.array(zod.object({
+  "id": zod.uuid().regex(adminFrontPageGetResponseCoursesItemIdRegExp),
+  "published": zod.boolean(),
+  "slug": zod.string(),
+  "title": zod.string()
+})),
+  "modules": zod.array(zod.object({
+  "courseId": zod.uuid().regex(adminFrontPageGetResponseModulesItemCourseIdRegExp),
+  "courseTitle": zod.string(),
+  "id": zod.uuid().regex(adminFrontPageGetResponseModulesItemIdRegExp),
+  "published": zod.boolean(),
+  "title": zod.string()
+}))
+})
+
+
+export const adminFrontPageReorderCoursesBodyOrderedIdsItemRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminFrontPageReorderCoursesBodyOrderedIdsMax = 500;
+
+export const adminFrontPageReorderCoursesBodyPreviousIdsItemRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminFrontPageReorderCoursesBodyPreviousIdsMax = 500;
+
+
+
+export const AdminFrontPageReorderCoursesBody = zod.object({
+  "orderedIds": zod.array(zod.uuid().regex(adminFrontPageReorderCoursesBodyOrderedIdsItemRegExp)).max(adminFrontPageReorderCoursesBodyOrderedIdsMax),
+  "previousIds": zod.array(zod.uuid().regex(adminFrontPageReorderCoursesBodyPreviousIdsItemRegExp)).max(adminFrontPageReorderCoursesBodyPreviousIdsMax)
+})
+
+export const adminFrontPageReorderCoursesResponseCoursesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminFrontPageReorderCoursesResponseModulesItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminFrontPageReorderCoursesResponseModulesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminFrontPageReorderCoursesResponse = zod.object({
+  "courses": zod.array(zod.object({
+  "id": zod.uuid().regex(adminFrontPageReorderCoursesResponseCoursesItemIdRegExp),
+  "published": zod.boolean(),
+  "slug": zod.string(),
+  "title": zod.string()
+})),
+  "modules": zod.array(zod.object({
+  "courseId": zod.uuid().regex(adminFrontPageReorderCoursesResponseModulesItemCourseIdRegExp),
+  "courseTitle": zod.string(),
+  "id": zod.uuid().regex(adminFrontPageReorderCoursesResponseModulesItemIdRegExp),
+  "published": zod.boolean(),
+  "title": zod.string()
+}))
+})
+
+
+export const adminFrontPageReorderModulesBodyOrderedIdsItemRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminFrontPageReorderModulesBodyOrderedIdsMax = 500;
+
+export const adminFrontPageReorderModulesBodyPreviousIdsItemRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminFrontPageReorderModulesBodyPreviousIdsMax = 500;
+
+
+
+export const AdminFrontPageReorderModulesBody = zod.object({
+  "orderedIds": zod.array(zod.uuid().regex(adminFrontPageReorderModulesBodyOrderedIdsItemRegExp)).max(adminFrontPageReorderModulesBodyOrderedIdsMax),
+  "previousIds": zod.array(zod.uuid().regex(adminFrontPageReorderModulesBodyPreviousIdsItemRegExp)).max(adminFrontPageReorderModulesBodyPreviousIdsMax)
+})
+
+export const adminFrontPageReorderModulesResponseCoursesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminFrontPageReorderModulesResponseModulesItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminFrontPageReorderModulesResponseModulesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminFrontPageReorderModulesResponse = zod.object({
+  "courses": zod.array(zod.object({
+  "id": zod.uuid().regex(adminFrontPageReorderModulesResponseCoursesItemIdRegExp),
+  "published": zod.boolean(),
+  "slug": zod.string(),
+  "title": zod.string()
+})),
+  "modules": zod.array(zod.object({
+  "courseId": zod.uuid().regex(adminFrontPageReorderModulesResponseModulesItemCourseIdRegExp),
+  "courseTitle": zod.string(),
+  "id": zod.uuid().regex(adminFrontPageReorderModulesResponseModulesItemIdRegExp),
+  "published": zod.boolean(),
+  "title": zod.string()
+}))
+})
+
+
+export const insightsFunnelQueryFromRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsFunnelQueryToRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsFunnelQueryCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsFunnelQueryUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsFunnelQueryFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsFunnelQueryDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsFunnelQuerySessionRegExp = new RegExp('^(\\d{4})-(\\d{2})$');
+
+
+export const InsightsFunnelQueryParams = zod.object({
+  "from": zod.string().regex(insightsFunnelQueryFromRegExp).optional(),
+  "to": zod.string().regex(insightsFunnelQueryToRegExp).optional(),
+  "courseId": zod.uuid().regex(insightsFunnelQueryCourseIdRegExp).optional(),
+  "universityId": zod.uuid().regex(insightsFunnelQueryUniversityIdRegExp).optional(),
+  "facultyId": zod.uuid().regex(insightsFunnelQueryFacultyIdRegExp).optional(),
+  "departmentId": zod.uuid().regex(insightsFunnelQueryDepartmentIdRegExp).optional(),
+  "session": zod.string().regex(insightsFunnelQuerySessionRegExp).optional()
+})
+
+export const insightsFunnelResponseRefreshedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsFunnelResponseStagesItemValueMin = 0;
+export const insightsFunnelResponseStagesItemValueMax = 9007199254740991;
+
+export const insightsFunnelResponseSuppressionThresholdExclusiveMin = 0;
+export const insightsFunnelResponseSuppressionThresholdMax = 9007199254740991;
+
+
+
+export const InsightsFunnelResponse = zod.object({
+  "refreshedAt": zod.iso.datetime({"offset":true}).regex(insightsFunnelResponseRefreshedAtRegExp).nullable(),
+  "stages": zod.array(zod.object({
+  "key": zod.enum(['registered', 'verified', 'approved', 'started', 'completed']),
+  "value": zod.int().min(insightsFunnelResponseStagesItemValueMin).max(insightsFunnelResponseStagesItemValueMax).nullable()
+})),
+  "suppressed": zod.boolean(),
+  "suppressionThreshold": zod.int().gt(insightsFunnelResponseSuppressionThresholdExclusiveMin).max(insightsFunnelResponseSuppressionThresholdMax)
+})
+
+
+export const insightsMissedQuestionsQueryFromRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsMissedQuestionsQueryToRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsMissedQuestionsQueryCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsMissedQuestionsQueryUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsMissedQuestionsQueryFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsMissedQuestionsQueryDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsMissedQuestionsQuerySessionRegExp = new RegExp('^(\\d{4})-(\\d{2})$');
+export const insightsMissedQuestionsQueryQuizIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsMissedQuestionsQueryLimitMax = 25;
+
+
+
+export const InsightsMissedQuestionsQueryParams = zod.object({
+  "from": zod.string().regex(insightsMissedQuestionsQueryFromRegExp).optional(),
+  "to": zod.string().regex(insightsMissedQuestionsQueryToRegExp).optional(),
+  "courseId": zod.uuid().regex(insightsMissedQuestionsQueryCourseIdRegExp).optional(),
+  "universityId": zod.uuid().regex(insightsMissedQuestionsQueryUniversityIdRegExp).optional(),
+  "facultyId": zod.uuid().regex(insightsMissedQuestionsQueryFacultyIdRegExp).optional(),
+  "departmentId": zod.uuid().regex(insightsMissedQuestionsQueryDepartmentIdRegExp).optional(),
+  "session": zod.string().regex(insightsMissedQuestionsQuerySessionRegExp).optional(),
+  "quizId": zod.uuid().regex(insightsMissedQuestionsQueryQuizIdRegExp),
+  "limit": zod.int().min(1).max(insightsMissedQuestionsQueryLimitMax).optional()
+})
+
+export const insightsMissedQuestionsResponseRefreshedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsMissedQuestionsResponseRowsItemAnsweredMin = 0;
+export const insightsMissedQuestionsResponseRowsItemAnsweredMax = 9007199254740991;
+
+export const insightsMissedQuestionsResponseRowsItemMissPercentMin = 0;
+
+export const insightsMissedQuestionsResponseRowsItemMissedMin = 0;
+export const insightsMissedQuestionsResponseRowsItemMissedMax = 9007199254740991;
+
+export const insightsMissedQuestionsResponseRowsItemOrderMin = 0;
+export const insightsMissedQuestionsResponseRowsItemOrderMax = 9007199254740991;
+
+export const insightsMissedQuestionsResponseSuppressedCountMin = 0;
+export const insightsMissedQuestionsResponseSuppressedCountMax = 9007199254740991;
+
+export const insightsMissedQuestionsResponseSuppressionThresholdExclusiveMin = 0;
+export const insightsMissedQuestionsResponseSuppressionThresholdMax = 9007199254740991;
+
+
+
+export const InsightsMissedQuestionsResponse = zod.object({
+  "label": zod.string(),
+  "quizId": zod.string(),
+  "refreshedAt": zod.iso.datetime({"offset":true}).regex(insightsMissedQuestionsResponseRefreshedAtRegExp).nullable(),
+  "rows": zod.array(zod.object({
+  "answered": zod.int().min(insightsMissedQuestionsResponseRowsItemAnsweredMin).max(insightsMissedQuestionsResponseRowsItemAnsweredMax),
+  "missPercent": zod.number().min(insightsMissedQuestionsResponseRowsItemMissPercentMin),
+  "missed": zod.int().min(insightsMissedQuestionsResponseRowsItemMissedMin).max(insightsMissedQuestionsResponseRowsItemMissedMax),
+  "order": zod.int().min(insightsMissedQuestionsResponseRowsItemOrderMin).max(insightsMissedQuestionsResponseRowsItemOrderMax),
+  "questionId": zod.string(),
+  "text": zod.string()
+})),
+  "suppressedCount": zod.int().min(insightsMissedQuestionsResponseSuppressedCountMin).max(insightsMissedQuestionsResponseSuppressedCountMax),
+  "suppressionThreshold": zod.int().gt(insightsMissedQuestionsResponseSuppressionThresholdExclusiveMin).max(insightsMissedQuestionsResponseSuppressionThresholdMax)
+})
+
+
+export const insightsModuleResultsQueryFromRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsModuleResultsQueryToRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsModuleResultsQueryCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsModuleResultsQueryUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsModuleResultsQueryFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsModuleResultsQueryDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsModuleResultsQuerySessionRegExp = new RegExp('^(\\d{4})-(\\d{2})$');
+
+
+export const InsightsModuleResultsQueryParams = zod.object({
+  "from": zod.string().regex(insightsModuleResultsQueryFromRegExp).optional(),
+  "to": zod.string().regex(insightsModuleResultsQueryToRegExp).optional(),
+  "courseId": zod.uuid().regex(insightsModuleResultsQueryCourseIdRegExp).optional(),
+  "universityId": zod.uuid().regex(insightsModuleResultsQueryUniversityIdRegExp).optional(),
+  "facultyId": zod.uuid().regex(insightsModuleResultsQueryFacultyIdRegExp).optional(),
+  "departmentId": zod.uuid().regex(insightsModuleResultsQueryDepartmentIdRegExp).optional(),
+  "session": zod.string().regex(insightsModuleResultsQuerySessionRegExp).optional()
+})
+
+export const insightsModuleResultsResponseRefreshedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsModuleResultsResponseRowsItemCompletedMin = 0;
+export const insightsModuleResultsResponseRowsItemCompletedMax = 9007199254740991;
+
+export const insightsModuleResultsResponseRowsItemCompletionRateMin = 0;
+
+export const insightsModuleResultsResponseRowsItemDropOffMin = 0;
+export const insightsModuleResultsResponseRowsItemDropOffMax = 9007199254740991;
+
+export const insightsModuleResultsResponseRowsItemQuizReadyMin = 0;
+export const insightsModuleResultsResponseRowsItemQuizReadyMax = 9007199254740991;
+
+export const insightsModuleResultsResponseRowsItemStartedMin = 0;
+export const insightsModuleResultsResponseRowsItemStartedMax = 9007199254740991;
+
+export const insightsModuleResultsResponseRowsItemStudentsMin = 0;
+export const insightsModuleResultsResponseRowsItemStudentsMax = 9007199254740991;
+
+export const insightsModuleResultsResponseSuppressionThresholdExclusiveMin = 0;
+export const insightsModuleResultsResponseSuppressionThresholdMax = 9007199254740991;
+
+
+
+export const InsightsModuleResultsResponse = zod.object({
+  "refreshedAt": zod.iso.datetime({"offset":true}).regex(insightsModuleResultsResponseRefreshedAtRegExp).nullable(),
+  "rows": zod.array(zod.object({
+  "completed": zod.int().min(insightsModuleResultsResponseRowsItemCompletedMin).max(insightsModuleResultsResponseRowsItemCompletedMax).nullable(),
+  "completionRate": zod.number().min(insightsModuleResultsResponseRowsItemCompletionRateMin).nullable(),
+  "dropOff": zod.int().min(insightsModuleResultsResponseRowsItemDropOffMin).max(insightsModuleResultsResponseRowsItemDropOffMax).nullable(),
+  "label": zod.string(),
+  "moduleId": zod.string(),
+  "quizReady": zod.int().min(insightsModuleResultsResponseRowsItemQuizReadyMin).max(insightsModuleResultsResponseRowsItemQuizReadyMax).nullable(),
+  "started": zod.int().min(insightsModuleResultsResponseRowsItemStartedMin).max(insightsModuleResultsResponseRowsItemStartedMax).nullable(),
+  "students": zod.int().min(insightsModuleResultsResponseRowsItemStudentsMin).max(insightsModuleResultsResponseRowsItemStudentsMax).nullable(),
+  "suppressed": zod.boolean()
+})),
+  "suppressionThreshold": zod.int().gt(insightsModuleResultsResponseSuppressionThresholdExclusiveMin).max(insightsModuleResultsResponseSuppressionThresholdMax)
+})
+
+
+export const insightsQuizResultsQueryFromRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsQuizResultsQueryToRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsQuizResultsQueryCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsQuizResultsQueryUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsQuizResultsQueryFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsQuizResultsQueryDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsQuizResultsQuerySessionRegExp = new RegExp('^(\\d{4})-(\\d{2})$');
+
+
+export const InsightsQuizResultsQueryParams = zod.object({
+  "from": zod.string().regex(insightsQuizResultsQueryFromRegExp).optional(),
+  "to": zod.string().regex(insightsQuizResultsQueryToRegExp).optional(),
+  "courseId": zod.uuid().regex(insightsQuizResultsQueryCourseIdRegExp).optional(),
+  "universityId": zod.uuid().regex(insightsQuizResultsQueryUniversityIdRegExp).optional(),
+  "facultyId": zod.uuid().regex(insightsQuizResultsQueryFacultyIdRegExp).optional(),
+  "departmentId": zod.uuid().regex(insightsQuizResultsQueryDepartmentIdRegExp).optional(),
+  "session": zod.string().regex(insightsQuizResultsQuerySessionRegExp).optional()
+})
+
+export const insightsQuizResultsResponseRefreshedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsQuizResultsResponseRowsItemAttemptedStudentsMin = 0;
+export const insightsQuizResultsResponseRowsItemAttemptedStudentsMax = 9007199254740991;
+
+export const insightsQuizResultsResponseRowsItemAttemptsMin = 0;
+export const insightsQuizResultsResponseRowsItemAttemptsMax = 9007199254740991;
+
+export const insightsQuizResultsResponseRowsItemAverageAttemptsMin = 0;
+
+export const insightsQuizResultsResponseRowsItemPassRateMin = 0;
+
+export const insightsQuizResultsResponseRowsItemPassedStudentsMin = 0;
+export const insightsQuizResultsResponseRowsItemPassedStudentsMax = 9007199254740991;
+
+export const insightsQuizResultsResponseSuppressionThresholdExclusiveMin = 0;
+export const insightsQuizResultsResponseSuppressionThresholdMax = 9007199254740991;
+
+
+
+export const InsightsQuizResultsResponse = zod.object({
+  "refreshedAt": zod.iso.datetime({"offset":true}).regex(insightsQuizResultsResponseRefreshedAtRegExp).nullable(),
+  "rows": zod.array(zod.object({
+  "attemptedStudents": zod.int().min(insightsQuizResultsResponseRowsItemAttemptedStudentsMin).max(insightsQuizResultsResponseRowsItemAttemptedStudentsMax).nullable(),
+  "attempts": zod.int().min(insightsQuizResultsResponseRowsItemAttemptsMin).max(insightsQuizResultsResponseRowsItemAttemptsMax).nullable(),
+  "averageAttempts": zod.number().min(insightsQuizResultsResponseRowsItemAverageAttemptsMin).nullable(),
+  "label": zod.string(),
+  "moduleId": zod.string(),
+  "passRate": zod.number().min(insightsQuizResultsResponseRowsItemPassRateMin).nullable(),
+  "passedStudents": zod.int().min(insightsQuizResultsResponseRowsItemPassedStudentsMin).max(insightsQuizResultsResponseRowsItemPassedStudentsMax).nullable(),
+  "quizId": zod.string(),
+  "suppressed": zod.boolean()
+})),
+  "suppressionThreshold": zod.int().gt(insightsQuizResultsResponseSuppressionThresholdExclusiveMin).max(insightsQuizResultsResponseSuppressionThresholdMax)
+})
+
+
+export const insightsRefreshResponseRunFinishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsRefreshResponseRunFromDayRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsRefreshResponseRunIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsRefreshResponseRunRequestedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsRefreshResponseRunRowsWrittenMin = 0;
+export const insightsRefreshResponseRunRowsWrittenMax = 9007199254740991;
+
+export const insightsRefreshResponseRunStartedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsRefreshResponseRunToDayRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+
+
+export const InsightsRefreshResponse = zod.object({
+  "run": zod.object({
+  "failed": zod.boolean(),
+  "finishedAt": zod.iso.datetime({"offset":true}).regex(insightsRefreshResponseRunFinishedAtRegExp).nullable(),
+  "fromDay": zod.string().regex(insightsRefreshResponseRunFromDayRegExp),
+  "id": zod.uuid().regex(insightsRefreshResponseRunIdRegExp),
+  "requestedAt": zod.iso.datetime({"offset":true}).regex(insightsRefreshResponseRunRequestedAtRegExp),
+  "rowsWritten": zod.int().min(insightsRefreshResponseRunRowsWrittenMin).max(insightsRefreshResponseRunRowsWrittenMax),
+  "startedAt": zod.iso.datetime({"offset":true}).regex(insightsRefreshResponseRunStartedAtRegExp).nullable(),
+  "status": zod.enum(['PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED']),
+  "toDay": zod.string().regex(insightsRefreshResponseRunToDayRegExp),
+  "trigger": zod.enum(['NIGHTLY', 'MANUAL', 'BACKFILL'])
+})
+})
+
+
+export const insightsStatusResponseActiveRunFinishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsStatusResponseActiveRunFromDayRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsStatusResponseActiveRunIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsStatusResponseActiveRunRequestedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsStatusResponseActiveRunRowsWrittenMin = 0;
+export const insightsStatusResponseActiveRunRowsWrittenMax = 9007199254740991;
+
+export const insightsStatusResponseActiveRunStartedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsStatusResponseActiveRunToDayRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsStatusResponseLastRunFinishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsStatusResponseLastRunFromDayRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsStatusResponseLastRunIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsStatusResponseLastRunRequestedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsStatusResponseLastRunRowsWrittenMin = 0;
+export const insightsStatusResponseLastRunRowsWrittenMax = 9007199254740991;
+
+export const insightsStatusResponseLastRunStartedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsStatusResponseLastRunToDayRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsStatusResponseLastSuccessfulAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const InsightsStatusResponse = zod.object({
+  "activeRun": zod.object({
+  "failed": zod.boolean(),
+  "finishedAt": zod.iso.datetime({"offset":true}).regex(insightsStatusResponseActiveRunFinishedAtRegExp).nullable(),
+  "fromDay": zod.string().regex(insightsStatusResponseActiveRunFromDayRegExp),
+  "id": zod.uuid().regex(insightsStatusResponseActiveRunIdRegExp),
+  "requestedAt": zod.iso.datetime({"offset":true}).regex(insightsStatusResponseActiveRunRequestedAtRegExp),
+  "rowsWritten": zod.int().min(insightsStatusResponseActiveRunRowsWrittenMin).max(insightsStatusResponseActiveRunRowsWrittenMax),
+  "startedAt": zod.iso.datetime({"offset":true}).regex(insightsStatusResponseActiveRunStartedAtRegExp).nullable(),
+  "status": zod.enum(['PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED']),
+  "toDay": zod.string().regex(insightsStatusResponseActiveRunToDayRegExp),
+  "trigger": zod.enum(['NIGHTLY', 'MANUAL', 'BACKFILL'])
+}).nullable(),
+  "lastRun": zod.object({
+  "failed": zod.boolean(),
+  "finishedAt": zod.iso.datetime({"offset":true}).regex(insightsStatusResponseLastRunFinishedAtRegExp).nullable(),
+  "fromDay": zod.string().regex(insightsStatusResponseLastRunFromDayRegExp),
+  "id": zod.uuid().regex(insightsStatusResponseLastRunIdRegExp),
+  "requestedAt": zod.iso.datetime({"offset":true}).regex(insightsStatusResponseLastRunRequestedAtRegExp),
+  "rowsWritten": zod.int().min(insightsStatusResponseLastRunRowsWrittenMin).max(insightsStatusResponseLastRunRowsWrittenMax),
+  "startedAt": zod.iso.datetime({"offset":true}).regex(insightsStatusResponseLastRunStartedAtRegExp).nullable(),
+  "status": zod.enum(['PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED']),
+  "toDay": zod.string().regex(insightsStatusResponseLastRunToDayRegExp),
+  "trigger": zod.enum(['NIGHTLY', 'MANUAL', 'BACKFILL'])
+}).nullable(),
+  "lastSuccessfulAt": zod.iso.datetime({"offset":true}).regex(insightsStatusResponseLastSuccessfulAtRegExp).nullable(),
+  "running": zod.boolean()
+})
+
+
+export const InsightsQueryParams = zod.object({
+  "series": zod.enum(['enrollments', 'modules', 'quizzes', 'questions'])
+})
+
+export const insightsQueryQueryFromRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsQueryQueryToRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsQueryQueryCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsQueryQueryUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsQueryQueryFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsQueryQueryDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsQueryQuerySessionRegExp = new RegExp('^(\\d{4})-(\\d{2})$');
+
+
+export const InsightsQueryQueryParams = zod.object({
+  "from": zod.string().regex(insightsQueryQueryFromRegExp).optional(),
+  "to": zod.string().regex(insightsQueryQueryToRegExp).optional(),
+  "courseId": zod.uuid().regex(insightsQueryQueryCourseIdRegExp).optional(),
+  "universityId": zod.uuid().regex(insightsQueryQueryUniversityIdRegExp).optional(),
+  "facultyId": zod.uuid().regex(insightsQueryQueryFacultyIdRegExp).optional(),
+  "departmentId": zod.uuid().regex(insightsQueryQueryDepartmentIdRegExp).optional(),
+  "session": zod.string().regex(insightsQueryQuerySessionRegExp).optional(),
+  "groupBy": zod.enum(['day', 'month', 'course', 'module', 'question', 'university', 'faculty', 'department', 'session']).optional()
+})
+
+export const insightsQueryResponseGroupsItemStudentsMin = 0;
+export const insightsQueryResponseGroupsItemStudentsMax = 9007199254740991;
+
+export const insightsQueryResponseGroupsItemValuesMinOne = 0;
+export const insightsQueryResponseGroupsItemValuesMaxOne = 9007199254740991;
+
+export const insightsQueryResponseRefreshedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const insightsQueryResponseSuppressionThresholdExclusiveMin = 0;
+export const insightsQueryResponseSuppressionThresholdMax = 9007199254740991;
+
+
+
+export const InsightsQueryResponse = zod.object({
+  "columns": zod.array(zod.string()),
+  "groupBy": zod.enum(['day', 'month', 'course', 'module', 'question', 'university', 'faculty', 'department', 'session']),
+  "groups": zod.array(zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "students": zod.int().min(insightsQueryResponseGroupsItemStudentsMin).max(insightsQueryResponseGroupsItemStudentsMax).nullable(),
+  "suppressed": zod.boolean(),
+  "values": zod.record(zod.string(), zod.int().min(insightsQueryResponseGroupsItemValuesMinOne).max(insightsQueryResponseGroupsItemValuesMaxOne).nullable())
+})),
+  "refreshedAt": zod.iso.datetime({"offset":true}).regex(insightsQueryResponseRefreshedAtRegExp).nullable(),
+  "series": zod.enum(['enrollments', 'modules', 'quizzes', 'questions']),
+  "suppressionThreshold": zod.int().gt(insightsQueryResponseSuppressionThresholdExclusiveMin).max(insightsQueryResponseSuppressionThresholdMax)
+})
+
+
+export const InsightsCsvParams = zod.object({
+  "series": zod.enum(['enrollments', 'modules', 'quizzes', 'questions'])
+})
+
+export const insightsCsvQueryFromRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsCsvQueryToRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const insightsCsvQueryCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsCsvQueryUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsCsvQueryFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsCsvQueryDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const insightsCsvQuerySessionRegExp = new RegExp('^(\\d{4})-(\\d{2})$');
+
+
+export const InsightsCsvQueryParams = zod.object({
+  "from": zod.string().regex(insightsCsvQueryFromRegExp).optional(),
+  "to": zod.string().regex(insightsCsvQueryToRegExp).optional(),
+  "courseId": zod.uuid().regex(insightsCsvQueryCourseIdRegExp).optional(),
+  "universityId": zod.uuid().regex(insightsCsvQueryUniversityIdRegExp).optional(),
+  "facultyId": zod.uuid().regex(insightsCsvQueryFacultyIdRegExp).optional(),
+  "departmentId": zod.uuid().regex(insightsCsvQueryDepartmentIdRegExp).optional(),
+  "session": zod.string().regex(insightsCsvQuerySessionRegExp).optional(),
+  "groupBy": zod.enum(['day', 'month', 'course', 'module', 'question', 'university', 'faculty', 'department', 'session']).optional()
+})
+
+export const InsightsCsvResponse = zod.unknown()
+
+
 export const adminMeDescribeResponseUserIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 
@@ -2845,6 +3496,250 @@ export const AdminMeDescribeResponse = zod.object({
   "mustChangePassword": zod.boolean(),
   "role": zod.enum(['SUPER_ADMIN', 'ADMIN', 'STUDENT'])
 })
+})
+
+
+export const newsListQueryStatusDefault = `all`;
+export const newsListQueryPageDefault = 1;
+export const newsListQueryPageMax = 9007199254740991;
+
+export const newsListQueryPageSizeDefault = 25;
+export const newsListQueryPageSizeMin = -9007199254740991;
+export const newsListQueryPageSizeMax = 9007199254740991;
+
+export const newsListQueryQMax = 120;
+
+
+
+export const NewsListQueryParams = zod.object({
+  "status": zod.enum(['all', 'draft', 'scheduled', 'published']).default(newsListQueryStatusDefault),
+  "page": zod.int().min(1).max(newsListQueryPageMax).default(newsListQueryPageDefault),
+  "pageSize": zod.int().min(newsListQueryPageSizeMin).max(newsListQueryPageSizeMax).default(newsListQueryPageSizeDefault),
+  "sort": zod.enum(['title', '-title', 'publishedAt', '-publishedAt', 'updatedAt', '-updatedAt']).optional(),
+  "q": zod.string().min(1).max(newsListQueryQMax).optional()
+})
+
+export const newsListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsListResponseItemsItemPublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsListResponseItemsItemUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsListResponsePageMax = 9007199254740991;
+
+export const newsListResponsePageSizeMax = 9007199254740991;
+
+export const newsListResponseTotalMin = 0;
+export const newsListResponseTotalMax = 9007199254740991;
+
+
+
+export const NewsListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.uuid().regex(newsListResponseItemsItemIdRegExp),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(newsListResponseItemsItemPublishedAtRegExp).nullable(),
+  "slug": zod.string(),
+  "status": zod.enum(['draft', 'scheduled', 'published']),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(newsListResponseItemsItemUpdatedAtRegExp)
+})),
+  "page": zod.int().min(1).max(newsListResponsePageMax),
+  "pageSize": zod.int().min(1).max(newsListResponsePageSizeMax),
+  "total": zod.int().min(newsListResponseTotalMin).max(newsListResponseTotalMax)
+})
+
+
+export const newsCreateBodyPublishedAtDefault = null;
+export const newsCreateBodyPublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const newsCreateBodyTitleMax = 200;
+
+
+
+export const NewsCreateBody = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(newsCreateBodyPublishedAtRegExp).nullish().default(newsCreateBodyPublishedAtDefault),
+  "schemaVersion": zod.literal(1),
+  "status": zod.enum(['draft', 'published']),
+  "title": zod.string().min(1).max(newsCreateBodyTitleMax)
+})
+
+export const newsCreateResponseAuthorIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsCreateResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsCreateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsCreateResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsCreateResponsePublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsCreateResponseSchemaVersionMax = 9007199254740991;
+
+export const newsCreateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const NewsCreateResponse = zod.object({
+  "authorId": zod.uuid().regex(newsCreateResponseAuthorIdRegExp),
+  "body": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(newsCreateResponseCreatedAtRegExp),
+  "id": zod.uuid().regex(newsCreateResponseIdRegExp),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(newsCreateResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(newsCreateResponsePublishedAtRegExp).nullable(),
+  "schemaVersion": zod.int().min(1).max(newsCreateResponseSchemaVersionMax),
+  "slug": zod.string(),
+  "status": zod.enum(['draft', 'scheduled', 'published']),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(newsCreateResponseUpdatedAtRegExp)
+})
+
+
+export const newsRemovePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const NewsRemoveParams = zod.object({
+  "id": zod.uuid().regex(newsRemovePathIdRegExp)
+})
+
+export const NewsRemoveResponse = zod.void()
+
+
+export const newsGetPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const NewsGetParams = zod.object({
+  "id": zod.uuid().regex(newsGetPathIdRegExp)
+})
+
+export const newsGetResponseAuthorIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsGetResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsGetResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsGetResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsGetResponsePublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsGetResponseSchemaVersionMax = 9007199254740991;
+
+export const newsGetResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const NewsGetResponse = zod.object({
+  "authorId": zod.uuid().regex(newsGetResponseAuthorIdRegExp),
+  "body": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(newsGetResponseCreatedAtRegExp),
+  "id": zod.uuid().regex(newsGetResponseIdRegExp),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(newsGetResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(newsGetResponsePublishedAtRegExp).nullable(),
+  "schemaVersion": zod.int().min(1).max(newsGetResponseSchemaVersionMax),
+  "slug": zod.string(),
+  "status": zod.enum(['draft', 'scheduled', 'published']),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(newsGetResponseUpdatedAtRegExp)
+})
+
+
+export const newsUpdatePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const NewsUpdateParams = zod.object({
+  "id": zod.uuid().regex(newsUpdatePathIdRegExp)
+})
+
+export const newsUpdateBodyPublishedAtDefault = null;
+export const newsUpdateBodyPublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$');
+export const newsUpdateBodyTitleMax = 200;
+
+
+
+export const NewsUpdateBody = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(newsUpdateBodyPublishedAtRegExp).nullish().default(newsUpdateBodyPublishedAtDefault),
+  "schemaVersion": zod.literal(1),
+  "status": zod.enum(['draft', 'published']),
+  "title": zod.string().min(1).max(newsUpdateBodyTitleMax)
+})
+
+export const newsUpdateResponseAuthorIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsUpdateResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsUpdateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsUpdateResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const newsUpdateResponsePublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const newsUpdateResponseSchemaVersionMax = 9007199254740991;
+
+export const newsUpdateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const NewsUpdateResponse = zod.object({
+  "authorId": zod.uuid().regex(newsUpdateResponseAuthorIdRegExp),
+  "body": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(newsUpdateResponseCreatedAtRegExp),
+  "id": zod.uuid().regex(newsUpdateResponseIdRegExp),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(newsUpdateResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(newsUpdateResponsePublishedAtRegExp).nullable(),
+  "schemaVersion": zod.int().min(1).max(newsUpdateResponseSchemaVersionMax),
+  "slug": zod.string(),
+  "status": zod.enum(['draft', 'scheduled', 'published']),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(newsUpdateResponseUpdatedAtRegExp)
+})
+
+
+export const adminOverviewGetQueryCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminOverviewGetQueryParams = zod.object({
+  "courseId": zod.uuid().regex(adminOverviewGetQueryCourseIdRegExp).optional()
+})
+
+export const adminOverviewGetResponseCertificatesIssuedMin = 0;
+export const adminOverviewGetResponseCertificatesIssuedMax = 9007199254740991;
+
+export const adminOverviewGetResponsePassRatesItemPassRateMin = 0;
+
+export const adminOverviewGetResponsePassRatesItemStudentsMin = 0;
+export const adminOverviewGetResponsePassRatesItemStudentsMax = 9007199254740991;
+
+export const adminOverviewGetResponsePendingCountMin = 0;
+export const adminOverviewGetResponsePendingCountMax = 9007199254740991;
+
+export const adminOverviewGetResponsePendingOldestAgeSecondsMin = 0;
+export const adminOverviewGetResponsePendingOldestAgeSecondsMax = 9007199254740991;
+
+export const adminOverviewGetResponsePendingOldestRequestedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminOverviewGetResponseRefreshedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const adminOverviewGetResponseStatusCountsItemCountMin = 0;
+export const adminOverviewGetResponseStatusCountsItemCountMax = 9007199254740991;
+
+export const adminOverviewGetResponseSuppressionThresholdExclusiveMin = 0;
+export const adminOverviewGetResponseSuppressionThresholdMax = 9007199254740991;
+
+export const adminOverviewGetResponseTotalEnrollmentsMin = 0;
+export const adminOverviewGetResponseTotalEnrollmentsMax = 9007199254740991;
+
+
+
+export const AdminOverviewGetResponse = zod.object({
+  "certificatesIssued": zod.int().min(adminOverviewGetResponseCertificatesIssuedMin).max(adminOverviewGetResponseCertificatesIssuedMax),
+  "passRates": zod.array(zod.object({
+  "label": zod.string(),
+  "moduleId": zod.string(),
+  "passRate": zod.number().min(adminOverviewGetResponsePassRatesItemPassRateMin).nullable(),
+  "students": zod.int().min(adminOverviewGetResponsePassRatesItemStudentsMin).max(adminOverviewGetResponsePassRatesItemStudentsMax).nullable(),
+  "suppressed": zod.boolean()
+})),
+  "pending": zod.object({
+  "count": zod.int().min(adminOverviewGetResponsePendingCountMin).max(adminOverviewGetResponsePendingCountMax),
+  "oldestAgeSeconds": zod.int().min(adminOverviewGetResponsePendingOldestAgeSecondsMin).max(adminOverviewGetResponsePendingOldestAgeSecondsMax).nullable(),
+  "oldestRequestedAt": zod.iso.datetime({"offset":true}).regex(adminOverviewGetResponsePendingOldestRequestedAtRegExp).nullable()
+}),
+  "refreshedAt": zod.iso.datetime({"offset":true}).regex(adminOverviewGetResponseRefreshedAtRegExp).nullable(),
+  "statusCounts": zod.array(zod.object({
+  "count": zod.int().min(adminOverviewGetResponseStatusCountsItemCountMin).max(adminOverviewGetResponseStatusCountsItemCountMax),
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED'])
+})),
+  "suppressionThreshold": zod.int().gt(adminOverviewGetResponseSuppressionThresholdExclusiveMin).max(adminOverviewGetResponseSuppressionThresholdMax),
+  "totalEnrollments": zod.int().min(adminOverviewGetResponseTotalEnrollmentsMin).max(adminOverviewGetResponseTotalEnrollmentsMax)
 })
 
 
@@ -2872,6 +3767,527 @@ export const AdminPlaybackPreviewResponse = zod.object({
   "manifestPath": zod.string(),
   "resumePositionSeconds": zod.int().min(adminPlaybackPreviewResponseResumePositionSecondsMin).max(adminPlaybackPreviewResponseResumePositionSecondsMax),
   "sessionId": zod.uuid().regex(adminPlaybackPreviewResponseSessionIdRegExp).nullable()
+})
+
+
+export const profileChangeAdminListQueryStatusDefault = `PENDING`;
+export const profileChangeAdminListQueryPageDefault = 1;
+export const profileChangeAdminListQueryPageMax = 9007199254740991;
+
+export const profileChangeAdminListQueryPageSizeDefault = 25;
+export const profileChangeAdminListQueryPageSizeMin = -9007199254740991;
+export const profileChangeAdminListQueryPageSizeMax = 9007199254740991;
+
+
+
+export const ProfileChangeAdminListQueryParams = zod.object({
+  "status": zod.enum(['PENDING', 'APPROVED', 'REJECTED']).default(profileChangeAdminListQueryStatusDefault),
+  "page": zod.int().min(1).max(profileChangeAdminListQueryPageMax).default(profileChangeAdminListQueryPageDefault),
+  "pageSize": zod.int().min(profileChangeAdminListQueryPageSizeMin).max(profileChangeAdminListQueryPageSizeMax).default(profileChangeAdminListQueryPageSizeDefault)
+})
+
+export const profileChangeAdminListResponseItemsItemCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const profileChangeAdminListResponseItemsItemCurrentDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeAdminListResponseItemsItemCurrentFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeAdminListResponseItemsItemCurrentUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeAdminListResponseItemsItemDecidedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const profileChangeAdminListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeAdminListResponseItemsItemNoteMax = 500;
+
+export const profileChangeAdminListResponseItemsItemReasonMax = 500;
+
+export const profileChangeAdminListResponseItemsItemRequestedDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeAdminListResponseItemsItemRequestedFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeAdminListResponseItemsItemRequestedNameMax = 100;
+
+export const profileChangeAdminListResponseItemsItemRequestedSessionMax = 16;
+
+export const profileChangeAdminListResponseItemsItemRequestedUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeAdminListResponsePageMax = 9007199254740991;
+
+export const profileChangeAdminListResponsePageSizeMax = 9007199254740991;
+
+export const profileChangeAdminListResponseTotalMin = 0;
+export const profileChangeAdminListResponseTotalMax = 9007199254740991;
+
+
+
+export const ProfileChangeAdminListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "createdAt": zod.iso.datetime({"offset":true}).regex(profileChangeAdminListResponseItemsItemCreatedAtRegExp),
+  "current": zod.object({
+  "department": zod.object({
+  "id": zod.uuid().regex(profileChangeAdminListResponseItemsItemCurrentDepartmentIdRegExp),
+  "name": zod.string()
+}),
+  "faculty": zod.object({
+  "id": zod.uuid().regex(profileChangeAdminListResponseItemsItemCurrentFacultyIdRegExp),
+  "name": zod.string()
+}),
+  "name": zod.string(),
+  "session": zod.string(),
+  "university": zod.object({
+  "id": zod.uuid().regex(profileChangeAdminListResponseItemsItemCurrentUniversityIdRegExp),
+  "name": zod.string()
+})
+}),
+  "decidedAt": zod.iso.datetime({"offset":true}).regex(profileChangeAdminListResponseItemsItemDecidedAtRegExp).nullable(),
+  "id": zod.uuid().regex(profileChangeAdminListResponseItemsItemIdRegExp),
+  "note": zod.string().min(1).max(profileChangeAdminListResponseItemsItemNoteMax).nullable(),
+  "reason": zod.string().min(1).max(profileChangeAdminListResponseItemsItemReasonMax).nullable(),
+  "requested": zod.object({
+  "department": zod.object({
+  "id": zod.uuid().regex(profileChangeAdminListResponseItemsItemRequestedDepartmentIdRegExp),
+  "name": zod.string()
+}).nullable(),
+  "faculty": zod.object({
+  "id": zod.uuid().regex(profileChangeAdminListResponseItemsItemRequestedFacultyIdRegExp),
+  "name": zod.string()
+}).nullable(),
+  "name": zod.string().min(1).max(profileChangeAdminListResponseItemsItemRequestedNameMax).nullable(),
+  "session": zod.string().min(1).max(profileChangeAdminListResponseItemsItemRequestedSessionMax).nullable(),
+  "university": zod.object({
+  "id": zod.uuid().regex(profileChangeAdminListResponseItemsItemRequestedUniversityIdRegExp),
+  "name": zod.string()
+}).nullable()
+}),
+  "status": zod.enum(['PENDING', 'APPROVED', 'REJECTED']),
+  "student": zod.object({
+  "email": zod.string(),
+  "name": zod.string()
+})
+})),
+  "page": zod.int().min(1).max(profileChangeAdminListResponsePageMax),
+  "pageSize": zod.int().min(1).max(profileChangeAdminListResponsePageSizeMax),
+  "total": zod.int().min(profileChangeAdminListResponseTotalMin).max(profileChangeAdminListResponseTotalMax)
+})
+
+
+export const profileChangeAdminApprovePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProfileChangeAdminApproveParams = zod.object({
+  "id": zod.uuid().regex(profileChangeAdminApprovePathIdRegExp)
+})
+
+export const profileChangeAdminApproveResponseDecidedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const profileChangeAdminApproveResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProfileChangeAdminApproveResponse = zod.object({
+  "decidedAt": zod.iso.datetime({"offset":true}).regex(profileChangeAdminApproveResponseDecidedAtRegExp),
+  "id": zod.uuid().regex(profileChangeAdminApproveResponseIdRegExp),
+  "status": zod.enum(['PENDING', 'APPROVED', 'REJECTED'])
+})
+
+
+export const profileChangeAdminRejectPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProfileChangeAdminRejectParams = zod.object({
+  "id": zod.uuid().regex(profileChangeAdminRejectPathIdRegExp)
+})
+
+export const profileChangeAdminRejectBodyReasonMax = 500;
+
+
+
+export const ProfileChangeAdminRejectBody = zod.object({
+  "reason": zod.string().min(1).max(profileChangeAdminRejectBodyReasonMax)
+})
+
+export const profileChangeAdminRejectResponseDecidedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const profileChangeAdminRejectResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProfileChangeAdminRejectResponse = zod.object({
+  "decidedAt": zod.iso.datetime({"offset":true}).regex(profileChangeAdminRejectResponseDecidedAtRegExp),
+  "id": zod.uuid().regex(profileChangeAdminRejectResponseIdRegExp),
+  "status": zod.enum(['PENDING', 'APPROVED', 'REJECTED'])
+})
+
+
+export const resourcesListQueryStatusDefault = `all`;
+export const resourcesListQueryPageDefault = 1;
+export const resourcesListQueryPageMax = 9007199254740991;
+
+export const resourcesListQueryPageSizeDefault = 25;
+export const resourcesListQueryPageSizeMin = -9007199254740991;
+export const resourcesListQueryPageSizeMax = 9007199254740991;
+
+export const resourcesListQueryQMax = 120;
+
+
+
+export const ResourcesListQueryParams = zod.object({
+  "status": zod.enum(['all', 'published', 'unpublished']).default(resourcesListQueryStatusDefault),
+  "page": zod.int().min(1).max(resourcesListQueryPageMax).default(resourcesListQueryPageDefault),
+  "pageSize": zod.int().min(resourcesListQueryPageSizeMin).max(resourcesListQueryPageSizeMax).default(resourcesListQueryPageSizeDefault),
+  "sort": zod.enum(['title', '-title', 'displayOrder', '-displayOrder', 'updatedAt', '-updatedAt']).optional(),
+  "q": zod.string().min(1).max(resourcesListQueryQMax).optional()
+})
+
+export const resourcesListResponseItemsItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesListResponseItemsItemCourseTitleMax = 200;
+
+export const resourcesListResponseItemsItemCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesListResponseItemsItemDescriptionMax = 1000;
+
+export const resourcesListResponseItemsItemDisplayOrderMin = -9007199254740991;
+export const resourcesListResponseItemsItemDisplayOrderMax = 9007199254740991;
+
+export const resourcesListResponseItemsItemFileAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesListResponseItemsItemFileSizeBytesMin = 0;
+export const resourcesListResponseItemsItemFileSizeBytesMax = 9007199254740991;
+
+export const resourcesListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesListResponseItemsItemUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesListResponseItemsItemUrlMax = 2000;
+
+export const resourcesListResponsePageMax = 9007199254740991;
+
+export const resourcesListResponsePageSizeMax = 9007199254740991;
+
+export const resourcesListResponseTotalMin = 0;
+export const resourcesListResponseTotalMax = 9007199254740991;
+
+
+
+export const ResourcesListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "courseId": zod.uuid().regex(resourcesListResponseItemsItemCourseIdRegExp).nullable(),
+  "courseTitle": zod.string().min(1).max(resourcesListResponseItemsItemCourseTitleMax).nullable(),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(resourcesListResponseItemsItemCreatedAtRegExp),
+  "description": zod.string().min(1).max(resourcesListResponseItemsItemDescriptionMax).nullable(),
+  "displayOrder": zod.int().min(resourcesListResponseItemsItemDisplayOrderMin).max(resourcesListResponseItemsItemDisplayOrderMax),
+  "file": zod.object({
+  "assetId": zod.uuid().regex(resourcesListResponseItemsItemFileAssetIdRegExp),
+  "mimeType": zod.string(),
+  "sizeBytes": zod.int().min(resourcesListResponseItemsItemFileSizeBytesMin).max(resourcesListResponseItemsItemFileSizeBytesMax),
+  "url": zod.string()
+}).nullable(),
+  "id": zod.uuid().regex(resourcesListResponseItemsItemIdRegExp),
+  "kind": zod.enum(['file', 'link']),
+  "published": zod.boolean(),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(resourcesListResponseItemsItemUpdatedAtRegExp),
+  "url": zod.string().min(1).max(resourcesListResponseItemsItemUrlMax).nullable()
+})),
+  "page": zod.int().min(1).max(resourcesListResponsePageMax),
+  "pageSize": zod.int().min(1).max(resourcesListResponsePageSizeMax),
+  "total": zod.int().min(resourcesListResponseTotalMin).max(resourcesListResponseTotalMax)
+})
+
+
+export const resourcesCreateBodyCourseIdDefault = null;
+export const resourcesCreateBodyCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesCreateBodyDescriptionDefault = null;
+export const resourcesCreateBodyDescriptionMax = 1000;
+
+export const resourcesCreateBodyDisplayOrderDefault = 0;
+export const resourcesCreateBodyDisplayOrderMin = 0;
+export const resourcesCreateBodyDisplayOrderMax = 100000;
+
+export const resourcesCreateBodyMediaAssetIdDefault = null;
+export const resourcesCreateBodyMediaAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesCreateBodyPublishedDefault = false;
+export const resourcesCreateBodyTitleMax = 200;
+
+export const resourcesCreateBodyUrlDefault = null;
+export const resourcesCreateBodyUrlMax = 2000;
+
+
+
+export const ResourcesCreateBody = zod.object({
+  "courseId": zod.uuid().regex(resourcesCreateBodyCourseIdRegExp).nullish().default(resourcesCreateBodyCourseIdDefault),
+  "description": zod.string().max(resourcesCreateBodyDescriptionMax).nullish().default(resourcesCreateBodyDescriptionDefault),
+  "displayOrder": zod.int().min(resourcesCreateBodyDisplayOrderMin).max(resourcesCreateBodyDisplayOrderMax).default(resourcesCreateBodyDisplayOrderDefault),
+  "kind": zod.enum(['file', 'link']),
+  "mediaAssetId": zod.uuid().regex(resourcesCreateBodyMediaAssetIdRegExp).nullish().default(resourcesCreateBodyMediaAssetIdDefault),
+  "published": zod.boolean().default(resourcesCreateBodyPublishedDefault),
+  "title": zod.string().min(1).max(resourcesCreateBodyTitleMax),
+  "url": zod.string().min(1).max(resourcesCreateBodyUrlMax).nullish().default(resourcesCreateBodyUrlDefault)
+})
+
+export const resourcesCreateResponseCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesCreateResponseCourseTitleMax = 200;
+
+export const resourcesCreateResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesCreateResponseDescriptionMax = 1000;
+
+export const resourcesCreateResponseDisplayOrderMin = -9007199254740991;
+export const resourcesCreateResponseDisplayOrderMax = 9007199254740991;
+
+export const resourcesCreateResponseFileAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesCreateResponseFileSizeBytesMin = 0;
+export const resourcesCreateResponseFileSizeBytesMax = 9007199254740991;
+
+export const resourcesCreateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesCreateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesCreateResponseUrlMax = 2000;
+
+
+
+export const ResourcesCreateResponse = zod.object({
+  "courseId": zod.uuid().regex(resourcesCreateResponseCourseIdRegExp).nullable(),
+  "courseTitle": zod.string().min(1).max(resourcesCreateResponseCourseTitleMax).nullable(),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(resourcesCreateResponseCreatedAtRegExp),
+  "description": zod.string().min(1).max(resourcesCreateResponseDescriptionMax).nullable(),
+  "displayOrder": zod.int().min(resourcesCreateResponseDisplayOrderMin).max(resourcesCreateResponseDisplayOrderMax),
+  "file": zod.object({
+  "assetId": zod.uuid().regex(resourcesCreateResponseFileAssetIdRegExp),
+  "mimeType": zod.string(),
+  "sizeBytes": zod.int().min(resourcesCreateResponseFileSizeBytesMin).max(resourcesCreateResponseFileSizeBytesMax),
+  "url": zod.string()
+}).nullable(),
+  "id": zod.uuid().regex(resourcesCreateResponseIdRegExp),
+  "kind": zod.enum(['file', 'link']),
+  "published": zod.boolean(),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(resourcesCreateResponseUpdatedAtRegExp),
+  "url": zod.string().min(1).max(resourcesCreateResponseUrlMax).nullable()
+})
+
+
+export const resourcesRemovePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ResourcesRemoveParams = zod.object({
+  "id": zod.uuid().regex(resourcesRemovePathIdRegExp)
+})
+
+export const ResourcesRemoveResponse = zod.void()
+
+
+export const resourcesGetPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ResourcesGetParams = zod.object({
+  "id": zod.uuid().regex(resourcesGetPathIdRegExp)
+})
+
+export const resourcesGetResponseCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesGetResponseCourseTitleMax = 200;
+
+export const resourcesGetResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesGetResponseDescriptionMax = 1000;
+
+export const resourcesGetResponseDisplayOrderMin = -9007199254740991;
+export const resourcesGetResponseDisplayOrderMax = 9007199254740991;
+
+export const resourcesGetResponseFileAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesGetResponseFileSizeBytesMin = 0;
+export const resourcesGetResponseFileSizeBytesMax = 9007199254740991;
+
+export const resourcesGetResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesGetResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesGetResponseUrlMax = 2000;
+
+
+
+export const ResourcesGetResponse = zod.object({
+  "courseId": zod.uuid().regex(resourcesGetResponseCourseIdRegExp).nullable(),
+  "courseTitle": zod.string().min(1).max(resourcesGetResponseCourseTitleMax).nullable(),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(resourcesGetResponseCreatedAtRegExp),
+  "description": zod.string().min(1).max(resourcesGetResponseDescriptionMax).nullable(),
+  "displayOrder": zod.int().min(resourcesGetResponseDisplayOrderMin).max(resourcesGetResponseDisplayOrderMax),
+  "file": zod.object({
+  "assetId": zod.uuid().regex(resourcesGetResponseFileAssetIdRegExp),
+  "mimeType": zod.string(),
+  "sizeBytes": zod.int().min(resourcesGetResponseFileSizeBytesMin).max(resourcesGetResponseFileSizeBytesMax),
+  "url": zod.string()
+}).nullable(),
+  "id": zod.uuid().regex(resourcesGetResponseIdRegExp),
+  "kind": zod.enum(['file', 'link']),
+  "published": zod.boolean(),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(resourcesGetResponseUpdatedAtRegExp),
+  "url": zod.string().min(1).max(resourcesGetResponseUrlMax).nullable()
+})
+
+
+export const resourcesUpdatePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ResourcesUpdateParams = zod.object({
+  "id": zod.uuid().regex(resourcesUpdatePathIdRegExp)
+})
+
+export const resourcesUpdateBodyCourseIdDefault = null;
+export const resourcesUpdateBodyCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesUpdateBodyDescriptionDefault = null;
+export const resourcesUpdateBodyDescriptionMax = 1000;
+
+export const resourcesUpdateBodyDisplayOrderDefault = 0;
+export const resourcesUpdateBodyDisplayOrderMin = 0;
+export const resourcesUpdateBodyDisplayOrderMax = 100000;
+
+export const resourcesUpdateBodyMediaAssetIdDefault = null;
+export const resourcesUpdateBodyMediaAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesUpdateBodyPublishedDefault = false;
+export const resourcesUpdateBodyTitleMax = 200;
+
+export const resourcesUpdateBodyUrlDefault = null;
+export const resourcesUpdateBodyUrlMax = 2000;
+
+
+
+export const ResourcesUpdateBody = zod.object({
+  "courseId": zod.uuid().regex(resourcesUpdateBodyCourseIdRegExp).nullish().default(resourcesUpdateBodyCourseIdDefault),
+  "description": zod.string().max(resourcesUpdateBodyDescriptionMax).nullish().default(resourcesUpdateBodyDescriptionDefault),
+  "displayOrder": zod.int().min(resourcesUpdateBodyDisplayOrderMin).max(resourcesUpdateBodyDisplayOrderMax).default(resourcesUpdateBodyDisplayOrderDefault),
+  "kind": zod.enum(['file', 'link']),
+  "mediaAssetId": zod.uuid().regex(resourcesUpdateBodyMediaAssetIdRegExp).nullish().default(resourcesUpdateBodyMediaAssetIdDefault),
+  "published": zod.boolean().default(resourcesUpdateBodyPublishedDefault),
+  "title": zod.string().min(1).max(resourcesUpdateBodyTitleMax),
+  "url": zod.string().min(1).max(resourcesUpdateBodyUrlMax).nullish().default(resourcesUpdateBodyUrlDefault)
+})
+
+export const resourcesUpdateResponseCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesUpdateResponseCourseTitleMax = 200;
+
+export const resourcesUpdateResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesUpdateResponseDescriptionMax = 1000;
+
+export const resourcesUpdateResponseDisplayOrderMin = -9007199254740991;
+export const resourcesUpdateResponseDisplayOrderMax = 9007199254740991;
+
+export const resourcesUpdateResponseFileAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesUpdateResponseFileSizeBytesMin = 0;
+export const resourcesUpdateResponseFileSizeBytesMax = 9007199254740991;
+
+export const resourcesUpdateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const resourcesUpdateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const resourcesUpdateResponseUrlMax = 2000;
+
+
+
+export const ResourcesUpdateResponse = zod.object({
+  "courseId": zod.uuid().regex(resourcesUpdateResponseCourseIdRegExp).nullable(),
+  "courseTitle": zod.string().min(1).max(resourcesUpdateResponseCourseTitleMax).nullable(),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(resourcesUpdateResponseCreatedAtRegExp),
+  "description": zod.string().min(1).max(resourcesUpdateResponseDescriptionMax).nullable(),
+  "displayOrder": zod.int().min(resourcesUpdateResponseDisplayOrderMin).max(resourcesUpdateResponseDisplayOrderMax),
+  "file": zod.object({
+  "assetId": zod.uuid().regex(resourcesUpdateResponseFileAssetIdRegExp),
+  "mimeType": zod.string(),
+  "sizeBytes": zod.int().min(resourcesUpdateResponseFileSizeBytesMin).max(resourcesUpdateResponseFileSizeBytesMax),
+  "url": zod.string()
+}).nullable(),
+  "id": zod.uuid().regex(resourcesUpdateResponseIdRegExp),
+  "kind": zod.enum(['file', 'link']),
+  "published": zod.boolean(),
+  "title": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(resourcesUpdateResponseUpdatedAtRegExp),
+  "url": zod.string().min(1).max(resourcesUpdateResponseUrlMax).nullable()
+})
+
+
+export const adminContactSettingsGetResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const AdminContactSettingsGetResponse = zod.object({
+  "address": zod.string(),
+  "email": zod.string(),
+  "officeHours": zod.string(),
+  "organisation": zod.string(),
+  "phone": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(adminContactSettingsGetResponseUpdatedAtRegExp).nullable()
+})
+
+
+export const adminContactSettingsUpdateBodyAddressMax = 500;
+
+export const adminContactSettingsUpdateBodyOfficeHoursMax = 300;
+
+export const adminContactSettingsUpdateBodyOrganisationMax = 160;
+
+
+
+export const AdminContactSettingsUpdateBody = zod.object({
+  "address": zod.string().max(adminContactSettingsUpdateBodyAddressMax),
+  "email": zod.string(),
+  "officeHours": zod.string().max(adminContactSettingsUpdateBodyOfficeHoursMax),
+  "organisation": zod.string().max(adminContactSettingsUpdateBodyOrganisationMax),
+  "phone": zod.string()
+})
+
+export const adminContactSettingsUpdateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const AdminContactSettingsUpdateResponse = zod.object({
+  "address": zod.string(),
+  "email": zod.string(),
+  "officeHours": zod.string(),
+  "organisation": zod.string(),
+  "phone": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(adminContactSettingsUpdateResponseUpdatedAtRegExp).nullable()
+})
+
+
+export const adminSiteSettingsGetResponseImageAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminSiteSettingsGetResponseImageAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminSiteSettingsGetResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminSiteSettingsGetResponseSchemaVersionMax = 9007199254740991;
+
+export const adminSiteSettingsGetResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const AdminSiteSettingsGetResponse = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "heading": zod.string(),
+  "image": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(adminSiteSettingsGetResponseImageAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "imageAssetId": zod.uuid().regex(adminSiteSettingsGetResponseImageAssetIdRegExpOne).nullable(),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(adminSiteSettingsGetResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "schemaVersion": zod.int().min(1).max(adminSiteSettingsGetResponseSchemaVersionMax),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(adminSiteSettingsGetResponseUpdatedAtRegExp).nullable()
+})
+
+
+export const adminSiteSettingsUpdateBodyHeadingMax = 120;
+
+export const adminSiteSettingsUpdateBodyImageAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const AdminSiteSettingsUpdateBody = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "heading": zod.string().min(1).max(adminSiteSettingsUpdateBodyHeadingMax),
+  "imageAssetId": zod.uuid().regex(adminSiteSettingsUpdateBodyImageAssetIdRegExp).nullable(),
+  "schemaVersion": zod.literal(1)
+})
+
+export const adminSiteSettingsUpdateResponseImageAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminSiteSettingsUpdateResponseImageAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminSiteSettingsUpdateResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const adminSiteSettingsUpdateResponseSchemaVersionMax = 9007199254740991;
+
+export const adminSiteSettingsUpdateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const AdminSiteSettingsUpdateResponse = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "heading": zod.string(),
+  "image": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(adminSiteSettingsUpdateResponseImageAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "imageAssetId": zod.uuid().regex(adminSiteSettingsUpdateResponseImageAssetIdRegExpOne).nullable(),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(adminSiteSettingsUpdateResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "schemaVersion": zod.int().min(1).max(adminSiteSettingsUpdateResponseSchemaVersionMax),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(adminSiteSettingsUpdateResponseUpdatedAtRegExp).nullable()
 })
 
 
@@ -2953,6 +4369,28 @@ export const StudentListListResponse = zod.object({
   "pageSize": zod.int().min(1).max(studentListListResponsePageSizeMax),
   "total": zod.int().min(studentListListResponseTotalMin).max(studentListListResponseTotalMax)
 })
+
+
+export const studentExportDownloadQueryCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentExportDownloadQueryUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentExportDownloadQueryFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentExportDownloadQueryDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const studentExportDownloadQuerySessionRegExp = new RegExp('^(\\d{4})-(\\d{2})$');
+export const studentExportDownloadQueryQMax = 100;
+
+
+
+export const StudentExportDownloadQueryParams = zod.object({
+  "courseId": zod.uuid().regex(studentExportDownloadQueryCourseIdRegExp).optional(),
+  "universityId": zod.uuid().regex(studentExportDownloadQueryUniversityIdRegExp).optional(),
+  "facultyId": zod.uuid().regex(studentExportDownloadQueryFacultyIdRegExp).optional(),
+  "departmentId": zod.uuid().regex(studentExportDownloadQueryDepartmentIdRegExp).optional(),
+  "session": zod.string().regex(studentExportDownloadQuerySessionRegExp).optional(),
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED']).optional(),
+  "q": zod.string().max(studentExportDownloadQueryQMax).optional()
+})
+
+export const StudentExportDownloadResponse = zod.unknown()
 
 
 export const studentDetailGetPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
@@ -3078,6 +4516,145 @@ export const StudentDetailGetResponse = zod.object({
   "name": zod.string()
 }),
   "userId": zod.uuid().regex(studentDetailGetResponseUserIdRegExp)
+})
+
+
+export const tagsListResponseItemsItemCourseCountMin = 0;
+export const tagsListResponseItemsItemCourseCountMax = 9007199254740991;
+
+export const tagsListResponseItemsItemCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const tagsListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const tagsListResponseItemsItemModuleCountMin = 0;
+export const tagsListResponseItemsItemModuleCountMax = 9007199254740991;
+
+export const tagsListResponseItemsItemUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const TagsListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "courseCount": zod.int().min(tagsListResponseItemsItemCourseCountMin).max(tagsListResponseItemsItemCourseCountMax),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(tagsListResponseItemsItemCreatedAtRegExp),
+  "id": zod.uuid().regex(tagsListResponseItemsItemIdRegExp),
+  "isSystem": zod.boolean(),
+  "moduleCount": zod.int().min(tagsListResponseItemsItemModuleCountMin).max(tagsListResponseItemsItemModuleCountMax),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(tagsListResponseItemsItemUpdatedAtRegExp)
+}))
+})
+
+
+export const TagsCreateBody = zod.object({
+  "name": zod.string()
+})
+
+export const tagsCreateResponseCourseCountMin = 0;
+export const tagsCreateResponseCourseCountMax = 9007199254740991;
+
+export const tagsCreateResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const tagsCreateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const tagsCreateResponseModuleCountMin = 0;
+export const tagsCreateResponseModuleCountMax = 9007199254740991;
+
+export const tagsCreateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const TagsCreateResponse = zod.object({
+  "courseCount": zod.int().min(tagsCreateResponseCourseCountMin).max(tagsCreateResponseCourseCountMax),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(tagsCreateResponseCreatedAtRegExp),
+  "id": zod.uuid().regex(tagsCreateResponseIdRegExp),
+  "isSystem": zod.boolean(),
+  "moduleCount": zod.int().min(tagsCreateResponseModuleCountMin).max(tagsCreateResponseModuleCountMax),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(tagsCreateResponseUpdatedAtRegExp)
+})
+
+
+export const tagsRemovePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const TagsRemoveParams = zod.object({
+  "id": zod.uuid().regex(tagsRemovePathIdRegExp)
+})
+
+export const TagsRemoveResponse = zod.void()
+
+
+export const tagsGetPathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const TagsGetParams = zod.object({
+  "id": zod.uuid().regex(tagsGetPathIdRegExp)
+})
+
+export const tagsGetResponseCourseCountMin = 0;
+export const tagsGetResponseCourseCountMax = 9007199254740991;
+
+export const tagsGetResponseCoursesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const tagsGetResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const tagsGetResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const tagsGetResponseModuleCountMin = 0;
+export const tagsGetResponseModuleCountMax = 9007199254740991;
+
+export const tagsGetResponseModulesItemCourseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const tagsGetResponseModulesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const tagsGetResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const TagsGetResponse = zod.object({
+  "courseCount": zod.int().min(tagsGetResponseCourseCountMin).max(tagsGetResponseCourseCountMax),
+  "courses": zod.array(zod.object({
+  "id": zod.uuid().regex(tagsGetResponseCoursesItemIdRegExp),
+  "title": zod.string()
+})),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(tagsGetResponseCreatedAtRegExp),
+  "id": zod.uuid().regex(tagsGetResponseIdRegExp),
+  "isSystem": zod.boolean(),
+  "moduleCount": zod.int().min(tagsGetResponseModuleCountMin).max(tagsGetResponseModuleCountMax),
+  "modules": zod.array(zod.object({
+  "courseId": zod.uuid().regex(tagsGetResponseModulesItemCourseIdRegExp),
+  "courseTitle": zod.string(),
+  "id": zod.uuid().regex(tagsGetResponseModulesItemIdRegExp),
+  "title": zod.string()
+})),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(tagsGetResponseUpdatedAtRegExp)
+})
+
+
+export const tagsUpdatePathIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const TagsUpdateParams = zod.object({
+  "id": zod.uuid().regex(tagsUpdatePathIdRegExp)
+})
+
+export const TagsUpdateBody = zod.object({
+  "name": zod.string()
+})
+
+export const tagsUpdateResponseCourseCountMin = 0;
+export const tagsUpdateResponseCourseCountMax = 9007199254740991;
+
+export const tagsUpdateResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const tagsUpdateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const tagsUpdateResponseModuleCountMin = 0;
+export const tagsUpdateResponseModuleCountMax = 9007199254740991;
+
+export const tagsUpdateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+
+
+export const TagsUpdateResponse = zod.object({
+  "courseCount": zod.int().min(tagsUpdateResponseCourseCountMin).max(tagsUpdateResponseCourseCountMax),
+  "createdAt": zod.iso.datetime({"offset":true}).regex(tagsUpdateResponseCreatedAtRegExp),
+  "id": zod.uuid().regex(tagsUpdateResponseIdRegExp),
+  "isSystem": zod.boolean(),
+  "moduleCount": zod.int().min(tagsUpdateResponseModuleCountMin).max(tagsUpdateResponseModuleCountMax),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "updatedAt": zod.iso.datetime({"offset":true}).regex(tagsUpdateResponseUpdatedAtRegExp)
 })
 
 
@@ -3452,6 +5029,7 @@ export const LessonContentReadParams = zod.object({
 
 export const lessonContentReadResponseModuleIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const lessonContentReadResponseSectionsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const lessonContentReadResponseSectionsItemImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const lessonContentReadResponseSectionsItemOrderMin = -9007199254740991;
 export const lessonContentReadResponseSectionsItemOrderMax = 9007199254740991;
 
@@ -3469,6 +5047,11 @@ export const LessonContentReadResponse = zod.object({
   "sections": zod.array(zod.object({
   "body": zod.record(zod.string(), zod.unknown()),
   "id": zod.uuid().regex(lessonContentReadResponseSectionsItemIdRegExp),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(lessonContentReadResponseSectionsItemImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
   "order": zod.int().min(lessonContentReadResponseSectionsItemOrderMin).max(lessonContentReadResponseSectionsItemOrderMax),
   "schemaVersion": zod.int().min(lessonContentReadResponseSectionsItemSchemaVersionMin).max(lessonContentReadResponseSectionsItemSchemaVersionMax),
   "title": zod.string()
@@ -3655,6 +5238,43 @@ export const QuizResultGetResponse = zod.object({
 })
 
 
+export const publicCoursesGetPathSlugMax = 80;
+
+
+
+export const PublicCoursesGetParams = zod.object({
+  "slug": zod.string().min(1).max(publicCoursesGetPathSlugMax)
+})
+
+export const publicCoursesGetResponseDescriptionMax = 5000;
+
+export const publicCoursesGetResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicCoursesGetResponseModulesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicCoursesGetResponseModulesItemOrderExclusiveMin = 0;
+export const publicCoursesGetResponseModulesItemOrderMax = 9007199254740991;
+
+export const publicCoursesGetResponseThumbnailAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const PublicCoursesGetResponse = zod.object({
+  "description": zod.string().max(publicCoursesGetResponseDescriptionMax).nullable(),
+  "id": zod.uuid().regex(publicCoursesGetResponseIdRegExp),
+  "modules": zod.array(zod.object({
+  "id": zod.uuid().regex(publicCoursesGetResponseModulesItemIdRegExp),
+  "objectives": zod.array(zod.string()),
+  "order": zod.int().gt(publicCoursesGetResponseModulesItemOrderExclusiveMin).max(publicCoursesGetResponseModulesItemOrderMax),
+  "title": zod.string()
+})),
+  "slug": zod.string(),
+  "thumbnail": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(publicCoursesGetResponseThumbnailAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "title": zod.string()
+})
+
+
 export const directoryLookupsListUniversitiesResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 
@@ -3737,6 +5357,36 @@ export const EnrollmentSubmitBody = zod.object({
 
 export const EnrollmentSubmitResponse = zod.object({
   "accepted": zod.literal(true)
+})
+
+
+export const publicFrontPageGetResponseCoursesItemDescriptionMax = 5000;
+
+export const publicFrontPageGetResponseCoursesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicFrontPageGetResponseCoursesItemThumbnailAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicFrontPageGetResponseCoursesItemThumbnailAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicFrontPageGetResponseModulesItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const PublicFrontPageGetResponse = zod.object({
+  "courses": zod.array(zod.object({
+  "description": zod.string().max(publicFrontPageGetResponseCoursesItemDescriptionMax).nullable(),
+  "id": zod.uuid().regex(publicFrontPageGetResponseCoursesItemIdRegExp),
+  "slug": zod.string(),
+  "thumbnail": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(publicFrontPageGetResponseCoursesItemThumbnailAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "thumbnailAssetId": zod.uuid().regex(publicFrontPageGetResponseCoursesItemThumbnailAssetIdRegExpOne).nullable(),
+  "title": zod.string()
+})),
+  "modules": zod.array(zod.object({
+  "courseSlug": zod.string(),
+  "courseTitle": zod.string(),
+  "id": zod.uuid().regex(publicFrontPageGetResponseModulesItemIdRegExp),
+  "title": zod.string()
+}))
 })
 
 
@@ -3841,6 +5491,30 @@ export const DashboardDescribeResponse = zod.object({
 })
 
 
+export const signedInEnrollmentRequestBodyCourseSlugMax = 80;
+
+
+export const signedInEnrollmentRequestBodyCourseSlugRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+export const SignedInEnrollmentRequestBody = zod.object({
+  "courseSlug": zod.string().min(1).max(signedInEnrollmentRequestBodyCourseSlugMax).regex(signedInEnrollmentRequestBodyCourseSlugRegExp)
+})
+
+export const signedInEnrollmentRequestResponseCourseSlugMax = 80;
+
+
+export const signedInEnrollmentRequestResponseCourseSlugRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+export const signedInEnrollmentRequestResponseEnrollmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const SignedInEnrollmentRequestResponse = zod.object({
+  "courseSlug": zod.string().min(1).max(signedInEnrollmentRequestResponseCourseSlugMax).regex(signedInEnrollmentRequestResponseCourseSlugRegExp),
+  "enrollmentId": zod.uuid().regex(signedInEnrollmentRequestResponseEnrollmentIdRegExp),
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED'])
+})
+
+
 export const notificationsListQueryPageDefault = 1;
 export const notificationsListQueryPageMax = 9007199254740991;
 
@@ -3874,7 +5548,7 @@ export const NotificationsListResponse = zod.object({
   "data": zod.record(zod.string(), zod.string().max(notificationsListResponseItemsItemDataMaxOne)),
   "id": zod.uuid().regex(notificationsListResponseItemsItemIdRegExp),
   "readAt": zod.iso.datetime({"offset":true}).regex(notificationsListResponseItemsItemReadAtRegExp).nullable(),
-  "type": zod.enum(['ENROLLMENT_APPROVED', 'ENROLLMENT_REJECTED', 'ENROLLMENT_REMOVED', 'ENROLLMENT_REINSTATED', 'CERTIFICATE_READY', 'NEWS_PUBLISHED'])
+  "type": zod.enum(['ENROLLMENT_APPROVED', 'ENROLLMENT_REJECTED', 'ENROLLMENT_REMOVED', 'ENROLLMENT_REINSTATED', 'CERTIFICATE_READY', 'NEWS_PUBLISHED', 'PROFILE_CHANGE_APPROVED', 'PROFILE_CHANGE_REJECTED'])
 })),
   "page": zod.int().min(1).max(notificationsListResponsePageMax),
   "pageSize": zod.int().min(1).max(notificationsListResponsePageSizeMax),
@@ -3918,7 +5592,334 @@ export const NotificationsMarkReadResponse = zod.object({
   "data": zod.record(zod.string(), zod.string().max(notificationsMarkReadResponseDataMaxOne)),
   "id": zod.uuid().regex(notificationsMarkReadResponseIdRegExp),
   "readAt": zod.iso.datetime({"offset":true}).regex(notificationsMarkReadResponseReadAtRegExp).nullable(),
-  "type": zod.enum(['ENROLLMENT_APPROVED', 'ENROLLMENT_REJECTED', 'ENROLLMENT_REMOVED', 'ENROLLMENT_REINSTATED', 'CERTIFICATE_READY', 'NEWS_PUBLISHED'])
+  "type": zod.enum(['ENROLLMENT_APPROVED', 'ENROLLMENT_REJECTED', 'ENROLLMENT_REMOVED', 'ENROLLMENT_REINSTATED', 'CERTIFICATE_READY', 'NEWS_PUBLISHED', 'PROFILE_CHANGE_APPROVED', 'PROFILE_CHANGE_REJECTED'])
+})
+
+
+export const passwordChangeChangeBodyCodeRegExp = new RegExp('^\\d{6}$');
+export const passwordChangeChangeBodyCurrentPasswordMax = 256;
+
+export const passwordChangeChangeBodyNewPasswordMin = 12;
+export const passwordChangeChangeBodyNewPasswordMax = 256;
+
+
+
+export const PasswordChangeChangeBody = zod.object({
+  "code": zod.string().regex(passwordChangeChangeBodyCodeRegExp),
+  "currentPassword": zod.string().min(1).max(passwordChangeChangeBodyCurrentPasswordMax),
+  "newPassword": zod.string().min(passwordChangeChangeBodyNewPasswordMin).max(passwordChangeChangeBodyNewPasswordMax)
+})
+
+export const PasswordChangeChangeResponse = zod.void()
+
+
+export const passwordChangeRequestCodeResponseExpiresInMinutesExclusiveMin = 0;
+export const passwordChangeRequestCodeResponseExpiresInMinutesMax = 9007199254740991;
+
+
+
+export const PasswordChangeRequestCodeResponse = zod.object({
+  "expiresInMinutes": zod.int().gt(passwordChangeRequestCodeResponseExpiresInMinutesExclusiveMin).max(passwordChangeRequestCodeResponseExpiresInMinutesMax)
+})
+
+
+export const profileDescribeResponseAvatarUrlMax = 2048;
+
+export const profileDescribeResponseDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileDescribeResponseFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileDescribeResponseUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProfileDescribeResponse = zod.object({
+  "avatarUrl": zod.string().min(1).max(profileDescribeResponseAvatarUrlMax).nullable(),
+  "department": zod.object({
+  "id": zod.uuid().regex(profileDescribeResponseDepartmentIdRegExp),
+  "name": zod.string()
+}),
+  "email": zod.string(),
+  "emailVerified": zod.boolean(),
+  "faculty": zod.object({
+  "id": zod.uuid().regex(profileDescribeResponseFacultyIdRegExp),
+  "name": zod.string()
+}),
+  "locked": zod.boolean(),
+  "name": zod.string(),
+  "session": zod.string(),
+  "university": zod.object({
+  "id": zod.uuid().regex(profileDescribeResponseUniversityIdRegExp),
+  "name": zod.string()
+})
+})
+
+
+export const profileUpdateBodyDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileUpdateBodyFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileUpdateBodySessionRegExp = new RegExp('^(\\d{4})-(\\d{2})$');
+export const profileUpdateBodyUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProfileUpdateBody = zod.object({
+  "departmentId": zod.uuid().regex(profileUpdateBodyDepartmentIdRegExp),
+  "facultyId": zod.uuid().regex(profileUpdateBodyFacultyIdRegExp),
+  "name": zod.string(),
+  "session": zod.string().regex(profileUpdateBodySessionRegExp),
+  "universityId": zod.uuid().regex(profileUpdateBodyUniversityIdRegExp)
+})
+
+export const profileUpdateResponseAvatarUrlMax = 2048;
+
+export const profileUpdateResponseDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileUpdateResponseFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileUpdateResponseUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProfileUpdateResponse = zod.object({
+  "avatarUrl": zod.string().min(1).max(profileUpdateResponseAvatarUrlMax).nullable(),
+  "department": zod.object({
+  "id": zod.uuid().regex(profileUpdateResponseDepartmentIdRegExp),
+  "name": zod.string()
+}),
+  "email": zod.string(),
+  "emailVerified": zod.boolean(),
+  "faculty": zod.object({
+  "id": zod.uuid().regex(profileUpdateResponseFacultyIdRegExp),
+  "name": zod.string()
+}),
+  "locked": zod.boolean(),
+  "name": zod.string(),
+  "session": zod.string(),
+  "university": zod.object({
+  "id": zod.uuid().regex(profileUpdateResponseUniversityIdRegExp),
+  "name": zod.string()
+})
+})
+
+
+export const profileChangeLatestResponseRequestCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const profileChangeLatestResponseRequestDecidedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const profileChangeLatestResponseRequestIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeLatestResponseRequestNoteMax = 500;
+
+export const profileChangeLatestResponseRequestReasonMax = 500;
+
+export const profileChangeLatestResponseRequestRequestedDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeLatestResponseRequestRequestedFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeLatestResponseRequestRequestedNameMax = 100;
+
+export const profileChangeLatestResponseRequestRequestedSessionMax = 16;
+
+export const profileChangeLatestResponseRequestRequestedUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProfileChangeLatestResponse = zod.object({
+  "request": zod.object({
+  "createdAt": zod.iso.datetime({"offset":true}).regex(profileChangeLatestResponseRequestCreatedAtRegExp),
+  "decidedAt": zod.iso.datetime({"offset":true}).regex(profileChangeLatestResponseRequestDecidedAtRegExp).nullable(),
+  "id": zod.uuid().regex(profileChangeLatestResponseRequestIdRegExp),
+  "note": zod.string().min(1).max(profileChangeLatestResponseRequestNoteMax).nullable(),
+  "reason": zod.string().min(1).max(profileChangeLatestResponseRequestReasonMax).nullable(),
+  "requested": zod.object({
+  "department": zod.object({
+  "id": zod.uuid().regex(profileChangeLatestResponseRequestRequestedDepartmentIdRegExp),
+  "name": zod.string()
+}).nullable(),
+  "faculty": zod.object({
+  "id": zod.uuid().regex(profileChangeLatestResponseRequestRequestedFacultyIdRegExp),
+  "name": zod.string()
+}).nullable(),
+  "name": zod.string().min(1).max(profileChangeLatestResponseRequestRequestedNameMax).nullable(),
+  "session": zod.string().min(1).max(profileChangeLatestResponseRequestRequestedSessionMax).nullable(),
+  "university": zod.object({
+  "id": zod.uuid().regex(profileChangeLatestResponseRequestRequestedUniversityIdRegExp),
+  "name": zod.string()
+}).nullable()
+}),
+  "status": zod.enum(['PENDING', 'APPROVED', 'REJECTED'])
+}).nullable()
+})
+
+
+export const profileChangeSubmitBodyDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeSubmitBodyFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeSubmitBodyNoteMax = 500;
+
+export const profileChangeSubmitBodySessionRegExp = new RegExp('^(\\d{4})-(\\d{2})$');
+export const profileChangeSubmitBodyUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProfileChangeSubmitBody = zod.object({
+  "departmentId": zod.uuid().regex(profileChangeSubmitBodyDepartmentIdRegExp),
+  "facultyId": zod.uuid().regex(profileChangeSubmitBodyFacultyIdRegExp),
+  "name": zod.string(),
+  "note": zod.string().max(profileChangeSubmitBodyNoteMax).optional(),
+  "session": zod.string().regex(profileChangeSubmitBodySessionRegExp),
+  "universityId": zod.uuid().regex(profileChangeSubmitBodyUniversityIdRegExp)
+})
+
+export const profileChangeSubmitResponseCreatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const profileChangeSubmitResponseDecidedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const profileChangeSubmitResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeSubmitResponseNoteMax = 500;
+
+export const profileChangeSubmitResponseReasonMax = 500;
+
+export const profileChangeSubmitResponseRequestedDepartmentIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeSubmitResponseRequestedFacultyIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const profileChangeSubmitResponseRequestedNameMax = 100;
+
+export const profileChangeSubmitResponseRequestedSessionMax = 16;
+
+export const profileChangeSubmitResponseRequestedUniversityIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+
+
+export const ProfileChangeSubmitResponse = zod.object({
+  "createdAt": zod.iso.datetime({"offset":true}).regex(profileChangeSubmitResponseCreatedAtRegExp),
+  "decidedAt": zod.iso.datetime({"offset":true}).regex(profileChangeSubmitResponseDecidedAtRegExp).nullable(),
+  "id": zod.uuid().regex(profileChangeSubmitResponseIdRegExp),
+  "note": zod.string().min(1).max(profileChangeSubmitResponseNoteMax).nullable(),
+  "reason": zod.string().min(1).max(profileChangeSubmitResponseReasonMax).nullable(),
+  "requested": zod.object({
+  "department": zod.object({
+  "id": zod.uuid().regex(profileChangeSubmitResponseRequestedDepartmentIdRegExp),
+  "name": zod.string()
+}).nullable(),
+  "faculty": zod.object({
+  "id": zod.uuid().regex(profileChangeSubmitResponseRequestedFacultyIdRegExp),
+  "name": zod.string()
+}).nullable(),
+  "name": zod.string().min(1).max(profileChangeSubmitResponseRequestedNameMax).nullable(),
+  "session": zod.string().min(1).max(profileChangeSubmitResponseRequestedSessionMax).nullable(),
+  "university": zod.object({
+  "id": zod.uuid().regex(profileChangeSubmitResponseRequestedUniversityIdRegExp),
+  "name": zod.string()
+}).nullable()
+}),
+  "status": zod.enum(['PENDING', 'APPROVED', 'REJECTED'])
+})
+
+
+export const publicNewsListQueryPageDefault = 1;
+export const publicNewsListQueryPageMax = 1000;
+
+
+
+export const PublicNewsListQueryParams = zod.object({
+  "page": zod.int().min(1).max(publicNewsListQueryPageMax).default(publicNewsListQueryPageDefault)
+})
+
+export const publicNewsListResponseItemsItemCoverAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicNewsListResponseItemsItemPublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const publicNewsListResponsePageMax = 9007199254740991;
+
+export const publicNewsListResponsePageSizeMax = 9007199254740991;
+
+export const publicNewsListResponseTotalMin = 0;
+export const publicNewsListResponseTotalMax = 9007199254740991;
+
+
+
+export const PublicNewsListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "cover": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(publicNewsListResponseItemsItemCoverAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(publicNewsListResponseItemsItemPublishedAtRegExp),
+  "slug": zod.string(),
+  "summary": zod.string(),
+  "title": zod.string()
+})),
+  "page": zod.int().min(1).max(publicNewsListResponsePageMax),
+  "pageSize": zod.int().min(1).max(publicNewsListResponsePageSizeMax),
+  "total": zod.int().min(publicNewsListResponseTotalMin).max(publicNewsListResponseTotalMax)
+})
+
+
+export const publicNewsGetPathSlugMax = 80;
+
+
+export const publicNewsGetPathSlugRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+export const PublicNewsGetParams = zod.object({
+  "slug": zod.string().min(1).max(publicNewsGetPathSlugMax).regex(publicNewsGetPathSlugRegExp)
+})
+
+export const publicNewsGetResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicNewsGetResponsePublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
+export const publicNewsGetResponseSchemaVersionMax = 9007199254740991;
+
+
+
+export const PublicNewsGetResponse = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(publicNewsGetResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "publishedAt": zod.iso.datetime({"offset":true}).regex(publicNewsGetResponsePublishedAtRegExp),
+  "schemaVersion": zod.int().min(1).max(publicNewsGetResponseSchemaVersionMax),
+  "slug": zod.string(),
+  "title": zod.string()
+})
+
+
+export const publicResourcesListResponseItemsItemDescriptionMax = 1000;
+
+export const publicResourcesListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicResourcesListResponseItemsItemMimeTypeMax = 200;
+
+export const publicResourcesListResponseItemsItemSizeBytesMin = 0;
+export const publicResourcesListResponseItemsItemSizeBytesMax = 9007199254740991;
+
+
+
+export const PublicResourcesListResponse = zod.object({
+  "items": zod.array(zod.object({
+  "description": zod.string().min(1).max(publicResourcesListResponseItemsItemDescriptionMax).nullable(),
+  "id": zod.uuid().regex(publicResourcesListResponseItemsItemIdRegExp),
+  "kind": zod.enum(['file', 'link']),
+  "mimeType": zod.string().min(1).max(publicResourcesListResponseItemsItemMimeTypeMax).nullable(),
+  "sizeBytes": zod.int().min(publicResourcesListResponseItemsItemSizeBytesMin).max(publicResourcesListResponseItemsItemSizeBytesMax).nullable(),
+  "title": zod.string(),
+  "url": zod.string()
+}))
+})
+
+
+export const PublicContactSettingsGetResponse = zod.object({
+  "address": zod.string(),
+  "email": zod.string(),
+  "officeHours": zod.string(),
+  "organisation": zod.string(),
+  "phone": zod.string()
+})
+
+
+export const publicSiteSettingsGetResponseImageAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicSiteSettingsGetResponseImageAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicSiteSettingsGetResponseImagesItemAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const publicSiteSettingsGetResponseSchemaVersionMax = 9007199254740991;
+
+
+
+export const PublicSiteSettingsGetResponse = zod.object({
+  "body": zod.record(zod.string(), zod.unknown()),
+  "heading": zod.string(),
+  "image": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(publicSiteSettingsGetResponseImageAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "imageAssetId": zod.uuid().regex(publicSiteSettingsGetResponseImageAssetIdRegExpOne).nullable(),
+  "images": zod.array(zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(publicSiteSettingsGetResponseImagesItemAssetIdRegExp),
+  "url": zod.string()
+})),
+  "schemaVersion": zod.int().min(1).max(publicSiteSettingsGetResponseSchemaVersionMax)
 })
 
 

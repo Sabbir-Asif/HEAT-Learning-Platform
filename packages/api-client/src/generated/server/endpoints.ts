@@ -18,8 +18,86 @@ export interface AcceptInviteRequestDto {
   token: string;
 }
 
+export interface AdminContactSettingsResponseDto {
+  address: string;
+  email: string;
+  officeHours: string;
+  organisation: string;
+  phone: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  updatedAt: string | null;
+}
+
 export interface AdminCsrfTokenResponseDto {
   token: string;
+}
+
+export type AdminFrontPageResponseDtoCoursesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  published: boolean;
+  slug: string;
+  title: string;
+};
+
+export type AdminFrontPageResponseDtoModulesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId: string;
+  courseTitle: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  published: boolean;
+  title: string;
+};
+
+export interface AdminFrontPageResponseDto {
+  courses: AdminFrontPageResponseDtoCoursesItem[];
+  modules: AdminFrontPageResponseDtoModulesItem[];
+}
+
+export type AdminLandingOverviewResponseDtoBody = {[key: string]: unknown};
+
+/**
+ * @nullable
+ */
+export type AdminLandingOverviewResponseDtoImage = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+} | null;
+
+export type AdminLandingOverviewResponseDtoImagesItem = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+};
+
+export interface AdminLandingOverviewResponseDto {
+  body: AdminLandingOverviewResponseDtoBody;
+  heading: string;
+  /** @nullable */
+  image: AdminLandingOverviewResponseDtoImage;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  imageAssetId: string | null;
+  images: AdminLandingOverviewResponseDtoImagesItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  schemaVersion: number;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  updatedAt: string | null;
 }
 
 export type AdminListResponseDtoItemsItemRole = typeof AdminListResponseDtoItemsItemRole[keyof typeof AdminListResponseDtoItemsItemRole];
@@ -99,6 +177,225 @@ export type AdminMeResponseDtoUser = {
 
 export interface AdminMeResponseDto {
   user: AdminMeResponseDtoUser;
+}
+
+export type AdminOverviewDtoPassRatesItem = {
+  label: string;
+  moduleId: string;
+  /**
+     * @minimum 0
+     * @nullable
+     */
+  passRate: number | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  students: number | null;
+  suppressed: boolean;
+};
+
+export type AdminOverviewDtoPending = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  count: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  oldestAgeSeconds: number | null;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  oldestRequestedAt: string | null;
+};
+
+export type AdminOverviewDtoStatusCountsItemStatus = typeof AdminOverviewDtoStatusCountsItemStatus[keyof typeof AdminOverviewDtoStatusCountsItemStatus];
+
+
+export const AdminOverviewDtoStatusCountsItemStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
+export type AdminOverviewDtoStatusCountsItem = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  count: number;
+  status: AdminOverviewDtoStatusCountsItemStatus;
+};
+
+export interface AdminOverviewDto {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  certificatesIssued: number;
+  passRates: AdminOverviewDtoPassRatesItem[];
+  pending: AdminOverviewDtoPending;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  refreshedAt: string | null;
+  statusCounts: AdminOverviewDtoStatusCountsItem[];
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  suppressionThreshold: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  totalEnrollments: number;
+}
+
+export type AdminProfileChangeListResponseDtoItemsItemCurrentDepartment = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type AdminProfileChangeListResponseDtoItemsItemCurrentFaculty = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type AdminProfileChangeListResponseDtoItemsItemCurrentUniversity = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type AdminProfileChangeListResponseDtoItemsItemCurrent = {
+  department: AdminProfileChangeListResponseDtoItemsItemCurrentDepartment;
+  faculty: AdminProfileChangeListResponseDtoItemsItemCurrentFaculty;
+  name: string;
+  session: string;
+  university: AdminProfileChangeListResponseDtoItemsItemCurrentUniversity;
+};
+
+/**
+ * @nullable
+ */
+export type AdminProfileChangeListResponseDtoItemsItemRequestedDepartment = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+} | null;
+
+/**
+ * @nullable
+ */
+export type AdminProfileChangeListResponseDtoItemsItemRequestedFaculty = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+} | null;
+
+/**
+ * @nullable
+ */
+export type AdminProfileChangeListResponseDtoItemsItemRequestedUniversity = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+} | null;
+
+export type AdminProfileChangeListResponseDtoItemsItemRequested = {
+  /** @nullable */
+  department: AdminProfileChangeListResponseDtoItemsItemRequestedDepartment;
+  /** @nullable */
+  faculty: AdminProfileChangeListResponseDtoItemsItemRequestedFaculty;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     * @nullable
+     */
+  name: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 16
+     * @nullable
+     */
+  session: string | null;
+  /** @nullable */
+  university: AdminProfileChangeListResponseDtoItemsItemRequestedUniversity;
+};
+
+export type AdminProfileChangeListResponseDtoItemsItemStatus = typeof AdminProfileChangeListResponseDtoItemsItemStatus[keyof typeof AdminProfileChangeListResponseDtoItemsItemStatus];
+
+
+export const AdminProfileChangeListResponseDtoItemsItemStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type AdminProfileChangeListResponseDtoItemsItemStudent = {
+  email: string;
+  name: string;
+};
+
+export type AdminProfileChangeListResponseDtoItemsItem = {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  current: AdminProfileChangeListResponseDtoItemsItemCurrent;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  decidedAt: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minLength 1
+     * @maxLength 500
+     * @nullable
+     */
+  note: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 500
+     * @nullable
+     */
+  reason: string | null;
+  requested: AdminProfileChangeListResponseDtoItemsItemRequested;
+  status: AdminProfileChangeListResponseDtoItemsItemStatus;
+  student: AdminProfileChangeListResponseDtoItemsItemStudent;
+};
+
+export interface AdminProfileChangeListResponseDto {
+  items: AdminProfileChangeListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
 }
 
 export interface AdminSignInRequestDto {
@@ -341,6 +638,7 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   DIRECTORY_IN_USE: 'DIRECTORY_IN_USE',
   DIRECTORY_NAME_TAKEN: 'DIRECTORY_NAME_TAKEN',
   EMAIL_IN_USE: 'EMAIL_IN_USE',
+  EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
   ENROLLMENT_ALREADY_DECIDED: 'ENROLLMENT_ALREADY_DECIDED',
   ENROLLMENT_NOT_ACTIVE: 'ENROLLMENT_NOT_ACTIVE',
   ENROLLMENT_NOT_REMOVABLE: 'ENROLLMENT_NOT_REMOVABLE',
@@ -348,6 +646,7 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   ENROLLMENT_NOT_VERIFIED: 'ENROLLMENT_NOT_VERIFIED',
   ENROLLMENT_STATE_CHANGED: 'ENROLLMENT_STATE_CHANGED',
   FORBIDDEN: 'FORBIDDEN',
+  INSIGHTS_REFRESH_RUNNING: 'INSIGHTS_REFRESH_RUNNING',
   INTERNAL: 'INTERNAL',
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
   INVITATION_EXPIRED: 'INVITATION_EXPIRED',
@@ -359,6 +658,13 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   ORIGIN_NOT_ALLOWED: 'ORIGIN_NOT_ALLOWED',
   PASSWORD_BREACHED: 'PASSWORD_BREACHED',
   PASSWORD_CHANGE_REQUIRED: 'PASSWORD_CHANGE_REQUIRED',
+  PASSWORD_CODE_EMAIL_UNVERIFIED: 'PASSWORD_CODE_EMAIL_UNVERIFIED',
+  PASSWORD_CODE_EXPIRED: 'PASSWORD_CODE_EXPIRED',
+  PASSWORD_CODE_INVALID: 'PASSWORD_CODE_INVALID',
+  PROFILE_CHANGE_NOT_PENDING: 'PROFILE_CHANGE_NOT_PENDING',
+  PROFILE_CHANGE_PENDING: 'PROFILE_CHANGE_PENDING',
+  PROFILE_CHANGE_UNCHANGED: 'PROFILE_CHANGE_UNCHANGED',
+  PROFILE_LOCKED: 'PROFILE_LOCKED',
   QUIZ_ANSWER_INVALID: 'QUIZ_ANSWER_INVALID',
   QUIZ_ATTEMPTS_UNLIMITED: 'QUIZ_ATTEMPTS_UNLIMITED',
   QUIZ_ATTEMPT_LIMIT_REACHED: 'QUIZ_ATTEMPT_LIMIT_REACHED',
@@ -370,7 +676,10 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   RESET_LINK_EXPIRED: 'RESET_LINK_EXPIRED',
   RESET_LINK_INVALID: 'RESET_LINK_INVALID',
   RESET_LINK_USED: 'RESET_LINK_USED',
+  TAG_NAME_TAKEN: 'TAG_NAME_TAKEN',
+  TAG_RESERVED: 'TAG_RESERVED',
   UNAUTHENTICATED: 'UNAUTHENTICATED',
+  UPLOAD_DIMENSIONS_TOO_LARGE: 'UPLOAD_DIMENSIONS_TOO_LARGE',
   UPLOAD_EXPIRED: 'UPLOAD_EXPIRED',
   UPLOAD_OFFSET_MISMATCH: 'UPLOAD_OFFSET_MISMATCH',
   UPLOAD_TOO_LARGE: 'UPLOAD_TOO_LARGE',
@@ -422,6 +731,7 @@ export const BulkRejectionResponseDtoFailedItemCode = {
   DIRECTORY_IN_USE: 'DIRECTORY_IN_USE',
   DIRECTORY_NAME_TAKEN: 'DIRECTORY_NAME_TAKEN',
   EMAIL_IN_USE: 'EMAIL_IN_USE',
+  EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
   ENROLLMENT_ALREADY_DECIDED: 'ENROLLMENT_ALREADY_DECIDED',
   ENROLLMENT_NOT_ACTIVE: 'ENROLLMENT_NOT_ACTIVE',
   ENROLLMENT_NOT_REMOVABLE: 'ENROLLMENT_NOT_REMOVABLE',
@@ -429,6 +739,7 @@ export const BulkRejectionResponseDtoFailedItemCode = {
   ENROLLMENT_NOT_VERIFIED: 'ENROLLMENT_NOT_VERIFIED',
   ENROLLMENT_STATE_CHANGED: 'ENROLLMENT_STATE_CHANGED',
   FORBIDDEN: 'FORBIDDEN',
+  INSIGHTS_REFRESH_RUNNING: 'INSIGHTS_REFRESH_RUNNING',
   INTERNAL: 'INTERNAL',
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
   INVITATION_EXPIRED: 'INVITATION_EXPIRED',
@@ -440,6 +751,13 @@ export const BulkRejectionResponseDtoFailedItemCode = {
   ORIGIN_NOT_ALLOWED: 'ORIGIN_NOT_ALLOWED',
   PASSWORD_BREACHED: 'PASSWORD_BREACHED',
   PASSWORD_CHANGE_REQUIRED: 'PASSWORD_CHANGE_REQUIRED',
+  PASSWORD_CODE_EMAIL_UNVERIFIED: 'PASSWORD_CODE_EMAIL_UNVERIFIED',
+  PASSWORD_CODE_EXPIRED: 'PASSWORD_CODE_EXPIRED',
+  PASSWORD_CODE_INVALID: 'PASSWORD_CODE_INVALID',
+  PROFILE_CHANGE_NOT_PENDING: 'PROFILE_CHANGE_NOT_PENDING',
+  PROFILE_CHANGE_PENDING: 'PROFILE_CHANGE_PENDING',
+  PROFILE_CHANGE_UNCHANGED: 'PROFILE_CHANGE_UNCHANGED',
+  PROFILE_LOCKED: 'PROFILE_LOCKED',
   QUIZ_ANSWER_INVALID: 'QUIZ_ANSWER_INVALID',
   QUIZ_ATTEMPTS_UNLIMITED: 'QUIZ_ATTEMPTS_UNLIMITED',
   QUIZ_ATTEMPT_LIMIT_REACHED: 'QUIZ_ATTEMPT_LIMIT_REACHED',
@@ -451,7 +769,10 @@ export const BulkRejectionResponseDtoFailedItemCode = {
   RESET_LINK_EXPIRED: 'RESET_LINK_EXPIRED',
   RESET_LINK_INVALID: 'RESET_LINK_INVALID',
   RESET_LINK_USED: 'RESET_LINK_USED',
+  TAG_NAME_TAKEN: 'TAG_NAME_TAKEN',
+  TAG_RESERVED: 'TAG_RESERVED',
   UNAUTHENTICATED: 'UNAUTHENTICATED',
+  UPLOAD_DIMENSIONS_TOO_LARGE: 'UPLOAD_DIMENSIONS_TOO_LARGE',
   UPLOAD_EXPIRED: 'UPLOAD_EXPIRED',
   UPLOAD_OFFSET_MISMATCH: 'UPLOAD_OFFSET_MISMATCH',
   UPLOAD_TOO_LARGE: 'UPLOAD_TOO_LARGE',
@@ -557,6 +878,32 @@ export interface ChangePasswordRequestDto {
      * @maxLength 256
      */
   newPassword: string;
+}
+
+export interface ChangeStudentPasswordRequestDto {
+  /** @pattern ^\d{6}$ */
+  code: string;
+  /**
+     * @minLength 1
+     * @maxLength 256
+     */
+  currentPassword: string;
+  /**
+     * @minLength 12
+     * @maxLength 256
+     */
+  newPassword: string;
+}
+
+export interface ContactSettingsRequestDto {
+  /** @maxLength 500 */
+  address: string;
+  email: string;
+  /** @maxLength 300 */
+  officeHours: string;
+  /** @maxLength 160 */
+  organisation: string;
+  phone: string;
 }
 
 /**
@@ -814,6 +1161,10 @@ export interface CreateModuleRequestDto {
   /** @maxItems 10 */
   objectives?: string[];
   title: string;
+}
+
+export interface CreateTagRequestDto {
+  name: string;
 }
 
 export interface CreateUniversityRequestDto {
@@ -1193,6 +1544,413 @@ export interface HealthResponseDto {
   status: HealthResponseDtoStatus;
 }
 
+export type InsightFunnelResultDtoStagesItemKey = typeof InsightFunnelResultDtoStagesItemKey[keyof typeof InsightFunnelResultDtoStagesItemKey];
+
+
+export const InsightFunnelResultDtoStagesItemKey = {
+  registered: 'registered',
+  verified: 'verified',
+  approved: 'approved',
+  started: 'started',
+  completed: 'completed',
+} as const;
+
+export type InsightFunnelResultDtoStagesItem = {
+  key: InsightFunnelResultDtoStagesItemKey;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  value: number | null;
+};
+
+export interface InsightFunnelResultDto {
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  refreshedAt: string | null;
+  stages: InsightFunnelResultDtoStagesItem[];
+  suppressed: boolean;
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  suppressionThreshold: number;
+}
+
+export type InsightMissedQuestionsDtoRowsItem = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  answered: number;
+  /** @minimum 0 */
+  missPercent: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  missed: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  order: number;
+  questionId: string;
+  text: string;
+};
+
+export interface InsightMissedQuestionsDto {
+  label: string;
+  quizId: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  refreshedAt: string | null;
+  rows: InsightMissedQuestionsDtoRowsItem[];
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  suppressedCount: number;
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  suppressionThreshold: number;
+}
+
+export type InsightModuleResultsDtoRowsItem = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  completed: number | null;
+  /**
+     * @minimum 0
+     * @nullable
+     */
+  completionRate: number | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  dropOff: number | null;
+  label: string;
+  moduleId: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  quizReady: number | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  started: number | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  students: number | null;
+  suppressed: boolean;
+};
+
+export interface InsightModuleResultsDto {
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  refreshedAt: string | null;
+  rows: InsightModuleResultsDtoRowsItem[];
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  suppressionThreshold: number;
+}
+
+export type InsightQuizResultsDtoRowsItem = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attemptedStudents: number | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attempts: number | null;
+  /**
+     * @minimum 0
+     * @nullable
+     */
+  averageAttempts: number | null;
+  label: string;
+  moduleId: string;
+  /**
+     * @minimum 0
+     * @nullable
+     */
+  passRate: number | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  passedStudents: number | null;
+  quizId: string;
+  suppressed: boolean;
+};
+
+export interface InsightQuizResultsDto {
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  refreshedAt: string | null;
+  rows: InsightQuizResultsDtoRowsItem[];
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  suppressionThreshold: number;
+}
+
+export type InsightRefreshResponseDtoRunStatus = typeof InsightRefreshResponseDtoRunStatus[keyof typeof InsightRefreshResponseDtoRunStatus];
+
+
+export const InsightRefreshResponseDtoRunStatus = {
+  PENDING: 'PENDING',
+  RUNNING: 'RUNNING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+} as const;
+
+export type InsightRefreshResponseDtoRunTrigger = typeof InsightRefreshResponseDtoRunTrigger[keyof typeof InsightRefreshResponseDtoRunTrigger];
+
+
+export const InsightRefreshResponseDtoRunTrigger = {
+  NIGHTLY: 'NIGHTLY',
+  MANUAL: 'MANUAL',
+  BACKFILL: 'BACKFILL',
+} as const;
+
+export type InsightRefreshResponseDtoRun = {
+  failed: boolean;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  finishedAt: string | null;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  fromDay: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  requestedAt: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  rowsWritten: number;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  startedAt: string | null;
+  status: InsightRefreshResponseDtoRunStatus;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  toDay: string;
+  trigger: InsightRefreshResponseDtoRunTrigger;
+};
+
+export interface InsightRefreshResponseDto {
+  run: InsightRefreshResponseDtoRun;
+}
+
+export type InsightResultDtoGroupBy = typeof InsightResultDtoGroupBy[keyof typeof InsightResultDtoGroupBy];
+
+
+export const InsightResultDtoGroupBy = {
+  day: 'day',
+  month: 'month',
+  course: 'course',
+  module: 'module',
+  question: 'question',
+  university: 'university',
+  faculty: 'faculty',
+  department: 'department',
+  session: 'session',
+} as const;
+
+export type InsightResultDtoGroupsItemValues = {[key: string]: number | null};
+
+export type InsightResultDtoGroupsItem = {
+  key: string;
+  label: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  students: number | null;
+  suppressed: boolean;
+  values: InsightResultDtoGroupsItemValues;
+};
+
+export type InsightResultDtoSeries = typeof InsightResultDtoSeries[keyof typeof InsightResultDtoSeries];
+
+
+export const InsightResultDtoSeries = {
+  enrollments: 'enrollments',
+  modules: 'modules',
+  quizzes: 'quizzes',
+  questions: 'questions',
+} as const;
+
+export interface InsightResultDto {
+  columns: string[];
+  groupBy: InsightResultDtoGroupBy;
+  groups: InsightResultDtoGroupsItem[];
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  refreshedAt: string | null;
+  series: InsightResultDtoSeries;
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  suppressionThreshold: number;
+}
+
+export type InsightStatusResponseDtoActiveRunStatus = typeof InsightStatusResponseDtoActiveRunStatus[keyof typeof InsightStatusResponseDtoActiveRunStatus];
+
+
+export const InsightStatusResponseDtoActiveRunStatus = {
+  PENDING: 'PENDING',
+  RUNNING: 'RUNNING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+} as const;
+
+export type InsightStatusResponseDtoActiveRunTrigger = typeof InsightStatusResponseDtoActiveRunTrigger[keyof typeof InsightStatusResponseDtoActiveRunTrigger];
+
+
+export const InsightStatusResponseDtoActiveRunTrigger = {
+  NIGHTLY: 'NIGHTLY',
+  MANUAL: 'MANUAL',
+  BACKFILL: 'BACKFILL',
+} as const;
+
+/**
+ * @nullable
+ */
+export type InsightStatusResponseDtoActiveRun = {
+  failed: boolean;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  finishedAt: string | null;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  fromDay: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  requestedAt: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  rowsWritten: number;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  startedAt: string | null;
+  status: InsightStatusResponseDtoActiveRunStatus;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  toDay: string;
+  trigger: InsightStatusResponseDtoActiveRunTrigger;
+} | null;
+
+export type InsightStatusResponseDtoLastRunStatus = typeof InsightStatusResponseDtoLastRunStatus[keyof typeof InsightStatusResponseDtoLastRunStatus];
+
+
+export const InsightStatusResponseDtoLastRunStatus = {
+  PENDING: 'PENDING',
+  RUNNING: 'RUNNING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED',
+} as const;
+
+export type InsightStatusResponseDtoLastRunTrigger = typeof InsightStatusResponseDtoLastRunTrigger[keyof typeof InsightStatusResponseDtoLastRunTrigger];
+
+
+export const InsightStatusResponseDtoLastRunTrigger = {
+  NIGHTLY: 'NIGHTLY',
+  MANUAL: 'MANUAL',
+  BACKFILL: 'BACKFILL',
+} as const;
+
+/**
+ * @nullable
+ */
+export type InsightStatusResponseDtoLastRun = {
+  failed: boolean;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  finishedAt: string | null;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  fromDay: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  requestedAt: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  rowsWritten: number;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  startedAt: string | null;
+  status: InsightStatusResponseDtoLastRunStatus;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  toDay: string;
+  trigger: InsightStatusResponseDtoLastRunTrigger;
+} | null;
+
+export interface InsightStatusResponseDto {
+  /** @nullable */
+  activeRun: InsightStatusResponseDtoActiveRun;
+  /** @nullable */
+  lastRun: InsightStatusResponseDtoLastRun;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  lastSuccessfulAt: string | null;
+  running: boolean;
+}
+
 export interface InvitationLookupRequestDto {
   /**
      * @minLength 1
@@ -1217,6 +1975,121 @@ export interface InvitationLookupResponseDto {
 
 export interface InviteAdminRequestDto {
   email: string;
+}
+
+export type LandingOverviewRequestDtoBody = {[key: string]: unknown};
+
+export type LandingOverviewRequestDtoSchemaVersion = typeof LandingOverviewRequestDtoSchemaVersion[keyof typeof LandingOverviewRequestDtoSchemaVersion];
+
+
+export const LandingOverviewRequestDtoSchemaVersion = {
+  NUMBER_1: 1,
+} as const;
+
+export interface LandingOverviewRequestDto {
+  body: LandingOverviewRequestDtoBody;
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  heading: string;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  imageAssetId: string | null;
+  schemaVersion: LandingOverviewRequestDtoSchemaVersion;
+}
+
+/**
+ * @nullable
+ */
+export type LatestProfileChangeResponseDtoRequestRequestedDepartment = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+} | null;
+
+/**
+ * @nullable
+ */
+export type LatestProfileChangeResponseDtoRequestRequestedFaculty = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+} | null;
+
+/**
+ * @nullable
+ */
+export type LatestProfileChangeResponseDtoRequestRequestedUniversity = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+} | null;
+
+export type LatestProfileChangeResponseDtoRequestRequested = {
+  /** @nullable */
+  department: LatestProfileChangeResponseDtoRequestRequestedDepartment;
+  /** @nullable */
+  faculty: LatestProfileChangeResponseDtoRequestRequestedFaculty;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     * @nullable
+     */
+  name: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 16
+     * @nullable
+     */
+  session: string | null;
+  /** @nullable */
+  university: LatestProfileChangeResponseDtoRequestRequestedUniversity;
+};
+
+export type LatestProfileChangeResponseDtoRequestStatus = typeof LatestProfileChangeResponseDtoRequestStatus[keyof typeof LatestProfileChangeResponseDtoRequestStatus];
+
+
+export const LatestProfileChangeResponseDtoRequestStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+/**
+ * @nullable
+ */
+export type LatestProfileChangeResponseDtoRequest = {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  decidedAt: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minLength 1
+     * @maxLength 500
+     * @nullable
+     */
+  note: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 500
+     * @nullable
+     */
+  reason: string | null;
+  requested: LatestProfileChangeResponseDtoRequestRequested;
+  status: LatestProfileChangeResponseDtoRequestStatus;
+} | null;
+
+export interface LatestProfileChangeResponseDto {
+  /** @nullable */
+  request: LatestProfileChangeResponseDtoRequest;
 }
 
 export type LearningStructureResponseDtoCourse = {
@@ -1431,6 +2304,42 @@ export interface LearningStructureResponseDto {
   learning: LearningStructureResponseDtoLearning;
 }
 
+export type LessonBodyRequestDtoBody = {[key: string]: unknown};
+
+export type LessonBodyRequestDtoSchemaVersion = typeof LessonBodyRequestDtoSchemaVersion[keyof typeof LessonBodyRequestDtoSchemaVersion];
+
+
+export const LessonBodyRequestDtoSchemaVersion = {
+  NUMBER_1: 1,
+} as const;
+
+export interface LessonBodyRequestDto {
+  body: LessonBodyRequestDtoBody;
+  schemaVersion: LessonBodyRequestDtoSchemaVersion;
+}
+
+export type LessonBodyResponseDtoBody = {[key: string]: unknown};
+
+export type LessonBodyResponseDtoImagesItem = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+};
+
+export interface LessonBodyResponseDto {
+  body: LessonBodyResponseDtoBody;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  images: LessonBodyResponseDtoImagesItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  schemaVersion: number;
+  title: string;
+}
+
 export type LessonContentResponseDtoModule = {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
@@ -1440,10 +2349,18 @@ export type LessonContentResponseDtoModule = {
 
 export type LessonContentResponseDtoSectionsItemBody = {[key: string]: unknown};
 
+export type LessonContentResponseDtoSectionsItemImagesItem = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+};
+
 export type LessonContentResponseDtoSectionsItem = {
   body: LessonContentResponseDtoSectionsItemBody;
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   id: string;
+  images: LessonContentResponseDtoSectionsItemImagesItem[];
   /**
      * @minimum -9007199254740991
      * @maximum 9007199254740991
@@ -1600,6 +2517,188 @@ export interface ModuleSummaryDto {
   updatedAt: string;
 }
 
+export type NewsAdminListResponseDtoItemsItemStatus = typeof NewsAdminListResponseDtoItemsItemStatus[keyof typeof NewsAdminListResponseDtoItemsItemStatus];
+
+
+export const NewsAdminListResponseDtoItemsItemStatus = {
+  draft: 'draft',
+  scheduled: 'scheduled',
+  published: 'published',
+} as const;
+
+export type NewsAdminListResponseDtoItemsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  publishedAt: string | null;
+  slug: string;
+  status: NewsAdminListResponseDtoItemsItemStatus;
+  title: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+};
+
+export interface NewsAdminListResponseDto {
+  items: NewsAdminListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+}
+
+export type NewsAdminPostDtoBody = {[key: string]: unknown};
+
+export type NewsAdminPostDtoImagesItem = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+};
+
+export type NewsAdminPostDtoStatus = typeof NewsAdminPostDtoStatus[keyof typeof NewsAdminPostDtoStatus];
+
+
+export const NewsAdminPostDtoStatus = {
+  draft: 'draft',
+  scheduled: 'scheduled',
+  published: 'published',
+} as const;
+
+export interface NewsAdminPostDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  authorId: string;
+  body: NewsAdminPostDtoBody;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  images: NewsAdminPostDtoImagesItem[];
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  publishedAt: string | null;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  schemaVersion: number;
+  slug: string;
+  status: NewsAdminPostDtoStatus;
+  title: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+}
+
+export type NewsPostRequestDtoBody = {[key: string]: unknown};
+
+export type NewsPostRequestDtoSchemaVersion = typeof NewsPostRequestDtoSchemaVersion[keyof typeof NewsPostRequestDtoSchemaVersion];
+
+
+export const NewsPostRequestDtoSchemaVersion = {
+  NUMBER_1: 1,
+} as const;
+
+export type NewsPostRequestDtoStatus = typeof NewsPostRequestDtoStatus[keyof typeof NewsPostRequestDtoStatus];
+
+
+export const NewsPostRequestDtoStatus = {
+  draft: 'draft',
+  published: 'published',
+} as const;
+
+export interface NewsPostRequestDto {
+  body: NewsPostRequestDtoBody;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|([+-](?:[01]\d|2[0-3]):[0-5]\d)))$
+     */
+  publishedAt?: string | null;
+  schemaVersion: NewsPostRequestDtoSchemaVersion;
+  status: NewsPostRequestDtoStatus;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title: string;
+}
+
+/**
+ * @nullable
+ */
+export type NewsPublicListResponseDtoItemsItemCover = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+} | null;
+
+export type NewsPublicListResponseDtoItemsItem = {
+  /** @nullable */
+  cover: NewsPublicListResponseDtoItemsItemCover;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  publishedAt: string;
+  slug: string;
+  summary: string;
+  title: string;
+};
+
+export interface NewsPublicListResponseDto {
+  items: NewsPublicListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+}
+
+export type NewsPublicPostDtoBody = {[key: string]: unknown};
+
+export type NewsPublicPostDtoImagesItem = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+};
+
+export interface NewsPublicPostDto {
+  body: NewsPublicPostDtoBody;
+  images: NewsPublicPostDtoImagesItem[];
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  publishedAt: string;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  schemaVersion: number;
+  slug: string;
+  title: string;
+}
+
 export type NotificationDtoData = {[key: string]: string};
 
 export type NotificationDtoType = typeof NotificationDtoType[keyof typeof NotificationDtoType];
@@ -1612,6 +2711,8 @@ export const NotificationDtoType = {
   ENROLLMENT_REINSTATED: 'ENROLLMENT_REINSTATED',
   CERTIFICATE_READY: 'CERTIFICATE_READY',
   NEWS_PUBLISHED: 'NEWS_PUBLISHED',
+  PROFILE_CHANGE_APPROVED: 'PROFILE_CHANGE_APPROVED',
+  PROFILE_CHANGE_REJECTED: 'PROFILE_CHANGE_REJECTED',
 } as const;
 
 export interface NotificationDto {
@@ -1640,6 +2741,8 @@ export const NotificationListResponseDtoItemsItemType = {
   ENROLLMENT_REINSTATED: 'ENROLLMENT_REINSTATED',
   CERTIFICATE_READY: 'CERTIFICATE_READY',
   NEWS_PUBLISHED: 'NEWS_PUBLISHED',
+  PROFILE_CHANGE_APPROVED: 'PROFILE_CHANGE_APPROVED',
+  PROFILE_CHANGE_REJECTED: 'PROFILE_CHANGE_REJECTED',
 } as const;
 
 export type NotificationListResponseDtoItemsItem = {
@@ -1675,6 +2778,14 @@ export interface NotificationListResponseDto {
   total: number;
 }
 
+export interface PasswordCodeRequestedResponseDto {
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  expiresInMinutes: number;
+}
+
 export type PlaybackSessionResponseDtoCaptionsItem = {
   /**
      * @minLength 1
@@ -1698,6 +2809,141 @@ export interface PlaybackSessionResponseDto {
      * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
      */
   sessionId: string | null;
+}
+
+export type ProfileChangeDecisionDtoStatus = typeof ProfileChangeDecisionDtoStatus[keyof typeof ProfileChangeDecisionDtoStatus];
+
+
+export const ProfileChangeDecisionDtoStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export interface ProfileChangeDecisionDto {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  decidedAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  status: ProfileChangeDecisionDtoStatus;
+}
+
+/**
+ * @nullable
+ */
+export type ProfileChangeRequestDtoRequestedDepartment = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+} | null;
+
+/**
+ * @nullable
+ */
+export type ProfileChangeRequestDtoRequestedFaculty = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+} | null;
+
+/**
+ * @nullable
+ */
+export type ProfileChangeRequestDtoRequestedUniversity = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+} | null;
+
+export type ProfileChangeRequestDtoRequested = {
+  /** @nullable */
+  department: ProfileChangeRequestDtoRequestedDepartment;
+  /** @nullable */
+  faculty: ProfileChangeRequestDtoRequestedFaculty;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     * @nullable
+     */
+  name: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 16
+     * @nullable
+     */
+  session: string | null;
+  /** @nullable */
+  university: ProfileChangeRequestDtoRequestedUniversity;
+};
+
+export type ProfileChangeRequestDtoStatus = typeof ProfileChangeRequestDtoStatus[keyof typeof ProfileChangeRequestDtoStatus];
+
+
+export const ProfileChangeRequestDtoStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export interface ProfileChangeRequestDto {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  decidedAt: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minLength 1
+     * @maxLength 500
+     * @nullable
+     */
+  note: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 500
+     * @nullable
+     */
+  reason: string | null;
+  requested: ProfileChangeRequestDtoRequested;
+  status: ProfileChangeRequestDtoStatus;
+}
+
+export type ProfileResponseDtoDepartment = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type ProfileResponseDtoFaculty = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export type ProfileResponseDtoUniversity = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  name: string;
+};
+
+export interface ProfileResponseDto {
+  /**
+     * @minLength 1
+     * @maxLength 2048
+     * @nullable
+     */
+  avatarUrl: string | null;
+  department: ProfileResponseDtoDepartment;
+  email: string;
+  emailVerified: boolean;
+  faculty: ProfileResponseDtoFaculty;
+  locked: boolean;
+  name: string;
+  session: string;
+  university: ProfileResponseDtoUniversity;
 }
 
 export type ProgressBatchDtoIntervalsItem = {
@@ -1747,6 +2993,130 @@ export interface ProgressResponseDto {
      * @maximum 9007199254740991
      */
   resumePositionSeconds: number;
+}
+
+export interface PublicContactSettingsResponseDto {
+  address: string;
+  email: string;
+  officeHours: string;
+  organisation: string;
+  phone: string;
+}
+
+export type PublicCourseResponseDtoModulesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  objectives: string[];
+  /**
+     * @maximum 9007199254740991
+     * @exclusiveMinimum 0
+     */
+  order: number;
+  title: string;
+};
+
+/**
+ * @nullable
+ */
+export type PublicCourseResponseDtoThumbnail = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+} | null;
+
+export interface PublicCourseResponseDto {
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  description: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  modules: PublicCourseResponseDtoModulesItem[];
+  slug: string;
+  /** @nullable */
+  thumbnail: PublicCourseResponseDtoThumbnail;
+  title: string;
+}
+
+/**
+ * @nullable
+ */
+export type PublicFrontPageResponseDtoCoursesItemThumbnail = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+} | null;
+
+export type PublicFrontPageResponseDtoCoursesItem = {
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  description: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  slug: string;
+  /** @nullable */
+  thumbnail: PublicFrontPageResponseDtoCoursesItemThumbnail;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  thumbnailAssetId: string | null;
+  title: string;
+};
+
+export type PublicFrontPageResponseDtoModulesItem = {
+  courseSlug: string;
+  courseTitle: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+export interface PublicFrontPageResponseDto {
+  courses: PublicFrontPageResponseDtoCoursesItem[];
+  modules: PublicFrontPageResponseDtoModulesItem[];
+}
+
+export type PublicLandingOverviewResponseDtoBody = {[key: string]: unknown};
+
+/**
+ * @nullable
+ */
+export type PublicLandingOverviewResponseDtoImage = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+} | null;
+
+export type PublicLandingOverviewResponseDtoImagesItem = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+};
+
+export interface PublicLandingOverviewResponseDto {
+  body: PublicLandingOverviewResponseDtoBody;
+  heading: string;
+  /** @nullable */
+  image: PublicLandingOverviewResponseDtoImage;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  imageAssetId: string | null;
+  images: PublicLandingOverviewResponseDtoImagesItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  schemaVersion: number;
 }
 
 export type PublishChecklistDtoFailuresItemCode = typeof PublishChecklistDtoFailuresItemCode[keyof typeof PublishChecklistDtoFailuresItemCode];
@@ -2158,6 +3528,14 @@ export interface RejectEnrollmentsRequestDto {
   reason?: string;
 }
 
+export interface RejectProfileChangeRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  reason: string;
+}
+
 export type RejectedEnrollmentDtoStatus = typeof RejectedEnrollmentDtoStatus[keyof typeof RejectedEnrollmentDtoStatus];
 
 
@@ -2223,6 +3601,237 @@ export interface ResetPasswordRequestDto {
   token: string;
 }
 
+/**
+ * @nullable
+ */
+export type ResourceAdminDtoFile = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  mimeType: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  sizeBytes: number;
+  url: string;
+} | null;
+
+export type ResourceAdminDtoKind = typeof ResourceAdminDtoKind[keyof typeof ResourceAdminDtoKind];
+
+
+export const ResourceAdminDtoKind = {
+  file: 'file',
+  link: 'link',
+} as const;
+
+export interface ResourceAdminDto {
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  courseId: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     * @nullable
+     */
+  courseTitle: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /**
+     * @minLength 1
+     * @maxLength 1000
+     * @nullable
+     */
+  description: string | null;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  displayOrder: number;
+  /** @nullable */
+  file: ResourceAdminDtoFile;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  kind: ResourceAdminDtoKind;
+  published: boolean;
+  title: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     * @nullable
+     */
+  url: string | null;
+}
+
+/**
+ * @nullable
+ */
+export type ResourceAdminListResponseDtoItemsItemFile = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  mimeType: string;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  sizeBytes: number;
+  url: string;
+} | null;
+
+export type ResourceAdminListResponseDtoItemsItemKind = typeof ResourceAdminListResponseDtoItemsItemKind[keyof typeof ResourceAdminListResponseDtoItemsItemKind];
+
+
+export const ResourceAdminListResponseDtoItemsItemKind = {
+  file: 'file',
+  link: 'link',
+} as const;
+
+export type ResourceAdminListResponseDtoItemsItem = {
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  courseId: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     * @nullable
+     */
+  courseTitle: string | null;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /**
+     * @minLength 1
+     * @maxLength 1000
+     * @nullable
+     */
+  description: string | null;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  displayOrder: number;
+  /** @nullable */
+  file: ResourceAdminListResponseDtoItemsItemFile;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  kind: ResourceAdminListResponseDtoItemsItemKind;
+  published: boolean;
+  title: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     * @nullable
+     */
+  url: string | null;
+};
+
+export interface ResourceAdminListResponseDto {
+  items: ResourceAdminListResponseDtoItemsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  page: number;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  pageSize: number;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+}
+
+export type ResourcePublicListResponseDtoItemsItemKind = typeof ResourcePublicListResponseDtoItemsItemKind[keyof typeof ResourcePublicListResponseDtoItemsItemKind];
+
+
+export const ResourcePublicListResponseDtoItemsItemKind = {
+  file: 'file',
+  link: 'link',
+} as const;
+
+export type ResourcePublicListResponseDtoItemsItem = {
+  /**
+     * @minLength 1
+     * @maxLength 1000
+     * @nullable
+     */
+  description: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  kind: ResourcePublicListResponseDtoItemsItemKind;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     * @nullable
+     */
+  mimeType: string | null;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  sizeBytes: number | null;
+  title: string;
+  url: string;
+};
+
+export interface ResourcePublicListResponseDto {
+  items: ResourcePublicListResponseDtoItemsItem[];
+}
+
+export type ResourceRequestDtoKind = typeof ResourceRequestDtoKind[keyof typeof ResourceRequestDtoKind];
+
+
+export const ResourceRequestDtoKind = {
+  file: 'file',
+  link: 'link',
+} as const;
+
+export interface ResourceRequestDto {
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  courseId?: string | null;
+  /**
+     * @maxLength 1000
+     * @nullable
+     */
+  description?: string | null;
+  /**
+     * @minimum 0
+     * @maximum 100000
+     */
+  displayOrder?: number;
+  kind: ResourceRequestDtoKind;
+  /**
+     * @nullable
+     * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  mediaAssetId?: string | null;
+  published?: boolean;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title: string;
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     * @nullable
+     */
+  url?: string | null;
+}
+
 export interface RevokeCertificateRequestDto {
   /**
      * @minLength 1
@@ -2246,6 +3855,14 @@ export interface RevokedCertificateDto {
   status: RevokedCertificateDtoStatus;
 }
 
+export interface SetTagsRequestDto {
+  /**
+     * @maxItems 50
+     * @items.pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+     */
+  tagIds: string[];
+}
+
 export interface SignInRequestDto {
   email: string;
   /**
@@ -2253,6 +3870,40 @@ export interface SignInRequestDto {
      * @maxLength 256
      */
   password: string;
+}
+
+export interface SignedInEnrollmentRequestDto {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     * @pattern ^[a-z0-9]+(?:-[a-z0-9]+)*$
+     */
+  courseSlug: string;
+}
+
+export type SignedInEnrollmentResponseDtoStatus = typeof SignedInEnrollmentResponseDtoStatus[keyof typeof SignedInEnrollmentResponseDtoStatus];
+
+
+export const SignedInEnrollmentResponseDtoStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
+export interface SignedInEnrollmentResponseDto {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     * @pattern ^[a-z0-9]+(?:-[a-z0-9]+)*$
+     */
+  courseSlug: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  enrollmentId: string;
+  status: SignedInEnrollmentResponseDtoStatus;
 }
 
 export type StudentDetailResponseDtoDepartment = {
@@ -2545,6 +4196,119 @@ export interface StudentListResponseDto {
   total: number;
 }
 
+export interface SubmitProfileChangeRequestDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId: string;
+  name: string;
+  /** @maxLength 500 */
+  note?: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId: string;
+}
+
+export type TagDetailDtoCoursesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+export type TagDetailDtoModulesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId: string;
+  courseTitle: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  title: string;
+};
+
+export interface TagDetailDto {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  courseCount: number;
+  courses: TagDetailDtoCoursesItem[];
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  isSystem: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  moduleCount: number;
+  modules: TagDetailDtoModulesItem[];
+  name: string;
+  slug: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+}
+
+export type TagListResponseDtoItemsItem = {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  courseCount: number;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  isSystem: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  moduleCount: number;
+  name: string;
+  slug: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+};
+
+export interface TagListResponseDto {
+  items: TagListResponseDtoItemsItem[];
+}
+
+export type TagRefListResponseDtoItemsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  isSystem: boolean;
+  name: string;
+  slug: string;
+};
+
+export interface TagRefListResponseDto {
+  items: TagRefListResponseDtoItemsItem[];
+}
+
+export interface TagSummaryDto {
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  courseCount: number;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  isSystem: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  moduleCount: number;
+  name: string;
+  slug: string;
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  updatedAt: string;
+}
+
 export type UniversityListResponseDtoItemsItem = {
   /**
      * @nullable
@@ -2670,6 +4434,18 @@ export interface UpdateModuleRequestDto {
   title: string;
 }
 
+export interface UpdateProfileRequestDto {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId: string;
+  name: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId: string;
+}
+
 export type UpdateQuizQuestionRequestDtoOptionsItem = {
   isCorrect: boolean;
   /**
@@ -2695,6 +4471,10 @@ export interface UpdateQuizQuestionRequestDto {
      * @maxLength 1000
      */
   text: string;
+}
+
+export interface UpdateTagRequestDto {
+  name: string;
 }
 
 export interface UpdateUniversityRequestDto {
@@ -2818,6 +4598,13 @@ export interface VideoLibraryListResponseDto {
   total: number;
 }
 
+export type VideoSlotListResponseDtoItemsItemCaptionsItem = typeof VideoSlotListResponseDtoItemsItemCaptionsItem[keyof typeof VideoSlotListResponseDtoItemsItemCaptionsItem];
+
+
+export const VideoSlotListResponseDtoItemsItemCaptionsItem = {
+  en: 'en',
+} as const;
+
 /**
  * @nullable
  */
@@ -2866,6 +4653,7 @@ export type VideoSlotListResponseDtoItemsItem = {
      * @nullable
      */
   assetKey: string | null;
+  captions: VideoSlotListResponseDtoItemsItemCaptionsItem[];
   /** @nullable */
   failureReason: VideoSlotListResponseDtoItemsItemFailureReason;
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
@@ -3153,6 +4941,258 @@ export const EnrollmentApprovalListPendingSort = {
   '-requestedAt': '-requestedAt',
 } as const;
 
+export type InsightsFunnelParams = {
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  from?: string;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  to?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId?: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session?: string;
+};
+
+export type InsightsMissedQuestionsParams = {
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  from?: string;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  to?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId?: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  quizId: string;
+  /**
+   * @minimum 1
+   * @maximum 25
+   */
+  limit?: number;
+};
+
+export type InsightsModuleResultsParams = {
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  from?: string;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  to?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId?: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session?: string;
+};
+
+export type InsightsQuizResultsParams = {
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  from?: string;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  to?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId?: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session?: string;
+};
+
+export type InsightsQueryParams = {
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  from?: string;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  to?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId?: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session?: string;
+  groupBy?: InsightsQueryGroupBy;
+};
+
+export type InsightsQueryGroupBy = typeof InsightsQueryGroupBy[keyof typeof InsightsQueryGroupBy];
+
+
+export const InsightsQueryGroupBy = {
+  day: 'day',
+  month: 'month',
+  course: 'course',
+  module: 'module',
+  question: 'question',
+  university: 'university',
+  faculty: 'faculty',
+  department: 'department',
+  session: 'session',
+} as const;
+
+export type InsightsCsvParams = {
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  from?: string;
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  to?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId?: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session?: string;
+  groupBy?: InsightsCsvGroupBy;
+};
+
+export type InsightsCsvGroupBy = typeof InsightsCsvGroupBy[keyof typeof InsightsCsvGroupBy];
+
+
+export const InsightsCsvGroupBy = {
+  day: 'day',
+  month: 'month',
+  course: 'course',
+  module: 'module',
+  question: 'question',
+  university: 'university',
+  faculty: 'faculty',
+  department: 'department',
+  session: 'session',
+} as const;
+
+export type NewsListParams = {
+  status?: NewsListStatus;
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  pageSize?: number;
+  sort?: NewsListSort;
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  q?: string;
+};
+
+export type NewsListStatus = typeof NewsListStatus[keyof typeof NewsListStatus];
+
+
+export const NewsListStatus = {
+  all: 'all',
+  draft: 'draft',
+  scheduled: 'scheduled',
+  published: 'published',
+} as const;
+
+export type NewsListSort = typeof NewsListSort[keyof typeof NewsListSort];
+
+
+export const NewsListSort = {
+  title: 'title',
+  '-title': '-title',
+  publishedAt: 'publishedAt',
+  '-publishedAt': '-publishedAt',
+  updatedAt: 'updatedAt',
+  '-updatedAt': '-updatedAt',
+} as const;
+
+export type AdminOverviewGetParams = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+};
+
+export type ProfileChangeAdminListParams = {
+  status?: ProfileChangeAdminListStatus;
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  pageSize?: number;
+};
+
+export type ProfileChangeAdminListStatus = typeof ProfileChangeAdminListStatus[keyof typeof ProfileChangeAdminListStatus];
+
+
+export const ProfileChangeAdminListStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type ResourcesListParams = {
+  status?: ResourcesListStatus;
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number;
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  pageSize?: number;
+  sort?: ResourcesListSort;
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  q?: string;
+};
+
+export type ResourcesListStatus = typeof ResourcesListStatus[keyof typeof ResourcesListStatus];
+
+
+export const ResourcesListStatus = {
+  all: 'all',
+  published: 'published',
+  unpublished: 'unpublished',
+} as const;
+
+export type ResourcesListSort = typeof ResourcesListSort[keyof typeof ResourcesListSort];
+
+
+export const ResourcesListSort = {
+  title: 'title',
+  '-title': '-title',
+  displayOrder: 'displayOrder',
+  '-displayOrder': '-displayOrder',
+  updatedAt: 'updatedAt',
+  '-updatedAt': '-updatedAt',
+} as const;
+
 export type StudentListListParams = {
   /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
   courseId?: string;
@@ -3201,6 +5241,35 @@ export const StudentListListSort = {
   '-name': '-name',
   requestedAt: 'requestedAt',
   '-requestedAt': '-requestedAt',
+} as const;
+
+export type StudentExportDownloadParams = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  courseId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  universityId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  facultyId?: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  departmentId?: string;
+  /** @pattern ^(\d{4})-(\d{2})$ */
+  session?: string;
+  status?: StudentExportDownloadStatus;
+  /** @maxLength 100 */
+  q?: string;
+};
+
+export type StudentExportDownloadStatus = typeof StudentExportDownloadStatus[keyof typeof StudentExportDownloadStatus];
+
+
+export const StudentExportDownloadStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
 } as const;
 
 export type VideoLibraryListParams = {
@@ -3254,6 +5323,14 @@ export type NotificationsListParams = {
    * @maximum 50
    */
   pageSize?: number;
+};
+
+export type PublicNewsListParams = {
+  /**
+   * @minimum 1
+   * @maximum 1000
+   */
+  page?: number;
 };
 
 export const getAdminAccountChangePasswordUrl = () => {
@@ -4367,6 +6444,132 @@ return serverFetch<ModuleSummaryDto>(getLessonSectionsUpdateUrl(id,moduleId,sect
 
 
 
+export const getLessonSectionsReadBodyUrl = (id: string,
+    moduleId: string,
+    sectionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/sections/${sectionId}/body`
+}
+
+export const lessonSectionsReadBody = async (id: string,
+    moduleId: string,
+    sectionId: string, options?: Parameters<typeof serverFetch>[1]): Promise<LessonBodyResponseDto> => {
+
+  return serverFetch<LessonBodyResponseDto>(getLessonSectionsReadBodyUrl(id,moduleId,sectionId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getLessonSectionsUpdateBodyUrl = (id: string,
+    moduleId: string,
+    sectionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/sections/${sectionId}/body`
+}
+
+export const lessonSectionsUpdateBody = async (id: string,
+    moduleId: string,
+    sectionId: string,
+    lessonBodyRequestDto: LessonBodyRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<LessonBodyResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<LessonBodyResponseDto>(getLessonSectionsUpdateBodyUrl(id,moduleId,sectionId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(lessonBodyRequestDto)
+  }
+);}
+
+
+
+export const getTagAssignmentsModuleTagsUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/tags`
+}
+
+export const tagAssignmentsModuleTags = async (id: string,
+    moduleId: string, options?: Parameters<typeof serverFetch>[1]): Promise<TagRefListResponseDto> => {
+
+  return serverFetch<TagRefListResponseDto>(getTagAssignmentsModuleTagsUrl(id,moduleId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getTagAssignmentsSetModuleTagsUrl = (id: string,
+    moduleId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/tags`
+}
+
+export const tagAssignmentsSetModuleTags = async (id: string,
+    moduleId: string,
+    setTagsRequestDto: SetTagsRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<TagRefListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<TagRefListResponseDto>(getTagAssignmentsSetModuleTagsUrl(id,moduleId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(setTagsRequestDto)
+  }
+);}
+
+
+
 export const getVideoSlotsListUrl = (id: string,
     moduleId: string,) => {
 
@@ -4531,6 +6734,33 @@ return serverFetch<VideoSlotListResponseDto>(getVideoSlotsUpdateUrl(id,moduleId,
 
 
 
+export const getVideoCaptionsRemoveUrl = (id: string,
+    moduleId: string,
+    videoId: string,
+    language: 'en',) => {
+
+
+
+
+  return `/api/admin/courses/${id}/modules/${moduleId}/videos/${videoId}/captions/${language}`
+}
+
+export const videoCaptionsRemove = async (id: string,
+    moduleId: string,
+    videoId: string,
+    language: 'en', options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getVideoCaptionsRemoveUrl(id,moduleId,videoId,language),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
 export const getVideoSlotsRetryTranscodeUrl = (id: string,
     moduleId: string,
     videoId: string,) => {
@@ -4658,6 +6888,63 @@ export const revisionsPublish = async (id: string,
     method: 'POST'
 
 
+  }
+);}
+
+
+
+export const getTagAssignmentsCourseTagsUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/tags`
+}
+
+export const tagAssignmentsCourseTags = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<TagRefListResponseDto> => {
+
+  return serverFetch<TagRefListResponseDto>(getTagAssignmentsCourseTagsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getTagAssignmentsSetCourseTagsUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/tags`
+}
+
+export const tagAssignmentsSetCourseTags = async (id: string,
+    setTagsRequestDto: SetTagsRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<TagRefListResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<TagRefListResponseDto>(getTagAssignmentsSetCourseTagsUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(setTagsRequestDto)
   }
 );}
 
@@ -5538,6 +7825,311 @@ return serverFetch<RemovedEnrollmentDto>(getEnrollmentRemovalRemoveUrl(id),
 
 
 
+export const getAdminFrontPageGetUrl = () => {
+
+
+
+
+  return `/api/admin/front-page`
+}
+
+export const adminFrontPageGet = async ( options?: Parameters<typeof serverFetch>[1]): Promise<AdminFrontPageResponseDto> => {
+
+  return serverFetch<AdminFrontPageResponseDto>(getAdminFrontPageGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getAdminFrontPageReorderCoursesUrl = () => {
+
+
+
+
+  return `/api/admin/front-page/courses/reorder`
+}
+
+export const adminFrontPageReorderCourses = async (reorderRequestDto: ReorderRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminFrontPageResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<AdminFrontPageResponseDto>(getAdminFrontPageReorderCoursesUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reorderRequestDto)
+  }
+);}
+
+
+
+export const getAdminFrontPageReorderModulesUrl = () => {
+
+
+
+
+  return `/api/admin/front-page/modules/reorder`
+}
+
+export const adminFrontPageReorderModules = async (reorderRequestDto: ReorderRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminFrontPageResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<AdminFrontPageResponseDto>(getAdminFrontPageReorderModulesUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reorderRequestDto)
+  }
+);}
+
+
+
+export const getInsightsFunnelUrl = (params?: InsightsFunnelParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/insights/funnel?${stringifiedParams}` : `/api/admin/insights/funnel`
+}
+
+export const insightsFunnel = async (params?: InsightsFunnelParams, options?: Parameters<typeof serverFetch>[1]): Promise<InsightFunnelResultDto> => {
+
+  return serverFetch<InsightFunnelResultDto>(getInsightsFunnelUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getInsightsMissedQuestionsUrl = (params: InsightsMissedQuestionsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/insights/missed-questions?${stringifiedParams}` : `/api/admin/insights/missed-questions`
+}
+
+export const insightsMissedQuestions = async (params: InsightsMissedQuestionsParams, options?: Parameters<typeof serverFetch>[1]): Promise<InsightMissedQuestionsDto> => {
+
+  return serverFetch<InsightMissedQuestionsDto>(getInsightsMissedQuestionsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getInsightsModuleResultsUrl = (params?: InsightsModuleResultsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/insights/module-results?${stringifiedParams}` : `/api/admin/insights/module-results`
+}
+
+export const insightsModuleResults = async (params?: InsightsModuleResultsParams, options?: Parameters<typeof serverFetch>[1]): Promise<InsightModuleResultsDto> => {
+
+  return serverFetch<InsightModuleResultsDto>(getInsightsModuleResultsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getInsightsQuizResultsUrl = (params?: InsightsQuizResultsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/insights/quiz-results?${stringifiedParams}` : `/api/admin/insights/quiz-results`
+}
+
+export const insightsQuizResults = async (params?: InsightsQuizResultsParams, options?: Parameters<typeof serverFetch>[1]): Promise<InsightQuizResultsDto> => {
+
+  return serverFetch<InsightQuizResultsDto>(getInsightsQuizResultsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getInsightsRefreshUrl = () => {
+
+
+
+
+  return `/api/admin/insights/refresh`
+}
+
+export const insightsRefresh = async ( options?: Parameters<typeof serverFetch>[1]): Promise<InsightRefreshResponseDto> => {
+
+  return serverFetch<InsightRefreshResponseDto>(getInsightsRefreshUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getInsightsStatusUrl = () => {
+
+
+
+
+  return `/api/admin/insights/status`
+}
+
+export const insightsStatus = async ( options?: Parameters<typeof serverFetch>[1]): Promise<InsightStatusResponseDto> => {
+
+  return serverFetch<InsightStatusResponseDto>(getInsightsStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getInsightsQueryUrl = (series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsQueryParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/insights/${series}?${stringifiedParams}` : `/api/admin/insights/${series}`
+}
+
+export const insightsQuery = async (series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsQueryParams, options?: Parameters<typeof serverFetch>[1]): Promise<InsightResultDto> => {
+
+  return serverFetch<InsightResultDto>(getInsightsQueryUrl(series,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getInsightsCsvUrl = (series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsCsvParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/insights/${series}/csv?${stringifiedParams}` : `/api/admin/insights/${series}/csv`
+}
+
+export const insightsCsv = async (series: 'enrollments' | 'modules' | 'quizzes' | 'questions',
+    params?: InsightsCsvParams, options?: Parameters<typeof serverFetch>[1]): Promise<string> => {
+
+  return serverFetch<string>(getInsightsCsvUrl(series,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export const getAdminMeDescribeUrl = () => {
 
 
@@ -5549,6 +8141,175 @@ export const getAdminMeDescribeUrl = () => {
 export const adminMeDescribe = async ( options?: Parameters<typeof serverFetch>[1]): Promise<AdminMeResponseDto> => {
 
   return serverFetch<AdminMeResponseDto>(getAdminMeDescribeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getNewsListUrl = (params?: NewsListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/news?${stringifiedParams}` : `/api/admin/news`
+}
+
+export const newsList = async (params?: NewsListParams, options?: Parameters<typeof serverFetch>[1]): Promise<NewsAdminListResponseDto> => {
+
+  return serverFetch<NewsAdminListResponseDto>(getNewsListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getNewsCreateUrl = () => {
+
+
+
+
+  return `/api/admin/news`
+}
+
+export const newsCreate = async (newsPostRequestDto: NewsPostRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<NewsAdminPostDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<NewsAdminPostDto>(getNewsCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(newsPostRequestDto)
+  }
+);}
+
+
+
+export const getNewsRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/news/${id}`
+}
+
+export const newsRemove = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getNewsRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getNewsGetUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/news/${id}`
+}
+
+export const newsGet = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<NewsAdminPostDto> => {
+
+  return serverFetch<NewsAdminPostDto>(getNewsGetUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getNewsUpdateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/news/${id}`
+}
+
+export const newsUpdate = async (id: string,
+    newsPostRequestDto: NewsPostRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<NewsAdminPostDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<NewsAdminPostDto>(getNewsUpdateUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(newsPostRequestDto)
+  }
+);}
+
+
+
+export const getAdminOverviewGetUrl = (params?: AdminOverviewGetParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/overview?${stringifiedParams}` : `/api/admin/overview`
+}
+
+export const adminOverviewGet = async (params?: AdminOverviewGetParams, options?: Parameters<typeof serverFetch>[1]): Promise<AdminOverviewDto> => {
+
+  return serverFetch<AdminOverviewDto>(getAdminOverviewGetUrl(params),
   {
     ...options,
     method: 'GET'
@@ -5575,6 +8336,344 @@ export const adminPlaybackPreview = async (videoId: string, options?: Parameters
     method: 'POST'
 
 
+  }
+);}
+
+
+
+export const getProfileChangeAdminListUrl = (params?: ProfileChangeAdminListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/profile-changes?${stringifiedParams}` : `/api/admin/profile-changes`
+}
+
+export const profileChangeAdminList = async (params?: ProfileChangeAdminListParams, options?: Parameters<typeof serverFetch>[1]): Promise<AdminProfileChangeListResponseDto> => {
+
+  return serverFetch<AdminProfileChangeListResponseDto>(getProfileChangeAdminListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getProfileChangeAdminApproveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/profile-changes/${id}/approve`
+}
+
+export const profileChangeAdminApprove = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<ProfileChangeDecisionDto> => {
+
+  return serverFetch<ProfileChangeDecisionDto>(getProfileChangeAdminApproveUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getProfileChangeAdminRejectUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/profile-changes/${id}/reject`
+}
+
+export const profileChangeAdminReject = async (id: string,
+    rejectProfileChangeRequestDto: RejectProfileChangeRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ProfileChangeDecisionDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ProfileChangeDecisionDto>(getProfileChangeAdminRejectUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(rejectProfileChangeRequestDto)
+  }
+);}
+
+
+
+export const getResourcesListUrl = (params?: ResourcesListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/resources?${stringifiedParams}` : `/api/admin/resources`
+}
+
+export const resourcesList = async (params?: ResourcesListParams, options?: Parameters<typeof serverFetch>[1]): Promise<ResourceAdminListResponseDto> => {
+
+  return serverFetch<ResourceAdminListResponseDto>(getResourcesListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getResourcesCreateUrl = () => {
+
+
+
+
+  return `/api/admin/resources`
+}
+
+export const resourcesCreate = async (resourceRequestDto: ResourceRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ResourceAdminDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ResourceAdminDto>(getResourcesCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(resourceRequestDto)
+  }
+);}
+
+
+
+export const getResourcesRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/resources/${id}`
+}
+
+export const resourcesRemove = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getResourcesRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getResourcesGetUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/resources/${id}`
+}
+
+export const resourcesGet = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<ResourceAdminDto> => {
+
+  return serverFetch<ResourceAdminDto>(getResourcesGetUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getResourcesUpdateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/resources/${id}`
+}
+
+export const resourcesUpdate = async (id: string,
+    resourceRequestDto: ResourceRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ResourceAdminDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ResourceAdminDto>(getResourcesUpdateUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(resourceRequestDto)
+  }
+);}
+
+
+
+export const getAdminContactSettingsGetUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/contact`
+}
+
+export const adminContactSettingsGet = async ( options?: Parameters<typeof serverFetch>[1]): Promise<AdminContactSettingsResponseDto> => {
+
+  return serverFetch<AdminContactSettingsResponseDto>(getAdminContactSettingsGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getAdminContactSettingsUpdateUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/contact`
+}
+
+export const adminContactSettingsUpdate = async (contactSettingsRequestDto: ContactSettingsRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminContactSettingsResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<AdminContactSettingsResponseDto>(getAdminContactSettingsUpdateUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(contactSettingsRequestDto)
+  }
+);}
+
+
+
+export const getAdminSiteSettingsGetUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/landing-overview`
+}
+
+export const adminSiteSettingsGet = async ( options?: Parameters<typeof serverFetch>[1]): Promise<AdminLandingOverviewResponseDto> => {
+
+  return serverFetch<AdminLandingOverviewResponseDto>(getAdminSiteSettingsGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getAdminSiteSettingsUpdateUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/landing-overview`
+}
+
+export const adminSiteSettingsUpdate = async (landingOverviewRequestDto: LandingOverviewRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminLandingOverviewResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<AdminLandingOverviewResponseDto>(getAdminSiteSettingsUpdateUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(landingOverviewRequestDto)
   }
 );}
 
@@ -5608,6 +8707,34 @@ export const studentListList = async (params?: StudentListListParams, options?: 
 
 
 
+export const getStudentExportDownloadUrl = (params?: StudentExportDownloadParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/students/export?${stringifiedParams}` : `/api/admin/students/export`
+}
+
+export const studentExportDownload = async (params?: StudentExportDownloadParams, options?: Parameters<typeof serverFetch>[1]): Promise<Blob> => {
+
+  return serverFetch<Blob>(getStudentExportDownloadUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export const getStudentDetailGetUrl = (id: string,) => {
 
 
@@ -5624,6 +8751,140 @@ export const studentDetailGet = async (id: string, options?: Parameters<typeof s
     method: 'GET'
 
 
+  }
+);}
+
+
+
+export const getTagsListUrl = () => {
+
+
+
+
+  return `/api/admin/tags`
+}
+
+export const tagsList = async ( options?: Parameters<typeof serverFetch>[1]): Promise<TagListResponseDto> => {
+
+  return serverFetch<TagListResponseDto>(getTagsListUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getTagsCreateUrl = () => {
+
+
+
+
+  return `/api/admin/tags`
+}
+
+export const tagsCreate = async (createTagRequestDto: CreateTagRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<TagSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<TagSummaryDto>(getTagsCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createTagRequestDto)
+  }
+);}
+
+
+
+export const getTagsRemoveUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/tags/${id}`
+}
+
+export const tagsRemove = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getTagsRemoveUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getTagsGetUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/tags/${id}`
+}
+
+export const tagsGet = async (id: string, options?: Parameters<typeof serverFetch>[1]): Promise<TagDetailDto> => {
+
+  return serverFetch<TagDetailDto>(getTagsGetUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getTagsUpdateUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/tags/${id}`
+}
+
+export const tagsUpdate = async (id: string,
+    updateTagRequestDto: UpdateTagRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<TagSummaryDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<TagSummaryDto>(getTagsUpdateUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateTagRequestDto)
   }
 );}
 
@@ -6125,6 +9386,27 @@ export const quizResultGet = async (courseId: string,
 
 
 
+export const getPublicCoursesGetUrl = (slug: string,) => {
+
+
+
+
+  return `/api/courses/${slug}`
+}
+
+export const publicCoursesGet = async (slug: string, options?: Parameters<typeof serverFetch>[1]): Promise<PublicCourseResponseDto> => {
+
+  return serverFetch<PublicCourseResponseDto>(getPublicCoursesGetUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export const getDirectoryLookupsListUniversitiesUrl = () => {
 
 
@@ -6225,6 +9507,27 @@ return serverFetch<EnrollmentAcceptedResponseDto>(getEnrollmentSubmitUrl(),
 
 
 
+export const getPublicFrontPageGetUrl = () => {
+
+
+
+
+  return `/api/front-page`
+}
+
+export const publicFrontPageGet = async ( options?: Parameters<typeof serverFetch>[1]): Promise<PublicFrontPageResponseDto> => {
+
+  return serverFetch<PublicFrontPageResponseDto>(getPublicFrontPageGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export const getHealthCheckUrl = () => {
 
 
@@ -6304,6 +9607,41 @@ export const dashboardDescribe = async ( options?: Parameters<typeof serverFetch
     method: 'GET'
 
 
+  }
+);}
+
+
+
+export const getSignedInEnrollmentRequestUrl = () => {
+
+
+
+
+  return `/api/me/enrollments`
+}
+
+export const signedInEnrollmentRequest = async (signedInEnrollmentRequestDto: SignedInEnrollmentRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<SignedInEnrollmentResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<SignedInEnrollmentResponseDto>(getSignedInEnrollmentRequestUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(signedInEnrollmentRequestDto)
   }
 );}
 
@@ -6393,6 +9731,286 @@ export const notificationsMarkRead = async (id: string, options?: Parameters<typ
   {
     ...options,
     method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getPasswordChangeChangeUrl = () => {
+
+
+
+
+  return `/api/me/password`
+}
+
+export const passwordChangeChange = async (changeStudentPasswordRequestDto: ChangeStudentPasswordRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<void>(getPasswordChangeChangeUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(changeStudentPasswordRequestDto)
+  }
+);}
+
+
+
+export const getPasswordChangeRequestCodeUrl = () => {
+
+
+
+
+  return `/api/me/password/code`
+}
+
+export const passwordChangeRequestCode = async ( options?: Parameters<typeof serverFetch>[1]): Promise<PasswordCodeRequestedResponseDto> => {
+
+  return serverFetch<PasswordCodeRequestedResponseDto>(getPasswordChangeRequestCodeUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+export const getProfileDescribeUrl = () => {
+
+
+
+
+  return `/api/me/profile`
+}
+
+export const profileDescribe = async ( options?: Parameters<typeof serverFetch>[1]): Promise<ProfileResponseDto> => {
+
+  return serverFetch<ProfileResponseDto>(getProfileDescribeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getProfileUpdateUrl = () => {
+
+
+
+
+  return `/api/me/profile`
+}
+
+export const profileUpdate = async (updateProfileRequestDto: UpdateProfileRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ProfileResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ProfileResponseDto>(getProfileUpdateUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateProfileRequestDto)
+  }
+);}
+
+
+
+export const getProfileChangeLatestUrl = () => {
+
+
+
+
+  return `/api/me/profile/change-request`
+}
+
+export const profileChangeLatest = async ( options?: Parameters<typeof serverFetch>[1]): Promise<LatestProfileChangeResponseDto> => {
+
+  return serverFetch<LatestProfileChangeResponseDto>(getProfileChangeLatestUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getProfileChangeSubmitUrl = () => {
+
+
+
+
+  return `/api/me/profile/change-request`
+}
+
+export const profileChangeSubmit = async (submitProfileChangeRequestDto: SubmitProfileChangeRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<ProfileChangeRequestDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<ProfileChangeRequestDto>(getProfileChangeSubmitUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(submitProfileChangeRequestDto)
+  }
+);}
+
+
+
+export const getPublicNewsListUrl = (params?: PublicNewsListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/news?${stringifiedParams}` : `/api/news`
+}
+
+export const publicNewsList = async (params?: PublicNewsListParams, options?: Parameters<typeof serverFetch>[1]): Promise<NewsPublicListResponseDto> => {
+
+  return serverFetch<NewsPublicListResponseDto>(getPublicNewsListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getPublicNewsGetUrl = (slug: string,) => {
+
+
+
+
+  return `/api/news/${slug}`
+}
+
+export const publicNewsGet = async (slug: string, options?: Parameters<typeof serverFetch>[1]): Promise<NewsPublicPostDto> => {
+
+  return serverFetch<NewsPublicPostDto>(getPublicNewsGetUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getPublicResourcesListUrl = () => {
+
+
+
+
+  return `/api/resources`
+}
+
+export const publicResourcesList = async ( options?: Parameters<typeof serverFetch>[1]): Promise<ResourcePublicListResponseDto> => {
+
+  return serverFetch<ResourcePublicListResponseDto>(getPublicResourcesListUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getPublicContactSettingsGetUrl = () => {
+
+
+
+
+  return `/api/site-settings/contact`
+}
+
+export const publicContactSettingsGet = async ( options?: Parameters<typeof serverFetch>[1]): Promise<PublicContactSettingsResponseDto> => {
+
+  return serverFetch<PublicContactSettingsResponseDto>(getPublicContactSettingsGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getPublicSiteSettingsGetUrl = () => {
+
+
+
+
+  return `/api/site-settings/landing-overview`
+}
+
+export const publicSiteSettingsGet = async ( options?: Parameters<typeof serverFetch>[1]): Promise<PublicLandingOverviewResponseDto> => {
+
+  return serverFetch<PublicLandingOverviewResponseDto>(getPublicSiteSettingsGetUrl(),
+  {
+    ...options,
+    method: 'GET'
 
 
   }

@@ -157,4 +157,29 @@ describe("routeOutboxEvent", () => {
       ],
     });
   });
+
+  test("routes a news published event to a student notification and no email", () => {
+    const postId = "0194f3a0-0000-7000-8000-0000000000aa";
+    const routing = routeOutboxEvent("news.published", {
+      postId,
+      slug: "orientation",
+      title: "Orientation",
+    });
+    expect(routing).toEqual({
+      outcome: "routed",
+      actions: [
+        {
+          kind: "news-notification",
+          data: { postId, slug: "orientation", title: "Orientation" },
+        },
+      ],
+    });
+  });
+
+  test("skips a news published event with an invalid payload", () => {
+    expect(routeOutboxEvent("news.published", {})).toEqual({
+      outcome: "skipped",
+      reason: "invalid news payload",
+    });
+  });
 });

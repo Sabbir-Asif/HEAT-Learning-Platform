@@ -19,10 +19,14 @@ import { EnrollmentRejectionService } from "./enrollment-rejection.service";
 import { EnrollmentRemovalService } from "./enrollment-removal.service";
 import { EnrollmentController } from "./enrollment.controller";
 import { EnrollmentService } from "./enrollment.service";
+import { StudentExportController } from "./student-export.controller";
+import { StudentExportService } from "./student-export.service";
 import { StudentDetailController } from "./student-detail.controller";
 import { StudentDetailService } from "./student-detail.service";
 import { StudentListController } from "./student-list.controller";
 import { StudentListService } from "./student-list.service";
+import { SignedInEnrollmentController } from "./signed-in-enrollment.controller";
+import { SignedInEnrollmentService } from "./signed-in-enrollment.service";
 
 @Module({
   imports: [
@@ -43,7 +47,9 @@ import { StudentListService } from "./student-list.service";
     EnrollmentRemovalController,
     AttemptGrantController,
     StudentListController,
+    StudentExportController,
     StudentDetailController,
+    SignedInEnrollmentController,
   ],
   providers: [
     EnrollmentService,
@@ -53,7 +59,9 @@ import { StudentListService } from "./student-list.service";
     AttemptGrantService,
     ApprovalQueueService,
     StudentListService,
+    StudentExportService,
     StudentDetailService,
+    SignedInEnrollmentService,
   ],
 })
 export class EnrollmentModule {}

@@ -14,6 +14,7 @@ interface Options {
   enrollment?: object | null;
   progress?: object[];
   moduleIds?: string[];
+  assets?: object[];
 }
 
 const enrollmentRow = (overrides: object = {}) => ({
@@ -31,6 +32,27 @@ const sectionRow = {
   title: "Intro",
   schemaVersion: 1,
   body: { type: "doc", content: [] },
+  images: [],
+};
+
+const imageId = "0198f1a0-0000-7000-8000-000000000051";
+
+const imageAsset = {
+  id: imageId,
+  key: "public/abc",
+  kind: "IMAGE",
+  visibility: "PUBLIC",
+  mimeType: "image/webp",
+  sizeBytes: 10,
+  width: 10,
+  height: 10,
+  altText: "A poster",
+  variants: [],
+};
+
+const imageBody = {
+  type: "doc",
+  content: [{ type: "image", attrs: { assetId: imageId, alt: "A poster" } }],
 };
 
 const build = (options: Options = {}) => {
@@ -51,13 +73,15 @@ const build = (options: Options = {}) => {
         lessonSections: [sectionRow],
       }),
     },
+    mediaAsset: { findMany: vi.fn().mockResolvedValue(options.assets ?? []) },
     moduleProgress: {
       findMany: vi
         .fn()
         .mockResolvedValue(options.progress ?? [{ moduleId: ids.m1, status: "UNLOCKED" }]),
     },
   };
-  return { service: new LessonContentService(database as never), database };
+  const media = { describe: vi.fn().mockReturnValue({ url: "/media/public/abc/w.webp" }) };
+  return { service: new LessonContentService(database as never, media as never), database };
 };
 
 describe("LessonContentService.read", () => {
@@ -68,6 +92,46 @@ describe("LessonContentService.read", () => {
       module: { id: ids.m1, title: "Module 1", objectives: ["Know the policy"] },
       sections: [sectionRow],
     });
+  });
+
+  test("resolves images of a rich-text body only for assets linked to that section", async () => {
+    const { service, database } = build({ assets: [imageAsset] });
+    database.module.findFirst.mockResolvedValue({
+      id: ids.m1,
+      title: "Module 1",
+      objectives: [],
+      lessonSections: [{ ...sectionRow, body: imageBody }],
+    });
+
+    const result = await service.read("u1", ids.course, ids.m1);
+
+    expect(result.sections[0]?.images).toEqual([
+      { assetId: imageId, url: "/media/public/abc/w.webp", alt: "A poster" },
+    ]);
+    expect(database.mediaAsset.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          linkedEntity: "LessonSection",
+          linkedId: ids.s1,
+          deletedAt: null,
+        }),
+      }),
+    );
+  });
+
+  test("a legacy body that fails the allow-list resolves no images", async () => {
+    const { service, database } = build({ assets: [imageAsset] });
+    database.module.findFirst.mockResolvedValue({
+      id: ids.m1,
+      title: "Module 1",
+      objectives: [],
+      lessonSections: [{ ...sectionRow, body: { type: "doc", content: [{ type: "script" }] } }],
+    });
+
+    const result = await service.read("u1", ids.course, ids.m1);
+
+    expect(result.sections[0]?.images).toEqual([]);
+    expect(database.mediaAsset.findMany).not.toHaveBeenCalled();
   });
 
   test("reads from the pinned revision and scopes the enrollment to the caller", async () => {

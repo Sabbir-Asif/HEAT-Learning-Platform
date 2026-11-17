@@ -96,12 +96,21 @@ const envSchema = z
         (value) => value === undefined || new URL(value).origin === value,
         "PUBLIC_APP_URL must be an origin",
       ),
+    PUBLIC_APP_INTERNAL_URL: z
+      .url()
+      .optional()
+      .refine(
+        (value) => value === undefined || new URL(value).origin === value,
+        "PUBLIC_APP_INTERNAL_URL must be an origin",
+      ),
+    REVALIDATE_SECRET: secret.optional(),
     AUDIT_TRANSACTION_MAX_WAIT_MS: positiveInt.default(5000),
     AUDIT_TRANSACTION_TIMEOUT_MS: positiveInt.default(15000),
     RESPONSE_FLOOR_MS: positiveInt.default(1000),
     VIDEO_UPLOAD_DIR: z.string().min(1).optional(),
     VIDEO_UPLOAD_EXPIRY_HOURS: positiveInt.default(24),
     HLS_MEDIA_DIR: z.string().min(1).optional(),
+    MEDIA_STORAGE_DIR: z.string().min(1).optional(),
     TRANSCODE_TIMEOUT_FACTOR: positiveInt.default(8),
     TRANSCODE_TIMEOUT_MIN_SECONDS: positiveInt.default(600),
     TRANSCODE_TIMEOUT_MAX_SECONDS: positiveInt.default(14400),
@@ -125,6 +134,13 @@ const envSchema = z
         code: "custom",
         path: ["VIDEO_UPLOAD_DIR"],
         message: "VIDEO_UPLOAD_DIR is required in production",
+      });
+    }
+    if (env.NODE_ENV === "production" && env.MEDIA_STORAGE_DIR === undefined) {
+      context.addIssue({
+        code: "custom",
+        path: ["MEDIA_STORAGE_DIR"],
+        message: "MEDIA_STORAGE_DIR is required in production",
       });
     }
     if (env.NODE_ENV === "production" && env.HLS_MEDIA_DIR === undefined) {
@@ -159,6 +175,7 @@ const envSchema = z
 
 const localVideoUploadDirectory = "../../.data/uploads";
 const localHlsMediaDirectory = "../../.data/hls";
+const localMediaDirectory = "../../.data/media";
 const localAdminAppUrl = "http://localhost:3001";
 const localPublicAppUrl = "http://localhost:3000";
 const localTrustedOrigins = [
@@ -176,6 +193,10 @@ export interface HlsConfig {
 export interface VideoUploadConfig {
   directory: string;
   expiryHours: number;
+}
+
+export interface MediaConfig {
+  directory: string;
 }
 
 export interface TranscodeConfig {
@@ -201,6 +222,7 @@ export interface AppConfig {
   breachedPasswordRangeUrl: string;
   invitations: { ttlHours: number; adminAppUrl: string };
   publicAppUrl: string;
+  revalidation: { url: string; secret: string | undefined };
   verification: { tokenTtlHours: number };
   passwordReset: { ttlMinutes: number };
   audit: { transactionMaxWaitMs: number; transactionTimeoutMs: number };
@@ -208,6 +230,7 @@ export interface AppConfig {
   rateLimit: RateLimitConfig;
   hls: HlsConfig | undefined;
   videoUploads: VideoUploadConfig;
+  media: MediaConfig;
   transcode: TranscodeConfig;
   mail: MailConfig;
 }
@@ -260,6 +283,10 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
       adminAppUrl: values.ADMIN_APP_URL ?? localAdminAppUrl,
     },
     publicAppUrl: values.PUBLIC_APP_URL ?? localPublicAppUrl,
+    revalidation: {
+      url: values.PUBLIC_APP_INTERNAL_URL ?? localPublicAppUrl,
+      secret: values.REVALIDATE_SECRET,
+    },
     verification: { tokenTtlHours: values.VERIFICATION_TOKEN_TTL_HOURS },
     passwordReset: { ttlMinutes: values.PASSWORD_RESET_TTL_MINUTES },
     audit: {
@@ -273,6 +300,7 @@ export const loadConfig = (env: NodeJS.ProcessEnv): AppConfig => {
       directory: values.VIDEO_UPLOAD_DIR ?? resolve(localVideoUploadDirectory),
       expiryHours: values.VIDEO_UPLOAD_EXPIRY_HOURS,
     },
+    media: { directory: values.MEDIA_STORAGE_DIR ?? resolve(localMediaDirectory) },
     transcode: {
       hlsDirectory: values.HLS_MEDIA_DIR ?? resolve(localHlsMediaDirectory),
       timeout: {

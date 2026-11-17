@@ -42,6 +42,7 @@ type ChartCardProps = {
   kind?: "line" | "bar";
   xKey: string;
   xLabel: string;
+  xTickMaxLength?: number;
   series: UpToFive<ChartSeries>;
   data: ChartRow[];
   status?: "ready" | "loading" | "error";
@@ -76,6 +77,12 @@ const tooltipStyle = {
 
 const tick = { fill: "var(--muted-foreground)", fontSize: 12 };
 
+function shortenTick(value: unknown, maxLength: number | undefined): string {
+  const text = String(value);
+  if (maxLength === undefined || text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
 function ChartCard({
   title,
   description,
@@ -83,6 +90,7 @@ function ChartCard({
   kind = "line",
   xKey,
   xLabel,
+  xTickMaxLength,
   series,
   data,
   status = "ready",
@@ -121,7 +129,13 @@ function ChartCard({
           <ResponsiveContainer width="100%" height="100%">
             <Chart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
               <CartesianGrid stroke="var(--border)" strokeOpacity={0.4} vertical={false} />
-              <XAxis dataKey={xKey} tick={tick} tickLine={false} minTickGap={16} />
+              <XAxis
+                dataKey={xKey}
+                tick={tick}
+                tickLine={false}
+                minTickGap={16}
+                tickFormatter={(value: unknown) => shortenTick(value, xTickMaxLength)}
+              />
               <YAxis tick={tick} tickLine={false} axisLine={false} width={40} />
               <Tooltip contentStyle={tooltipStyle} cursor={{ stroke: "var(--border)" }} />
               <Legend />

@@ -5,7 +5,7 @@ const query = { sort: "name" as const, page: 2, pageSize: 25 };
 
 describe("studentWhere", () => {
   test("always excludes soft-deleted enrollments and accounts", () => {
-    expect(studentWhere(query)).toEqual({ deletedAt: null, user: { deletedAt: null } });
+    expect(studentWhere({})).toEqual({ deletedAt: null, user: { deletedAt: null } });
   });
 
   test("maps every filter onto the enrollment, course and profile", () => {

@@ -15,6 +15,7 @@ import {
   TagIcon,
   UserCogIcon,
   UserCheckIcon,
+  UserPenIcon,
   UsersIcon,
 } from "lucide-react";
 
@@ -32,6 +33,7 @@ export function adminNavigation(isSuperAdmin = true): NavGroup[] {
       items: [
         { href: "/enrollments", label: "Enrollments", icon: UserCheckIcon },
         { href: "/students", label: "Students", icon: UsersIcon },
+        { href: "/profile-changes", label: "Profile changes", icon: UserPenIcon },
       ],
     },
     { label: "Courses", items: [{ href: "/courses", label: "Courses", icon: BookOpenIcon }] },

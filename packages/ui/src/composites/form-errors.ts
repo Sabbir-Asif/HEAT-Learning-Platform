@@ -32,6 +32,7 @@ export type FormErrorCopyKey =
   | "DIRECTORY_IN_USE"
   | "DIRECTORY_NAME_TAKEN"
   | "EMAIL_IN_USE"
+  | "EMAIL_NOT_VERIFIED"
   | "ENROLLMENT_ALREADY_DECIDED"
   | "ENROLLMENT_NOT_ACTIVE"
   | "ENROLLMENT_NOT_REMOVABLE"
@@ -39,6 +40,7 @@ export type FormErrorCopyKey =
   | "ENROLLMENT_STATE_CHANGED"
   | "ENROLLMENT_NOT_VERIFIED"
   | "FORBIDDEN"
+  | "INSIGHTS_REFRESH_RUNNING"
   | "INTERNAL"
   | "INVALID_CREDENTIALS"
   | "INVITATION_EXPIRED"
@@ -50,6 +52,13 @@ export type FormErrorCopyKey =
   | "ORIGIN_NOT_ALLOWED"
   | "PASSWORD_BREACHED"
   | "PASSWORD_CHANGE_REQUIRED"
+  | "PASSWORD_CODE_EMAIL_UNVERIFIED"
+  | "PASSWORD_CODE_EXPIRED"
+  | "PASSWORD_CODE_INVALID"
+  | "PROFILE_CHANGE_NOT_PENDING"
+  | "PROFILE_CHANGE_PENDING"
+  | "PROFILE_CHANGE_UNCHANGED"
+  | "PROFILE_LOCKED"
   | "QUIZ_ANSWER_INVALID"
   | "QUIZ_ATTEMPTS_UNLIMITED"
   | "QUIZ_ATTEMPT_LIMIT_REACHED"
@@ -61,7 +70,10 @@ export type FormErrorCopyKey =
   | "RESET_LINK_EXPIRED"
   | "RESET_LINK_INVALID"
   | "RESET_LINK_USED"
+  | "TAG_NAME_TAKEN"
+  | "TAG_RESERVED"
   | "UNAUTHENTICATED"
+  | "UPLOAD_DIMENSIONS_TOO_LARGE"
   | "UPLOAD_EXPIRED"
   | "UPLOAD_OFFSET_MISMATCH"
   | "UPLOAD_TOO_LARGE"
@@ -119,6 +131,7 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   DIRECTORY_IN_USE: "This record is still in use, so it cannot be deleted.",
   DIRECTORY_NAME_TAKEN: "A record with this name already exists.",
   EMAIL_IN_USE: "An account with this email address already exists.",
+  EMAIL_NOT_VERIFIED: "Verify your email address to request this course.",
   ENROLLMENT_ALREADY_DECIDED: "This request was already decided or was withdrawn.",
   ENROLLMENT_NOT_ACTIVE: "Your enrollment in this course is not active.",
   ENROLLMENT_NOT_REMOVABLE: "Only an approved or completed student can be removed.",
@@ -127,6 +140,7 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   ENROLLMENT_NOT_VERIFIED:
     "The student has not verified their email yet, so it cannot be approved.",
   FORBIDDEN: "You do not have permission to do this.",
+  INSIGHTS_REFRESH_RUNNING: "An insights refresh is already running. Try again when it finishes.",
   INTERNAL: "Something went wrong on our side. Try again in a moment.",
   INVALID_CREDENTIALS: "The email or password is not correct.",
   INVITATION_EXPIRED: "This invitation has expired. Ask the super admin to send a new one.",
@@ -138,6 +152,14 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   ORIGIN_NOT_ALLOWED: "This request did not come from an allowed site.",
   PASSWORD_BREACHED: "This password has appeared in a data breach. Choose a different one.",
   PASSWORD_CHANGE_REQUIRED: "Change your password to continue.",
+  PASSWORD_CODE_EMAIL_UNVERIFIED: "Verify your email address to change your password.",
+  PASSWORD_CODE_EXPIRED: "This code is no longer valid. Request a new one.",
+  PASSWORD_CODE_INVALID: "The code is not correct.",
+  PROFILE_CHANGE_NOT_PENDING: "This change request was already decided. Reload the list.",
+  PROFILE_CHANGE_PENDING: "You already have a change request waiting for a decision.",
+  PROFILE_CHANGE_UNCHANGED: "Change at least one detail to send a request.",
+  PROFILE_LOCKED:
+    "Your name and academic details are locked. Send a change request to update them.",
   QUIZ_ANSWER_INVALID:
     "One of the answers does not belong to this quiz. Reload the quiz and try again.",
   QUIZ_ATTEMPTS_UNLIMITED: "This quiz has no attempt limit, so there is nothing to grant.",
@@ -152,7 +174,10 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   RESET_LINK_EXPIRED: "This reset link has expired. Request a new one.",
   RESET_LINK_INVALID: "This reset link is not valid.",
   RESET_LINK_USED: "This reset link has already been used or replaced.",
+  TAG_NAME_TAKEN: "A tag with this name already exists.",
+  TAG_RESERVED: "The front page tag is built in and cannot be renamed or deleted.",
   UNAUTHENTICATED: "Your session has ended. Sign in again to continue.",
+  UPLOAD_DIMENSIONS_TOO_LARGE: "This image has more pixels than the upload limit.",
   UPLOAD_EXPIRED: "This upload expired before it finished. Start it again.",
   UPLOAD_OFFSET_MISMATCH: "The upload got out of step with the server. Start it again.",
   UPLOAD_TOO_LARGE: "This file is larger than the upload limit.",
