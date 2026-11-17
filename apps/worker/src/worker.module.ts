@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { CoreModule, WorkerMailConnectionCheck } from "api/core";
 import { ExpiryRunner } from "./cleanup";
 import { CoreModule, InsightsRollupService, WorkerMailConnectionCheck } from "api/core";
 import { CertificateConsumer } from "./certificate/certificate-consumer";
