@@ -134,6 +134,7 @@ model ProfileChangeRequest {
   requestedName         String?
   requestedDepartmentId String?             @db.Uuid
   requestedSession      String?
+  note                  String?
   status                ProfileChangeStatus @default(PENDING)
   decidedById           String?             @db.Uuid
   decidedAt             DateTime?
