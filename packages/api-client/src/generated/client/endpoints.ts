@@ -72,10 +72,12 @@ import type {
   GrantAttemptRequestDto,
   GrantedAttemptDto,
   HealthResponseDto,
+  InsightFunnelResultDto,
   InsightRefreshResponseDto,
   InsightResultDto,
   InsightStatusResponseDto,
   InsightsCsvParams,
+  InsightsFunnelParams,
   InsightsQueryParams,
   InvitationLookupRequestDto,
   InvitationLookupResponseDto,
@@ -6760,6 +6762,108 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getEnrollmentRemovalRemoveMutationOptions(options), queryClient);
     }
+
+export const getInsightsFunnelUrl = (params?: InsightsFunnelParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/insights/funnel?${stringifiedParams}` : `/api/admin/insights/funnel`
+}
+
+export const insightsFunnel = async (params?: InsightsFunnelParams, options?: Parameters<typeof customFetch>[1]): Promise<InsightFunnelResultDto> => {
+
+  return customFetch<InsightFunnelResultDto>(getInsightsFunnelUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getInsightsFunnelQueryKey = (params?: InsightsFunnelParams,) => {
+    return [
+    `/api/admin/insights/funnel`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getInsightsFunnelQueryOptions = <TData = Awaited<ReturnType<typeof insightsFunnel>>, TError = ErrorType<unknown>>(params?: InsightsFunnelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsFunnel>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getInsightsFunnelQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof insightsFunnel>>> = ({ signal }) => insightsFunnel(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof insightsFunnel>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type InsightsFunnelQueryResult = NonNullable<Awaited<ReturnType<typeof insightsFunnel>>>
+export type InsightsFunnelQueryError = ErrorType<unknown>
+
+
+export function useInsightsFunnel<TData = Awaited<ReturnType<typeof insightsFunnel>>, TError = ErrorType<unknown>>(
+ params: undefined |  InsightsFunnelParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsFunnel>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsFunnel>>,
+          TError,
+          Awaited<ReturnType<typeof insightsFunnel>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsFunnel<TData = Awaited<ReturnType<typeof insightsFunnel>>, TError = ErrorType<unknown>>(
+ params?: InsightsFunnelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsFunnel>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof insightsFunnel>>,
+          TError,
+          Awaited<ReturnType<typeof insightsFunnel>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInsightsFunnel<TData = Awaited<ReturnType<typeof insightsFunnel>>, TError = ErrorType<unknown>>(
+ params?: InsightsFunnelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsFunnel>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useInsightsFunnel<TData = Awaited<ReturnType<typeof insightsFunnel>>, TError = ErrorType<unknown>>(
+ params?: InsightsFunnelParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof insightsFunnel>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getInsightsFunnelQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getInsightsRefreshUrl = () => {
 
