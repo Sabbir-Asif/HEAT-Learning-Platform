@@ -1,7 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import {
-  notificationLabelMaxLength,
-} from "@heat/contracts";
+import { notificationLabelMaxLength } from "@heat/contracts";
 import type {
   AdminProfileChangeItem,
   AdminProfileChangeListResponse,
