@@ -55,7 +55,9 @@ export const options = {
   },
 };
 
-const state = { signedIn: false, csrf: "" };
+const csrfCookieName = "__Host-heat_csrf";
+
+const state = { signedIn: false, csrf: "", controlSegmentUrl: "" };
 
 const jsonHeaders = (csrf) => ({
   "Content-Type": "application/json",
@@ -63,15 +65,15 @@ const jsonHeaders = (csrf) => ({
 });
 
 const signIn = (account) => {
-  const token = http.get(`${baseUrl}/api/auth/csrf`, { tags: { name: "csrf" } });
-  const csrf = token.json("token");
   const response = http.post(
     `${baseUrl}/api/auth/sign-in`,
     JSON.stringify({ email: account.email, password: account.password }),
-    { headers: jsonHeaders(csrf), tags: { name: "sign-in" } },
+    { headers: { "Content-Type": "application/json" }, tags: { name: "sign-in" } },
   );
-  state.signedIn = response.status === 200 || response.status === 201;
-  state.csrf = csrf;
+  const cookies = http.cookieJar().cookiesForURL(`${baseUrl}/`);
+  const issued = cookies[csrfCookieName];
+  state.csrf = issued !== undefined && issued.length > 0 ? issued[0] : "";
+  state.signedIn = response.status === 200 && state.csrf !== "";
   return state.signedIn;
 };
 
@@ -139,8 +141,32 @@ export function viewer() {
   }
 }
 
+const discoverControlSegment = () => {
+  const account = accounts[accounts.length - 1];
+  if (!state.signedIn && !signIn(account)) return false;
+  const manifestPath = startSession("");
+  if (manifestPath === null) return false;
+  const masterUrl = `${baseUrl}${manifestPath}`;
+  const master = fetchText(masterUrl, "master-playlist");
+  if (master === null) return false;
+  const uris = variantUris(master);
+  if (uris.length === 0) return false;
+  const playlistUrl = resolveUri(masterUrl, uris[0]);
+  const playlist = fetchText(playlistUrl, "rendition-playlist");
+  if (playlist === null) return false;
+  const segments = segmentEntries(playlist);
+  if (segments.length === 0) return false;
+  state.controlSegmentUrl = resolveUri(playlistUrl, segments[0].uri);
+  return true;
+};
+
 export function control() {
-  const response = http.get(`${baseUrl}/hls/${videoId}/720p/segment_00000.ts`, {
+  if (state.controlSegmentUrl === "" && !discoverControlSegment()) {
+    sessionFailures.add(true);
+    sleep(10);
+    return;
+  }
+  const response = http.get(state.controlSegmentUrl, {
     tags: { name: "control-segment" },
     jar: new http.CookieJar(),
   });
