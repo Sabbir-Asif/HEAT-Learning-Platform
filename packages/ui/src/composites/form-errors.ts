@@ -40,6 +40,7 @@ export type FormErrorCopyKey =
   | "ENROLLMENT_STATE_CHANGED"
   | "ENROLLMENT_NOT_VERIFIED"
   | "FORBIDDEN"
+  | "INSIGHTS_REFRESH_RUNNING"
   | "INTERNAL"
   | "INVALID_CREDENTIALS"
   | "INVITATION_EXPIRED"
@@ -139,6 +140,7 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   ENROLLMENT_NOT_VERIFIED:
     "The student has not verified their email yet, so it cannot be approved.",
   FORBIDDEN: "You do not have permission to do this.",
+  INSIGHTS_REFRESH_RUNNING: "An insights refresh is already running. Try again when it finishes.",
   INTERNAL: "Something went wrong on our side. Try again in a moment.",
   INVALID_CREDENTIALS: "The email or password is not correct.",
   INVITATION_EXPIRED: "This invitation has expired. Ask the super admin to send a new one.",
