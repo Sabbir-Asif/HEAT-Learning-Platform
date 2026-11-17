@@ -85,6 +85,7 @@ describe("video slot responses", () => {
           failureReason: null,
           uploadedAt: "2026-11-11T06:00:00.000Z",
           statusChangedAt: "2026-11-11T06:01:00.000Z",
+          captions: [],
         },
       ],
       locked: false,
