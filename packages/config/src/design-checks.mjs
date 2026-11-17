@@ -20,6 +20,11 @@ export const STATUS_STATES = [
   "course.draft",
   "course.published",
   "course.locked",
+  "news.draft",
+  "news.scheduled",
+  "news.published",
+  "resource.draft",
+  "resource.published",
 ];
 
 const BASE_ROLES = [
