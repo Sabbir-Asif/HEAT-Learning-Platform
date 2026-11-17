@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { adminPageSizes } from "./admins";
-import { enrollmentStepOneSchema } from "./enrollment";
+import { englishNameMaxLength, enrollmentStepOneSchema } from "./enrollment";
 import { namedReferenceSchema } from "./profile";
 
 export const profileChangeNoteMaxLength = 500;
@@ -40,11 +40,11 @@ export type RejectProfileChangeRequest = z.infer<typeof rejectProfileChangeReque
 export const profileChangeIdParamsSchema = z.object({ id: z.uuid() });
 
 export const profileChangeRequestedSchema = z.object({
-  name: z.string().nullable(),
+  name: z.string().min(1).max(englishNameMaxLength).nullable(),
   university: namedReferenceSchema.nullable(),
   faculty: namedReferenceSchema.nullable(),
   department: namedReferenceSchema.nullable(),
-  session: z.string().nullable(),
+  session: z.string().min(1).max(16).nullable(),
 });
 
 export type ProfileChangeRequested = z.infer<typeof profileChangeRequestedSchema>;
@@ -53,8 +53,8 @@ export const profileChangeRequestSchema = z.object({
   id: z.uuid(),
   status: profileChangeStatusSchema,
   requested: profileChangeRequestedSchema,
-  note: z.string().nullable(),
-  reason: z.string().nullable(),
+  note: z.string().min(1).max(profileChangeNoteMaxLength).nullable(),
+  reason: z.string().min(1).max(profileChangeReasonMaxLength).nullable(),
   createdAt: z.iso.datetime(),
   decidedAt: z.iso.datetime().nullable(),
 });
