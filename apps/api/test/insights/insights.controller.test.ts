@@ -44,4 +44,20 @@ describe("InsightsController", () => {
     await controller.refresh({ userId: "admin-1" } as never);
     expect(refresh).toHaveBeenCalledWith("admin-1");
   });
+
+  test("the module, quiz and missed question routes pass the query to the service", async () => {
+    const moduleResults = vi.fn().mockResolvedValue({ rows: [] });
+    const quizResults = vi.fn().mockResolvedValue({ rows: [] });
+    const missedQuestions = vi.fn().mockResolvedValue({ rows: [] });
+    const controller = new InsightsController(
+      { moduleResults, quizResults, missedQuestions } as never,
+      {} as never,
+    );
+    await controller.moduleResults({ courseId: "c" });
+    await controller.quizResults({ session: "2020-21" });
+    await controller.missedQuestions({ quizId: "q", limit: 5 });
+    expect(moduleResults).toHaveBeenCalledWith({ courseId: "c" });
+    expect(quizResults).toHaveBeenCalledWith({ session: "2020-21" });
+    expect(missedQuestions).toHaveBeenCalledWith({ quizId: "q", limit: 5 });
+  });
 });

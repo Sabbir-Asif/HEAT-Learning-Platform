@@ -40,12 +40,14 @@ export const isGroupByAllowed = (series: InsightSeries, groupBy: InsightGroupBy)
 export const buildRollupWhere = (
   series: InsightSeries,
   filters: InsightFilters,
+  moduleId?: string,
 ): Prisma.InsightRollupWhereInput => {
   const range: Prisma.DateTimeFilter = {};
   if (filters.from !== undefined) range.gte = dayAsDate(filters.from);
   if (filters.to !== undefined) range.lte = dayAsDate(filters.to);
   return {
     kind: kindBySeries[series],
+    ...(moduleId === undefined ? {} : { moduleId }),
     ...(filters.from === undefined && filters.to === undefined ? {} : { day: range }),
     ...(filters.courseId === undefined ? {} : { courseId: filters.courseId }),
     ...(filters.universityId === undefined ? {} : { universityId: filters.universityId }),

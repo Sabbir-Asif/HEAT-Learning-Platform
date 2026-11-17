@@ -7,8 +7,14 @@ import { Audited } from "../audit";
 import {
   InsightFunnelQueryDto,
   InsightFunnelResultDto,
+  InsightMissedQuestionsDto,
+  InsightMissedQuestionsQueryDto,
+  InsightModuleResultsDto,
+  InsightModuleResultsQueryDto,
   InsightQueryDto,
   InsightRefreshResponseDto,
+  InsightQuizResultsDto,
+  InsightQuizResultsQueryDto,
   InsightResultDto,
   InsightSeriesParamsDto,
   InsightStatusResponseDto,
@@ -48,6 +54,26 @@ export class InsightsController {
   @ApiOkResponse({ type: InsightFunnelResultDto })
   funnel(@Query() query: InsightFunnelQueryDto): Promise<InsightFunnelResultDto> {
     return this.queries.funnel(query);
+  }
+
+  @Get("module-results")
+  @ApiOkResponse({ type: InsightModuleResultsDto })
+  moduleResults(@Query() query: InsightModuleResultsQueryDto): Promise<InsightModuleResultsDto> {
+    return this.queries.moduleResults(query);
+  }
+
+  @Get("quiz-results")
+  @ApiOkResponse({ type: InsightQuizResultsDto })
+  quizResults(@Query() query: InsightQuizResultsQueryDto): Promise<InsightQuizResultsDto> {
+    return this.queries.quizResults(query);
+  }
+
+  @Get("missed-questions")
+  @ApiOkResponse({ type: InsightMissedQuestionsDto })
+  missedQuestions(
+    @Query() query: InsightMissedQuestionsQueryDto,
+  ): Promise<InsightMissedQuestionsDto> {
+    return this.queries.missedQuestions(query);
   }
 
   @Get(":series")

@@ -1,6 +1,7 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   insightDefaultGroupBy,
+  insightMissedDefaultLimit,
   insightSeriesColumns,
   insightSuppressionThreshold,
 } from "@heat/contracts";
@@ -11,6 +12,10 @@ import type {
   InsightResult,
   InsightSeries,
   InsightFunnelResult,
+  InsightMissedQuestions,
+  InsightMissedQuestionsQuery,
+  InsightModuleResults,
+  InsightQuizResults,
 } from "@heat/contracts";
 import type { HeatClient } from "@heat/db";
 import { DATABASE, dayFromDate } from "../core";
@@ -25,8 +30,16 @@ import {
   toInsightGroup,
 } from "./insights-query";
 import type { InsightGroupKind, QueryRow } from "./insights-query";
+import {
+  moduleLabels,
+  toMissedQuestions,
+  toModuleResults,
+  toQuizResults,
+} from "./insights-results";
+import type { ModuleInfo } from "./insights-results";
 
 const readBatchSize = 2000;
+const defaultMissedLimit = insightMissedDefaultLimit;
 const questionLabelLength = 120;
 
 const timeGroupings: readonly InsightGroupBy[] = ["day", "month"];
@@ -67,6 +80,61 @@ export class InsightsQueryService {
     return toFunnel(totals, await this.refreshedAt());
   }
 
+  async moduleResults(filters: InsightFilters): Promise<InsightModuleResults> {
+    const totals = await this.totalsByGroup("modules", filters, "module");
+    const infos = await this.moduleInfos(totals.map((group) => group.key));
+    return {
+      rows: toModuleResults(totals, infos),
+      suppressionThreshold: insightSuppressionThreshold,
+      refreshedAt: await this.refreshedAt(),
+    };
+  }
+
+  async quizResults(filters: InsightFilters): Promise<InsightQuizResults> {
+    const totals = await this.totalsByGroup("quizzes", filters, "module");
+    const moduleIds = totals.map((group) => group.key).filter((key) => key !== "");
+    const infos = await this.moduleInfos(moduleIds);
+    const quizzes = await this.database.$includingDeleted().quiz.findMany({
+      where: { moduleId: { in: moduleIds } },
+      select: { id: true, moduleId: true },
+    });
+    return {
+      rows: toQuizResults(totals, infos, new Map(quizzes.map((quiz) => [quiz.moduleId, quiz.id]))),
+      suppressionThreshold: insightSuppressionThreshold,
+      refreshedAt: await this.refreshedAt(),
+    };
+  }
+
+  async missedQuestions(query: InsightMissedQuestionsQuery): Promise<InsightMissedQuestions> {
+    const { quizId, limit, ...filters } = query;
+    const everything = this.database.$includingDeleted();
+    const quiz = await everything.quiz.findUnique({
+      where: { id: quizId },
+      select: { id: true, moduleId: true },
+    });
+    if (quiz === null) throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND");
+    const infos = await this.moduleInfos([quiz.moduleId]);
+    const label = moduleLabels(infos, new Set([quiz.moduleId])).get(quiz.moduleId) ?? "";
+    const totals = await this.totalsByGroup("questions", filters, "question", quiz.moduleId);
+    const questions = await everything.question.findMany({
+      where: { quizId: quiz.id },
+      select: { id: true, order: true, text: true },
+    });
+    const { rows, suppressedCount } = toMissedQuestions(
+      totals,
+      questions,
+      limit ?? defaultMissedLimit,
+    );
+    return {
+      quizId: quiz.id,
+      label,
+      rows,
+      suppressedCount,
+      suppressionThreshold: insightSuppressionThreshold,
+      refreshedAt: await this.refreshedAt(),
+    };
+  }
+
   async csv(series: InsightSeries, query: InsightQuery): Promise<string> {
     const result = await this.query(series, query);
     return toCsv(result.columns, result.groups);
@@ -76,8 +144,9 @@ export class InsightsQueryService {
     series: InsightSeries,
     query: InsightFilters,
     groupBy: InsightGroupKind,
+    moduleId?: string,
   ) {
-    const where = buildRollupWhere(series, query);
+    const where = buildRollupWhere(series, query, moduleId);
     const accumulator = new GroupAccumulator(groupBy);
     let cursor: string | undefined;
     for (;;) {
@@ -121,6 +190,39 @@ export class InsightsQueryService {
       cursor = last.id;
     }
     return accumulator.result();
+  }
+
+  private async moduleInfos(moduleIds: readonly string[]): Promise<ModuleInfo[]> {
+    const ids = moduleIds.filter((id) => id !== "");
+    if (ids.length === 0) return [];
+    const everything = this.database.$includingDeleted();
+    const seeds = await everything.module.findMany({
+      where: { id: { in: ids } },
+      select: { revisionId: true },
+    });
+    const modules = await everything.module.findMany({
+      where: { revisionId: { in: [...new Set(seeds.map((seed) => seed.revisionId))] } },
+      select: {
+        id: true,
+        order: true,
+        title: true,
+        deletedAt: true,
+        revisionId: true,
+        revision: {
+          select: { number: true, courseId: true, course: { select: { title: true } } },
+        },
+      },
+    });
+    return modules.map((row) => ({
+      id: row.id,
+      order: row.order,
+      title: row.title,
+      deleted: row.deletedAt !== null,
+      revisionId: row.revisionId,
+      revisionNumber: row.revision.number,
+      courseId: row.revision.courseId,
+      courseTitle: row.revision.course.title,
+    }));
   }
 
   private async labelsFor(
