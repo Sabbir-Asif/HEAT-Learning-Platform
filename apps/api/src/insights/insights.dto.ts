@@ -1,4 +1,6 @@
 import {
+  adminOverviewQuerySchema,
+  adminOverviewSchema,
   insightFunnelQuerySchema,
   insightFunnelResultSchema,
   insightMissedQuestionsQuerySchema,
@@ -30,3 +32,5 @@ export class InsightMissedQuestionsQueryDto extends createZodDto(
   insightMissedQuestionsQuerySchema,
 ) {}
 export class InsightMissedQuestionsDto extends createZodDto(insightMissedQuestionsSchema) {}
+export class AdminOverviewQueryDto extends createZodDto(adminOverviewQuerySchema) {}
+export class AdminOverviewDto extends createZodDto(adminOverviewSchema) {}
