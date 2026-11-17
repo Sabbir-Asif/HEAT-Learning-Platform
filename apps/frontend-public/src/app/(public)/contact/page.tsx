@@ -4,7 +4,10 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "Contact" };
+export const metadata: Metadata = {
+  title: "Contact",
+  description: "How to reach the HEAT project team at the University of Dhaka.",
+};
 
 export default async function Page() {
   const settings = await cachedContactSettings();
