@@ -22,6 +22,7 @@ import { InsightsModule } from "./insights";
 import { LearningModule } from "./learning";
 import { PasswordResetModule } from "./password-reset";
 import { PlaybackModule } from "./playback";
+import { ProfileChangesModule } from "./profile-changes";
 import { ResourcesModule } from "./resources";
 import { StudentsModule } from "./students";
 import { StudentAuthModule } from "./student-auth/student-auth.module";
@@ -51,6 +52,7 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     MediaModule,
     PasswordResetModule,
     PlaybackModule,
+    ProfileChangesModule,
     ResourcesModule,
     StudentsModule,
   ],
