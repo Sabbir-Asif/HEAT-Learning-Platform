@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { csvByteOrderMark, csvCell, csvLine, neutraliseFormula } from "../../src/students/csv";
+import { csvByteOrderMark, csvCell, csvLine, neutraliseFormula } from "../../src/enrollment/csv";
 
 describe("neutraliseFormula", () => {
   test.each(["=1+1", "+1", "-1", "@SUM(A1)", "\tcmd", "\rcmd"])("prefixes %j", (value) => {

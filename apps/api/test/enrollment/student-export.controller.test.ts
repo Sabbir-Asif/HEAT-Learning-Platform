@@ -1,7 +1,7 @@
 import { Writable } from "node:stream";
 import { describe, expect, test, vi } from "vitest";
 import { AUDIENCE_KEY, ROLES_KEY } from "../../src/access/access.decorators";
-import { StudentExportController } from "../../src/students/student-export.controller";
+import { StudentExportController } from "../../src/enrollment/student-export.controller";
 
 const waitFor = (output: Writable) => new Promise((resolve) => output.once("finish", resolve));
 

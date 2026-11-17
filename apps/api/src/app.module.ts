@@ -24,7 +24,6 @@ import { PasswordResetModule } from "./password-reset";
 import { PlaybackModule } from "./playback";
 import { ProfileChangesModule } from "./profile-changes";
 import { ResourcesModule } from "./resources";
-import { StudentsModule } from "./students";
 import { StudentAuthModule } from "./student-auth/student-auth.module";
 
 @Module({
@@ -54,7 +53,6 @@ import { StudentAuthModule } from "./student-auth/student-auth.module";
     PlaybackModule,
     ProfileChangesModule,
     ResourcesModule,
-    StudentsModule,
   ],
   controllers: [HealthController],
 })

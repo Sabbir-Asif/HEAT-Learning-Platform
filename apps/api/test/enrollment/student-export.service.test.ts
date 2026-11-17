@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
-import { StudentExportService, exportBatchSize } from "../../src/students/student-export.service";
+import { StudentExportService, exportBatchSize } from "../../src/enrollment/student-export.service";
+import { StudentListService } from "../../src/enrollment/student-list.service";
 
 const row = (id: string, name: string) => ({
   id,
@@ -111,5 +112,52 @@ describe("StudentExportService", () => {
     await stream.return(undefined);
 
     expect(recordStandalone).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("student list and export filters", () => {
+  const listDefaults = { sort: "name" as const, page: 1, pageSize: 25 };
+  const cases: Array<[string, Record<string, string>]> = [
+    ["no filter", {}],
+    ["course", { courseId: "course" }],
+    ["university", { universityId: "university" }],
+    ["faculty", { facultyId: "faculty" }],
+    ["department", { departmentId: "department" }],
+    ["session", { session: "2020-21" }],
+    ["status", { status: "APPROVED" }],
+    ["search", { q: "anne" }],
+    [
+      "every filter",
+      {
+        courseId: "course",
+        universityId: "university",
+        facultyId: "faculty",
+        departmentId: "department",
+        session: "2020-21",
+        status: "APPROVED",
+        q: "anne",
+      },
+    ],
+  ];
+
+  test.each(cases)("the list and the export query the same rows for %s", async (_name, filter) => {
+    const listFindMany = vi.fn().mockResolvedValue([]);
+    const count = vi.fn().mockResolvedValue(0);
+    await new StudentListService({ enrollment: { findMany: listFindMany, count } } as never).list({
+      ...listDefaults,
+      ...filter,
+    } as never);
+    const exportFindMany = vi.fn().mockResolvedValue([]);
+    await collect(
+      new StudentExportService(
+        { enrollment: { findMany: exportFindMany } } as never,
+        { recordStandalone: vi.fn().mockResolvedValue(undefined) } as never,
+      ).stream(filter as never, actor, new AbortController().signal),
+    );
+
+    const listWhere = listFindMany.mock.calls[0]?.[0].where;
+    const exportWhere = exportFindMany.mock.calls[0]?.[0].where;
+    expect(exportWhere).toEqual(listWhere);
+    expect(count).toHaveBeenCalledWith({ where: listWhere });
   });
 });

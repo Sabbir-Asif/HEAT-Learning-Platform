@@ -4,13 +4,9 @@ import type { HeatClient } from "@heat/db";
 import { AuditService } from "../audit";
 import type { AuditActor } from "../audit";
 import { DATABASE } from "../core";
+import { studentWhere } from "./student-list.service";
 import { csvByteOrderMark, csvLine } from "./csv";
-import {
-  formatDhakaDateTime,
-  progressSummary,
-  studentExportColumns,
-  studentListWhere,
-} from "./student-export-rules";
+import { formatDhakaDateTime, progressSummary, studentExportColumns } from "./student-export-rules";
 
 export const exportBatchSize = 500;
 
@@ -59,7 +55,7 @@ export class StudentExportService {
     actor: AuditActor,
     signal: AbortSignal,
   ): AsyncGenerator<string> {
-    const where = studentListWhere(query);
+    const where = studentWhere(query);
     let rowCount = 0;
     let completed = false;
     try {
