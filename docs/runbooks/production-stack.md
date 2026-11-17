@@ -22,7 +22,7 @@ These are starting budgets. Tune them from `docker stats` during a transcode wit
 
 Rules the file follows:
 
-- Networks: `web` (nginx, both frontends, API), `data` (internal, no outbound route: Postgres, Redis, API, worker) and `egress` (API and worker, for mail and the breached-password check). Postgres and Redis sit only on `data`.
+- Networks: `web` (nginx, both frontends, API), `data` (internal, no outbound route: Postgres, Redis, API, worker), `egress` (API and worker, for mail and the breached-password check) and `revalidate` (internal, only `frontend-public` and the worker, so the worker can call `POST /api/revalidate` after a news publication). Postgres and Redis sit only on `data`.
 - Only nginx publishes ports, bound explicitly to `0.0.0.0:80` and `0.0.0.0:443`.
 - Every service has `restart: unless-stopped`, `no-new-privileges`, `TZ=Asia/Dhaka` and `json-file` logs rotated at 10 MB, 5 files. Applications, Postgres and Redis run as a non-root user with all capabilities dropped; nginx keeps only `CHOWN`, `SETGID`, `SETUID` and `NET_BIND_SERVICE`.
 - Secrets are never in the file or the images. Each service reads `/etc/heat/<service>.env` (mode 600, set by the hardening script) when it starts.
@@ -38,7 +38,7 @@ sudo install -d -o 1000 -g 1000 /srv/heat/uploads /srv/heat/hls /srv/heat/media 
 Create these files in `/etc/heat`, each with mode 600 and owned by the deploy user, then run `sudo ./infra/provision/provision.sh` to confirm the modes:
 
 - `compose.env`: copy `infra/compose.prod.env.example` and set the registry prefix, release tag and the Nginx site config path (`NGINX_SITE_CONF`, delivered by E14-3).
-- `api.env`, `worker.env`, `frontend-public.env`, `frontend-internal.env`: start from each app's `.env.example`. Use the compose service names as hosts: `DATABASE_URL` to `postgres:5432`, `REDIS_URL` to `redis://redis:6379`, `PUBLIC_APP_INTERNAL_URL` to `http://frontend-public:3000`. Point the storage paths at `/srv/heat/uploads`, `/srv/heat/hls`, `/srv/heat/media`, `/srv/heat/certificates` and `/srv/heat/tmp`.
+- `api.env`, `worker.env`, `frontend-public.env`, `frontend-internal.env`: start from each app's `.env.example`. Use the compose service names as hosts: `DATABASE_URL` to `postgres:5432`, `REDIS_URL` to `redis://redis:6379`, `PUBLIC_APP_INTERNAL_URL` to `http://frontend-public:3000`. In `worker.env` and `api.env` also set `PUBLIC_APP_INTERNAL_URL` (`http://frontend-public:3000`) and `REVALIDATE_SECRET`, the same value as in `frontend-public.env`; without them the worker falls back to `http://localhost:3000` and news revalidation fails. Point the storage paths at `/srv/heat/uploads`, `/srv/heat/hls`, `/srv/heat/media`, `/srv/heat/certificates` and `/srv/heat/tmp`.
 - `postgres.env`: `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`.
 - `nginx.env`: `HLS_SIGNING_KEYS`, the same value as in `api.env`.
 

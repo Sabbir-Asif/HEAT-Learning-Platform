@@ -68,8 +68,15 @@ describe("production compose stack", () => {
 
   test("nginx reaches only the web network and never the data stores", () => {
     expect(services.nginx.networks).toEqual(["web"]);
-    for (const name of ["frontend-public", "frontend-internal"])
-      expect(services[name].networks).toEqual(["web"]);
+    expect(services["frontend-internal"].networks).toEqual(["web"]);
+    expect(services["frontend-public"].networks).toEqual(["web", "revalidate"]);
+  });
+
+  test("the worker reaches frontend-public only through the internal revalidate network", () => {
+    expect(stack.networks.revalidate.internal).toBe(true);
+    expect(services.worker.networks).toEqual(["data", "egress", "revalidate"]);
+    const members = names.filter((name) => (services[name].networks ?? []).includes("revalidate"));
+    expect(members.sort()).toEqual(["frontend-public", "worker"]);
   });
 
   test.each([...apps, ...dataStores])("%s runs as a non-root user", (name) => {

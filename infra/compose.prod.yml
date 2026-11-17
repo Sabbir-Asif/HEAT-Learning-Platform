@@ -86,6 +86,7 @@ services:
       - ${ENV_DIR:-/etc/heat}/frontend-public.env
     networks:
       - web
+      - revalidate
     depends_on:
       api:
         condition: service_healthy
@@ -188,6 +189,7 @@ services:
     networks:
       - data
       - egress
+      - revalidate
     depends_on:
       postgres:
         condition: service_healthy
@@ -262,6 +264,8 @@ networks:
   data:
     internal: true
   egress:
+  revalidate:
+    internal: true
 
 volumes:
   postgres-data:
