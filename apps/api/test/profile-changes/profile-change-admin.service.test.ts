@@ -40,14 +40,14 @@ const build = (options: { row?: unknown; claimed?: number; offerError?: Error } 
         return {};
       }),
     },
-    notification: {
-      create: vi.fn().mockImplementation(async () => {
-        order.push("notification");
-        return {};
-      }),
-    },
   };
   const audit = { client: vi.fn().mockReturnValue(db), capture: vi.fn() };
+  const notifications = {
+    createWithin: vi.fn().mockImplementation(async () => {
+      order.push("notification");
+      return true;
+    }),
+  };
   const departments = {
     assertDepartmentOfferable: vi.fn().mockImplementation(async () => {
       order.push("directory");
@@ -59,13 +59,14 @@ const build = (options: { row?: unknown; claimed?: number; offerError?: Error } 
     { now: () => now } as never,
     departments as never,
     audit as never,
+    notifications as never,
   );
-  return { service, db, audit, departments, order };
+  return { service, db, audit, departments, notifications, order };
 };
 
 describe("ProfileChangeAdminService.approve", () => {
   test("applies the change, notifies the student and records before and after together", async () => {
-    const { service, db, audit, order } = build();
+    const { service, db, audit, order, notifications } = build();
 
     const result = await service.approve("request-id", "admin-id");
 
@@ -78,12 +79,10 @@ describe("ProfileChangeAdminService.approve", () => {
       where: { id: "profile-id" },
       data: { name: "Anne Jones", departmentId: "new-department-id", session: "2021-22" },
     });
-    expect(db.notification.create).toHaveBeenCalledWith({
-      data: {
-        userId: "user-id",
-        type: "PROFILE_CHANGE_APPROVED",
-        data: { requestId: "request-id" },
-      },
+    expect(notifications.createWithin).toHaveBeenCalledWith(db, {
+      userId: "user-id",
+      type: "PROFILE_CHANGE_APPROVED",
+      data: { requestId: "request-id" },
     });
     expect(audit.capture).toHaveBeenCalledWith({
       entityId: "request-id",
@@ -128,12 +127,12 @@ describe("ProfileChangeAdminService.approve", () => {
     const offerError = new ApiException(400, "VALIDATION_FAILED", undefined, undefined, [
       { path: "departmentId", code: "invalid_value" },
     ]);
-    const { service, db, audit } = build({ offerError });
+    const { service, db, audit, notifications } = build({ offerError });
 
     await expect(service.approve("request-id", "admin-id")).rejects.toBe(offerError);
     expect(db.profileChangeRequest.updateMany).not.toHaveBeenCalled();
     expect(db.studentProfile.update).not.toHaveBeenCalled();
-    expect(db.notification.create).not.toHaveBeenCalled();
+    expect(notifications.createWithin).not.toHaveBeenCalled();
     expect(audit.capture).not.toHaveBeenCalled();
   });
 
@@ -156,13 +155,13 @@ describe("ProfileChangeAdminService.approve", () => {
   });
 
   test("refuses when another admin decided it first", async () => {
-    const { service, db } = build({ claimed: 0 });
+    const { service, db, notifications } = build({ claimed: 0 });
 
     await expect(service.approve("request-id", "admin-id")).rejects.toMatchObject({
       code: "PROFILE_CHANGE_NOT_PENDING",
     });
     expect(db.studentProfile.update).not.toHaveBeenCalled();
-    expect(db.notification.create).not.toHaveBeenCalled();
+    expect(notifications.createWithin).not.toHaveBeenCalled();
   });
 
   test("answers not found for a missing request", async () => {
@@ -176,7 +175,7 @@ describe("ProfileChangeAdminService.approve", () => {
 
 describe("ProfileChangeAdminService.reject", () => {
   test("stores the reason, notifies the student and leaves the profile alone", async () => {
-    const { service, db, audit } = build();
+    const { service, db, audit, notifications } = build();
 
     const result = await service.reject("request-id", "admin-id", "Name does not match records");
 
@@ -190,12 +189,10 @@ describe("ProfileChangeAdminService.reject", () => {
       },
     });
     expect(db.studentProfile.update).not.toHaveBeenCalled();
-    expect(db.notification.create).toHaveBeenCalledWith({
-      data: {
-        userId: "user-id",
-        type: "PROFILE_CHANGE_REJECTED",
-        data: { requestId: "request-id", reason: "Name does not match records" },
-      },
+    expect(notifications.createWithin).toHaveBeenCalledWith(db, {
+      userId: "user-id",
+      type: "PROFILE_CHANGE_REJECTED",
+      data: { requestId: "request-id", reason: "Name does not match records" },
     });
     expect(audit.capture).toHaveBeenCalledWith(
       expect.objectContaining({

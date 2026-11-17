@@ -1,4 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
+import {
+  notificationLabelMaxLength,
+} from "@heat/contracts";
 import type {
   AdminProfileChangeItem,
   AdminProfileChangeListResponse,
@@ -11,6 +14,7 @@ import { CLOCK, DATABASE } from "../core";
 import type { Clock } from "../core";
 import { DepartmentOfferingService } from "../directory";
 import { ApiException } from "../http/api-exception";
+import { NotificationsService } from "../notifications";
 import { adminRequestSelect, presentAdminRequest } from "./profile-change-presenter";
 import { assertStoredNameIsEnglish } from "./profile-change-rules";
 
@@ -21,6 +25,7 @@ export class ProfileChangeAdminService {
     @Inject(CLOCK) private readonly clock: Clock,
     private readonly departments: DepartmentOfferingService,
     private readonly audit: AuditService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   async list(query: ProfileChangeQuery): Promise<AdminProfileChangeListResponse> {
@@ -60,8 +65,10 @@ export class ProfileChangeAdminService {
       ...(request.requestedSession === null ? {} : { session: request.requestedSession }),
     };
     await db.studentProfile.update({ where: { id: profile.id }, data: next });
-    await db.notification.create({
-      data: { userId: request.user.id, type: "PROFILE_CHANGE_APPROVED", data: { requestId: id } },
+    await this.notifications.createWithin(db, {
+      userId: request.user.id,
+      type: "PROFILE_CHANGE_APPROVED",
+      data: { requestId: id },
     });
     this.audit.capture({
       entityId: id,
@@ -88,12 +95,10 @@ export class ProfileChangeAdminService {
     const request = await this.pending(id);
     const now = this.clock.now();
     await this.claim(id, "REJECTED", adminId, now, reason);
-    await db.notification.create({
-      data: {
-        userId: request.user.id,
-        type: "PROFILE_CHANGE_REJECTED",
-        data: { requestId: id, reason },
-      },
+    await this.notifications.createWithin(db, {
+      userId: request.user.id,
+      type: "PROFILE_CHANGE_REJECTED",
+      data: { requestId: id, reason: reason.slice(0, notificationLabelMaxLength) },
     });
     this.audit.capture({
       entityId: id,

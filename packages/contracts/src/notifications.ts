@@ -7,6 +7,8 @@ export const notificationTypes = [
   "ENROLLMENT_REINSTATED",
   "CERTIFICATE_READY",
   "NEWS_PUBLISHED",
+  "PROFILE_CHANGE_APPROVED",
+  "PROFILE_CHANGE_REJECTED",
 ] as const;
 
 export const notificationTypeSchema = z.enum(notificationTypes);

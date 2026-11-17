@@ -22,7 +22,7 @@ describe("studentListWhere", () => {
       departmentId: "d",
       session: "2020-21",
       status: "APPROVED",
-      search: "rahim",
+      q: "rahim",
     });
     expect(where).toMatchObject({
       courseId: "c",

@@ -22,7 +22,7 @@ export const studentListWhere = (filter: StudentFilter) => {
     ...(filter.universityId === undefined ? {} : { universityId: filter.universityId }),
     ...(filter.facultyId === undefined ? {} : { facultyId: filter.facultyId }),
   };
-  const search = filter.search;
+  const search = filter.q;
   return {
     deletedAt: null,
     ...(filter.courseId === undefined ? {} : { courseId: filter.courseId }),

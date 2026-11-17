@@ -38,6 +38,15 @@ describe("toNotificationRowModel", () => {
     expect(model.title).toBe("Exam schedule");
   });
 
+  test("renders text for profile change decisions", () => {
+    expect(toNotificationRowModel(item({ type: "PROFILE_CHANGE_APPROVED" })).title).toBe(
+      "Your profile change was approved",
+    );
+    expect(toNotificationRowModel(item({ type: "PROFILE_CHANGE_REJECTED" })).title).toBe(
+      "Your profile change was not approved",
+    );
+  });
+
   test("falls back to generic news text without a title", () => {
     const model = toNotificationRowModel(item({ type: "NEWS_PUBLISHED" }));
     expect(model.title).toBe("New announcement");
