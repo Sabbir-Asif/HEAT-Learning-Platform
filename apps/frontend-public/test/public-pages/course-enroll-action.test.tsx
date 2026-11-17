@@ -73,7 +73,7 @@ describe("CourseEnrollAction", () => {
     const view = await render();
 
     expect(view.querySelector("button")).toBeNull();
-    expect(view.querySelector('[data-slot="badge"]')).not.toBeNull();
+    expect(view.querySelector('[data-slot="status-badge"]')).not.toBeNull();
   });
 
   test("offers to continue learning once access is granted", async () => {
