@@ -1,10 +1,17 @@
 import { describe, expect, test } from "vitest";
 import { buildCsv } from "@heat/ui/charts";
 import {
+  attemptRows,
+  completionRows,
+  dropOffRows,
   funnelRows,
   funnelSummary,
   hasSuppressedValues,
   insightFilterKeys,
+  missedNote,
+  missedRows,
+  passRateRows,
+  selectedQuizId,
   suppressionNote,
   toInsightParams,
   trendRows,
@@ -166,5 +173,165 @@ describe("summaries and the suppression note", () => {
     expect(hasSuppressedValues(funnel([10, 8, 6, 3, 1]), hidden)).toBe(true);
     expect(hasSuppressedValues(funnel([null, null, null, null, null], true), shown)).toBe(true);
     expect(suppressionNote(5)).toContain("fewer than 5 students");
+  });
+});
+
+const moduleResults = {
+  rows: [
+    {
+      moduleId: "m1",
+      label: "Consent",
+      suppressed: false,
+      students: 20,
+      started: 20,
+      quizReady: 18,
+      completed: 16,
+      completionRate: 80,
+      dropOff: 6,
+    },
+    {
+      moduleId: "m2",
+      label: "Reporting",
+      suppressed: true,
+      students: null,
+      started: null,
+      quizReady: null,
+      completed: null,
+      completionRate: null,
+      dropOff: null,
+    },
+  ],
+  suppressionThreshold: 5,
+  refreshedAt: null,
+};
+
+const quizResults = {
+  rows: [
+    {
+      quizId: "q1",
+      moduleId: "m1",
+      label: "Consent",
+      suppressed: false,
+      attemptedStudents: 12,
+      passedStudents: 9,
+      attempts: 30,
+      passRate: 75,
+      averageAttempts: 2.5,
+    },
+    {
+      quizId: "q2",
+      moduleId: "m2",
+      label: "Reporting",
+      suppressed: true,
+      attemptedStudents: null,
+      passedStudents: null,
+      attempts: null,
+      passRate: null,
+      averageAttempts: null,
+    },
+  ],
+  suppressionThreshold: 5,
+  refreshedAt: null,
+};
+
+describe("module and quiz chart rows", () => {
+  test("completion and drop-off rows carry one value per module and a blank for a withheld one", () => {
+    expect(completionRows(moduleResults)).toEqual([
+      { module: "Consent", completionRate: 80 },
+      { module: "Reporting", completionRate: null },
+    ]);
+    expect(dropOffRows(moduleResults)).toEqual([
+      { module: "Consent", dropOff: 6 },
+      { module: "Reporting", dropOff: null },
+    ]);
+  });
+
+  test("pass rate and attempts rows follow the quiz rows", () => {
+    expect(passRateRows(quizResults)).toEqual([
+      { quiz: "Consent", passRate: 75 },
+      { quiz: "Reporting", passRate: null },
+    ]);
+    expect(attemptRows(quizResults)).toEqual([
+      { quiz: "Consent", averageAttempts: 2.5 },
+      { quiz: "Reporting", averageAttempts: null },
+    ]);
+  });
+
+  test("the csv of a chart has the same rows as the chart", () => {
+    const rows = completionRows(moduleResults);
+    const csv = buildCsv(
+      [
+        { key: "module", label: "Module" },
+        { key: "completionRate", label: "Completion rate (%)" },
+      ],
+      rows,
+    );
+    expect(csv.replace("\ufeff", "").split("\r\n")).toEqual([
+      "Module,Completion rate (%)",
+      "Consent,80",
+      "Reporting,",
+    ]);
+  });
+
+  test("a withheld module or quiz switches the privacy note on", () => {
+    expect(hasSuppressedValues(undefined, undefined, moduleResults, undefined)).toBe(true);
+    expect(hasSuppressedValues(undefined, undefined, undefined, quizResults)).toBe(true);
+    expect(hasSuppressedValues(undefined, undefined, undefined, undefined)).toBe(false);
+  });
+
+  test("module filters reach the module routes through the shared params", () => {
+    expect(toInsightParams(filters({ course: "c", session: "2020-21", quiz: "q1" }))).toEqual({
+      courseId: "c",
+      session: "2020-21",
+    });
+  });
+});
+
+describe("most-missed questions", () => {
+  const result = {
+    quizId: "q1",
+    label: "Consent",
+    rows: [
+      {
+        questionId: "a",
+        order: 2,
+        text: "Is consent reversible?",
+        answered: 12,
+        missed: 6,
+        missPercent: 50,
+      },
+      {
+        questionId: "b",
+        order: 5,
+        text: "Who may report?",
+        answered: 1,
+        missed: 1,
+        missPercent: 100,
+      },
+    ],
+    suppressedCount: 2,
+    suppressionThreshold: 5,
+    refreshedAt: null,
+  };
+
+  test("each row shows the text, the miss percentage and the answers it rests on", () => {
+    expect(missedRows(result)).toEqual([
+      { question: "Q2. Is consent reversible? (12 answers)", missPercent: 50 },
+      { question: "Q5. Who may report? (1 answer)", missPercent: 100 },
+    ]);
+  });
+
+  test("the note says how many questions are not listed", () => {
+    expect(missedNote(result)).toContain("2 questions are not listed");
+    expect(missedNote({ ...result, suppressedCount: 1 })).toContain("1 question is not listed");
+    expect(missedNote({ ...result, suppressedCount: 0 })).not.toContain("not listed");
+    expect(missedNote(undefined)).not.toContain("not listed");
+  });
+
+  test("the selected quiz is the requested one, else the first visible one", () => {
+    expect(selectedQuizId(quizResults, "q1")).toBe("q1");
+    expect(selectedQuizId(quizResults, "q2")).toBe("q1");
+    expect(selectedQuizId(quizResults, "gone")).toBe("q1");
+    expect(selectedQuizId(undefined, "q1")).toBe("");
   });
 });

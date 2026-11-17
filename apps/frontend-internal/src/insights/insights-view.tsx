@@ -5,6 +5,9 @@ import {
   useDepartmentsList,
   useFacultiesList,
   useInsightsFunnel,
+  useInsightsMissedQuestions,
+  useInsightsModuleResults,
+  useInsightsQuizResults,
   useInsightsQuery,
   useUniversitiesList,
 } from "@heat/api-client";
@@ -26,12 +29,24 @@ import type { ChartSeries, UpToFive } from "@heat/ui/charts";
 import { FilterBar, useTableUrlState } from "@heat/ui/data";
 import { ShellContent } from "@heat/ui/shell";
 import {
+  attemptRows,
+  attemptSummary,
+  completionRows,
+  completionSummary,
+  dropOffRows,
+  dropOffSummary,
   funnelRows,
   funnelSummary,
   hasSuppressedValues,
   insightFilterKeys,
   isRangeInvalid,
   isSessionValid,
+  missedNote,
+  missedRows,
+  missedSummary,
+  passRateRows,
+  passRateSummary,
+  selectedQuizId,
   stageLabels,
   suppressionNote,
   toInsightParams,
@@ -54,7 +69,7 @@ const trendSeries: UpToFive<ChartSeries> = [
 export function InsightsView() {
   const url = useTableUrlState({ sortable: [], filters: insightFilterKeys });
   const values = url.filters as InsightFilterValues;
-  const { from, to, course, university, faculty, department, session } = values;
+  const { from, to, course, university, faculty, department, session, quiz } = values;
   const rangeInvalid = isRangeInvalid(from, to);
   const sessionValid = isSessionValid(session);
   const enabled = !rangeInvalid && sessionValid;
@@ -88,6 +103,14 @@ export function InsightsView() {
     "enrollments",
     { ...params, groupBy: "day" },
     { query: { enabled } },
+  );
+
+  const modules = useInsightsModuleResults(params, { query: { enabled } });
+  const quizzes = useInsightsQuizResults(params, { query: { enabled } });
+  const quizId = selectedQuizId(quizzes.data, quiz);
+  const missed = useInsightsMissedQuestions(
+    { ...params, quizId },
+    { query: { enabled: enabled && quizId !== "" } },
   );
 
   const options = (
@@ -156,6 +179,17 @@ export function InsightsView() {
   const suppressionThreshold =
     funnel.data?.suppressionThreshold ?? trend.data?.suppressionThreshold ?? 5;
 
+  const quizOptions = (quizzes.data?.rows ?? [])
+    .filter((row) => !row.suppressed)
+    .map((row) => ({ value: row.quizId, label: row.label }));
+
+  const missedStatus =
+    missed.isError || (quizzes.isError && !missed.data)
+      ? "error"
+      : enabled && (quizzes.isPending || (quizId !== "" && missed.isPending))
+        ? "loading"
+        : "ready";
+
   return (
     <ShellContent>
       <PageHeader title="Insights" />
@@ -219,7 +253,7 @@ export function InsightsView() {
           )}
         </Field>
       </FilterBar>
-      {hasSuppressedValues(funnel.data, trend.data) ? (
+      {hasSuppressedValues(funnel.data, trend.data, modules.data, quizzes.data) ? (
         <FieldDescription role="note">{suppressionNote(suppressionThreshold)}</FieldDescription>
       ) : null}
       <div className="grid gap-4 xl:grid-cols-2">
@@ -246,6 +280,83 @@ export function InsightsView() {
           status={status(trend)}
           onRetry={() => void trend.refetch()}
         />
+        <ChartCard
+          title="Module completion"
+          description="Share of students who started a module and completed it."
+          kind="bar"
+          xKey="module"
+          xLabel="Module"
+          xTickMaxLength={18}
+          series={[{ key: "completionRate", label: "Completion rate (%)" }]}
+          data={modules.data ? completionRows(modules.data) : []}
+          summary={modules.data ? completionSummary(modules.data) : "Module completion"}
+          status={status(modules)}
+          onRetry={() => void modules.refetch()}
+        />
+        <ChartCard
+          title="Where students stop"
+          description="Students whose last module reached was this one."
+          kind="bar"
+          xKey="module"
+          xLabel="Module"
+          xTickMaxLength={18}
+          series={[{ key: "dropOff", label: "Students" }]}
+          data={modules.data ? dropOffRows(modules.data) : []}
+          summary={modules.data ? dropOffSummary(modules.data) : "Where students stop"}
+          status={status(modules)}
+          onRetry={() => void modules.refetch()}
+        />
+        <ChartCard
+          title="Quiz pass rate"
+          description="Share of students who took a quiz and passed it."
+          kind="bar"
+          xKey="quiz"
+          xLabel="Quiz"
+          xTickMaxLength={18}
+          series={[{ key: "passRate", label: "Pass rate (%)" }]}
+          data={quizzes.data ? passRateRows(quizzes.data) : []}
+          summary={quizzes.data ? passRateSummary(quizzes.data) : "Quiz pass rate"}
+          status={status(quizzes)}
+          onRetry={() => void quizzes.refetch()}
+        />
+        <ChartCard
+          title="Average quiz attempts"
+          description="Attempts per student who took the quiz."
+          kind="bar"
+          xKey="quiz"
+          xLabel="Quiz"
+          xTickMaxLength={18}
+          series={[{ key: "averageAttempts", label: "Attempts per student" }]}
+          data={quizzes.data ? attemptRows(quizzes.data) : []}
+          summary={quizzes.data ? attemptSummary(quizzes.data) : "Average quiz attempts"}
+          status={status(quizzes)}
+          onRetry={() => void quizzes.refetch()}
+        />
+        <div className="flex flex-col gap-4 xl:col-span-2">
+          {selectFilter(
+            "quiz",
+            "Quiz for most-missed questions",
+            quizOptions,
+            quizId,
+            (next) => url.setFilter("quiz", next),
+            quizOptions.length === 0,
+          )}
+          <ChartCard
+            title="Most-missed questions"
+            description={missedNote(missed.data)}
+            kind="bar"
+            xKey="question"
+            xLabel="Question"
+            xTickMaxLength={24}
+            series={[{ key: "missPercent", label: "Missed (%)" }]}
+            data={missed.data && quizId !== "" ? missedRows(missed.data) : []}
+            summary={
+              missed.data && quizId !== "" ? missedSummary(missed.data) : "Most-missed questions"
+            }
+            status={missedStatus}
+            onRetry={() => void missed.refetch()}
+          />
+        </div>
       </div>
     </ShellContent>
   );

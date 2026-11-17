@@ -1,5 +1,8 @@
 import type {
   InsightFunnelResultDto,
+  InsightMissedQuestionsDto,
+  InsightModuleResultsDto,
+  InsightQuizResultsDto,
   InsightResultDto,
   InsightsFunnelParams,
 } from "@heat/api-client";
@@ -15,6 +18,7 @@ export const insightFilterKeys = [
   "faculty",
   "department",
   "session",
+  "quiz",
 ] as const;
 
 export type InsightFilterValues = Record<(typeof insightFilterKeys)[number], string>;
@@ -63,8 +67,75 @@ export const trendRows = (result: InsightResultDto): ChartRow[] =>
 export const hasSuppressedValues = (
   funnel: InsightFunnelResultDto | undefined,
   trend: InsightResultDto | undefined,
+  modules?: InsightModuleResultsDto,
+  quizzes?: InsightQuizResultsDto,
 ): boolean =>
-  Boolean(funnel?.suppressed) || Boolean(trend?.groups.some((group) => group.suppressed));
+  Boolean(funnel?.suppressed) ||
+  Boolean(trend?.groups.some((group) => group.suppressed)) ||
+  Boolean(modules?.rows.some((row) => row.suppressed)) ||
+  Boolean(quizzes?.rows.some((row) => row.suppressed));
+
+export const completionRows = (results: InsightModuleResultsDto): ChartRow[] =>
+  results.rows.map((row) => ({ module: row.label, completionRate: row.completionRate }));
+
+export const dropOffRows = (results: InsightModuleResultsDto): ChartRow[] =>
+  results.rows.map((row) => ({ module: row.label, dropOff: row.dropOff }));
+
+export const passRateRows = (results: InsightQuizResultsDto): ChartRow[] =>
+  results.rows.map((row) => ({ quiz: row.label, passRate: row.passRate }));
+
+export const attemptRows = (results: InsightQuizResultsDto): ChartRow[] =>
+  results.rows.map((row) => ({ quiz: row.label, averageAttempts: row.averageAttempts }));
+
+export const selectedQuizId = (
+  results: InsightQuizResultsDto | undefined,
+  requested: string,
+): string => {
+  const rows = results?.rows ?? [];
+  const requestedRow = rows.find((row) => row.quizId === requested && !row.suppressed);
+  return requestedRow?.quizId ?? rows.find((row) => !row.suppressed)?.quizId ?? "";
+};
+
+export const missedRows = (result: InsightMissedQuestionsDto): ChartRow[] =>
+  result.rows.map((row) => ({
+    question: `Q${row.order}. ${row.text} (${row.answered} ${row.answered === 1 ? "answer" : "answers"})`,
+    missPercent: row.missPercent,
+  }));
+
+export const missedNote = (result: InsightMissedQuestionsDto | undefined): string => {
+  const base = "Share of answers that were wrong, with the number of answers it rests on.";
+  const withheld = result?.suppressedCount ?? 0;
+  if (withheld === 0) return base;
+  const threshold = result?.suppressionThreshold ?? 5;
+  return `${base} ${withheld} ${withheld === 1 ? "question is" : "questions are"} not listed because fewer than ${threshold} students answered ${withheld === 1 ? "it" : "them"}.`;
+};
+
+const percent = (value: number | null): string => (value === null ? "withheld" : `${value}%`);
+
+export const completionSummary = (results: InsightModuleResultsDto): string =>
+  `Completion rate per module. ${results.rows
+    .map((row) => `${row.label} ${percent(row.completionRate)}`)
+    .join(", ")}.`;
+
+export const dropOffSummary = (results: InsightModuleResultsDto): string =>
+  `Students whose last module reached was each module. ${results.rows
+    .map((row) => `${row.label} ${row.dropOff ?? "withheld"}`)
+    .join(", ")}.`;
+
+export const passRateSummary = (results: InsightQuizResultsDto): string =>
+  `Pass rate per quiz. ${results.rows
+    .map((row) => `${row.label} ${percent(row.passRate)}`)
+    .join(", ")}.`;
+
+export const attemptSummary = (results: InsightQuizResultsDto): string =>
+  `Average attempts per student for each quiz. ${results.rows
+    .map((row) => `${row.label} ${row.averageAttempts ?? "withheld"}`)
+    .join(", ")}.`;
+
+export const missedSummary = (result: InsightMissedQuestionsDto): string =>
+  `Most-missed questions in ${result.label}. ${result.rows
+    .map((row) => `Question ${row.order} ${row.missPercent}% of ${row.answered} answers`)
+    .join(", ")}.`;
 
 export const suppressionNote = (threshold: number): string =>
   `Values for fewer than ${threshold} students are withheld to protect privacy. They are left blank in the charts, the tables and the CSV files.`;
