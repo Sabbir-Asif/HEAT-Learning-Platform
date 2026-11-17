@@ -7,8 +7,10 @@ import type { MediaAssetRecord } from "../../src/media/media-url.service";
 const secret = "k".repeat(40);
 const now = new Date("2026-11-12T00:00:00.000Z");
 
-const service = (hls: AppConfig["hls"] = { keys: new Map([["k1", secret]]), activeKeyId: "k1" }) =>
+const withHls = (hls: AppConfig["hls"]) =>
   new MediaUrlService({ hls } as AppConfig, { now: () => now });
+
+const service = () => withHls({ keys: new Map([["k1", secret]]), activeKeyId: "k1" });
 
 const asset = (visibility: MediaAssetRecord["visibility"]): MediaAssetRecord => ({
   id: "0194f3a0-0000-7000-8000-000000000001",
@@ -64,6 +66,6 @@ describe("MediaUrlService", () => {
   });
 
   test("signing a protected file without keys fails loudly", () => {
-    expect(() => service(undefined).fileUrl(asset("PROTECTED"), "w320.webp")).toThrow();
+    expect(() => withHls(undefined).fileUrl(asset("PROTECTED"), "w320.webp")).toThrow();
   });
 });
