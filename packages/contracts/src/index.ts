@@ -13,6 +13,7 @@ export * from "./dashboard";
 export * from "./directory";
 export * from "./enrollment";
 export * from "./errors";
+export * from "./insights";
 export * from "./learning";
 export * from "./media";
 export * from "./modules";
