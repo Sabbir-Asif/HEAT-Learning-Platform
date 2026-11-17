@@ -39,6 +39,11 @@ describe("admin navigation", () => {
     expect(findActiveHref(items, "/")).toBe("/");
   });
 
+  test("profile changes sit under Students", () => {
+    const students = adminNavigation().find((group) => group.label === "Students");
+    expect(students?.items.map((item) => item.href)).toContain("/profile-changes");
+  });
+
   test("every item points to a route in the manifest", () => {
     for (const item of flat()) expect(routePaths).toContain(item.href);
   });

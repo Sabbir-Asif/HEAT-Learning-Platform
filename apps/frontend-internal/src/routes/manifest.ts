@@ -11,6 +11,7 @@ export const routeManifest: ReadonlyArray<RouteEntry> = [
   { pattern: "/insights", path: "/insights", kind: "admin" },
   { pattern: "/enrollments", path: "/enrollments", kind: "admin" },
   { pattern: "/students", path: "/students", kind: "admin" },
+  { pattern: "/profile-changes", path: "/profile-changes", kind: "admin" },
   { pattern: "/students/[id]", path: "/students/sample-id", kind: "admin" },
   { pattern: "/courses", path: "/courses", kind: "admin" },
   { pattern: "/courses/[id]", path: "/courses/sample-id", kind: "admin" },
