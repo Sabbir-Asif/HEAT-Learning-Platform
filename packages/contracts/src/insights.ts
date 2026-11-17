@@ -90,6 +90,13 @@ export const insightQuerySchema = z
   .object({ ...insightFilterShape, groupBy: insightGroupBySchema.optional() })
   .refine(dateRangeIsOrdered, dateRangeMessage);
 
+export const insightFunnelQuerySchema = insightFiltersSchema.refine(
+  dateRangeIsOrdered,
+  dateRangeMessage,
+);
+
+export type InsightFunnelQuery = z.infer<typeof insightFunnelQuerySchema>;
+
 export type InsightQuery = z.infer<typeof insightQuerySchema>;
 
 export const insightSeriesParamsSchema = z.object({ series: insightSeriesSchema });
@@ -116,6 +123,24 @@ export const insightResultSchema = z.object({
 });
 
 export type InsightResult = z.infer<typeof insightResultSchema>;
+
+export const insightFunnelStages = insightSeriesColumns.enrollments;
+
+export const insightFunnelStageSchema = z.object({
+  key: z.enum(insightFunnelStages),
+  value: z.number().int().nonnegative().nullable(),
+});
+
+export type InsightFunnelStage = z.infer<typeof insightFunnelStageSchema>;
+
+export const insightFunnelResultSchema = z.object({
+  stages: z.array(insightFunnelStageSchema),
+  suppressed: z.boolean(),
+  suppressionThreshold: z.number().int().positive(),
+  refreshedAt: z.iso.datetime().nullable(),
+});
+
+export type InsightFunnelResult = z.infer<typeof insightFunnelResultSchema>;
 
 export const insightRunStatusSchema = z.enum(["PENDING", "RUNNING", "SUCCEEDED", "FAILED"]);
 

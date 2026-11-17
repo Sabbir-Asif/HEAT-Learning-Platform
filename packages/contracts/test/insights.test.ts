@@ -2,6 +2,8 @@ import { describe, expect, test } from "vitest";
 import {
   errorCodes,
   insightDefaultGroupBy,
+  insightFunnelQuerySchema,
+  insightFunnelStages,
   insightQuerySchema,
   insightSeriesGroupBy,
   insightSeriesParamsSchema,
@@ -59,5 +61,26 @@ describe("insight series", () => {
 
   test("the refresh conflict has a published error code", () => {
     expect(errorCodes).toContain("INSIGHTS_REFRESH_RUNNING");
+  });
+});
+
+describe("insight funnel", () => {
+  test("the funnel stages are the enrollment columns in order", () => {
+    expect(insightFunnelStages).toEqual([
+      "registered",
+      "verified",
+      "approved",
+      "started",
+      "completed",
+    ]);
+  });
+
+  test("the funnel query rejects an end date before the start date", () => {
+    expect(
+      insightFunnelQuerySchema.safeParse({ from: "2026-02-01", to: "2026-01-01" }).success,
+    ).toBe(false);
+    expect(
+      insightFunnelQuerySchema.safeParse({ from: "2026-01-01", to: "2026-02-01" }).success,
+    ).toBe(true);
   });
 });
