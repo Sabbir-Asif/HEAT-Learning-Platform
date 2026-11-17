@@ -366,6 +366,7 @@ erDiagram
     String requestedName
     String requestedDepartmentId FK
     String requestedSession
+    String note
     ProfileChangeStatus status
     String decidedById FK
     DateTime decidedAt
