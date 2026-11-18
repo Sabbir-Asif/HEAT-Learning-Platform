@@ -56,7 +56,7 @@ export class CertificateAttachmentSource implements EmailAttachmentSource {
     }
     return [
       {
-        filename: `HEAT-certificate-${record.number}.pdf`,
+        filename: `WSAP-certificate-${record.number}.pdf`,
         content: Buffer.from(content),
         contentType: "application/pdf",
       },

@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { Providers } from "../shell/providers";
 import "./globals.css";
 
-export const metadata: Metadata = { title: "HEAT Gender Safety Training" };
+export const metadata: Metadata = { title: "Women Safety Awareness Program" };
 
 export const viewport: Viewport = { viewportFit: "cover" };
 

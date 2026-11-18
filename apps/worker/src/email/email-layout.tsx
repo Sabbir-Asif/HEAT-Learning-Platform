@@ -18,7 +18,7 @@ export const EmailLayout = ({ preview, supportAddress, children }: EmailLayoutPr
     <Preview>{preview}</Preview>
     <Body style={bodyStyle}>
       <Container style={containerStyle}>
-        <Text style={headingStyle}>HEAT</Text>
+        <Text style={headingStyle}>WSAP</Text>
         <Section>{children}</Section>
         <Text style={footerStyle}>
           Questions? Write to <a href={`mailto:${supportAddress}`}>{supportAddress}</a>.

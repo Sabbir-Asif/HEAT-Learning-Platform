@@ -16,12 +16,12 @@ export const adminInvitation = defineEmailTemplate({
   key: "admin-invitation",
   category: "PASSWORD",
   schema: z.object({ name: text, token: opaque, expiresAt: z.iso.datetime() }),
-  subject: () => "You are invited to the HEAT admin console",
+  subject: () => "You are invited to the WSAP admin console",
   body: ({ name, token, expiresAt }, context) => (
     <EmailLayout preview="Your admin invitation" supportAddress={context.supportAddress}>
       <Paragraph>Hello {name},</Paragraph>
       <Paragraph>
-        You have been invited to the HEAT admin console. Set your password to begin.
+        You have been invited to the WSAP admin console. Set your password to begin.
       </Paragraph>
       <ActionLink
         label="Accept the invitation"

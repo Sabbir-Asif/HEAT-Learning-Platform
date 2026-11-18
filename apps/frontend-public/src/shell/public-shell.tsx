@@ -43,7 +43,7 @@ export function PublicShell({ children }: { children: ReactNode }) {
         brand={{
           name: siteName,
           description:
-            "A gender safety course for University of Dhaka students, part of the HEAT project (PIN 13019).",
+            "A women safety awareness course for University of Dhaka students, funded under the HEAT project (PIN 13019).",
           logos: [heatLogo, crestLogo],
         }}
         columns={footerColumns}

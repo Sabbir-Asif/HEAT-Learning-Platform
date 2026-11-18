@@ -9,12 +9,13 @@ export const studentVerification = defineEmailTemplate({
   key: "student-verification",
   category: "VERIFICATION",
   schema: z.object({ name: text, token: opaque }),
-  subject: () => "Verify your email address for HEAT",
+  subject: () => "Verify your email address for WSAP",
   body: ({ name, token }, context) => (
     <EmailLayout preview="Verify your email address" supportAddress={context.supportAddress}>
       <Paragraph>Hello {name},</Paragraph>
       <Paragraph>
-        Thank you for registering for HEAT. Please confirm that this is your email address.
+        Thank you for registering for the Women Safety Awareness Program. Please confirm that this
+        is your email address.
       </Paragraph>
       <ActionLink
         label="Verify your email"

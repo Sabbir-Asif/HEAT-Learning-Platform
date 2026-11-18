@@ -38,10 +38,10 @@ const certificateEnvSchema = z.object({
   CERTIFICATE_INTRO: text("This is to certify that"),
   CERTIFICATE_COMPLETION: text("has successfully completed the course"),
   CERTIFICATE_VERIFY_LABEL: text("Verify this certificate at"),
-  CERTIFICATE_ORGANISATION_NAME: text("HEAT Project, University of Dhaka"),
+  CERTIFICATE_ORGANISATION_NAME: text("Women Safety Awareness Program, University of Dhaka"),
   CERTIFICATE_ORGANISATION_ADDRESS: text("University of Dhaka, Dhaka 1000, Bangladesh"),
   CERTIFICATE_SIGNATORY_ONE_NAME: text("Name of the Project Director"),
-  CERTIFICATE_SIGNATORY_ONE_TITLE: text("Project Director, HEAT Project"),
+  CERTIFICATE_SIGNATORY_ONE_TITLE: text("Project Director, Women Safety Awareness Program"),
   CERTIFICATE_SIGNATORY_TWO_NAME: text("Name of the Vice-Chancellor"),
   CERTIFICATE_SIGNATORY_TWO_TITLE: text("Vice-Chancellor, University of Dhaka"),
 });

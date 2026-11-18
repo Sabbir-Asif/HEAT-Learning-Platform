@@ -136,7 +136,7 @@ Artifact: the plan in this session, and the plan and approval comments when one 
 
 ## 5. Implement (TDD)
 
-Work inline in this session; do not dispatch subagents to implement tasks. Rules (schemas, state changes, calculations) are written test first with `superpowers:test-driven-development`: a failing test, the least code that passes, a refactor. Screens and wiring may be written straight, then checked in stage 6. When a test fails for a reason you did not expect, use `superpowers:systematic-debugging` before changing code. Tests live in `test/` mirroring `src/` (README, Where tests live).
+Work inline in this session; do not dispatch subagents to implement tasks. Rules (schemas, state changes, calculations) are written test first with `superpowers:test-driven-development`: a failing test, the least code that passes, a refactor. Screens and wiring may be written straight, then checked in stage 6. When a test fails for a reason you did not expect, use `superpowers:systematic-debugging` before changing code. Tests live in `test/` mirroring `src/` (docs/guides/quality-and-testing.md, Where tests live).
 
 Run only the affected package's tests while working (`pnpm --filter <package> test`), not the whole repository. Commit each task: `<type>(<scope>): <summary> (#N)`, conventional, one task per commit.
 

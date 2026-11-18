@@ -1,8 +1,8 @@
-# HEAT LMS design file and theme
+# WSAP LMS design file and theme
 
 Issue #30. This directory holds the Open Pencil designs for the key student and admin screens and the theme they share. The designs are a proposal until the owner approves them with a comment on #30 that names the commit or file version and says "Open Pencil designs and theme approved". Merging the pull request is not approval.
 
-Design rule from the owner (2026-11-08): one consistent, modern design that fits the theme (calm, trustworthy, safe, University of Dhaka gender-safety training), and a drawer wherever a modal or dialog would otherwise be used. No decorative or filler element. The demo mock (`HEAT Gender Safety Training Platform.png`, kept outside the repository) is a direction, not a spec: its deep purple, lavender tints, warm amber highlight and green progress colour are the starting palette.
+Design rule from the owner (2026-11-08): one consistent, modern design that fits the theme (calm, trustworthy, safe, University of Dhaka women safety awareness training), and a drawer wherever a modal or dialog would otherwise be used. No decorative or filler element. The demo mock (`HEAT Gender Safety Training Platform.png`, kept outside the repository) is a direction, not a spec: its deep purple, lavender tints, warm amber highlight and green progress colour are the starting palette.
 
 ## Status
 
@@ -217,7 +217,7 @@ Filled in by 30b (student screens) and 30c (admin screens). Each screen has a ro
 | Landing | Decide to enroll | Headline, one paragraph, Enroll now, See modules, three facts (modules, hours, certificate) | State what the course is, give the single action and the way to the module list; the facts answer how long and what you get |
 | Landing | Decide to enroll | The course path: six modules with durations | Show what the training covers and how long it takes before asking for an account |
 | Landing | Decide to enroll | How it works (three steps) | Set expectations for verification, approval and the certificate |
-| Landing | Decide to enroll | Part of the HEAT project: heading and one paragraph | Says who runs the course, which a student checks before giving personal details |
+| Landing | Decide to enroll | Funded under the HEAT project: heading and one paragraph | Says who runs the course, which a student checks before giving personal details |
 | Landing | Decide to enroll | Footer with partners and policy links | Credibility and the privacy and accessibility links. The mock's speech bubble, four feature tiles, skyline, hero photo placeholder, info cards and repeated call-to-action band are dropped |
 | Enroll details | Create an account | First and last name, university email, student ID, university, faculty, department, password with strength meter, consent | The data the training team needs to approve the enrollment; no role field, the role is set by the team |
 | Enroll details | Create an account | Step 1 of 3 progress bar | Shows how many steps remain before the captcha and confirmation |

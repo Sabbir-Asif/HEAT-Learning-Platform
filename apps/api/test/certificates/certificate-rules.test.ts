@@ -82,7 +82,7 @@ describe("downloadHeaders", () => {
     expect(downloadHeaders("ABCD-EFGH-JKMN", key)).toEqual({
       "X-Accel-Redirect": `/internal/certificates/${key}`,
       "Content-Type": "application/pdf",
-      "Content-Disposition": 'attachment; filename="heat-certificate-ABCD-EFGH-JKMN.pdf"',
+      "Content-Disposition": 'attachment; filename="wsap-certificate-ABCD-EFGH-JKMN.pdf"',
       "Cache-Control": "private, no-store",
     });
   });

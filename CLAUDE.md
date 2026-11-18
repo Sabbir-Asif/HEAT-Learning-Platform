@@ -1,6 +1,6 @@
-# HEAT LMS
+# Women Safety Awareness Program (WSAP) LMS
 
-Learning platform for the HEAT gender-safety training at the University of Dhaka: a public site and learner area, an admin console, a NestJS API and a background worker. This repo is a pnpm + Turborepo monorepo. Conventions live here and in the area files below, not in chat history. Read this file, then the file for the area you touch.
+Learning platform for the Women Safety Awareness Program (WSAP) training at the University of Dhaka: a public site and learner area, an admin console, a NestJS API and a background worker. This repo is a pnpm + Turborepo monorepo. Conventions live here and in the area files below, not in chat history. Read this file, then the file for the area you touch.
 
 ## Where things are
 
@@ -19,11 +19,11 @@ Learning platform for the HEAT gender-safety training at the University of Dhaka
 - Decisions: [docs/adr/](docs/adr/), one record per decision. ADR changes always go through the owner.
 - Plan: [docs/plan/heat-lms-project-plan.html](docs/plan/heat-lms-project-plan.html). Frontend design: [docs/superpowers/specs/](docs/superpowers/specs/).
 - Runbooks: `docs/runbooks/`, created by the tickets that need them.
-- Commands, ports, local services, CI and the `test/` layout: [README.md](README.md).
+- Commands and the first run: [README.md](README.md). Ports, local services, CI and the `test/` layout: [docs/guides/](docs/guides/local-development.md).
 
 ## Commands
 
-Run from the repo root. Details are in [README.md](README.md).
+Run from the repo root. Details are in [README.md](README.md) and [docs/guides/](docs/guides/quality-and-testing.md).
 
 ```sh
 pnpm install
@@ -67,7 +67,7 @@ Every ticket is reviewed against these rules. Implementer and reviewers read the
 - Every endpoint has an explicit guard. Deny by default, with a test that fails on any unguarded route
 - Uploads checked by magic bytes and ffprobe, size-capped, stored outside the web root
 - Secrets only in environment files with restricted permissions; no secrets in images or the repo
-- Dependabot, CodeQL, pnpm audit and container scanning in CI (CodeQL is not enabled yet, see README, Continuous integration)
+- Dependabot, CodeQL, pnpm audit and container scanning in CI (CodeQL is not enabled yet, see docs/guides/ci-and-github.md)
 
 ### Engineering
 

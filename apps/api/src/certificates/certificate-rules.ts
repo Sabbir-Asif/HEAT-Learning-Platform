@@ -51,7 +51,7 @@ export const downloadHeaders = (number: string, fileKey: string): Record<string,
   return {
     "X-Accel-Redirect": `${internalCertificatePrefix}${fileKey}`,
     "Content-Type": "application/pdf",
-    "Content-Disposition": `attachment; filename="heat-certificate-${safeFilenameNumber(number)}.pdf"`,
+    "Content-Disposition": `attachment; filename="wsap-certificate-${safeFilenameNumber(number)}.pdf"`,
     "Cache-Control": "private, no-store",
   };
 };

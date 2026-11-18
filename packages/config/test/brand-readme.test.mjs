@@ -4,14 +4,14 @@ import { describe, expect, test } from "vitest";
 import { brandLocation } from "../src/brand.mjs";
 
 const root = resolve(import.meta.dirname, "../../..");
-const readme = readFileSync(resolve(root, "README.md"), "utf8");
+const readme = readFileSync(resolve(root, "docs/guides/design-and-brand.md"), "utf8");
 const { sourceDir } = brandLocation(root);
 
 const section = () => {
-  const start = readme.indexOf("### Brand assets");
+  const start = readme.indexOf("## Brand assets");
   if (start === -1) return "";
   const rest = readme.slice(start + 1);
-  const next = rest.search(/\n### /);
+  const next = rest.search(/\n## /);
   return next === -1 ? rest : rest.slice(0, next);
 };
 
@@ -26,10 +26,12 @@ const rows = () =>
         .map((cell) => cell.trim()),
     );
 
-describe("README Brand assets", () => {
-  test("has a Brand assets section under Development", () => {
+describe("Brand assets guide", () => {
+  test("has a Brand assets section and the README links to the guide", () => {
     expect(section()).not.toBe("");
-    expect(readme.indexOf("## Development")).toBeLessThan(readme.indexOf("### Brand assets"));
+    expect(readFileSync(resolve(root, "README.md"), "utf8")).toContain(
+      "docs/guides/design-and-brand.md",
+    );
   });
 
   test("lists every source file with its source, a known status and an ISO date", () => {

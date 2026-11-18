@@ -12,7 +12,7 @@ export const passwordChangeCode = defineEmailTemplate({
     code: z.string().trim().min(4).max(12),
     expiresInMinutes: z.number().int().positive().max(1440),
   }),
-  subject: () => "Your HEAT password change code",
+  subject: () => "Your WSAP password change code",
   body: ({ name, code, expiresInMinutes }, context) => (
     <EmailLayout preview="Your password change code" supportAddress={context.supportAddress}>
       <Paragraph>Hello {name},</Paragraph>

@@ -1,0 +1,162 @@
+upstream frontend_public {
+    server frontend-public:3000;
+}
+
+upstream frontend_internal {
+    server frontend-internal:3001;
+}
+
+upstream api {
+    server api:4000;
+}
+
+js_path /etc/nginx/njs;
+js_import hls from hls.js;
+js_set $hls_authorized hls.authorize;
+js_import media from media.js;
+js_set $media_authorized media.authorize;
+
+map $uri $media_disposition {
+    ~*\.(pdf|docx|pptx)$ "attachment";
+    default "";
+}
+
+map $uri $hls_cache_control {
+    ~\.m3u8$ "private, no-store";
+    default   "private, max-age=600";
+}
+
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ""      close;
+}
+
+
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_prefer_server_ciphers off;
+ssl_session_cache shared:ssl:10m;
+ssl_session_timeout 1d;
+ssl_session_tickets off;
+
+server {
+    listen 80 default_server;
+    server_name _;
+
+    location = /nginx-health {
+        access_log off;
+        return 200 "ok\n";
+    }
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 404;
+    }
+}
+
+server {
+    listen 80;
+    server_name ${PUBLIC_DOMAIN} ${ADMIN_DOMAIN};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl default_server;
+    http2 on;
+    server_name _;
+    ssl_reject_handshake on;
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${PUBLIC_DOMAIN};
+
+    ssl_certificate /etc/letsencrypt/live/${PUBLIC_DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${PUBLIC_DOMAIN}/privkey.pem;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    client_max_body_size 1m;
+
+    location ^~ /api/admin/ {
+        return 404;
+    }
+
+    location ~* ^/api/admin(/|$) {
+        return 404;
+    }
+
+    include /etc/nginx/conf.d/hls.inc;
+    include /etc/nginx/conf.d/certificates.inc;
+    include /etc/nginx/conf.d/media.inc;
+
+    location = /api/revalidate {
+        return 404;
+    }
+
+    location /api/ {
+        proxy_pass http://api;
+        include /etc/nginx/conf.d/proxy.inc;
+    }
+
+    location / {
+        proxy_pass http://frontend_public;
+        include /etc/nginx/conf.d/proxy.inc;
+    }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${ADMIN_DOMAIN};
+
+    ssl_certificate /etc/letsencrypt/live/${PUBLIC_DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${PUBLIC_DOMAIN}/privkey.pem;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    client_max_body_size 1m;
+
+    include /etc/nginx/conf.d/hls.inc;
+    include /etc/nginx/conf.d/certificates.inc;
+    include /etc/nginx/conf.d/media.inc;
+
+    location = /api/revalidate {
+        return 404;
+    }
+
+    location ~ ^/api/admin/courses/[^/]+/modules/[^/]+/videos/[^/]+/upload {
+        client_max_body_size 2g;
+        proxy_request_buffering off;
+        proxy_read_timeout 900s;
+        proxy_send_timeout 900s;
+        proxy_pass http://api;
+        include /etc/nginx/conf.d/proxy.inc;
+    }
+
+    location ^~ /api/admin/media {
+        client_max_body_size 64m;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+        proxy_pass http://api;
+        include /etc/nginx/conf.d/proxy.inc;
+    }
+
+    location /api/ {
+        proxy_pass http://api;
+        include /etc/nginx/conf.d/proxy.inc;
+    }
+
+    location / {
+        proxy_pass http://frontend_internal;
+        include /etc/nginx/conf.d/proxy.inc;
+    }
+}

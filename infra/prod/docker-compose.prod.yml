@@ -1,0 +1,203 @@
+name: wsap-prod
+
+x-app: &app
+  env_file:
+    - ${ENV_FILE:-../../.env}
+  restart: unless-stopped
+  networks:
+    - internal
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis-data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    <<: *app
+    build:
+      context: ../..
+      dockerfile: infra/prod/Dockerfile
+      target: migrate
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    <<: *app
+    build:
+      context: ../..
+      dockerfile: infra/prod/Dockerfile
+      target: api
+    environment:
+      PORT: "4000"
+    volumes:
+      - ${DATA_ROOT:-/srv/heat}:/srv/heat
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:4000/api/health').then((r)=>process.exit(r.ok?0:1),()=>process.exit(1))
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  worker:
+    <<: *app
+    build:
+      context: ../..
+      dockerfile: infra/prod/Dockerfile
+      target: worker
+    volumes:
+      - ${DATA_ROOT:-/srv/heat}:/srv/heat
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  frontend-public:
+    <<: *app
+    build:
+      context: ../..
+      dockerfile: infra/prod/Dockerfile
+      target: frontend
+      args:
+        APP: frontend-public
+    environment:
+      PORT: "3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:3000/').then((r)=>process.exit(r.status<500?0:1),()=>process.exit(1))
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  frontend-internal:
+    <<: *app
+    build:
+      context: ../..
+      dockerfile: infra/prod/Dockerfile
+      target: frontend
+      args:
+        APP: frontend-internal
+    environment:
+      PORT: "3001"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:3001/').then((r)=>process.exit(r.status<500?0:1),()=>process.exit(1))
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  nginx:
+    image: nginx:1.29-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN:?set PUBLIC_DOMAIN in .env}
+      ADMIN_DOMAIN: ${ADMIN_DOMAIN:?set ADMIN_DOMAIN in .env}
+      HLS_SIGNING_KEYS: ${HLS_SIGNING_KEYS:?set HLS_SIGNING_KEYS in .env}
+      NGINX_ENVSUBST_FILTER: DOMAIN
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx/prod.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ../nginx/proxy.inc:/etc/nginx/conf.d/proxy.inc:ro
+      - ../nginx/hls.inc:/etc/nginx/conf.d/hls.inc:ro
+      - ../nginx/certificates.inc:/etc/nginx/conf.d/certificates.inc:ro
+      - ../nginx/media.inc:/etc/nginx/conf.d/media.inc:ro
+      - ../nginx/hls.js:/etc/nginx/njs/hls.js:ro
+      - ../nginx/hls-verify.js:/etc/nginx/njs/hls-verify.js:ro
+      - ../nginx/media.js:/etc/nginx/njs/media.js:ro
+      - ../nginx/media-verify.js:/etc/nginx/njs/media-verify.js:ro
+      - ${DATA_ROOT:-/srv/heat}/hls:/srv/media/hls:ro
+      - ${DATA_ROOT:-/srv/heat}/certificates:/srv/certificates:ro
+      - ${DATA_ROOT:-/srv/heat}/media:/srv/mediastore:ro
+      - letsencrypt:/etc/letsencrypt:ro
+      - certbot-webroot:/var/www/certbot:ro
+    networks:
+      - internal
+    depends_on:
+      api:
+        condition: service_healthy
+      frontend-public:
+        condition: service_healthy
+      frontend-internal:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/nginx-health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  certbot:
+    image: certbot/certbot:v3.0.1
+    restart: unless-stopped
+    entrypoint:
+      - sh
+      - -c
+      - trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot-webroot:/var/www/certbot
+    networks:
+      - internal
+
+networks:
+  internal:
+
+volumes:
+  postgres-data:
+  redis-data:
+  letsencrypt:
+  certbot-webroot:

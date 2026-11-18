@@ -27,8 +27,8 @@ describe("Playwright pin", () => {
     }
   });
 
-  test("the README documents the image reference and the update command", () => {
-    const readme = read("README.md");
+  test("the quality guide documents the image reference and the update command", () => {
+    const readme = read("docs/guides/quality-and-testing.md");
     expect(readme).toContain(image);
     expect(readme).toContain("pnpm e2e:docker:update");
   });

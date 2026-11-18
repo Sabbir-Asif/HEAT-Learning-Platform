@@ -1,4 +1,4 @@
-# HEAT LMS — Frontend Architecture Design
+# WSAP LMS — Frontend Architecture Design
 
 Date: 2026-11-07 · Status: revised after adversarial review, awaiting approval · Companion to the project plan (`docs/plan/heat-lms-project-plan.html`, decisions D1–D16 and section 14, Adversarial review)
 
