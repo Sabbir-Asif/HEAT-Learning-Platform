@@ -21,6 +21,7 @@ import {
   planReorder,
   planResequence,
 } from "./module-rules";
+import { highestModuleOrder } from "./highest-order";
 
 export const moduleSelect = {
   id: true,
@@ -93,14 +94,11 @@ export class ModulesService {
     const client = this.audit.client(this.database);
     const scope = await lockScope(client as ContentLocker, courseId);
     assertContentUnlocked(scope.lockedAt);
-    const highest = await client.module.aggregate({
-      where: { revisionId: scope.revisionId, deletedAt: null },
-      _max: { order: true },
-    });
+    const highest = await highestModuleOrder(client, scope.revisionId);
     const created = await client.module.create({
       data: {
         revisionId: scope.revisionId,
-        order: nextOrder(highest._max.order),
+        order: nextOrder(highest),
         title: request.title,
         objectives: request.objectives,
       },

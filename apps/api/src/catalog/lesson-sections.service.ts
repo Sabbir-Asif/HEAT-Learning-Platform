@@ -22,6 +22,7 @@ import { applyOrderPlan, lockScope, readScope } from "./content-access";
 import type { ContentLocker } from "./content-access";
 import { moduleSelect, toModuleSummary } from "./modules.service";
 import { assertContentUnlocked, nextOrder, planReorder, planResequence } from "./module-rules";
+import { highestLessonSectionOrder } from "./highest-order";
 
 type SectionClient = Pick<HeatClient, "module" | "lessonSection">;
 
@@ -113,14 +114,11 @@ export class LessonSectionsService {
     const scope = await lockScope(client as ContentLocker, courseId);
     assertContentUnlocked(scope.lockedAt);
     await this.assertModule(client, scope.revisionId, moduleId);
-    const highest = await client.lessonSection.aggregate({
-      where: { moduleId, deletedAt: null },
-      _max: { order: true },
-    });
+    const highest = await highestLessonSectionOrder(client, moduleId);
     const created = await client.lessonSection.create({
       data: {
         moduleId,
-        order: nextOrder(highest._max.order),
+        order: nextOrder(highest),
         title: request.title,
         body: emptyBody,
         schemaVersion: 1,

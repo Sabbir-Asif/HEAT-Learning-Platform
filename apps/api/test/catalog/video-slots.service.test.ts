@@ -38,7 +38,7 @@ const build = (options: { lockedAt?: Date | null; slots?: SlotFixture[] } = {}) 
   const slots = options.slots ?? [slot("a", 1), slot("b", 2), slot("c", 3)];
   const calls: string[] = [];
   const database = {
-    $queryRaw: vi.fn().mockResolvedValue([{ lockedAt: options.lockedAt ?? null }]),
+    $queryRaw: vi.fn().mockResolvedValue([{ lockedAt: options.lockedAt ?? null, highest: 3 }]),
     course: {
       findUnique: vi.fn().mockResolvedValue({
         lockedAt: options.lockedAt ?? null,
@@ -63,7 +63,6 @@ const build = (options: { lockedAt?: Date | null; slots?: SlotFixture[] } = {}) 
         .mockImplementation(({ where }: { where: { id: string } }) =>
           Promise.resolve(slots.find((item) => item.id === where.id) ?? null),
         ),
-      aggregate: vi.fn().mockResolvedValue({ _max: { order: 3 } }),
       create: vi.fn().mockResolvedValue(slot("n", 4)),
       update: vi
         .fn()
@@ -187,7 +186,7 @@ describe("VideoSlotsService.create", () => {
 
   test("starts at order 1 in an empty module", async () => {
     const { service, database, inAuditScope } = build({ slots: [] });
-    database.video.aggregate.mockResolvedValue({ _max: { order: null } });
+    database.$queryRaw.mockResolvedValue([{ lockedAt: null, highest: null }]);
     await inAuditScope(() => service.create(courseId, "m", { title: "Intro", required: true }));
     expect(database.video.create.mock.calls[0]?.[0].data.order).toBe(1);
   });
