@@ -19,7 +19,7 @@ import { ThemedLogo } from "./themed-logo";
 import type { LogoSource, ShellLink } from "./types";
 
 interface ShellSidebarProps {
-  brand: { name: string; href: string; logo: LogoSource };
+  brand: { name: string; href: string; logo?: LogoSource };
   groups: ReadonlyArray<NavGroup>;
   pathname: string;
   navLabel: string;
@@ -95,7 +95,9 @@ function ShellSidebar({
             "text-sidebar-foreground focus-visible:ring-sidebar-ring flex items-center gap-3 rounded-md outline-hidden focus-visible:ring-2",
           children: (
             <>
-              <ThemedLogo {...brand.logo} tone="inverse" eager className="h-9" />
+              {brand.logo ? (
+                <ThemedLogo {...brand.logo} tone="inverse" eager className="h-9" />
+              ) : null}
               <span className="font-display text-heading-3 truncate">{brand.name}</span>
             </>
           ),
