@@ -22,7 +22,6 @@ import {
   Field,
   FieldDescription,
   FieldLabel,
-  Input,
   PageHeader,
   Select,
   SelectContent,
@@ -30,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@heat/ui";
-import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui/data";
+import { DataTable, FilterBar, SearchInput, useClampedPage, useTableUrlState } from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
@@ -274,12 +273,11 @@ export function DepartmentsView() {
         activeCount={url.activeFilterCount}
         onClear={url.clearFilters}
         search={
-          <Input
-            type="search"
-            aria-label="Search departments"
+          <SearchInput
+            label="Search departments"
             placeholder="Search by name"
-            defaultValue={url.query}
-            onChange={(event) => url.setQuery(event.target.value.trim())}
+            value={url.query}
+            onValueChange={url.setQuery}
           />
         }
       >

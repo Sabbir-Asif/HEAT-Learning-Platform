@@ -26,7 +26,7 @@ import {
   SelectValue,
   StatusBadge,
 } from "@heat/ui";
-import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui/data";
+import { DataTable, FilterBar, SearchInput, useClampedPage, useTableUrlState } from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
@@ -223,12 +223,11 @@ export function StudentsView() {
         activeCount={url.activeFilterCount}
         onClear={url.clearFilters}
         search={
-          <Input
-            type="search"
-            aria-label="Search students"
+          <SearchInput
+            label="Search students"
             placeholder="Search by name or email"
-            defaultValue={url.query}
-            onChange={(event) => url.setQuery(event.target.value.trim())}
+            value={url.query}
+            onValueChange={url.setQuery}
           />
         }
       >

@@ -10,7 +10,6 @@ import {
   Field,
   FieldDescription,
   FieldLabel,
-  Input,
   PageHeader,
   Select,
   SelectContent,
@@ -19,7 +18,7 @@ import {
   SelectValue,
   StatusBadge,
 } from "@heat/ui";
-import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui/data";
+import { DataTable, FilterBar, SearchInput, useClampedPage, useTableUrlState } from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
@@ -161,12 +160,11 @@ export function ResourcesView() {
         activeCount={url.activeFilterCount}
         onClear={url.clearFilters}
         search={
-          <Input
-            type="search"
-            aria-label="Search resources"
+          <SearchInput
+            label="Search resources"
             placeholder="Search by title"
-            defaultValue={url.query}
-            onChange={(event) => url.setQuery(event.target.value.trim())}
+            value={url.query}
+            onValueChange={url.setQuery}
           />
         }
       >

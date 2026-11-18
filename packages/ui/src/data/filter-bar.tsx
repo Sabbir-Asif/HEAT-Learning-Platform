@@ -42,7 +42,7 @@ function FilterBar({
         className={cn("flex flex-wrap items-end gap-3", className)}
         {...props}
       >
-        {search}
+        {search ? <div className="min-w-60 flex-1 md:max-w-sm">{search}</div> : null}
         {children}
         {activeCount > 0 ? (
           <Button variant="ghost" onClick={onClear}>
