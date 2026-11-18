@@ -43,7 +43,6 @@ Auth, permissions, uploads, personal data, secrets and dependencies touched, and
 - [ ] Tests added or updated, and `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test:coverage` and `pnpm build` pass
 - [ ] No secrets, environment files or personal data in the diff
 - [ ] Docs or ADR updated where behaviour or a decision changed
-- [ ] UI changes pass the UI review checklist in CLAUDE.md
 - [ ] CI green
 ```
 

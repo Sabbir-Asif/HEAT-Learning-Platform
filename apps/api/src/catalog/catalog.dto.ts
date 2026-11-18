@@ -1,4 +1,7 @@
 import {
+  revisionSnapshotResponseSchema,
+  adminQuizSettingsResponseSchema,
+  quizSettingsRequestSchema,
   adminContactSettingsResponseSchema,
   contactSettingsRequestSchema,
   publicContactSettingsResponseSchema,
@@ -155,3 +158,9 @@ export class AdminContactSettingsResponseDto extends createZodDto(
 export class PublicContactSettingsResponseDto extends createZodDto(
   publicContactSettingsResponseSchema,
 ) {}
+
+export class QuizSettingsRequestDto extends createZodDto(quizSettingsRequestSchema) {}
+
+export class AdminQuizSettingsResponseDto extends createZodDto(adminQuizSettingsResponseSchema) {}
+
+export class RevisionSnapshotResponseDto extends createZodDto(revisionSnapshotResponseSchema) {}

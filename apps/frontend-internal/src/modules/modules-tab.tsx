@@ -6,9 +6,22 @@ import {
   useModulesList,
   useModulesReorder,
 } from "@heat/api-client";
-import { Button, EmptyState, ErrorState, FieldDescription, Skeleton, SortableList } from "@heat/ui";
+import {
+  Button,
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  EmptyState,
+  ErrorState,
+  FieldDescription,
+  Skeleton,
+  SortableList,
+} from "@heat/ui";
 import { useQueryClient } from "@tanstack/react-query";
-import { LayersIcon, PlusIcon } from "lucide-react";
+import { ChevronRightIcon, LayersIcon, ListChecksIcon, PlusIcon, TargetIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { FormSheet } from "./form-sheet";
@@ -63,45 +76,70 @@ export function ModulesTab({ courseId }: { courseId: string }) {
   );
 
   return (
-    <div className="flex max-w-3xl flex-col gap-4">
+    <div className="flex flex-col gap-4">
       {locked ? <FieldDescription role="note">{moduleLockedMessage}</FieldDescription> : null}
       {problem !== null ? <FieldDescription role="alert">{problem}</FieldDescription> : null}
-      {items.length === 0 ? (
-        <EmptyState
-          icon={LayersIcon}
-          title="No modules yet"
-          description="Add the first module. Students work through modules in this order."
-          action={addButton}
-        />
-      ) : (
-        <>
-          <div>{addButton}</div>
-          <SortableList
-            aria-label="Modules in order"
-            disabled={locked || reorder.isPending}
-            onReorder={(orderedIds) => void saveOrder(orderedIds)}
-            items={items.map((item) => ({
-              id: item.id,
-              label: item.title,
-              content: (
-                <div className="flex flex-col gap-1">
-                  <Button
-                    variant="link"
-                    render={<Link href={`/courses/${courseId}/modules/${item.id}`} />}
-                  >
-                    {item.order}. {item.title}
-                  </Button>
-                  <FieldDescription>
-                    {item.sections.length} {item.sections.length === 1 ? "section" : "sections"},{" "}
-                    {item.objectives.length}{" "}
-                    {item.objectives.length === 1 ? "objective" : "objectives"}
-                  </FieldDescription>
-                </div>
-              ),
-            }))}
-          />
-        </>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {items.length} {items.length === 1 ? "module" : "modules"}
+          </CardTitle>
+          <CardDescription>
+            Students work through modules in this order. Drag a module to reorder it.
+          </CardDescription>
+          {items.length === 0 ? null : <CardAction>{addButton}</CardAction>}
+        </CardHeader>
+        <CardContent>
+          {items.length === 0 ? (
+            <EmptyState
+              icon={LayersIcon}
+              title="No modules yet"
+              description="Add the first module. Students work through modules in this order."
+              action={addButton}
+            />
+          ) : (
+            <SortableList
+              aria-label="Modules in order"
+              disabled={locked || reorder.isPending}
+              onReorder={(orderedIds) => void saveOrder(orderedIds)}
+              items={items.map((item) => ({
+                id: item.id,
+                label: item.title,
+                content: (
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex min-w-0 flex-col gap-1">
+                      <Button
+                        variant="link"
+                        className="justify-start"
+                        render={<Link href={`/courses/${courseId}/modules/${item.id}`} />}
+                      >
+                        {item.order}. {item.title}
+                      </Button>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                        <span className="flex items-center gap-1.5">
+                          <ListChecksIcon aria-hidden="true" className="size-4" />
+                          <FieldDescription>
+                            {item.sections.length}{" "}
+                            {item.sections.length === 1 ? "section" : "sections"}
+                          </FieldDescription>
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <TargetIcon aria-hidden="true" className="size-4" />
+                          <FieldDescription>
+                            {item.objectives.length}{" "}
+                            {item.objectives.length === 1 ? "objective" : "objectives"}
+                          </FieldDescription>
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronRightIcon aria-hidden="true" className="size-4 shrink-0" />
+                  </div>
+                ),
+              }))}
+            />
+          )}
+        </CardContent>
+      </Card>
       <FormSheet
         open={adding}
         title="Add a module"

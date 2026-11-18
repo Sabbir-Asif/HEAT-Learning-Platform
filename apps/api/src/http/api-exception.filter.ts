@@ -44,6 +44,7 @@ const messages: Record<ErrorCode, string> = {
   COURSE_REVISION_DRAFT_EXISTS:
     "A draft revision already exists. Publish it or finish it before cloning again.",
   COURSE_REVISION_NOT_DRAFT: "This revision is not an open draft.",
+  COURSE_REVISION_REQUIRED: "A course needs at least one revision.",
   COURSE_SLUG_TAKEN: "A course with this slug already exists.",
   CSRF_TOKEN_INVALID:
     "The security token for this request is missing or no longer valid. Reload the page and try again.",

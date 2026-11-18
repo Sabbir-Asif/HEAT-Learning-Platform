@@ -11,22 +11,11 @@ import {
   useInsightsQuery,
   useUniversitiesList,
 } from "@heat/api-client";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-  Input,
-  PageHeader,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@heat/ui";
+import { Field, FieldDescription, FieldError, FieldLabel, Input, PageHeader } from "@heat/ui";
 import { ChartCard } from "@heat/ui/charts";
 import type { ChartSeries, UpToFive } from "@heat/ui/charts";
-import { FilterBar, useTableUrlState } from "@heat/ui/data";
+import { FilterBar, FilterInput, FilterSelect, useTableUrlState } from "@heat/ui/data";
+import { filterIcon } from "../filters/filter-icon";
 import { ShellContent } from "@heat/ui/shell";
 import {
   attemptRows,
@@ -130,47 +119,33 @@ export function InsightsView() {
     disabled = false,
     truncated = false,
   ) => (
-    <Field>
-      <FieldLabel id={`insights-filter-${id}`}>{label}</FieldLabel>
-      <Select
-        items={items}
-        value={value || all}
-        disabled={disabled}
-        onValueChange={(next) => onChange(next === all ? null : next)}
-      >
-        <SelectTrigger aria-labelledby={`insights-filter-${id}`} className="w-full">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {items.map((item) => (
-            <SelectItem key={item.value} value={item.value}>
-              {item.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      {truncated ? (
-        <FieldDescription>{`Showing the first ${optionLimit}. Narrow with the other filters.`}</FieldDescription>
-      ) : null}
-    </Field>
+    <FilterSelect
+      label={label}
+      icon={filterIcon(label)}
+      items={items}
+      value={value || all}
+      defaultValue={all}
+      disabled={disabled}
+      note={
+        truncated ? `Showing the first ${optionLimit}. Narrow with the other filters.` : undefined
+      }
+      onValueChange={(next) => onChange(next === all ? null : next)}
+    />
   );
 
   const dateFilter = (key: "from" | "to", label: string) => (
-    <Field>
-      <FieldLabel htmlFor={`insights-${key}`}>{label}</FieldLabel>
-      <Input
-        id={`insights-${key}`}
-        type="date"
-        {...(key === "from" && to ? { max: to } : {})}
-        {...(key === "to" && from ? { min: from } : {})}
-        aria-invalid={key === "to" && rangeInvalid ? true : undefined}
-        value={url.filters[key]}
-        onChange={(event) => url.setFilter(key, event.target.value)}
-      />
-      {key === "to" && rangeInvalid ? (
-        <FieldError>The end date must not be before the start date.</FieldError>
-      ) : null}
-    </Field>
+    <FilterInput
+      label={label}
+      icon={filterIcon(label)}
+      type="date"
+      {...(key === "from" && to ? { max: to } : {})}
+      {...(key === "to" && from ? { min: from } : {})}
+      error={
+        key === "to" && rangeInvalid ? "The end date must not be before the start date." : undefined
+      }
+      value={url.filters[key]}
+      onChange={(event) => url.setFilter(key, event.target.value)}
+    />
   );
 
   const status = (query: { isError: boolean; isPending: boolean }) =>

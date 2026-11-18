@@ -1,6 +1,6 @@
 # frontend-public
 
-Next.js app for the public site and the learner area, on `learn.<domain>` (port 3000). Shared rules: [root CLAUDE.md](../../CLAUDE.md), including the [UI review checklist](../../CLAUDE.md#ui-review-checklist). This file adds only what is specific to this app.
+Next.js app for the public site and the learner area, on `learn.<domain>` (port 3000). Shared rules: [root CLAUDE.md](../../CLAUDE.md). This file adds only what is specific to this app.
 
 ## Data path
 

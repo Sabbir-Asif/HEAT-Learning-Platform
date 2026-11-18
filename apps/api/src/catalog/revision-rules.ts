@@ -25,6 +25,22 @@ export const assertCanPublishRevision = (input: {
   }
 };
 
+export const assertCanDeleteRevision = (input: {
+  requestedId: string;
+  latest: { id: string; publishedAt: Date | null };
+  enrollmentCount: number;
+  revisionCount: number;
+}): void => {
+  if (
+    input.latest.id !== input.requestedId ||
+    input.latest.publishedAt !== null ||
+    input.enrollmentCount > 0
+  ) {
+    throw new ApiException(409, "COURSE_REVISION_NOT_DRAFT");
+  }
+  if (input.revisionCount < 2) throw new ApiException(409, "COURSE_REVISION_REQUIRED");
+};
+
 export const referenceIncrements = (
   assetIds: ReadonlyArray<string | null>,
 ): Map<string, number> => {

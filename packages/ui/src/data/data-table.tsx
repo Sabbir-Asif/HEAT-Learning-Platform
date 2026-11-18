@@ -224,6 +224,7 @@ function DataTable<Row extends RowData>({
                       <Button
                         variant="ghost"
                         size="sm"
+                        className="-ml-2.5 font-semibold tracking-wide"
                         onClick={() => onToggleSort(header.column.id)}
                       >
                         {String(header.column.columnDef.header)}
@@ -277,14 +278,35 @@ function DataTable<Row extends RowData>({
           Updating
         </p>
       ) : null}
-      <div>{body}</div>
-      <Pagination
-        page={page}
-        pageSize={pageSize}
-        total={total}
-        onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
-      />
+      <div
+        className={cn(
+          !(isMobile && status === "ready" && rows.length > 0) &&
+            "bg-card overflow-hidden rounded-lg border shadow-xs",
+          fetching && "opacity-70 transition-opacity",
+        )}
+      >
+        {body}
+        {!(isMobile && status === "ready" && rows.length > 0) ? (
+          <div className="border-t px-4 py-3">
+            <Pagination
+              page={page}
+              pageSize={pageSize}
+              total={total}
+              onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
+            />
+          </div>
+        ) : null}
+      </div>
+      {isMobile && status === "ready" && rows.length > 0 ? (
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
+      ) : null}
     </div>
   );
 }
@@ -343,9 +365,9 @@ function LoadingRows({ columns, mobile }: { columns: number; mobile: boolean }) 
     );
   }
   return (
-    <div className="flex flex-col gap-2" role="status" aria-label="Loading">
+    <div className="flex flex-col gap-3 p-4" role="status" aria-label="Loading">
       {items.map((item) => (
-        <div key={item} className="flex gap-3">
+        <div key={item} className="flex gap-4">
           {Array.from({ length: columns }, (_, column) => (
             <Skeleton key={column} className="h-8 flex-1" />
           ))}

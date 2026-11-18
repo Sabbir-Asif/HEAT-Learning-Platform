@@ -2,6 +2,8 @@ import type { CourseRevisionItemDto } from "@heat/api-client";
 import { describe, expect, test } from "vitest";
 import {
   canCloneRevisions,
+  canDeleteRevision,
+  deleteRevisionFailedMessage,
   cloneRevisionFailedMessage,
   draftRevisionOf,
   publishRevisionFailedMessage,
@@ -56,5 +58,28 @@ describe("canCloneRevisions and draftRevisionOf", () => {
     const draft = revision({ id: "d", status: "DRAFT" });
     expect(draftRevisionOf([revision({}), draft])).toBe(draft);
     expect(draftRevisionOf([revision({})])).toBeNull();
+  });
+});
+
+describe("canDeleteRevision", () => {
+  const draft = { status: "DRAFT" as const, current: true, enrollmentCount: 0 };
+
+  test("allows the latest empty draft when another revision exists", () => {
+    expect(canDeleteRevision(draft, 2)).toBe(true);
+  });
+
+  test("refuses published, older, enrolled and only revisions", () => {
+    expect(canDeleteRevision({ ...draft, status: "PUBLISHED" }, 2)).toBe(false);
+    expect(canDeleteRevision({ ...draft, current: false }, 2)).toBe(false);
+    expect(canDeleteRevision({ ...draft, enrollmentCount: 1 }, 2)).toBe(false);
+    expect(canDeleteRevision(draft, 1)).toBe(false);
+  });
+});
+
+describe("deleteRevisionFailedMessage", () => {
+  test("explains each refusal", () => {
+    expect(deleteRevisionFailedMessage("COURSE_REVISION_NOT_DRAFT")).toContain("latest draft");
+    expect(deleteRevisionFailedMessage("COURSE_REVISION_REQUIRED")).toContain("at least one");
+    expect(deleteRevisionFailedMessage(undefined)).toContain("Try again");
   });
 });

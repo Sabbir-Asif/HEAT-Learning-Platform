@@ -28,6 +28,7 @@ import type {
   AdminMeResponseDto,
   AdminOverviewDto,
   AdminProfileChangeListResponseDto,
+  AdminQuizSettingsResponseDto,
   AdminSignInRequestDto,
   AdminSummaryDto,
   ApprovalQueueResponseDto,
@@ -114,6 +115,7 @@ import type {
   QuizQuestionRequestDto,
   QuizResultResponseDto,
   QuizRulesRequestDto,
+  QuizSettingsRequestDto,
   QuizSubmitRequestDto,
   QuizSubmitResponseDto,
   QuizSummaryDto,
@@ -133,6 +135,7 @@ import type {
   ResourceAdminListResponseDto,
   ResourcePublicListResponseDto,
   ResourceRequestDto,
+  RevisionSnapshotResponseDto,
   RevokeCertificateRequestDto,
   RevokedCertificateDto,
   SetTagsRequestDto,
@@ -260,6 +263,10 @@ export const getRevisionsListResponseMock = (overrideResponse: Partial<Extract<C
 
 export const getRevisionsCloneResponseMock = (overrideResponse: Partial<Extract<CourseRevisionItemDto, object>> = {}): CourseRevisionItemDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', current: faker.datatype.boolean(), enrollmentCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), locked: faker.datatype.boolean(), number: faker.number.int({min: 1, max: 9007199254740991}), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), status: faker.helpers.arrayElement(['DRAFT','PUBLISHED'] as const), ...overrideResponse})
 
+export const getRevisionsSnapshotResponseMock = (overrideResponse: Partial<Extract<RevisionSnapshotResponseDto, object>> = {}): RevisionSnapshotResponseDto => ({modules: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), objectives: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), order: faker.number.int({min: 1, max: 9007199254740991}), quiz: faker.helpers.arrayElement([{attemptLimit: faker.helpers.arrayElement([faker.number.int({min: -9007199254740991, max: 9007199254740991}), null]), passMarkPercent: faker.number.int({min: -9007199254740991, max: 9007199254740991}), questions: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({explanation: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 2000}}), null]), id: faker.string.uuid(), options: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), isCorrect: faker.datatype.boolean(), text: faker.string.alpha({length: {min: 10, max: 20}})})), order: faker.number.int({min: 1, max: 9007199254740991}), text: faker.string.alpha({length: {min: 10, max: 20}})})), waitMinutes: faker.number.int({min: -9007199254740991, max: 9007199254740991})},null,]), sections: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({body: {
+        [faker.string.alphanumeric(5)]: {}
+      }, id: faker.string.uuid(), images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), order: faker.number.int({min: 1, max: 9007199254740991}), title: faker.string.alpha({length: {min: 10, max: 20}})})), title: faker.string.alpha({length: {min: 10, max: 20}}), videos: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), order: faker.number.int({min: 1, max: 9007199254740991}), required: faker.datatype.boolean(), status: faker.helpers.arrayElement(['NOT_UPLOADED','UPLOADING','UPLOADED','QUEUED','PROCESSING','READY','FAILED','REJECTED'] as const), title: faker.string.alpha({length: {min: 10, max: 20}})}))})), revision: {createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', current: faker.datatype.boolean(), enrollmentCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), locked: faker.datatype.boolean(), number: faker.number.int({min: 1, max: 9007199254740991}), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), status: faker.helpers.arrayElement(['DRAFT','PUBLISHED'] as const)}, students: {items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({email: faker.string.alpha({length: {min: 10, max: 20}}), enrollmentId: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const), userId: faker.string.uuid()})), total: faker.number.int({min: 0, max: 9007199254740991})}, ...overrideResponse})
+
 export const getRevisionsPublishResponseMock = (overrideResponse: Partial<Extract<CourseRevisionItemDto, object>> = {}): CourseRevisionItemDto => ({createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', current: faker.datatype.boolean(), enrollmentCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), locked: faker.datatype.boolean(), number: faker.number.int({min: 1, max: 9007199254740991}), publishedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), status: faker.helpers.arrayElement(['DRAFT','PUBLISHED'] as const), ...overrideResponse})
 
 export const getTagAssignmentsCourseTagsResponseMock = (overrideResponse: Partial<Extract<TagRefListResponseDto, object>> = {}): TagRefListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), isSystem: faker.datatype.boolean(), name: faker.string.alpha({length: {min: 10, max: 20}}), slug: faker.string.alpha({length: {min: 10, max: 20}})})), ...overrideResponse})
@@ -306,11 +313,11 @@ export const getUniversitiesArchiveResponseMock = (overrideResponse: Partial<Ext
 
 export const getUniversitiesRestoreResponseMock = (overrideResponse: Partial<Extract<UniversitySummaryDto, object>> = {}): UniversitySummaryDto => ({archivedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), createdAt: faker.date.past().toISOString().slice(0, 19) + 'Z', departmentCount: faker.number.int({min: 0, max: 9007199254740991}), facultyCount: faker.number.int({min: 0, max: 9007199254740991}), id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), studentCount: faker.number.int({min: 0, max: 9007199254740991}), updatedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
-export const getEnrollmentApprovalApproveManyResponseMock = (overrideResponse: Partial<Extract<BulkApprovalResponseDto, object>> = {}): BulkApprovalResponseDto => ({failed: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement(['AUDIT_ACTOR_FILTER_TOO_BROAD','BAD_REQUEST','CANNOT_DEACTIVATE_SELF','CAPTCHA_EXPIRED','CAPTCHA_INVALID','CERTIFICATE_NOT_READY','CERTIFICATE_REVOKED','CONTENT_LOCKED','COURSE_HAS_ENROLLMENTS','COURSE_LOCKED','COURSE_NOT_AVAILABLE','COURSE_NOT_DRAFT','COURSE_NOT_PUBLISHED','COURSE_PUBLISH_CHECKS_FAILED','COURSE_REVISION_DRAFT_EXISTS','COURSE_REVISION_NOT_DRAFT','COURSE_SLUG_TAKEN','CSRF_TOKEN_INVALID','DIRECTORY_ARCHIVED','DIRECTORY_IN_USE','DIRECTORY_NAME_TAKEN','EMAIL_IN_USE','EMAIL_NOT_VERIFIED','ENROLLMENT_ALREADY_DECIDED','ENROLLMENT_NOT_ACTIVE','ENROLLMENT_NOT_REMOVABLE','ENROLLMENT_NOT_REMOVED','ENROLLMENT_NOT_VERIFIED','ENROLLMENT_STATE_CHANGED','FORBIDDEN','INSIGHTS_REFRESH_RUNNING','INTERNAL','INVALID_CREDENTIALS','INVITATION_EXPIRED','INVITATION_INVALID','INVITATION_NOT_PENDING','MODULE_LOCKED','NOT_FOUND','ORDER_CONFLICT','ORIGIN_NOT_ALLOWED','PASSWORD_BREACHED','PASSWORD_CHANGE_REQUIRED','PASSWORD_CODE_EMAIL_UNVERIFIED','PASSWORD_CODE_EXPIRED','PASSWORD_CODE_INVALID','PROFILE_CHANGE_NOT_PENDING','PROFILE_CHANGE_PENDING','PROFILE_CHANGE_UNCHANGED','PROFILE_LOCKED','QUIZ_ANSWER_INVALID','QUIZ_ATTEMPTS_UNLIMITED','QUIZ_ATTEMPT_LIMIT_REACHED','QUIZ_ATTEMPT_NOT_OPEN','QUIZ_ATTEMPT_WAIT','QUIZ_GRANT_NOT_NEEDED','QUIZ_NOT_UNLOCKED','RATE_LIMITED','RESET_LINK_EXPIRED','RESET_LINK_INVALID','RESET_LINK_USED','TAG_NAME_TAKEN','TAG_RESERVED','UNAUTHENTICATED','UPLOAD_DIMENSIONS_TOO_LARGE','UPLOAD_EXPIRED','UPLOAD_OFFSET_MISMATCH','UPLOAD_TOO_LARGE','UPLOAD_TYPE_NOT_ALLOWED','VALIDATION_FAILED','VERIFICATION_LINK_EXPIRED','VERIFICATION_LINK_INVALID','VERIFICATION_LINK_USED','VERIFICATION_RESEND_LIMIT','VIDEO_NOT_FAILED','VIDEO_NOT_READY'] as const), id: faker.string.uuid()})), succeeded: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), ...overrideResponse})
+export const getEnrollmentApprovalApproveManyResponseMock = (overrideResponse: Partial<Extract<BulkApprovalResponseDto, object>> = {}): BulkApprovalResponseDto => ({failed: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement(['AUDIT_ACTOR_FILTER_TOO_BROAD','BAD_REQUEST','CANNOT_DEACTIVATE_SELF','CAPTCHA_EXPIRED','CAPTCHA_INVALID','CERTIFICATE_NOT_READY','CERTIFICATE_REVOKED','CONTENT_LOCKED','COURSE_HAS_ENROLLMENTS','COURSE_LOCKED','COURSE_NOT_AVAILABLE','COURSE_NOT_DRAFT','COURSE_NOT_PUBLISHED','COURSE_PUBLISH_CHECKS_FAILED','COURSE_REVISION_DRAFT_EXISTS','COURSE_REVISION_NOT_DRAFT','COURSE_REVISION_REQUIRED','COURSE_SLUG_TAKEN','CSRF_TOKEN_INVALID','DIRECTORY_ARCHIVED','DIRECTORY_IN_USE','DIRECTORY_NAME_TAKEN','EMAIL_IN_USE','EMAIL_NOT_VERIFIED','ENROLLMENT_ALREADY_DECIDED','ENROLLMENT_NOT_ACTIVE','ENROLLMENT_NOT_REMOVABLE','ENROLLMENT_NOT_REMOVED','ENROLLMENT_NOT_VERIFIED','ENROLLMENT_STATE_CHANGED','FORBIDDEN','INSIGHTS_REFRESH_RUNNING','INTERNAL','INVALID_CREDENTIALS','INVITATION_EXPIRED','INVITATION_INVALID','INVITATION_NOT_PENDING','MODULE_LOCKED','NOT_FOUND','ORDER_CONFLICT','ORIGIN_NOT_ALLOWED','PASSWORD_BREACHED','PASSWORD_CHANGE_REQUIRED','PASSWORD_CODE_EMAIL_UNVERIFIED','PASSWORD_CODE_EXPIRED','PASSWORD_CODE_INVALID','PROFILE_CHANGE_NOT_PENDING','PROFILE_CHANGE_PENDING','PROFILE_CHANGE_UNCHANGED','PROFILE_LOCKED','QUIZ_ANSWER_INVALID','QUIZ_ATTEMPTS_UNLIMITED','QUIZ_ATTEMPT_LIMIT_REACHED','QUIZ_ATTEMPT_NOT_OPEN','QUIZ_ATTEMPT_WAIT','QUIZ_GRANT_NOT_NEEDED','QUIZ_NOT_UNLOCKED','RATE_LIMITED','RESET_LINK_EXPIRED','RESET_LINK_INVALID','RESET_LINK_USED','TAG_NAME_TAKEN','TAG_RESERVED','UNAUTHENTICATED','UPLOAD_DIMENSIONS_TOO_LARGE','UPLOAD_EXPIRED','UPLOAD_OFFSET_MISMATCH','UPLOAD_TOO_LARGE','UPLOAD_TYPE_NOT_ALLOWED','VALIDATION_FAILED','VERIFICATION_LINK_EXPIRED','VERIFICATION_LINK_INVALID','VERIFICATION_LINK_USED','VERIFICATION_RESEND_LIMIT','VIDEO_NOT_FAILED','VIDEO_NOT_READY'] as const), id: faker.string.uuid()})), succeeded: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), ...overrideResponse})
 
 export const getEnrollmentApprovalListPendingResponseMock = (overrideResponse: Partial<Extract<ApprovalQueueResponseDto, object>> = {}): ApprovalQueueResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({course: {id: faker.string.uuid(), title: faker.string.alpha({length: {min: 10, max: 20}})}, department: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, id: faker.string.uuid(), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', session: faker.string.alpha({length: {min: 10, max: 20}}), student: {email: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}})}, university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, verifiedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null])})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
 
-export const getEnrollmentApprovalRejectManyResponseMock = (overrideResponse: Partial<Extract<BulkRejectionResponseDto, object>> = {}): BulkRejectionResponseDto => ({failed: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement(['AUDIT_ACTOR_FILTER_TOO_BROAD','BAD_REQUEST','CANNOT_DEACTIVATE_SELF','CAPTCHA_EXPIRED','CAPTCHA_INVALID','CERTIFICATE_NOT_READY','CERTIFICATE_REVOKED','CONTENT_LOCKED','COURSE_HAS_ENROLLMENTS','COURSE_LOCKED','COURSE_NOT_AVAILABLE','COURSE_NOT_DRAFT','COURSE_NOT_PUBLISHED','COURSE_PUBLISH_CHECKS_FAILED','COURSE_REVISION_DRAFT_EXISTS','COURSE_REVISION_NOT_DRAFT','COURSE_SLUG_TAKEN','CSRF_TOKEN_INVALID','DIRECTORY_ARCHIVED','DIRECTORY_IN_USE','DIRECTORY_NAME_TAKEN','EMAIL_IN_USE','EMAIL_NOT_VERIFIED','ENROLLMENT_ALREADY_DECIDED','ENROLLMENT_NOT_ACTIVE','ENROLLMENT_NOT_REMOVABLE','ENROLLMENT_NOT_REMOVED','ENROLLMENT_NOT_VERIFIED','ENROLLMENT_STATE_CHANGED','FORBIDDEN','INSIGHTS_REFRESH_RUNNING','INTERNAL','INVALID_CREDENTIALS','INVITATION_EXPIRED','INVITATION_INVALID','INVITATION_NOT_PENDING','MODULE_LOCKED','NOT_FOUND','ORDER_CONFLICT','ORIGIN_NOT_ALLOWED','PASSWORD_BREACHED','PASSWORD_CHANGE_REQUIRED','PASSWORD_CODE_EMAIL_UNVERIFIED','PASSWORD_CODE_EXPIRED','PASSWORD_CODE_INVALID','PROFILE_CHANGE_NOT_PENDING','PROFILE_CHANGE_PENDING','PROFILE_CHANGE_UNCHANGED','PROFILE_LOCKED','QUIZ_ANSWER_INVALID','QUIZ_ATTEMPTS_UNLIMITED','QUIZ_ATTEMPT_LIMIT_REACHED','QUIZ_ATTEMPT_NOT_OPEN','QUIZ_ATTEMPT_WAIT','QUIZ_GRANT_NOT_NEEDED','QUIZ_NOT_UNLOCKED','RATE_LIMITED','RESET_LINK_EXPIRED','RESET_LINK_INVALID','RESET_LINK_USED','TAG_NAME_TAKEN','TAG_RESERVED','UNAUTHENTICATED','UPLOAD_DIMENSIONS_TOO_LARGE','UPLOAD_EXPIRED','UPLOAD_OFFSET_MISMATCH','UPLOAD_TOO_LARGE','UPLOAD_TYPE_NOT_ALLOWED','VALIDATION_FAILED','VERIFICATION_LINK_EXPIRED','VERIFICATION_LINK_INVALID','VERIFICATION_LINK_USED','VERIFICATION_RESEND_LIMIT','VIDEO_NOT_FAILED','VIDEO_NOT_READY'] as const), id: faker.string.uuid()})), succeeded: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), ...overrideResponse})
+export const getEnrollmentApprovalRejectManyResponseMock = (overrideResponse: Partial<Extract<BulkRejectionResponseDto, object>> = {}): BulkRejectionResponseDto => ({failed: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({code: faker.helpers.arrayElement(['AUDIT_ACTOR_FILTER_TOO_BROAD','BAD_REQUEST','CANNOT_DEACTIVATE_SELF','CAPTCHA_EXPIRED','CAPTCHA_INVALID','CERTIFICATE_NOT_READY','CERTIFICATE_REVOKED','CONTENT_LOCKED','COURSE_HAS_ENROLLMENTS','COURSE_LOCKED','COURSE_NOT_AVAILABLE','COURSE_NOT_DRAFT','COURSE_NOT_PUBLISHED','COURSE_PUBLISH_CHECKS_FAILED','COURSE_REVISION_DRAFT_EXISTS','COURSE_REVISION_NOT_DRAFT','COURSE_REVISION_REQUIRED','COURSE_SLUG_TAKEN','CSRF_TOKEN_INVALID','DIRECTORY_ARCHIVED','DIRECTORY_IN_USE','DIRECTORY_NAME_TAKEN','EMAIL_IN_USE','EMAIL_NOT_VERIFIED','ENROLLMENT_ALREADY_DECIDED','ENROLLMENT_NOT_ACTIVE','ENROLLMENT_NOT_REMOVABLE','ENROLLMENT_NOT_REMOVED','ENROLLMENT_NOT_VERIFIED','ENROLLMENT_STATE_CHANGED','FORBIDDEN','INSIGHTS_REFRESH_RUNNING','INTERNAL','INVALID_CREDENTIALS','INVITATION_EXPIRED','INVITATION_INVALID','INVITATION_NOT_PENDING','MODULE_LOCKED','NOT_FOUND','ORDER_CONFLICT','ORIGIN_NOT_ALLOWED','PASSWORD_BREACHED','PASSWORD_CHANGE_REQUIRED','PASSWORD_CODE_EMAIL_UNVERIFIED','PASSWORD_CODE_EXPIRED','PASSWORD_CODE_INVALID','PROFILE_CHANGE_NOT_PENDING','PROFILE_CHANGE_PENDING','PROFILE_CHANGE_UNCHANGED','PROFILE_LOCKED','QUIZ_ANSWER_INVALID','QUIZ_ATTEMPTS_UNLIMITED','QUIZ_ATTEMPT_LIMIT_REACHED','QUIZ_ATTEMPT_NOT_OPEN','QUIZ_ATTEMPT_WAIT','QUIZ_GRANT_NOT_NEEDED','QUIZ_NOT_UNLOCKED','RATE_LIMITED','RESET_LINK_EXPIRED','RESET_LINK_INVALID','RESET_LINK_USED','TAG_NAME_TAKEN','TAG_RESERVED','UNAUTHENTICATED','UPLOAD_DIMENSIONS_TOO_LARGE','UPLOAD_EXPIRED','UPLOAD_OFFSET_MISMATCH','UPLOAD_TOO_LARGE','UPLOAD_TYPE_NOT_ALLOWED','VALIDATION_FAILED','VERIFICATION_LINK_EXPIRED','VERIFICATION_LINK_INVALID','VERIFICATION_LINK_USED','VERIFICATION_RESEND_LIMIT','VIDEO_NOT_FAILED','VIDEO_NOT_READY'] as const), id: faker.string.uuid()})), succeeded: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.uuid())), ...overrideResponse})
 
 export const getEnrollmentApprovalApproveResponseMock = (overrideResponse: Partial<Extract<ApprovedEnrollmentDto, object>> = {}): ApprovedEnrollmentDto => ({approvedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', courseRevisionId: faker.string.uuid(), id: faker.string.uuid(), status: faker.helpers.arrayElement(['APPROVED'] as const), ...overrideResponse})
 
@@ -391,6 +398,10 @@ export const getAdminSiteSettingsGetResponseMock = (overrideResponse: Partial<Ex
 export const getAdminSiteSettingsUpdateResponseMock = (overrideResponse: Partial<Extract<AdminLandingOverviewResponseDto, object>> = {}): AdminLandingOverviewResponseDto => ({body: {
         [faker.string.alphanumeric(5)]: {}
       }, heading: faker.string.alpha({length: {min: 10, max: 20}}), image: faker.helpers.arrayElement([{alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})},null,]), imageAssetId: faker.helpers.arrayElement([faker.string.uuid(), null]), images: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({alt: faker.string.alpha({length: {min: 10, max: 20}}), assetId: faker.string.uuid(), url: faker.string.alpha({length: {min: 10, max: 20}})})), schemaVersion: faker.number.int({min: 1, max: 9007199254740991}), updatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), ...overrideResponse})
+
+export const getAdminQuizSettingsGetResponseMock = (overrideResponse: Partial<Extract<AdminQuizSettingsResponseDto, object>> = {}): AdminQuizSettingsResponseDto => ({attemptLimit: faker.helpers.arrayElement([faker.number.int({min: -9007199254740991, max: 9007199254740991}), null]), updatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), ...overrideResponse})
+
+export const getAdminQuizSettingsUpdateResponseMock = (overrideResponse: Partial<Extract<AdminQuizSettingsResponseDto, object>> = {}): AdminQuizSettingsResponseDto => ({attemptLimit: faker.helpers.arrayElement([faker.number.int({min: -9007199254740991, max: 9007199254740991}), null]), updatedAt: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', null]), ...overrideResponse})
 
 export const getStudentListListResponseMock = (overrideResponse: Partial<Extract<StudentListResponseDto, object>> = {}): StudentListResponseDto => ({items: Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({course: {id: faker.string.uuid(), title: faker.string.alpha({length: {min: 10, max: 20}})}, department: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, faculty: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}, id: faker.string.uuid(), requestedAt: faker.date.past().toISOString().slice(0, 19) + 'Z', session: faker.string.alpha({length: {min: 10, max: 20}}), status: faker.helpers.arrayElement(['PENDING_VERIFICATION','PENDING_APPROVAL','APPROVED','COMPLETED','REJECTED','EXPIRED','REMOVED'] as const), student: {email: faker.string.alpha({length: {min: 10, max: 20}}), name: faker.string.alpha({length: {min: 10, max: 20}}), userId: faker.string.uuid()}, university: {id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}})}})), page: faker.number.int({min: 1, max: 9007199254740991}), pageSize: faker.number.int({min: 1, max: 9007199254740991}), total: faker.number.int({min: 0, max: 9007199254740991}), ...overrideResponse})
 
@@ -1110,6 +1121,28 @@ export const getRevisionsCloneMockHandler = (overrideResponse?: CourseRevisionIt
     ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
     : getRevisionsCloneResponseMock(),
       { status: 201
+      })
+  }, options)
+}
+
+export const getRevisionsRemoveMockHandler = (overrideResponse?: void | ((info: Parameters<HttpResponseResolver<{ id: string; revisionId: string }>>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.delete<{ id: string; revisionId: string }>('*/api/admin/courses/:id/revisions/:revisionId', async (info: Parameters<HttpResponseResolver<{ id: string; revisionId: string }>>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
+
+export const getRevisionsSnapshotMockHandler = (overrideResponse?: RevisionSnapshotResponseDto | ((info: Parameters<HttpResponseResolver<{ id: string; revisionId: string }>>[0]) => Promise<RevisionSnapshotResponseDto> | RevisionSnapshotResponseDto), options?: RequestHandlerOptions) => {
+  return http.get<{ id: string; revisionId: string }>('*/api/admin/courses/:id/revisions/:revisionId', async (info: Parameters<HttpResponseResolver<{ id: string; revisionId: string }>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getRevisionsSnapshotResponseMock(),
+      { status: 200
       })
   }, options)
 }
@@ -1885,6 +1918,30 @@ export const getAdminSiteSettingsUpdateMockHandler = (overrideResponse?: AdminLa
   }, options)
 }
 
+export const getAdminQuizSettingsGetMockHandler = (overrideResponse?: AdminQuizSettingsResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<AdminQuizSettingsResponseDto> | AdminQuizSettingsResponseDto), options?: RequestHandlerOptions) => {
+  return http.get('*/api/admin/site-settings/quiz', async (info: Parameters<HttpResponseResolver>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminQuizSettingsGetResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getAdminQuizSettingsUpdateMockHandler = (overrideResponse?: AdminQuizSettingsResponseDto | ((info: Parameters<HttpResponseResolver<PathParams, QuizSettingsRequestDto>>[0]) => Promise<AdminQuizSettingsResponseDto> | AdminQuizSettingsResponseDto), options?: RequestHandlerOptions) => {
+  return http.put<PathParams, QuizSettingsRequestDto>('*/api/admin/site-settings/quiz', async (info: Parameters<HttpResponseResolver<PathParams, QuizSettingsRequestDto>>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getAdminQuizSettingsUpdateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getStudentListListMockHandler = (overrideResponse?: StudentListResponseDto | ((info: Parameters<HttpResponseResolver>[0]) => Promise<StudentListResponseDto> | StudentListResponseDto), options?: RequestHandlerOptions) => {
   return http.get('*/api/admin/students', async (info: Parameters<HttpResponseResolver>[0]) => {
 
@@ -2589,6 +2646,8 @@ export const getHeatLmsApiMock = () => [
   getCoursesPublishChecksMockHandler(),
   getRevisionsListMockHandler(),
   getRevisionsCloneMockHandler(),
+  getRevisionsRemoveMockHandler(),
+  getRevisionsSnapshotMockHandler(),
   getRevisionsPublishMockHandler(),
   getTagAssignmentsCourseTagsMockHandler(),
   getTagAssignmentsSetCourseTagsMockHandler(),
@@ -2654,6 +2713,8 @@ export const getHeatLmsApiMock = () => [
   getAdminContactSettingsUpdateMockHandler(),
   getAdminSiteSettingsGetMockHandler(),
   getAdminSiteSettingsUpdateMockHandler(),
+  getAdminQuizSettingsGetMockHandler(),
+  getAdminQuizSettingsUpdateMockHandler(),
   getStudentListListMockHandler(),
   getStudentExportDownloadMockHandler(),
   getStudentDetailGetMockHandler(),

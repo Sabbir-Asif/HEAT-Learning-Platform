@@ -49,12 +49,18 @@ const quizRow = (questions: QuestionFixture[]) => ({
 });
 
 const build = (
-  options: { lockedAt?: Date | null; questions?: QuestionFixture[]; quiz?: boolean } = {},
+  options: {
+    lockedAt?: Date | null;
+    questions?: QuestionFixture[];
+    quiz?: boolean;
+    siteValue?: { value: unknown };
+  } = {},
 ) => {
   const questions = options.questions ?? [question("a", 1), question("b", 2), question("c", 3)];
   const calls: string[] = [];
   const hasQuiz = options.quiz ?? true;
   const database = {
+    siteSetting: { findUnique: vi.fn().mockResolvedValue(options.siteValue ?? null) },
     $queryRaw: vi.fn().mockResolvedValue([{ lockedAt: options.lockedAt ?? null }]),
     course: {
       findUnique: vi.fn().mockResolvedValue({
@@ -144,6 +150,17 @@ describe("QuizService.get", () => {
     expect(database.quiz.create).not.toHaveBeenCalled();
   });
 
+  test("starts a module without a quiz at the site attempt limit", async () => {
+    const { service } = build({ quiz: false, siteValue: { value: { attemptLimit: 5 } } });
+    const result = await service.get(courseId, "m");
+    expect(result.rules).toEqual({ passMarkPercent: 70, attemptLimit: 5, waitMinutes: 10 });
+  });
+
+  test("ignores a malformed site setting and stays unlimited", async () => {
+    const { service } = build({ quiz: false, siteValue: { value: { attemptLimit: "x" } } });
+    expect((await service.get(courseId, "m")).rules.attemptLimit).toBeNull();
+  });
+
   test("returns questions in order with their options and the locked flag", async () => {
     const { service, database } = build({ lockedAt: at });
     const result = await service.get(courseId, "m");
@@ -216,8 +233,24 @@ describe("QuizService.createQuestion", () => {
     const { service, database, inAuditScope } = build({ quiz: false });
     database.question.aggregate.mockResolvedValue({ _max: { order: null } });
     await inAuditScope(() => service.createQuestion(courseId, "m", request()));
-    expect(database.quiz.create.mock.calls[0]?.[0].data).toEqual({ moduleId: "m" });
+    expect(database.quiz.create.mock.calls[0]?.[0].data).toEqual({
+      moduleId: "m",
+      attemptLimit: null,
+    });
     expect(database.question.create.mock.calls[0]?.[0].data.order).toBe(1);
+  });
+
+  test("creates the quiz at the site attempt limit when one is set", async () => {
+    const { service, database, inAuditScope } = build({
+      quiz: false,
+      siteValue: { value: { attemptLimit: 10 } },
+    });
+    database.question.aggregate.mockResolvedValue({ _max: { order: null } });
+    await inAuditScope(() => service.createQuestion(courseId, "m", request()));
+    expect(database.quiz.create.mock.calls[0]?.[0].data).toEqual({
+      moduleId: "m",
+      attemptLimit: 10,
+    });
   });
 
   test("adds the question with the next order and ordered options", async () => {

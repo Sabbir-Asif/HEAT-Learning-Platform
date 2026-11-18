@@ -22,7 +22,6 @@ import {
   Field,
   FieldDescription,
   FieldLabel,
-  Input,
   PageHeader,
   Select,
   SelectContent,
@@ -30,8 +29,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@heat/ui";
-import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui/data";
+import {
+  DataTable,
+  FilterBar,
+  FilterSelect,
+  SearchInput,
+  useClampedPage,
+  useTableUrlState,
+} from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
+import { filterIcon } from "../filters/filter-icon";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArchiveIcon, ArchiveRestoreIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
@@ -274,12 +281,11 @@ export function DepartmentsView() {
         activeCount={url.activeFilterCount}
         onClear={url.clearFilters}
         search={
-          <Input
-            type="search"
-            aria-label="Search departments"
+          <SearchInput
+            label="Search departments"
             placeholder="Search by name"
-            defaultValue={url.query}
-            onChange={(event) => url.setQuery(event.target.value.trim())}
+            value={url.query}
+            onValueChange={url.setQuery}
           />
         }
       >
@@ -330,27 +336,15 @@ export function DepartmentsView() {
             <FieldDescription>{optionsTruncatedMessage(optionLimit)}</FieldDescription>
           ) : null}
         </Field>
-        <Field>
-          <FieldLabel id="department-filter-status">Status</FieldLabel>
-          <Select
-            items={directoryStatusItems}
-            value={status}
-            onValueChange={(value) =>
-              url.setFilter(statusFilterKey, value === "active" ? null : value)
-            }
-          >
-            <SelectTrigger aria-labelledby="department-filter-status" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {directoryStatusItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
+        <FilterSelect
+          label="Status"
+          icon={filterIcon("Status")}
+          items={directoryStatusItems}
+          value={status}
+          onValueChange={(value) =>
+            url.setFilter(statusFilterKey, value === "active" ? null : value)
+          }
+        />
       </FilterBar>
       <DataTable
         label="Departments"

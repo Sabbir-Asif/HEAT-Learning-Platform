@@ -22,7 +22,7 @@ import { UserCogIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useMemo, type ReactNode } from "react";
-import { adminName, heatLogo } from "./brand";
+import { adminName } from "./brand";
 import { buildBreadcrumbs } from "./breadcrumbs";
 import { adminNavigation } from "./navigation";
 
@@ -43,7 +43,7 @@ export function AdminShell({
       <SkipLink />
       <ShellSidebar
         mode="drawer"
-        brand={{ name: adminName, href: "/", logo: heatLogo }}
+        brand={{ name: adminName, href: "/" }}
         groups={groups}
         pathname={pathname}
         navLabel="Admin"

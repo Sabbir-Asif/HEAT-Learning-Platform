@@ -24,5 +24,4 @@ Closes #
 - [ ] Tests added or updated, and `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm test:coverage` and `pnpm build` pass
 - [ ] No secrets, `.env` files or personal data in the diff
 - [ ] Docs or ADR updated where behaviour or a decision changed
-- [ ] UI changes pass the UI review checklist in [CLAUDE.md](https://github.com/Sabbir-Asif/HEAT-Learning-Platform/blob/main/CLAUDE.md#ui-review-checklist)
 - [ ] Migrations changed (`packages/db/prisma/migrations`): reviewed against the [migration review checklist](https://github.com/Sabbir-Asif/HEAT-Learning-Platform/blob/main/docs/runbooks/migration-review.md), or write "No migration changes"

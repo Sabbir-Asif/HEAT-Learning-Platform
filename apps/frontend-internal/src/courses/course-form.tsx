@@ -19,7 +19,9 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { slugFromTitle } from "./course-slug";
 import { courseLockedMessage, courseSlugTakenMessage } from "./courses-copy";
+import { isContentLocked } from "./courses-status";
 
 type CourseFormProps = {
   course: CourseSummaryDto | null;
@@ -41,7 +43,7 @@ export function CourseForm({ course, onSaved, onCancel, onDirtyChange }: CourseF
     resolver: zodResolver(courseFormSchema),
     defaultValues: valuesOf(course),
   });
-  const locked = course?.lockedAt != null;
+  const locked = course !== null && isContentLocked(course);
 
   const { reset } = form;
   const { isDirty } = form.formState;
@@ -52,6 +54,14 @@ export function CourseForm({ course, onSaved, onCancel, onDirtyChange }: CourseF
   useEffect(() => {
     onDirtyChange?.(isDirty);
   }, [isDirty, onDirtyChange]);
+
+  const title = form.watch("title");
+  const slugEdited = form.formState.dirtyFields.slug === true;
+  const { setValue } = form;
+  useEffect(() => {
+    if (course !== null || slugEdited) return;
+    setValue("slug", slugFromTitle(title), { shouldValidate: title !== "" });
+  }, [course, slugEdited, title, setValue]);
 
   useEffect(() => {
     if (!isDirty) return undefined;
@@ -107,7 +117,11 @@ export function CourseForm({ course, onSaved, onCancel, onDirtyChange }: CourseF
       <FormField
         name="slug"
         label="Slug"
-        description="Lowercase letters, digits and hyphens. It appears in the course address."
+        description={
+          course === null
+            ? "Filled in from the title. Edit it to change the course address."
+            : "Lowercase letters, digits and hyphens. It appears in the course address."
+        }
         render={({ field, controlProps }) => (
           <Input autoComplete="off" readOnly={locked} {...field} {...controlProps} />
         )}
@@ -115,12 +129,16 @@ export function CourseForm({ course, onSaved, onCancel, onDirtyChange }: CourseF
       <FormField
         name="description"
         label="Description"
-        description={`Up to ${courseDescriptionMaxLength} characters.`}
+        description={`${form.watch("description").length} of ${courseDescriptionMaxLength} characters.`}
         render={({ field, controlProps }) => <Textarea rows={6} {...field} {...controlProps} />}
       />
       <div className="flex gap-2">
         <Button type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? "Saving" : "Save"}
+          {form.formState.isSubmitting
+            ? "Saving"
+            : course === null
+              ? "Create course"
+              : "Save changes"}
         </Button>
         {onCancel ? (
           <Button type="button" variant="outline" onClick={onCancel}>

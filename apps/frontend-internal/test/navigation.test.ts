@@ -17,7 +17,6 @@ describe("admin navigation", () => {
       "Courses",
       "Media",
       "Directory",
-      "Site content",
       "Administration",
     ]);
   });
@@ -35,7 +34,7 @@ describe("admin navigation", () => {
   test("nested routes keep the parent item active", () => {
     const items = flat();
     expect(findActiveHref(items, "/courses/7/modules/2")).toBe("/courses");
-    expect(findActiveHref(items, "/content/news/9")).toBe("/content/news");
+    expect(findActiveHref(items, "/courses/7")).toBe("/courses");
     expect(findActiveHref(items, "/")).toBe("/");
   });
 

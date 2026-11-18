@@ -11,23 +11,18 @@ import {
 } from "@heat/api-client";
 import type { StudentListListParams, StudentListResponseDtoItemsItem } from "@heat/api-client";
 import { academicSessionSchema, enrollmentStatuses } from "@heat/contracts";
+import { Button, FieldDescription, PageHeader, StatusBadge } from "@heat/ui";
 import {
-  Button,
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-  Input,
-  PageHeader,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  StatusBadge,
-} from "@heat/ui";
-import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui/data";
+  DataTable,
+  FilterBar,
+  FilterInput,
+  FilterSelect,
+  SearchInput,
+  useClampedPage,
+  useTableUrlState,
+} from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
+import { filterIcon } from "../filters/filter-icon";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
@@ -181,29 +176,18 @@ export function StudentsView() {
     disabled = false,
     truncated = false,
   ) => (
-    <Field>
-      <FieldLabel id={`student-filter-${id}`}>{label}</FieldLabel>
-      <Select
-        items={entries}
-        value={value || all}
-        disabled={disabled}
-        onValueChange={(next) => onChange(next === all ? null : next)}
-      >
-        <SelectTrigger aria-labelledby={`student-filter-${id}`} className="w-full">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {entries.map((entry) => (
-            <SelectItem key={entry.value} value={entry.value}>
-              {entry.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      {truncated ? (
-        <FieldDescription>{`Showing the first ${optionLimit}. Narrow with the other filters.`}</FieldDescription>
-      ) : null}
-    </Field>
+    <FilterSelect
+      label={label}
+      icon={filterIcon(label)}
+      items={entries}
+      value={value || all}
+      defaultValue={all}
+      disabled={disabled}
+      note={
+        truncated ? `Showing the first ${optionLimit}. Narrow with the other filters.` : undefined
+      }
+      onValueChange={(next) => onChange(next === all ? null : next)}
+    />
   );
 
   return (
@@ -223,12 +207,11 @@ export function StudentsView() {
         activeCount={url.activeFilterCount}
         onClear={url.clearFilters}
         search={
-          <Input
-            type="search"
-            aria-label="Search students"
+          <SearchInput
+            label="Search students"
             placeholder="Search by name or email"
-            defaultValue={url.query}
-            onChange={(event) => url.setQuery(event.target.value.trim())}
+            value={url.query}
+            onValueChange={url.setQuery}
           />
         }
       >
@@ -268,26 +251,25 @@ export function StudentsView() {
           !university || !faculty,
           (departments.data?.total ?? 0) > optionLimit,
         )}
-        <Field>
-          <FieldLabel htmlFor="student-session">Session</FieldLabel>
-          <Input
-            id="student-session"
-            key={session}
-            defaultValue={session}
-            placeholder="2020-21"
-            aria-invalid={sessionValid ? undefined : true}
-            onBlur={(event) => {
-              const next = event.target.value.trim();
-              if (next !== session) url.setFilter("session", next);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") event.currentTarget.blur();
-            }}
-          />
-          {sessionValid ? null : (
-            <FieldError>Use the format 2020-21, where the second part is the next year.</FieldError>
-          )}
-        </Field>
+        <FilterInput
+          label="Session"
+          icon={filterIcon("Session")}
+          key={session}
+          defaultValue={session}
+          placeholder="2020-21"
+          error={
+            sessionValid
+              ? undefined
+              : "Use the format 2020-21, where the second part is the next year."
+          }
+          onBlur={(event) => {
+            const next = event.target.value.trim();
+            if (next !== session) url.setFilter("session", next);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") event.currentTarget.blur();
+          }}
+        />
         {selectFilter(studentStatusFilterKey, "Status", statusItems, status, (next) =>
           url.setFilter(studentStatusFilterKey, next),
         )}

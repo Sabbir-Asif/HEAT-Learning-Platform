@@ -2,9 +2,10 @@
 
 import { useAuditLogList } from "@heat/api-client";
 import type { AuditLogListParams, AuditLogListResponseDtoItemsItem } from "@heat/api-client";
-import { Field, FieldError, FieldLabel, Input, PageHeader } from "@heat/ui";
-import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui/data";
+import { PageHeader } from "@heat/ui";
+import { DataTable, FilterBar, FilterInput, useClampedPage, useTableUrlState } from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
+import { filterIcon } from "../filters/filter-icon";
 import { ShellContent } from "@heat/ui/shell";
 import { useMemo } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
@@ -53,46 +54,42 @@ export function AuditLogView() {
   );
 
   const textFilter = (key: "actor" | "action" | "entity", label: string) => (
-    <Field>
-      <FieldLabel htmlFor={`audit-${key}`}>{label}</FieldLabel>
-      <Input
-        id={`audit-${key}`}
-        key={url.filters[key]}
-        defaultValue={url.filters[key]}
-        onBlur={(event) => {
-          const next = event.target.value.trim();
-          if (next !== url.filters[key]) url.setFilter(key, next);
-        }}
-        onKeyDown={(event) => {
-          if (event.key === "Enter") event.currentTarget.blur();
-        }}
-      />
-    </Field>
+    <FilterInput
+      label={label}
+      icon={filterIcon(label)}
+      key={url.filters[key]}
+      defaultValue={url.filters[key]}
+      placeholder="Any"
+      onBlur={(event) => {
+        const next = event.target.value.trim();
+        if (next !== url.filters[key]) url.setFilter(key, next);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") event.currentTarget.blur();
+      }}
+    />
   );
 
   const dateFilter = (key: "from" | "to", label: string) => (
-    <Field>
-      <FieldLabel htmlFor={`audit-${key}`}>{label}</FieldLabel>
-      <Input
-        id={`audit-${key}`}
-        type="date"
-        {...(key === "from" && to ? { max: to } : {})}
-        {...(key === "to" && from ? { min: from } : {})}
-        aria-invalid={key === "to" && rangeInvalid ? true : undefined}
-        value={url.filters[key]}
-        onChange={(event) => url.setFilter(key, event.target.value)}
-      />
-      {key === "to" && rangeInvalid ? (
-        <FieldError>The end date must not be before the start date.</FieldError>
-      ) : null}
-    </Field>
+    <FilterInput
+      label={label}
+      icon={filterIcon(label)}
+      type="date"
+      {...(key === "from" && to ? { max: to } : {})}
+      {...(key === "to" && from ? { min: from } : {})}
+      error={
+        key === "to" && rangeInvalid ? "The end date must not be before the start date." : undefined
+      }
+      value={url.filters[key]}
+      onChange={(event) => url.setFilter(key, event.target.value)}
+    />
   );
 
   return (
     <ShellContent>
       <PageHeader title="Audit log" />
       <FilterBar activeCount={url.activeFilterCount} onClear={url.clearFilters}>
-        {textFilter("actor", "Actor email")}
+        {textFilter("actor", "Actor")}
         {textFilter("action", "Action")}
         {textFilter("entity", "Entity")}
         {dateFilter("from", "From")}

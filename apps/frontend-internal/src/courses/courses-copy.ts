@@ -1,7 +1,7 @@
 export const courseSlugTakenMessage = "A course with this slug already exists.";
 
 export const courseLockedMessage =
-  "This course is locked because students are enrolled. The title and slug cannot change; the description can.";
+  "This revision is published and locked. The title and slug cannot change; the description can. Clone it into a draft to change them.";
 
 export const unsavedChangesMessage = "You have unsaved changes. Discard them?";
 

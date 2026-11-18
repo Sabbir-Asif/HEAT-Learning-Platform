@@ -34,6 +34,7 @@ import type {
   AdminOverviewDto,
   AdminOverviewGetParams,
   AdminProfileChangeListResponseDto,
+  AdminQuizSettingsResponseDto,
   AdminSignInRequestDto,
   AdminSummaryDto,
   AdminUsersListParams,
@@ -136,6 +137,7 @@ import type {
   QuizQuestionRequestDto,
   QuizResultResponseDto,
   QuizRulesRequestDto,
+  QuizSettingsRequestDto,
   QuizSubmitRequestDto,
   QuizSubmitResponseDto,
   QuizSummaryDto,
@@ -156,6 +158,7 @@ import type {
   ResourcePublicListResponseDto,
   ResourceRequestDto,
   ResourcesListParams,
+  RevisionSnapshotResponseDto,
   RevokeCertificateRequestDto,
   RevokedCertificateDto,
   SetTagsRequestDto,
@@ -4609,6 +4612,179 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getRevisionsCloneMutationOptions(options), queryClient);
     }
+
+export const getRevisionsRemoveUrl = (id: string,
+    revisionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/revisions/${revisionId}`
+}
+
+export const revisionsRemove = async (id: string,
+    revisionId: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getRevisionsRemoveUrl(id,revisionId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getRevisionsRemoveMutationKey = () => ['revisionsRemove'] as const;
+
+export const getRevisionsRemoveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revisionsRemove>>, TError,RevisionsRemoveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof revisionsRemove>>, TError,RevisionsRemoveMutationVariables, TContext> => {
+
+const mutationKey = getRevisionsRemoveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof revisionsRemove>>, RevisionsRemoveMutationVariables> = (props) => {
+          const {id,revisionId} = props ?? {};
+
+          return  revisionsRemove(id,revisionId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RevisionsRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof revisionsRemove>>>
+
+    export type RevisionsRemoveMutationError = ErrorType<unknown>
+    export type RevisionsRemoveMutationVariables = {id: string;revisionId: string}
+
+    export const useRevisionsRemove = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revisionsRemove>>, TError,RevisionsRemoveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof revisionsRemove>>,
+        TError,
+        RevisionsRemoveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRevisionsRemoveMutationOptions(options), queryClient);
+    }
+
+export const getRevisionsSnapshotUrl = (id: string,
+    revisionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/revisions/${revisionId}`
+}
+
+export const revisionsSnapshot = async (id: string,
+    revisionId: string, options?: Parameters<typeof customFetch>[1]): Promise<RevisionSnapshotResponseDto> => {
+
+  return customFetch<RevisionSnapshotResponseDto>(getRevisionsSnapshotUrl(id,revisionId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getRevisionsSnapshotQueryKey = (id: string,
+    revisionId: string,) => {
+    return [
+    `/api/admin/courses/${id}/revisions/${revisionId}`
+    ] as const;
+    }
+
+
+export const getRevisionsSnapshotQueryOptions = <TData = Awaited<ReturnType<typeof revisionsSnapshot>>, TError = ErrorType<unknown>>(id: string,
+    revisionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof revisionsSnapshot>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getRevisionsSnapshotQueryKey(id,revisionId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof revisionsSnapshot>>> = ({ signal }) => revisionsSnapshot(id,revisionId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined && revisionId !== null && revisionId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof revisionsSnapshot>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type RevisionsSnapshotQueryResult = NonNullable<Awaited<ReturnType<typeof revisionsSnapshot>>>
+export type RevisionsSnapshotQueryError = ErrorType<unknown>
+
+
+export function useRevisionsSnapshot<TData = Awaited<ReturnType<typeof revisionsSnapshot>>, TError = ErrorType<unknown>>(
+ id: string,
+    revisionId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof revisionsSnapshot>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof revisionsSnapshot>>,
+          TError,
+          Awaited<ReturnType<typeof revisionsSnapshot>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useRevisionsSnapshot<TData = Awaited<ReturnType<typeof revisionsSnapshot>>, TError = ErrorType<unknown>>(
+ id: string,
+    revisionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof revisionsSnapshot>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof revisionsSnapshot>>,
+          TError,
+          Awaited<ReturnType<typeof revisionsSnapshot>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useRevisionsSnapshot<TData = Awaited<ReturnType<typeof revisionsSnapshot>>, TError = ErrorType<unknown>>(
+ id: string,
+    revisionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof revisionsSnapshot>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useRevisionsSnapshot<TData = Awaited<ReturnType<typeof revisionsSnapshot>>, TError = ErrorType<unknown>>(
+ id: string,
+    revisionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof revisionsSnapshot>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getRevisionsSnapshotQueryOptions(id,revisionId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getRevisionsPublishUrl = (id: string,
     revisionId: string,) => {
@@ -10159,6 +10335,183 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getAdminSiteSettingsUpdateMutationOptions(options), queryClient);
+    }
+
+export const getAdminQuizSettingsGetUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/quiz`
+}
+
+export const adminQuizSettingsGet = async ( options?: Parameters<typeof customFetch>[1]): Promise<AdminQuizSettingsResponseDto> => {
+
+  return customFetch<AdminQuizSettingsResponseDto>(getAdminQuizSettingsGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminQuizSettingsGetQueryKey = () => {
+    return [
+    `/api/admin/site-settings/quiz`
+    ] as const;
+    }
+
+
+export const getAdminQuizSettingsGetQueryOptions = <TData = Awaited<ReturnType<typeof adminQuizSettingsGet>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminQuizSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminQuizSettingsGetQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminQuizSettingsGet>>> = ({ signal }) => adminQuizSettingsGet({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminQuizSettingsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdminQuizSettingsGetQueryResult = NonNullable<Awaited<ReturnType<typeof adminQuizSettingsGet>>>
+export type AdminQuizSettingsGetQueryError = ErrorType<unknown>
+
+
+export function useAdminQuizSettingsGet<TData = Awaited<ReturnType<typeof adminQuizSettingsGet>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminQuizSettingsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminQuizSettingsGet>>,
+          TError,
+          Awaited<ReturnType<typeof adminQuizSettingsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminQuizSettingsGet<TData = Awaited<ReturnType<typeof adminQuizSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminQuizSettingsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminQuizSettingsGet>>,
+          TError,
+          Awaited<ReturnType<typeof adminQuizSettingsGet>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdminQuizSettingsGet<TData = Awaited<ReturnType<typeof adminQuizSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminQuizSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useAdminQuizSettingsGet<TData = Awaited<ReturnType<typeof adminQuizSettingsGet>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof adminQuizSettingsGet>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdminQuizSettingsGetQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getAdminQuizSettingsUpdateUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/quiz`
+}
+
+export const adminQuizSettingsUpdate = async (quizSettingsRequestDto: QuizSettingsRequestDto, options?: Parameters<typeof customFetch>[1]): Promise<AdminQuizSettingsResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<AdminQuizSettingsResponseDto>(getAdminQuizSettingsUpdateUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quizSettingsRequestDto)
+  }
+);}
+
+
+
+
+
+export const getAdminQuizSettingsUpdateMutationKey = () => ['adminQuizSettingsUpdate'] as const;
+
+export const getAdminQuizSettingsUpdateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminQuizSettingsUpdate>>, TError,AdminQuizSettingsUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminQuizSettingsUpdate>>, TError,AdminQuizSettingsUpdateMutationVariables, TContext> => {
+
+const mutationKey = getAdminQuizSettingsUpdateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminQuizSettingsUpdate>>, AdminQuizSettingsUpdateMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminQuizSettingsUpdate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminQuizSettingsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof adminQuizSettingsUpdate>>>
+    export type AdminQuizSettingsUpdateMutationBody = QuizSettingsRequestDto
+    export type AdminQuizSettingsUpdateMutationError = ErrorType<unknown>
+    export type AdminQuizSettingsUpdateMutationVariables = {data: QuizSettingsRequestDto}
+
+    export const useAdminQuizSettingsUpdate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminQuizSettingsUpdate>>, TError,AdminQuizSettingsUpdateMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof adminQuizSettingsUpdate>>,
+        TError,
+        AdminQuizSettingsUpdateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAdminQuizSettingsUpdateMutationOptions(options), queryClient);
     }
 
 export const getStudentListListUrl = (params?: StudentListListParams,) => {

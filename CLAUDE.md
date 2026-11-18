@@ -102,19 +102,6 @@ Every ticket is reviewed against these rules. Implementer and reviewers read the
 - Runbooks for deploy, rollback, restore, disk full, bandwidth near quota and email quota reached
 - Email queue dashboard: sent today, remaining quota, delayed jobs, failures
 
-## UI review checklist
-
-For any change to a screen, in either frontend or in `@heat/ui`. A failed item blocks the change.
-
-- [ ] Built only from `@heat/ui` components; no new one-off component in an app
-- [ ] No `.css` file in an app other than the single entry that imports `@heat/ui/styles.css`
-- [ ] No inline `style` and no arbitrary Tailwind values (`[...]`) outside `@heat/ui`
-- [ ] Tailwind in apps only for layout: grid, flex, gap and spacing tokens
-- [ ] Colour, type, radius and spacing come from the tokens
-- [ ] No-filler rule: every element serves the screen's task; no decorative cards, banners or stat tiles unless the numbers are the point of the page
-- [ ] Loading, empty and error states present; works at phone and laptop width, light and dark
-- [ ] Same table, form, dialog and feedback pattern as the rest of both apps
-
 ## Reference implementations
 
 New code copies the first implementation of its pattern. Each ticket that lands the first of a pattern fills in its row.

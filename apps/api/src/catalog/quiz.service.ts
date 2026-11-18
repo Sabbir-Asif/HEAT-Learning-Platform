@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { quizDefaults } from "@heat/contracts";
+import { quizDefaults, quizSettingsKey } from "@heat/contracts";
 import type {
   QuestionType,
   QuizOptionRequest,
@@ -18,8 +18,9 @@ import { applyOrderPlan, lockScope, readScope } from "./content-access";
 import type { ContentLocker } from "./content-access";
 import { assertContentUnlocked, nextOrder, planReorder, planResequence } from "./module-rules";
 import { assertOptionsUnlocked, assertRulesUnlocked } from "./quiz-rules";
+import { readStoredQuizSettings } from "./quiz-settings-rules";
 
-type QuizClient = Pick<HeatClient, "module" | "quiz" | "question" | "option">;
+type QuizClient = Pick<HeatClient, "module" | "quiz" | "question" | "option" | "siteSetting">;
 
 const questionSelect = {
   id: true,
@@ -270,7 +271,12 @@ export class QuizService {
   ): Promise<QuizSummary> {
     const row = await this.findQuiz(client, moduleId);
     if (row === null) {
-      return { id: null, rules: { ...quizDefaults }, questions: [], locked };
+      return {
+        id: null,
+        rules: { ...quizDefaults, attemptLimit: await this.defaultAttemptLimit(client) },
+        questions: [],
+        locked,
+      };
     }
     return {
       id: row.id,
@@ -290,8 +296,19 @@ export class QuizService {
   private async ensureQuiz(client: QuizClient, moduleId: string): Promise<string> {
     const existing = await this.findQuiz(client, moduleId);
     if (existing !== null) return existing.id;
-    const created = await client.quiz.create({ data: { moduleId }, select: { id: true } });
+    const created = await client.quiz.create({
+      data: { moduleId, attemptLimit: await this.defaultAttemptLimit(client) },
+      select: { id: true },
+    });
     return created.id;
+  }
+
+  private async defaultAttemptLimit(client: QuizClient): Promise<number | null> {
+    const row = await client.siteSetting.findUnique({
+      where: { key: quizSettingsKey },
+      select: { value: true },
+    });
+    return readStoredQuizSettings(row?.value).attemptLimit;
   }
 
   private async assertModule(

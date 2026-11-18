@@ -5,16 +5,31 @@ import type { LucideIcon } from "lucide-react";
 
 type PageHeaderProps = Omit<React.ComponentProps<"header">, "title"> & {
   title: string;
+  description?: string;
   breadcrumbs?: React.ReactNode;
   action?: React.ReactNode;
 };
 
-function PageHeader({ title, breadcrumbs, action, className, ...props }: PageHeaderProps) {
+function PageHeader({
+  title,
+  description,
+  breadcrumbs,
+  action,
+  className,
+  ...props
+}: PageHeaderProps) {
   return (
     <header data-slot="page-header" className={cn("flex flex-col gap-2", className)} {...props}>
       {breadcrumbs}
       <div className="flex items-start justify-between gap-3">
-        <h1 className="font-heading min-w-0 text-2xl font-semibold break-words">{title}</h1>
+        <div className="flex min-w-0 flex-col gap-1">
+          <h1 className="font-heading min-w-0 text-2xl font-semibold tracking-tight break-words">
+            {title}
+          </h1>
+          {description ? (
+            <p className="text-muted-foreground text-sm text-pretty">{description}</p>
+          ) : null}
+        </div>
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>
     </header>

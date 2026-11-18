@@ -14,3 +14,8 @@ export const courseStatusItems: ReadonlyArray<{ value: CourseListStatus; label: 
 
 export const courseStatusFromUrl = (value: string | undefined): CourseListStatus =>
   courseListStatuses.find((status) => status === value) ?? "all";
+
+export const isContentLocked = (course: {
+  lockedAt: string | null;
+  currentRevision: { publishedAt: string | null } | null;
+}): boolean => course.lockedAt !== null && course.currentRevision?.publishedAt != null;

@@ -38,3 +38,45 @@ export const draftRevisionOf = (
   revisions: readonly CourseRevisionItemDto[],
 ): CourseRevisionItemDto | null =>
   revisions.find((revision) => revision.status === "DRAFT") ?? null;
+
+export const revisionSnapshotLoadFailedMessage = "The revision could not be loaded.";
+
+export const revisionSnapshotNotice = (
+  status: CourseRevisionItemDto["status"],
+  students: number,
+): string => {
+  if (students > 0) {
+    const who = students === 1 ? "1 student is" : `${students} students are`;
+    return `${who} enrolled on this revision. They keep this exact content, even after newer revisions are published.`;
+  }
+  return status === "DRAFT"
+    ? "No students are enrolled on this draft. Students are enrolled on a revision once it is published and they are approved."
+    : "No students are enrolled on this revision. New approvals use the newest published revision.";
+};
+
+export const revisionStudentsOverflow = (shown: number, total: number): string =>
+  `Showing the first ${shown} of ${total} students.`;
+
+export const revisionModuleCountLabel = (count: number): string =>
+  count === 1 ? "1 module" : `${count} modules`;
+
+export const deleteRevisionTitle = "Delete this draft revision?";
+
+export const deleteRevisionDescription =
+  "The draft and everything in it is deleted. Published revisions and enrolled students are not affected. This cannot be undone.";
+
+export const deleteRevisionFailedMessage = (code: string | undefined): string =>
+  code === "COURSE_REVISION_NOT_DRAFT"
+    ? "Only the latest draft revision, with no students enrolled, can be deleted."
+    : code === "COURSE_REVISION_REQUIRED"
+      ? "A course needs at least one revision."
+      : "The revision could not be deleted. Try again.";
+
+export const canDeleteRevision = (
+  revision: Pick<CourseRevisionItemDto, "status" | "current" | "enrollmentCount">,
+  revisionCount: number,
+): boolean =>
+  revision.status === "DRAFT" &&
+  revision.current &&
+  revision.enrollmentCount === 0 &&
+  revisionCount > 1;

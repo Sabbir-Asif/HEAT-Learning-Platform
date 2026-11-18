@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   assertCanCloneRevision,
+  assertCanDeleteRevision,
   assertCanPublishRevision,
   referenceIncrements,
   revisionLocked,
@@ -121,5 +122,47 @@ describe("referenceIncrements", () => {
 
   test("returns nothing for no slots", () => {
     expect(referenceIncrements([]).size).toBe(0);
+  });
+});
+
+describe("assertCanDeleteRevision", () => {
+  const input = {
+    requestedId: "r3",
+    latest: { id: "r3", publishedAt: null as Date | null },
+    enrollmentCount: 0,
+    revisionCount: 3,
+  };
+
+  test("allows deleting the latest draft when another revision remains", () => {
+    expect(codeOf(() => assertCanDeleteRevision(input))).toBeNull();
+  });
+
+  test("refuses a published revision", () => {
+    expect(
+      codeOf(() =>
+        assertCanDeleteRevision({ ...input, latest: { id: "r3", publishedAt: published } }),
+      ),
+    ).toEqual([409, "COURSE_REVISION_NOT_DRAFT"]);
+  });
+
+  test("refuses a revision that is not the latest", () => {
+    expect(codeOf(() => assertCanDeleteRevision({ ...input, requestedId: "r2" }))).toEqual([
+      409,
+      "COURSE_REVISION_NOT_DRAFT",
+    ]);
+  });
+
+  test("refuses a draft that students are enrolled on", () => {
+    expect(codeOf(() => assertCanDeleteRevision({ ...input, enrollmentCount: 1 }))).toEqual([
+      409,
+      "COURSE_REVISION_NOT_DRAFT",
+    ]);
+  });
+
+  test("refuses to delete the only revision of a course", () => {
+    expect(codeOf(() => assertCanDeleteRevision({ ...input, revisionCount: 1 }))).toEqual([
+      409,
+      "COURSE_REVISION_REQUIRED",
+    ]);
   });
 });

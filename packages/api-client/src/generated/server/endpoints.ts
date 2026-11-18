@@ -398,6 +398,20 @@ export interface AdminProfileChangeListResponseDto {
   total: number;
 }
 
+export interface AdminQuizSettingsResponseDto {
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attemptLimit: number | null;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  updatedAt: string | null;
+}
+
 export interface AdminSignInRequestDto {
   email: string;
   /**
@@ -632,6 +646,7 @@ export const BulkApprovalResponseDtoFailedItemCode = {
   COURSE_PUBLISH_CHECKS_FAILED: 'COURSE_PUBLISH_CHECKS_FAILED',
   COURSE_REVISION_DRAFT_EXISTS: 'COURSE_REVISION_DRAFT_EXISTS',
   COURSE_REVISION_NOT_DRAFT: 'COURSE_REVISION_NOT_DRAFT',
+  COURSE_REVISION_REQUIRED: 'COURSE_REVISION_REQUIRED',
   COURSE_SLUG_TAKEN: 'COURSE_SLUG_TAKEN',
   CSRF_TOKEN_INVALID: 'CSRF_TOKEN_INVALID',
   DIRECTORY_ARCHIVED: 'DIRECTORY_ARCHIVED',
@@ -725,6 +740,7 @@ export const BulkRejectionResponseDtoFailedItemCode = {
   COURSE_PUBLISH_CHECKS_FAILED: 'COURSE_PUBLISH_CHECKS_FAILED',
   COURSE_REVISION_DRAFT_EXISTS: 'COURSE_REVISION_DRAFT_EXISTS',
   COURSE_REVISION_NOT_DRAFT: 'COURSE_REVISION_NOT_DRAFT',
+  COURSE_REVISION_REQUIRED: 'COURSE_REVISION_REQUIRED',
   COURSE_SLUG_TAKEN: 'COURSE_SLUG_TAKEN',
   CSRF_TOKEN_INVALID: 'CSRF_TOKEN_INVALID',
   DIRECTORY_ARCHIVED: 'DIRECTORY_ARCHIVED',
@@ -3369,6 +3385,15 @@ export interface QuizRulesRequestDto {
   waitMinutes: number;
 }
 
+export interface QuizSettingsRequestDto {
+  /**
+     * @minimum 1
+     * @maximum 1000
+     * @nullable
+     */
+  attemptLimit: number | null;
+}
+
 export type QuizSubmitRequestDtoAnswers = {[key: string]: string};
 
 export interface QuizSubmitRequestDto {
@@ -3830,6 +3855,189 @@ export interface ResourceRequestDto {
      * @nullable
      */
   url?: string | null;
+}
+
+export type RevisionSnapshotResponseDtoModulesItemQuizQuestionsItemOptionsItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  isCorrect: boolean;
+  text: string;
+};
+
+export type RevisionSnapshotResponseDtoModulesItemQuizQuestionsItem = {
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  explanation: string | null;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  options: RevisionSnapshotResponseDtoModulesItemQuizQuestionsItemOptionsItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  text: string;
+};
+
+/**
+ * @nullable
+ */
+export type RevisionSnapshotResponseDtoModulesItemQuiz = {
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     * @nullable
+     */
+  attemptLimit: number | null;
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  passMarkPercent: number;
+  questions: RevisionSnapshotResponseDtoModulesItemQuizQuestionsItem[];
+  /**
+     * @minimum -9007199254740991
+     * @maximum 9007199254740991
+     */
+  waitMinutes: number;
+} | null;
+
+export type RevisionSnapshotResponseDtoModulesItemSectionsItemBody = {[key: string]: unknown};
+
+export type RevisionSnapshotResponseDtoModulesItemSectionsItemImagesItem = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+};
+
+export type RevisionSnapshotResponseDtoModulesItemSectionsItem = {
+  body: RevisionSnapshotResponseDtoModulesItemSectionsItemBody;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  images: RevisionSnapshotResponseDtoModulesItemSectionsItemImagesItem[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  title: string;
+};
+
+export type RevisionSnapshotResponseDtoModulesItemVideosItemStatus = typeof RevisionSnapshotResponseDtoModulesItemVideosItemStatus[keyof typeof RevisionSnapshotResponseDtoModulesItemVideosItemStatus];
+
+
+export const RevisionSnapshotResponseDtoModulesItemVideosItemStatus = {
+  NOT_UPLOADED: 'NOT_UPLOADED',
+  UPLOADING: 'UPLOADING',
+  UPLOADED: 'UPLOADED',
+  QUEUED: 'QUEUED',
+  PROCESSING: 'PROCESSING',
+  READY: 'READY',
+  FAILED: 'FAILED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type RevisionSnapshotResponseDtoModulesItemVideosItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  required: boolean;
+  status: RevisionSnapshotResponseDtoModulesItemVideosItemStatus;
+  title: string;
+};
+
+export type RevisionSnapshotResponseDtoModulesItem = {
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  objectives: string[];
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  order: number;
+  /** @nullable */
+  quiz: RevisionSnapshotResponseDtoModulesItemQuiz;
+  sections: RevisionSnapshotResponseDtoModulesItemSectionsItem[];
+  title: string;
+  videos: RevisionSnapshotResponseDtoModulesItemVideosItem[];
+};
+
+export type RevisionSnapshotResponseDtoRevisionStatus = typeof RevisionSnapshotResponseDtoRevisionStatus[keyof typeof RevisionSnapshotResponseDtoRevisionStatus];
+
+
+export const RevisionSnapshotResponseDtoRevisionStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+} as const;
+
+export type RevisionSnapshotResponseDtoRevision = {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
+  createdAt: string;
+  current: boolean;
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  enrollmentCount: number;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  id: string;
+  locked: boolean;
+  /**
+     * @minimum 1
+     * @maximum 9007199254740991
+     */
+  number: number;
+  /**
+     * @nullable
+     * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$
+     */
+  publishedAt: string | null;
+  status: RevisionSnapshotResponseDtoRevisionStatus;
+};
+
+export type RevisionSnapshotResponseDtoStudentsItemsItemStatus = typeof RevisionSnapshotResponseDtoStudentsItemsItemStatus[keyof typeof RevisionSnapshotResponseDtoStudentsItemsItemStatus];
+
+
+export const RevisionSnapshotResponseDtoStudentsItemsItemStatus = {
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED',
+  REMOVED: 'REMOVED',
+} as const;
+
+export type RevisionSnapshotResponseDtoStudentsItemsItem = {
+  email: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  enrollmentId: string;
+  name: string;
+  status: RevisionSnapshotResponseDtoStudentsItemsItemStatus;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  userId: string;
+};
+
+export type RevisionSnapshotResponseDtoStudents = {
+  items: RevisionSnapshotResponseDtoStudentsItemsItem[];
+  /**
+     * @minimum 0
+     * @maximum 9007199254740991
+     */
+  total: number;
+};
+
+export interface RevisionSnapshotResponseDto {
+  modules: RevisionSnapshotResponseDtoModulesItem[];
+  revision: RevisionSnapshotResponseDtoRevision;
+  students: RevisionSnapshotResponseDtoStudents;
 }
 
 export interface RevokeCertificateRequestDto {
@@ -6870,6 +7078,52 @@ export const revisionsClone = async (id: string, options?: Parameters<typeof ser
 
 
 
+export const getRevisionsRemoveUrl = (id: string,
+    revisionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/revisions/${revisionId}`
+}
+
+export const revisionsRemove = async (id: string,
+    revisionId: string, options?: Parameters<typeof serverFetch>[1]): Promise<void> => {
+
+  return serverFetch<void>(getRevisionsRemoveUrl(id,revisionId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+export const getRevisionsSnapshotUrl = (id: string,
+    revisionId: string,) => {
+
+
+
+
+  return `/api/admin/courses/${id}/revisions/${revisionId}`
+}
+
+export const revisionsSnapshot = async (id: string,
+    revisionId: string, options?: Parameters<typeof serverFetch>[1]): Promise<RevisionSnapshotResponseDto> => {
+
+  return serverFetch<RevisionSnapshotResponseDto>(getRevisionsSnapshotUrl(id,revisionId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export const getRevisionsPublishUrl = (id: string,
     revisionId: string,) => {
 
@@ -8674,6 +8928,62 @@ return serverFetch<AdminLandingOverviewResponseDto>(getAdminSiteSettingsUpdateUr
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(landingOverviewRequestDto)
+  }
+);}
+
+
+
+export const getAdminQuizSettingsGetUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/quiz`
+}
+
+export const adminQuizSettingsGet = async ( options?: Parameters<typeof serverFetch>[1]): Promise<AdminQuizSettingsResponseDto> => {
+
+  return serverFetch<AdminQuizSettingsResponseDto>(getAdminQuizSettingsGetUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export const getAdminQuizSettingsUpdateUrl = () => {
+
+
+
+
+  return `/api/admin/site-settings/quiz`
+}
+
+export const adminQuizSettingsUpdate = async (quizSettingsRequestDto: QuizSettingsRequestDto, options?: Parameters<typeof serverFetch>[1]): Promise<AdminQuizSettingsResponseDto> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return serverFetch<AdminQuizSettingsResponseDto>(getAdminQuizSettingsUpdateUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quizSettingsRequestDto)
   }
 );}
 
