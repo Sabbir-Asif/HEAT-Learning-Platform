@@ -26,6 +26,7 @@ export type FormErrorCopyKey =
   | "COURSE_PUBLISH_CHECKS_FAILED"
   | "COURSE_REVISION_DRAFT_EXISTS"
   | "COURSE_REVISION_NOT_DRAFT"
+  | "COURSE_REVISION_REQUIRED"
   | "COURSE_SLUG_TAKEN"
   | "CSRF_TOKEN_INVALID"
   | "DIRECTORY_ARCHIVED"
@@ -124,6 +125,7 @@ export const formErrorCopy: Record<FormErrorCopyKey, string> = {
   COURSE_REVISION_DRAFT_EXISTS:
     "A draft revision already exists. Publish it or finish it before cloning again.",
   COURSE_REVISION_NOT_DRAFT: "This revision is not an open draft.",
+  COURSE_REVISION_REQUIRED: "A course needs at least one revision.",
   COURSE_SLUG_TAKEN: "A course with this slug already exists.",
   CSRF_TOKEN_INVALID: "Your session check failed. Reload the page and try again.",
   DIRECTORY_ARCHIVED:

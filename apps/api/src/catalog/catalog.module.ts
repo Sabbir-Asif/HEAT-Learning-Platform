@@ -16,6 +16,9 @@ import {
   PublicContactSettingsController,
 } from "./contact-settings.controller";
 import { ContactSettingsService } from "./contact-settings.service";
+import { AdminQuizSettingsController } from "./quiz-settings.controller";
+import { RevisionSnapshotService } from "./revision-snapshot.service";
+import { QuizSettingsService } from "./quiz-settings.service";
 import {
   AdminSiteSettingsController,
   PublicSiteSettingsController,
@@ -71,6 +74,7 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     PublicSiteSettingsController,
     AdminContactSettingsController,
     PublicContactSettingsController,
+    AdminQuizSettingsController,
   ],
   providers: [
     CoursesService,
@@ -106,6 +110,8 @@ import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
     FrontPageService,
     SiteSettingsService,
     ContactSettingsService,
+    QuizSettingsService,
+    RevisionSnapshotService,
     PublicImagesService,
     PublicCoursesService,
     { provide: PUBLIC_REVALIDATION, useClass: HttpPublicRevalidation },

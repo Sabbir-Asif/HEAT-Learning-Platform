@@ -9,6 +9,8 @@ export * from "./auth";
 export * from "./captcha";
 export * from "./certificates";
 export * from "./contact-settings";
+export * from "./quiz-settings";
+export * from "./revision-snapshot";
 export * from "./courses";
 export * from "./dashboard";
 export * from "./directory";

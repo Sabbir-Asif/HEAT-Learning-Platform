@@ -190,8 +190,20 @@ describe("CoursesService.update", () => {
     expect(revalidate).toHaveBeenCalledWith(["front-page", "course:heat", "course:heat-two"]);
   });
 
-  test("refuses a locked course whose title changes", async () => {
+  test("allows a title change while the latest revision is a draft", async () => {
     const { service, database, inAuditScope } = build({ existing: row({ lockedAt: at }) });
+
+    await inAuditScope(() => service.update(id, { ...request, title: "Other" }));
+    expect(database.course.update).toHaveBeenCalled();
+  });
+
+  test("refuses a locked course whose title changes", async () => {
+    const { service, database, inAuditScope } = build({
+      existing: row({
+        lockedAt: at,
+        revisions: [{ id: "rev", number: 1, publishedAt: at }],
+      }),
+    });
 
     expect(await code(inAuditScope(() => service.update(id, { ...request, title: "Other" })))).toBe(
       "COURSE_LOCKED",

@@ -12,9 +12,16 @@ describe("RevisionsController access", () => {
   test.each([
     ["clone", "course.revision.clone"],
     ["publish", "course.revision.publish"],
+    ["remove", "course.revision.delete"],
   ] as const)("%s is audited as %s", (handler, action) => {
     const method = RevisionsController.prototype[handler];
     expect(Reflect.getMetadata(AUDITED_KEY, method)).toEqual({ action, entity: "CourseRevision" });
+  });
+
+  test("snapshot is a read and is not audited", () => {
+    expect(
+      Reflect.getMetadata(AUDITED_KEY, RevisionsController.prototype.snapshot),
+    ).toBeUndefined();
   });
 
   test("list is a read and is not audited", () => {

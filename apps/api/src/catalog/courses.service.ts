@@ -166,7 +166,11 @@ export class CoursesService {
 
   async update(id: string, request: UpdateCourseRequest): Promise<CourseSummary> {
     const before = await this.existing(id, this.database);
-    assertLockedEditAllowed(before, request);
+    const latest = before.revisions[0];
+    assertLockedEditAllowed(
+      { ...before, lockedAt: latest?.publishedAt == null ? null : before.lockedAt },
+      request,
+    );
     await this.assertSlugFree(request.slug, id);
     await this.assertThumbnail(request.thumbnailAssetId);
     try {
