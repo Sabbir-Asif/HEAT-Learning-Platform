@@ -12,4 +12,4 @@ export const crestLogo: LogoSource = {
   alt: "University of Dhaka crest",
 };
 
-export const adminName = "HEAT Admin";
+export const adminName = "WSAP Admin";

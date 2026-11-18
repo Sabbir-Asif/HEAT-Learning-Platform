@@ -47,7 +47,7 @@ describe("CertificateAttachmentSource", () => {
     expect(requested).toEqual(["ABC123"]);
     expect(attachments).toEqual([
       {
-        filename: "HEAT-certificate-ABC123.pdf",
+        filename: "WSAP-certificate-ABC123.pdf",
         content: Buffer.from(bytes),
         contentType: "application/pdf",
       },

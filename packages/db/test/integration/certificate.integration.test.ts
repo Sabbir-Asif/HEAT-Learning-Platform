@@ -119,6 +119,16 @@ describe("certificate numbers", () => {
     ).rejects.toMatchObject({ code: "P2002" });
   });
 
+  test("a grouped base32 number is accepted", async () => {
+    const enrollment = await createEnrollment();
+
+    const issued = await database.prisma.certificate.create({
+      data: { ...certificateData(enrollment.id), number: "7K4M-2ZMH-DZ0X" },
+    });
+
+    expect(issued.number).toBe("7K4M-2ZMH-DZ0X");
+  });
+
   test("a number in another format is rejected", async () => {
     const enrollment = await createEnrollment();
 

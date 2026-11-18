@@ -70,8 +70,8 @@ describe.each(emailTemplateKeys)("%s", (key) => {
     expect(message.subject).not.toMatch(/[\r\n]/);
     expect(message.html).toContain("<html");
     expect(message.text.length).toBeGreaterThan(0);
-    expect(message.html).toContain("HEAT");
-    expect(message.text).toContain("HEAT");
+    expect(message.html).toContain("WSAP");
+    expect(message.text).toContain("WSAP");
     expect(message.text).toContain(context.supportAddress);
     expect(message.html).not.toMatch(/<img/i);
   });

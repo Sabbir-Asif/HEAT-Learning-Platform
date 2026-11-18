@@ -21,7 +21,7 @@ import { heatLogo } from "./brand";
 import { learnerNavigation } from "./navigation";
 
 const groups = [{ label: "Learn", items: learnerNavigation }];
-const brandName = "Gender Safety Training";
+const brandName = "Women Safety Awareness Program";
 
 export function LearnerShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();

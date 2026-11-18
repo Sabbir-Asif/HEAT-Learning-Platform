@@ -9,7 +9,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
     <AuthLayout
       brand={{ name: adminName, href: "/", logos: [heatLogo, crestLogo] }}
       panel={{
-        headline: "The HEAT training administration console.",
+        headline: "The Women Safety Awareness Program administration console.",
         points: [
           { icon: KeyRoundIcon, label: "Passwords are checked against known breaches" },
           { icon: ClockIcon, label: "Sessions end after 30 minutes idle" },

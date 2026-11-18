@@ -2,12 +2,12 @@
 
 exports[`admin-invitation > matches the snapshot 1`] = `
 {
-  "subject": "You are invited to the HEAT admin console",
-  "text": "HEAT
+  "subject": "You are invited to the WSAP admin console",
+  "text": "WSAP
 
 Hello Rahim,
 
-You have been invited to the HEAT admin console. Set your password to begin.
+You have been invited to the WSAP admin console. Set your password to begin.
 
 Accept the invitation: https://admin.heat.example/accept-invite/inv456
 
@@ -20,7 +20,7 @@ Questions? Write to support@heat.example.",
 exports[`certificate-ready > matches the snapshot 1`] = `
 {
   "subject": "Your certificate for HEAT Basics is ready",
-  "text": "HEAT
+  "text": "WSAP
 
 Hello Amina,
 
@@ -37,7 +37,7 @@ Questions? Write to support@heat.example.",
 exports[`enrollment-approved > matches the snapshot 1`] = `
 {
   "subject": "Your enrollment in HEAT Basics is approved",
-  "text": "HEAT
+  "text": "WSAP
 
 Hello Amina,
 
@@ -52,7 +52,7 @@ Questions? Write to support@heat.example.",
 exports[`enrollment-reinstated > matches the snapshot 1`] = `
 {
   "subject": "Your enrollment in HEAT Basics is active again",
-  "text": "HEAT
+  "text": "WSAP
 
 Hello Amina,
 
@@ -67,7 +67,7 @@ Questions? Write to support@heat.example.",
 exports[`enrollment-rejected > matches the snapshot 1`] = `
 {
   "subject": "Your enrollment request for HEAT Basics was not approved",
-  "text": "HEAT
+  "text": "WSAP
 
 Hello Amina,
 
@@ -84,7 +84,7 @@ Questions? Write to support@heat.example.",
 exports[`enrollment-removed > matches the snapshot 1`] = `
 {
   "subject": "You were removed from HEAT Basics",
-  "text": "HEAT
+  "text": "WSAP
 
 Hello Amina,
 
@@ -100,8 +100,8 @@ Questions? Write to support@heat.example.",
 
 exports[`password-change-code > matches the snapshot 1`] = `
 {
-  "subject": "Your HEAT password change code",
-  "text": "HEAT
+  "subject": "Your WSAP password change code",
+  "text": "WSAP
 
 Hello Amina,
 
@@ -119,8 +119,8 @@ Questions? Write to support@heat.example.",
 
 exports[`password-reset > matches the snapshot 1`] = `
 {
-  "subject": "Reset your HEAT password",
-  "text": "HEAT
+  "subject": "Reset your WSAP password",
+  "text": "WSAP
 
 Hello Amina,
 
@@ -136,12 +136,12 @@ Questions? Write to support@heat.example.",
 
 exports[`student-already-registered > matches the snapshot 1`] = `
 {
-  "subject": "You already have a HEAT account",
-  "text": "HEAT
+  "subject": "You already have a WSAP account",
+  "text": "WSAP
 
 Hello Amina,
 
-Someone tried to register for HEAT with this email address, which already has an account.
+Someone tried to register for WSAP with this email address, which already has an account.
 
 Sign in: https://learn.heat.example/sign-in
 
@@ -155,12 +155,12 @@ Questions? Write to support@heat.example.",
 
 exports[`student-verification > matches the snapshot 1`] = `
 {
-  "subject": "Verify your email address for HEAT",
-  "text": "HEAT
+  "subject": "Verify your email address for WSAP",
+  "text": "WSAP
 
 Hello Amina,
 
-Thank you for registering for HEAT. Please confirm that this is your email address.
+Thank you for registering for the Women Safety Awareness Program. Please confirm that this is your email address.
 
 Verify your email: https://learn.heat.example/verify-email/tok123
 

@@ -26,7 +26,8 @@
         "$TURBO_DEFAULT$",
         "$TURBO_ROOT$/apps/*/public/brand/**",
         "$TURBO_ROOT$/packages/ui/src/styles.css",
-        "$TURBO_ROOT$/README.md"
+        "$TURBO_ROOT$/README.md",
+        "$TURBO_ROOT$/docs/guides/*.md"
       ]
     },
     "@heat/config#test:coverage": {
@@ -36,7 +37,8 @@
         "$TURBO_DEFAULT$",
         "$TURBO_ROOT$/apps/*/public/brand/**",
         "$TURBO_ROOT$/packages/ui/src/styles.css",
-        "$TURBO_ROOT$/README.md"
+        "$TURBO_ROOT$/README.md",
+        "$TURBO_ROOT$/docs/guides/*.md"
       ]
     },
     "format:check": {},

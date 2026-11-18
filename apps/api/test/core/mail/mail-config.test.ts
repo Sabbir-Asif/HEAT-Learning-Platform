@@ -8,7 +8,7 @@ describe("loadMailConfig", () => {
       port: 1035,
       tls: "none",
       auth: null,
-      from: { address: "noreply@heat.localhost", name: "HEAT" },
+      from: { address: "noreply@heat.localhost", name: "WSAP" },
       timeoutMs: 10000,
     });
   });

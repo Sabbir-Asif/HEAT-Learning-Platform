@@ -23,7 +23,7 @@ export const toVerificationModel = (
   return {
     heading: valid ? "This certificate is valid" : "This certificate was revoked",
     note: valid
-      ? `Certificate ${number} was issued by the HEAT training programme.`
+      ? `Certificate ${number} was issued by the Women Safety Awareness Program.`
       : `Certificate ${number} is no longer valid. Do not accept it as proof of completion.`,
     valid,
     rows: [

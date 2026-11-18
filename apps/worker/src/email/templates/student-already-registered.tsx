@@ -9,12 +9,12 @@ export const studentAlreadyRegistered = defineEmailTemplate({
   key: "student-already-registered",
   category: "VERIFICATION",
   schema: z.object({ name: text }),
-  subject: () => "You already have a HEAT account",
+  subject: () => "You already have a WSAP account",
   body: ({ name }, context) => (
     <EmailLayout preview="You already have an account" supportAddress={context.supportAddress}>
       <Paragraph>Hello {name},</Paragraph>
       <Paragraph>
-        Someone tried to register for HEAT with this email address, which already has an account.
+        Someone tried to register for WSAP with this email address, which already has an account.
       </Paragraph>
       <ActionLink
         label="Sign in"

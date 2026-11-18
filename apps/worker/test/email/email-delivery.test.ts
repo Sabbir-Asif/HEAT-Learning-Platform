@@ -249,7 +249,7 @@ describe("EmailDelivery", () => {
 
 describe("EmailDelivery attachments", () => {
   const attachment = {
-    filename: "HEAT-certificate-ABC123.pdf",
+    filename: "WSAP-certificate-ABC123.pdf",
     content: Buffer.from([1, 2, 3]),
     contentType: "application/pdf",
   };

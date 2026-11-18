@@ -27,7 +27,7 @@ const schema = z.object({
   SMTP_USER: z.preprocess(blankToUndefined, z.string().min(1).optional()),
   SMTP_PASSWORD: z.preprocess(blankToUndefined, z.string().min(1).optional()),
   SMTP_FROM_ADDRESS: z.preprocess(blankToUndefined, z.email().optional()),
-  SMTP_FROM_NAME: z.preprocess(blankToUndefined, z.string().min(1).default("HEAT")),
+  SMTP_FROM_NAME: z.preprocess(blankToUndefined, z.string().min(1).default("WSAP")),
   SMTP_TIMEOUT_MS: z.preprocess(
     blankToUndefined,
     z.coerce.number().int().positive().default(10000),

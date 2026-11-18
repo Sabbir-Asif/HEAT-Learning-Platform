@@ -14,7 +14,7 @@ Prisma schema, migrations and client. Compiles to `dist/` because the API import
 - Foreign keys to history (enrollments, decisions, content, directory) use `onDelete: Restrict`. Cascade is only for rows that belong to one user and hold credentials or sessions.
 - A column that stores a secret is named `*Hash` and has a check constraint for the 64-character SHA-256 form; the raw value never reaches the database.
 - A schema change regenerates `docs/data-model.md` and updates `docs/data-inventory.md` when it adds personal data.
-- Integration tests use the harness in `src/testing` (`@heat/db/testing`): a migrated template database cloned per test, see README, Integration tests. It is compiled into `dist` but only test code imports it, and it keeps its Testcontainers dependencies in `devDependencies`.
+- Integration tests use the harness in `src/testing` (`@heat/db/testing`): a migrated template database cloned per test, see docs/guides/quality-and-testing.md, Integration tests. It is compiled into `dist` but only test code imports it, and it keeps its Testcontainers dependencies in `devDependencies`.
 
 ## Audit log and the application role
 

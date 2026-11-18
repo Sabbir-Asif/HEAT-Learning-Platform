@@ -22,4 +22,4 @@ export const partnerLogos: LogoSource[] = [
   },
 ];
 
-export const siteName = "HEAT Safety Training";
+export const siteName = "Women Safety Awareness Program";

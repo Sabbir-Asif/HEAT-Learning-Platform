@@ -9,7 +9,7 @@ export const passwordReset = defineEmailTemplate({
   key: "password-reset",
   category: "PASSWORD",
   schema: z.object({ name: text, token: opaque }),
-  subject: () => "Reset your HEAT password",
+  subject: () => "Reset your WSAP password",
   body: ({ name, token }, context) => (
     <EmailLayout preview="Reset your password" supportAddress={context.supportAddress}>
       <Paragraph>Hello {name},</Paragraph>

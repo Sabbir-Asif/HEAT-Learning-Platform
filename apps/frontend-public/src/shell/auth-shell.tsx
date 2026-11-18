@@ -8,7 +8,7 @@ import { crestLogo, heatLogo } from "./brand";
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
     <AuthLayout
-      brand={{ name: "Gender Safety Training", href: "/", logos: [heatLogo, crestLogo] }}
+      brand={{ name: "Women Safety Awareness Program", href: "/", logos: [heatLogo, crestLogo] }}
       panel={{
         headline: "A safer campus starts with people who know what to do.",
         points: [
