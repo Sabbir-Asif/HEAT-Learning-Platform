@@ -31,6 +31,7 @@ export * from "./components/tooltip";
 export * from "./composites/body-text";
 export * from "./composites/bullet-list";
 export * from "./composites/captcha-field";
+export * from "./composites/cell-primary";
 export * from "./composites/certificate-card";
 export * from "./composites/confirm-dialog";
 export * from "./composites/empty-state";

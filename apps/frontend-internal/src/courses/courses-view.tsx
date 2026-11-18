@@ -11,6 +11,7 @@ import type { CourseListResponseDtoItemsItem } from "@heat/api-client";
 import { courseSortFields } from "@heat/contracts";
 import {
   Button,
+  CellPrimary,
   ConfirmDialog,
   Field,
   FieldDescription,
@@ -78,14 +79,27 @@ export function CoursesView() {
 
   const columns = useMemo<DataTableColumn<CourseRow>[]>(
     () => [
-      { id: "title", header: "Title", cell: (row) => row.title, sortable: true },
-      { id: "slug", header: "Slug", cell: (row) => row.slug },
+      {
+        id: "title",
+        header: "Course",
+        cell: (row) => (
+          <CellPrimary
+            title={<Link href={`/courses/${row.id}`}>{row.title}</Link>}
+            description={row.slug}
+          />
+        ),
+        sortable: true,
+      },
       {
         id: "status",
         header: "Status",
         cell: (row) => <StatusBadge kind="course" status={row.status} />,
       },
-      { id: "enrollments", header: "Enrollments", cell: (row) => String(row.enrollmentCount) },
+      {
+        id: "enrollments",
+        header: "Enrollments",
+        cell: (row) => String(row.enrollmentCount),
+      },
       {
         id: "updatedAt",
         header: "Updated",
@@ -99,13 +113,13 @@ export function CoursesView() {
   function actions(row: CourseRow) {
     return (
       <>
-        <Button variant="outline" size="sm" render={<Link href={`/courses/${row.id}`} />}>
+        <Button variant="ghost" size="sm" render={<Link href={`/courses/${row.id}`} />}>
           <PencilIcon data-icon="inline-start" />
           Edit
         </Button>
         <ConfirmDialog
           trigger={
-            <Button variant="outline" size="sm">
+            <Button variant="ghostDestructive" size="sm">
               <Trash2Icon data-icon="inline-start" />
               Delete
             </Button>
@@ -149,6 +163,7 @@ export function CoursesView() {
     <ShellContent>
       <PageHeader
         title="Courses"
+        description="Create courses, build their modules and publish them to learners."
         action={
           <Button
             onClick={() => {

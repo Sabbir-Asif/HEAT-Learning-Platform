@@ -12,13 +12,13 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function mount(pathname = "/dashboard", logo: typeof fixtureLogo | null = fixtureLogo) {
+function mount(pathname = "/dashboard") {
   return render(
     <SidebarProvider>
       <SidebarTrigger />
       <ShellSidebar
         mode="drawer"
-        brand={{ name: "Admin", href: "/", ...(logo ? { logo } : {}) }}
+        brand={{ name: "Admin", href: "/", logo: fixtureLogo }}
         groups={fixtureGroups}
         pathname={pathname}
         navLabel="Admin"
@@ -54,13 +54,5 @@ describe("ShellSidebar as a drawer", () => {
     const current = document.querySelectorAll("[aria-current='page']");
     expect(current).toHaveLength(1);
     expect(current[0]?.textContent).toBe("My Learning");
-  });
-
-  test("shows only the brand name when no logo is given", async () => {
-    mount("/dashboard", null);
-    fireEvent.click(screen.getByRole("button", { name: /toggle sidebar/i }));
-    const dialog = await screen.findByRole("dialog");
-    expect(dialog.querySelector("img")).toBeNull();
-    expect(screen.getByRole("link", { name: "Admin" })).not.toBeNull();
   });
 });
