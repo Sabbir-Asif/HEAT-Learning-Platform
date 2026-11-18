@@ -1,7 +1,7 @@
 import { revalidateRequestSchema, revalidateSecretHeader } from "@heat/contracts";
 import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
-import { decideRevalidation } from "@/revalidate/revalidate-auth";
+import { decideRevalidation } from "../../../revalidate/revalidate-auth";
 
 export async function POST(request: Request) {
   const decision = decideRevalidation({

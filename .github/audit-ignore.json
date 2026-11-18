@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "advisory": "GHSA-fc5q-39xc-vjpf",
+    "reason": "picomatch ReDoS through single-branch repeated extglobs has no patched release (every version through 4.0.7 is affected). It is reached only through build and lint tooling (Nest CLI, orval, Storybook, eslint-config-next) that globs our own repository paths, never untrusted input, and is not part of the API or worker runtime.",
+    "expires": "2027-02-15"
+  }
+]

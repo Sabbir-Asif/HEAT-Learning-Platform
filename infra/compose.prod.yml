@@ -1,0 +1,273 @@
+name: heat-lms
+
+x-service: &service
+  restart: unless-stopped
+  init: true
+  security_opt:
+    - no-new-privileges:true
+  environment: &timezone
+    TZ: Asia/Dhaka
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: "5"
+
+x-node-health: &node-health
+  interval: 15s
+  timeout: 5s
+  retries: 5
+  start_period: 40s
+
+services:
+  nginx:
+    <<: *service
+    image: nginx:1.29-alpine
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+    environment:
+      <<: *timezone
+    env_file:
+      - ${ENV_DIR:-/etc/heat}/nginx.env
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - NET_BIND_SERVICE
+      - DAC_READ_SEARCH
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${NGINX_SITE_CONF:?set NGINX_SITE_CONF in compose.env}:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/proxy.inc:/etc/nginx/conf.d/proxy.inc:ro
+      - ./nginx/hls.inc:/etc/nginx/conf.d/hls.inc:ro
+      - ./nginx/certificates.inc:/etc/nginx/conf.d/certificates.inc:ro
+      - ./nginx/media.inc:/etc/nginx/conf.d/media.inc:ro
+      - ./nginx/hls.js:/etc/nginx/njs/hls.js:ro
+      - ./nginx/hls-verify.js:/etc/nginx/njs/hls-verify.js:ro
+      - ./nginx/media.js:/etc/nginx/njs/media.js:ro
+      - ./nginx/media-verify.js:/etc/nginx/njs/media-verify.js:ro
+      - ${TLS_DIR:-/etc/heat/tls}:/etc/nginx/tls:ro
+      - ${DATA_DIR:-/srv/heat}/hls:/srv/media/hls:ro
+      - ${DATA_DIR:-/srv/heat}/certificates:/srv/certificates:ro
+      - ${DATA_DIR:-/srv/heat}/media:/srv/mediastore:ro
+    networks:
+      - web
+    depends_on:
+      api:
+        condition: service_healthy
+      frontend-public:
+        condition: service_healthy
+      frontend-internal:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/nginx-health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512m
+
+  frontend-public:
+    <<: *service
+    image: ${REGISTRY_PREFIX:?set REGISTRY_PREFIX in compose.env}/heat-frontend-public:${RELEASE_TAG:?set RELEASE_TAG in compose.env}
+    user: "1000:1000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    env_file:
+      - ${ENV_DIR:-/etc/heat}/frontend-public.env
+    networks:
+      - web
+      - revalidate
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      <<: *node-health
+      test:
+        - CMD
+        - node
+        - -e
+        - 'fetch("http://127.0.0.1:3000/").then((r) => process.exit(r.status < 500 ? 0 : 1)).catch(() => process.exit(1))'
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 768m
+
+  frontend-internal:
+    <<: *service
+    image: ${REGISTRY_PREFIX:?set REGISTRY_PREFIX in compose.env}/heat-frontend-internal:${RELEASE_TAG:?set RELEASE_TAG in compose.env}
+    user: "1000:1000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    env_file:
+      - ${ENV_DIR:-/etc/heat}/frontend-internal.env
+    networks:
+      - web
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      <<: *node-health
+      test:
+        - CMD
+        - node
+        - -e
+        - 'fetch("http://127.0.0.1:3001/").then((r) => process.exit(r.status < 500 ? 0 : 1)).catch(() => process.exit(1))'
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512m
+
+  api:
+    <<: *service
+    image: ${REGISTRY_PREFIX:?set REGISTRY_PREFIX in compose.env}/heat-api:${RELEASE_TAG:?set RELEASE_TAG in compose.env}
+    user: "1000:1000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    env_file:
+      - ${ENV_DIR:-/etc/heat}/api.env
+    volumes:
+      - ${DATA_DIR:-/srv/heat}/uploads:/srv/heat/uploads
+      - ${DATA_DIR:-/srv/heat}/hls:/srv/heat/hls
+      - ${DATA_DIR:-/srv/heat}/media:/srv/heat/media
+      - ${DATA_DIR:-/srv/heat}/certificates:/srv/heat/certificates:ro
+    networks:
+      - web
+      - data
+      - egress
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      <<: *node-health
+      test:
+        - CMD
+        - node
+        - -e
+        - 'fetch("http://127.0.0.1:4000/api/health").then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))'
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2g
+
+  worker:
+    <<: *service
+    image: ${REGISTRY_PREFIX:?set REGISTRY_PREFIX in compose.env}/heat-worker:${RELEASE_TAG:?set RELEASE_TAG in compose.env}
+    user: "1000:1000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    env_file:
+      - ${ENV_DIR:-/etc/heat}/worker.env
+    volumes:
+      - ${DATA_DIR:-/srv/heat}/uploads:/srv/heat/uploads
+      - ${DATA_DIR:-/srv/heat}/hls:/srv/heat/hls
+      - ${DATA_DIR:-/srv/heat}/certificates:/srv/heat/certificates
+      - ${DATA_DIR:-/srv/heat}/tmp:/srv/heat/tmp
+    networks:
+      - data
+      - egress
+      - revalidate
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      <<: *node-health
+      test: ["CMD", "node", "-e", "process.kill(1, 0)"]
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 3g
+
+  postgres:
+    <<: *service
+    image: postgres:17-alpine
+    user: postgres
+    cap_drop:
+      - ALL
+    env_file:
+      - ${ENV_DIR:-/etc/heat}/postgres.env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - data
+    shm_size: 256m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 3g
+
+  redis:
+    <<: *service
+    image: redis:7-alpine
+    user: redis
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - 768mb
+      - --maxmemory-policy
+      - noeviction
+    cap_drop:
+      - ALL
+    volumes:
+      - redis-data:/data
+    networks:
+      - data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1g
+
+networks:
+  web:
+  data:
+    internal: true
+  egress:
+  revalidate:
+    internal: true
+
+volumes:
+  postgres-data:
+  redis-data:

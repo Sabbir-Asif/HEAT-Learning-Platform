@@ -37,11 +37,12 @@ describe("NewsArticle", () => {
     expect(view.querySelector("a[href='https://du.ac.bd']")?.textContent).toBe("Read more");
   });
 
-  test("drops a javascript link and keeps its text", async () => {
+  test("renders no body at all for a javascript link, since the contract rejects the whole document", async () => {
     const view = await mount(<NewsArticle post={post(withLink("javascript:alert(1)"))} />);
 
     expect(view.querySelector("a[href^='javascript']")).toBeNull();
-    expect(view.textContent).toContain("Read more");
+    expect(view.textContent).not.toContain("Read more");
+    expect(view.querySelector("h1")?.textContent).toBe("Orientation week");
   });
 
   test("renders an unparsable body as an empty article without injecting markup", async () => {

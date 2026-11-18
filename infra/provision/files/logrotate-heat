@@ -1,0 +1,9 @@
+/var/log/heat/*.log {
+    weekly
+    rotate 8
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 __DEPLOY_USER__ adm
+}

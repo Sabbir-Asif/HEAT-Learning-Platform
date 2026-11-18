@@ -141,6 +141,7 @@ describe("loadConfig", () => {
         TRUSTED_ORIGINS: "https://learn.example.test",
         ADMIN_APP_URL: "https://admin.example.test",
         VIDEO_UPLOAD_DIR: "/srv/heat/uploads",
+        MEDIA_STORAGE_DIR: "/srv/heat/media/files",
         HLS_MEDIA_DIR: "/srv/heat/media/hls",
       }).csrf.trustedOrigins,
     ).toEqual(["https://learn.example.test"]);
@@ -345,6 +346,7 @@ describe("video uploads", () => {
       loadConfig({
         ...production,
         VIDEO_UPLOAD_DIR: "/srv/heat/uploads",
+        MEDIA_STORAGE_DIR: "/srv/heat/media/files",
         HLS_MEDIA_DIR: "/srv/heat/media/hls",
       }).videoUploads.directory,
     ).toBe("/srv/heat/uploads");
@@ -386,6 +388,7 @@ describe("transcode config", () => {
       ADMIN_APP_URL: "https://admin.example.test",
       TRUSTED_ORIGINS: "https://admin.example.test",
       VIDEO_UPLOAD_DIR: "/srv/heat/uploads",
+      MEDIA_STORAGE_DIR: "/srv/heat/media/files",
     };
     expect(() => loadConfig(production)).toThrow("HLS_MEDIA_DIR");
     expect(

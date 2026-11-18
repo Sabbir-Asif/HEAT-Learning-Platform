@@ -5,7 +5,10 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "News" };
+export const metadata: Metadata = {
+  title: "News",
+  description: "Announcements and updates from the HEAT project at the University of Dhaka.",
+};
 
 interface PageProps {
   searchParams: Promise<{ page?: string | string[] }>;

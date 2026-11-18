@@ -1,8 +1,9 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import type { OnApplicationBootstrap, OnApplicationShutdown } from "@nestjs/common";
-import { CLOCK, DATABASE } from "api/core";
-import type { Clock } from "api/core";
+import { APP_CONFIG, CLOCK, DATABASE } from "api/core";
+import type { AppConfig, Clock } from "api/core";
 import type { HeatClient } from "@heat/db";
+import { HttpNewsRevalidation } from "./http-news-revalidation";
 import { NewsPublication } from "./news-publication";
 import { PrismaNewsPublicationStore } from "./prisma-news-publication-store";
 
@@ -15,11 +16,20 @@ export class NewsPublicationRunner implements OnApplicationBootstrap, OnApplicat
   private timer: NodeJS.Timeout | null = null;
   private running = false;
 
-  constructor(@Inject(DATABASE) database: HeatClient, @Inject(CLOCK) clock: Clock) {
-    this.publication = new NewsPublication(new PrismaNewsPublicationStore(database), clock, {
-      info: (line) => this.logger.log(line),
-      error: (line) => this.logger.error(line),
-    });
+  constructor(
+    @Inject(DATABASE) database: HeatClient,
+    @Inject(CLOCK) clock: Clock,
+    @Inject(APP_CONFIG) config: AppConfig,
+  ) {
+    this.publication = new NewsPublication(
+      new PrismaNewsPublicationStore(database),
+      clock,
+      {
+        info: (line) => this.logger.log(line),
+        error: (line) => this.logger.error(line),
+      },
+      new HttpNewsRevalidation(config.revalidation),
+    );
   }
 
   onApplicationBootstrap(): void {

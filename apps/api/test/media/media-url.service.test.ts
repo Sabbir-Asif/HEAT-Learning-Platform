@@ -64,6 +64,8 @@ describe("MediaUrlService", () => {
   });
 
   test("signing a protected file without keys fails loudly", () => {
-    expect(() => service(undefined).fileUrl(asset("PROTECTED"), "w320.webp")).toThrow();
+    const unsigned = new MediaUrlService({ hls: undefined } as AppConfig, { now: () => now });
+
+    expect(() => unsigned.fileUrl(asset("PROTECTED"), "w320.webp")).toThrow();
   });
 });

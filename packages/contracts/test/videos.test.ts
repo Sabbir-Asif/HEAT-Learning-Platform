@@ -57,6 +57,7 @@ describe("video slot responses", () => {
           assetKey: null,
           rejectionReason: null,
           failureReason: null,
+          captions: [],
         },
       ],
       locked: false,
