@@ -21,6 +21,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { slugFromTitle } from "./course-slug";
 import { courseLockedMessage, courseSlugTakenMessage } from "./courses-copy";
+import { isContentLocked } from "./courses-status";
 
 type CourseFormProps = {
   course: CourseSummaryDto | null;
@@ -42,7 +43,7 @@ export function CourseForm({ course, onSaved, onCancel, onDirtyChange }: CourseF
     resolver: zodResolver(courseFormSchema),
     defaultValues: valuesOf(course),
   });
-  const locked = course?.lockedAt != null;
+  const locked = course !== null && isContentLocked(course);
 
   const { reset } = form;
   const { isDirty } = form.formState;

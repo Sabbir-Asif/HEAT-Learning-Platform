@@ -8,6 +8,7 @@ import {
   useRevisionsClone,
   useRevisionsList,
   useRevisionsPublish,
+  useRevisionsRemove,
 } from "@heat/api-client";
 import {
   Button,
@@ -25,14 +26,19 @@ import {
   TableRow,
 } from "@heat/ui";
 import { useQueryClient } from "@tanstack/react-query";
-import { CopyPlusIcon, GlobeIcon, HistoryIcon } from "lucide-react";
+import { CopyPlusIcon, EyeIcon, GlobeIcon, HistoryIcon, Trash2Icon } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
 import {
   canCloneRevisions,
+  canDeleteRevision,
   cloneRevisionDescription,
   cloneRevisionFailedMessage,
   cloneRevisionTitle,
+  deleteRevisionDescription,
+  deleteRevisionFailedMessage,
+  deleteRevisionTitle,
   publishRevisionDescription,
   publishRevisionFailedMessage,
   publishRevisionTitle,
@@ -47,6 +53,8 @@ export function RevisionsTab({ courseId }: { courseId: string }) {
   const list = useRevisionsList(courseId);
   const clone = useRevisionsClone();
   const publish = useRevisionsPublish();
+  const remove = useRevisionsRemove();
+  const [deleteError, setDeleteError] = useState<string | undefined>(undefined);
   const [notice, setNotice] = useState<string | null>(null);
   const [cloneError, setCloneError] = useState<string | undefined>(undefined);
   const [failures, setFailures] = useState<readonly string[]>([]);
@@ -143,7 +151,45 @@ export function RevisionsTab({ courseId }: { courseId: string }) {
               <TableCell>
                 {item.publishedAt === null ? "Not published" : formatDhakaTime(item.publishedAt)}
               </TableCell>
-              <TableCell>
+              <TableCell className="flex flex-wrap justify-end gap-2">
+                <Button
+                  variant="outline"
+                  nativeButton={false}
+                  render={<Link href={`/courses/${courseId}/revisions/${item.id}`} />}
+                >
+                  <EyeIcon data-icon="inline-start" />
+                  View
+                </Button>
+                {canDeleteRevision(item, items.length) ? (
+                  <ConfirmDialog
+                    trigger={
+                      <Button variant="outline">
+                        <Trash2Icon data-icon="inline-start" />
+                        Delete
+                      </Button>
+                    }
+                    title={deleteRevisionTitle}
+                    itemName={revisionLabel(item)}
+                    description={deleteRevisionDescription}
+                    confirmLabel="Delete revision"
+                    confirmationName={revisionLabel(item)}
+                    destructive
+                    errorMessage={deleteRevisionFailedMessage(deleteError)}
+                    onConfirm={async () => {
+                      setNotice(null);
+                      setDeleteError(undefined);
+                      try {
+                        await remove.mutateAsync({ id: courseId, revisionId: item.id });
+                      } catch (error) {
+                        setDeleteError(isApiError(error) ? error.code : undefined);
+                        await refresh();
+                        throw error;
+                      }
+                      await refresh();
+                      setNotice(`${revisionLabel(item)} was deleted.`);
+                    }}
+                  />
+                ) : null}
                 {item.status === "DRAFT" ? (
                   <ConfirmDialog
                     trigger={

@@ -11,13 +11,18 @@ import {
 } from "@heat/api-client";
 import {
   Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
   ConfirmDialog,
   EmptyState,
   ErrorState,
   FieldDescription,
   PageHeader,
-  SectionHeading,
   Skeleton,
+  StatCard,
   StatusBadge,
   Tabs,
   TabsContent,
@@ -26,13 +31,13 @@ import {
 } from "@heat/ui";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
-import { EyeIcon, GlobeIcon, SearchXIcon } from "lucide-react";
+import { CircleAlertIcon, CircleCheckIcon, EyeIcon, GlobeIcon, SearchXIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
 import { ModulesTab } from "../modules/modules-tab";
-import { FrontPageTab } from "../tags/front-page-tab";
 import { CourseForm } from "./course-form";
+import { isContentLocked } from "./courses-status";
 import { RevisionsTab } from "./revisions-tab";
 import {
   publishBlockersTitle,
@@ -134,66 +139,93 @@ export function CourseDetailsView({ id }: { id: string }) {
           </div>
         }
       />
-      <div className="flex flex-wrap items-center gap-2">
-        <StatusBadge kind="course" status={current.lockedAt === null ? current.status : "locked"} />
-        <FieldDescription>
-          Updated {formatDhakaTime(current.updatedAt)}
-          {current.currentRevision ? ` - Revision ${current.currentRevision.number}` : ""}
-        </FieldDescription>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <StatusBadge kind="course" status={isContentLocked(current) ? "locked" : current.status} />
+        <FieldDescription>/{current.slug}</FieldDescription>
       </div>
       {notice !== null ? <FieldDescription role="status">{notice}</FieldDescription> : null}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatCard label="Enrollments" value={String(current.enrollmentCount)} />
+        <StatCard
+          label="Revision"
+          value={current.currentRevision ? `#${current.currentRevision.number}` : "None"}
+        />
+        <StatCard
+          label="Published"
+          value={current.publishedAt ? formatDhakaTime(current.publishedAt) : "Not yet"}
+        />
+        <StatCard label="Last updated" value={formatDhakaTime(current.updatedAt)} />
+      </div>
       {current.status === "DRAFT" ? (
-        <section aria-labelledby="publish-checklist" className="flex flex-col gap-2">
-          <SectionHeading id="publish-checklist">
-            {checklist.isSuccess && checklist.data.failures.length > 0
-              ? publishBlockersTitle(checklist.data.failures.length)
-              : "Publish checklist"}
-          </SectionHeading>
-          {checklist.isPending ? <Skeleton className="h-6 w-80" /> : null}
-          {checklist.isError ? (
-            <ErrorState
-              title={publishChecklistFailedMessage}
-              onRetry={() => void checklist.refetch()}
-            />
-          ) : null}
-          {checklist.isSuccess && checklist.data.failures.length === 0 ? (
-            <FieldDescription role="status">{publishChecklistClearMessage}</FieldDescription>
-          ) : null}
-          {checklist.isSuccess && checklist.data.failures.length > 0 ? (
-            <ul className="flex flex-col gap-1">
-              {checklist.data.failures.map((failure) => (
-                <li key={`${failure.code}-${failure.moduleId}-${failure.questionId}`}>
-                  <FieldDescription>{failure.message}</FieldDescription>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </section>
+        <Card aria-labelledby="publish-checklist">
+          <CardHeader>
+            <CardTitle id="publish-checklist">
+              {checklist.isSuccess && checklist.data.failures.length > 0
+                ? publishBlockersTitle(checklist.data.failures.length)
+                : "Publish checklist"}
+            </CardTitle>
+            <CardDescription>
+              A draft can be published once every item below is clear.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2">
+            {checklist.isPending ? <Skeleton className="h-6 w-80" /> : null}
+            {checklist.isError ? (
+              <ErrorState
+                title={publishChecklistFailedMessage}
+                onRetry={() => void checklist.refetch()}
+              />
+            ) : null}
+            {checklist.isSuccess && checklist.data.failures.length === 0 ? (
+              <div role="status" className="flex items-center gap-2">
+                <CircleCheckIcon aria-hidden="true" className="size-4 shrink-0" />
+                <FieldDescription>{publishChecklistClearMessage}</FieldDescription>
+              </div>
+            ) : null}
+            {checklist.isSuccess && checklist.data.failures.length > 0 ? (
+              <ul className="flex flex-col gap-2">
+                {checklist.data.failures.map((failure) => (
+                  <li
+                    key={`${failure.code}-${failure.moduleId}-${failure.questionId}`}
+                    className="flex items-start gap-2"
+                  >
+                    <CircleAlertIcon aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+                    <FieldDescription>{failure.message}</FieldDescription>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </CardContent>
+        </Card>
       ) : null}
       <Tabs defaultValue="details">
         <TabsList variant="line">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="modules">Modules</TabsTrigger>
           <TabsTrigger value="revisions">Revisions</TabsTrigger>
-          <TabsTrigger value="front-page">Front page</TabsTrigger>
         </TabsList>
-        <TabsContent value="details" className="max-w-2xl">
-          <CourseForm
-            course={current}
-            onSaved={async () => {
-              setNotice("The course was saved.");
-              await refresh();
-            }}
-          />
+        <TabsContent value="details">
+          <Card className="max-w-2xl">
+            <CardHeader>
+              <CardTitle>Course details</CardTitle>
+              <CardDescription>The title, address and description learners see.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CourseForm
+                course={current}
+                onSaved={async () => {
+                  setNotice("The course was saved.");
+                  await refresh();
+                }}
+              />
+            </CardContent>
+          </Card>
         </TabsContent>
         <TabsContent value="modules">
           <ModulesTab courseId={id} />
         </TabsContent>
         <TabsContent value="revisions">
           <RevisionsTab courseId={id} />
-        </TabsContent>
-        <TabsContent value="front-page">
-          <FrontPageTab courseId={id} />
         </TabsContent>
       </Tabs>
     </ShellContent>

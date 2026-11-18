@@ -10,6 +10,7 @@ const segmentLabels: Record<string, string> = {
   edit: "Edit",
   preview: "Preview",
   modules: "Modules",
+  revisions: "Revisions",
 };
 
 function cleanSegments(pathname: string): string[] {

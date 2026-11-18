@@ -9,6 +9,11 @@ import {
 } from "@heat/api-client";
 import {
   Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
   ConfirmDialog,
   EmptyState,
   ErrorState,
@@ -22,10 +27,11 @@ import {
 } from "@heat/ui";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
-import { SearchXIcon, Trash2Icon } from "lucide-react";
+import { ArrowLeftIcon, SearchXIcon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { isContentLocked } from "../courses/courses-status";
 import { ModuleForm } from "./module-form";
 import { moduleDeleteFailedMessage } from "./modules-copy";
 import { QuizPanel } from "./quiz-panel";
@@ -76,12 +82,24 @@ export function ModuleContentView({ courseId, moduleId }: ModuleContentViewProps
   }
 
   const current = moduleQuery.data;
-  const locked = course.data.lockedAt !== null;
+  const locked = isContentLocked(course.data);
 
   return (
     <ShellContent>
       <PageHeader
         title={current.title}
+        description={`Module ${current.order} of ${course.data.title}`}
+        breadcrumbs={
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-fit"
+            render={<Link href={`/courses/${courseId}`} />}
+          >
+            <ArrowLeftIcon data-icon="inline-start" />
+            Back to {course.data.title}
+          </Button>
+        }
         action={
           <ConfirmDialog
             trigger={
@@ -107,11 +125,6 @@ export function ModuleContentView({ courseId, moduleId }: ModuleContentViewProps
           />
         }
       />
-      <div>
-        <Button variant="link" render={<Link href={`/courses/${courseId}`} />}>
-          Back to {course.data.title}
-        </Button>
-      </div>
       {notice !== null ? <FieldDescription role="status">{notice}</FieldDescription> : null}
       <Tabs defaultValue="content">
         <TabsList variant="line">
@@ -119,17 +132,27 @@ export function ModuleContentView({ courseId, moduleId }: ModuleContentViewProps
           <TabsTrigger value="video">Video</TabsTrigger>
           <TabsTrigger value="quiz">Quiz</TabsTrigger>
         </TabsList>
-        <TabsContent value="content" className="flex max-w-2xl flex-col gap-8">
-          <ModuleForm
-            courseId={courseId}
-            module={current}
-            locked={locked}
-            onSaved={async () => {
-              setNotice("The module was saved.");
-              await queryClient.invalidateQueries({ queryKey: getModulesListQueryKey(courseId) });
-              await moduleQuery.refetch();
-            }}
-          />
+        <TabsContent value="content" className="flex flex-col gap-6">
+          <Card className="max-w-2xl">
+            <CardHeader>
+              <CardTitle>Module details</CardTitle>
+              <CardDescription>The title and learning objectives students see.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ModuleForm
+                courseId={courseId}
+                module={current}
+                locked={locked}
+                onSaved={async () => {
+                  setNotice("The module was saved.");
+                  await queryClient.invalidateQueries({
+                    queryKey: getModulesListQueryKey(courseId),
+                  });
+                  await moduleQuery.refetch();
+                }}
+              />
+            </CardContent>
+          </Card>
           <SectionsPanel courseId={courseId} module={current} locked={locked} />
         </TabsContent>
         <TabsContent value="video" className="flex max-w-2xl flex-col gap-8">
