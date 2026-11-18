@@ -154,7 +154,7 @@ pnpm verify
 
 Turbo replays unchanged packages from its cache. Only when all five pass on a clean tree does it write the verification marker that the pull request hook looks for. A later commit invalidates the marker, so run it again after a fix, once, at the end.
 
-Then check each acceptance criterion that a unit test does not prove, for real and once: a request with `curl` against the dev stack, or for a UI change the screen opened through Chrome DevTools at phone and laptop width in the light theme, against the UI review checklist in the root CLAUDE.md. Save screenshots for the pull request in `$SCRATCH`, outside the repository, because a file in the tree invalidates the verification marker. Integration tests, Playwright and axe are not run in v0; the Polish ticket runs them.
+Then check each acceptance criterion that a unit test does not prove, for real and once: a request with `curl` against the dev stack, or for a UI change the screen opened through Chrome DevTools at phone and laptop width in the light theme. Save screenshots for the pull request in `$SCRATCH`, outside the repository, because a file in the tree invalidates the verification marker. Integration tests, Playwright and axe are not run in v0; the Polish ticket runs them.
 
 Write the commands and their result lines to `$SCRATCH/verify-$N.md`. Only a green run you have just watched counts as green.
 

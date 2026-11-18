@@ -1,6 +1,6 @@
 # @heat/ui
 
-The shared design system and the only place styles are written. Ships TypeScript source; the Next.js apps compile it through `transpilePackages`. Shared rules: [root CLAUDE.md](../../CLAUDE.md), including the [UI review checklist](../../CLAUDE.md#ui-review-checklist). This file adds only what is specific to the package.
+The shared design system and the only place styles are written. Ships TypeScript source; the Next.js apps compile it through `transpilePackages`. Shared rules: [root CLAUDE.md](../../CLAUDE.md). This file adds only what is specific to the package.
 
 ## Rules
 

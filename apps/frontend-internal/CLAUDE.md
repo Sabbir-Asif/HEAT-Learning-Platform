@@ -1,6 +1,6 @@
 # frontend-internal
 
-Next.js admin console on `admin.<domain>` (port 3001). Shared rules: [root CLAUDE.md](../../CLAUDE.md), including the [UI review checklist](../../CLAUDE.md#ui-review-checklist). This file adds only what is specific to this app. The data path is the one in [frontend-public](../frontend-public/CLAUDE.md#data-path), without the public cached pages.
+Next.js admin console on `admin.<domain>` (port 3001). Shared rules: [root CLAUDE.md](../../CLAUDE.md). This file adds only what is specific to this app. The data path is the one in [frontend-public](../frontend-public/CLAUDE.md#data-path), without the public cached pages.
 
 ## Rules
 
