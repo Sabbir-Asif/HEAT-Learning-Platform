@@ -3,22 +3,17 @@
 import { getNewsListQueryKey, useNewsList, useNewsRemove } from "@heat/api-client";
 import type { NewsAdminListResponseDtoItemsItem } from "@heat/api-client";
 import { newsSortFields } from "@heat/contracts";
+import { Button, ConfirmDialog, FieldDescription, PageHeader, StatusBadge } from "@heat/ui";
 import {
-  Button,
-  ConfirmDialog,
-  Field,
-  FieldDescription,
-  FieldLabel,
-  PageHeader,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  StatusBadge,
-} from "@heat/ui";
-import { DataTable, FilterBar, SearchInput, useClampedPage, useTableUrlState } from "@heat/ui/data";
+  DataTable,
+  FilterBar,
+  FilterSelect,
+  SearchInput,
+  useClampedPage,
+  useTableUrlState,
+} from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
+import { filterIcon } from "../filters/filter-icon";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
 import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
@@ -145,27 +140,15 @@ export function NewsView() {
           />
         }
       >
-        <Field>
-          <FieldLabel id="news-filter-status">Status</FieldLabel>
-          <Select
-            items={newsStatusItems}
-            value={status}
-            onValueChange={(value) =>
-              url.setFilter(newsStatusFilterKey, value === "all" ? null : value)
-            }
-          >
-            <SelectTrigger aria-labelledby="news-filter-status" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {newsStatusItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
+        <FilterSelect
+          label="Status"
+          icon={filterIcon("Status")}
+          items={newsStatusItems}
+          value={status}
+          onValueChange={(value) =>
+            url.setFilter(newsStatusFilterKey, value === "all" ? null : value)
+          }
+        />
       </FilterBar>
       <DataTable
         label="News posts"

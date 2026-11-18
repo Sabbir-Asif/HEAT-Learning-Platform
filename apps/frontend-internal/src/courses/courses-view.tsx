@@ -13,19 +13,20 @@ import {
   Button,
   CellPrimary,
   ConfirmDialog,
-  Field,
   FieldDescription,
-  FieldLabel,
   PageHeader,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   StatusBadge,
 } from "@heat/ui";
-import { DataTable, FilterBar, SearchInput, useClampedPage, useTableUrlState } from "@heat/ui/data";
+import {
+  DataTable,
+  FilterBar,
+  FilterSelect,
+  SearchInput,
+  useClampedPage,
+  useTableUrlState,
+} from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
+import { filterIcon } from "../filters/filter-icon";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
 import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
@@ -188,27 +189,15 @@ export function CoursesView() {
           />
         }
       >
-        <Field>
-          <FieldLabel id="course-filter-status">Status</FieldLabel>
-          <Select
-            items={courseStatusItems}
-            value={status}
-            onValueChange={(value) =>
-              url.setFilter(courseStatusFilterKey, value === "all" ? null : value)
-            }
-          >
-            <SelectTrigger aria-labelledby="course-filter-status" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {courseStatusItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
+        <FilterSelect
+          label="Status"
+          icon={filterIcon("Status")}
+          items={courseStatusItems}
+          value={status}
+          onValueChange={(value) =>
+            url.setFilter(courseStatusFilterKey, value === "all" ? null : value)
+          }
+        />
       </FilterBar>
       <DataTable
         label="Courses"

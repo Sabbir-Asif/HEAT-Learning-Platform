@@ -1,20 +1,16 @@
 "use client";
 
 import { getProfileChangeAdminListQueryKey, useProfileChangeAdminList } from "@heat/api-client";
+import { Button, FieldDescription, PageHeader } from "@heat/ui";
 import {
-  Button,
-  Field,
-  FieldDescription,
-  FieldLabel,
-  PageHeader,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@heat/ui";
-import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui/data";
+  DataTable,
+  FilterBar,
+  FilterSelect,
+  useClampedPage,
+  useTableUrlState,
+} from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
+import { filterIcon } from "../filters/filter-icon";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
 import { CheckIcon, XIcon } from "lucide-react";
@@ -92,25 +88,13 @@ export function ProfileChangesView() {
       <PageHeader title="Profile changes" />
       {notice !== null ? <FieldDescription role="status">{notice}</FieldDescription> : null}
       <FilterBar activeCount={url.activeFilterCount} onClear={url.clearFilters}>
-        <Field>
-          <FieldLabel id="profile-changes-status">Status</FieldLabel>
-          <Select
-            items={statusFilterItems}
-            value={status}
-            onValueChange={(next) => url.setFilter("status", next === "pending" ? null : next)}
-          >
-            <SelectTrigger aria-labelledby="profile-changes-status" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {statusFilterItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
+        <FilterSelect
+          label="Status"
+          icon={filterIcon("Status")}
+          items={statusFilterItems}
+          value={status}
+          onValueChange={(next) => url.setFilter("status", next === "pending" ? null : next)}
+        />
       </FilterBar>
       <DataTable
         label="Profile change requests"

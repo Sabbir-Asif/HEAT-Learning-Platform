@@ -62,7 +62,10 @@ function SearchInput({
   };
 
   return (
-    <InputGroup data-slot="search-input" className={cn("md:max-w-sm", className)}>
+    <InputGroup
+      data-slot="search-input"
+      className={cn("h-9 rounded-md shadow-xs md:max-w-xs", className)}
+    >
       <InputGroupAddon>
         <SearchIcon />
       </InputGroupAddon>

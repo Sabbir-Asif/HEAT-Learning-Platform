@@ -1,5 +1,7 @@
 export * from "./data-table";
 export * from "./filter-bar";
+export * from "./filter-input";
+export * from "./filter-select";
 export * from "./pagination";
 export * from "./search-input";
 export { pageSelectionState, toggleId, togglePage } from "./selection";

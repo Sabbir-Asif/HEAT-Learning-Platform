@@ -3,20 +3,16 @@
 import { useCoursesList, useVideoLibraryList } from "@heat/api-client";
 import type { VideoLibraryListResponseDtoItemsItem } from "@heat/api-client";
 import { videoLibraryStatusSchema, videoPollIntervalMs, videoStatusIsFinal } from "@heat/contracts";
+import { FieldDescription, PageHeader, StatusBadge } from "@heat/ui";
 import {
-  Field,
-  FieldDescription,
-  FieldLabel,
-  PageHeader,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  StatusBadge,
-} from "@heat/ui";
-import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui/data";
+  DataTable,
+  FilterBar,
+  FilterSelect,
+  useClampedPage,
+  useTableUrlState,
+} from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
+import { filterIcon } from "../filters/filter-icon";
 import { ShellContent } from "@heat/ui/shell";
 import { useMemo } from "react";
 import {
@@ -133,28 +129,17 @@ export function VideosView() {
     onChange: (next: string | null) => void,
     truncated = false,
   ) => (
-    <Field>
-      <FieldLabel id={`video-filter-${id}`}>{label}</FieldLabel>
-      <Select
-        items={entries}
-        value={value || all}
-        onValueChange={(next) => onChange(next === all ? null : next)}
-      >
-        <SelectTrigger aria-labelledby={`video-filter-${id}`} className="w-full">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {entries.map((entry) => (
-            <SelectItem key={entry.value} value={entry.value}>
-              {entry.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      {truncated ? (
-        <FieldDescription>{`Showing the first ${optionLimit} courses.`}</FieldDescription>
-      ) : null}
-    </Field>
+    <FilterSelect
+      label={label}
+      icon={filterIcon(label)}
+      items={entries}
+      value={value || all}
+      defaultValue={all}
+      note={
+        truncated ? `Showing the first ${optionLimit}. Narrow with the other filters.` : undefined
+      }
+      onValueChange={(next) => onChange(next === all ? null : next)}
+    />
   );
 
   return (

@@ -39,13 +39,13 @@ function FilterBar({
     return (
       <div
         data-slot="filter-bar"
-        className={cn("flex flex-wrap items-end gap-3", className)}
+        className={cn("flex flex-wrap items-center gap-2", className)}
         {...props}
       >
-        {search ? <div className="min-w-60 flex-1 md:max-w-sm">{search}</div> : null}
+        {search ? <div className="min-w-60 flex-1 md:max-w-xs">{search}</div> : null}
         {children}
         {activeCount > 0 ? (
-          <Button variant="ghost" onClick={onClear}>
+          <Button variant="ghost" size="sm" onClick={onClear}>
             <XIcon data-icon="inline-start" />
             Clear filters
           </Button>
@@ -55,7 +55,7 @@ function FilterBar({
   }
 
   return (
-    <div data-slot="filter-bar" className={cn("flex items-end gap-2", className)} {...props}>
+    <div data-slot="filter-bar" className={cn("flex items-center gap-2", className)} {...props}>
       <div className="min-w-0 flex-1">{search}</div>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger render={<Button variant="outline" />}>
@@ -70,7 +70,7 @@ function FilterBar({
               Narrow the list. Each change applies at once, and Apply closes this panel.
             </SheetDescription>
           </SheetHeader>
-          <div className="flex flex-col gap-4 px-4">{children}</div>
+          <div className="flex flex-col gap-3 px-4">{children}</div>
           <SheetFooter>
             <Button variant="outline" onClick={onClear} disabled={activeCount === 0}>
               Clear

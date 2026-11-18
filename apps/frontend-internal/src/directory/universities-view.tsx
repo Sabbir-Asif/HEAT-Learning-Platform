@@ -11,22 +11,17 @@ import {
 } from "@heat/api-client";
 import type { UniversityListResponseDtoItemsItem } from "@heat/api-client";
 import { universitySortFields } from "@heat/contracts";
+import { Badge, Button, ConfirmDialog, FieldDescription, PageHeader } from "@heat/ui";
 import {
-  Badge,
-  Button,
-  ConfirmDialog,
-  Field,
-  FieldDescription,
-  FieldLabel,
-  PageHeader,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@heat/ui";
-import { DataTable, FilterBar, SearchInput, useClampedPage, useTableUrlState } from "@heat/ui/data";
+  DataTable,
+  FilterBar,
+  FilterSelect,
+  SearchInput,
+  useClampedPage,
+  useTableUrlState,
+} from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
+import { filterIcon } from "../filters/filter-icon";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArchiveIcon, ArchiveRestoreIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
@@ -234,27 +229,15 @@ export function UniversitiesView() {
           />
         }
       >
-        <Field>
-          <FieldLabel id="university-filter-status">Status</FieldLabel>
-          <Select
-            items={directoryStatusItems}
-            value={status}
-            onValueChange={(value) =>
-              url.setFilter(statusFilterKey, value === "active" ? null : value)
-            }
-          >
-            <SelectTrigger aria-labelledby="university-filter-status" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {directoryStatusItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
+        <FilterSelect
+          label="Status"
+          icon={filterIcon("Status")}
+          items={directoryStatusItems}
+          value={status}
+          onValueChange={(value) =>
+            url.setFilter(statusFilterKey, value === "active" ? null : value)
+          }
+        />
       </FilterBar>
       <DataTable
         label="Universities"

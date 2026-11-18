@@ -21,14 +21,16 @@ import {
   FieldLabel,
   Input,
   PageHeader,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
 } from "@heat/ui";
-import { DataTable, FilterBar, useClampedPage, useTableUrlState } from "@heat/ui/data";
+import {
+  DataTable,
+  FilterBar,
+  FilterSelect,
+  useClampedPage,
+  useTableUrlState,
+} from "@heat/ui/data";
 import type { DataTableColumn } from "@heat/ui/data";
+import { filterIcon } from "../filters/filter-icon";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
 import { CheckIcon, XIcon } from "lucide-react";
@@ -175,29 +177,18 @@ export function ApprovalQueueView() {
     disabled = false,
     truncated = false,
   ) => (
-    <Field>
-      <FieldLabel id={`approval-filter-${id}`}>{label}</FieldLabel>
-      <Select
-        items={items}
-        value={value || all}
-        disabled={disabled}
-        onValueChange={(next) => onChange(next === all ? null : next)}
-      >
-        <SelectTrigger aria-labelledby={`approval-filter-${id}`} className="w-full">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {items.map((item) => (
-            <SelectItem key={item.value} value={item.value}>
-              {item.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      {truncated ? (
-        <FieldDescription>{`Showing the first ${optionLimit}. Narrow with the other filters.`}</FieldDescription>
-      ) : null}
-    </Field>
+    <FilterSelect
+      label={label}
+      icon={filterIcon(label)}
+      items={items}
+      value={value || all}
+      defaultValue={all}
+      disabled={disabled}
+      note={
+        truncated ? `Showing the first ${optionLimit}. Narrow with the other filters.` : undefined
+      }
+      onValueChange={(next) => onChange(next === all ? null : next)}
+    />
   );
 
   const dateFilter = (key: "from" | "to", label: string) => (
