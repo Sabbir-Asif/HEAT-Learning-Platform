@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "advisory": "GHSA-fc5q-39xc-vjpf",
+    "reason": "picomatch ReDoS through repeated extglobs has no patched release; reachable only through build and test tooling (vite, vitest, tinyglobby), never at runtime on user input. Revisit when a fixed picomatch ships.",
+    "expires": "2027-01-17"
+  }
+]
