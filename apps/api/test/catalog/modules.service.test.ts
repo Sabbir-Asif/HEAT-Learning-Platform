@@ -29,7 +29,9 @@ const build = (
   const modules = options.modules ?? [moduleRow("a", 1), moduleRow("b", 2), moduleRow("c", 3)];
   const calls: string[] = [];
   const database = {
-    $queryRaw: vi.fn().mockResolvedValue([{ lockedAt: options.lockedAt ?? null }]),
+    $queryRaw: vi
+      .fn()
+      .mockResolvedValue([{ lockedAt: options.lockedAt ?? null, highest: modules.length }]),
     course: {
       findUnique: vi.fn().mockResolvedValue({
         slug: "heat",
@@ -44,7 +46,6 @@ const build = (
         .mockImplementation(({ where }: { where: { id: string } }) =>
           Promise.resolve(modules.find((item: { id: string }) => item.id === where.id) ?? null),
         ),
-      aggregate: vi.fn().mockResolvedValue({ _max: { order: modules.length } }),
       create: vi.fn().mockResolvedValue(moduleRow("n", modules.length + 1)),
       update: vi
         .fn()

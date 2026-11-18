@@ -23,7 +23,7 @@ const build = (options: { lockedAt?: Date | null } = {}) => {
   const sections = [sectionRow("a", 1), sectionRow("b", 2), sectionRow("c", 3)];
   const calls: string[] = [];
   const database = {
-    $queryRaw: vi.fn().mockResolvedValue([{ lockedAt: options.lockedAt ?? null }]),
+    $queryRaw: vi.fn().mockResolvedValue([{ lockedAt: options.lockedAt ?? null, highest: 3 }]),
     course: {
       findUnique: vi.fn().mockResolvedValue({
         lockedAt: options.lockedAt ?? null,
@@ -44,7 +44,6 @@ const build = (options: { lockedAt?: Date | null } = {}) => {
         .mockImplementation(({ where }: { where: { id: string } }) =>
           Promise.resolve(sections.find((item) => item.id === where.id) ?? null),
         ),
-      aggregate: vi.fn().mockResolvedValue({ _max: { order: 3 } }),
       create: vi.fn().mockResolvedValue(sectionRow("n", 4)),
       update: vi
         .fn()

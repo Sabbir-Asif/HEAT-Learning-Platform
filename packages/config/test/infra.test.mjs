@@ -79,9 +79,18 @@ describe("dev Nginx config", () => {
 
   test("every proxied location uses the shared proxy headers", () => {
     const proxied = [...nginx.matchAll(/proxy_pass [^;]+;\s*include ([^;]+);/g)];
-    expect(proxied).toHaveLength(4);
+    expect(proxied).toHaveLength(5);
     expect(new Set(proxied.map((m) => m[1]))).toEqual(new Set(["/etc/nginx/conf.d/proxy.inc"]));
     expect(compose).toContain("../nginx/proxy.inc:/etc/nginx/conf.d/proxy.inc:ro");
+  });
+
+  test("the admin host lets large video uploads through unbuffered", () => {
+    const upload = nginx.match(
+      /location ~ \^\/api\/admin\/courses\/\[\^\/\]\+\/modules\/\[\^\/\]\+\/videos\/\[\^\/\]\+\/upload \{([^}]*)\}/,
+    );
+    expect(upload?.[1]).toContain("client_max_body_size 2g;");
+    expect(upload?.[1]).toContain("proxy_request_buffering off;");
+    expect(upload?.[1]).toContain("proxy_pass http://api;");
   });
 
   test("client-supplied forwarding headers are overwritten, never appended", () => {

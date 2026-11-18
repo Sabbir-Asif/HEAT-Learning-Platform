@@ -22,6 +22,7 @@ import { ApiException } from "../http/api-exception";
 import { applyOrderPlan, lockScope, readScope } from "./content-access";
 import type { ContentLocker } from "./content-access";
 import { assertContentUnlocked, nextOrder, planReorder, planResequence } from "./module-rules";
+import { highestVideoOrder } from "./highest-order";
 import { assertRequiredFlagUnlocked, slotStatusOf } from "./video-rules";
 
 type SlotClient = Pick<HeatClient, "module" | "video">;
@@ -145,14 +146,11 @@ export class VideoSlotsService {
     const scope = await lockScope(client as ContentLocker, courseId);
     assertContentUnlocked(scope.lockedAt);
     await this.assertModule(client, scope.revisionId, moduleId);
-    const highest = await client.video.aggregate({
-      where: { moduleId, deletedAt: null },
-      _max: { order: true },
-    });
+    const highest = await highestVideoOrder(client, moduleId);
     const created = await client.video.create({
       data: {
         moduleId,
-        order: nextOrder(highest._max.order),
+        order: nextOrder(highest),
         title: request.title,
         required: request.required,
       },
