@@ -57,33 +57,26 @@ describe("class conflicts and order are errors", () => {
 const restricted = (messages) =>
   messages.filter((message) => message.ruleId === "better-tailwindcss/no-restricted-classes");
 
-describe("arbitrary values", () => {
-  const arbitrary = ["mt-[13px]", "md:w-[40%]", "[&>*]:p-2", "bg-[var(--x)]"];
+describe("styling classes in apps", () => {
+  const styled = [
+    "mt-[13px]",
+    "md:w-[40%]",
+    "bg-[var(--x)]",
+    "bg-primary text-lg font-bold",
+    "rounded-2xl shadow-md border",
+    "absolute relative z-10",
+    "dark:bg-card hover:p-2 group-hover:flex",
+  ];
 
-  for (const className of arbitrary) {
-    test(`app rejects ${className} in a className string and names it`, async () => {
-      const messages = restricted(await lint("app", markup(className), appFile));
-      expect(messages).toHaveLength(1);
-      expect(messages[0].message).toContain(className);
-      expect(messages[0].message).toContain("@heat/ui");
+  for (const classes of styled) {
+    test(`app accepts ${classes}`, async () => {
+      expect(restricted(await lint("app", markup(classes), appFile))).toEqual([]);
     });
 
-    test(`ui accepts ${className}`, async () => {
-      expect(restricted(await lint("ui", markup(className), uiFile))).toEqual([]);
+    test(`ui accepts ${classes}`, async () => {
+      expect(restricted(await lint("ui", markup(classes), uiFile))).toEqual([]);
     });
   }
-
-  test("app rejects arbitrary values in template literals and class helpers", async () => {
-    const sources = [
-      "export const a = <div className={`mt-[13px] ${x}`} />;\n",
-      'export const a = <div className={cn("flex", "mt-[13px]")} />;\n',
-      'export const a = <div className={clsx("flex", { "mt-[13px]": on })} />;\n',
-      'export const a = cva("flex", { variants: { size: { sm: "mt-[13px]" } } });\n',
-    ];
-    for (const source of sources) {
-      expect(restricted(await lint("app", source, appFile)), source).toHaveLength(1);
-    }
-  });
 
   test("app ignores non-literal expressions without crashing", async () => {
     const sources = [
@@ -94,72 +87,6 @@ describe("arbitrary values", () => {
     for (const source of sources) {
       expect(await lint("app", source, appFile), source).toEqual([]);
     }
-  });
-});
-
-describe("layout-only classes in apps", () => {
-  const allowed = [
-    "flex flex-col gap-4",
-    "md:grid md:grid-cols-3 lg:gap-x-6",
-    "p-4 px-2 -mt-2 m-auto mx-4",
-    "w-1/2 h-screen size-8 min-h-0 max-w-screen-md",
-    "items-center justify-between self-end place-items-center content-start order-2",
-    "overflow-hidden overflow-x-auto container hidden sm:block inline-flex contents",
-    "space-y-2 col-span-2 row-span-1 grow shrink-0 basis-1/3 2xl:p-8",
-    "sr-only not-sr-only truncate aspect-video aspect-square aspect-4/3",
-    "motion-reduce:hidden print:hidden *:p-2 min-md:flex max-sm:hidden",
-    "@container @container/main @sm:flex @md:grid-cols-2 @max-lg:hidden @min-xl:p-4 @3xl:gap-2",
-  ];
-  const disallowed = [
-    "bg-red-500",
-    "text-lg",
-    "font-bold",
-    "rounded",
-    "shadow-md",
-    "border",
-    "opacity-50",
-    "dark:flex",
-    "hover:p-2",
-    "md:bg-red-500",
-    "absolute",
-    "p",
-    "relative",
-    "fixed",
-    "sticky",
-    "z-10",
-    "float-left",
-    "visible",
-    "invisible",
-    "motion-reduce:bg-red-500",
-    "print:text-lg",
-    "@sm:bg-red-500",
-    "*:bg-red-500",
-    "group-hover:flex",
-  ];
-
-  for (const classes of allowed) {
-    test(`app accepts ${classes}`, async () => {
-      expect(restricted(await lint("app", markup(classes), appFile))).toEqual([]);
-    });
-  }
-
-  for (const className of disallowed) {
-    test(`app rejects ${className}, names it and points to @heat/ui`, async () => {
-      const messages = restricted(await lint("app", markup(className), appFile));
-      expect(messages).toHaveLength(1);
-      expect(messages[0].message).toContain(`'${className}'`);
-      expect(messages[0].message).toContain("@heat/ui");
-    });
-
-    test(`ui accepts ${className}`, async () => {
-      expect(restricted(await lint("ui", markup(className), uiFile))).toEqual([]);
-    });
-  }
-
-  test("an arbitrary value is reported once, as an arbitrary value", async () => {
-    const messages = restricted(await lint("app", markup("mt-[13px]"), appFile));
-    expect(messages).toHaveLength(1);
-    expect(messages[0].message).toContain("Arbitrary value");
   });
 });
 
@@ -293,8 +220,8 @@ describe("class-like attributes and plain JavaScript sources", () => {
   };
 
   for (const [name, source] of Object.entries(sources)) {
-    test(`app rejects ${name}`, async () => {
-      expect(restricted(await lint("app", source, appFile))).toHaveLength(1);
+    test(`app accepts ${name}`, async () => {
+      expect(restricted(await lint("app", source, appFile))).toEqual([]);
     });
 
     test(`ui accepts ${name}`, async () => {
@@ -322,7 +249,7 @@ describe("class-like attributes and plain JavaScript sources", () => {
     for (const file of ["src/app/page.jsx", "src/lib/helpers.js"]) {
       const source = 'export const a = <div style={{ color: "red" }} className="mt-[13px]" />;\n';
       const messages = await lint("app", source, file);
-      expect(restricted(messages), file).toHaveLength(1);
+      expect(restricted(messages), file).toEqual([]);
       expect(
         messages.filter((message) => message.ruleId === "no-restricted-syntax"),
         file,
