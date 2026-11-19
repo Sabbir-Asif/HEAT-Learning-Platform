@@ -18,6 +18,7 @@ import {
   publishChecksFailed,
 } from "./course-rules";
 import { COURSE_PUBLISH_CHECKS } from "./publish-checks";
+import { PublicImagesService } from "./public-images.service";
 import { courseCacheTag, frontPageCacheTag, PUBLIC_REVALIDATION } from "./public-revalidation";
 import type { PublicRevalidation } from "./public-revalidation";
 import type { CoursePublishCheck } from "./publish-checks";
@@ -69,7 +70,7 @@ const statusWhere = (status: CourseListQuery["status"]) => {
   return {};
 };
 
-const toSummary = (row: CourseRow): CourseSummary => {
+const toSummary = (row: CourseRow, thumbnail: CourseSummary["thumbnail"]): CourseSummary => {
   const revision = row.revisions[0];
   return {
     id: row.id,
@@ -77,6 +78,7 @@ const toSummary = (row: CourseRow): CourseSummary => {
     title: row.title,
     description: row.description,
     thumbnailAssetId: row.thumbnailAssetId,
+    thumbnail,
     status: row.status,
     lockedAt: row.lockedAt?.toISOString() ?? null,
     publishedAt: row.publishedAt?.toISOString() ?? null,
@@ -93,6 +95,12 @@ const toSummary = (row: CourseRow): CourseSummary => {
           },
   };
 };
+
+const thumbnailOf = (
+  thumbnails: Map<string, NonNullable<CourseSummary["thumbnail"]>>,
+  row: CourseRow,
+): CourseSummary["thumbnail"] =>
+  row.thumbnailAssetId === null ? null : (thumbnails.get(row.thumbnailAssetId) ?? null);
 
 const errorCodeOf = (error: unknown): unknown =>
   typeof error === "object" && error !== null ? (error as { code?: unknown }).code : undefined;
@@ -112,6 +120,7 @@ export class CoursesService {
     private readonly audit: AuditService,
     @Inject(COURSE_PUBLISH_CHECKS) private readonly publishChecks: CoursePublishCheck[],
     @Inject(PUBLIC_REVALIDATION) private readonly revalidation: PublicRevalidation,
+    private readonly images: PublicImagesService,
   ) {}
 
   async list(query: CourseListQuery): Promise<CourseListResponse> {
@@ -136,11 +145,17 @@ export class CoursesService {
       }),
       this.database.course.count({ where }),
     ]);
-    return { items: rows.map(toSummary), total, page: query.page, pageSize: query.pageSize };
+    const thumbnails = await this.images.resolve(rows.map((row) => row.thumbnailAssetId));
+    return {
+      items: rows.map((row) => toSummary(row, thumbnailOf(thumbnails, row))),
+      total,
+      page: query.page,
+      pageSize: query.pageSize,
+    };
   }
 
   async get(id: string): Promise<CourseSummary> {
-    return toSummary(await this.existing(id, this.database));
+    return this.summarize(await this.existing(id, this.database));
   }
 
   async create(request: CreateCourseRequest): Promise<CourseSummary> {
@@ -158,7 +173,7 @@ export class CoursesService {
         include: withSummaryParts,
       });
       this.audit.capture({ entityId: created.id, after: auditedFields(created) });
-      return toSummary(created);
+      return await this.summarize(created);
     } catch (error) {
       throw this.translate(error);
     }
@@ -190,7 +205,7 @@ export class CoursesService {
         after: auditedFields(updated),
       });
       this.revalidateAfterCommit(before.slug, updated.slug);
-      return toSummary(updated);
+      return await this.summarize(updated);
     } catch (error) {
       throw this.translate(error);
     }
@@ -236,7 +251,12 @@ export class CoursesService {
       after: { status: published.status, publishedAt: now.toISOString() },
     });
     this.revalidateAfterCommit(published.slug);
-    return toSummary(published);
+    return this.summarize(published);
+  }
+
+  private async summarize(row: CourseRow): Promise<CourseSummary> {
+    const thumbnails = await this.images.resolve([row.thumbnailAssetId]);
+    return toSummary(row, thumbnailOf(thumbnails, row));
   }
 
   private revalidateAfterCommit(...slugs: string[]): void {

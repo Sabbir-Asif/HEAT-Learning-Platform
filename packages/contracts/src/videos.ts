@@ -76,6 +76,7 @@ export const videoSlotSummarySchema = z.object({
   assetKey: z.string().max(128).nullable(),
   rejectionReason: videoRejectionReasonSchema.nullable(),
   failureReason: videoFailureReasonSchema.nullable(),
+  progressPercent: z.number().int().min(0).max(100).nullable(),
   uploadedAt: z.iso.datetime().nullable(),
   statusChangedAt: z.iso.datetime().nullable(),
   captions: z.array(captionLanguageSchema),

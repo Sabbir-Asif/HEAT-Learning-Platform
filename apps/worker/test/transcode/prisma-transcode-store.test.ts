@@ -27,7 +27,7 @@ describe("PrismaTranscodeStore.claim", () => {
     expect(await store.claim(assetId)).toEqual({ assetKey: "key" });
     expect(database.videoAsset.updateMany).toHaveBeenCalledWith({
       where: { id: assetId, status: { in: ["QUEUED", "PROCESSING"] } },
-      data: { status: "PROCESSING", failureReason: null },
+      data: { status: "PROCESSING", failureReason: null, progressPercent: 0 },
     });
   });
 
@@ -55,7 +55,12 @@ describe("PrismaTranscodeStore.markReady", () => {
     expect(applied).toBe(true);
     expect(tx.videoAsset.updateMany).toHaveBeenCalledWith({
       where: { id: assetId, status: "PROCESSING" },
-      data: { status: "READY", durationSeconds: 61, failureReason: null },
+      data: {
+        status: "READY",
+        durationSeconds: 61,
+        failureReason: null,
+        progressPercent: null,
+      },
     });
     expect(tx.videoRendition.deleteMany).toHaveBeenCalledWith({ where: { assetId } });
     expect(tx.videoRendition.createMany).toHaveBeenCalledWith({
@@ -79,7 +84,22 @@ describe("PrismaTranscodeStore.markFailed", () => {
     await store.markFailed(assetId, "TIMED_OUT");
     expect(database.videoAsset.updateMany).toHaveBeenCalledWith({
       where: { id: assetId, status: "PROCESSING" },
-      data: { status: "FAILED", failureReason: "TIMED_OUT" },
+      data: { status: "FAILED", failureReason: "TIMED_OUT", progressPercent: null },
+    });
+  });
+});
+
+describe("PrismaTranscodeStore.reportProgress", () => {
+  test("stores the percentage only while processing and never moves it backwards", async () => {
+    const { store, database } = build();
+    await store.reportProgress(assetId, 50);
+    expect(database.videoAsset.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: assetId,
+        status: "PROCESSING",
+        OR: [{ progressPercent: null }, { progressPercent: { lt: 50 } }],
+      },
+      data: { progressPercent: 50 },
     });
   });
 });

@@ -4,7 +4,12 @@ import { DashboardService } from "../../src/learning/dashboard.service";
 const id = (n: number) => `0198f1a0-0000-7000-8000-0000000000${String(n).padStart(2, "0")}`;
 const at = (minute: number) => new Date(Date.UTC(2026, 10, 12, 10, minute));
 
-const course = (n: number) => ({ id: id(n), slug: `course-${n}`, title: `Course ${n}` });
+const course = (n: number) => ({
+  id: id(n),
+  slug: `course-${n}`,
+  title: `Course ${n}`,
+  thumbnailAssetId: null,
+});
 
 const enrollmentRow = (overrides: object = {}) => ({
   id: "e1",
@@ -49,8 +54,10 @@ const build = (options: Options = {}) => {
     module: { findMany: vi.fn().mockResolvedValue(modules) },
     moduleProgress: { findMany: vi.fn().mockResolvedValue(options.moduleProgress ?? []) },
     videoProgress: { findMany: vi.fn().mockResolvedValue(options.videoProgress ?? []) },
+    mediaAsset: { findMany: vi.fn().mockResolvedValue([]) },
   };
-  return { service: new DashboardService(database as never), database };
+  const media = { describe: vi.fn() };
+  return { service: new DashboardService(database as never, media as never), database };
 };
 
 describe("DashboardService.describe", () => {
@@ -99,6 +106,7 @@ describe("DashboardService.describe", () => {
         courseId: id(1),
         courseSlug: "course-1",
         courseTitle: "Course 1",
+        thumbnail: null,
         status: "APPROVED",
         reason: null,
         progress: { modulesCompleted: 1, modulesTotal: 3, percent: 33 },

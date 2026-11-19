@@ -25,6 +25,12 @@ export type VideoSlotListResponseDtoItemsItem = {
      * @maximum 9007199254740991
      */
   order: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     * @nullable
+     */
+  progressPercent: number | null;
   /** @nullable */
   rejectionReason: VideoSlotListResponseDtoItemsItemRejectionReason;
   required: boolean;

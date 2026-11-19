@@ -39,6 +39,7 @@ const slotSelect = {
       assetKey: true,
       rejectionReason: true,
       failureReason: true,
+      progressPercent: true,
       createdAt: true,
       updatedAt: true,
       captions: { select: { language: true }, orderBy: { language: "asc" as const } },
@@ -57,6 +58,7 @@ interface SlotRow {
     assetKey: string;
     rejectionReason: string | null;
     failureReason: string | null;
+    progressPercent: number | null;
     createdAt: Date;
     updatedAt: Date;
     captions: Array<{ language: string }>;
@@ -82,6 +84,7 @@ const toSlotSummary = (row: SlotRow): VideoSlotSummary => ({
   assetKey: row.asset?.assetKey ?? null,
   rejectionReason: reasonOf(row.asset?.rejectionReason ?? null),
   failureReason: failureOf(row.asset?.failureReason ?? null),
+  progressPercent: row.asset?.progressPercent ?? null,
   uploadedAt: row.asset?.createdAt.toISOString() ?? null,
   statusChangedAt: row.asset?.updatedAt.toISOString() ?? null,
   captions: (row.asset?.captions ?? []).flatMap((caption) => {

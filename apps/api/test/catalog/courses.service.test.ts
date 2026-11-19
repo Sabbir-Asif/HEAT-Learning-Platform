@@ -36,6 +36,7 @@ const build = (
     publishedCount?: number;
     createError?: Error;
     checks?: string[][];
+    thumbnails?: Array<[string, { assetId: string; url: string; alt: string }]>;
   } = {},
 ) => {
   const database = {
@@ -69,6 +70,7 @@ const build = (
     new AuditService({} as never),
     checks as never,
     { revalidate } as never,
+    { resolve: vi.fn().mockResolvedValue(new Map(options.thumbnails ?? [])) } as never,
   );
   const changes: AuditChange[] = [];
   const afterCommit: Array<() => Promise<void>> = [];
@@ -314,5 +316,15 @@ describe("CoursesService.publish", () => {
     const { service, inAuditScope } = build({ publishedCount: 0 });
 
     expect(await code(inAuditScope(() => service.publish(id)))).toBe("COURSE_NOT_DRAFT");
+  });
+
+  test("summaries carry the resolved thumbnail, or null without one", async () => {
+    const image = { assetId, url: "/api/media/public/a/w640.webp", alt: "Cover" };
+    const withImage = build({
+      existing: row({ thumbnailAssetId: assetId }),
+      thumbnails: [[assetId, image]],
+    });
+    expect((await withImage.service.get(id)).thumbnail).toEqual(image);
+    expect((await build().service.get(id)).thumbnail).toBeNull();
   });
 });

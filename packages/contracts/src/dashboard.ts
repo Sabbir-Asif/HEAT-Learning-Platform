@@ -2,6 +2,7 @@ import { z } from "zod";
 import { approvalReasonMaxLength } from "./approvals";
 import { enrollmentStatusSchema } from "./auth";
 import { dashboardCertificateSchema } from "./certificates";
+import { lessonBodyImageSchema } from "./rich-text";
 
 export const dashboardNextModuleSchema = z.object({
   id: z.uuid(),
@@ -21,6 +22,7 @@ export const dashboardCourseSchema = z.object({
   courseId: z.uuid(),
   courseSlug: z.string(),
   courseTitle: z.string(),
+  thumbnail: lessonBodyImageSchema.nullable(),
   status: enrollmentStatusSchema,
   reason: z.string().max(approvalReasonMaxLength).nullable(),
   progress: dashboardProgressSchema.nullable(),

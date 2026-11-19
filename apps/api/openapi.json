@@ -1621,6 +1621,28 @@
                   ],
                   "type": "string"
                 },
+                "thumbnail": {
+                  "nullable": true,
+                  "properties": {
+                    "alt": {
+                      "type": "string"
+                    },
+                    "assetId": {
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "assetId",
+                    "url",
+                    "alt"
+                  ],
+                  "type": "object"
+                },
                 "thumbnailAssetId": {
                   "format": "uuid",
                   "nullable": true,
@@ -1642,6 +1664,7 @@
                 "title",
                 "description",
                 "thumbnailAssetId",
+                "thumbnail",
                 "status",
                 "lockedAt",
                 "publishedAt",
@@ -1868,6 +1891,28 @@
             ],
             "type": "string"
           },
+          "thumbnail": {
+            "nullable": true,
+            "properties": {
+              "alt": {
+                "type": "string"
+              },
+              "assetId": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "assetId",
+              "url",
+              "alt"
+            ],
+            "type": "object"
+          },
           "thumbnailAssetId": {
             "format": "uuid",
             "nullable": true,
@@ -1889,6 +1934,7 @@
           "title",
           "description",
           "thumbnailAssetId",
+          "thumbnail",
           "status",
           "lockedAt",
           "publishedAt",
@@ -2148,12 +2194,35 @@
                     "REMOVED"
                   ],
                   "type": "string"
+                },
+                "thumbnail": {
+                  "nullable": true,
+                  "properties": {
+                    "alt": {
+                      "type": "string"
+                    },
+                    "assetId": {
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "assetId",
+                    "url",
+                    "alt"
+                  ],
+                  "type": "object"
                 }
               },
               "required": [
                 "courseId",
                 "courseSlug",
                 "courseTitle",
+                "thumbnail",
                 "status",
                 "reason",
                 "progress",
@@ -8531,6 +8600,12 @@
                   "minimum": 1,
                   "type": "integer"
                 },
+                "progressPercent": {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "nullable": true,
+                  "type": "integer"
+                },
                 "rejectionReason": {
                   "enum": [
                     "NOT_A_VIDEO",
@@ -8584,6 +8659,7 @@
                 "assetKey",
                 "rejectionReason",
                 "failureReason",
+                "progressPercent",
                 "uploadedAt",
                 "statusChangedAt",
                 "captions"
