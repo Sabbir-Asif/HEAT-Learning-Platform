@@ -66,6 +66,26 @@ const migrate = () => {
   }
 };
 
+const seed = () => {
+  const { status, error } = spawnSync(
+    "pnpm",
+    ["--filter", "@heat/db", "exec", "prisma", "db", "seed"],
+    {
+      cwd: root,
+      stdio: "inherit",
+      env: { ...process.env, SEED_SAMPLE_DIRECTORY: "true" },
+      shell: process.platform === "win32",
+    },
+  );
+  if (error) console.error(`Could not run pnpm (${error.message}).`);
+  if (status !== 0) {
+    console.error(
+      "Could not seed the database. Check SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD in apps/api/.env.",
+    );
+    process.exit(status ?? 1);
+  }
+};
+
 const prefixLines = (name, stream, target) => {
   let pending = "";
   stream.on("data", (chunk) => {
@@ -87,6 +107,7 @@ const start = () => {
     process.exit(1);
   }
   migrate();
+  seed();
   const children = services.map((service) => {
     const child = spawn(process.execPath, service.args, {
       cwd: join(root, service.cwd),
