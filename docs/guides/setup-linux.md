@@ -163,35 +163,19 @@ Leave this terminal open. It starts the public site (port 3000), the admin conso
 
 Use this instead of step 9 when you present. Pages are compiled ahead of time, so every page opens at once. Stop `pnpm dev` first if it is running (`Ctrl+C`).
 
-Build everything and copy the images, fonts and styles into the production output of the two sites (Next.js does not do this copy itself):
+Build everything once. This also copies the images, fonts and styles into the production output of the two sites, which Next.js does not do itself:
 
 ```sh
-pnpm build
-cp -R apps/frontend-public/.next/static apps/frontend-public/.next/standalone/apps/frontend-public/.next/
-cp -R apps/frontend-public/public apps/frontend-public/.next/standalone/apps/frontend-public/
-cp -R apps/frontend-internal/.next/static apps/frontend-internal/.next/standalone/apps/frontend-internal/.next/
-cp -R apps/frontend-internal/public apps/frontend-internal/.next/standalone/apps/frontend-internal/
+pnpm demo:build
 ```
 
-Open four terminals in the project folder (run `nvm use` in each) and run one command in each:
+Then start the API, the worker and both sites together in one window. Each line of output is prefixed with the app name, and `Ctrl+C` stops all four:
 
 ```sh
-pnpm --filter api exec node --env-file=.env dist/main.js
+pnpm demo
 ```
 
-```sh
-pnpm --filter worker exec node --env-file=../api/.env dist/main.js
-```
-
-```sh
-pnpm --filter frontend-public start
-```
-
-```sh
-PORT=3001 pnpm --filter frontend-internal start
-```
-
-The ports are the same as in development, so Nginx and the addresses in the next step do not change. Run `pnpm build` and the four copy commands again after every code change. If the API or the worker will not start in this mode, run `pnpm --filter api dev` and `pnpm --filter worker dev` in their place; the two sites stay in production mode.
+The ports are the same as in development, so Nginx and the addresses in the next step do not change. Run `pnpm demo:build` again after every code change. If the API or the worker will not start in this mode, run `pnpm --filter api dev` and `pnpm --filter worker dev` in two other windows in their place, and start the two sites with `pnpm --filter frontend-public start` and `pnpm --filter frontend-internal start` (set `PORT=3001` for the second one).
 
 ## 11. Open the site
 
@@ -230,7 +214,7 @@ pnpm dev:up
 | `502` only while the apps are running, and `ufw` is active      | The firewall blocks containers from reaching the host. Run `sudo ufw allow from 172.16.0.0/12 to any port 3000,3001,4000 proto tcp`.                                                                |
 | Sign-in says "The server sent an unexpected reply"              | You opened `localhost:3000` or `localhost:3001`. Use `learn.localhost` and `admin.localhost`.                                                                                                       |
 | `pnpm build` ends with `Killed` or exit code 137                | The machine ran out of memory because both sites build at once. Close other programs and run `pnpm build --concurrency=1`, or add swap space.                                                       |
-| Page has no styles in demo mode                                 | The copy commands of step 10 were skipped after the last build. Run them again and restart the two sites.                                                                                           |
+| Page has no styles in demo mode                                 | The last build was not made with `pnpm demo:build`, so the copy step was skipped. Run it again and restart `pnpm demo`.                                                                                           |
 | `learn.localhost` does not open                                 | Use Chrome, Chromium or Firefox. If your browser or system resolver does not resolve `*.localhost`, add `127.0.0.1 learn.localhost admin.localhost` to `/etc/hosts` with `sudo nano /etc/hosts`.     |
 
 To move Nginx to port 8080:

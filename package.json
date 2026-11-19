@@ -33,7 +33,9 @@
     "db:migrate": "pnpm --filter @heat/db prisma:migrate",
     "dev:up": "node infra/scripts/dev.mjs up",
     "dev:down": "node infra/scripts/dev.mjs down",
-    "dev:reset": "node infra/scripts/dev.mjs reset"
+    "dev:reset": "node infra/scripts/dev.mjs reset",
+    "demo:build": "node infra/scripts/demo.mjs build",
+    "demo": "node infra/scripts/demo.mjs start"
   },
   "devDependencies": {
     "@heat/config": "workspace:*",
