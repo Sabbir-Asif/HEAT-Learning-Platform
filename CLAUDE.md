@@ -86,8 +86,8 @@ Every ticket is reviewed against these rules. Implementer and reviewers read the
 - The interface is in English only
 - Performance budget on a mid-range Android over 4G: LCP under 2.5 s on public pages
 - Loading, empty and error states designed for every screen
-- Every screen built from `@heat/ui` components; no app-level CSS files and no values outside the tokens
-- No decorative or filler components: each element on a screen must help the task on that screen
+- Screens use `@heat/ui` components and the design tokens; apps may style with Tailwind classes, and keep no app-level CSS files
+- Visual design is modern and polished, matching the public home page palette (owner decision, 2026-11-20, replaces the layout-only rule for apps)
 - Consistent patterns across both apps: the same table, form, dialog and feedback behaviour everywhere
 
 ### Operations
