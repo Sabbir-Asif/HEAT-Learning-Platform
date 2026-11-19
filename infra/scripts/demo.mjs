@@ -53,6 +53,19 @@ const build = () => {
   console.log("Built. Run pnpm demo to start the API, the worker and both sites.");
 };
 
+const migrate = () => {
+  const { status, error } = spawnSync("pnpm", ["db:migrate"], {
+    cwd: root,
+    stdio: "inherit",
+    shell: process.platform === "win32",
+  });
+  if (error) console.error(`Could not run pnpm (${error.message}).`);
+  if (status !== 0) {
+    console.error("Could not migrate the database. Run pnpm dev:up first.");
+    process.exit(status ?? 1);
+  }
+};
+
 const prefixLines = (name, stream, target) => {
   let pending = "";
   stream.on("data", (chunk) => {
@@ -73,6 +86,7 @@ const start = () => {
     );
     process.exit(1);
   }
+  migrate();
   const children = services.map((service) => {
     const child = spawn(process.execPath, service.args, {
       cwd: join(root, service.cwd),
