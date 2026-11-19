@@ -11,7 +11,7 @@ import {
   useInsightsQuery,
   useUniversitiesList,
 } from "@heat/api-client";
-import { Field, FieldDescription, FieldError, FieldLabel, Input, PageHeader } from "@heat/ui";
+import { FieldDescription, PageHeader } from "@heat/ui";
 import { ChartCard } from "@heat/ui/charts";
 import type { ChartSeries, UpToFive } from "@heat/ui/charts";
 import { FilterBar, FilterInput, FilterSelect, useTableUrlState } from "@heat/ui/data";
@@ -207,26 +207,25 @@ export function InsightsView() {
           !university || !faculty,
           (departments.data?.total ?? 0) > optionLimit,
         )}
-        <Field>
-          <FieldLabel htmlFor="insights-session">Session</FieldLabel>
-          <Input
-            id="insights-session"
-            key={session}
-            defaultValue={session}
-            placeholder="2020-21"
-            aria-invalid={sessionValid ? undefined : true}
-            onBlur={(event) => {
-              const next = event.target.value.trim();
-              if (next !== session) url.setFilter("session", next);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") event.currentTarget.blur();
-            }}
-          />
-          {sessionValid ? null : (
-            <FieldError>Use the format 2020-21, where the second part is the next year.</FieldError>
-          )}
-        </Field>
+        <FilterInput
+          label="Session"
+          icon={filterIcon("Session")}
+          key={session}
+          defaultValue={session}
+          placeholder="2020-21"
+          error={
+            sessionValid
+              ? undefined
+              : "Use the format 2020-21, where the second part is the next year."
+          }
+          onBlur={(event) => {
+            const next = event.target.value.trim();
+            if (next !== session) url.setFilter("session", next);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") event.currentTarget.blur();
+          }}
+        />
       </FilterBar>
       {hasSuppressedValues(funnel.data, trend.data, modules.data, quizzes.data) ? (
         <FieldDescription role="note">{suppressionNote(suppressionThreshold)}</FieldDescription>

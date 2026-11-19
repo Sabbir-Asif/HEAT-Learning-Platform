@@ -17,11 +17,13 @@ import {
   rateLimitedMessage,
 } from "@heat/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { slugFromTitle } from "./course-slug";
 import { courseLockedMessage, courseSlugTakenMessage } from "./courses-copy";
 import { isContentLocked } from "./courses-status";
+import { ThumbnailField } from "./thumbnail-field";
+import type { ThumbnailValue } from "./thumbnail-field";
 
 type CourseFormProps = {
   course: CourseSummaryDto | null;
@@ -43,17 +45,22 @@ export function CourseForm({ course, onSaved, onCancel, onDirtyChange }: CourseF
     resolver: zodResolver(courseFormSchema),
     defaultValues: valuesOf(course),
   });
+  const savedThumbnail = course?.thumbnail ?? null;
+  const [thumbnail, setThumbnail] = useState<ThumbnailValue | null>(savedThumbnail);
   const locked = course !== null && isContentLocked(course);
 
   const { reset } = form;
   const { isDirty } = form.formState;
   useEffect(() => {
     reset(valuesOf(course));
-  }, [reset, course]);
+    setThumbnail(savedThumbnail);
+  }, [reset, course, savedThumbnail]);
+
+  const formDirty = isDirty || (thumbnail?.assetId ?? null) !== (savedThumbnail?.assetId ?? null);
 
   useEffect(() => {
-    onDirtyChange?.(isDirty);
-  }, [isDirty, onDirtyChange]);
+    onDirtyChange?.(formDirty);
+  }, [formDirty, onDirtyChange]);
 
   const title = form.watch("title");
   const slugEdited = form.formState.dirtyFields.slug === true;
@@ -64,18 +71,18 @@ export function CourseForm({ course, onSaved, onCancel, onDirtyChange }: CourseF
   }, [course, slugEdited, title, setValue]);
 
   useEffect(() => {
-    if (!isDirty) return undefined;
+    if (!formDirty) return undefined;
     const warn = (event: BeforeUnloadEvent) => event.preventDefault();
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [isDirty]);
+  }, [formDirty]);
 
   async function onSubmit(values: CourseFormValues) {
     const data = {
       title: values.title,
       slug: values.slug,
       description: values.description === "" ? null : values.description,
-      thumbnailAssetId: course?.thumbnailAssetId ?? null,
+      thumbnailAssetId: thumbnail?.assetId ?? null,
     };
     try {
       const saved =
@@ -132,6 +139,7 @@ export function CourseForm({ course, onSaved, onCancel, onDirtyChange }: CourseF
         description={`${form.watch("description").length} of ${courseDescriptionMaxLength} characters.`}
         render={({ field, controlProps }) => <Textarea rows={6} {...field} {...controlProps} />}
       />
+      <ThumbnailField title={title} value={thumbnail} onChange={setThumbnail} />
       <div className="flex gap-2">
         <Button type="submit" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting

@@ -26,7 +26,7 @@ test("the CSS entry imports the shared theme and scans the shared components", (
 test("the root layout loads the CSS entry and mounts the theme provider", () => {
   const layout = readFileSync(join(source, "app/layout.tsx"), "utf8");
   expect(layout).toContain('import "./globals.css";');
-  expect(layout).toContain("<ThemeProvider>");
+  expect(layout).toContain('<ThemeProvider defaultTheme="light">');
   expect(layout).toContain("suppressHydrationWarning");
 });
 

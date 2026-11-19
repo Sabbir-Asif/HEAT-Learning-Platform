@@ -2,12 +2,12 @@ import { AuthLayout, ThemeSwitch } from "@heat/ui/shell";
 import { ClockIcon, KeyRoundIcon } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { adminName, crestLogo, heatLogo } from "./brand";
+import { adminName } from "./brand";
 
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
     <AuthLayout
-      brand={{ name: adminName, href: "/", logos: [heatLogo, crestLogo] }}
+      brand={{ name: adminName, href: "/" }}
       panel={{
         headline: "The Women Safety Awareness Program administration console.",
         points: [

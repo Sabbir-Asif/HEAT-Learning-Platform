@@ -37,6 +37,7 @@ import { useState } from "react";
 import { formatDhakaTime } from "../admins/admin-copy";
 import { ModulesTab } from "../modules/modules-tab";
 import { CourseForm } from "./course-form";
+import { HomePageCard } from "./home-page-card";
 import { isContentLocked } from "./courses-status";
 import { RevisionsTab } from "./revisions-tab";
 import {
@@ -143,6 +144,7 @@ export function CourseDetailsView({ id }: { id: string }) {
         <StatusBadge kind="course" status={isContentLocked(current) ? "locked" : current.status} />
         <FieldDescription>/{current.slug}</FieldDescription>
       </div>
+      <HomePageCard courseId={id} published={current.status === "PUBLISHED"} />
       {notice !== null ? <FieldDescription role="status">{notice}</FieldDescription> : null}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Enrollments" value={String(current.enrollmentCount)} />
@@ -205,7 +207,7 @@ export function CourseDetailsView({ id }: { id: string }) {
           <TabsTrigger value="revisions">Revisions</TabsTrigger>
         </TabsList>
         <TabsContent value="details">
-          <Card className="max-w-2xl">
+          <Card className="max-w-5xl">
             <CardHeader>
               <CardTitle>Course details</CardTitle>
               <CardDescription>The title, address and description learners see.</CardDescription>

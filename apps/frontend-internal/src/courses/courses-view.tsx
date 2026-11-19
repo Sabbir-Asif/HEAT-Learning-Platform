@@ -11,29 +11,29 @@ import type { CourseListResponseDtoItemsItem } from "@heat/api-client";
 import { courseSortFields } from "@heat/contracts";
 import {
   Button,
-  CellPrimary,
   ConfirmDialog,
+  EmptyState,
+  ErrorState,
   FieldDescription,
   PageHeader,
-  StatusBadge,
+  Skeleton,
 } from "@heat/ui";
 import {
-  DataTable,
   FilterBar,
   FilterSelect,
+  Pagination,
   SearchInput,
   useClampedPage,
   useTableUrlState,
 } from "@heat/ui/data";
-import type { DataTableColumn } from "@heat/ui/data";
 import { filterIcon } from "../filters/filter-icon";
 import { ShellContent } from "@heat/ui/shell";
 import { useQueryClient } from "@tanstack/react-query";
-import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { BookOpenIcon, PencilIcon, PlusIcon, SearchXIcon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import { formatDhakaTime } from "../admins/admin-copy";
+import { useState } from "react";
+import { CourseCard } from "./course-card";
 import { CourseFormSheet } from "./course-form-sheet";
 import { courseDeleteBlockedMessage, courseDeleteFailedMessage } from "./courses-copy";
 import {
@@ -44,6 +44,8 @@ import {
 } from "./courses-status";
 
 type CourseRow = CourseListResponseDtoItemsItem;
+
+const gridClass = "grid gap-6 sm:grid-cols-2 xl:grid-cols-3";
 
 const sortable = ["title", "createdAt", "updatedAt"] as const;
 const sortValues: readonly string[] = courseSortFields;
@@ -76,39 +78,6 @@ export function CoursesView() {
 
   const refresh = () =>
     queryClient.invalidateQueries({ queryKey: getCoursesListQueryKey().slice(0, 1) });
-
-  const columns = useMemo<DataTableColumn<CourseRow>[]>(
-    () => [
-      {
-        id: "title",
-        header: "Course",
-        cell: (row) => (
-          <CellPrimary
-            title={<Link href={`/courses/${row.id}`}>{row.title}</Link>}
-            description={row.slug}
-          />
-        ),
-        sortable: true,
-      },
-      {
-        id: "status",
-        header: "Status",
-        cell: (row) => <StatusBadge kind="course" status={row.status} />,
-      },
-      {
-        id: "enrollments",
-        header: "Enrollments",
-        cell: (row) => String(row.enrollmentCount),
-      },
-      {
-        id: "updatedAt",
-        header: "Updated",
-        cell: (row) => formatDhakaTime(row.updatedAt),
-        sortable: true,
-      },
-    ],
-    [],
-  );
 
   function actions(row: CourseRow) {
     return (
@@ -199,28 +168,51 @@ export function CoursesView() {
           }
         />
       </FilterBar>
-      <DataTable
-        label="Courses"
-        columns={columns}
-        rows={list.data?.items ?? []}
-        getRowId={(row) => row.id}
-        total={total}
-        page={page}
-        pageSize={url.pageSize}
-        sort={url.sort}
-        onToggleSort={url.toggleSort}
-        onSortChange={url.setSort}
-        onPageChange={url.setPage}
-        onPageSizeChange={url.setPageSize}
-        status={list.isError ? "error" : list.isPending ? "loading" : "ready"}
-        fetching={list.isFetching && !list.isPending}
-        onRetry={() => void list.refetch()}
-        filtersActive={url.activeFilterCount > 0}
-        onClearFilters={url.clearFilters}
-        emptyTitle="No courses yet"
-        emptyDescription="Add a course to start building its modules."
-        actions={actions}
-      />
+      {list.isError ? (
+        <ErrorState title="The courses could not be loaded" onRetry={() => void list.refetch()} />
+      ) : list.isPending ? (
+        <div role="status" aria-label="Loading courses" className={gridClass}>
+          {[0, 1, 2].map((slot) => (
+            <Skeleton key={slot} className="h-80 w-full rounded-xl" />
+          ))}
+        </div>
+      ) : list.data.items.length === 0 ? (
+        url.activeFilterCount > 0 || url.query !== "" ? (
+          <EmptyState
+            icon={SearchXIcon}
+            title="No courses match"
+            description="Try a different search or clear the filters."
+            action={
+              <Button variant="outline" onClick={url.clearFilters}>
+                Clear filters
+              </Button>
+            }
+          />
+        ) : (
+          <EmptyState
+            icon={BookOpenIcon}
+            title="No courses yet"
+            description="Add a course to start building its modules."
+          />
+        )
+      ) : (
+        <>
+          <ul className={gridClass} aria-label="Courses">
+            {list.data.items.map((row, index) => (
+              <li key={row.id} className="flex *:w-full">
+                <CourseCard course={row} priority={index < 3} actions={actions(row)} />
+              </li>
+            ))}
+          </ul>
+          <Pagination
+            page={page}
+            pageSize={url.pageSize}
+            total={total}
+            onPageChange={url.setPage}
+            onPageSizeChange={url.setPageSize}
+          />
+        </>
+      )}
       <CourseFormSheet
         open={creating}
         onClose={() => setCreating(false)}

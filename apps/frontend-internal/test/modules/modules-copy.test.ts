@@ -8,6 +8,7 @@ import {
   videoSlotDeleteFailedMessage,
   videoSlotLockedMessage,
   videoFailureMessage,
+  videoProcessingLabel,
   videoRejectionMessage,
   videoRetryFailedMessage,
   videoTimeLabel,
@@ -89,6 +90,14 @@ describe("videoRejectionMessage", () => {
     expect(videoRejectionMessage("UNSUPPORTED_CODEC")).toContain("video codec is not supported");
     expect(videoRejectionMessage("TOO_LARGE")).toContain("limit");
     expect(videoRejectionMessage("NO_DURATION")).toContain("incomplete");
+  });
+});
+
+describe("videoProcessingLabel", () => {
+  test("says what the video is waiting for or doing", () => {
+    expect(videoProcessingLabel("QUEUED", null)).toBe("Waiting to be processed");
+    expect(videoProcessingLabel("PROCESSING", null)).toBe("Starting to process");
+    expect(videoProcessingLabel("PROCESSING", 50)).toBe("Processing the video");
   });
 });
 
