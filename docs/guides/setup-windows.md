@@ -142,36 +142,19 @@ Leave this window open. It starts the public site (port 3000), the admin console
 
 Use this instead of step 8 when you present. Pages are compiled ahead of time, so every page opens at once. Stop `pnpm dev` first if it is running (`Ctrl+C`).
 
-Build everything and copy the images, fonts and styles into the production output of the two sites (Next.js does not do this copy itself):
+Build everything once. This also copies the images, fonts and styles into the production output of the two sites, which Next.js does not do itself:
 
-```powershell
-pnpm build
-Copy-Item -Recurse -Force apps\frontend-public\.next\static apps\frontend-public\.next\standalone\apps\frontend-public\.next\
-Copy-Item -Recurse -Force apps\frontend-public\public apps\frontend-public\.next\standalone\apps\frontend-public\
-Copy-Item -Recurse -Force apps\frontend-internal\.next\static apps\frontend-internal\.next\standalone\apps\frontend-internal\.next\
-Copy-Item -Recurse -Force apps\frontend-internal\public apps\frontend-internal\.next\standalone\apps\frontend-internal\
+```sh
+pnpm demo:build
 ```
 
-Open four PowerShell windows in the project folder and run one command in each:
+Then start the API, the worker and both sites together in one window. Each line of output is prefixed with the app name, and `Ctrl+C` stops all four:
 
-```powershell
-pnpm --filter api exec node --env-file=.env dist/main.js
+```sh
+pnpm demo
 ```
 
-```powershell
-pnpm --filter worker exec node --env-file=../api/.env dist/main.js
-```
-
-```powershell
-pnpm --filter frontend-public start
-```
-
-```powershell
-$env:PORT = "3001"
-pnpm --filter frontend-internal start
-```
-
-The ports are the same as in development, so Nginx and the addresses in the next step do not change. Run `pnpm build` and the four copy commands again after every code change. If the API or the worker will not start in this mode, run `pnpm --filter api dev` and `pnpm --filter worker dev` in their place; the two sites stay in production mode.
+The ports are the same as in development, so Nginx and the addresses in the next step do not change. Run `pnpm demo:build` again after every code change. If the API or the worker will not start in this mode, run `pnpm --filter api dev` and `pnpm --filter worker dev` in two other windows in their place, and start the two sites with `pnpm --filter frontend-public start` and `pnpm --filter frontend-internal start` (set `PORT=3001` for the second one).
 
 ## 10. Open the site
 
@@ -209,10 +192,10 @@ pnpm dev:up
 | Docker Desktop says virtualization is disabled                  | Switch on Intel VT-x or AMD-V (SVM) in the BIOS or UEFI, then start again.                                                                                      |
 | `address already in use` for port 80 when running `pnpm dev:up` | Another program holds port 80, often IIS or the World Wide Web Publishing Service. Stop it (`net stop was /y`, administrator) or move Nginx to port 8080, below. |
 | `nvm use` says it cannot create a link or access is denied      | The window is not an administrator PowerShell.                                                                                                                  |
-| Pages answer `502 Bad Gateway`                                  | The apps are not running yet. Nginx forwards to them on the host; wait for `pnpm dev` to finish starting, or start the four commands of step 9.                  |
+| Pages answer `502 Bad Gateway`                                  | The apps are not running yet. Nginx forwards to them on the host; wait for `pnpm dev` to finish starting, or start `pnpm demo` (step 9).                  |
 | Sign-in says "The server sent an unexpected reply"              | You opened `localhost:3000` or `localhost:3001`. Use `learn.localhost` and `admin.localhost`.                                                                    |
 | `pnpm build` ends with `Killed` or exit code 137                | The machine ran out of memory because both sites build at once. Close other programs and run `pnpm build --concurrency=1`.                                       |
-| Page has no styles in demo mode                                 | The copy commands of step 9 were skipped after the last build. Run them again and restart the two sites.                                                         |
+| Page has no styles in demo mode                                 | The last build was not made with `pnpm demo:build`, so the copy step was skipped. Run it again and restart `pnpm demo`.                                                         |
 | Scripts are disabled (`running scripts is disabled`)            | Run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, then open a new window.                                                                              |
 
 To move Nginx to port 8080:
