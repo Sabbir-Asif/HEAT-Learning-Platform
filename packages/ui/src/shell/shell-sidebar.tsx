@@ -1,5 +1,6 @@
 "use client";
 
+import type { LucideIcon } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -19,7 +20,7 @@ import { ThemedLogo } from "./themed-logo";
 import type { LogoSource, ShellLink } from "./types";
 
 interface ShellSidebarProps {
-  brand: { name: string; href: string; logo?: LogoSource };
+  brand: { name: string; href: string; logo?: LogoSource; icon?: LucideIcon };
   groups: ReadonlyArray<NavGroup>;
   pathname: string;
   navLabel: string;
@@ -52,7 +53,7 @@ function SidebarNav({
                 return (
                   <SidebarMenuItem key={href}>
                     <SidebarMenuButton
-                      className="h-10"
+                      className="h-11"
                       isActive={active}
                       onClick={() => setOpenMobile(false)}
                       render={linkElement(link, {
@@ -60,7 +61,12 @@ function SidebarNav({
                         "aria-current": active ? "page" : undefined,
                       })}
                     >
-                      <Icon aria-hidden="true" />
+                      <span
+                        aria-hidden="true"
+                        className="bg-sidebar-foreground/10 group-data-active/menu-button:bg-sidebar-primary group-data-active/menu-button:text-sidebar-primary-foreground grid size-8 shrink-0 place-items-center rounded-lg transition-colors"
+                      >
+                        <Icon />
+                      </span>
                       <span>{label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -98,7 +104,15 @@ function ShellSidebar({
               {brand.logo ? (
                 <ThemedLogo {...brand.logo} tone="inverse" eager className="h-9" />
               ) : null}
-              <span className="font-display truncate text-xl font-bold tracking-wide">
+              {brand.icon ? (
+                <span
+                  aria-hidden="true"
+                  className="bg-sidebar-primary text-sidebar-primary-foreground grid size-9 shrink-0 place-items-center rounded-xl shadow-md"
+                >
+                  <brand.icon className="size-5" />
+                </span>
+              ) : null}
+              <span className="font-display truncate text-lg font-bold tracking-wide">
                 {brand.name}
               </span>
             </>

@@ -66,6 +66,7 @@ type FormFieldProps<T extends FieldValues, N extends FieldPath<T>> = {
   name: N;
   label: string;
   description?: string;
+  labelAction?: React.ReactNode;
   className?: string;
   render: (args: {
     field: ControllerRenderProps<T, N>;
@@ -77,6 +78,7 @@ function FormField<T extends FieldValues, N extends FieldPath<T> = FieldPath<T>>
   name,
   label,
   description,
+  labelAction,
   className,
   render,
 }: FormFieldProps<T, N>) {
@@ -102,7 +104,14 @@ function FormField<T extends FieldValues, N extends FieldPath<T> = FieldPath<T>>
             data-invalid={invalid}
             className={className}
           >
-            <FieldLabel htmlFor={id}>{label}</FieldLabel>
+            {labelAction ? (
+              <div className="flex items-center justify-between gap-2">
+                <FieldLabel htmlFor={id}>{label}</FieldLabel>
+                {labelAction}
+              </div>
+            ) : (
+              <FieldLabel htmlFor={id}>{label}</FieldLabel>
+            )}
             {render({
               field,
               controlProps: { id, "aria-invalid": invalid, "aria-describedby": describedBy },

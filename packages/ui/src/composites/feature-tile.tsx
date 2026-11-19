@@ -12,16 +12,18 @@ function FeatureTile({ icon: Icon, title, description, className, ...props }: Fe
     <div
       data-slot="feature-tile"
       className={cn(
-        "bg-card text-card-foreground ring-divider flex h-full flex-col items-center gap-3 rounded-xl p-5 text-center shadow-md ring-1",
+        "bg-card text-card-foreground ring-divider flex h-full flex-col items-start gap-4 rounded-xl p-6 shadow-sm ring-1 transition-shadow hover:shadow-md",
         className,
       )}
       {...props}
     >
-      <span className="bg-accent text-accent-foreground flex size-12 items-center justify-center rounded-full">
-        <Icon aria-hidden="true" className="size-6" />
+      <span className="bg-accent text-accent-foreground flex size-11 items-center justify-center rounded-lg">
+        <Icon aria-hidden="true" className="size-5" />
       </span>
       <h3 className="font-heading text-base font-semibold">{title}</h3>
-      <p className="text-muted-foreground text-sm text-pretty">{description}</p>
+      <p className="text-muted-foreground -mt-2 text-sm leading-relaxed text-pretty">
+        {description}
+      </p>
     </div>
   );
 }
@@ -37,7 +39,10 @@ function FeatureGrid({ tiles, className, ...props }: FeatureGridProps) {
   return (
     <section
       data-slot="feature-grid"
-      className={cn("mx-auto w-full max-w-7xl px-4 pt-10 md:px-6 md:pt-14", className)}
+      className={cn(
+        "relative z-10 mx-auto w-full max-w-7xl px-4 pt-8 md:-mt-12 md:px-6 md:pt-0",
+        className,
+      )}
       {...props}
     >
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

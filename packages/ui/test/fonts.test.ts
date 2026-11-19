@@ -12,18 +12,14 @@ function isAsset(item: Rollup.OutputChunk | Rollup.OutputAsset): item is Rollup.
 }
 
 describe("font tokens", () => {
-  test("headings use Source Serif 4 and body text uses Public Sans, with the declared fallbacks", () => {
-    expect(theme.get("--font-display")).toBe(
-      '"Source Serif 4 Variable", Georgia, "Times New Roman", serif',
-    );
-    expect(theme.get("--font-sans")).toBe(
-      '"Public Sans Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
-    );
+  test("headings and body text both use DM Sans, with the declared fallbacks", () => {
+    const stack = '"DM Sans Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    expect(theme.get("--font-display")).toBe(stack);
+    expect(theme.get("--font-sans")).toBe(stack);
   });
 
-  test("the stylesheet imports both self-hosted font packages", () => {
-    expect(css).toContain("@fontsource-variable/source-serif-4/wght.css");
-    expect(css).toContain("@fontsource-variable/public-sans/wght.css");
+  test("the stylesheet imports the self-hosted font package", () => {
+    expect(css).toContain("@fontsource-variable/dm-sans/wght.css");
   });
 });
 
@@ -49,10 +45,9 @@ describe("built stylesheet", () => {
     fontFiles = assets.filter((asset) => asset.fileName.endsWith(".woff2")).map((a) => a.fileName);
   }, 60_000);
 
-  test("declares @font-face for both families with font-display swap", () => {
+  test("declares @font-face for the family with font-display swap", () => {
     const faces = builtCss.match(/@font-face\s*\{[^}]*\}/g) ?? [];
-    expect(faces.some((face) => face.includes("Source Serif 4 Variable"))).toBe(true);
-    expect(faces.some((face) => face.includes("Public Sans Variable"))).toBe(true);
+    expect(faces.some((face) => face.includes("DM Sans Variable"))).toBe(true);
     for (const face of faces) expect(face).toContain("font-display:swap");
   });
 
@@ -63,7 +58,6 @@ describe("built stylesheet", () => {
   });
 
   test("the Latin files are among the emitted fonts", () => {
-    expect(fontFiles.some((file) => file.includes("source-serif-4-latin-wght"))).toBe(true);
-    expect(fontFiles.some((file) => file.includes("public-sans-latin-wght"))).toBe(true);
+    expect(fontFiles.some((file) => file.includes("dm-sans-latin-wght"))).toBe(true);
   });
 });

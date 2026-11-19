@@ -1,10 +1,11 @@
 "use client";
 
-import { Container, Hotkey, StatusAnnouncer, createPlayer } from "@videojs/react";
+import { Container, Hotkey, PlayButton, StatusAnnouncer, createPlayer } from "@videojs/react";
 import { HlsJsVideo } from "@videojs/react/media/hlsjs-video";
 import { videoFeatures } from "@videojs/react/video";
 import { Hls } from "@videojs/hlsjs-video";
 import type { HlsJsAdapter } from "@videojs/hlsjs-video";
+import { PlayIcon } from "lucide-react";
 import * as React from "react";
 import { Button } from "../components/button";
 import { cn } from "../lib/utils";
@@ -61,6 +62,7 @@ interface VideoPlayerProps {
   startPositionSeconds?: number;
   autoPlay?: boolean;
   captions?: readonly { language: string }[];
+  poster?: string;
   onProgress?: (progress: PlayerProgress) => void;
   className?: string;
 }
@@ -74,10 +76,13 @@ function PlayerSurface({
   startPositionSeconds = 0,
   autoPlay = false,
   captions = [],
+  poster,
   onProgress,
   className,
 }: VideoPlayerProps) {
   const store = usePlayer();
+  const started = usePlayer((state) => state.started);
+  const paused = usePlayer((state) => state.paused);
   const renditions = usePlayer((state) => state.videoRenditionList);
   const mediaRef = React.useRef<HlsJsAdapter>(null);
   const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -289,7 +294,7 @@ function PlayerSurface({
       data-slot="video-player"
       aria-label={title}
       className={cn(
-        "bg-player text-player-foreground relative aspect-video w-full overflow-hidden rounded-lg",
+        "bg-player text-player-foreground relative aspect-video w-full overflow-hidden rounded-xl shadow-lg",
         className,
       )}
     >
@@ -300,6 +305,7 @@ function PlayerSurface({
         playsInline
         autoPlay={autoPlay}
         preload="metadata"
+        poster={poster}
         className="size-full object-contain"
         onError={() => {
           if (!mediaRef.current?.engine) void recover();
@@ -315,6 +321,18 @@ function PlayerSurface({
           />
         ))}
       </HlsJsVideo>
+      {started || !paused ? null : (
+        <PlayButton
+          className="from-player/70 to-player/10 absolute inset-0 z-1 grid place-items-center bg-linear-to-t outline-none"
+          render={(props) => (
+            <button {...props} type="button" aria-label={`Play ${title}`}>
+              <span className="bg-primary text-primary-foreground grid size-16 place-items-center rounded-full shadow-lg transition-transform hover:scale-105 md:size-20">
+                <PlayIcon aria-hidden="true" className="size-7 translate-x-0.5 md:size-9" />
+              </span>
+            </button>
+          )}
+        />
+      )}
       <PlayerControls onQualityChange={rememberQuality} />
       <Hotkey keys="Space" action="togglePaused" />
       <Hotkey keys="k" action="togglePaused" />

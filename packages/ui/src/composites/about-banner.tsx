@@ -3,10 +3,19 @@ import { cn } from "../lib/utils";
 type AboutBannerProps = Omit<React.ComponentProps<"section">, "title"> & {
   id: string;
   title: string;
+  eyebrow?: string;
   image: React.ReactNode;
 };
 
-function AboutBanner({ id, title, image, className, children, ...props }: AboutBannerProps) {
+function AboutBanner({
+  id,
+  title,
+  eyebrow,
+  image,
+  className,
+  children,
+  ...props
+}: AboutBannerProps) {
   const headingId = `${id}-heading`;
   return (
     <section
@@ -17,7 +26,12 @@ function AboutBanner({ id, title, image, className, children, ...props }: AboutB
       {...props}
     >
       <div className="bg-secondary ring-divider grid items-center overflow-hidden rounded-xl ring-1 md:grid-cols-2">
-        <div className="flex flex-col gap-4 p-6 md:p-10">
+        <div className="flex flex-col gap-5 p-6 md:p-12">
+          {eyebrow ? (
+            <p className="text-primary text-xs font-semibold tracking-widest uppercase">
+              {eyebrow}
+            </p>
+          ) : null}
           <h2 id={headingId} className="font-display text-heading-1 tracking-tight md:text-4xl">
             {title}
           </h2>

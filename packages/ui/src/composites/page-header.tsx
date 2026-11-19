@@ -23,11 +23,11 @@ function PageHeader({
       {breadcrumbs}
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-1">
-          <h1 className="font-heading min-w-0 text-2xl font-semibold tracking-tight break-words">
+          <h1 className="font-heading min-w-0 text-3xl font-semibold tracking-tight break-words">
             {title}
           </h1>
           {description ? (
-            <p className="text-muted-foreground text-sm text-pretty">{description}</p>
+            <p className="text-muted-foreground text-base text-pretty">{description}</p>
           ) : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}

@@ -160,7 +160,7 @@ describe("AuthLayout", () => {
       </AuthLayout>,
     );
     expect(screen.getAllByRole("main")).toHaveLength(1);
-    expect(screen.getByRole("complementary", { name: "About the training" })).not.toBeNull();
+    expect(screen.getByRole("list", { name: "About the training" })).not.toBeNull();
     expect(screen.getByText("Safe")).not.toBeNull();
   });
 });

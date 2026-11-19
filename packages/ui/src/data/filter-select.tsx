@@ -52,13 +52,13 @@ function FilterSelect({
         data-active={active ? "" : undefined}
         aria-label={label}
         className={cn(
-          "data-active:border-primary/40 data-active:bg-primary/5 h-9 w-full min-w-0 gap-2 rounded-md pr-2.5 pl-3 shadow-xs md:w-auto md:max-w-64",
+          "data-active:border-primary/40 data-active:bg-primary/5 h-9 w-full min-w-0 gap-2 rounded-md pr-2.5 pl-3 shadow-xs data-[size=default]:h-9 md:w-auto md:max-w-56",
           className,
         )}
       >
         {icon ? <span className="text-muted-foreground flex items-center">{icon}</span> : null}
         <span className="text-muted-foreground font-medium">{label}</span>
-        <SelectValue className="text-foreground truncate font-medium" />
+        <SelectValue className={cn("text-foreground truncate font-medium", !active && "hidden!")} />
       </SelectTrigger>
       <SelectContent alignItemWithTrigger={false} align="start" className="w-auto min-w-52">
         {items.map((item) => (

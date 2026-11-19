@@ -39,7 +39,7 @@ function ShellContent({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="shell-content"
       className={cn(
-        "mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 md:px-6 md:py-8",
+        "mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 md:px-8 md:py-10",
         className,
       )}
       {...props}
@@ -57,7 +57,7 @@ function ShellHeader({
     <header
       data-slot="shell-header"
       className={cn(
-        "bg-background/80 border-border sticky top-0 z-20 border-b backdrop-blur-md",
+        "bg-background/70 border-divider/60 sticky top-0 z-20 border-b backdrop-blur-2xl backdrop-saturate-150",
         className,
       )}
       {...props}
