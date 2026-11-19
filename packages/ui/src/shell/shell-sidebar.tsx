@@ -98,7 +98,9 @@ function ShellSidebar({
               {brand.logo ? (
                 <ThemedLogo {...brand.logo} tone="inverse" eager className="h-9" />
               ) : null}
-              <span className="font-display text-heading-3 truncate">{brand.name}</span>
+              <span className="font-display truncate text-xl font-bold tracking-wide">
+                {brand.name}
+              </span>
             </>
           ),
         })}

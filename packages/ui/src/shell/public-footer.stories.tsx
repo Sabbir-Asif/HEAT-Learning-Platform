@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import { fixtureLogo, fixturePartners } from "./fixtures";
+import { fixturePartners } from "./fixtures";
 import { PublicFooter } from "./public-footer";
 
 const meta = {
@@ -12,7 +12,6 @@ const meta = {
     brand: {
       name: "HEAT Safety Training",
       description: "A gender safety course for University of Dhaka students.",
-      logos: [fixtureLogo],
     },
     columns: [
       {
