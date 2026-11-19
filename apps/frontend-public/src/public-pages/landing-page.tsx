@@ -38,10 +38,18 @@ const features = [
   },
 ];
 
+const aboutFacts = [
+  { label: "Project", value: "HEAT sub-project (PIN 13019)" },
+  { label: "Implemented by", value: "Department of Women and Gender Studies" },
+  { label: "Institution", value: "University of Dhaka" },
+  { label: "Audience", value: "Students, teachers and administrators" },
+];
+
 export function LandingPage({ frontPage }: LandingPageProps) {
   return (
     <>
       <HeroBanner
+        className="-mt-17 pt-17"
         badge="HEAT Project (PIN 13019)"
         title="Preventing gender-based violence in university campuses"
         description="An interactive training for students, teachers and university administrators, from the Women Safety Awareness Program at the University of Dhaka."
@@ -81,7 +89,8 @@ export function LandingPage({ frontPage }: LandingPageProps) {
       </PageSection>
       <AboutBanner
         id="about"
-        title="About the Project"
+        eyebrow="About the project"
+        title="Safer campuses start with awareness"
         image={
           <Image
             src="/hero/campus-illustration.jpg"
@@ -93,10 +102,20 @@ export function LandingPage({ frontPage }: LandingPageProps) {
         }
       >
         <p>
-          A HEAT sub-project (PIN 13019) implemented by the Department of Women and Gender Studies,
-          University of Dhaka, with the aim of developing a holistic approach to prevent
+          The Women Safety Awareness Program is a HEAT sub-project implemented by the Department of
+          Women and Gender Studies, University of Dhaka. It develops a holistic approach to prevent
           gender-based violence in university campuses.
         </p>
+        <dl className="mt-2 grid gap-4 sm:grid-cols-2">
+          {aboutFacts.map((fact) => (
+            <div key={fact.label} className="flex flex-col gap-0.5">
+              <dt className="text-xs font-semibold tracking-widest uppercase opacity-70">
+                {fact.label}
+              </dt>
+              <dd className="text-base font-semibold">{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
       </AboutBanner>
     </>
   );

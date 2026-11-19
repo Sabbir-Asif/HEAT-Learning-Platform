@@ -1,4 +1,4 @@
-import { FieldDescription, PageHeader } from "@heat/ui";
+import { PageHeader } from "@heat/ui";
 import { safeNextPath } from "@/auth/next-path";
 import { SignInForm } from "@/auth/sign-in-form";
 
@@ -11,8 +11,10 @@ export default async function Page({ searchParams }: SignInPageProps) {
   const requested = Array.isArray(next) ? next[0] : next;
   return (
     <>
-      <PageHeader title="Sign in" />
-      <FieldDescription>Use the email and password you enrolled with.</FieldDescription>
+      <PageHeader
+        title="Welcome back"
+        description="Sign in with the email and password you enrolled with."
+      />
       <SignInForm next={safeNextPath(requested)} />
     </>
   );

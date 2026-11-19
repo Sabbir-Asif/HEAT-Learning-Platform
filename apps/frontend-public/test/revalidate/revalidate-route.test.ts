@@ -49,7 +49,7 @@ describe("POST /api/revalidate", () => {
   test("refuses a request that came through the proxy", async () => {
     const response = await post(
       { tags: ["front-page"] },
-      { "x-revalidate-secret": secret, "x-forwarded-for": "203.0.113.9" },
+      { "x-revalidate-secret": secret, "x-real-ip": "203.0.113.9" },
     );
 
     expect(response.status).toBe(403);

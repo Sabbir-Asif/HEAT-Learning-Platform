@@ -13,7 +13,9 @@ import {
   ProgressLabel,
   ProgressValue,
   QuizQuestion,
+  cn,
 } from "@heat/ui";
+import { ArrowLeftIcon, ArrowRightIcon, SendIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatAttemptTime } from "../learn/learning-view";
 import { browserStorage, createAnswerStore } from "./quiz-answer-store";
@@ -99,7 +101,7 @@ export function QuizRunner({
   const question = questions[step];
   const unanswered = unansweredOf(questions, answers);
   return (
-    <Card>
+    <Card className="mx-auto w-full max-w-3xl [--card-spacing:--spacing(6)] md:[--card-spacing:--spacing(8)]">
       <CardHeader>
         <Progress value={answeredPercentOf(answered, total)}>
           <ProgressLabel>
@@ -107,11 +109,33 @@ export function QuizRunner({
           </ProgressLabel>
           <ProgressValue />
         </Progress>
+        <ol aria-label="Questions" className="flex flex-wrap gap-2 pt-2">
+          {questions.map((entry, index) => (
+            <li key={entry.id}>
+              <button
+                type="button"
+                aria-label={`Go to question ${index + 1}`}
+                aria-current={index === step ? "step" : undefined}
+                onClick={() => goTo(index)}
+                className={cn(
+                  "focus-visible:ring-ring/50 grid size-9 place-items-center rounded-lg text-sm font-semibold transition-colors focus-visible:ring-3 focus-visible:outline-none",
+                  index === step
+                    ? "bg-primary text-primary-foreground"
+                    : answers[entry.id] === undefined
+                      ? "bg-muted text-muted-foreground hover:bg-secondary"
+                      : "bg-accent text-accent-foreground hover:bg-secondary",
+                )}
+              >
+                {index + 1}
+              </button>
+            </li>
+          ))}
+        </ol>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+      <CardContent className="flex flex-col gap-6">
         {question === undefined ? (
           <div className="flex flex-col gap-4">
-            <CardTitle ref={reviewHeading} tabIndex={-1}>
+            <CardTitle ref={reviewHeading} tabIndex={-1} className="font-heading text-2xl">
               <h2>Review your answers</h2>
             </CardTitle>
             {unanswered.length === 0 ? (
@@ -162,21 +186,24 @@ export function QuizRunner({
         )}
         {notice === null ? null : <CardDescription role="alert">{notice}</CardDescription>}
       </CardContent>
-      <CardFooter className="flex justify-between gap-3">
+      <CardFooter className="flex justify-between gap-3 border-t">
         <Button
           variant="outline"
           disabled={step === 0 || submitting}
           onClick={() => goTo(step - 1)}
         >
+          <ArrowLeftIcon aria-hidden="true" />
           Previous
         </Button>
         {question === undefined ? (
           <Button disabled={submitting} onClick={() => void submitAnswers()}>
             {submitting ? "Submitting" : "Submit answers"}
+            <SendIcon aria-hidden="true" />
           </Button>
         ) : (
           <Button onClick={() => goTo(step + 1)}>
             {step === total - 1 ? "Review answers" : "Next"}
+            <ArrowRightIcon aria-hidden="true" />
           </Button>
         )}
       </CardFooter>

@@ -96,15 +96,23 @@ export function QuizPassed({
     );
   }
   return (
-    <Card>
-      <CardContent className="flex flex-col gap-3">
-        <CardTitle>
-          <h2>You passed this quiz with {result.scorePercent}%</h2>
-        </CardTitle>
-        <CardDescription>
-          {passMarkPercent === null ? "" : `Pass mark ${passMarkPercent}%. `}
-          Submitted on {formatAttemptTime(result.submittedAt)}.
-        </CardDescription>
+    <Card className="max-w-3xl">
+      <CardContent className="flex flex-col gap-5 sm:flex-row sm:items-center">
+        <span
+          aria-hidden="true"
+          className="bg-accent text-accent-foreground grid size-14 shrink-0 place-items-center rounded-2xl [&>svg]:size-7"
+        >
+          <TrophyIcon />
+        </span>
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <CardTitle>
+            <h2>You passed this quiz with {result.scorePercent}%</h2>
+          </CardTitle>
+          <CardDescription>
+            {passMarkPercent === null ? "" : `Pass mark ${passMarkPercent}%. `}
+            Submitted on {formatAttemptTime(result.submittedAt)}.
+          </CardDescription>
+        </div>
         <div className="flex flex-wrap gap-2">
           <Button
             nativeButton={false}

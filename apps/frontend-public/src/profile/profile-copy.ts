@@ -12,7 +12,7 @@ export const lockedExplanation =
 export const changeRequestHeading = "Request a change";
 
 export const changeRequestIntro =
-  "Change the details below and send them with a note. An admin reviews every request and you get a notification with the decision.";
+  "Need to correct your name or academic details? Send a request with a note. An admin reviews it and you get a notification with the decision.";
 
 export const changeRequestPendingMessage =
   "Your change request is waiting for an admin. You can send another one after it is decided.";

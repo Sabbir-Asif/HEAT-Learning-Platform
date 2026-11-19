@@ -13,6 +13,7 @@ const course = (overrides: Partial<DashboardCourse> = {}): DashboardCourse => ({
   courseId: id,
   courseSlug: "heat",
   courseTitle: "HEAT",
+  thumbnail: null,
   status: "APPROVED",
   reason: null,
   progress: { modulesCompleted: 1, modulesTotal: 4, percent: 25 },

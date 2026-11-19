@@ -7,7 +7,7 @@ export const secretMatches = (expected: string, provided: string | null): boolea
   return timingSafeEqual(digest(expected), digest(provided));
 };
 
-const proxyHeaders = ["x-forwarded-for", "x-real-ip", "forwarded"] as const;
+const proxyHeaders = ["x-real-ip", "forwarded"] as const;
 
 export type RevalidateDecision = { kind: "allowed" } | { kind: "refused"; status: 401 | 403 | 503 };
 

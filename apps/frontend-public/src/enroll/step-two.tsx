@@ -6,18 +6,20 @@ import type { EnrollmentStepTwo, EnrollmentStepTwoInput } from "@heat/contracts"
 import {
   Button,
   CaptchaField,
-  FieldDescription,
   Form,
   FormField,
   FormMessage,
-  Input,
-  PageHeader,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   applyServerError,
 } from "@heat/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, MailIcon } from "lucide-react";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { PasswordInput } from "../auth/password-input";
+import { EnrollHeader } from "./enroll-header";
 import { readStepOne } from "./step-one-store";
 import { supportEmail } from "./support-contact";
 import { classifySubmitError } from "./submit-error";
@@ -35,11 +37,12 @@ const emptyStepTwo: EnrollmentStepTwoInput = {
 
 interface StepTwoProps {
   courseSlug: string;
+  courseTitle?: string | undefined;
   onBack: () => void;
   onSuccess: (email: string) => void;
 }
 
-export function StepTwo({ courseSlug, onBack, onSuccess }: StepTwoProps) {
+export function StepTwo({ courseSlug, courseTitle, onBack, onSuccess }: StepTwoProps) {
   const form = useForm<EnrollmentStepTwoInput, unknown, EnrollmentStepTwo>({
     resolver: zodResolver(enrollmentStepTwoSchema),
     defaultValues: emptyStepTwo,
@@ -80,21 +83,30 @@ export function StepTwo({ courseSlug, onBack, onSuccess }: StepTwoProps) {
 
   return (
     <>
-      <PageHeader title="Create your account" />
-      <FieldDescription>Step 2 of 2: your sign-in details.</FieldDescription>
+      <EnrollHeader
+        step={2}
+        title="Create your account"
+        description="Step 2 of 2: your sign-in details."
+        courseTitle={courseTitle}
+      />
       <Form form={form} onSubmit={onSubmit}>
         <FormField
           name="email"
           label="Email"
           description="We send a verification link to this address."
           render={({ field, controlProps }) => (
-            <Input
-              type="email"
-              autoComplete="email"
-              placeholder="anne@example.com"
-              {...field}
-              {...controlProps}
-            />
+            <InputGroup className="h-11">
+              <InputGroupAddon>
+                <MailIcon aria-hidden="true" />
+              </InputGroupAddon>
+              <InputGroupInput
+                type="email"
+                autoComplete="email"
+                placeholder="anne@example.com"
+                {...field}
+                {...controlProps}
+              />
+            </InputGroup>
           )}
         />
         <FormField
@@ -102,14 +114,14 @@ export function StepTwo({ courseSlug, onBack, onSuccess }: StepTwoProps) {
           label="Password"
           description="Use at least 12 characters."
           render={({ field, controlProps }) => (
-            <Input type="password" autoComplete="new-password" {...field} {...controlProps} />
+            <PasswordInput autoComplete="new-password" {...field} {...controlProps} />
           )}
         />
         <FormField
           name="confirmPassword"
           label="Retype password"
           render={({ field, controlProps }) => (
-            <Input type="password" autoComplete="new-password" {...field} {...controlProps} />
+            <PasswordInput autoComplete="new-password" {...field} {...controlProps} />
           )}
         />
         <Controller
@@ -135,12 +147,19 @@ export function StepTwo({ courseSlug, onBack, onSuccess }: StepTwoProps) {
         />
         <FormMessage />
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-          <Button type="button" variant="outline" onClick={onBack} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            className="h-11"
+            onClick={onBack}
+            disabled={isSubmitting}
+          >
             <ArrowLeftIcon data-icon="inline-start" />
             Back
           </Button>
-          <Button type="submit" size="lg" disabled={isSubmitting}>
-            {isSubmitting ? "Submitting" : "Submit"}
+          <Button type="submit" size="lg" className="h-11 sm:min-w-40" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting" : "Create account"}
           </Button>
         </div>
       </Form>

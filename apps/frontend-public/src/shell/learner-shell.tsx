@@ -16,6 +16,7 @@ import { UserIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { useStudentSession } from "../auth/use-student-session";
 import { useUnreadCount } from "../notifications/use-unread-count";
 import { siteShortName } from "./brand";
 import { learnerNavigation } from "./navigation";
@@ -25,8 +26,10 @@ const groups = [{ label: "Learn", items: learnerNavigation }];
 export function LearnerShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const unreadCount = useUnreadCount();
+  const state = useStudentSession();
+  const user = state.kind === "signed-in" ? state.session.user : null;
   return (
-    <SidebarProvider>
+    <SidebarProvider data-glass width="14rem">
       <SkipLink />
       <ShellSidebar
         brand={{ name: siteShortName, href: "/dashboard" }}
@@ -43,7 +46,8 @@ export function LearnerShell({ children }: { children: ReactNode }) {
             <NotificationsLink href="/notifications" count={unreadCount} link={Link} />
             <ThemeSwitch />
             <UserMenu
-              name="Student account"
+              name={user?.name ?? "Student account"}
+              {...(user ? { email: user.email } : {})}
               items={[{ href: "/profile", label: "Profile", icon: UserIcon }]}
               link={Link}
             />

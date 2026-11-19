@@ -54,7 +54,7 @@ describe("LessonPage", () => {
   test("renders the lesson sections as paragraphs under their titles", async () => {
     const view = await render(content(paragraphs("First paragraph")));
 
-    const laptop = view.querySelector('[data-layout="laptop-text"]');
+    const laptop = view.querySelector('[data-layout="lesson-tabs"] article');
     expect(laptop?.querySelector("h2")?.textContent).toBe("Section 1");
     expect(laptop?.querySelector("p")?.textContent).toBe("First paragraph");
   });
@@ -78,7 +78,7 @@ describe("LessonPage", () => {
 
     const view = await render(lesson);
 
-    const laptop = view.querySelector('[data-layout="laptop-text"]');
+    const laptop = view.querySelector('[data-layout="lesson-tabs"] article');
     expect(laptop?.querySelector("blockquote")?.textContent).toBe("Quote");
     expect(laptop?.querySelector("img")?.getAttribute("src")).toBe("/media/p/w.webp");
     expect(laptop?.querySelector("h2")?.textContent).toBe("Section 1");
@@ -105,45 +105,43 @@ describe("LessonPage", () => {
     const view = await render(content(body));
 
     expect(view.querySelector('a[href^="javascript"]')).toBeNull();
-    expect(view.querySelector('[data-layout="laptop-text"] a')).toBeNull();
+    expect(view.querySelector('[data-layout="lesson-tabs"] a')).toBeNull();
     expect(view.textContent).toContain("click me");
     expect(view.textContent).not.toContain("evil");
   });
 
-  test("has the video region, the objectives and the module list in the side panel", async () => {
+  test("has the quiz and the roadmap in the side panel and the objectives in a tab", async () => {
     const view = await render(content(paragraphs("Text")));
 
     const aside = view.querySelector("aside");
-    expect(aside?.textContent).toContain("Learning objectives");
-    expect(aside?.textContent).toContain("Objective 1");
+    expect(aside?.textContent).toContain("Course roadmap");
     expect(aside?.textContent).toContain("2. Module 2");
+    expect(aside?.textContent).toContain("Take the quiz");
     expect(view.querySelector('section[aria-label="Videos"]')?.textContent).toContain("Video 1");
   });
 
-  test("on a phone the Lesson, Objectives and Modules tabs are keyboard operable tabs", async () => {
+  test("the Objectives, Lesson and Modules tabs are keyboard operable tabs starting on the objectives", async () => {
     const view = await render(content(paragraphs("Text")));
 
     const tabs = [...view.querySelectorAll('[role="tab"]')];
-    expect(tabs.map((tab) => tab.textContent)).toEqual(["Lesson", "Objectives", "Modules"]);
+    expect(tabs.map((tab) => tab.textContent)).toEqual(["Objectives", "Lesson", "Modules"]);
     expect(view.querySelector('[role="tablist"]')).not.toBeNull();
     expect(tabs[0]?.getAttribute("aria-selected")).toBe("true");
-    expect(view.querySelector('[role="tabpanel"]')).not.toBeNull();
+    expect(view.querySelector('[role="tabpanel"]')?.textContent).toContain("Objective 1");
 
     await act(async () => {
       (tabs[1] as HTMLElement).click();
     });
 
     expect(tabs[1]?.getAttribute("aria-selected")).toBe("true");
-    expect(view.querySelector('[role="tabpanel"]')?.textContent).toContain("Objective 1");
+    expect(view.querySelector('[role="tabpanel"]:not([hidden])')?.textContent).toContain("Text");
   });
 
   test("the video comes before the lesson text and the tabs", async () => {
     const view = await render(content(paragraphs("Text")));
 
     const video = view.querySelector('section[aria-label="Videos"]');
-    const text = view.querySelector('[data-layout="laptop-text"]');
-    const tabs = view.querySelector('[data-layout="phone-tabs"]');
-    expect(video?.compareDocumentPosition(text as Node)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    const tabs = view.querySelector('[data-layout="lesson-tabs"]');
     expect(video?.compareDocumentPosition(tabs as Node)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 

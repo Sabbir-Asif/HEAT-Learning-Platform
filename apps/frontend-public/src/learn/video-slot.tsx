@@ -2,21 +2,11 @@
 
 import { maxPlaybackRate } from "@heat/contracts";
 import { useStudentPlaybackRefresh, useStudentPlaybackStart } from "@heat/api-client";
-import {
-  Badge,
-  Button,
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  ErrorState,
-  Skeleton,
-} from "@heat/ui";
+import { Badge, Button } from "@heat/ui";
 import { VideoPlayer } from "@heat/ui/player";
-import { PlayIcon } from "lucide-react";
+import { ClockIcon, Loader2Icon, PlayIcon, RotateCcwIcon } from "lucide-react";
 import { useCallback } from "react";
+import type { ReactNode } from "react";
 import { videoStatusText } from "./learning-view";
 import { useProgressReporting } from "./use-progress-reporting";
 import type { LearningModule } from "./learning-view";
@@ -27,6 +17,18 @@ export interface VideoSlotProps {
 }
 
 type LessonVideo = LearningModule["videos"][number];
+
+function PosterFrame({ children }: { children: ReactNode }) {
+  return (
+    <div className="bg-player text-player-foreground from-primary/40 via-player to-player relative grid aspect-video w-full place-items-center overflow-hidden rounded-xl bg-linear-to-br p-4 shadow-lg">
+      <span
+        aria-hidden="true"
+        className="bg-sidebar-primary/20 absolute -top-16 -right-16 size-64 rounded-full blur-3xl"
+      />
+      <div className="relative flex flex-col items-center gap-3 text-center">{children}</div>
+    </div>
+  );
+}
 
 function VideoFrame({ courseId, video }: { courseId: string; video: LessonVideo }) {
   const start = useStudentPlaybackStart();
@@ -41,11 +43,12 @@ function VideoFrame({ courseId, video }: { courseId: string; video: LessonVideo 
 
   if (video.status === "UNAVAILABLE") {
     return (
-      <Card className="aspect-video items-center justify-center">
-        <CardContent>
-          <CardDescription role="status">{videoStatusText(video)}</CardDescription>
-        </CardContent>
-      </Card>
+      <PosterFrame>
+        <ClockIcon aria-hidden="true" className="size-8 opacity-80" />
+        <p role="status" className="text-sm opacity-90">
+          {videoStatusText(video)}
+        </p>
+      </PosterFrame>
     );
   }
 
@@ -68,56 +71,69 @@ function VideoFrame({ courseId, video }: { courseId: string; video: LessonVideo 
   if (start.isPending) {
     return (
       <div aria-busy="true">
-        <p role="status" className="sr-only">
-          Loading video
-        </p>
-        <Skeleton className="aspect-video w-full" />
+        <PosterFrame>
+          <Loader2Icon aria-hidden="true" className="size-10 animate-spin opacity-90" />
+          <p role="status" className="text-sm opacity-90">
+            Loading video
+          </p>
+        </PosterFrame>
       </div>
     );
   }
 
   if (start.isError) {
     return (
-      <Card className="aspect-video items-center justify-center">
-        <ErrorState
-          title="This video could not be loaded"
-          description="Check your connection and try again."
-          onRetry={() => start.mutate({ id: video.id })}
-        />
-      </Card>
+      <PosterFrame>
+        <div role="alert" className="flex flex-col items-center gap-3">
+          <p className="font-medium">This video could not be loaded</p>
+          <p className="text-sm opacity-80">Check your connection and try again.</p>
+          <Button variant="secondary" onClick={() => start.mutate({ id: video.id })}>
+            <RotateCcwIcon data-icon="inline-start" />
+            Try again
+          </Button>
+        </div>
+      </PosterFrame>
     );
   }
 
   return (
-    <Card className="aspect-video items-center justify-center">
-      <CardContent className="flex flex-col items-center gap-2">
-        <Button onClick={() => start.mutate({ id: video.id })}>
-          <PlayIcon data-icon="inline-start" />
+    <PosterFrame>
+      <button
+        type="button"
+        onClick={() => start.mutate({ id: video.id })}
+        aria-label={`Play ${video.title}`}
+        className="group focus-visible:ring-ring flex flex-col items-center gap-3 rounded-xl outline-none focus-visible:ring-3"
+      >
+        <span className="bg-primary text-primary-foreground grid size-20 place-items-center rounded-full shadow-lg transition-transform group-hover:scale-105">
+          <PlayIcon aria-hidden="true" className="size-9 translate-x-0.5" />
+        </span>
+        <span className="text-xs font-semibold tracking-widest uppercase opacity-80">
           Play video
-        </Button>
-        <CardDescription role="status">{videoStatusText(video)}</CardDescription>
-      </CardContent>
-    </Card>
+        </span>
+        <span className="font-heading max-w-md text-lg font-semibold text-balance">
+          {video.title}
+        </span>
+      </button>
+      <p role="status" className="text-sm opacity-80">
+        {videoStatusText(video)}
+      </p>
+    </PosterFrame>
   );
 }
 
 export default function VideoSlot({ courseId, videos }: VideoSlotProps) {
   return (
-    <section aria-label="Videos" className="flex flex-col gap-4">
+    <section aria-label="Videos" className="flex flex-col gap-6">
       {videos.map((video) => (
-        <Card key={video.id} size="sm">
-          <CardHeader>
-            <CardTitle>{video.title}</CardTitle>
-            {video.required ? (
-              <CardAction>
-                <Badge variant="outline">Required</Badge>
-              </CardAction>
-            ) : null}
-          </CardHeader>
-          <CardContent className="flex flex-col gap-2">
-            <VideoFrame courseId={courseId} video={video} />
-          </CardContent>
-        </Card>
+        <div key={video.id} className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="font-heading text-player-foreground text-base font-semibold">
+              {video.title}
+            </h2>
+            {video.required ? <Badge variant="secondary">Required</Badge> : null}
+          </div>
+          <VideoFrame courseId={courseId} video={video} />
+        </div>
       ))}
     </section>
   );

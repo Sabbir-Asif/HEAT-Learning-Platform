@@ -1,4 +1,5 @@
 import type { ProfileResponseDto } from "@heat/api-client";
+import { act } from "react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ChangeRequestSection } from "../../src/profile/change-request-section";
 import { mount } from "../learn/mount";
@@ -15,6 +16,13 @@ vi.mock("../../src/profile/change-request-form", () => ({
 }));
 
 beforeEach(() => useProfileChangeLatest.mockReset());
+
+const openForm = async (view: HTMLElement) => {
+  const trigger = [...view.querySelectorAll("button")].find(
+    (button) => button.textContent === "Request a change",
+  );
+  await act(async () => trigger?.click());
+};
 
 const id = "0198f1a0-0000-7000-8000-0000000000a1";
 
@@ -74,11 +82,13 @@ describe("ChangeRequestSection", () => {
     expect(view.querySelector("button")).not.toBeNull();
   });
 
-  test("offers the form when the student never asked", async () => {
+  test("keeps the form closed until the student asks for it", async () => {
     settled(null);
 
     const view = await mount(<ChangeRequestSection profile={profile} />);
 
+    expect(view.querySelector("form")).toBeNull();
+    await openForm(view);
     expect(view.querySelector("form[aria-label='Change request']")).not.toBeNull();
   });
 
@@ -100,6 +110,7 @@ describe("ChangeRequestSection", () => {
 
     expect(view.textContent).toContain("was not approved");
     expect(view.textContent).toContain("Reason: The name does not match your records");
+    await openForm(view);
     expect(view.querySelector("form[aria-label='Change request']")).not.toBeNull();
   });
 });

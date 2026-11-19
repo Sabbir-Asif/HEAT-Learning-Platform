@@ -72,7 +72,9 @@ export function PasswordSection({ emailVerified }: PasswordSectionProps) {
 
   return (
     <section aria-labelledby="profile-password" className="flex flex-col gap-3">
-      <FieldTitle id="profile-password">Password</FieldTitle>
+      <FieldTitle id="profile-password" className="sr-only">
+        Password
+      </FieldTitle>
       {emailVerified ? (
         <Form form={form} onSubmit={onSubmit} aria-label="Change password">
           <FormField

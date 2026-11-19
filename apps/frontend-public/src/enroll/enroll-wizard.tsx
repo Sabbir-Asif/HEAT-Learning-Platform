@@ -6,12 +6,20 @@ import {
   useDirectoryLookupsListUniversities,
 } from "@heat/api-client";
 import { enrollmentStepOneSchema } from "@heat/contracts";
-import { Button, FieldDescription, Form, FormField, Input, PageHeader } from "@heat/ui";
+import { Button, Form, FormField, InputGroup, InputGroupAddon, InputGroupInput } from "@heat/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRightIcon } from "lucide-react";
+import {
+  ArrowRightIcon,
+  BuildingIcon,
+  CalendarIcon,
+  GraduationCapIcon,
+  LibraryIcon,
+  UserIcon,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { chooseFaculty, chooseUniversity, dropStaleSelections } from "./cascade";
+import { EnrollHeader } from "./enroll-header";
 import { EnrollSuccess } from "./enroll-success";
 import { LookupSelect, LookupState, noOptions } from "./lookup-fields";
 import {
@@ -25,9 +33,10 @@ import { StepTwo } from "./step-two";
 
 interface EnrollWizardProps {
   courseSlug: string;
+  courseTitle?: string | undefined;
 }
 
-export function EnrollWizard({ courseSlug }: EnrollWizardProps) {
+export function EnrollWizard({ courseSlug, courseTitle }: EnrollWizardProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const [enrolledEmail, setEnrolledEmail] = useState<string>();
   const hydrated = useRef(false);
@@ -108,6 +117,7 @@ export function EnrollWizard({ courseSlug }: EnrollWizardProps) {
     return (
       <StepTwo
         courseSlug={courseSlug}
+        courseTitle={courseTitle}
         onBack={() => setStep(1)}
         onSuccess={(email) => {
           clearStepOne();
@@ -119,15 +129,29 @@ export function EnrollWizard({ courseSlug }: EnrollWizardProps) {
 
   return (
     <>
-      <PageHeader title="Enroll" />
-      <FieldDescription>Step 1 of 2: your academic details.</FieldDescription>
+      <EnrollHeader
+        step={1}
+        title="Tell us about yourself"
+        description="Step 1 of 2: your academic details."
+        courseTitle={courseTitle}
+      />
       <Form form={form} onSubmit={onSubmit}>
         <FormField
           name="name"
           label="Full name in English"
           description="This is printed on your certificate."
           render={({ field, controlProps }) => (
-            <Input autoComplete="name" placeholder="Anne Smith" {...field} {...controlProps} />
+            <InputGroup className="h-11">
+              <InputGroupAddon>
+                <UserIcon aria-hidden="true" />
+              </InputGroupAddon>
+              <InputGroupInput
+                autoComplete="name"
+                placeholder="Anne Smith"
+                {...field}
+                {...controlProps}
+              />
+            </InputGroup>
           )}
         />
         <FormField
@@ -137,6 +161,7 @@ export function EnrollWizard({ courseSlug }: EnrollWizardProps) {
             <>
               <LookupSelect
                 label="University"
+                icon={BuildingIcon}
                 placeholder={
                   universities.isPending ? "Loading universities" : "Select your university"
                 }
@@ -155,69 +180,87 @@ export function EnrollWizard({ courseSlug }: EnrollWizardProps) {
             </>
           )}
         />
-        <FormField
-          name="facultyId"
-          label="Faculty"
-          render={({ field, controlProps }) => (
-            <>
-              <LookupSelect
-                label="Faculty"
-                placeholder={
-                  universityId && faculties.isPending ? "Loading faculties" : "Select your faculty"
-                }
-                options={facultyOptions}
-                disabled={!universityId || faculties.isPending || facultyFailed}
-                value={field.value}
-                triggerProps={{ ...controlProps, ref: field.ref, onBlur: field.onBlur }}
-                onChange={(id) => pick(chooseFaculty(form.getValues(), id))}
-              />
-              <LookupState
-                failed={facultyFailed}
-                empty={facultyEmpty}
-                emptyTitle="This university has no faculties yet"
-                onRetry={() => void faculties.refetch()}
-              />
-            </>
-          )}
-        />
-        <FormField
-          name="departmentId"
-          label="Department"
-          render={({ field, controlProps }) => (
-            <>
-              <LookupSelect
-                label="Department"
-                placeholder={
-                  facultyId && departments.isPending
-                    ? "Loading departments"
-                    : "Select your department"
-                }
-                options={departmentOptions}
-                disabled={!facultyId || departments.isPending || departmentFailed}
-                value={field.value}
-                triggerProps={{ ...controlProps, ref: field.ref, onBlur: field.onBlur }}
-                onChange={(id) =>
-                  form.setValue("departmentId", id, { shouldValidate: form.formState.isSubmitted })
-                }
-              />
-              <LookupState
-                failed={departmentFailed}
-                empty={departmentEmpty}
-                emptyTitle="This faculty has no departments yet"
-                onRetry={() => void departments.refetch()}
-              />
-            </>
-          )}
-        />
+        <div className="grid gap-5 md:grid-cols-2">
+          <FormField
+            name="facultyId"
+            label="Faculty"
+            render={({ field, controlProps }) => (
+              <>
+                <LookupSelect
+                  label="Faculty"
+                  icon={LibraryIcon}
+                  placeholder={
+                    universityId && faculties.isPending
+                      ? "Loading faculties"
+                      : "Select your faculty"
+                  }
+                  options={facultyOptions}
+                  disabled={!universityId || faculties.isPending || facultyFailed}
+                  value={field.value}
+                  triggerProps={{ ...controlProps, ref: field.ref, onBlur: field.onBlur }}
+                  onChange={(id) => pick(chooseFaculty(form.getValues(), id))}
+                />
+                <LookupState
+                  failed={facultyFailed}
+                  empty={facultyEmpty}
+                  emptyTitle="This university has no faculties yet"
+                  onRetry={() => void faculties.refetch()}
+                />
+              </>
+            )}
+          />
+          <FormField
+            name="departmentId"
+            label="Department"
+            render={({ field, controlProps }) => (
+              <>
+                <LookupSelect
+                  label="Department"
+                  icon={GraduationCapIcon}
+                  placeholder={
+                    facultyId && departments.isPending
+                      ? "Loading departments"
+                      : "Select your department"
+                  }
+                  options={departmentOptions}
+                  disabled={!facultyId || departments.isPending || departmentFailed}
+                  value={field.value}
+                  triggerProps={{ ...controlProps, ref: field.ref, onBlur: field.onBlur }}
+                  onChange={(id) =>
+                    form.setValue("departmentId", id, {
+                      shouldValidate: form.formState.isSubmitted,
+                    })
+                  }
+                />
+                <LookupState
+                  failed={departmentFailed}
+                  empty={departmentEmpty}
+                  emptyTitle="This faculty has no departments yet"
+                  onRetry={() => void departments.refetch()}
+                />
+              </>
+            )}
+          />
+        </div>
         <FormField
           name="session"
           label="Session"
           description="For example 2020-21."
           render={({ field, controlProps }) => (
-            <Input inputMode="numeric" placeholder="2020-21" {...field} {...controlProps} />
+            <InputGroup className="h-11">
+              <InputGroupAddon>
+                <CalendarIcon aria-hidden="true" />
+              </InputGroupAddon>
+              <InputGroupInput
+                inputMode="numeric"
+                placeholder="2020-21"
+                {...field}
+                {...controlProps}
+              />
+            </InputGroup>
           )}
         />
-        <Button type="submit" size="lg" disabled={blocked}>
+        <Button type="submit" size="lg" className="h-11" disabled={blocked}>
           Next
           <ArrowRightIcon data-icon="inline-end" />
         </Button>

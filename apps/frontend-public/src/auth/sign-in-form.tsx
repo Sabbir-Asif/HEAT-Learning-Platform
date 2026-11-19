@@ -8,17 +8,20 @@ import {
   Form,
   FormField,
   FormMessage,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   applyServerError,
   formErrorCopy,
   rateLimitedMessage,
 } from "@heat/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LogInIcon } from "lucide-react";
+import { ArrowRightIcon, MailIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { defaultNextPath } from "./next-path";
+import { PasswordInput } from "./password-input";
 
 export const invalidCredentialsMessage = "The email or password is not correct.";
 
@@ -73,22 +76,37 @@ export function SignInForm({ next }: SignInFormProps) {
         name="email"
         label="University email"
         render={({ field, controlProps }) => (
-          <Input
-            type="email"
-            autoComplete="username"
-            inputMode="email"
-            placeholder="name@du.ac.bd"
-            {...field}
-            {...controlProps}
-          />
+          <InputGroup className="h-11">
+            <InputGroupAddon>
+              <MailIcon aria-hidden="true" />
+            </InputGroupAddon>
+            <InputGroupInput
+              type="email"
+              autoComplete="username"
+              inputMode="email"
+              placeholder="name@du.ac.bd"
+              {...field}
+              {...controlProps}
+            />
+          </InputGroup>
         )}
       />
       <FormField
         name="password"
         label="Password"
+        labelAction={
+          <Button
+            variant="link"
+            size="sm"
+            className="h-auto p-0"
+            nativeButton={false}
+            render={<Link href="/forgot-password" />}
+          >
+            Forgot password?
+          </Button>
+        }
         render={({ field, controlProps }) => (
-          <Input
-            type="password"
+          <PasswordInput
             autoComplete="current-password"
             placeholder="Your password"
             {...field}
@@ -96,23 +114,19 @@ export function SignInForm({ next }: SignInFormProps) {
           />
         )}
       />
-      <Button type="submit" size="lg" disabled={form.formState.isSubmitting}>
-        <LogInIcon data-icon="inline-start" />
+      <Button type="submit" size="lg" className="h-11" disabled={form.formState.isSubmitting}>
         {form.formState.isSubmitting ? "Signing in" : "Sign in"}
+        <ArrowRightIcon data-icon="inline-end" />
       </Button>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <Button
-          variant="link"
-          size="sm"
-          nativeButton={false}
-          render={<Link href="/forgot-password" />}
+      <p className="text-muted-foreground border-divider border-t pt-5 text-center text-sm">
+        New to the program?{" "}
+        <Link
+          href="/enroll"
+          className="text-primary focus-visible:ring-ring rounded-sm font-semibold underline-offset-4 outline-hidden hover:underline focus-visible:ring-2"
         >
-          Forgot password?
-        </Button>
-        <Button variant="outline" size="sm" nativeButton={false} render={<Link href="/enroll" />}>
-          New here? Enroll
-        </Button>
-      </div>
+          Create an account
+        </Link>
+      </p>
     </Form>
   );
 }

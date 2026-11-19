@@ -68,7 +68,7 @@ export function AcademicFields({ current, locked, onBlockedChange }: AcademicFie
   }
 
   return (
-    <>
+    <div className="grid gap-x-6 gap-y-5 md:grid-cols-2">
       <FormField
         name="name"
         label="Full name in English"
@@ -156,6 +156,6 @@ export function AcademicFields({ current, locked, onBlockedChange }: AcademicFie
           <Input inputMode="numeric" readOnly={locked} {...field} {...controlProps} />
         )}
       />
-    </>
+    </div>
   );
 }

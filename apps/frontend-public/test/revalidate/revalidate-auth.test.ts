@@ -38,7 +38,11 @@ describe("decideRevalidation", () => {
     expect(decide({ expectedSecret: "" })).toEqual({ kind: "refused", status: 503 });
   });
 
-  test.each(["x-forwarded-for", "x-real-ip", "forwarded"])(
+  test("accepts the x-forwarded-for header that Next adds to every request", () => {
+    expect(decide({ headers: { "x-forwarded-for": "10.0.0.5" } })).toEqual({ kind: "allowed" });
+  });
+
+  test.each(["x-real-ip", "forwarded"])(
     "refuses a call that came through the proxy (%s) even with the secret",
     (header) => {
       expect(decide({ headers: { [header]: "203.0.113.9" } })).toEqual({
