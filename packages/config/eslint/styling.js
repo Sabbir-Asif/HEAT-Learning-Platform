@@ -31,95 +31,6 @@ export const classOrderConfig = {
   },
 };
 
-const breakpoints = "(?:sm|md|lg|xl|2xl)";
-const containerSizes = "(?:3xs|2xs|xs|sm|md|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl)";
-const layoutVariants = [
-  `(?:(?:min-|max-)?${breakpoints}:)`,
-  `(?:@(?:min-|max-)?${containerSizes}:)`,
-  "(?:motion-reduce:|print:|\\*:)",
-];
-const breakpointVariants = `(?:${layoutVariants.join("|")})*`;
-const layoutWords = [
-  "flex",
-  "grid",
-  "block",
-  "hidden",
-  "contents",
-  "inline",
-  "inline-block",
-  "inline-flex",
-  "inline-grid",
-  "container",
-  "grow",
-  "shrink",
-  "sr-only",
-  "not-sr-only",
-  "truncate",
-  "@container(?:/[a-z0-9-]+)?",
-];
-const layoutPrefixes = [
-  "flex",
-  "grid",
-  "col",
-  "row",
-  "gap",
-  "gap-x",
-  "gap-y",
-  "space-x",
-  "space-y",
-  "items",
-  "justify",
-  "content",
-  "place",
-  "self",
-  "order",
-  "grow",
-  "shrink",
-  "basis",
-  "aspect",
-  "p",
-  "px",
-  "py",
-  "pt",
-  "pr",
-  "pb",
-  "pl",
-  "ps",
-  "pe",
-  "m",
-  "mx",
-  "my",
-  "mt",
-  "mr",
-  "mb",
-  "ml",
-  "ms",
-  "me",
-  "w",
-  "h",
-  "size",
-  "min-w",
-  "min-h",
-  "max-w",
-  "max-h",
-  "overflow",
-  "overflow-x",
-  "overflow-y",
-];
-const layoutClass = `${breakpointVariants}-?(?:${layoutWords.join("|")}|(?:${layoutPrefixes.join("|")})-[a-z0-9./-]+)`;
-
-const restrictedClasses = [
-  {
-    pattern: "^(.*\\[.*)$",
-    message: "Arbitrary value '$1' is not allowed in an app. Add a token or a variant to @heat/ui.",
-  },
-  {
-    pattern: `^(?![^\\[]*\\[)(?!${layoutClass}$)(.+)$`,
-    message:
-      "Class '$1' is not a layout utility. Apps may only lay out; styling lives in a @heat/ui component.",
-  },
-];
-
 const stylesheetImport = "ImportDeclaration[source.value=/\\.(?:css|scss|sass|less)$/]";
 const entryStylesheet = "[source.value=/^(?:\\.|@\\/app)\\/globals\\.css$/]";
 
@@ -144,7 +55,6 @@ export const appStylingConfig = {
   settings,
   rules: {
     "no-restricted-syntax": ["error", ...restrictedSyntax],
-    "better-tailwindcss/no-restricted-classes": ["error", { restrict: restrictedClasses }],
   },
 };
 

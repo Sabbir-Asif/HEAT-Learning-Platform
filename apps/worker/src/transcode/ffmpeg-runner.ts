@@ -1,18 +1,29 @@
 import { spawn } from "node:child_process";
 import type { EventEmitter } from "node:events";
+import { ProgressLineReader, progressArgs } from "./ffmpeg-progress";
 
 export type EncodeResult = "ok" | "failed" | "timed-out";
 
 export interface FfmpegRunner {
-  run(args: readonly string[], timeoutMs: number): Promise<EncodeResult>;
+  run(
+    args: readonly string[],
+    timeoutMs: number,
+    onProgress?: (encodedSeconds: number) => void,
+  ): Promise<EncodeResult>;
+}
+
+export interface ProgressStream {
+  setEncoding(encoding: "utf8"): unknown;
+  on(event: "data", listener: (chunk: string) => void): unknown;
 }
 
 export interface SpawnedProcess extends EventEmitter {
+  stdout?: ProgressStream | null;
   kill(signal: "SIGKILL"): boolean;
 }
 
 export interface SpawnOptions {
-  stdio: "ignore";
+  stdio: ["ignore", "pipe", "ignore"];
   shell: false;
   env: Record<string, string>;
 }
@@ -43,15 +54,22 @@ export class NodeFfmpegRunner implements FfmpegRunner {
     private readonly onExit: (code: number | null) => void = () => undefined,
   ) {}
 
-  run(args: readonly string[], timeoutMs: number): Promise<EncodeResult> {
+  run(
+    args: readonly string[],
+    timeoutMs: number,
+    onProgress: (encodedSeconds: number) => void = () => undefined,
+  ): Promise<EncodeResult> {
     assertLocalOnly(args);
-    const command = niceCommand(args);
+    const command = niceCommand([...progressArgs, ...args]);
     return new Promise((resolve) => {
       const child = this.start(command.file, command.args, {
-        stdio: "ignore",
+        stdio: ["ignore", "pipe", "ignore"],
         shell: false,
         env: { PATH: this.path },
       });
+      const reader = new ProgressLineReader(onProgress);
+      child.stdout?.setEncoding("utf8");
+      child.stdout?.on("data", (chunk) => reader.push(chunk));
       let timedOut = false;
       const timer = setTimeout(() => {
         timedOut = true;

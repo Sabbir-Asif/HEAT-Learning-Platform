@@ -91,6 +91,16 @@ export const videoRetryFailedMessage = (code: string | undefined): string =>
     ? "This video is no longer failed, so it cannot be retried. The list has been refreshed."
     : "The video could not be retried. Try again.";
 
+export const videoProcessingLabel = (
+  status: "QUEUED" | "PROCESSING",
+  progressPercent: number | null,
+): string =>
+  status === "QUEUED"
+    ? "Waiting to be processed"
+    : progressPercent === null
+      ? "Starting to process"
+      : "Processing the video";
+
 export const videoSlotsPollInterval = (
   items: ReadonlyArray<{ status: VideoSlotStatus }> | undefined,
 ): number | false =>

@@ -6,11 +6,12 @@ interface CatalogImageProps {
   image: LessonBodyImage;
   sizes: string;
   priority?: boolean;
+  className?: string;
 }
 
-export function CatalogImage({ image, sizes, priority = false }: CatalogImageProps) {
+export function CatalogImage({ image, sizes, priority = false, className }: CatalogImageProps) {
   return (
-    <ImageFrame>
+    <ImageFrame className={className}>
       <Image src={image.url} alt={image.alt} fill sizes={sizes} priority={priority} />
     </ImageFrame>
   );

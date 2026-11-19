@@ -13,18 +13,11 @@ import type {
   EnrollmentApprovalListPendingParams,
 } from "@heat/api-client";
 import { academicSessionSchema } from "@heat/contracts";
-import {
-  Button,
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-  Input,
-  PageHeader,
-} from "@heat/ui";
+import { Button, FieldDescription, PageHeader } from "@heat/ui";
 import {
   DataTable,
   FilterBar,
+  FilterInput,
   FilterSelect,
   useClampedPage,
   useTableUrlState,
@@ -192,21 +185,18 @@ export function ApprovalQueueView() {
   );
 
   const dateFilter = (key: "from" | "to", label: string) => (
-    <Field>
-      <FieldLabel htmlFor={`approval-${key}`}>{label}</FieldLabel>
-      <Input
-        id={`approval-${key}`}
-        type="date"
-        {...(key === "from" && to ? { max: to } : {})}
-        {...(key === "to" && from ? { min: from } : {})}
-        aria-invalid={key === "to" && rangeInvalid ? true : undefined}
-        value={url.filters[key]}
-        onChange={(event) => url.setFilter(key, event.target.value)}
-      />
-      {key === "to" && rangeInvalid ? (
-        <FieldError>The end date must not be before the start date.</FieldError>
-      ) : null}
-    </Field>
+    <FilterInput
+      label={label}
+      icon={filterIcon(key === "from" ? "From" : "To")}
+      type="date"
+      {...(key === "from" && to ? { max: to } : {})}
+      {...(key === "to" && from ? { min: from } : {})}
+      error={
+        key === "to" && rangeInvalid ? "The end date must not be before the start date." : undefined
+      }
+      value={url.filters[key]}
+      onChange={(event) => url.setFilter(key, event.target.value)}
+    />
   );
 
   function openApprove(ids: string[]) {
@@ -292,26 +282,25 @@ export function ApprovalQueueView() {
           !university || !faculty,
           (departments.data?.total ?? 0) > optionLimit,
         )}
-        <Field>
-          <FieldLabel htmlFor="approval-session">Session</FieldLabel>
-          <Input
-            id="approval-session"
-            key={session}
-            defaultValue={session}
-            placeholder="2020-21"
-            aria-invalid={sessionValid ? undefined : true}
-            onBlur={(event) => {
-              const next = event.target.value.trim();
-              if (next !== session) url.setFilter("session", next);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") event.currentTarget.blur();
-            }}
-          />
-          {sessionValid ? null : (
-            <FieldError>Use the format 2020-21, where the second part is the next year.</FieldError>
-          )}
-        </Field>
+        <FilterInput
+          label="Session"
+          icon={filterIcon("Session")}
+          key={session}
+          defaultValue={session}
+          placeholder="2020-21"
+          error={
+            sessionValid
+              ? undefined
+              : "Use the format 2020-21, where the second part is the next year."
+          }
+          onBlur={(event) => {
+            const next = event.target.value.trim();
+            if (next !== session) url.setFilter("session", next);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") event.currentTarget.blur();
+          }}
+        />
         {dateFilter("from", "Submitted from")}
         {dateFilter("to", "Submitted to")}
       </FilterBar>

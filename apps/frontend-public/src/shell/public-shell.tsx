@@ -37,7 +37,7 @@ function HeaderActions() {
 export function PublicShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   return (
-    <div className="flex min-h-svh flex-col">
+    <div data-glass className="flex min-h-svh flex-col">
       <SkipLink />
       <PublicHeader
         brand={{ name: siteShortName, href: "/" }}

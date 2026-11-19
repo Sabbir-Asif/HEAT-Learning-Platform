@@ -5,7 +5,12 @@ import type { SpawnedProcess, SpawnOptions } from "../../src/transcode/ffmpeg-ru
 
 const safeArgs = ["-protocol_whitelist", "file", "-nostdin", "-i", "/in.orig", "/out/index.m3u8"];
 
+class FakeStdout extends EventEmitter {
+  setEncoding = vi.fn();
+}
+
 class FakeProcess extends EventEmitter implements SpawnedProcess {
+  readonly stdout = new FakeStdout();
   readonly kill = vi.fn(() => {
     queueMicrotask(() => this.emit("close", null));
     return true;
@@ -47,14 +52,30 @@ describe("NodeFfmpegRunner", () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  test("starts nice without a shell, with only PATH in the environment and no stdio", async () => {
+  test("starts nice without a shell, with only PATH in the environment and only stdout piped", async () => {
     const { child, calls, runner } = harness();
     const result = runner.run(safeArgs, 1000);
     child.emit("close", 0);
     expect(await result).toBe("ok");
     expect(calls[0]?.file).toBe("nice");
     expect(calls[0]?.args.slice(0, 3)).toEqual(["-n", "19", "ffmpeg"]);
-    expect(calls[0]?.options).toEqual({ stdio: "ignore", shell: false, env: { PATH: "/usr/bin" } });
+    expect(calls[0]?.args.slice(3, 6)).toEqual(["-progress", "pipe:1", "-nostats"]);
+    expect(calls[0]?.options).toEqual({
+      stdio: ["ignore", "pipe", "ignore"],
+      shell: false,
+      env: { PATH: "/usr/bin" },
+    });
+  });
+
+  test("reports the encoded seconds from FFmpeg's progress output, even when lines are split", async () => {
+    const { child, runner } = harness();
+    const seen: number[] = [];
+    const result = runner.run(safeArgs, 1000, (seconds) => seen.push(seconds));
+    child.stdout.emit("data", "frame=10\nout_time_us=2500");
+    child.stdout.emit("data", "000\nprogress=continue\nout_time_ms=5000000\n");
+    child.emit("close", 0);
+    await result;
+    expect(seen).toEqual([2.5, 5]);
   });
 
   test("reports a non-zero exit as failed", async () => {

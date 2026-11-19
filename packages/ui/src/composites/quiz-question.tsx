@@ -35,18 +35,18 @@ function QuizQuestion({
     <section
       data-slot="quiz-question"
       aria-labelledby={headingId}
-      className={cn("flex flex-col gap-4", className)}
+      className={cn("flex flex-col gap-5", className)}
       {...props}
     >
       <div className="flex flex-col gap-1">
-        <p className="text-muted-foreground text-sm">
+        <p className="text-primary text-xs font-semibold tracking-widest uppercase">
           Question {number} of {total}
         </p>
         <h2
           id={headingId}
           ref={headingRef}
           tabIndex={-1}
-          className="font-heading text-xl font-semibold outline-none"
+          className="font-heading text-2xl leading-snug font-semibold outline-none"
         >
           {text}
         </h2>
@@ -56,13 +56,19 @@ function QuizQuestion({
         value={value ?? ""}
         onValueChange={(next) => onValueChange(String(next))}
       >
-        {options.map((option) => (
+        {options.map((option, index) => (
           <label
             key={option.id}
-            className="border-input hover:bg-muted has-data-checked:border-primary has-data-checked:bg-accent flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-sm"
+            className="border-divider bg-card hover:border-primary/50 hover:bg-accent/40 has-data-checked:border-primary has-data-checked:bg-accent has-data-checked:ring-primary flex cursor-pointer items-center gap-4 rounded-xl border-2 p-4 text-base transition-colors has-data-checked:ring-1"
           >
-            <RadioGroupItem value={option.id} className="mt-0.5" />
-            <span>{option.text}</span>
+            <span
+              aria-hidden="true"
+              className="bg-muted text-muted-foreground grid size-8 shrink-0 place-items-center rounded-lg text-sm font-semibold"
+            >
+              {String.fromCharCode(65 + index)}
+            </span>
+            <span className="flex-1">{option.text}</span>
+            <RadioGroupItem value={option.id} />
           </label>
         ))}
       </RadioGroup>

@@ -36,17 +36,19 @@ function PublicFooter({ brand, columns, partners, legal, copyright, link }: Publ
 
   return (
     <footer data-slot="public-footer" className="bg-secondary text-secondary-foreground">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-12 md:px-6 md:py-16">
-        <div className="grid gap-10 lg:grid-cols-2">
-          <div className="flex max-w-md flex-col gap-3">
-            <p className="font-display text-heading-2">{brand.name}</p>
-            <p className="text-muted-foreground text-sm text-pretty">{brand.description}</p>
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-12 px-4 pt-14 pb-8 md:px-6 md:pt-16">
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)]">
+          <div className="flex max-w-sm flex-col gap-4">
+            <p className="font-display text-heading-2 leading-tight font-semibold">{brand.name}</p>
+            <p className="text-muted-foreground text-sm leading-relaxed text-pretty">
+              {brand.description}
+            </p>
           </div>
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             {columns.map((column) => (
-              <nav key={column.title} aria-label={column.title} className="flex flex-col gap-3">
-                <p className="text-sm font-semibold">{column.title}</p>
-                <ul className="flex flex-col gap-2">
+              <nav key={column.title} aria-label={column.title} className="flex flex-col gap-4">
+                <p className="text-xs font-semibold tracking-widest uppercase">{column.title}</p>
+                <ul className="flex flex-col gap-3">
                   {column.links.map((item) => (
                     <li key={item.href}>{renderLink(item)}</li>
                   ))}
@@ -57,21 +59,21 @@ function PublicFooter({ brand, columns, partners, legal, copyright, link }: Publ
         </div>
         <section
           aria-label="Partners"
-          className="bg-card ring-divider flex flex-col gap-4 rounded-xl px-6 py-5 ring-1 sm:flex-row sm:items-center sm:gap-8"
+          className="border-border/60 flex flex-col gap-5 border-t pt-8 sm:flex-row sm:items-center sm:justify-between"
         >
-          <p className="text-muted-foreground text-sm font-semibold">In partnership with</p>
-          <ul className="flex flex-wrap items-center gap-x-8 gap-y-4">
+          <p className="text-xs font-semibold tracking-widest uppercase">In partnership with</p>
+          <ul className="flex flex-wrap items-center gap-x-10 gap-y-4">
             {partners.map((partner) => (
-              <li key={partner.src}>
-                <ThemedLogo {...partner} className="h-10" />
+              <li key={partner.src} className="opacity-80 transition-opacity hover:opacity-100">
+                <ThemedLogo {...partner} className="h-9" />
               </li>
             ))}
           </ul>
         </section>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="border-border/60 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-muted-foreground text-sm">{copyright}</p>
           <nav aria-label="Legal">
-            <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
               {legal.map((item) => (
                 <li key={item.href}>{renderLink(item)}</li>
               ))}

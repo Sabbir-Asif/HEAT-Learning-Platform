@@ -948,6 +948,16 @@ export const CourseListResponseDtoItemsItemStatus = {
   PUBLISHED: 'PUBLISHED',
 } as const;
 
+/**
+ * @nullable
+ */
+export type CourseListResponseDtoItemsItemThumbnail = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+} | null;
+
 export type CourseListResponseDtoItemsItem = {
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
@@ -977,6 +987,8 @@ export type CourseListResponseDtoItemsItem = {
   publishedAt: string | null;
   slug: string;
   status: CourseListResponseDtoItemsItemStatus;
+  /** @nullable */
+  thumbnail: CourseListResponseDtoItemsItemThumbnail;
   /**
      * @nullable
      * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
@@ -1102,6 +1114,16 @@ export const CourseSummaryDtoStatus = {
   PUBLISHED: 'PUBLISHED',
 } as const;
 
+/**
+ * @nullable
+ */
+export type CourseSummaryDtoThumbnail = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+} | null;
+
 export interface CourseSummaryDto {
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z))$ */
   createdAt: string;
@@ -1131,6 +1153,8 @@ export interface CourseSummaryDto {
   publishedAt: string | null;
   slug: string;
   status: CourseSummaryDtoStatus;
+  /** @nullable */
+  thumbnail: CourseSummaryDtoThumbnail;
   /**
      * @nullable
      * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
@@ -1275,6 +1299,16 @@ export const DashboardResponseDtoCoursesItemStatus = {
   REMOVED: 'REMOVED',
 } as const;
 
+/**
+ * @nullable
+ */
+export type DashboardResponseDtoCoursesItemThumbnail = {
+  alt: string;
+  /** @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$ */
+  assetId: string;
+  url: string;
+} | null;
+
 export type DashboardResponseDtoCoursesItem = {
   /** @nullable */
   certificate: DashboardResponseDtoCoursesItemCertificate;
@@ -1292,6 +1326,8 @@ export type DashboardResponseDtoCoursesItem = {
      */
   reason: string | null;
   status: DashboardResponseDtoCoursesItemStatus;
+  /** @nullable */
+  thumbnail: DashboardResponseDtoCoursesItemThumbnail;
 };
 
 export interface DashboardResponseDto {
@@ -4871,6 +4907,12 @@ export type VideoSlotListResponseDtoItemsItem = {
      * @maximum 9007199254740991
      */
   order: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     * @nullable
+     */
+  progressPercent: number | null;
   /** @nullable */
   rejectionReason: VideoSlotListResponseDtoItemsItemRejectionReason;
   required: boolean;

@@ -17,6 +17,7 @@ import {
 import { ChartCard } from "@heat/ui/charts";
 import { useTableUrlState } from "@heat/ui/data";
 import { ShellContent } from "@heat/ui/shell";
+import { AwardIcon, ClockIcon, UserCheckIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
 import {
   oldestPendingValue,
@@ -81,14 +82,30 @@ export function OverviewView() {
                 href={pendingQueueHref(course)}
                 aria-label="Open the approval queue, oldest first"
               >
-                <StatCard label="Awaiting approval" value={String(data.pending.count)} />
+                <StatCard
+                  icon={UserCheckIcon}
+                  label="Awaiting approval"
+                  value={String(data.pending.count)}
+                />
               </Link>
-              <StatCard label="Oldest waiting request" value={oldestPendingValue(data.pending)} />
-              <StatCard label="Enrollments" value={String(data.totalEnrollments)} />
-              <StatCard label="Certificates issued" value={String(data.certificatesIssued)} />
+              <StatCard
+                icon={ClockIcon}
+                label="Oldest waiting request"
+                value={oldestPendingValue(data.pending)}
+              />
+              <StatCard
+                icon={UsersIcon}
+                label="Enrollments"
+                value={String(data.totalEnrollments)}
+              />
+              <StatCard
+                icon={AwardIcon}
+                label="Certificates issued"
+                value={String(data.certificatesIssued)}
+              />
             </>
           ) : (
-            [0, 1, 2, 3].map((slot) => <Skeleton key={slot} className="h-24 w-full" />)
+            [0, 1, 2, 3].map((slot) => <Skeleton key={slot} className="h-28 w-full rounded-xl" />)
           )}
         </div>
       )}

@@ -22,7 +22,8 @@ function PageSection({ id, title, description, className, children, ...props }: 
           className,
         )}
       >
-        <header className="flex max-w-2xl flex-col gap-2">
+        <header className="flex max-w-2xl flex-col gap-3">
+          <span aria-hidden="true" className="bg-primary h-1 w-10 rounded-full" />
           <h2
             id={headingId}
             className="font-display text-heading-1 tracking-tight text-balance md:text-4xl"

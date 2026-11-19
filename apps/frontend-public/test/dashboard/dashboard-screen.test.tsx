@@ -11,6 +11,10 @@ vi.mock("@heat/api-client", async (importOriginal) => ({
   useDashboardDescribe: (...args: unknown[]) => useDashboardDescribe(...args),
 }));
 
+vi.mock("../../src/auth/use-student-session", () => ({
+  useStudentSession: () => ({ kind: "anonymous" }),
+}));
+
 beforeEach(() => useDashboardDescribe.mockReset());
 
 const id = "0198f1a0-0000-7000-8000-0000000000a1";
@@ -19,6 +23,7 @@ const course = (overrides: Partial<DashboardCourse> = {}): DashboardCourse => ({
   courseId: id,
   courseSlug: "heat",
   courseTitle: "HEAT Gender Safety",
+  thumbnail: null,
   status: "APPROVED",
   reason: null,
   progress: { modulesCompleted: 1, modulesTotal: 4, percent: 25 },

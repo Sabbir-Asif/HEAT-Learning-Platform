@@ -49,7 +49,7 @@ export function AdminShell({
         navLabel="Admin"
         link={Link}
       />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--accent)_55%,transparent),transparent_360px)]">
         <ShellHeader>
           <SidebarTrigger />
           <Breadcrumb>

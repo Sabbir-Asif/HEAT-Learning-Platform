@@ -3,6 +3,7 @@ import type { HeatClient } from "@heat/db";
 import { Inject, Injectable } from "@nestjs/common";
 import { certificateStatusOf } from "../certificates/certificate-rules";
 import { DATABASE } from "../core";
+import { MediaUrlService } from "../media";
 import { learnsCourse } from "./course-access";
 import { resumePointOf } from "./dashboard-rules";
 import {
@@ -14,7 +15,10 @@ import {
 
 @Injectable()
 export class DashboardService {
-  constructor(@Inject(DATABASE) private readonly database: HeatClient) {}
+  constructor(
+    @Inject(DATABASE) private readonly database: HeatClient,
+    private readonly media: MediaUrlService,
+  ) {}
 
   async describe(userId: string): Promise<DashboardResponse> {
     const enrollments = await this.database.enrollment.findMany({
@@ -24,7 +28,7 @@ export class DashboardService {
         id: true,
         status: true,
         courseRevisionId: true,
-        course: { select: { id: true, slug: true, title: true } },
+        course: { select: { id: true, slug: true, title: true, thumbnailAssetId: true } },
         certificate: { select: { id: true, fileKey: true, revokedAt: true } },
         decisions: {
           where: { action: { in: ["REJECT", "REMOVE"] } },
@@ -34,6 +38,42 @@ export class DashboardService {
         },
       },
     });
+    const thumbnailIds = [
+      ...new Set(enrollments.flatMap((enrollment) => enrollment.course.thumbnailAssetId ?? [])),
+    ];
+    const thumbnails =
+      thumbnailIds.length === 0
+        ? []
+        : await this.database.mediaAsset.findMany({
+            where: {
+              id: { in: thumbnailIds },
+              deletedAt: null,
+              kind: "IMAGE",
+              visibility: "PUBLIC",
+            },
+            select: {
+              id: true,
+              key: true,
+              kind: true,
+              visibility: true,
+              mimeType: true,
+              sizeBytes: true,
+              width: true,
+              height: true,
+              altText: true,
+              variants: true,
+            },
+          });
+    const thumbnailById = new Map(
+      thumbnails.map((asset) => [
+        asset.id,
+        {
+          assetId: asset.id,
+          url: this.media.describe(asset, "student").url,
+          alt: asset.altText ?? "",
+        },
+      ]),
+    );
     const learning = enrollments.filter(
       (enrollment) => learnsCourse(enrollment.status) && enrollment.courseRevisionId !== null,
     );
@@ -78,6 +118,10 @@ export class DashboardService {
         courseId: enrollment.course.id,
         courseSlug: enrollment.course.slug,
         courseTitle: enrollment.course.title,
+        thumbnail:
+          enrollment.course.thumbnailAssetId === null
+            ? null
+            : (thumbnailById.get(enrollment.course.thumbnailAssetId) ?? null),
         status: enrollment.status,
         reason:
           enrollment.status === "REMOVED" ||

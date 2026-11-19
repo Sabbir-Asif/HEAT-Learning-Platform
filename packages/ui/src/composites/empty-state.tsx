@@ -19,14 +19,21 @@ function EmptyState({
   return (
     <div
       data-slot="empty-state"
-      className={cn("flex flex-col items-center gap-3 px-4 py-10 text-center", className)}
+      className={cn("flex flex-col items-center gap-4 px-4 py-12 text-center", className)}
       {...props}
     >
-      <Icon aria-hidden="true" className="text-muted-foreground size-5" />
+      <span
+        aria-hidden="true"
+        className="bg-accent text-accent-foreground grid size-14 place-items-center rounded-full"
+      >
+        <Icon className="size-6" />
+      </span>
       <div className="flex flex-col gap-1">
-        <p className="text-sm font-medium break-words">{title}</p>
+        <p className="font-heading text-secondary-foreground text-lg font-semibold break-words">
+          {title}
+        </p>
         {description ? (
-          <p className="text-muted-foreground text-sm break-words">{description}</p>
+          <p className="text-muted-foreground max-w-md text-sm break-words">{description}</p>
         ) : null}
       </div>
       {action}

@@ -381,6 +381,7 @@ export const coursesListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}
 export const coursesListResponseItemsItemLockedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const coursesListResponseItemsItemPublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const coursesListResponseItemsItemThumbnailAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const coursesListResponseItemsItemThumbnailAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const coursesListResponseItemsItemUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const coursesListResponsePageMax = 9007199254740991;
 
@@ -406,7 +407,12 @@ export const CoursesListResponse = zod.object({
   "publishedAt": zod.iso.datetime({"offset":true}).regex(coursesListResponseItemsItemPublishedAtRegExp).nullable(),
   "slug": zod.string(),
   "status": zod.enum(['DRAFT', 'PUBLISHED']),
-  "thumbnailAssetId": zod.uuid().regex(coursesListResponseItemsItemThumbnailAssetIdRegExp).nullable(),
+  "thumbnail": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(coursesListResponseItemsItemThumbnailAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "thumbnailAssetId": zod.uuid().regex(coursesListResponseItemsItemThumbnailAssetIdRegExpOne).nullable(),
   "title": zod.string(),
   "updatedAt": zod.iso.datetime({"offset":true}).regex(coursesListResponseItemsItemUpdatedAtRegExp)
 })),
@@ -447,6 +453,7 @@ export const coursesCreateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-
 export const coursesCreateResponseLockedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const coursesCreateResponsePublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const coursesCreateResponseThumbnailAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const coursesCreateResponseThumbnailAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const coursesCreateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 
 
@@ -464,7 +471,12 @@ export const CoursesCreateResponse = zod.object({
   "publishedAt": zod.iso.datetime({"offset":true}).regex(coursesCreateResponsePublishedAtRegExp).nullable(),
   "slug": zod.string(),
   "status": zod.enum(['DRAFT', 'PUBLISHED']),
-  "thumbnailAssetId": zod.uuid().regex(coursesCreateResponseThumbnailAssetIdRegExp).nullable(),
+  "thumbnail": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(coursesCreateResponseThumbnailAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "thumbnailAssetId": zod.uuid().regex(coursesCreateResponseThumbnailAssetIdRegExpOne).nullable(),
   "title": zod.string(),
   "updatedAt": zod.iso.datetime({"offset":true}).regex(coursesCreateResponseUpdatedAtRegExp)
 })
@@ -501,6 +513,7 @@ export const coursesGetResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-
 export const coursesGetResponseLockedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const coursesGetResponsePublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const coursesGetResponseThumbnailAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const coursesGetResponseThumbnailAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const coursesGetResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 
 
@@ -518,7 +531,12 @@ export const CoursesGetResponse = zod.object({
   "publishedAt": zod.iso.datetime({"offset":true}).regex(coursesGetResponsePublishedAtRegExp).nullable(),
   "slug": zod.string(),
   "status": zod.enum(['DRAFT', 'PUBLISHED']),
-  "thumbnailAssetId": zod.uuid().regex(coursesGetResponseThumbnailAssetIdRegExp).nullable(),
+  "thumbnail": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(coursesGetResponseThumbnailAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "thumbnailAssetId": zod.uuid().regex(coursesGetResponseThumbnailAssetIdRegExpOne).nullable(),
   "title": zod.string(),
   "updatedAt": zod.iso.datetime({"offset":true}).regex(coursesGetResponseUpdatedAtRegExp)
 })
@@ -562,6 +580,7 @@ export const coursesUpdateResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-
 export const coursesUpdateResponseLockedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const coursesUpdateResponsePublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const coursesUpdateResponseThumbnailAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const coursesUpdateResponseThumbnailAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const coursesUpdateResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 
 
@@ -579,7 +598,12 @@ export const CoursesUpdateResponse = zod.object({
   "publishedAt": zod.iso.datetime({"offset":true}).regex(coursesUpdateResponsePublishedAtRegExp).nullable(),
   "slug": zod.string(),
   "status": zod.enum(['DRAFT', 'PUBLISHED']),
-  "thumbnailAssetId": zod.uuid().regex(coursesUpdateResponseThumbnailAssetIdRegExp).nullable(),
+  "thumbnail": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(coursesUpdateResponseThumbnailAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "thumbnailAssetId": zod.uuid().regex(coursesUpdateResponseThumbnailAssetIdRegExpOne).nullable(),
   "title": zod.string(),
   "updatedAt": zod.iso.datetime({"offset":true}).regex(coursesUpdateResponseUpdatedAtRegExp)
 })
@@ -1470,6 +1494,9 @@ export const videoSlotsListResponseItemsItemAssetKeyMax = 128;
 export const videoSlotsListResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const videoSlotsListResponseItemsItemOrderMax = 9007199254740991;
 
+export const videoSlotsListResponseItemsItemProgressPercentMin = 0;
+export const videoSlotsListResponseItemsItemProgressPercentMax = 100;
+
 export const videoSlotsListResponseItemsItemStatusChangedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const videoSlotsListResponseItemsItemUploadedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 
@@ -1481,6 +1508,7 @@ export const VideoSlotsListResponse = zod.object({
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsListResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsListResponseItemsItemOrderMax),
+  "progressPercent": zod.int().min(videoSlotsListResponseItemsItemProgressPercentMin).max(videoSlotsListResponseItemsItemProgressPercentMax).nullable(),
   "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
@@ -1513,6 +1541,9 @@ export const videoSlotsCreateResponseItemsItemAssetKeyMax = 128;
 export const videoSlotsCreateResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const videoSlotsCreateResponseItemsItemOrderMax = 9007199254740991;
 
+export const videoSlotsCreateResponseItemsItemProgressPercentMin = 0;
+export const videoSlotsCreateResponseItemsItemProgressPercentMax = 100;
+
 export const videoSlotsCreateResponseItemsItemStatusChangedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const videoSlotsCreateResponseItemsItemUploadedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 
@@ -1524,6 +1555,7 @@ export const VideoSlotsCreateResponse = zod.object({
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsCreateResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsCreateResponseItemsItemOrderMax),
+  "progressPercent": zod.int().min(videoSlotsCreateResponseItemsItemProgressPercentMin).max(videoSlotsCreateResponseItemsItemProgressPercentMax).nullable(),
   "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
@@ -1562,6 +1594,9 @@ export const videoSlotsReorderResponseItemsItemAssetKeyMax = 128;
 export const videoSlotsReorderResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const videoSlotsReorderResponseItemsItemOrderMax = 9007199254740991;
 
+export const videoSlotsReorderResponseItemsItemProgressPercentMin = 0;
+export const videoSlotsReorderResponseItemsItemProgressPercentMax = 100;
+
 export const videoSlotsReorderResponseItemsItemStatusChangedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const videoSlotsReorderResponseItemsItemUploadedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 
@@ -1573,6 +1608,7 @@ export const VideoSlotsReorderResponse = zod.object({
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsReorderResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsReorderResponseItemsItemOrderMax),
+  "progressPercent": zod.int().min(videoSlotsReorderResponseItemsItemProgressPercentMin).max(videoSlotsReorderResponseItemsItemProgressPercentMax).nullable(),
   "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
@@ -1600,6 +1636,9 @@ export const videoSlotsRemoveResponseItemsItemAssetKeyMax = 128;
 export const videoSlotsRemoveResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const videoSlotsRemoveResponseItemsItemOrderMax = 9007199254740991;
 
+export const videoSlotsRemoveResponseItemsItemProgressPercentMin = 0;
+export const videoSlotsRemoveResponseItemsItemProgressPercentMax = 100;
+
 export const videoSlotsRemoveResponseItemsItemStatusChangedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const videoSlotsRemoveResponseItemsItemUploadedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 
@@ -1611,6 +1650,7 @@ export const VideoSlotsRemoveResponse = zod.object({
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsRemoveResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsRemoveResponseItemsItemOrderMax),
+  "progressPercent": zod.int().min(videoSlotsRemoveResponseItemsItemProgressPercentMin).max(videoSlotsRemoveResponseItemsItemProgressPercentMax).nullable(),
   "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
@@ -1643,6 +1683,9 @@ export const videoSlotsUpdateResponseItemsItemAssetKeyMax = 128;
 export const videoSlotsUpdateResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const videoSlotsUpdateResponseItemsItemOrderMax = 9007199254740991;
 
+export const videoSlotsUpdateResponseItemsItemProgressPercentMin = 0;
+export const videoSlotsUpdateResponseItemsItemProgressPercentMax = 100;
+
 export const videoSlotsUpdateResponseItemsItemStatusChangedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const videoSlotsUpdateResponseItemsItemUploadedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 
@@ -1654,6 +1697,7 @@ export const VideoSlotsUpdateResponse = zod.object({
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsUpdateResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsUpdateResponseItemsItemOrderMax),
+  "progressPercent": zod.int().min(videoSlotsUpdateResponseItemsItemProgressPercentMin).max(videoSlotsUpdateResponseItemsItemProgressPercentMax).nullable(),
   "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
@@ -1696,6 +1740,9 @@ export const videoSlotsRetryTranscodeResponseItemsItemAssetKeyMax = 128;
 export const videoSlotsRetryTranscodeResponseItemsItemIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const videoSlotsRetryTranscodeResponseItemsItemOrderMax = 9007199254740991;
 
+export const videoSlotsRetryTranscodeResponseItemsItemProgressPercentMin = 0;
+export const videoSlotsRetryTranscodeResponseItemsItemProgressPercentMax = 100;
+
 export const videoSlotsRetryTranscodeResponseItemsItemStatusChangedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const videoSlotsRetryTranscodeResponseItemsItemUploadedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 
@@ -1707,6 +1754,7 @@ export const VideoSlotsRetryTranscodeResponse = zod.object({
   "failureReason": zod.union([zod.literal('SOURCE_UNREADABLE'),zod.literal('ENCODE_FAILED'),zod.literal('TIMED_OUT'),zod.literal('VALIDATION_FAILED'),zod.literal('PUBLISH_FAILED'),zod.literal(null)]).nullable(),
   "id": zod.uuid().regex(videoSlotsRetryTranscodeResponseItemsItemIdRegExp),
   "order": zod.int().min(1).max(videoSlotsRetryTranscodeResponseItemsItemOrderMax),
+  "progressPercent": zod.int().min(videoSlotsRetryTranscodeResponseItemsItemProgressPercentMin).max(videoSlotsRetryTranscodeResponseItemsItemProgressPercentMax).nullable(),
   "rejectionReason": zod.union([zod.literal('NOT_A_VIDEO'),zod.literal('UNSUPPORTED_CONTAINER'),zod.literal('UNSUPPORTED_CODEC'),zod.literal('TOO_LARGE'),zod.literal('NO_DURATION'),zod.literal(null)]).nullable(),
   "required": zod.boolean(),
   "status": zod.enum(['NOT_UPLOADED', 'UPLOADING', 'UPLOADED', 'QUEUED', 'PROCESSING', 'READY', 'FAILED', 'REJECTED']),
@@ -1739,6 +1787,7 @@ export const coursesPublishResponseIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a
 export const coursesPublishResponseLockedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const coursesPublishResponsePublishedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 export const coursesPublishResponseThumbnailAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
+export const coursesPublishResponseThumbnailAssetIdRegExpOne = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 export const coursesPublishResponseUpdatedAtRegExp = new RegExp('^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$');
 
 
@@ -1756,7 +1805,12 @@ export const CoursesPublishResponse = zod.object({
   "publishedAt": zod.iso.datetime({"offset":true}).regex(coursesPublishResponsePublishedAtRegExp).nullable(),
   "slug": zod.string(),
   "status": zod.enum(['DRAFT', 'PUBLISHED']),
-  "thumbnailAssetId": zod.uuid().regex(coursesPublishResponseThumbnailAssetIdRegExp).nullable(),
+  "thumbnail": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(coursesPublishResponseThumbnailAssetIdRegExp),
+  "url": zod.string()
+}).nullable(),
+  "thumbnailAssetId": zod.uuid().regex(coursesPublishResponseThumbnailAssetIdRegExpOne).nullable(),
   "title": zod.string(),
   "updatedAt": zod.iso.datetime({"offset":true}).regex(coursesPublishResponseUpdatedAtRegExp)
 })
@@ -5619,6 +5673,7 @@ export const dashboardDescribeResponseCoursesItemProgressPercentMax = 100;
 
 export const dashboardDescribeResponseCoursesItemReasonMax = 500;
 
+export const dashboardDescribeResponseCoursesItemThumbnailAssetIdRegExp = new RegExp('^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$');
 
 
 export const DashboardDescribeResponse = zod.object({
@@ -5643,7 +5698,12 @@ export const DashboardDescribeResponse = zod.object({
   "percent": zod.int().min(dashboardDescribeResponseCoursesItemProgressPercentMin).max(dashboardDescribeResponseCoursesItemProgressPercentMax)
 }).nullable(),
   "reason": zod.string().max(dashboardDescribeResponseCoursesItemReasonMax).nullable(),
-  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED'])
+  "status": zod.enum(['PENDING_VERIFICATION', 'PENDING_APPROVAL', 'APPROVED', 'COMPLETED', 'REJECTED', 'EXPIRED', 'REMOVED']),
+  "thumbnail": zod.object({
+  "alt": zod.string(),
+  "assetId": zod.uuid().regex(dashboardDescribeResponseCoursesItemThumbnailAssetIdRegExp),
+  "url": zod.string()
+}).nullable()
 }))
 })
 

@@ -15,7 +15,7 @@ export class PrismaTranscodeStore implements TranscodeStore {
     if (asset === null) return null;
     const flipped = await this.database.videoAsset.updateMany({
       where: { id: assetId, status: { in: [...claimable] } },
-      data: { status: "PROCESSING", failureReason: null },
+      data: { status: "PROCESSING", failureReason: null, progressPercent: 0 },
     });
     return flipped.count === 0 ? null : asset;
   }
@@ -24,7 +24,12 @@ export class PrismaTranscodeStore implements TranscodeStore {
     return this.database.$transaction(async (tx) => {
       const flipped = await tx.videoAsset.updateMany({
         where: { id: assetId, status: "PROCESSING" },
-        data: { status: "READY", durationSeconds: result.durationSeconds, failureReason: null },
+        data: {
+          status: "READY",
+          durationSeconds: result.durationSeconds,
+          failureReason: null,
+          progressPercent: null,
+        },
       });
       if (flipped.count === 0) return false;
       await tx.videoRendition.deleteMany({ where: { assetId } });
@@ -42,7 +47,18 @@ export class PrismaTranscodeStore implements TranscodeStore {
   async markFailed(assetId: string, reason: VideoFailureReason): Promise<void> {
     await this.database.videoAsset.updateMany({
       where: { id: assetId, status: "PROCESSING" },
-      data: { status: "FAILED", failureReason: reason },
+      data: { status: "FAILED", failureReason: reason, progressPercent: null },
+    });
+  }
+
+  async reportProgress(assetId: string, percent: number): Promise<void> {
+    await this.database.videoAsset.updateMany({
+      where: {
+        id: assetId,
+        status: "PROCESSING",
+        OR: [{ progressPercent: null }, { progressPercent: { lt: percent } }],
+      },
+      data: { progressPercent: percent },
     });
   }
 }

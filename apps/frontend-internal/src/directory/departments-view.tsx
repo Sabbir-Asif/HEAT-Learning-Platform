@@ -15,20 +15,7 @@ import {
 } from "@heat/api-client";
 import type { DepartmentListResponseDtoItemsItem } from "@heat/api-client";
 import { departmentSortFields } from "@heat/contracts";
-import {
-  Badge,
-  Button,
-  ConfirmDialog,
-  Field,
-  FieldDescription,
-  FieldLabel,
-  PageHeader,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@heat/ui";
+import { Badge, Button, ConfirmDialog, FieldDescription, PageHeader } from "@heat/ui";
 import {
   DataTable,
   FilterBar,
@@ -289,53 +276,35 @@ export function DepartmentsView() {
           />
         }
       >
-        <Field>
-          <FieldLabel id="department-filter-university">University</FieldLabel>
-          <Select
-            items={universityItems}
-            value={university || all}
-            onValueChange={(value) => {
-              url.setFilters({ university: value === all ? null : value, faculty: null });
-            }}
-          >
-            <SelectTrigger aria-labelledby="department-filter-university" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {universityItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {(universities.data?.total ?? 0) > optionLimit ? (
-            <FieldDescription>{optionsTruncatedMessage(optionLimit)}</FieldDescription>
-          ) : null}
-        </Field>
-        <Field>
-          <FieldLabel id="department-filter-faculty">Faculty</FieldLabel>
-          <Select
-            items={facultyItems}
-            value={faculty || all}
-            disabled={!university}
-            onValueChange={(value) => url.setFilter("faculty", value === all ? null : value)}
-          >
-            <SelectTrigger aria-labelledby="department-filter-faculty" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {facultyItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {(faculties.data?.total ?? 0) > optionLimit ? (
-            <FieldDescription>{optionsTruncatedMessage(optionLimit)}</FieldDescription>
-          ) : null}
-        </Field>
+        <FilterSelect
+          label="University"
+          icon={filterIcon("University")}
+          items={universityItems}
+          value={university || all}
+          defaultValue={all}
+          note={
+            (universities.data?.total ?? 0) > optionLimit
+              ? optionsTruncatedMessage(optionLimit)
+              : undefined
+          }
+          onValueChange={(value) =>
+            url.setFilters({ university: value === all ? null : value, faculty: null })
+          }
+        />
+        <FilterSelect
+          label="Faculty"
+          icon={filterIcon("Faculty")}
+          items={facultyItems}
+          value={faculty || all}
+          defaultValue={all}
+          disabled={!university}
+          note={
+            (faculties.data?.total ?? 0) > optionLimit
+              ? optionsTruncatedMessage(optionLimit)
+              : undefined
+          }
+          onValueChange={(value) => url.setFilter("faculty", value === all ? null : value)}
+        />
         <FilterSelect
           label="Status"
           icon={filterIcon("Status")}

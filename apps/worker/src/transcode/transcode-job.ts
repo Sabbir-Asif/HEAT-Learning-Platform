@@ -7,6 +7,7 @@ import type { Publication } from "./hls-publish";
 import { buildMasterPlaylist, buildRenditionArgs, renditionsForSource } from "./ladder";
 import type { Rendition } from "./ladder";
 import type { CodecProbe, SourceInfo, SourceProbe } from "./media-probe";
+import { overallPercent } from "./ffmpeg-progress";
 import { MASTER_FILE, collectOutput } from "./output-collector";
 import { validateOutput } from "./output-validation";
 import { transcodeTimeoutMs } from "./transcode-timeout";
@@ -26,6 +27,7 @@ export interface TranscodeStore {
   claim(assetId: string): Promise<{ assetKey: string } | null>;
   markReady(assetId: string, result: ReadyResult): Promise<boolean>;
   markFailed(assetId: string, reason: VideoFailureReason): Promise<void>;
+  reportProgress(assetId: string, percent: number): Promise<void>;
 }
 
 export interface TranscodeSettings {
@@ -97,7 +99,7 @@ export class TranscodeJob {
     finalAttempt: boolean,
   ): Promise<TranscodeOutcome> {
     const { store } = this.dependencies;
-    const result = await this.attempt(assetKey, staging, attemptId);
+    const result = await this.attempt(assetId, assetKey, staging, attemptId);
     if (result.failure === null) {
       let applied: boolean;
       try {
@@ -121,6 +123,7 @@ export class TranscodeJob {
   }
 
   private async attempt(
+    assetId: string,
     assetKey: string,
     staging: string,
     attemptId: string,
@@ -135,7 +138,7 @@ export class TranscodeJob {
     }
     if (source === null) return failure("SOURCE_UNREADABLE", false);
     const renditions = renditionsForSource(source);
-    const built = await this.build(input, staging, source, renditions);
+    const built = await this.build(assetId, input, staging, source, renditions);
     if (built !== null) return built;
     const hasAudio = source.hasAudio;
     const names = renditions.map((rendition) => rendition.name);
@@ -180,15 +183,18 @@ export class TranscodeJob {
   }
 
   private async build(
+    assetId: string,
     input: string,
     staging: string,
     source: SourceInfo,
     renditions: readonly Rendition[],
   ): Promise<{ failure: Failure } | null> {
     const { filesystem, ffmpeg, nowMs } = this.dependencies;
+    const { store } = this.dependencies;
     const deadline = nowMs() + transcodeTimeoutMs(source.durationSeconds, this.settings.timeout);
+    await store.reportProgress(assetId, 0).catch(() => undefined);
     try {
-      for (const rendition of renditions) {
+      for (const [index, rendition] of renditions.entries()) {
         await filesystem.makeDirectory(join(staging, rendition.name));
         const remaining = deadline - nowMs();
         if (remaining <= 0) return failure("TIMED_OUT", false);
@@ -197,9 +203,23 @@ export class TranscodeJob {
           outputDir: staging,
           fps: source.fps,
         });
-        const result = await ffmpeg.run(args, remaining);
+        let reported = -1;
+        const result = await ffmpeg.run(args, remaining, (encodedSeconds) => {
+          const percent = overallPercent(
+            index,
+            renditions.length,
+            encodedSeconds,
+            source.durationSeconds,
+          );
+          if (percent <= reported) return;
+          reported = percent;
+          void store.reportProgress(assetId, percent).catch(() => undefined);
+        });
         if (result === "timed-out") return failure("TIMED_OUT", false);
         if (result === "failed") return failure("ENCODE_FAILED", true);
+        await store
+          .reportProgress(assetId, Math.round(((index + 1) / renditions.length) * 100))
+          .catch(() => undefined);
       }
       await filesystem.writeText(
         join(staging, MASTER_FILE),

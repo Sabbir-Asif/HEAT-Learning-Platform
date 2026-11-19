@@ -56,12 +56,18 @@ export function AvatarSection({ profile }: AvatarSectionProps) {
 
   return (
     <section aria-labelledby="profile-picture" className="flex flex-col gap-3">
-      <FieldTitle id="profile-picture">Profile picture</FieldTitle>
-      <Avatar src={profile.avatarUrl} name={profile.name} />
-      <FieldDescription>
-        Only you and the course team can see your picture. Uploading a new one replaces the current
-        picture. It is cropped to a square.
-      </FieldDescription>
+      <div className="flex items-center gap-4">
+        <Avatar src={profile.avatarUrl} name={profile.name} className="size-16 shrink-0" />
+        <div className="flex min-w-0 flex-col gap-1">
+          <FieldTitle id="profile-picture" className="sr-only">
+            Profile picture
+          </FieldTitle>
+          <FieldDescription>
+            Only you and the course team can see your picture. A new upload replaces the current one
+            and is cropped to a square.
+          </FieldDescription>
+        </div>
+      </div>
       <FileUpload
         label="Profile picture"
         preset="avatar"

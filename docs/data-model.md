@@ -125,6 +125,7 @@ erDiagram
     VideoAssetStatus status
     Int referenceCount
     Int durationSeconds
+    Int progressPercent
     String rejectionReason
     String failureReason
     DateTime createdAt

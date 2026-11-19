@@ -67,6 +67,7 @@ const build = (options: Options = {}) => {
         : Promise.resolve(options.ready ?? true),
     ),
     markFailed: vi.fn().mockResolvedValue(undefined),
+    reportProgress: vi.fn().mockResolvedValue(undefined),
   };
   const times = [...(options.times ?? [])];
   const ffmpeg: FfmpegRunner & { run: ReturnType<typeof vi.fn> } = {
@@ -128,6 +129,37 @@ describe("TranscodeJob success", () => {
     });
     expect(store.markFailed).not.toHaveBeenCalled();
     expect(filesystem.filesUnder(`${hls}/.staging-${key}-a1`)).toEqual([]);
+  });
+
+  test("reports progress at the start and after every rendition", async () => {
+    const { job, store } = build();
+    await job.run(assetId, false);
+    expect(vi.mocked(store.reportProgress).mock.calls.map((call) => call[1])).toEqual([
+      0, 25, 50, 75, 100,
+    ]);
+  });
+
+  test("reports progress inside a rendition from FFmpeg's encoded time, only upwards", async () => {
+    const { job, store, ffmpeg, filesystem } = build({
+      source: source({ width: 640, height: 360 }),
+    });
+    ffmpeg.run.mockImplementationOnce(async (args: readonly string[], _timeout, onProgress) => {
+      writeRendition(args, filesystem, 60);
+      onProgress?.(15);
+      onProgress?.(15);
+      onProgress?.(30);
+      return "ok";
+    });
+    await job.run(assetId, false);
+    expect(vi.mocked(store.reportProgress).mock.calls.map((call) => call[1])).toEqual([
+      0, 25, 50, 100,
+    ]);
+  });
+
+  test("a failing progress write does not fail the job", async () => {
+    const { job, store } = build();
+    vi.mocked(store.reportProgress).mockRejectedValue(new Error("db down"));
+    expect(await job.run(assetId, false)).toEqual({ status: "ready" });
   });
 
   test("encodes one rendition at a time, reading only the upload and writing only the staging directory", async () => {

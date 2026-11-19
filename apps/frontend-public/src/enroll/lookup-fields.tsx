@@ -9,6 +9,7 @@ import {
 } from "@heat/ui";
 import type { FormControlProps } from "@heat/ui";
 import { BuildingIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { Ref } from "react";
 
 export interface LookupOption {
@@ -20,6 +21,7 @@ export const noOptions: LookupOption[] = [];
 
 interface LookupSelectProps {
   label: string;
+  icon?: LucideIcon;
   placeholder: string;
   options: readonly LookupOption[];
   disabled: boolean;
@@ -30,6 +32,7 @@ interface LookupSelectProps {
 
 export function LookupSelect({
   label,
+  icon: Icon,
   placeholder,
   options,
   disabled,
@@ -45,7 +48,14 @@ export function LookupSelect({
       onValueChange={(value) => onChange(value ?? "")}
       disabled={disabled}
     >
-      <SelectTrigger {...triggerProps} aria-label={label} className="w-full">
+      <SelectTrigger
+        {...triggerProps}
+        aria-label={label}
+        className={Icon === undefined ? "w-full" : "w-full data-[size=default]:h-11"}
+      >
+        {Icon === undefined ? null : (
+          <Icon aria-hidden="true" className="text-muted-foreground size-4 shrink-0" />
+        )}
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>

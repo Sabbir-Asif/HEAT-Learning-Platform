@@ -18,6 +18,7 @@ interface SlotFixture {
     assetKey: string;
     rejectionReason?: string | null;
     failureReason?: string | null;
+    progressPercent?: number | null;
     createdAt?: Date;
     updatedAt?: Date;
   } | null;
@@ -117,6 +118,22 @@ describe("VideoSlotsService.list rejection reason", () => {
       null,
       null,
     ]);
+  });
+});
+
+describe("VideoSlotsService.list progress", () => {
+  test("shows the processing percentage, and null when there is none", async () => {
+    const { service } = build({
+      slots: [
+        slot("a", 1, {
+          assetId: "x",
+          asset: { status: "PROCESSING", assetKey: "k1", progressPercent: 50 },
+        }),
+        slot("b", 2, { assetId: "y", asset: { status: "READY", assetKey: "k2" } }),
+      ],
+    });
+    const result = await service.list(courseId, "m");
+    expect(result.items.map((item) => item.progressPercent)).toEqual([50, null]);
   });
 });
 

@@ -64,7 +64,7 @@ export function NotificationsScreen() {
           </Button>
         }
       />
-      <ul>
+      <ul className="flex max-w-3xl flex-col gap-3">
         {models.map(({ id, ...row }) => (
           <NotificationRow
             key={id}

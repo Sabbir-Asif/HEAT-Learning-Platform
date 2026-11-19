@@ -36,9 +36,15 @@ import {
 } from "./modules-copy";
 import { VideoSlotForm } from "./video-slot-form";
 import { VideoSlotCaptions } from "./video-slot-captions";
+import { VideoSlotProgress } from "./video-slot-progress";
 import { VideoSlotUpload } from "./video-slot-upload";
 
 type EditingSlot = { id: string; title: string; required: boolean } | "new" | null;
+
+const withoutProgress = (data: VideoSlotListResponseDto): VideoSlotListResponseDto => ({
+  ...data,
+  items: data.items.map((slot) => ({ ...slot, progressPercent: null })),
+});
 
 type VideoSlotsPanelProps = {
   courseId: string;
@@ -49,7 +55,10 @@ type VideoSlotsPanelProps = {
 export function VideoSlotsPanel({ courseId, moduleId, courseLocked }: VideoSlotsPanelProps) {
   const queryClient = useQueryClient();
   const slots = useVideoSlotsList(courseId, moduleId, {
-    query: { refetchInterval: (query) => videoSlotsPollInterval(query.state.data?.items) },
+    query: {
+      select: withoutProgress,
+      refetchInterval: (query) => videoSlotsPollInterval(query.state.data?.items),
+    },
   });
   const reorder = useVideoSlotsReorder();
   const remove = useVideoSlotsRemove();
@@ -166,6 +175,14 @@ export function VideoSlotsPanel({ courseId, moduleId, courseLocked }: VideoSlots
                       {videoTimeLabel(slot.statusChangedAt)}.
                     </FieldDescription>
                   )}
+                  {slot.status === "QUEUED" || slot.status === "PROCESSING" ? (
+                    <VideoSlotProgress
+                      courseId={courseId}
+                      moduleId={moduleId}
+                      videoId={slot.id}
+                      status={slot.status}
+                    />
+                  ) : null}
                   {slot.status === "FAILED" ? (
                     <div className="flex flex-wrap items-center gap-2">
                       <FieldDescription role="alert" className="mr-auto">

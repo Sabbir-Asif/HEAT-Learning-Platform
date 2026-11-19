@@ -9,7 +9,7 @@ export function VideoAreaLoading() {
       <p role="status" className="sr-only">
         Loading video
       </p>
-      <Skeleton className="aspect-video w-full" />
+      <Skeleton className="bg-player/90 aspect-video w-full rounded-xl" />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import type { DashboardResponseDtoCoursesItemCertificate } from './dashboardResp
 import type { DashboardResponseDtoCoursesItemNextModule } from './dashboardResponseDtoCoursesItemNextModule';
 import type { DashboardResponseDtoCoursesItemProgress } from './dashboardResponseDtoCoursesItemProgress';
 import type { DashboardResponseDtoCoursesItemStatus } from './dashboardResponseDtoCoursesItemStatus';
+import type { DashboardResponseDtoCoursesItemThumbnail } from './dashboardResponseDtoCoursesItemThumbnail';
 
 export type DashboardResponseDtoCoursesItem = {
   /** @nullable */
@@ -26,4 +27,6 @@ export type DashboardResponseDtoCoursesItem = {
      */
   reason: string | null;
   status: DashboardResponseDtoCoursesItemStatus;
+  /** @nullable */
+  thumbnail: DashboardResponseDtoCoursesItemThumbnail;
 };

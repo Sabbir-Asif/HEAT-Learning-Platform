@@ -32,7 +32,7 @@ function FilterInput({ label, icon, error, className, id, ...props }: FilterInpu
           id={inputId}
           aria-invalid={error ? true : props["aria-invalid"]}
           aria-describedby={error ? errorId : props["aria-describedby"]}
-          className="placeholder:text-muted-foreground/70 text-foreground h-full min-w-0 flex-1 bg-transparent font-medium outline-none md:w-32 md:flex-none"
+          className="placeholder:text-muted-foreground/70 text-foreground h-full min-w-0 flex-1 bg-transparent font-medium outline-none md:w-24 md:flex-none"
           {...props}
         />
       </label>

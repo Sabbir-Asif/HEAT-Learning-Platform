@@ -1,10 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { FilterIcon, XIcon } from "lucide-react";
+import { ChevronDownIcon, SlidersHorizontalIcon, XIcon } from "lucide-react";
 import { Badge } from "../components/badge";
 import { Button } from "../components/button";
-import { Popover, PopoverContent, PopoverTrigger } from "../components/popover";
 import { cn } from "../lib/utils";
 
 type FilterBarProps = Omit<React.ComponentProps<"div">, "children"> & {
@@ -22,38 +21,43 @@ function FilterBar({
   className,
   ...props
 }: FilterBarProps) {
+  const [open, setOpen] = React.useState(false);
+  const panelId = React.useId();
   return (
     <div
       data-slot="filter-bar"
       className={cn("flex flex-wrap items-center gap-2", className)}
       {...props}
     >
-      {search ? <div className="min-w-0 flex-1 md:max-w-xs">{search}</div> : null}
-      <Popover>
-        <PopoverTrigger render={<Button variant="outline" />}>
-          <FilterIcon data-icon="inline-start" />
-          Filters
-          {activeCount > 0 ? <Badge variant="secondary">{activeCount}</Badge> : null}
-        </PopoverTrigger>
-        <PopoverContent className="flex w-96 flex-col gap-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-medium">Filters</p>
-            <div className="flex items-center gap-1">
-              <Badge variant={activeCount > 0 ? "secondary" : "outline"}>
-                {activeCount} selected
-              </Badge>
-              <Button variant="ghost" size="sm" onClick={onClear} disabled={activeCount === 0}>
-                Clear
-              </Button>
-            </div>
-          </div>
-          <div className="flex flex-col gap-2 *:w-full *:max-w-none">{children}</div>
-        </PopoverContent>
-      </Popover>
+      {search ? <div className="min-w-0 flex-1 md:w-60 md:flex-none">{search}</div> : null}
+      <Button
+        variant="outline"
+        className="md:hidden"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <SlidersHorizontalIcon data-icon="inline-start" />
+        Filters
+        {activeCount > 0 ? <Badge variant="secondary">{activeCount}</Badge> : null}
+        <ChevronDownIcon
+          data-icon="inline-end"
+          className={cn("transition-transform", open && "rotate-180")}
+        />
+      </Button>
+      <div
+        id={panelId}
+        role="group"
+        aria-label="Filters"
+        className={cn("w-full flex-col gap-2 md:contents", open ? "flex" : "hidden md:contents")}
+      >
+        {children}
+      </div>
       {activeCount > 0 ? (
         <Button variant="ghost" size="sm" onClick={onClear}>
           <XIcon data-icon="inline-start" />
-          Clear filters
+          Clear
+          <Badge variant="secondary">{activeCount}</Badge>
         </Button>
       ) : null}
     </div>

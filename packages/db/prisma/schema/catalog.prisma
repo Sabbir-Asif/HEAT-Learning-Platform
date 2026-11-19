@@ -95,6 +95,7 @@ model VideoAsset {
   status          VideoAssetStatus @default(UPLOADING)
   referenceCount  Int              @default(0)
   durationSeconds Int?
+  progressPercent Int?
   rejectionReason String?
   failureReason   String?
   createdAt       DateTime         @default(now())
