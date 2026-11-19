@@ -23,3 +23,4 @@ export const partnerLogos: LogoSource[] = [
 ];
 
 export const siteName = "Women Safety Awareness Program";
+export const siteShortName = "WSAP";

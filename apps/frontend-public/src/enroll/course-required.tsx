@@ -11,7 +11,7 @@ export function CourseRequired() {
         title="Choose a course to enroll in"
         description="Open a course and use its Enroll button."
         action={
-          <Button variant="outline" nativeButton={false} render={<Link href="/courses" />}>
+          <Button variant="outline" nativeButton={false} render={<Link href="/#courses" />}>
             Browse courses
           </Button>
         }

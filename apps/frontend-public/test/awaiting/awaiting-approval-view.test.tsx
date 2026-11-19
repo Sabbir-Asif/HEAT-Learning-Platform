@@ -109,7 +109,7 @@ describe("AwaitingApprovalView", () => {
     const view = await mount(<AwaitingApprovalView enrollments={[]} emailVerified />);
 
     expect(view.textContent).toContain("You have no enrollment requests");
-    expect(view.querySelector('a[href="/courses"]')).not.toBeNull();
+    expect(view.querySelector('a[href="/#courses"]')).not.toBeNull();
   });
 
   test("says the verification email is on its way while it is queued", async () => {

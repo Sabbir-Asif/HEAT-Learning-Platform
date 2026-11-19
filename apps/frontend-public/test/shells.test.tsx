@@ -5,6 +5,9 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 const pathname = vi.hoisted(() => ({ value: "/dashboard" }));
 
 vi.mock("next/navigation", () => ({ usePathname: () => pathname.value }));
+vi.mock("../src/auth/use-student-session", () => ({
+  useStudentSession: () => ({ kind: "anonymous" }),
+}));
 vi.mock("../src/notifications/use-unread-count", () => ({ useUnreadCount: () => 3 }));
 
 import { AuthShell } from "../src/shell/auth-shell";
@@ -44,7 +47,7 @@ afterEach(async () => {
 });
 
 describe("learner shell", () => {
-  test("the bottom bar has exactly five items and marks the active one", async () => {
+  test("the bottom bar has exactly four items and marks the active one", async () => {
     pathname.value = "/learn/safety/intro";
     const view = await mount(
       <LearnerShell>
@@ -52,7 +55,7 @@ describe("learner shell", () => {
       </LearnerShell>,
     );
     const bar = view.querySelector('[data-slot="bottom-bar"]') as HTMLElement;
-    expect(bar.querySelectorAll("a")).toHaveLength(5);
+    expect(bar.querySelectorAll("a")).toHaveLength(4);
     const current = bar.querySelectorAll('[aria-current="page"]');
     expect(current).toHaveLength(1);
     expect(current[0]?.textContent).toBe("My Learning");
@@ -84,7 +87,7 @@ describe("learner shell", () => {
 
 describe("public shell", () => {
   test("has one main landmark, primary navigation and sign in and enroll actions", async () => {
-    pathname.value = "/about";
+    pathname.value = "/";
     const view = await mount(
       <PublicShell>
         <p>content</p>
@@ -92,8 +95,9 @@ describe("public shell", () => {
     );
     expect(view.querySelectorAll("main")).toHaveLength(1);
     expect(view.querySelector('nav[aria-label="Primary"] [aria-current="page"]')?.textContent).toBe(
-      "About",
+      "Home",
     );
+    expect(view.querySelector('header [data-slot="themed-logo"]')).toBeNull();
     const hrefs = [...view.querySelectorAll("a")].map((link) => link.getAttribute("href"));
     expect(hrefs).toContain("/sign-in");
     expect(hrefs).toContain("/enroll");

@@ -41,25 +41,17 @@ describe("route manifest", () => {
 describe("navigation", () => {
   const known = new Set(routePaths);
 
-  test("the learner bar has exactly five items", () => {
+  test("the learner bar has exactly four items", () => {
     expect(learnerNavigation.map((item) => item.label)).toEqual([
       "Dashboard",
       "My Learning",
       "Certificates",
-      "Resources",
       "Profile",
     ]);
   });
 
   test("the public nav matches the spec", () => {
-    expect(publicNavigation.map((item) => item.label)).toEqual([
-      "Home",
-      "About",
-      "Training Modules",
-      "Resources",
-      "News",
-      "Contact",
-    ]);
+    expect(publicNavigation.map((item) => item.label)).toEqual(["Home", "About", "Courses"]);
   });
 
   test("every internal link points to a route that exists", () => {
@@ -69,7 +61,7 @@ describe("navigation", () => {
       ...footerColumns.flatMap((column) => column.links),
       ...legalLinks,
     ]
-      .map((item) => item.href)
+      .map((item) => item.href.split("#")[0] || "/")
       .filter((href) => href.startsWith("/"));
     for (const href of hrefs) expect(known.has(href)).toBe(true);
   });

@@ -21,7 +21,7 @@ describe("CourseRequired", () => {
     await act(async () => root?.render(<CourseRequired />));
 
     expect(container.textContent).toContain("Choose a course to enroll in");
-    expect(container.querySelector('a[href="/courses"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/#courses"]')).not.toBeNull();
     expect(container.querySelector("form")).toBeNull();
   });
 });

@@ -123,7 +123,7 @@ export function AwaitingApprovalView({
           icon={BookOpenIcon}
           title="You have no enrollment requests"
           action={
-            <Button variant="outline" nativeButton={false} render={<Link href="/courses" />}>
+            <Button variant="outline" nativeButton={false} render={<Link href="/#courses" />}>
               Browse courses
             </Button>
           }
