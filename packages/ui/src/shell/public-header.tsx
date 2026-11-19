@@ -12,7 +12,7 @@ import { ThemedLogo } from "./themed-logo";
 import type { LogoSource, ShellLink } from "./types";
 
 interface PublicHeaderProps {
-  brand: { name: string; subtitle?: string; href: string; logos: ReadonlyArray<LogoSource> };
+  brand: { name: string; subtitle?: string; href: string; logos?: ReadonlyArray<LogoSource> };
   items: ReadonlyArray<NavItem>;
   pathname: string;
   link?: ShellLink;
@@ -80,11 +80,13 @@ function PublicHeader({
           "focus-visible:ring-ring flex min-w-0 items-center gap-2 rounded-md outline-hidden focus-visible:ring-2",
         children: (
           <>
-            {brand.logos.map((logo) => (
+            {(brand.logos ?? []).map((logo) => (
               <ThemedLogo key={logo.src} {...logo} eager className="h-9" />
             ))}
-            <span className="flex min-w-0 flex-col leading-tight max-lg:sr-only">
-              <span className="font-display truncate text-base font-semibold">{brand.name}</span>
+            <span className="flex min-w-0 flex-col leading-tight">
+              <span className="font-display truncate text-xl font-bold tracking-wide">
+                {brand.name}
+              </span>
               {brand.subtitle ? (
                 <span className="text-muted-foreground truncate text-sm">{brand.subtitle}</span>
               ) : null}

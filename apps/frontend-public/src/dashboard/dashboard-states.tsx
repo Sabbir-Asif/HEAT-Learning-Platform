@@ -36,7 +36,7 @@ export function DashboardEmpty() {
         title="No courses yet"
         description="Courses you enrol in appear here."
         action={
-          <Button variant="outline" nativeButton={false} render={<Link href="/courses" />}>
+          <Button variant="outline" nativeButton={false} render={<Link href="/#courses" />}>
             Browse courses
           </Button>
         }

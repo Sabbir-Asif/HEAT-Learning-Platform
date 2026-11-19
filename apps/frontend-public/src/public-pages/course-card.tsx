@@ -2,7 +2,7 @@ import type { PublicFrontPageResponse } from "@heat/contracts";
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@heat/ui";
 import Link from "next/link";
 import { CatalogImage } from "./catalog-image";
-import { EnrollButton } from "./enroll-button";
+import { CourseEnrollAction } from "./course-enroll-action";
 import { courseHref } from "./links";
 
 type FrontPageCourse = PublicFrontPageResponse["courses"][number];
@@ -19,10 +19,10 @@ export function CourseCard({ course }: { course: FrontPageCourse }) {
           <CardDescription>{course.description}</CardDescription>
         )}
       </CardHeader>
-      <CardContent className="flex flex-wrap gap-2">
-        <EnrollButton courseSlug={course.slug} courseTitle={course.title} />
+      <CardContent className="mt-auto flex flex-wrap items-center gap-2">
+        <CourseEnrollAction courseSlug={course.slug} courseTitle={course.title} />
         <Button
-          variant="outline"
+          variant="ghost"
           nativeButton={false}
           render={<Link href={courseHref(course.slug)} />}
         >

@@ -1,10 +1,5 @@
 import { describe, expect, test } from "vitest";
-import {
-  contactLines,
-  courseHref,
-  descriptionParagraphs,
-  enrollHref,
-} from "../../src/public-pages/links";
+import { courseHref, descriptionParagraphs, enrollHref } from "../../src/public-pages/links";
 
 describe("links", () => {
   test("deep-links the enroll page with the course slug", () => {
@@ -20,11 +15,5 @@ describe("links", () => {
     expect(descriptionParagraphs("One\n\n  Two  \n\n\n\nThree")).toEqual(["One", "Two", "Three"]);
     expect(descriptionParagraphs(null)).toEqual([]);
     expect(descriptionParagraphs("  \n\n ")).toEqual([]);
-  });
-});
-
-describe("contactLines", () => {
-  test("splits on newlines and drops blank lines", () => {
-    expect(contactLines(" Room 12 \r\n\nTSC, Dhaka\n")).toEqual(["Room 12", "TSC, Dhaka"]);
   });
 });

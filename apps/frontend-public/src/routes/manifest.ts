@@ -8,13 +8,7 @@ export interface RouteEntry {
 
 export const routeManifest: ReadonlyArray<RouteEntry> = [
   { pattern: "/", path: "/", kind: "public" },
-  { pattern: "/about", path: "/about", kind: "public" },
-  { pattern: "/courses", path: "/courses", kind: "public" },
   { pattern: "/courses/[slug]", path: "/courses/sample-course", kind: "public" },
-  { pattern: "/resources", path: "/resources", kind: "public" },
-  { pattern: "/news", path: "/news", kind: "public" },
-  { pattern: "/news/[slug]", path: "/news/sample-article", kind: "public" },
-  { pattern: "/contact", path: "/contact", kind: "public" },
   { pattern: "/verify", path: "/verify", kind: "public" },
   { pattern: "/verify/[certificateNumber]", path: "/verify/sample-number", kind: "public" },
   { pattern: "/privacy", path: "/privacy", kind: "public" },

@@ -1,56 +1,76 @@
-import { parseRichText } from "@heat/contracts";
-import type { PublicFrontPageResponse, PublicLandingOverviewResponse } from "@heat/contracts";
+import type { PublicFrontPageResponse } from "@heat/contracts";
+import { AboutBanner, EmptyState, FeatureGrid, HeroBanner, PageSection } from "@heat/ui";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  EmptyState,
-  PageHeader,
-  SectionHeading,
-} from "@heat/ui";
-import { RichTextRenderer } from "@heat/ui/content";
-import { ShellContent } from "@heat/ui/shell";
-import { BookOpenIcon } from "lucide-react";
-import { CatalogImage } from "./catalog-image";
+  AwardIcon,
+  BookOpenIcon,
+  ClipboardCheckIcon,
+  GraduationCapIcon,
+  UsersIcon,
+} from "lucide-react";
+import Image from "next/image";
 import { CourseCard } from "./course-card";
-import { EnrollButton } from "./enroll-button";
+import { HeroActions } from "./hero-actions";
 
 interface LandingPageProps {
-  overview: PublicLandingOverviewResponse;
   frontPage: PublicFrontPageResponse;
 }
 
-function Overview({ overview }: { overview: PublicLandingOverviewResponse }) {
-  const parsed = parseRichText(overview.body);
-  return (
-    <section aria-label="Overview" className="grid items-center gap-6 md:grid-cols-2">
-      <div className="flex flex-col gap-4">
-        <PageHeader title={overview.heading} />
-        {parsed.ok ? <RichTextRenderer document={parsed.doc} images={overview.images} /> : null}
-      </div>
-      {overview.image === null ? null : (
-        <CatalogImage image={overview.image} sizes="(min-width: 768px) 50vw, 100vw" priority />
-      )}
-    </section>
-  );
-}
+const features = [
+  {
+    icon: BookOpenIcon,
+    title: "Interactive learning",
+    description: "Engaging modules, case studies and real-life scenarios.",
+  },
+  {
+    icon: ClipboardCheckIcon,
+    title: "Assess your learning",
+    description: "Quizzes, reflections and feedback after every module.",
+  },
+  {
+    icon: AwardIcon,
+    title: "Get a certificate",
+    description: "Receive a completion certificate when you finish a course.",
+  },
+  {
+    icon: UsersIcon,
+    title: "For the university community",
+    description: "Designed for students, teachers and administrators.",
+  },
+];
 
-export function LandingPage({ overview, frontPage }: LandingPageProps) {
+export function LandingPage({ frontPage }: LandingPageProps) {
   return (
-    <ShellContent>
-      <Overview overview={overview} />
-      <section aria-labelledby="courses-heading" className="flex flex-col gap-4">
-        <SectionHeading id="courses-heading">Courses</SectionHeading>
+    <>
+      <HeroBanner
+        badge="HEAT Project (PIN 13019)"
+        title="Preventing gender-based violence in university campuses"
+        description="An interactive training for students, teachers and university administrators, from the Women Safety Awareness Program at the University of Dhaka."
+        actions={<HeroActions />}
+        image={
+          <Image
+            src="/hero/campus-gathering.jpg"
+            alt="Four university students talking together in front of a campus building"
+            fill
+            priority
+            unoptimized
+            sizes="100vw"
+          />
+        }
+      />
+      <FeatureGrid aria-label="What you get" tiles={features} />
+      <PageSection
+        id="courses"
+        title="Courses"
+        description="Enroll in a course to start learning, or pick up where you left off."
+      >
         {frontPage.courses.length === 0 ? (
           <EmptyState
-            icon={BookOpenIcon}
+            icon={GraduationCapIcon}
             title="No courses yet"
             description="Courses will appear here when they are published."
           />
         ) : (
-          <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {frontPage.courses.map((course) => (
               <li key={course.id}>
                 <CourseCard course={course} />
@@ -58,27 +78,26 @@ export function LandingPage({ overview, frontPage }: LandingPageProps) {
             ))}
           </ul>
         )}
-      </section>
-      {frontPage.modules.length === 0 ? null : (
-        <section aria-labelledby="modules-heading" className="flex flex-col gap-4">
-          <SectionHeading id="modules-heading">Modules</SectionHeading>
-          <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {frontPage.modules.map((module) => (
-              <li key={module.id}>
-                <Card size="sm" className="h-full">
-                  <CardHeader>
-                    <CardTitle>{module.title}</CardTitle>
-                    <CardDescription>Part of {module.courseTitle}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <EnrollButton courseSlug={module.courseSlug} courseTitle={module.courseTitle} />
-                  </CardContent>
-                </Card>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-    </ShellContent>
+      </PageSection>
+      <AboutBanner
+        id="about"
+        title="About the Project"
+        image={
+          <Image
+            src="/hero/campus-illustration.jpg"
+            alt="Illustration of a University of Dhaka campus building between trees"
+            fill
+            unoptimized
+            sizes="(min-width: 768px) 50vw, 100vw"
+          />
+        }
+      >
+        <p>
+          A HEAT sub-project (PIN 13019) implemented by the Department of Women and Gender Studies,
+          University of Dhaka, with the aim of developing a holistic approach to prevent
+          gender-based violence in university campuses.
+        </p>
+      </AboutBanner>
+    </>
   );
 }

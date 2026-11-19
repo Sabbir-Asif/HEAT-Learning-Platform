@@ -105,7 +105,7 @@ describe("PublicFooter", () => {
   test("renders columns, partners, legal links and a mailto link as a plain anchor", () => {
     render(
       <PublicFooter
-        brand={{ name: "HEAT", description: "About", logos: [fixtureLogo] }}
+        brand={{ name: "HEAT", description: "About" }}
         columns={[
           {
             title: "Contact",
@@ -125,9 +125,7 @@ describe("PublicFooter", () => {
     expect(
       within(screen.getByRole("navigation", { name: "Legal" })).getAllByRole("link"),
     ).toHaveLength(1);
-    expect(screen.getByRole("region", { name: "Partners" }).querySelectorAll("img")).toHaveLength(
-      3,
-    );
+    expect(screen.getByRole("region", { name: "Partners" }).querySelectorAll("li")).toHaveLength(3);
   });
 });
 

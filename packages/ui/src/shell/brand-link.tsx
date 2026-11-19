@@ -6,7 +6,7 @@ import type { LogoSource, ShellLink } from "./types";
 interface BrandLinkProps {
   name: string;
   href: string;
-  logo: LogoSource;
+  logo?: LogoSource;
   link?: ShellLink;
   className?: string;
 }
@@ -20,8 +20,8 @@ function BrandLink({ name, href, logo, link, className }: BrandLinkProps) {
     ),
     children: (
       <>
-        <ThemedLogo {...logo} eager className="h-9" />
-        <span className="font-display truncate text-base font-semibold">{name}</span>
+        {logo ? <ThemedLogo {...logo} eager className="h-9" /> : null}
+        <span className="font-display truncate text-xl font-bold tracking-wide">{name}</span>
       </>
     ),
   });

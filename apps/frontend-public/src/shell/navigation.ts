@@ -6,26 +6,19 @@ import {
   InfoIcon,
   LayersIcon,
   LayoutDashboardIcon,
-  LibraryIcon,
-  MailIcon,
-  NewspaperIcon,
   UserIcon,
 } from "lucide-react";
 
 export const publicNavigation: NavItem[] = [
   { href: "/", label: "Home", icon: HomeIcon },
-  { href: "/about", label: "About", icon: InfoIcon },
-  { href: "/courses", label: "Training Modules", icon: LayersIcon },
-  { href: "/resources", label: "Resources", icon: LibraryIcon },
-  { href: "/news", label: "News", icon: NewspaperIcon },
-  { href: "/contact", label: "Contact", icon: MailIcon },
+  { href: "/#about", label: "About", icon: InfoIcon },
+  { href: "/#courses", label: "Courses", icon: LayersIcon },
 ];
 
 export const learnerNavigation: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboardIcon },
   { href: "/learn", label: "My Learning", icon: BookOpenIcon },
   { href: "/certificates", label: "Certificates", icon: AwardIcon },
-  { href: "/resources", label: "Resources", icon: LibraryIcon },
   { href: "/profile", label: "Profile", icon: UserIcon },
 ];
 
@@ -33,18 +26,13 @@ export const footerColumns: FooterColumn[] = [
   {
     title: "Learn",
     links: [
-      { href: "/courses", label: "Training modules" },
-      { href: "/resources", label: "Resources" },
-      { href: "/news", label: "News" },
+      { href: "/#courses", label: "Courses" },
       { href: "/verify", label: "Verify a certificate" },
     ],
   },
   {
     title: "About",
-    links: [
-      { href: "/about", label: "About the course" },
-      { href: "/contact", label: "Contact" },
-    ],
+    links: [{ href: "/#about", label: "About the project" }],
   },
   {
     title: "Contact",

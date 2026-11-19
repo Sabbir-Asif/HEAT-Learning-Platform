@@ -17,11 +17,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useUnreadCount } from "../notifications/use-unread-count";
-import { heatLogo } from "./brand";
+import { siteShortName } from "./brand";
 import { learnerNavigation } from "./navigation";
 
 const groups = [{ label: "Learn", items: learnerNavigation }];
-const brandName = "Women Safety Awareness Program";
 
 export function LearnerShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -30,7 +29,7 @@ export function LearnerShell({ children }: { children: ReactNode }) {
     <SidebarProvider>
       <SkipLink />
       <ShellSidebar
-        brand={{ name: brandName, href: "/dashboard", logo: heatLogo }}
+        brand={{ name: siteShortName, href: "/dashboard" }}
         groups={groups}
         pathname={pathname}
         navLabel="Learner"
@@ -39,13 +38,7 @@ export function LearnerShell({ children }: { children: ReactNode }) {
       />
       <div className="flex min-w-0 flex-1 flex-col">
         <ShellHeader>
-          <BrandLink
-            name={brandName}
-            href="/dashboard"
-            logo={heatLogo}
-            link={Link}
-            className="md:hidden"
-          />
+          <BrandLink name={siteShortName} href="/dashboard" link={Link} className="md:hidden" />
           <div className="ml-auto flex items-center gap-1">
             <NotificationsLink href="/notifications" count={unreadCount} link={Link} />
             <ThemeSwitch />
