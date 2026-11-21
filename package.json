@@ -41,7 +41,7 @@
     "@heat/config": "workspace:*",
     "eslint": "catalog:",
     "prettier": "catalog:",
-    "turbo": "^2.11.10"
+    "turbo": "^2.11.11"
   },
   "prettier": "@heat/config/prettier"
 }
